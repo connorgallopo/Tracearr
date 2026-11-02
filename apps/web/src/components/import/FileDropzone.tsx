@@ -101,10 +101,8 @@ export function FileDropzone({
   }, [onFileSelect]);
 
   const handleClick = useCallback(() => {
-    if (!disabled) {
-      fileInputRef.current?.click();
-    }
-  }, [disabled]);
+    fileInputRef.current?.click();
+  }, []);
 
   return (
     <div className="space-y-2">
@@ -118,13 +116,15 @@ export function FileDropzone({
       />
 
       {!selectedFile ? (
-        <div
+        <button
+          type="button"
           onClick={handleClick}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
+          disabled={disabled}
           className={cn(
-            'flex cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-8 transition-colors',
+            'focus-visible:border-ring focus-visible:ring-ring/50 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-8 transition-colors outline-none focus-visible:ring-[3px]',
             isDragging && 'border-primary bg-primary/5',
             !isDragging &&
               'border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-muted/50',
@@ -132,20 +132,20 @@ export function FileDropzone({
             error && 'border-destructive'
           )}
         >
-          <div className={cn('rounded-full p-3', isDragging ? 'bg-primary/10' : 'bg-muted')}>
+          <span className={cn('rounded-full p-3', isDragging ? 'bg-primary/10' : 'bg-muted')}>
             <Upload
               className={cn('h-6 w-6', isDragging ? 'text-primary' : 'text-muted-foreground')}
             />
-          </div>
-          <div className="text-center">
-            <p className="font-medium">
+          </span>
+          <span className="text-center">
+            <span className="block font-medium">
               {isDragging ? t('import.dropzone.dropHere') : t('import.dropzone.dragOrClick')}
-            </p>
-            <p className="text-muted-foreground mt-1 text-sm">
+            </span>
+            <span className="text-muted-foreground mt-1 block text-sm">
               {t('import.dropzone.limit', { accept, size: formatFileSize(maxSize) })}
-            </p>
-          </div>
-        </div>
+            </span>
+          </span>
+        </button>
       ) : (
         <div className="bg-muted/30 flex items-center gap-3 rounded-lg border p-3">
           <div className="bg-primary/10 rounded-lg p-2">
