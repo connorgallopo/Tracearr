@@ -90,11 +90,6 @@
         "availableThisWeek_other": "{{count}} became available this week",
         "requestedAgo": "Requested {{age}} ago",
         "seeAll": "See all"
-      },
-      "link": {
-        "title": "Your own account isn't linked yet",
-        "description": "Plays on your Jellyfin or Emby account are recorded under a separate person until you link it from that server's row in Settings.",
-        "action": "Open server settings"
       }
     },
     "resources": {
@@ -553,8 +548,14 @@
         },
         "columns": {
           "hoursPerGb": "Hours/GB",
-          "lastWatched": "Last watched"
-        }
+          "value": "Value"
+        },
+        "category": {
+          "low": "Low Value",
+          "moderate": "Moderate",
+          "high": "High Value"
+        },
+        "deletionSuggested": "(deletion suggested)"
       },
       "matchBadge": {
         "exact": "Exact",
@@ -572,7 +573,7 @@
       "peakHour": "Peak Hour",
       "viewingHours": "Viewing Hours",
       "peak": "Peak:",
-      "viewingTrend": "Viewing trend",
+      "monthlyTrends": "Monthly Trends",
       "busiest": "Busiest:",
       "quietest": "Quietest:",
       "bingeHighlights": "Binge Highlights",
@@ -594,6 +595,12 @@
         "empty": {
           "title": "No binge patterns detected",
           "description": "Watch multiple episodes in a row to see binge patterns."
+        },
+        "tiers": {
+          "highlyAddictive": "Highly Addictive",
+          "addictive": "Addictive",
+          "bingeable": "Bingeable",
+          "casual": "Casual Watch"
         }
       },
       "percentWatchedValue": "{{pct}}% watched",
@@ -693,9 +700,11 @@
       },
       "monthly": {
         "watchCount": "Watch Count",
+        "uniqueItems_one": "Unique Items: {{count}}",
+        "uniqueItems_other": "Unique Items: {{count}}",
         "empty": {
-          "title": "No viewing data",
-          "description": "Viewing trends will appear here once data is available"
+          "title": "No monthly data",
+          "description": "Monthly watch trends will appear here once data is available"
         }
       },
       "watchesValue_one": "Watches: {{count}}",
@@ -2193,7 +2202,6 @@
         "reset": "Connection reset",
         "tls": "TLS error",
         "http": "HTTP {{status}}",
-        "relay": "Plex relay",
         "unknown": "Connection failed"
       },
       "connectionsReachable": "{{reachable}} of {{total}} connections reachable",
