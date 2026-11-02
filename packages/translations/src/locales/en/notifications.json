@@ -161,7 +161,9 @@
       "newsletterRetryQueued_other": "Retrying {{count}} recipients",
       "brandingSaved": "Email branding saved",
       "suppressionAdded": "Address added to the suppression list",
-      "suppressionRemoved": "Address removed from the suppression list"
+      "suppressionRemoved": "Address removed from the suppression list",
+      "ownerAccountLinked": "Account linked",
+      "ownerAccountUnlinked": "Account unlinked"
     },
     "error": {
       "serverAddFailed": "Failed to add server",
@@ -169,7 +171,7 @@
       "serverSyncFailed": "Failed to sync server",
       "serverHistoricalFailed": "Failed to change the server's status",
       "settingsUpdateFailed": "Failed to update settings",
-      "copyFailed": "Could not copy to clipboard",
+      "copyManual": "Press Ctrl+C or ⌘C to copy",
       "acknowledgeFailed": "Failed to acknowledge violation",
       "dismissFailed": "Failed to dismiss violation",
       "authFailed": "Authentication failed",
@@ -196,8 +198,6 @@
       "jobAlreadyRunning": "Job already running",
       "jobStartFailed": "Failed to start job",
       "jobLoadFailed": "Failed to load maintenance jobs",
-      "invalidUrl": "Invalid URL",
-      "plexDirectUrl": "plex.direct URLs are relay addresses that cannot be used here. Please use a direct IP address or hostname instead.",
       "userMergeFailed": "Failed to merge users",
       "serverUserSplitFailed": "Failed to split account",
       "mergeSuggestionDismissFailed": "Could not dismiss the suggestion",
@@ -221,7 +221,9 @@
       "newsletterSnapshotFailed": "Could not load the snapshot: {{error}}",
       "brandingSaveFailed": "Could not save the email branding: {{error}}",
       "suppressionAddFailed": "Could not add the address: {{error}}",
-      "suppressionRemoveFailed": "Could not remove the address: {{error}}"
+      "suppressionRemoveFailed": "Could not remove the address: {{error}}",
+      "ownerAccountLinkFailed": "Failed to link account",
+      "ownerAccountUnlinkFailed": "Failed to unlink account"
     },
     "warning": {
       "jobFailed": {
