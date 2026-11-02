@@ -220,6 +220,8 @@
     "session_one": "{{count}} sesiune",
     "session_few": "",
     "session_other": "{{count}} sesiuni",
+    "download_one": "",
+    "download_few": "",
     "download_other": "",
     "stream_one": "{{count}} stream",
     "stream_few": "",
