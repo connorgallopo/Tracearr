@@ -610,7 +610,7 @@
       "quietest": "Liniște:",
       "bingeHighlights": "Repere maraton",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "Sesiuni maraton",
+      "consecutivePlays": "",
       "noData": "Nu există date de vizionare",
       "noDataDesc": "Statisticile de vizionare vor apărea aici după ce conținutul a fost redat. Reveniți după ceva activitate de vizionare.",
       "failedToLoad": "Încărcarea datelor analitice a eșuat",
@@ -621,7 +621,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {
