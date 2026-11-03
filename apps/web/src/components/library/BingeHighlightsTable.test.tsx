@@ -16,9 +16,8 @@ const show: BingeShow = {
   totalEpisodeWatches: 9,
   consecutiveEpisodes: 6,
   consecutivePct: 66.6,
-  avgGapMinutes: 4,
-  bingeScore: 72,
   maxEpisodesInOneDay: 5,
+  people: 2,
   serverIds: ['srv-1'],
 };
 
@@ -29,7 +28,7 @@ describe('BingeHighlightsTable', () => {
       'library.watch.binge.columns.show',
       'common:media.episode_plural',
       'library.watch.binge.columns.consecutive',
-      'library.watch.binge.columns.bingeScore',
+      'library.watch.binge.columns.people',
       'library.watch.binge.columns.maxPerDay',
     ]) {
       expect(screen.getByRole('columnheader', { name: key })).toBeInTheDocument();
@@ -49,21 +48,14 @@ describe('BingeHighlightsTable', () => {
     expect(screen.getByText('library.watch.binge.empty.description')).toBeInTheDocument();
   });
 
-  it('shows the binge score as a number with no tier label', () => {
+  it('shows the people count after the consecutive plays', () => {
     render(<BingeHighlightsTable data={[show]} />);
-    expect(screen.getByText('72')).toBeInTheDocument();
-    expect(screen.queryByText(/Highly Addictive|Bingeable|tiers/)).not.toBeInTheDocument();
+    const cells = screen.getAllByRole('cell').map((cell) => cell.textContent);
+    expect(cells.slice(1, 4)).toEqual(['9', '6(67%)', '2']);
   });
 
   it('keeps two shows with the same title as separate rows', () => {
-    render(
-      <BingeHighlightsTable
-        data={[
-          { ...show, bingeScore: 72 },
-          { ...show, showMediaId: 'show-2', bingeScore: 41 },
-        ]}
-      />
-    );
+    render(<BingeHighlightsTable data={[show, { ...show, showMediaId: 'show-2' }]} />);
     expect(screen.getAllByText('Severance')).toHaveLength(2);
   });
 });

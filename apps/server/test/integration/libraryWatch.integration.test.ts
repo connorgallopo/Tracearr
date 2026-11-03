@@ -480,7 +480,6 @@ describe('library watch patterns', () => {
       '/library/patterns?timezone=UTC&startDate=2026-03-10T00:00:00.000Z&endDate=2026-03-13T00:00:00.000Z'
     );
 
-    expect(body.summary.totalWatchSessions).toBe(1);
     expect(body.peakTimes.hourlyDistribution).toEqual([
       expect.objectContaining({ hour: 23, watchCount: 1 }),
     ]);
@@ -516,7 +515,6 @@ describe('library watch patterns', () => {
       expect.objectContaining({ hour: 12, watchCount: 1, pctOfTotal: 100 }),
     ]);
     expect(body.trend.points.reduce((sum, p) => sum + p.watchCount, 0)).toBe(1);
-    expect(body.summary.totalWatchSessions).toBe(2);
   });
 
   it('computes binge numbers from the range only', async () => {
@@ -544,11 +542,10 @@ describe('library watch patterns', () => {
       serverIds: [server.id],
       totalEpisodeWatches: 4,
       consecutiveEpisodes: 3,
-      consecutivePct: 100,
-      avgGapMinutes: 5,
+      consecutivePct: 75,
       maxEpisodesInOneDay: 4,
+      people: 1,
     });
-    expect(ranged.bingeShows[0]?.bingeScore).toBe(15 + 30 + 24);
     expect(allTime.bingeShows.map((b) => [b.showTitle, b.totalEpisodeWatches])).toEqual([
       ['Marrow Creek', 9],
       ['Nettle Hill', 5],
@@ -578,5 +575,126 @@ describe('library watch patterns', () => {
       ['Northern Line', 4],
     ]);
     expect(body.bingeShows.map((b) => b.showMediaId).sort()).toEqual(showIds.sort());
+  });
+
+  /** E1 paused and resumed after 5 minutes, then E2 and E3 each 10 minutes after the last stop. */
+  async function seedPausedBinge() {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await account(server.id);
+    const showId = await addShow(server.id, 'Copper Sound', 10_100);
+    const e1 = await addEpisode(server.id, showId, 10_101);
+    const e2 = await addEpisode(server.id, showId, 10_102);
+    const e3 = await addEpisode(server.id, showId, 10_103);
+    const common = { serverId: server.id, serverUserId: user, showMediaId: showId };
+    const at = (minutes: number) => daysAgo(2, minutes * MIN_MS);
+    const segment = { ...common, mediaId: e1, ratingKey: 'rk-e1', durationMs: 20 * MIN_MS };
+    const first = await play({ ...segment, startedAt: at(0) });
+    await play({ ...segment, startedAt: at(25), referenceId: first });
+    for (const [mediaId, start] of [
+      [e2, 55],
+      [e3, 90],
+    ] as const) {
+      await play({
+        ...common,
+        mediaId,
+        ratingKey: `rk-${mediaId}`,
+        startedAt: at(start),
+        durationMs: 25 * MIN_MS,
+      });
+    }
+  }
+
+  it('counts a pause and resume as one play, not a consecutive episode', async () => {
+    await seedPausedBinge();
+
+    const body = await get<PatternsResponse>('/library/patterns?timezone=UTC&bingeThreshold=2');
+
+    expect(body.bingeShows).toHaveLength(1);
+    expect(body.bingeShows[0]).toMatchObject({
+      showTitle: 'Copper Sound',
+      totalEpisodeWatches: 3,
+      consecutiveEpisodes: 2,
+      people: 1,
+    });
+  });
+
+  it('summary reports the share of episode plays that were consecutive', async () => {
+    await seedPausedBinge();
+
+    const body = await get<PatternsResponse>('/library/patterns?timezone=UTC&bingeThreshold=2');
+
+    expect(body.summary.consecutivePlaysPct).toBe(Math.round((1000 * 2) / 3) / 10);
+  });
+
+  it('counts one person once across two servers and chains their plays', async () => {
+    const server1 = await createTestServer({ type: 'plex' });
+    const server2 = await createTestServer({ type: 'jellyfin' });
+    const person = await createTestUser({ role: 'member' });
+    const account1 = (await createTestServerUser({ userId: person.id, serverId: server1.id })).id;
+    const account2 = (await createTestServerUser({ userId: person.id, serverId: server2.id })).id;
+    const showId = await addShow(server1.id, 'Saltmarsh', 10_200);
+    expect(await addShow(server2.id, 'Saltmarsh', 10_200)).toBe(showId);
+    // E1 on server 1, E2 on server 2 ten minutes after, E3 on server 1 ten minutes after that
+    for (const [n, serverId, serverUserId, minutes] of [
+      [1, server1.id, account1, 0],
+      [2, server2.id, account2, 35],
+      [3, server1.id, account1, 70],
+    ] as const) {
+      const mediaId = await addEpisode(server1.id, showId, 10_200 + n);
+      expect(await addEpisode(server2.id, showId, 10_200 + n)).toBe(mediaId);
+      await play({
+        serverId,
+        serverUserId,
+        mediaId,
+        showMediaId: showId,
+        ratingKey: `rk-${mediaId}`,
+        startedAt: daysAgo(2, minutes * MIN_MS),
+        durationMs: 25 * MIN_MS,
+      });
+    }
+
+    const body = await get<PatternsResponse>('/library/patterns?timezone=UTC&bingeThreshold=2');
+
+    expect(body.bingeShows).toHaveLength(1);
+    expect(body.bingeShows[0]).toMatchObject({
+      totalEpisodeWatches: 3,
+      consecutiveEpisodes: 2,
+      people: 1,
+    });
+    expect(body.bingeShows[0]?.serverIds.sort()).toEqual([server1.id, server2.id].sort());
+  });
+
+  it('ranks binge shows by consecutive plays, then max per day', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await account(server.id);
+    const common = { serverId: server.id, serverUserId: user };
+    // [title, tvdb id, episodes per day]: 4 consecutive at 3 a day, 3 at 4 a day, 3 at 3 a day
+    const shows = [
+      ['Fallow Reach', 10_300, [3, 3]],
+      ['Gannet Point', 10_400, [4]],
+      ['Heron Bight', 10_500, [3, 2]],
+    ] as const;
+    for (const [title, tvdbId, days] of shows) {
+      const showId = await addShow(server.id, title, tvdbId);
+      let n = 0;
+      for (const [day, count] of days.entries()) {
+        const episodes: string[] = [];
+        for (let i = 0; i < count; i++) {
+          n += 1;
+          episodes.push(await addEpisode(server.id, showId, tvdbId + n));
+        }
+        await binge({ ...common, showId, episodes, startedAt: daysAgo(day + 2) });
+      }
+    }
+
+    const body = await get<PatternsResponse>('/library/patterns?timezone=UTC');
+
+    expect(
+      body.bingeShows.map((b) => [b.showTitle, b.consecutiveEpisodes, b.maxEpisodesInOneDay])
+    ).toEqual([
+      ['Fallow Reach', 4, 3],
+      ['Gannet Point', 3, 4],
+      ['Heron Bight', 3, 3],
+    ]);
   });
 });

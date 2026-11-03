@@ -544,7 +544,6 @@
       "quietest": "가장 한산함:",
       "bingeHighlights": "몰아보기 하이라이트",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "몰아보기 세션",
       "noData": "아직 시청 데이터가 없습니다",
       "noDataDesc": "콘텐츠가 재생되면 시청 분석이 여기에 표시됩니다. 시청 활동이 생긴 뒤 다시 확인하세요.",
       "failedToLoad": "시청 분석을 불러오지 못했습니다",
@@ -555,7 +554,6 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
           "maxPerDay": ""
         },
         "empty": {

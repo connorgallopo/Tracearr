@@ -5,13 +5,12 @@ import type { Server } from '@tracearr/shared';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { TopMoviesTable } from './TopMoviesTable';
-import { TopShowsTable } from './TopShowsTable';
+import { TopShowsTable, type ShowSortBy } from './TopShowsTable';
 import { useTopMovies, useTopShows } from '@/hooks/queries';
 import { toApiLibraryParams } from '@/hooks/useTimeRange';
 import type { TimeRangeValue } from '@/components/ui/time-range-picker';
 
 type MovieSortBy = 'plays' | 'watch_hours' | 'viewers' | 'completion_rate';
-type ShowSortBy = 'plays' | 'watch_hours' | 'viewers' | 'completion_rate' | 'binge_score';
 type SortOrder = 'asc' | 'desc';
 
 interface MostWatchedSectionProps {

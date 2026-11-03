@@ -14,7 +14,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 import sensible from '@fastify/sensible';
 import { sql } from 'drizzle-orm';
-import type { AuthUser } from '@tracearr/shared';
+import type { AuthUser, TopShowsResponse } from '@tracearr/shared';
 import {
   createTestServer,
   createTestUser,
@@ -531,6 +531,104 @@ describe('library analytics count resume chains once', () => {
     expect(singleIdentity.serverIds).toEqual([server1.id]);
     expect(singleIdentity.totalEpisodeViews).toBe(2);
     expect(singleIdentity.totalWatchHours).toBeCloseTo(1.0, 5);
+  });
+
+  it('top shows reports episodes per viewer over people with a counted play', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const personA = await createTestServerUser({
+      serverId: server.id,
+      userId: (await createTestUser()).id,
+    });
+    const personB = await createTestServerUser({
+      serverId: server.id,
+      userId: (await createTestUser()).id,
+    });
+    const show = (title: string, tvdbId: number) =>
+      resolveMediaForItem({
+        mediaType: 'show',
+        tvdbId,
+        title,
+        serverId: server.id,
+        ratingKey: `show-${tvdbId}`,
+      });
+    const episode = (showMediaId: string, tvdbId: number) =>
+      resolveMediaForItem({
+        mediaType: 'episode',
+        tvdbId,
+        title: `Episode ${tvdbId}`,
+        serverId: server.id,
+        ratingKey: `ep-${tvdbId}`,
+        showMediaId,
+      });
+
+    // Deep: A watches four distinct episodes, B samples one for 20 seconds
+    const deep = await show('Tidewater', 830_000);
+    for (let n = 1; n <= 4; n++) {
+      await seedEpisode({
+        serverId: server.id,
+        serverUserId: personA.id,
+        ratingKey: `ep-${830_000 + n}`,
+        showTitle: 'Tidewater',
+        showMediaId: deep,
+        mediaId: await episode(deep, 830_000 + n),
+        episodeNumber: n,
+      });
+    }
+    const sampledAt = new Date(Date.now() - 3 * 86_400_000);
+    await createTestSession({
+      serverId: server.id,
+      serverUserId: personB.id,
+      ratingKey: 'ep-830001',
+      mediaType: 'episode',
+      showMediaId: deep,
+      mediaId: await episode(deep, 830_001),
+      state: 'stopped',
+      startedAt: sampledAt,
+      stoppedAt: new Date(sampledAt.getTime() + 20_000),
+      durationMs: 20_000,
+      totalDurationMs: THIRTY_MIN,
+      progressMs: 20_000,
+    });
+
+    // Repeated: A replays one episode on five days, more plays than Tidewater
+    const repeated = await show('Driftwood', 840_000);
+    const replayed = await episode(repeated, 840_001);
+    for (let day = 1; day <= 5; day++) {
+      await seedEpisode({
+        serverId: server.id,
+        serverUserId: personA.id,
+        ratingKey: 'ep-840001',
+        showTitle: 'Driftwood',
+        showMediaId: repeated,
+        mediaId: replayed,
+        daysAgo: day,
+      });
+    }
+
+    await db.execute(
+      sql`CALL refresh_continuous_aggregate('user_media_plays_daily'::regclass, NULL, NULL)`
+    );
+    const owner = await buildApp(ownerFor([server.id]));
+    app = owner;
+    const rows = async (query: string) => {
+      const res = await owner.inject({ method: 'GET', url: `/library/top-shows?${query}` });
+      expect(res.statusCode).toBe(200);
+      return (JSON.parse(res.body) as TopShowsResponse).items.map((i) => [
+        i.showTitle,
+        i.totalEpisodeViews,
+        i.uniqueViewers,
+        i.episodesPerViewer,
+      ]);
+    };
+
+    expect(await rows('sortBy=plays')).toEqual([
+      ['Driftwood', 5, 1, 1],
+      ['Tidewater', 4, 1, 4],
+    ]);
+    expect(await rows('sortBy=episodes_per_viewer')).toEqual([
+      ['Tidewater', 4, 1, 4],
+      ['Driftwood', 5, 1, 1],
+    ]);
   });
 });
 

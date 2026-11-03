@@ -577,7 +577,6 @@
       "quietest": "Kysely:",
       "bingeHighlights": "Ahmimiskatselun kohokohdat",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "Ahmimiskatselukerrat",
       "noData": "Ei vielä katselutietoja",
       "noDataDesc": "Katseluanalytiikka näkyy täällä, kun sisältöä on toistettu. Palaa katsomaan, kun katselua on kertynyt.",
       "failedToLoad": "Katseluanalytiikan lataaminen epäonnistui",
@@ -588,7 +587,6 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
           "maxPerDay": ""
         },
         "empty": {

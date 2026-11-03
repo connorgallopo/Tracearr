@@ -2,7 +2,7 @@
  * Library Top Content Routes
  *
  * GET /top-movies - Top movies by plays, watch time, viewers or completion
- * GET /top-shows - Top shows by plays, watch time, viewers, completion or binge score
+ * GET /top-shows - Top shows by plays, watch time, viewers, completion or episodes per viewer
  *
  * Both read user_media_plays_daily by media identity within the page's window, the same play
  * set as ROI, the watch summary and a title page: a play counts once per resume chain, an
@@ -58,7 +58,7 @@ interface RawTitleRow extends RawSummaryRow {
   total_watch_hours: string;
   unique_viewers: string;
   completion_rate: string | null;
-  binge_score: string | null;
+  episodes_per_viewer: string | null;
 }
 
 const SORT_COLUMNS: Record<SortBy, string> = {
@@ -66,7 +66,7 @@ const SORT_COLUMNS: Record<SortBy, string> = {
   watch_hours: 'watched_ms',
   viewers: 'unique_viewers',
   completion_rate: 'completion_rate',
-  binge_score: 'binge_score',
+  episodes_per_viewer: 'episodes_per_viewer',
 };
 
 // A chain counts as completed the way the watch summary counts it. The alias joins hash only
@@ -100,7 +100,7 @@ function playsCte(type: 'movie' | 'show', input: TopContentQuery): SQL {
 /**
  * One row per title ident with at least one counted play in the window, plus the summary over
  * all of them. Movies and shows share the shape: a movie is a show with one episode, so the
- * per-viewer episode rollup gives the movie completion rate and the show binge score alike.
+ * per-viewer episode rollup gives the movie completion rate and the show episodes per viewer alike.
  */
 function topContentCtes(type: 'movie' | 'show', input: TopContentQuery): SQL {
   return sql`
@@ -109,16 +109,14 @@ function topContentCtes(type: 'movie' | 'show', input: TopContentQuery): SQL {
       SELECT ident, user_id, episode,
         COUNT(DISTINCT chain_id) FILTER (WHERE counted) AS plays,
         SUM(watched_ms) AS watched_ms,
-        BOOL_OR(completed) FILTER (WHERE counted) AS completed,
-        COUNT(DISTINCT day) FILTER (WHERE counted) AS viewing_days
+        BOOL_OR(completed) FILTER (WHERE counted) AS completed
       FROM plays
       GROUP BY ident, user_id, episode
     ),
     viewer_titles AS (
       SELECT ident, user_id, SUM(plays) AS plays, SUM(watched_ms) AS watched_ms,
         COUNT(*) FILTER (WHERE plays > 0) AS episodes_watched,
-        COUNT(*) FILTER (WHERE completed) AS completed_episodes,
-        SUM(viewing_days) AS viewing_days
+        COUNT(*) FILTER (WHERE completed) AS completed_episodes
       FROM viewer_episodes
       GROUP BY ident, user_id
     ),
@@ -127,11 +125,7 @@ function topContentCtes(type: 'movie' | 'show', input: TopContentQuery): SQL {
         -- countedViewersSql's rule at per-identity grain: a viewer has a counted play
         COUNT(*) FILTER (WHERE plays > 0) AS unique_viewers,
         ROUND(100.0 * SUM(completed_episodes) / NULLIF(SUM(episodes_watched), 0), 1) AS completion_rate,
-        LEAST(100, ROUND(
-          40 * (AVG(episodes_watched) * ROUND(100.0 * SUM(completed_episodes) / NULLIF(SUM(episodes_watched), 0), 1) / 100 / 10) +
-          30 * (SUM(viewing_days)::numeric / NULLIF(COUNT(*) FILTER (WHERE watched_ms > 0), 0) * 2) +
-          30 * (SUM(completed_episodes)::numeric / NULLIF(SUM(episodes_watched), 0))
-        , 0)) AS binge_score
+        ROUND(AVG(episodes_watched) FILTER (WHERE plays > 0), 1) AS episodes_per_viewer
       FROM viewer_titles
       GROUP BY ident
       HAVING SUM(plays) > 0
@@ -165,7 +159,7 @@ export function buildTopContentQuery(type: 'movie' | 'show', input: TopContentQu
       ROUND(t.watched_ms / 3600000.0, 1)::text AS total_watch_hours,
       t.unique_viewers::text AS unique_viewers,
       t.completion_rate::text AS completion_rate,
-      t.binge_score::text AS binge_score,
+      t.episodes_per_viewer::text AS episodes_per_viewer,
       s.*
     FROM (
       SELECT * FROM titles ORDER BY ${orderBy('')} LIMIT ${input.limit} OFFSET ${input.offset}
@@ -253,7 +247,7 @@ function toShows(r: TopContentPage): TopShowsResponse {
       totalWatchHours: toFloat(row.total_watch_hours),
       uniqueViewers: toInt(row.unique_viewers),
       avgCompletionRate: toFloat(row.completion_rate),
-      bingeScore: toFloat(row.binge_score),
+      episodesPerViewer: toFloat(row.episodes_per_viewer),
     })),
     summary: { totalShows: r.total, totalWatchHours: r.totalWatchHours },
     pagination: { page: r.page, pageSize: r.pageSize, total: r.total },

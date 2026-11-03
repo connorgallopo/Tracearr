@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Zap } from 'lucide-react';
-import type { BingeShow } from '@tracearr/shared';
-import type { Server } from '@tracearr/shared';
+import type { BingeShow, Server } from '@tracearr/shared';
 import {
   Table,
   TableBody,
@@ -21,8 +20,8 @@ interface BingeHighlightsTableProps {
 }
 
 /**
- * Table displaying binge-watched shows with scores and episode stats.
- * Shows shows where users watched multiple episodes consecutively.
+ * Table of shows people watched back to back: episode plays, consecutive plays, the people who
+ * binged and the most episodes one person played in a day.
  * In multi-server mode adds a Server column showing all involved servers and applies a
  * per-row left-border accent using the primaryServerId color.
  */
@@ -60,7 +59,7 @@ export function BingeHighlightsTable({
           {isMultiServer && <TableHead>{t('library.watch.binge.columns.servers')}</TableHead>}
           <TableHead>{t('common:media.episode_plural')}</TableHead>
           <TableHead>{t('library.watch.binge.columns.consecutive')}</TableHead>
-          <TableHead>{t('library.watch.binge.columns.bingeScore')}</TableHead>
+          <TableHead>{t('library.watch.binge.columns.people')}</TableHead>
           <TableHead>{t('library.watch.binge.columns.maxPerDay')}</TableHead>
         </TableRow>
       </TableHeader>
@@ -98,7 +97,7 @@ export function BingeHighlightsTable({
                   </span>
                 </div>
               </TableCell>
-              <TableCell className="font-medium">{show.bingeScore.toFixed(0)}</TableCell>
+              <TableCell>{show.people}</TableCell>
               <TableCell className="text-muted-foreground">{show.maxEpisodesInOneDay}</TableCell>
             </TableRow>
           );

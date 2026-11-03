@@ -1397,7 +1397,7 @@ export const topContentQuerySchema = withCustomWindow(
     period: z.enum(['7d', '30d', '90d', '1y', 'all']).default('30d'),
     ...customWindowFields,
     sortBy: z
-      .enum(['plays', 'watch_hours', 'viewers', 'completion_rate', 'binge_score'])
+      .enum(['plays', 'watch_hours', 'viewers', 'completion_rate', 'episodes_per_viewer'])
       .default('plays'),
     sortOrder: z.enum(['asc', 'desc']).default('desc'),
     page: z.coerce.number().int().positive().default(1),

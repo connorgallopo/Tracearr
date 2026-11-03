@@ -9,6 +9,10 @@
     {
       "type": "fix",
       "text": "a few seconds of a title no longer counts as a viewer, and a play the server marked watched always does"
+    },
+    {
+      "type": "improved",
+      "text": "binge highlights rank shows by episodes watched back to back per person; Top shows lists episodes per viewer"
     }
   ]
 }

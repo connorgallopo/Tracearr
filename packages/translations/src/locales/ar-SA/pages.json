@@ -709,7 +709,6 @@
       "quietest": "هادئ:",
       "bingeHighlights": "أبرز جلسات المشاهدة المتواصلة",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "جلسات المشاهدة المتواصلة",
       "noData": "لا توجد بيانات مشاهدة بعد",
       "noDataDesc": "سوف تظهر تحليلات المشاهدة هنا بمجرد تشغيل المحتوى. تحقق مرة أخرى بعد بعض نشاط المشاهدة.",
       "failedToLoad": "فشل تحميل تحليلات المشاهدة",
@@ -720,7 +719,6 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
           "maxPerDay": ""
         },
         "empty": {

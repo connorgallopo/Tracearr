@@ -20,7 +20,8 @@ import {
   type SortOrder,
 } from '@/components/ui/sortable-table-head';
 
-type ShowSortBy = 'plays' | 'watch_hours' | 'viewers' | 'completion_rate' | 'binge_score';
+export type ShowSortBy =
+  'plays' | 'watch_hours' | 'viewers' | 'completion_rate' | 'episodes_per_viewer';
 
 interface TopShowsTableProps {
   data: TopShowsResponse | undefined;
@@ -36,7 +37,7 @@ interface TopShowsTableProps {
 
 /**
  * Table component for displaying top TV shows by engagement metrics.
- * Server-side sortable by episode views, watch hours, viewers, completion rate, and binge score.
+ * Server-side sortable by episode views, watch hours, viewers, completion rate and episodes per viewer.
  * In multi-server mode renders per-title color dots for each server that owns the show.
  */
 export function TopShowsTable({
@@ -115,12 +116,12 @@ export function TopShowsTable({
               {t('common:labels.completion')}
             </SortableTableHead>
             <SortableTableHead
-              field="binge_score"
+              field="episodes_per_viewer"
               sortBy={sortBy}
               sortOrder={sortOrder}
               onSort={handleSort}
             >
-              {t('library.watch.binge.columns.bingeScore')}
+              {t('library.watch.binge.columns.episodesPerViewer')}
             </SortableTableHead>
           </TableRow>
         </TableHeader>
@@ -152,7 +153,7 @@ export function TopShowsTable({
               <TableCell>{item.totalWatchHours.toFixed(1)}</TableCell>
               <TableCell>{item.uniqueViewers}</TableCell>
               <TableCell>{getCompletionBadge(item.avgCompletionRate)}</TableCell>
-              <TableCell className="font-medium">{item.bingeScore.toFixed(0)}</TableCell>
+              <TableCell className="font-medium">{item.episodesPerViewer.toFixed(1)}</TableCell>
             </TableRow>
           ))}
         </TableBody>

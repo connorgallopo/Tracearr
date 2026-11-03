@@ -7,7 +7,8 @@
  * belongs to its media identity, not the library row it was played from, so plays of a
  * re-added or removed title still count. Binge shows are keyed by show identity (a merged
  * alias folds into its winner), so one show on two servers is one row and two shows that
- * share a title stay apart. `primaryServerId` is the server with the most episodes watched.
+ * share a title stay apart, and plays are counted per person across their accounts.
+ * `primaryServerId` is the server with the most of the binge plays.
  */
 
 import type { FastifyPluginAsync } from 'fastify';
@@ -37,10 +38,9 @@ interface RawBingeRow {
   thumb_path: string | null;
   total_episode_watches: string;
   consecutive_episodes: string;
-  consecutive_pct: string | null;
-  avg_gap_minutes: string | null;
-  max_episodes_in_one_day: string | null;
-  binge_score: string;
+  consecutive_pct: string;
+  max_episodes_in_one_day: string;
+  people: string;
   server_ids: string[];
 }
 
@@ -58,9 +58,7 @@ interface RawTrendRow {
 }
 
 interface RawSummaryRow {
-  total_watch_sessions: string;
-  avg_sessions_per_day: string;
-  binge_sessions_pct: string;
+  consecutive_plays_pct: string;
 }
 
 type Window = { startDate: Date | null; endDate: Date; lastDay: Date };
@@ -71,8 +69,8 @@ function trendBucket(window: Window): TrendBucket {
   return days <= 31 ? 'day' : days <= 183 ? 'week' : 'month';
 }
 
-// Counted sessions with a media identity, started within the window, on the selected servers
-// and, when one is given, in a library that holds that title. Sessions are aliased sess.
+// Sessions with a media identity, counted or not, started within the window, on the selected
+// servers and, when one is given, in a library that holds that title. Sessions are aliased sess.
 function sessionScopeSql(
   window: Window,
   serverIds: string[] | undefined,
@@ -88,95 +86,107 @@ function sessionScopeSql(
           AND li.server_id = sess.server_id
       )`
     : sql``;
-  return sql`${countedSessionSql('sess')} AND sess.media_id IS NOT NULL
+  return sql`sess.media_id IS NOT NULL
     ${lower} AND sess.started_at < ${window.endDate}::timestamptz
     ${buildMultiServerFragment(serverIds, 'sess.server_id')}
     ${library}`;
 }
 
-// Gaps only see sessions inside the window, so a binge that began before it starts fresh.
-function buildBingeQuery(scope: SQL, bingeThreshold: number, limit: number): SQL {
+// One row per counted episode play (resume chain) in scope, keyed by person and show identity.
+// A play is consecutive when it is a different episode starting 30 minutes or less after the
+// same person's previous play of the show ended. A play ends when its last segment stops, so a
+// chain reads every segment in scope, counted or not, and is kept when any segment counts.
+// Gaps only see plays inside the window, so a binge that began before it starts fresh.
+function episodePlaysCtes(segments: SQL): SQL {
+  const show = sql`COALESCE(sh.merged_into_id, sess.show_media_id)`;
+  const episode = sql`COALESCE(em.merged_into_id, sess.media_id)`;
   return sql`
-    WITH eps AS (
-      SELECT sess.server_user_id, sess.server_id, sess.media_id, sess.started_at, sess.thumb_path,
-        COALESCE(sh.merged_into_id, sess.show_media_id) AS show_id,
-        EXTRACT(EPOCH FROM (sess.started_at - LAG(sess.stopped_at) OVER (
-          PARTITION BY sess.server_user_id, COALESCE(sh.merged_into_id, sess.show_media_id)
-          ORDER BY sess.started_at
-        ))) / 60 AS gap_minutes
+    chains AS (
+      SELECT su.user_id, ${show} AS show_id, ${episode} AS episode,
+        MIN(sess.started_at) AS started_at,
+        MAX(sess.stopped_at) AS stopped_at,
+        (array_agg(sess.server_id ORDER BY sess.started_at))[1] AS server_id,
+        (array_agg(sess.thumb_path ORDER BY sess.started_at))[1] AS thumb_path
       FROM sessions sess
-      LEFT JOIN media sh ON sh.id = sess.show_media_id
-      WHERE ${scope}
+      JOIN server_users su ON su.id = sess.server_user_id
+      LEFT JOIN media sh ON sh.id = sess.show_media_id AND sh.merged_into_id IS NOT NULL
+      LEFT JOIN media em ON em.id = sess.media_id AND em.merged_into_id IS NOT NULL
+      WHERE ${segments}
         AND sess.media_type = 'episode'
         AND sess.show_media_id IS NOT NULL
         AND sess.stopped_at IS NOT NULL
+      GROUP BY COALESCE(sess.reference_id, sess.id), su.user_id, ${show}, ${episode}
+      HAVING BOOL_OR(${countedSessionSql('sess')})
     ),
-    per_user AS (
-      SELECT server_user_id, show_id,
-        COUNT(*) AS total_episode_watches,
-        COUNT(*) FILTER (WHERE gap_minutes <= 30) AS consecutive_episodes,
-        100.0 * COUNT(*) FILTER (WHERE gap_minutes <= 30) / NULLIF(COUNT(*) - 1, 0) AS consecutive_pct,
-        AVG(gap_minutes) FILTER (WHERE gap_minutes <= 480) AS avg_gap_minutes
-      FROM eps
-      GROUP BY server_user_id, show_id
-      HAVING COUNT(*) >= 2 AND COUNT(*) FILTER (WHERE gap_minutes <= 30) >= ${bingeThreshold}
+    plays AS (
+      SELECT c.*,
+        COALESCE(
+          c.started_at - LAG(c.stopped_at) OVER w <= INTERVAL '30 minutes'
+            AND c.episode <> LAG(c.episode) OVER w,
+          false
+        ) AS consecutive
+      FROM chains c
+      WINDOW w AS (PARTITION BY c.user_id, c.show_id ORDER BY c.started_at)
+    )`;
+}
+
+function buildBingeQuery(segments: SQL, bingeThreshold: number, limit: number): SQL {
+  return sql`
+    WITH ${episodePlaysCtes(segments)},
+    person_days AS (
+      SELECT user_id, show_id, COUNT(*) AS plays,
+        COUNT(*) FILTER (WHERE consecutive) AS consecutive,
+        COUNT(DISTINCT episode) AS episodes
+      FROM plays
+      GROUP BY user_id, show_id, (started_at AT TIME ZONE 'UTC')::date
     ),
-    per_user_day AS (
-      SELECT server_user_id, show_id, MAX(episodes) AS max_episodes_in_one_day
-      FROM (
-        SELECT eps.server_user_id, eps.show_id,
-          COUNT(DISTINCT COALESCE(em.merged_into_id, eps.media_id)) AS episodes
-        FROM eps
-        LEFT JOIN media em ON em.id = eps.media_id
-        GROUP BY eps.server_user_id, eps.show_id, date_trunc('day', eps.started_at AT TIME ZONE 'UTC')
-      ) d
-      GROUP BY server_user_id, show_id
+    per_person AS (
+      SELECT user_id, show_id, SUM(plays) AS plays, SUM(consecutive) AS consecutive,
+        MAX(episodes) AS max_per_day
+      FROM person_days
+      GROUP BY user_id, show_id
+      HAVING SUM(consecutive) >= ${bingeThreshold}
     ),
-    binge_eps AS (
-      SELECT e.* FROM eps e JOIN per_user u USING (server_user_id, show_id)
+    binge_plays AS (
+      SELECT p.* FROM plays p JOIN per_person USING (user_id, show_id)
     ),
     server_counts AS (
-      SELECT show_id, server_id, COUNT(*) AS episodes FROM binge_eps GROUP BY show_id, server_id
+      SELECT show_id, server_id, COUNT(*) AS plays FROM binge_plays GROUP BY show_id, server_id
     ),
     per_show AS (
-      SELECT u.show_id,
-        SUM(u.total_episode_watches) AS total_episode_watches,
-        SUM(u.consecutive_episodes) AS consecutive_episodes,
-        ROUND(AVG(u.consecutive_pct)::numeric, 1) AS consecutive_pct,
-        ROUND(AVG(u.avg_gap_minutes)::numeric, 1) AS avg_gap_minutes,
-        MAX(d.max_episodes_in_one_day) AS max_episodes_in_one_day
-      FROM per_user u
-      JOIN per_user_day d USING (server_user_id, show_id)
-      GROUP BY u.show_id
-    ),
-    scored AS (
-      SELECT ps.*,
-        ROUND(
-          LEAST(ps.consecutive_episodes * 5, 40) +
-          LEAST(COALESCE(ps.consecutive_pct, 0), 30) +
-          LEAST(COALESCE(ps.max_episodes_in_one_day, 1) * 6, 30)
-        , 1) AS binge_score
-      FROM per_show ps
+      SELECT show_id, SUM(plays) AS plays, SUM(consecutive) AS consecutive,
+        MAX(max_per_day) AS max_per_day, COUNT(*) AS people
+      FROM per_person
+      GROUP BY show_id
     )
     SELECT
       s.show_id::text AS show_media_id,
       shm.title AS show_title,
       (SELECT sc.server_id::text FROM server_counts sc WHERE sc.show_id = s.show_id
-        ORDER BY sc.episodes DESC, sc.server_id LIMIT 1) AS primary_server_id,
-      (SELECT be.thumb_path FROM binge_eps be WHERE be.show_id = s.show_id
-        ORDER BY be.thumb_path IS NULL, be.started_at DESC LIMIT 1) AS thumb_path,
-      s.total_episode_watches::text AS total_episode_watches,
-      s.consecutive_episodes::text AS consecutive_episodes,
-      s.consecutive_pct::text AS consecutive_pct,
-      s.avg_gap_minutes::text AS avg_gap_minutes,
-      COALESCE(s.max_episodes_in_one_day, 1)::text AS max_episodes_in_one_day,
+        ORDER BY sc.plays DESC, sc.server_id LIMIT 1) AS primary_server_id,
+      (SELECT bp.thumb_path FROM binge_plays bp WHERE bp.show_id = s.show_id
+        ORDER BY bp.thumb_path IS NULL, bp.started_at DESC LIMIT 1) AS thumb_path,
+      s.plays::text AS total_episode_watches,
+      s.consecutive::text AS consecutive_episodes,
+      ROUND(100.0 * s.consecutive / s.plays, 1)::text AS consecutive_pct,
+      s.max_per_day::text AS max_episodes_in_one_day,
+      s.people::text AS people,
       (SELECT array_agg(sc.server_id::text ORDER BY sc.server_id::text) FROM server_counts sc
-        WHERE sc.show_id = s.show_id) AS server_ids,
-      s.binge_score::text AS binge_score
-    FROM scored s
+        WHERE sc.show_id = s.show_id) AS server_ids
+    FROM per_show s
     JOIN media shm ON shm.id = s.show_id
-    ORDER BY s.binge_score DESC, shm.title ASC, s.show_id
+    ORDER BY s.consecutive DESC, s.max_per_day DESC, shm.title ASC, s.show_id
     LIMIT ${limit}`;
+}
+
+// Every counted episode play in scope, with no binge threshold.
+function buildConsecutiveShareQuery(segments: SQL): SQL {
+  return sql`
+    WITH ${episodePlaysCtes(segments)}
+    SELECT COALESCE(
+      ROUND(100.0 * COUNT(*) FILTER (WHERE consecutive) / NULLIF(COUNT(*), 0), 1), 0
+    )::text AS consecutive_plays_pct
+    FROM plays`;
 }
 
 // One point per bucket from the window's start (or the first session for all time) to its
@@ -254,7 +264,8 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
       const bucket = trendBucket(window);
 
       const resolvedIds = resolveServerIds(request.user, serverId, rawServerIds);
-      const scope = sessionScopeSql(window, resolvedIds, libraryId);
+      const segments = sessionScopeSql(window, resolvedIds, libraryId);
+      const scope = sql`${countedSessionSql('sess')} AND ${segments}`;
 
       const serverCacheKey = serverCacheSegment(resolvedIds);
       const cacheKey = buildLibraryCacheKey(
@@ -277,16 +288,14 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
       let peakHour = 0;
       let peakDayOfWeek = 0;
       let points: TrendPoint[] = [];
-      let totalWatchSessions = 0;
-      let avgSessionsPerDay = 0;
-      let bingeSessionsPct = 0;
+      let consecutivePlaysPct = 0;
 
       const queries: Promise<void>[] = [];
 
       if (includeBinge) {
         queries.push(
           (async () => {
-            const bingeResult = await db.execute(buildBingeQuery(scope, bingeThreshold, limit));
+            const bingeResult = await db.execute(buildBingeQuery(segments, bingeThreshold, limit));
             bingeShows = (bingeResult.rows as unknown as RawBingeRow[]).map((row) => ({
               showMediaId: row.show_media_id,
               showTitle: row.show_title,
@@ -294,10 +303,9 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
               thumbPath: row.thumb_path,
               totalEpisodeWatches: parseInt(row.total_episode_watches, 10),
               consecutiveEpisodes: parseInt(row.consecutive_episodes, 10),
-              consecutivePct: parseFloat(row.consecutive_pct || '0'),
-              avgGapMinutes: parseFloat(row.avg_gap_minutes || '0'),
-              bingeScore: parseFloat(row.binge_score),
-              maxEpisodesInOneDay: parseInt(row.max_episodes_in_one_day || '1', 10),
+              consecutivePct: parseFloat(row.consecutive_pct),
+              maxEpisodesInOneDay: parseInt(row.max_episodes_in_one_day, 10),
+              people: parseInt(row.people, 10),
               serverIds: row.server_ids,
             }));
           })()
@@ -375,25 +383,9 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
 
       queries.push(
         (async () => {
-          const summaryResult = await db.execute(sql`
-            SELECT
-              COUNT(*)::text AS total_watch_sessions,
-              ROUND(COUNT(*)::numeric / NULLIF(COUNT(DISTINCT DATE(sess.started_at)), 0), 1)::text
-                AS avg_sessions_per_day,
-              ROUND((100.0 * COUNT(*) FILTER (
-                WHERE sess.media_type = 'episode'
-                  AND (sess.stopped_at - sess.started_at) < INTERVAL '30 minutes'
-              ) / NULLIF(COUNT(*), 0))::numeric, 1)::text AS binge_sessions_pct
-            FROM sessions sess
-            WHERE ${scope}
-          `);
-
+          const summaryResult = await db.execute(buildConsecutiveShareQuery(segments));
           const summaryRow = summaryResult.rows[0] as unknown as RawSummaryRow | undefined;
-          if (summaryRow) {
-            totalWatchSessions = parseInt(summaryRow.total_watch_sessions || '0', 10);
-            avgSessionsPerDay = parseFloat(summaryRow.avg_sessions_per_day || '0');
-            bingeSessionsPct = parseFloat(summaryRow.binge_sessions_pct || '0');
-          }
+          consecutivePlaysPct = parseFloat(summaryRow?.consecutive_plays_pct ?? '0');
         })()
       );
 
@@ -407,11 +399,7 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
           peakDayOfWeek,
         },
         trend: { bucket, points, ...busiestAndQuietest(points) },
-        summary: {
-          totalWatchSessions,
-          avgSessionsPerDay,
-          bingeSessionsPct,
-        },
+        summary: { consecutivePlaysPct },
       };
 
       await app.redis.setex(cacheKey, CACHE_TTL.LIBRARY_PATTERNS, JSON.stringify(response));

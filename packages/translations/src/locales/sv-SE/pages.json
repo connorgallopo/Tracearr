@@ -577,7 +577,6 @@
       "quietest": "Tyst:",
       "bingeHighlights": "Höjdpunkter från sträcktittning",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "Sträcktittningar",
       "noData": "Ingen visningsdata än",
       "noDataDesc": "Visningsanalysen visas här när innehåll har spelats upp. Kom tillbaka efter lite tittande.",
       "failedToLoad": "Det gick inte att läsa in visningsanalys",
@@ -588,7 +587,6 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
           "maxPerDay": ""
         },
         "empty": {

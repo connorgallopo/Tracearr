@@ -260,9 +260,9 @@ export function LibraryWatch() {
           {patterns.data?.summary && (
             <CardAction className="text-right">
               <p className="text-lg font-medium">
-                {patterns.data.summary.bingeSessionsPct.toFixed(0)}%
+                {patterns.data.summary.consecutivePlaysPct.toFixed(0)}%
               </p>
-              <p className="text-muted-foreground text-xs">{t('library.watch.bingeSessions')}</p>
+              <p className="text-muted-foreground text-xs">{t('library.watch.consecutivePlays')}</p>
             </CardAction>
           )}
         </CardHeader>

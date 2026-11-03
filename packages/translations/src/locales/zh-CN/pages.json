@@ -544,7 +544,6 @@
       "quietest": "安静：",
       "bingeHighlights": "追剧亮点",
       "bingeHighlightsDesc": "观看模式最密集的剧集。",
-      "bingeSessions": "追剧会话",
       "noData": "尚无观看数据",
       "noDataDesc": "播放内容后，观看分析将显示在这里。有观看活动后再来查看。",
       "failedToLoad": "加载观看分析失败",
@@ -555,7 +554,6 @@
           "show": "剧集",
           "servers": "服务器",
           "consecutive": "连续",
-          "bingeScore": "追剧得分",
           "maxPerDay": "每日最多"
         },
         "empty": {

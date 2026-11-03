@@ -577,7 +577,6 @@
       "quietest": "",
       "bingeHighlights": "",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "",
       "noData": "",
       "noDataDesc": "",
       "failedToLoad": "",
@@ -588,7 +587,6 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
           "maxPerDay": ""
         },
         "empty": {
