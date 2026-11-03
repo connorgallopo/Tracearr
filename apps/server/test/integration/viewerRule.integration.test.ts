@@ -108,6 +108,8 @@ interface PlayOptions {
   durationMs: number;
   startedAt: Date;
   watched?: boolean;
+  showMediaId?: string;
+  seasonNumber?: number;
 }
 
 async function play(opts: PlayOptions): Promise<void> {
@@ -116,7 +118,9 @@ async function play(opts: PlayOptions): Promise<void> {
     serverUserId: opts.serverUserId,
     mediaId: opts.mediaId ?? null,
     ratingKey: opts.ratingKey,
-    mediaType: 'movie',
+    mediaType: opts.showMediaId ? 'episode' : 'movie',
+    showMediaId: opts.showMediaId ?? null,
+    seasonNumber: opts.seasonNumber ?? null,
     state: 'stopped',
     referenceId: null,
     durationMs: opts.durationMs,
@@ -200,6 +204,41 @@ describe('one viewer rule', () => {
 
     const watchers = await getMediaWatchers({
       scope: { kind: 'media', aliases: [movieId], seasonNumber: null, showAliases: [] },
+      windowKey: 'last_30',
+      serverIds: undefined,
+    });
+    const row = watchers.find((w) => w.user.server_user_id === viewer);
+    expect(row?.last_watched_day).toBe(threeDaysAgo.toISOString().slice(0, 10));
+  });
+
+  it('season watchers last_watched_day, read from sessions, ignores a later sample', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const showMediaId = await resolveMediaForItem({
+      mediaType: 'show',
+      tvdbId: 930_100,
+      title: 'Last Day Show',
+      year: 2020,
+      serverId: server.id,
+      ratingKey: 'last-day-show',
+    });
+    const viewer = await identity(server.id);
+    const threeDaysAgo = new Date(startOfTodayUtc().getTime() - 3 * DAY_MS);
+    const common = { serverId: server.id, serverUserId: viewer, showMediaId, seasonNumber: 1 };
+    await play({
+      ...common,
+      ratingKey: 'last-day-e1',
+      durationMs: 300_000,
+      startedAt: threeDaysAgo,
+    });
+    await play({
+      ...common,
+      ratingKey: 'last-day-e2',
+      durationMs: 20_000,
+      startedAt: startOfTodayUtc(),
+    });
+
+    const watchers = await getMediaWatchers({
+      scope: { kind: 'season', aliases: [], seasonNumber: 1, showAliases: [showMediaId] },
       windowKey: 'last_30',
       serverIds: undefined,
     });

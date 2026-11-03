@@ -492,6 +492,59 @@ describe('shelves command center endpoint against a real database', () => {
     expect.soft(stats.last_30.combined.plays).toBe(1);
   });
 
+  it('the shelf and top-movies cover the same days for a custom range', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const account = await createTestServerUser({ serverId: server.id, userId: user.id });
+    const { app } = await buildApp(ownerFor());
+    const today = startOfTodayUtc();
+    const noon = 12 * 60 * 60 * 1000;
+
+    const movie = await seedMovie({
+      serverId: server.id,
+      ratingKey: 'custom-edge',
+      title: 'Custom Edge Movie',
+      year: 2020,
+      tmdbId: 906_007,
+    });
+    // The range is three days back to yesterday: its first and last minute are in, the days
+    // either side are out
+    for (const startedAt of [
+      today - 4 * DAY_MS + noon,
+      today - 3 * DAY_MS,
+      today - 60_000,
+      today,
+    ]) {
+      await seedSession({
+        serverId: server.id,
+        serverUserId: account.id,
+        mediaId: movie,
+        ratingKey: 'custom-edge',
+        durationMs: 300_000,
+        startedAt: new Date(startedAt),
+      });
+    }
+
+    await refreshPlaysAggregate();
+
+    const first = new Date(today - 3 * DAY_MS).toISOString();
+    const last = new Date(today - DAY_MS).toISOString();
+    const { body: shelves } = await fetchShelves(
+      app,
+      `?period=custom&startDate=${first}&endDate=${last}`
+    );
+    expect.soft(shelves.mostPopularMovies.find((r) => r.mediaId === movie)?.plays).toBe(2);
+
+    const exclusiveEnd = new Date(today).toISOString();
+    const top = (
+      await app.inject({
+        method: 'GET',
+        url: `/library/top-movies?period=30d&startDate=${first}&endDate=${exclusiveEnd}`,
+      })
+    ).json<TopMoviesResponse>();
+    expect.soft(top.items.find((r) => r.title === 'Custom Edge Movie')?.totalPlays).toBe(2);
+  });
+
   it('a title played in-window but removed from the library does not surface in mostPopular or count toward titlesTouched', async () => {
     const server = await createTestServer({ type: 'plex' });
     const user = await createTestUser();

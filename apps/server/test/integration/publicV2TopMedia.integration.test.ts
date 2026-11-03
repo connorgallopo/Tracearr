@@ -413,6 +413,7 @@ describe('listTopMedia', () => {
 
     const seen: string[] = [];
     let after: { value: number; id: string } | null = null;
+    let nextCursor: string | null = null;
     for (let page = 0; page < 5; page++) {
       const result = await listTopMedia({
         kind: 'movie',
@@ -423,12 +424,14 @@ describe('listTopMedia', () => {
         after,
       });
       seen.push(...result.data.map((row) => row.media_id));
-      if (!result.nextCursor) break;
-      after = decodeRankCursor(result.nextCursor);
+      nextCursor = result.nextCursor;
+      if (!nextCursor) break;
+      after = decodeRankCursor(nextCursor);
     }
 
     expect(seen).toHaveLength(4);
     expect(new Set(seen)).toEqual(new Set(ids));
+    expect(nextCursor).toBeNull();
   });
 
   it('last_watched_day is the last day with a counted play', async () => {
