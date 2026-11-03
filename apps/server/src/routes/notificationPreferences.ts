@@ -12,7 +12,7 @@ import { z } from 'zod';
 import type { NotificationPreferences, NotificationPreferencesWithStatus } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { mobileSessions, notificationPreferences } from '../db/schema.js';
-import { getPushDelivery } from '../services/pushDelivery.js';
+import { getPushDelivery, PUSH_PREFERENCES, setPushSwitches } from '../services/pushDelivery.js';
 import { getPushRateLimiter } from '../services/pushRateLimiter.js';
 import { pushNotificationService } from '../services/pushNotification.js';
 
@@ -75,6 +75,23 @@ async function findMobileSessionForUserFallback(_userId: string): Promise<Mobile
     .limit(1);
 
   return session[0] ?? null;
+}
+
+/** The switches read the server-wide senders; the row's own columns are no longer consulted. */
+async function withDelivery(
+  row: typeof notificationPreferences.$inferSelect,
+  mobileSession: MobileSessionRef
+): Promise<NotificationPreferencesWithStatus> {
+  const delivery = {
+    tokenRegistered: Boolean(mobileSession.expoPushToken),
+    ...(await getPushDelivery()),
+  };
+  const switches = delivery.switches;
+  return {
+    ...toApiResponse(row),
+    ...(switches && Object.fromEntries(PUSH_PREFERENCES.map((key) => [key, switches[key].on]))),
+    delivery,
+  };
 }
 
 /**
@@ -149,13 +166,7 @@ export const notificationPreferencesRoutes: FastifyPluginAsync = async (app) => 
       return reply.internalServerError('Failed to load notification preferences');
     }
 
-    const response: NotificationPreferencesWithStatus = {
-      ...toApiResponse(row),
-      delivery: {
-        tokenRegistered: Boolean(mobileSession.expoPushToken),
-        ...(await getPushDelivery()),
-      },
-    };
+    const response = await withDelivery(row, mobileSession);
 
     // Get live rate limit status from Redis
     const rateLimiter = getPushRateLimiter();
@@ -217,6 +228,14 @@ export const notificationPreferencesRoutes: FastifyPluginAsync = async (app) => 
 
     const prefsId = existing[0]!.id;
 
+    await setPushSwitches(
+      Object.fromEntries(
+        PUSH_PREFERENCES.flatMap((key) =>
+          body.data[key] === undefined ? [] : [[key, body.data[key]]]
+        )
+      )
+    );
+
     // Build update object
     const updateData: Partial<typeof notificationPreferences.$inferInsert> = {
       updatedAt: new Date(),
@@ -225,29 +244,8 @@ export const notificationPreferencesRoutes: FastifyPluginAsync = async (app) => 
     if (body.data.pushEnabled !== undefined) {
       updateData.pushEnabled = body.data.pushEnabled;
     }
-    if (body.data.onViolationDetected !== undefined) {
-      updateData.onViolationDetected = body.data.onViolationDetected;
-    }
-    if (body.data.onStreamStarted !== undefined) {
-      updateData.onStreamStarted = body.data.onStreamStarted;
-    }
-    if (body.data.onStreamStopped !== undefined) {
-      updateData.onStreamStopped = body.data.onStreamStopped;
-    }
     if (body.data.onConcurrentStreams !== undefined) {
       updateData.onConcurrentStreams = body.data.onConcurrentStreams;
-    }
-    if (body.data.onNewDevice !== undefined) {
-      updateData.onNewDevice = body.data.onNewDevice;
-    }
-    if (body.data.onTrustScoreChanged !== undefined) {
-      updateData.onTrustScoreChanged = body.data.onTrustScoreChanged;
-    }
-    if (body.data.onServerDown !== undefined) {
-      updateData.onServerDown = body.data.onServerDown;
-    }
-    if (body.data.onServerUp !== undefined) {
-      updateData.onServerUp = body.data.onServerUp;
     }
     if (body.data.violationMinSeverity !== undefined) {
       updateData.violationMinSeverity = body.data.violationMinSeverity;
@@ -300,7 +298,7 @@ export const notificationPreferencesRoutes: FastifyPluginAsync = async (app) => 
       'Notification preferences updated'
     );
 
-    return toApiResponse(row);
+    return withDelivery(row, mobileSession);
   });
 
   /**

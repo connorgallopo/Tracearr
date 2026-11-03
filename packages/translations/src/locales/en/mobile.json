@@ -113,7 +113,12 @@
     "sentByAutomations_other": "Sent by {{count}} automations",
     "noViolationSender": "Receive violations is off for Mobile push",
     "noAutomationSends": "No automation sends this to Mobile push",
-    "eventsFooter": "Your server pushes an event when an automation sends it to the Mobile push destination. These switches choose which of those this device shows. Automations are set up in the web dashboard."
+    "eventsFooter": "Your server pushes an event when an automation sends it to the Mobile push destination. These switches choose which of those this device shows. Automations are set up in the web dashboard.",
+    "alsoSentBy_one": "Also sent by {{count}} automation from the web dashboard, which this switch does not change",
+    "alsoSentBy_other": "Also sent by {{count}} automations from the web dashboard, which this switch does not change",
+    "scopedSenders_one": "{{count}} of them is limited to one server",
+    "scopedSenders_other": "{{count}} of them are limited to one server",
+    "sharedEventsFooter": "These switches change what your server sends to Mobile push, so they apply to every paired device. Push notifications and quiet hours apply to this device only."
   },
   "session": {
     "streamTerminated": "Stream Terminated",

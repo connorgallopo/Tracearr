@@ -1798,7 +1798,7 @@ export interface RateLimitStatus {
   resetHourIn: number; // seconds until hour window resets
 }
 
-/** The per-device toggles that filter a push after the server has decided to send it. */
+/** The push switches; each reads and writes the server-wide senders, not the device. */
 export type PushEventPreference =
   | 'onViolationDetected'
   | 'onStreamStarted'
@@ -1808,7 +1808,16 @@ export type PushEventPreference =
   | 'onServerDown'
   | 'onServerUp';
 
-/** What stands between an event and this device, apart from the device's own toggles. */
+export interface PushSwitch {
+  /** Something sends this event to Mobile push, and Mobile push is on. */
+  on: boolean;
+  /** Senders the switch does not own: built or customized in the web, or scoped to a server. */
+  others: number;
+  /** How many of `others` are scoped to one server. */
+  scoped: number;
+}
+
+/** What stands between an event and this device. */
 export interface PushDeliveryStatus {
   /** The server holds a push token for this device. */
   tokenRegistered: boolean;
@@ -1818,6 +1827,8 @@ export interface PushDeliveryStatus {
   violationsSubscribed: boolean;
   /** Active automations that send each event to Mobile push. */
   automations: Record<PushEventPreference, number>;
+  /** Absent before the switches read from the senders. */
+  switches?: Record<PushEventPreference, PushSwitch>;
 }
 
 // Extended preferences response including live rate limit status

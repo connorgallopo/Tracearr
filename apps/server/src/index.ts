@@ -225,6 +225,7 @@ import { registeredQueue, shutdownAllJobs } from './jobs/jobSafety.js';
 import { reconcileJobsOnBoot } from './jobs/jobsBoot.js';
 import { DEFAULT_LOCK_DURATION_MS } from './jobs/lockUtils.js';
 import { startConnectionBudget, stopConnectionBudget } from './services/connectionBudget.js';
+import { reconcileDeviceMutes } from './services/pushDelivery.js';
 import { initPushRateLimiter } from './services/pushRateLimiter.js';
 import { initializeV2Rules } from './services/automations/v2Integration.js';
 import { rehydratePauseWakes, stopPauseWakes } from './services/automations/wakes/pauseWakes.js';
@@ -926,6 +927,13 @@ async function initializeServices(app: FastifyInstance) {
   // Needs the catalog it seeds: the destination subscriptions it converts become instances of
   // those templates. Unwrapped too, or an install ends up with neither the checkbox nor the rule.
   await runSystemEventsMigration();
+
+  // Wrapped: the device columns stay as they were and the next boot tries again.
+  try {
+    await reconcileDeviceMutes();
+  } catch (err) {
+    app.log.warn({ err }, 'Failed to move device push mutes onto their senders');
+  }
 
   // Wrapped: a failed seed leaves the setting null, which shows nothing and retries next boot.
   try {

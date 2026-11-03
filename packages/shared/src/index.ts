@@ -161,6 +161,7 @@ export type {
   RateLimitStatus,
   PushEventPreference,
   PushDeliveryStatus,
+  PushSwitch,
   NotificationPreferencesWithStatus,
   EncryptedPushPayload,
   PushNotificationPayload,
