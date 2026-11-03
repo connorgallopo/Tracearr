@@ -208,13 +208,13 @@ export const REDIS_KEYS = {
     return `${_redisPrefix}tracearr:library:roi:v2`;
   },
   get LIBRARY_PATTERNS() {
-    return `${_redisPrefix}tracearr:library:patterns`;
+    return `${_redisPrefix}tracearr:library:patterns:v2`;
   },
   get LIBRARY_TOP_MOVIES() {
-    return `${_redisPrefix}tracearr:library:top-movies`;
+    return `${_redisPrefix}tracearr:library:top-movies:v2`;
   },
   get LIBRARY_TOP_SHOWS() {
-    return `${_redisPrefix}tracearr:library:top-shows`;
+    return `${_redisPrefix}tracearr:library:top-shows:v2`;
   },
   get LIBRARY_CODECS() {
     return `${_redisPrefix}tracearr:library:codecs:v2`;

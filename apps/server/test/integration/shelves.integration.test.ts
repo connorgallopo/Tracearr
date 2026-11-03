@@ -1025,7 +1025,7 @@ describe('shelves command center endpoint against a real database', () => {
     expect(body.recentlyAddedMovies.map((r) => r.title)).toContain('V1 Cache Movie');
 
     const versionedKey = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v11`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v12`,
       'all',
       'month',
       undefined,
@@ -1049,21 +1049,21 @@ describe('shelves command center endpoint against a real database', () => {
     });
 
     const weekKey = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v11`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v12`,
       'all',
       'week',
       undefined,
       'auto:dw1'
     );
     const weekKeyDw0 = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v11`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v12`,
       'all',
       'week',
       undefined,
       'auto:dw0'
     );
     const yearKey = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v11`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v12`,
       'all',
       'year',
       undefined,
@@ -1709,7 +1709,7 @@ describe('shelves preferred poster source', () => {
     expect(autoRow.posterUrl).toContain(`v=${autoRow.posterVersion}`);
 
     const autoKey = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v11`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v12`,
       'all',
       'year',
       undefined,
@@ -1722,7 +1722,7 @@ describe('shelves preferred poster source', () => {
     // back server B's already-cached poster.
     await setSetting('preferredPosterServerId', serverA.id);
     const preferredKey = buildLibraryCacheKey(
-      `${REDIS_KEYS.LIBRARY_SHELVES}:v11`,
+      `${REDIS_KEYS.LIBRARY_SHELVES}:v12`,
       'all',
       'year',
       undefined,
@@ -1748,7 +1748,7 @@ describe('shelves cache invalidation on library sync', () => {
 
   it('a sync invalidates the versioned cached shelves key', async () => {
     initLibrarySyncQueue(process.env.REDIS_URL ?? 'redis://localhost:6380');
-    const key = buildLibraryCacheKey(`${REDIS_KEYS.LIBRARY_SHELVES}:v11`, 'all', 'month');
+    const key = buildLibraryCacheKey(`${REDIS_KEYS.LIBRARY_SHELVES}:v12`, 'all', 'month');
     const { getRedis } = await import('../../src/lib/redisShared.js');
     const redis = getRedis();
     await redis.set(key, JSON.stringify({ marker: true }));

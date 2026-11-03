@@ -866,8 +866,9 @@ export const libraryShelvesRoute: FastifyPluginAsync = async (app) => {
       // lost, and those move to recentlyUpdated, which a v7 payload lacks.
       // v10: recentlyAddedAlbums, mostPlayedArtists and the music meta counts.
       // v11: album rows carry posterVersion, and artist and album art is square.
+      // v12: the day window and viewer counts changed.
       const cacheKey = buildLibraryCacheKey(
-        `${REDIS_KEYS.LIBRARY_SHELVES}:v11`,
+        `${REDIS_KEYS.LIBRARY_SHELVES}:v12`,
         serverCacheKey,
         periodCacheKey,
         undefined,

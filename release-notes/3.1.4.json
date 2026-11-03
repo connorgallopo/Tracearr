@@ -16,7 +16,7 @@
     },
     {
       "type": "fix",
-      "text": "the Overview shelves and Browse now cover exactly the days picked; a 30-day range no longer includes a 31st day"
+      "text": "the Overview shelves now cover exactly the days picked; a 30-day range no longer includes a 31st day"
     }
   ]
 }
