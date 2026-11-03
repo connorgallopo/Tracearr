@@ -160,8 +160,8 @@
       "brandingSaved": "S'ha desat la imatge de marca del correu",
       "suppressionAdded": "S'ha afegit l'adreça a la llista de supressió",
       "suppressionRemoved": "S'ha tret l'adreça de la llista de supressió",
-      "ownerAccountLinked": "",
-      "ownerAccountUnlinked": "",
+      "ownerAccountLinked": "S'ha enllaçat el compte",
+      "ownerAccountUnlinked": "S'ha desenllaçat el compte",
       "newsletterRetryQueued_one": "S'està reintentant amb {{count}} destinatari",
       "newsletterRetryQueued_other": "S'està reintentant amb {{count}} destinataris"
     },
@@ -171,7 +171,7 @@
       "serverSyncFailed": "No s'ha pogut sincronitzar el servidor",
       "serverHistoricalFailed": "No s'ha pogut canviar l'estat del servidor",
       "settingsUpdateFailed": "No s'ha pogut actualitzar la configuració",
-      "copyManual": "",
+      "copyManual": "Premeu Ctrl+C o ⌘C per copiar",
       "acknowledgeFailed": "No s'ha pogut confirmar l'incompliment",
       "dismissFailed": "No s'ha pogut descartar l'incompliment",
       "authFailed": "Ha fallat l'autenticació",
@@ -222,8 +222,8 @@
       "brandingSaveFailed": "No s'ha pogut desar la imatge de marca del correu: {{error}}",
       "suppressionAddFailed": "No s'ha pogut afegir l'adreça: {{error}}",
       "suppressionRemoveFailed": "No s'ha pogut treure l'adreça: {{error}}",
-      "ownerAccountLinkFailed": "",
-      "ownerAccountUnlinkFailed": ""
+      "ownerAccountLinkFailed": "No s'ha pogut enllaçar el compte",
+      "ownerAccountUnlinkFailed": "No s'ha pogut desenllaçar el compte"
     },
     "warning": {
       "jobFailed": {

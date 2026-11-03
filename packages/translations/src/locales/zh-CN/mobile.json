@@ -112,7 +112,10 @@
     "noViolationSender": "移动推送的违规接收已关闭",
     "noAutomationSends": "没有自动化将此发送到移动推送",
     "eventsFooter": "当自动化将事件发送到移动推送目标时，您的服务器会推送该事件。这些开关用于选择此设备显示其中哪些内容。自动化在网页仪表盘中设置。",
-    "sentByAutomations_other": "由 {{count}} 个自动化发送"
+    "sharedEventsFooter": "",
+    "sentByAutomations_other": "由 {{count}} 个自动化发送",
+    "alsoSentBy_other": "",
+    "scopedSenders_other": ""
   },
   "session": {
     "streamTerminated": "流已终止",

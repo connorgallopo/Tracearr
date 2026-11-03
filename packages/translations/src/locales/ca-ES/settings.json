@@ -59,11 +59,11 @@
     "timeFormatDescription": "Trieu com es mostra el temps.",
     "timeFormat12h": "12 hores (1:30 PM)",
     "timeFormat24h": "24 hores (13:30)",
-    "dateFormat": "",
-    "dateFormatDescription": "",
-    "weekStart": "",
-    "weekStartDescription": "",
-    "automatic": "",
+    "dateFormat": "Format de la data",
+    "dateFormatDescription": "Com s'escriuen les dates. Automàtic segueix la regió del navegador.",
+    "weekStart": "La setmana comença el",
+    "weekStartDescription": "Primer dia de la setmana als calendaris i als gràfics per dia de la setmana.",
+    "automatic": "Automàtic",
     "theme": "Tema",
     "accentColor": "Color d'accent",
     "default": "(per defecte)",
@@ -258,26 +258,26 @@
       "updateAvailable": "actualització {{version}} disponible"
     },
     "ownerAccount": {
-      "label": "",
-      "link": "",
-      "unlink": "",
+      "label": "El vostre compte",
+      "link": "Enllaça",
+      "unlink": "Desenllaça",
       "dialog": {
-        "title": "",
-        "description": "",
-        "admin": "",
-        "lastActive": "",
-        "neverActive": "",
-        "otherAccounts": "",
-        "signsIn": "",
-        "warningTitle": "",
-        "warning": "",
-        "warning_jellyfin": "",
-        "confirmLabel": "",
-        "submit": ""
+        "title": "Enllaceu el vostre compte a {{server}}",
+        "description": "Trieu el compte que feu servir en aquest servidor. Les seves reproduccions passen a ser vostres, i iniciar la sessió amb aquest compte obre Tracearr com a vós.",
+        "admin": "Administrador",
+        "lastActive": "Actiu {{ago}}",
+        "neverActive": "Encara no hi ha activitat",
+        "otherAccounts": "Té comptes en altres servidors. Separeu-lo primer a la seva pàgina.",
+        "signsIn": "Inicia la sessió a Tracearr pel seu compte",
+        "warningTitle": "Enllaceu només el vostre propi compte",
+        "warning": "Qualsevol persona que pugui iniciar la sessió en aquest servidor com a {{username}} obté accés complet de propietari a Tracearr: qui en conegui la contrasenya i qui gestioni aquest servidor.",
+        "warning_jellyfin": "Qualsevol persona que pugui iniciar la sessió en aquest servidor com a {{username}} obté accés complet de propietari a Tracearr: qui en conegui la contrasenya, qualsevol dispositiu amb la sessió iniciada amb aquest compte que aprovi un codi de Quick Connect, i qui gestioni aquest servidor.",
+        "confirmLabel": "Escriviu {{username}} per confirmar",
+        "submit": "Enllaça el compte"
       },
       "confirmUnlink": {
-        "title": "",
-        "body": ""
+        "title": "Voleu desenllaçar {{username}}?",
+        "body": "Les seves reproduccions tornen a una persona pròpia. Tracearr tancarà la vostra sessió a tot arreu excepte en aquest navegador i als telèfons aparellats."
       }
     }
   },
@@ -550,49 +550,49 @@
     "acknowledge": "Entesos"
   },
   "storageWarning": {
-    "bannerDatabase": "",
-    "bannerData": "",
-    "showHow": "",
-    "hide": "",
-    "titleDatabase": "",
-    "titleData": "",
+    "bannerDatabase": "La base de dades de Tracearr és en un recurs compartit d'usuari d'Unraid, cosa que alenteix totes les lectures i escriptures.",
+    "bannerData": "Algunes dades de Tracearr són en un recurs compartit d'usuari d'Unraid, cosa que alenteix totes les lectures i escriptures.",
+    "showHow": "Mostra'm com solucionar-ho",
+    "hide": "Amaga fins que es reiniciï Tracearr",
+    "titleDatabase": "Traieu la base de dades del recurs compartit d'usuari",
+    "titleData": "Traieu les dades de Tracearr del recurs compartit d'usuari",
     "fields": {
-      "postgres": "",
-      "redis": "",
-      "appData": ""
+      "postgres": "PostgreSQL Data",
+      "redis": "Redis Data",
+      "appData": "App Data"
     },
-    "isSetTo": "",
-    "overheadDatabase": "",
-    "overheadData": "",
+    "isSetTo": "<strong>{{field}}</strong> està configurat com a <code>{{path}}</code>.",
+    "overheadDatabase": "Els camins dins de <code>/mnt/user</code> passen per la capa FUSE d'Unraid (shfs), que afegeix una sobrecàrrega a cada lectura i escriptura de la base de dades.",
+    "overheadData": "Els camins dins de <code>/mnt/user</code> passen per la capa FUSE d'Unraid (shfs), que afegeix una sobrecàrrega a cada lectura i escriptura.",
     "pool": {
-      "alreadyDatabase": "",
-      "alreadyData": "",
-      "alreadyPools": "",
-      "openEdit": "",
-      "change": "",
-      "copyPath": "",
-      "apply": "",
-      "clears": ""
+      "alreadyDatabase": "Els fitxers de la base de dades ja són al pool <code>{{pool}}</code>, així que no cal moure res. Feu que Tracearr apunti directament a aquest pool:",
+      "alreadyData": "Els fitxers de Tracearr ja són al pool <code>{{pool}}</code>, així que no cal moure res. Feu que Tracearr apunti directament a aquest pool:",
+      "alreadyPools": "Els fitxers de Tracearr ja són als seus pools, així que no cal moure res. Feu que Tracearr apunti directament a cada pool:",
+      "openEdit": "A Unraid, obriu Docker, feu clic a la icona de Tracearr i trieu Edit.",
+      "change": "Canvieu <strong>{{field}}</strong> a:",
+      "copyPath": "Copia el camí de {{field}}",
+      "apply": "Feu clic a Apply. Unraid torna a crear el contenidor amb els camins nous.",
+      "clears": "Tracearr ho comprova cada vegada que s'inicia, de manera que aquest avís desapareix després del reinici."
     },
     "split": {
-      "arrayDatabase": "",
-      "arrayData": "",
-      "poolsDatabase": "",
-      "poolsData": "",
-      "stop": "",
-      "shares": "",
-      "move": "",
-      "start": ""
+      "arrayDatabase": "Una part de la base de dades és a l'array (<code>{{disks}}</code>), així que el pool encara no la conté tota. De moment, deixeu el camí tal com està: si feu que Tracearr apunti a una carpeta on falten fitxers, s'iniciarà una base de dades nova i buida.",
+      "arrayData": "Alguns fitxers de <strong>{{field}}</strong> són a l'array (<code>{{disks}}</code>), així que el pool encara no els conté tots. De moment, deixeu el camí tal com està: si feu que Tracearr apunti a una carpeta on falten fitxers, aquests fitxers es quedaran enrere.",
+      "poolsDatabase": "La base de dades està repartida entre diversos pools (<code>{{pools}}</code>), així que cap pool no la conté tota. De moment, deixeu el camí tal com està: si feu que Tracearr apunti a una carpeta on falten fitxers, s'iniciarà una base de dades nova i buida. Primer moveu-la a un sol pool, i aleshores aquest avís us mostrarà el camí exacte que heu de configurar.",
+      "poolsData": "Els fitxers de <strong>{{field}}</strong> estan repartits entre diversos pools (<code>{{pools}}</code>), així que cap pool no els conté tots. De moment, deixeu el camí tal com està: si feu que Tracearr apunti a una carpeta on falten fitxers, aquests fitxers es quedaran enrere. Primer moveu-los a un sol pool, i aleshores aquest avís us mostrarà el camí exacte que heu de configurar.",
+      "stop": "Atureu el contenidor de Tracearr.",
+      "shares": "A Shares, obriu <code>{{share}}</code>. Poseu Primary storage al vostre pool, Secondary storage a Array i Mover action a Array → pool.",
+      "move": "A Main, feu clic a Move i espereu que acabi.",
+      "start": "Inicieu Tracearr. Quan tots els fitxers siguin al pool, aquest avís us mostrarà el camí exacte que heu de configurar."
     },
     "unknown": {
-      "isSetToDatabase": "",
-      "isSetToData": "",
-      "otherFuseDatabase": "",
-      "otherFuseData": "",
-      "fixDatabase": "",
-      "fixData": ""
+      "isSetToDatabase": "<strong>{{field}}</strong> està configurat com a <code>{{path}}</code>, que passa per la capa FUSE d'Unraid (shfs) i alenteix totes les lectures i escriptures de la base de dades.",
+      "isSetToData": "<strong>{{field}}</strong> està configurat com a <code>{{path}}</code>, que passa per la capa FUSE d'Unraid (shfs) i alenteix totes les lectures i escriptures.",
+      "otherFuseDatabase": "<strong>{{field}}</strong> és en un muntatge <code>{{fsType}}</code>, un sistema de fitxers FUSE que alenteix totes les lectures i escriptures de la base de dades.",
+      "otherFuseData": "<strong>{{field}}</strong> és en un muntatge <code>{{fsType}}</code>, un sistema de fitxers FUSE que alenteix totes les lectures i escriptures.",
+      "fixDatabase": "Si appdata és en un pool, canvieu <strong>{{field}}</strong> a la pàgina Edit del contenidor per la mateixa carpeta d'aquest pool, per exemple <code>{{example}}</code>. Primer comproveu que la carpeta del pool contingui un fitxer anomenat PG_VERSION. Sense aquest fitxer, Tracearr inicia una base de dades nova i buida.",
+      "fixData": "Si appdata és en un pool, canvieu <strong>{{field}}</strong> a la pàgina Edit del contenidor per la mateixa carpeta d'aquest pool, per exemple <code>{{example}}</code>. Primer comproveu que la carpeta del pool contingui els mateixos fitxers que l'actual."
     },
-    "faq": ""
+    "faq": "Per què els recursos compartits d'usuari són lents"
   },
   "backup": {
     "title": "Còpia de seguretat",

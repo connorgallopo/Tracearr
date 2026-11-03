@@ -112,9 +112,16 @@
     "noViolationSender": "",
     "noAutomationSends": "",
     "eventsFooter": "",
+    "sharedEventsFooter": "",
     "sentByAutomations_one": "",
     "sentByAutomations_few": "",
-    "sentByAutomations_other": ""
+    "sentByAutomations_other": "",
+    "alsoSentBy_one": "",
+    "alsoSentBy_few": "",
+    "alsoSentBy_other": "",
+    "scopedSenders_one": "",
+    "scopedSenders_few": "",
+    "scopedSenders_other": ""
   },
   "session": {
     "streamTerminated": "",

@@ -112,7 +112,10 @@
     "noViolationSender": "",
     "noAutomationSends": "",
     "eventsFooter": "",
-    "sentByAutomations_other": ""
+    "sharedEventsFooter": "",
+    "sentByAutomations_other": "",
+    "alsoSentBy_other": "",
+    "scopedSenders_other": ""
   },
   "session": {
     "streamTerminated": "스트림 종료됨",
