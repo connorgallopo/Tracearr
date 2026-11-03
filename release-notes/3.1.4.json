@@ -1,6 +1,6 @@
 {
   "version": "3.1.4",
-  "date": "2026-11-02",
+  "date": "2026-11-03",
   "changes": [
     {
       "type": "note",
@@ -17,6 +17,18 @@
     {
       "type": "fix",
       "text": "the Overview shelves now cover exactly the days picked; a 30-day range no longer includes a 31st day"
+    },
+    {
+      "type": "improved",
+      "text": "the mobile app's notification switches set what the server sends to Mobile push, so they apply to every paired device"
+    },
+    {
+      "type": "fix",
+      "text": "a user that fails to save during a server sync shows up in the sync's errors instead of failing the sync"
+    },
+    {
+      "type": "fix",
+      "text": "the import file drop zone opens the file picker from the keyboard"
     }
   ]
 }
