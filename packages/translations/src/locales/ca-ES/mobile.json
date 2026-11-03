@@ -112,13 +112,13 @@
     "noViolationSender": "L'opció «Rep els incompliments» està desactivada per a Push mòbil",
     "noAutomationSends": "Cap automatització no ho envia a Push mòbil",
     "eventsFooter": "El vostre servidor envia un esdeveniment push quan una automatització el dirigeix a la destinació Push mòbil. Aquests interruptors determinen quins d'aquests esdeveniments mostra aquest dispositiu. Les automatitzacions es configuren al tauler de control web.",
-    "sharedEventsFooter": "",
+    "sharedEventsFooter": "Aquests interruptors canvien el que el vostre servidor envia a la destinació Push mòbil, de manera que s'apliquen a tots els dispositius aparellats. Les notificacions push i les hores de silenci només s'apliquen a aquest dispositiu.",
     "sentByAutomations_one": "L'envia {{count}} automatització",
     "sentByAutomations_other": "L'envien {{count}} automatitzacions",
-    "alsoSentBy_one": "",
-    "alsoSentBy_other": "",
-    "scopedSenders_one": "",
-    "scopedSenders_other": ""
+    "alsoSentBy_one": "També l'envia {{count}} automatització del tauler de control web, que aquest interruptor no afecta",
+    "alsoSentBy_other": "També l'envien {{count}} automatitzacions del tauler de control web, que aquest interruptor no afecta",
+    "scopedSenders_one": "{{count}} d'elles està limitada a un servidor",
+    "scopedSenders_other": "{{count}} d'elles estan limitades a un servidor"
   },
   "session": {
     "streamTerminated": "Transmissió finalitzada",
