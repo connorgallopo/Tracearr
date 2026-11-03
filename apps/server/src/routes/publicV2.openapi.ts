@@ -1337,22 +1337,19 @@ const StatMeasures = z.object({
     .int()
     .openapi({
       description:
-        'Resume chains whose first session reached 2 minutes, from the daily rollup. Plays on ' +
-        'media Tracearr could not identify are not counted. Season refs compute live from ' +
-        'sessions instead and count a chain when ANY segment reaches 2 minutes, so a season ' +
-        'total can exceed the sum of its episodes',
+        'Resume chains with at least one counted segment (2 minutes or more, or marked watched ' +
+        'by the server). Plays on media Tracearr could not identify are not counted',
     }),
   watch_time_ms: z.number().int().openapi({
-    description: 'Milliseconds summed across sessions that individually reached 2 minutes',
+    description: 'Milliseconds summed across counted segments',
   }),
   unique_users: z
     .number()
     .int()
     .openapi({
       description:
-        'Distinct Tracearr identities with at least 2 minutes watched; one person on many ' +
-        'servers counts once. Can exceed what plays implies, since a chain only counts as a ' +
-        'play when its first session qualifies',
+        'Distinct Tracearr identities with at least one counted play; one person on many ' +
+        'servers counts once. Never exceeds plays',
     }),
 });
 
@@ -1403,7 +1400,10 @@ const Watcher = z
       .number()
       .nullable()
       .openapi({ description: 'Max progress vs content duration, 0-100, capped', example: 96.4 }),
-    last_watched_day: z.string().nullable().openapi({ description: 'UTC date, YYYY-MM-DD' }),
+    last_watched_day: z
+      .string()
+      .nullable()
+      .openapi({ description: 'Last UTC day with a counted play, YYYY-MM-DD' }),
     distinct_episodes_watched: z
       .number()
       .int()
