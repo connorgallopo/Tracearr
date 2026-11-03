@@ -577,7 +577,7 @@
       "quietest": "",
       "bingeHighlights": "",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "",
+      "consecutivePlays": "",
       "noData": "",
       "noDataDesc": "",
       "failedToLoad": "",
@@ -588,7 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {
