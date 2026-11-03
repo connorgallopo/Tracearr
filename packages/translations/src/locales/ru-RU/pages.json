@@ -643,7 +643,7 @@
       "quietest": "Тихий тест:",
       "bingeHighlights": "Лучшие марафоны",
       "bingeHighlightsDesc": "Сериалы с самым интенсивным просмотром.",
-      "bingeSessions": "Сессии марафонов",
+      "consecutivePlays": "",
       "noData": "Нет данных для просмотра",
       "noDataDesc": "Аналитика просмотров появится здесь после воспроизведения контента. Загляните сюда позже.",
       "failedToLoad": "Не удалось загрузить аналитику",
@@ -654,7 +654,8 @@
           "show": "Сериал",
           "servers": "Серверы",
           "consecutive": "Подряд",
-          "bingeScore": "Балл марафона",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": "Макс./день"
         },
         "empty": {
