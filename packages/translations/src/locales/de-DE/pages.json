@@ -1260,7 +1260,7 @@
         "sampleGone": "",
         "backToLive": ""
       },
-      "selectedCount_one": "",
+      "selectedCount_one": "{{count}} ausgewählt",
       "selectedCount_other": "{{count}} ausgewählte"
     },
     "categories": {
@@ -1909,11 +1909,11 @@
     "templates": {
       "account-inactivity": {
         "name": "Inaktives Konto",
-        "description": "",
+        "description": "Einen Verstoß auslösen, wenn ein Konto länger als die von Ihnen festgelegte Anzahl von Tagen ungenutzt bleibt.",
         "keywords": ""
       },
       "concurrent-streams": {
-        "name": "",
+        "name": "Zu viele Streams gleichzeitig",
         "description": "",
         "keywords": ""
       },
@@ -1928,17 +1928,17 @@
         "keywords": ""
       },
       "geo-restriction": {
-        "name": "",
+        "name": "Gesperrte Länder",
         "description": "",
         "keywords": ""
       },
       "impossible-travel": {
-        "name": "",
-        "description": "",
+        "name": "Unmögliche Reise",
+        "description": "Löst einen Verstoß aus, wenn zwei Sitzungen so weit voneinander entfernt sind, dass niemand die Strecke zwischen ihnen zurücklegen könnte.",
         "keywords": ""
       },
       "kill-paused-streams": {
-        "name": "",
+        "name": "Angehaltene Streams beenden",
         "description": "",
         "keywords": ""
       },
@@ -1958,17 +1958,17 @@
         "keywords": ""
       },
       "newsletter-failed": {
-        "name": "",
+        "name": "Newsletter fehlgeschlagen",
         "description": "",
         "keywords": ""
       },
       "no-4k-transcodes": {
-        "name": "",
-        "description": "",
+        "name": "Keine 4K Transkodierung",
+        "description": "Einen Stream anhalten, der 4K-Quellvideos transkodiert.",
         "keywords": ""
       },
       "paused-too-long": {
-        "name": "",
+        "name": "Zu lange pausiert",
         "description": "",
         "keywords": ""
       },
@@ -2749,7 +2749,7 @@
       },
       "watchers": {
         "title": "",
-        "titleMusic": "",
+        "titleMusic": "Zuhörer",
         "loadError": "",
         "empty": "",
         "emptyMusic": "",
@@ -2757,25 +2757,25 @@
         "completionLabel": "",
         "columns": {
           "plays": "",
-          "episodes": "",
+          "episodes": "Episoden",
           "completion": "",
-          "lastWatched": "",
-          "lastPlayed": ""
+          "lastWatched": "Zuletzt gesehen",
+          "lastPlayed": "Zuletzt gespielt"
         }
       },
       "seasons": {
         "title": "",
         "loadError": "",
         "empty": "",
-        "watchedPct": "",
-        "stripSummary": "",
+        "watchedPct": "{{percent}}% gesehen",
+        "stripSummary": "{{season}}: {{percent}}% gesehen",
         "episodeLabel": {
-          "watched": "",
+          "watched": "{{code}}: gesehen",
           "partial": "",
           "unwatched": ""
         },
         "episodeCount_one": "",
-        "episodeCount_other": ""
+        "episodeCount_other": "{{count}} Episoden"
       },
       "albums": {
         "title": "",
@@ -2784,14 +2784,14 @@
         "trackCount_other": ""
       },
       "album": {
-        "kind": "",
+        "kind": "Album",
         "loadError": "",
         "finishedCaption": "",
         "vsPrior30": "",
         "tracksCaption": "",
         "columns": {
-          "title": "",
-          "length": ""
+          "title": "Titel",
+          "length": "Länge"
         }
       },
       "platforms": {
@@ -2804,7 +2804,7 @@
         }
       },
       "history": {
-        "title": "",
+        "title": "Verlauf",
         "loadError": "",
         "empty": "",
         "notWatched": "",
@@ -2813,12 +2813,12 @@
         }
       },
       "copies": {
-        "title": "",
+        "title": "Kopien",
         "loadError": "",
         "unknownLibrary": "",
         "columns": {
-          "library": "",
-          "episodes": "",
+          "library": "Bibliothek",
+          "episodes": "Episoden",
           "added": ""
         },
         "versionLabel": ""
@@ -2853,46 +2853,46 @@
         "done": "",
         "watchedLabel": "",
         "watched": {
-          "all": "",
+          "all": "Alle",
           "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "partial": "Teilweise gesehen",
+          "unwatched": "Ungesehen"
         },
-        "unwatchedByLens": "",
-        "resolutionLabel": "",
+        "unwatchedByLens": "Ungesehen von {{name}}",
+        "resolutionLabel": "Auflösung",
         "resolutionAll": "",
         "videoCodecLabel": "",
         "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
-        "hdrChip": "",
+        "hdrChip": "HDR",
         "audioCodecLabel": "",
         "audioCodecAll": "",
         "audioChannelsLabel": "",
         "audioChannelsAll": "",
-        "atmosLabel": "",
+        "atmosLabel": "Audio",
         "atmosAll": "",
         "atmosOnly": "",
-        "atmosChip": "",
-        "genreLabel": "",
+        "atmosChip": "Atmos",
+        "genreLabel": "Genre",
         "genreAll": "",
-        "serverLabel": "",
+        "serverLabel": "Server",
         "serverAll": "",
-        "libraryLabel": "",
+        "libraryLabel": "Bibliothek",
         "libraryAll": "",
-        "yearFromLabel": "",
-        "yearToLabel": "",
+        "yearFromLabel": "Von Jahr",
+        "yearToLabel": "Zu Jahr",
         "sizeGbMinLabel": "",
         "sizeGbMaxLabel": "",
-        "sizeChipAtLeast": "",
-        "sizeChipAtMost": "",
-        "sizeChipRange": "",
-        "sortLabel": "",
+        "sizeChipAtLeast": "≥ {{min}} GB",
+        "sizeChipAtMost": "≤ {{max}} GB",
+        "sizeChipRange": "{{min}}–{{max}} GB",
+        "sortLabel": "Sortieren",
         "sort": {
-          "title": "",
+          "title": "Titel A–Z",
           "added": "",
-          "year": "",
+          "year": "Jahr",
           "plays": "",
           "watch_time": "",
           "viewers": ""
@@ -2946,36 +2946,36 @@
       "waiting": ""
     },
     "mediaPanel": {
-      "title": "",
+      "title": "Anfragen",
       "loadError": "",
       "empty": ""
     },
     "userCard": {
-      "title": "",
+      "title": "Anfragen",
       "loadError": "",
       "viewAll": "",
-      "showLess": "",
+      "showLess": "Weniger zeigen",
       "summary": {
-        "requests": "",
+        "requests": "Anfragen",
         "medianWait": "",
         "approvalRate": "",
         "neverWatched": ""
       },
-      "empty": ""
+      "empty": "Keine Anfragen bisher"
     },
-    "unattributed": "",
+    "unattributed": "Nicht auf dem Server",
     "watched": {
       "byRequester": "",
       "byOthers": ""
     },
     "page": {
-      "title": "",
+      "title": "Anfragen",
       "failedToLoad": "",
       "notConfigured": "",
       "notConfiguredDescription": "",
       "linkSeerr": "",
       "kpi": {
-        "requested": "",
+        "requested": "Angefragt",
         "watched": "",
         "neverPlayed": "",
         "ofLanded": "",
@@ -2987,7 +2987,7 @@
     "funnel": {
       "title": "",
       "description": "",
-      "requested": "",
+      "requested": "Abgefragt",
       "landed": "",
       "watched": "",
       "share": "",
