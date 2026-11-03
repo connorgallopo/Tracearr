@@ -577,7 +577,7 @@
       "quietest": "Silencieux:",
       "bingeHighlights": "Temps forts des marathons",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "Sessions marathon",
+      "consecutivePlays": "",
       "noData": "Aucune donnée de surveillance pour le moment",
       "noDataDesc": "Les analyses de visionnage apparaîtront ici une fois que du contenu aura été lu. Revenez après un peu d'activité de visionnage.",
       "failedToLoad": "Impossible de charger les analyses de visionnage",
@@ -588,7 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {
