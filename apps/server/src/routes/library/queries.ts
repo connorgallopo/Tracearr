@@ -72,7 +72,8 @@ export function buildValueRollupCte(
   // via its own media_id and get counted as a "movie".
   const typeGuard = {
     movie: sql`AND am.media_type = 'movie'`,
-    show: sql`AND p.show_media_id IS NOT NULL`,
+    // The type predicate lets the planner estimate the join and hash-join media.
+    show: sql`AND p.show_media_id IS NOT NULL AND am.media_type = 'show'`,
     artist: sql`AND p.media_type = 'track'`,
   }[type];
   // Artists also narrow p to their own tracks first, so the artist LATERAL runs
