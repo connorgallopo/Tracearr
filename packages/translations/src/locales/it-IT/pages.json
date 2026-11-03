@@ -577,7 +577,7 @@
       "quietest": "Silenzioso:",
       "bingeHighlights": "",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "Sessioni Maratona",
+      "consecutivePlays": "",
       "noData": "Ancora nessun dato dell'orologio",
       "noDataDesc": "Le analisi di visione appariranno qui una volta che il contenuto sarà stato riprodotto. Riprova dopo qualche attività di visione.",
       "failedToLoad": "Impossibile caricare le analisi di visione",
@@ -588,7 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {
