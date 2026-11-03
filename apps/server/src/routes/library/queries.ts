@@ -171,7 +171,7 @@ export async function listTopMedia(args: {
   const result = await db.execute(sql`
     WITH ${cte},
     page AS (
-      SELECT canonical_id, plays, COALESCE(watch_time_ms, 0) AS watch_time_ms, viewers, last_day,
+      SELECT canonical_id, plays, ${TOP_MEDIA_SORT.watch_time} AS watch_time_ms, viewers, last_day,
         ${sortValue} AS sort_value
       FROM value_rollup
       WHERE plays > 0 ${afterFragment}
