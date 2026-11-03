@@ -577,7 +577,7 @@
       "quietest": "Quietest:",
       "bingeHighlights": "Binge Highlights",
       "bingeHighlightsDesc": "Shows with the most intensive viewing patterns.",
-      "bingeSessions": "Binge Sessions",
+      "consecutivePlays": "Consecutive plays",
       "noData": "No watch data yet",
       "noDataDesc": "Watch analytics will appear here once content has been played. Check back after some viewing activity.",
       "failedToLoad": "Failed to load watch analytics",
@@ -588,7 +588,8 @@
           "show": "Show",
           "servers": "Servers",
           "consecutive": "Consecutive",
-          "bingeScore": "Binge Score",
+          "people": "People",
+          "episodesPerViewer": "Episodes per viewer",
           "maxPerDay": "Max/Day"
         },
         "empty": {
