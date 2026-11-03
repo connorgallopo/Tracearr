@@ -577,7 +577,7 @@
       "quietest": "Más tranquilo:",
       "bingeHighlights": "Maratones destacados",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "Sesiones maratón",
+      "consecutivePlays": "",
       "noData": "Aún no hay datos de reloj",
       "noDataDesc": "El análisis de visualización aparecerá aquí cuando se haya reproducido contenido. Vuelva a comprobarlo tras algo de actividad de visualización.",
       "failedToLoad": "Error al cargar el análisis de visualización",
@@ -588,7 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {
