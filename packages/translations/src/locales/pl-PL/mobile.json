@@ -112,10 +112,19 @@
     "noViolationSender": "Powiadomienia o naruszeniach są wyłączone dla mobilnego push",
     "noAutomationSends": "Żadna automatyzacja nie wysyła tego do mobilnego push",
     "eventsFooter": "Twój serwer wypycha zdarzenie, gdy automatyzacja wysyła je do miejsca docelowego \"push mobilny\". Te przełączniki wybierają, które z nich są otrzymywane przez to urządzenie. Automatyzacje mogą być edytowane w panelu administracyjnym.",
+    "sharedEventsFooter": "",
     "sentByAutomations_one": "Wysyłane przez {{count}} automatyzację",
     "sentByAutomations_few": "Wysyłane przez {{count}} automatyzacje",
     "sentByAutomations_many": "Wysyłane przez {{count}} automatyzacji",
-    "sentByAutomations_other": "Wysyłane przez {{count}} automatyzacji"
+    "sentByAutomations_other": "Wysyłane przez {{count}} automatyzacji",
+    "alsoSentBy_one": "",
+    "alsoSentBy_few": "",
+    "alsoSentBy_many": "",
+    "alsoSentBy_other": "",
+    "scopedSenders_one": "",
+    "scopedSenders_few": "",
+    "scopedSenders_many": "",
+    "scopedSenders_other": ""
   },
   "session": {
     "streamTerminated": "Strumień przerwany",
