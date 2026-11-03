@@ -626,6 +626,81 @@ describe('library watch patterns', () => {
     expect(body.summary.consecutivePlaysPct).toBe(Math.round((1000 * 2) / 3) / 10);
   });
 
+  it('does not count the same episode replayed as a new play as consecutive', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await account(server.id);
+    const showId = await addShow(server.id, 'Tidewater', 10_150);
+    const e1 = await addEpisode(server.id, showId, 10_151);
+    const e2 = await addEpisode(server.id, showId, 10_152);
+    const e3 = await addEpisode(server.id, showId, 10_153);
+    const common = { serverId: server.id, serverUserId: user, showMediaId: showId };
+    // E1, E1 again as a new play, then E2 and E3, each starting 5 minutes after the last stop
+    for (const [mediaId, start] of [
+      [e1, 0],
+      [e1, 30],
+      [e2, 60],
+      [e3, 90],
+    ] as const) {
+      await play({
+        ...common,
+        mediaId,
+        ratingKey: `rk-${mediaId}`,
+        startedAt: daysAgo(2, start * MIN_MS),
+        durationMs: 25 * MIN_MS,
+      });
+    }
+
+    const body = await get<PatternsResponse>('/library/patterns?timezone=UTC&bingeThreshold=2');
+
+    expect(body.bingeShows).toHaveLength(1);
+    expect(body.bingeShows[0]).toMatchObject({ totalEpisodeWatches: 4, consecutiveEpisodes: 2 });
+  });
+
+  it('counts a play ending in a short segment and ends it when that segment stops', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await account(server.id);
+    const showId = await addShow(server.id, 'Brackwater', 10_160);
+    const e1 = await addEpisode(server.id, showId, 10_161);
+    const e2 = await addEpisode(server.id, showId, 10_162);
+    const e3 = await addEpisode(server.id, showId, 10_163);
+    const common = { serverId: server.id, serverUserId: user, showMediaId: showId };
+    const at = (minutes: number) => daysAgo(2, minutes * MIN_MS);
+    // E1 runs 0-20, resumes for one uncounted minute 25-26; E2 starts 28 minutes after that
+    // stop, which is 34 after the counted segment's stop
+    const first = await play({
+      ...common,
+      mediaId: e1,
+      ratingKey: 'rk-e1',
+      startedAt: at(0),
+      durationMs: 20 * MIN_MS,
+    });
+    await play({
+      ...common,
+      mediaId: e1,
+      ratingKey: 'rk-e1',
+      startedAt: at(25),
+      durationMs: MIN_MS,
+      referenceId: first,
+    });
+    for (const [mediaId, start] of [
+      [e2, 54],
+      [e3, 89],
+    ] as const) {
+      await play({
+        ...common,
+        mediaId,
+        ratingKey: `rk-${mediaId}`,
+        startedAt: at(start),
+        durationMs: 25 * MIN_MS,
+      });
+    }
+
+    const body = await get<PatternsResponse>('/library/patterns?timezone=UTC&bingeThreshold=2');
+
+    expect(body.bingeShows).toHaveLength(1);
+    expect(body.bingeShows[0]).toMatchObject({ totalEpisodeWatches: 3, consecutiveEpisodes: 2 });
+  });
+
   it('counts one person once across two servers and chains their plays', async () => {
     const server1 = await createTestServer({ type: 'plex' });
     const server2 = await createTestServer({ type: 'jellyfin' });

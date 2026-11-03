@@ -57,9 +57,7 @@ interface RawTrendRow {
   total_watch_hours: string;
 }
 
-interface RawSummaryRow {
-  consecutive_plays_pct: string;
-}
+type RawBingeQueryRow = { consecutive_plays_pct: string } & (RawBingeRow | { show_media_id: null });
 
 type Window = { startDate: Date | null; endDate: Date; lastDay: Date };
 
@@ -97,12 +95,16 @@ function sessionScopeSql(
 // same person's previous play of the show ended. A play ends when its last segment stops, so a
 // chain reads every segment in scope, counted or not, and is kept when any segment counts.
 // Gaps only see plays inside the window, so a binge that began before it starts fresh.
-function episodePlaysCtes(segments: SQL): SQL {
+// Every row carries the share of all plays that were consecutive, with no threshold; with no
+// binge shows it comes back alone in one row with no show. Servers and art are read only for
+// the shows that make the list.
+function buildBingeQuery(segments: SQL, bingeThreshold: number, limit: number): SQL {
   const show = sql`COALESCE(sh.merged_into_id, sess.show_media_id)`;
   const episode = sql`COALESCE(em.merged_into_id, sess.media_id)`;
   return sql`
-    chains AS (
-      SELECT su.user_id, ${show} AS show_id, ${episode} AS episode,
+    WITH chains AS (
+      SELECT su.user_id, ${show} AS show_id, COALESCE(sess.reference_id, sess.id) AS chain_id,
+        ${episode} AS episode,
         MIN(sess.started_at) AS started_at,
         MAX(sess.stopped_at) AS stopped_at,
         (array_agg(sess.server_id ORDER BY sess.started_at))[1] AS server_id,
@@ -115,7 +117,7 @@ function episodePlaysCtes(segments: SQL): SQL {
         AND sess.media_type = 'episode'
         AND sess.show_media_id IS NOT NULL
         AND sess.stopped_at IS NOT NULL
-      GROUP BY COALESCE(sess.reference_id, sess.id), su.user_id, ${show}, ${episode}
+      GROUP BY 1, 2, 3, 4
       HAVING BOOL_OR(${countedSessionSql('sess')})
     ),
     plays AS (
@@ -126,13 +128,8 @@ function episodePlaysCtes(segments: SQL): SQL {
           false
         ) AS consecutive
       FROM chains c
-      WINDOW w AS (PARTITION BY c.user_id, c.show_id ORDER BY c.started_at)
-    )`;
-}
-
-function buildBingeQuery(segments: SQL, bingeThreshold: number, limit: number): SQL {
-  return sql`
-    WITH ${episodePlaysCtes(segments)},
+      WINDOW w AS (PARTITION BY c.user_id, c.show_id ORDER BY c.started_at, c.episode, c.chain_id)
+    ),
     person_days AS (
       SELECT user_id, show_id, COUNT(*) AS plays,
         COUNT(*) FILTER (WHERE consecutive) AS consecutive,
@@ -147,46 +144,51 @@ function buildBingeQuery(segments: SQL, bingeThreshold: number, limit: number): 
       GROUP BY user_id, show_id
       HAVING SUM(consecutive) >= ${bingeThreshold}
     ),
-    binge_plays AS (
-      SELECT p.* FROM plays p JOIN per_person USING (user_id, show_id)
+    ranked AS (
+      SELECT s.show_id, shm.title, SUM(s.plays) AS plays, SUM(s.consecutive) AS consecutive,
+        MAX(s.max_per_day) AS max_per_day, COUNT(*) AS people,
+        ROW_NUMBER() OVER (
+          ORDER BY SUM(s.consecutive) DESC, MAX(s.max_per_day) DESC, shm.title, s.show_id
+        ) AS rank
+      FROM per_person s
+      JOIN media shm ON shm.id = s.show_id
+      GROUP BY s.show_id, shm.title
+      ORDER BY rank
+      LIMIT ${limit}
+    ),
+    ranked_plays AS (
+      SELECT p.show_id, p.server_id, p.thumb_path, p.started_at
+      FROM plays p
+      JOIN per_person USING (user_id, show_id)
+      WHERE p.show_id IN (SELECT show_id FROM ranked)
     ),
     server_counts AS (
-      SELECT show_id, server_id, COUNT(*) AS plays FROM binge_plays GROUP BY show_id, server_id
+      SELECT show_id, server_id, COUNT(*) AS plays FROM ranked_plays GROUP BY show_id, server_id
     ),
-    per_show AS (
-      SELECT show_id, SUM(plays) AS plays, SUM(consecutive) AS consecutive,
-        MAX(max_per_day) AS max_per_day, COUNT(*) AS people
-      FROM per_person
-      GROUP BY show_id
+    share AS (
+      SELECT COALESCE(
+        ROUND(100.0 * COUNT(*) FILTER (WHERE consecutive) / NULLIF(COUNT(*), 0), 1), 0
+      )::text AS consecutive_plays_pct
+      FROM plays
     )
     SELECT
-      s.show_id::text AS show_media_id,
-      shm.title AS show_title,
-      (SELECT sc.server_id::text FROM server_counts sc WHERE sc.show_id = s.show_id
+      share.consecutive_plays_pct,
+      r.show_id::text AS show_media_id,
+      r.title AS show_title,
+      (SELECT sc.server_id::text FROM server_counts sc WHERE sc.show_id = r.show_id
         ORDER BY sc.plays DESC, sc.server_id LIMIT 1) AS primary_server_id,
-      (SELECT bp.thumb_path FROM binge_plays bp WHERE bp.show_id = s.show_id
-        ORDER BY bp.thumb_path IS NULL, bp.started_at DESC LIMIT 1) AS thumb_path,
-      s.plays::text AS total_episode_watches,
-      s.consecutive::text AS consecutive_episodes,
-      ROUND(100.0 * s.consecutive / s.plays, 1)::text AS consecutive_pct,
-      s.max_per_day::text AS max_episodes_in_one_day,
-      s.people::text AS people,
+      (SELECT rp.thumb_path FROM ranked_plays rp WHERE rp.show_id = r.show_id
+        ORDER BY rp.thumb_path IS NULL, rp.started_at DESC LIMIT 1) AS thumb_path,
+      r.plays::text AS total_episode_watches,
+      r.consecutive::text AS consecutive_episodes,
+      ROUND(100.0 * r.consecutive / r.plays, 1)::text AS consecutive_pct,
+      r.max_per_day::text AS max_episodes_in_one_day,
+      r.people::text AS people,
       (SELECT array_agg(sc.server_id::text ORDER BY sc.server_id::text) FROM server_counts sc
-        WHERE sc.show_id = s.show_id) AS server_ids
-    FROM per_show s
-    JOIN media shm ON shm.id = s.show_id
-    ORDER BY s.consecutive DESC, s.max_per_day DESC, shm.title ASC, s.show_id
-    LIMIT ${limit}`;
-}
-
-// Every counted episode play in scope, with no binge threshold.
-function buildConsecutiveShareQuery(segments: SQL): SQL {
-  return sql`
-    WITH ${episodePlaysCtes(segments)}
-    SELECT COALESCE(
-      ROUND(100.0 * COUNT(*) FILTER (WHERE consecutive) / NULLIF(COUNT(*), 0), 1), 0
-    )::text AS consecutive_plays_pct
-    FROM plays`;
+        WHERE sc.show_id = r.show_id) AS server_ids
+    FROM share
+    LEFT JOIN ranked r ON true
+    ORDER BY r.rank`;
 }
 
 // One point per bucket from the window's start (or the first session for all time) to its
@@ -292,25 +294,33 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
 
       const queries: Promise<void>[] = [];
 
-      if (includeBinge) {
-        queries.push(
-          (async () => {
-            const bingeResult = await db.execute(buildBingeQuery(segments, bingeThreshold, limit));
-            bingeShows = (bingeResult.rows as unknown as RawBingeRow[]).map((row) => ({
-              showMediaId: row.show_media_id,
-              showTitle: row.show_title,
-              primaryServerId: row.primary_server_id,
-              thumbPath: row.thumb_path,
-              totalEpisodeWatches: parseInt(row.total_episode_watches, 10),
-              consecutiveEpisodes: parseInt(row.consecutive_episodes, 10),
-              consecutivePct: parseFloat(row.consecutive_pct),
-              maxEpisodesInOneDay: parseInt(row.max_episodes_in_one_day, 10),
-              people: parseInt(row.people, 10),
-              serverIds: row.server_ids,
-            }));
-          })()
-        );
-      }
+      queries.push(
+        (async () => {
+          const result = await db.execute(
+            buildBingeQuery(segments, bingeThreshold, includeBinge ? limit : 0)
+          );
+          const rows = result.rows as unknown as RawBingeQueryRow[];
+          consecutivePlaysPct = parseFloat(rows[0]?.consecutive_plays_pct ?? '0');
+          bingeShows = rows.flatMap((row) =>
+            row.show_media_id === null
+              ? []
+              : [
+                  {
+                    showMediaId: row.show_media_id,
+                    showTitle: row.show_title,
+                    primaryServerId: row.primary_server_id,
+                    thumbPath: row.thumb_path,
+                    totalEpisodeWatches: parseInt(row.total_episode_watches, 10),
+                    consecutiveEpisodes: parseInt(row.consecutive_episodes, 10),
+                    consecutivePct: parseFloat(row.consecutive_pct),
+                    maxEpisodesInOneDay: parseInt(row.max_episodes_in_one_day, 10),
+                    people: parseInt(row.people, 10),
+                    serverIds: row.server_ids,
+                  },
+                ]
+          );
+        })()
+      );
 
       if (includePeakTimes) {
         queries.push(
@@ -380,14 +390,6 @@ export const libraryPatternsRoute: FastifyPluginAsync = async (app) => {
           })()
         );
       }
-
-      queries.push(
-        (async () => {
-          const summaryResult = await db.execute(buildConsecutiveShareQuery(segments));
-          const summaryRow = summaryResult.rows[0] as unknown as RawSummaryRow | undefined;
-          consecutivePlaysPct = parseFloat(summaryRow?.consecutive_plays_pct ?? '0');
-        })()
-      );
 
       await Promise.all(queries);
 

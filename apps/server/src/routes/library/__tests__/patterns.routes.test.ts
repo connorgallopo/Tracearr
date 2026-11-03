@@ -72,7 +72,7 @@ describe('GET /library/patterns', () => {
 
     expect(response.statusCode).toBe(200);
     const queries = executed();
-    expect(queries).toHaveLength(5);
+    expect(queries).toHaveLength(4);
     for (const query of queries) {
       expect(query.sql).toContain('sess.started_at >=');
       expect(query.params).toEqual(expect.arrayContaining([start, end]));
