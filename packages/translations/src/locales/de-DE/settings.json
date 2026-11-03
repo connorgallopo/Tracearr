@@ -793,17 +793,17 @@
         "movies": "",
         "shows": "",
         "music": "",
-        "mostWatched": "",
+        "mostWatched": "Meistgesehen",
         "legend": "",
-        "description": "",
-        "upTo": "",
+        "description": "Die E-Mail listet auf, was im Fenster hinzugefügt wurde, bis zu diesen Einschränkungen. Alles, was über dem Limit liegt und alles, was darauf abzielt, die E-Mail unter den 102 KB zu halten, an denen Gmail sie abschneidet, wird zu einer Zeile \"+N mehr\".",
+        "upTo": "Bis zu",
         "the": "",
         "units": {
-          "movies": "",
+          "movies": "Filme",
           "shows": "",
           "seasonsEach": "",
-          "albums": "",
-          "mostPlayed": ""
+          "albums": "Albums ",
+          "mostPlayed": "am häufigsten gespielt"
         },
         "labels": {
           "movies_one": "",
@@ -853,10 +853,10 @@
         "nameLabel": "",
         "namePlaceholder": "",
         "removeAddress": "",
-        "badAddress": "",
-        "loadFailed": "",
-        "willReceive": "",
-        "excludedCount": "",
+        "badAddress": "Das ist keine E-Mail-Adresse.",
+        "loadFailed": "Konnte die Empfänger nicht laden.",
+        "willReceive": "Will receive {{count}}",
+        "excludedCount": "Ausgeschlossen {{count}}",
         "noAddress": "",
         "suppressedCount": "",
         "newSinceLastSend": "",
@@ -915,7 +915,7 @@
         "title": "",
         "destination": "",
         "destinationHelp": "",
-        "pickDestination": "",
+        "pickDestination": "Wähle ein Ziel",
         "noDestination": "",
         "imageMode": "",
         "modes": {
@@ -977,9 +977,9 @@
       "preview": {
         "variants": "",
         "variantTab": "",
-        "title": "",
-        "draft": "",
-        "subjectLabel": "",
+        "title": "Vorschau",
+        "draft": "Vorschau der nicht gespeicherten Änderungen",
+        "subjectLabel": "Betreff",
         "window": "",
         "windowSince": "",
         "countsListed": {
@@ -988,19 +988,19 @@
           "albums": ""
         },
         "recipients": "",
-        "width": "",
+        "width": "Breite",
         "widths": {
           "desktop": "",
           "phone": ""
         },
-        "images": "",
-        "imagesOn": "",
-        "imagesBlocked": "",
+        "images": "Bilder",
+        "imagesOn": "Zeige",
+        "imagesBlocked": "Blockiert",
         "imagesBlockedNote": "",
         "linksNote": ""
       },
       "test": {
-        "title": "",
+        "title": "Sende einen Test",
         "description": "",
         "variant": "",
         "address": "",
@@ -1031,9 +1031,9 @@
       "emptyDescription": "",
       "loadFailed": "",
       "trigger": {
-        "schedule": "",
+        "schedule": "Geplant",
         "manual": "",
-        "test": ""
+        "test": "Test"
       },
       "window": "",
       "recipientsEmpty": "",
@@ -1080,12 +1080,12 @@
       "accentPicker": "",
       "footerText": "",
       "footerTextHelp": "",
-      "postalAddress": "",
-      "postalAddressHelp": "",
-      "mailto": "",
+      "postalAddress": "Postanschrift",
+      "postalAddressHelp": "Optional; einige Rechtsordnungen erwarten eine bei Massensendungen.",
+      "mailto": "Bieten Sie auch die Möglichkeit an, sich per E-Mail abzumelden",
       "mailtoHelp": "",
       "save": "",
-      "saving": ""
+      "saving": "Speichern"
     },
     "suppressions": {
       "title": "",
@@ -1095,10 +1095,10 @@
       "add": "",
       "addTitle": "",
       "addDescription": "",
-      "address": "",
+      "address": "E-Mail-Adresse",
       "addConfirm": "",
       "reason": {
-        "unsubscribed": "",
+        "unsubscribed": "Abgemeldet",
         "manual": ""
       },
       "openSource": "",
@@ -1109,14 +1109,14 @@
   },
   "shared": {
     "timezone": {
-      "placeholder": "",
-      "search": "",
+      "placeholder": "Wähle eine Zeitzone",
+      "search": "Suche eine Zeitzone",
       "empty": "",
       "other": ""
     }
   },
   "requests": {
-    "label": "",
+    "label": "Anfragen",
     "link": "",
     "unlink": "",
     "syncNow": "",
@@ -1140,7 +1140,7 @@
       "url": "",
       "apiKey": "API-Schlüssel",
       "apiKeyHint": "Seerr → Einstellungen → Allgemein → API-Schlüssel",
-      "apiKeyKeep": "",
+      "apiKeyKeep": "Leer lassen, um den aktuellen Schlüssel beizubehalten",
       "showKey": "Zeige API-Schlüssel",
       "hideKey": "Verberge API-Schlüssel",
       "test": "Test",
