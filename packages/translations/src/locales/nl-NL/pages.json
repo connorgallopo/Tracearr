@@ -577,7 +577,7 @@
       "quietest": "Stiltesten:",
       "bingeHighlights": "Hoogtepunten kijkmarathons",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "Kijkmarathons",
+      "consecutivePlays": "",
       "noData": "Nog geen kijkgegevens",
       "noDataDesc": "Kijkanalyse verschijnt hier zodra er content is afgespeeld. Kom terug na wat kijkactiviteit.",
       "failedToLoad": "Kijkanalyse laden mislukt",
@@ -588,7 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {
