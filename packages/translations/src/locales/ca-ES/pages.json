@@ -577,7 +577,7 @@
       "quietest": "Amb menys activitat:",
       "bingeHighlights": "Destacats de marató",
       "bingeHighlightsDesc": "Sèries amb els patrons de visionament més intensius.",
-      "consecutivePlays": "",
+      "consecutivePlays": "Reproduccions consecutives",
       "noData": "Encara no hi ha dades de visionament",
       "noDataDesc": "Les analítiques de visionament apareixeran aquí un cop s'hagi reproduït contingut. Torneu a consultar-ho després d'una mica d'activitat de visionament.",
       "failedToLoad": "No s'han pogut carregar les analítiques de visionament",
@@ -588,8 +588,8 @@
           "show": "Sèrie",
           "servers": "Servidors",
           "consecutive": "Consecutius",
-          "people": "",
-          "episodesPerViewer": "",
+          "people": "Persones",
+          "episodesPerViewer": "Episodis per espectador",
           "maxPerDay": "Màx./dia"
         },
         "empty": {
