@@ -577,7 +577,7 @@
       "quietest": "Ruhe:",
       "bingeHighlights": "Serienmarathon-Highlights",
       "bingeHighlightsDesc": "",
-      "bingeSessions": "Serienmarathons",
+      "consecutivePlays": "",
       "noData": "Noch keine Wiedergabedaten",
       "noDataDesc": "Die Analyse wird hier angezeigt, sobald der Inhalt wiedergegeben wurde. Schauen Sie nach einer Aktivität wieder vorbei.",
       "failedToLoad": "Fehler beim Laden der Wiedergabeanalyse",
@@ -588,7 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
-          "bingeScore": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {
