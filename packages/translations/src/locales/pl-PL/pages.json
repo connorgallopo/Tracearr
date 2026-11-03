@@ -643,7 +643,7 @@
       "quietest": "Najspokojniejszy:",
       "bingeHighlights": "Maratony serialowe",
       "bingeHighlightsDesc": "Seriale oglądane najintensywniej.",
-      "bingeSessions": "Sesje maratonowe",
+      "consecutivePlays": "",
       "noData": "Brak danych o oglądalności",
       "noDataDesc": "Statystyki oglądalności pojawią się tutaj, gdy zawartość zostanie odtworzona. Sprawdź ponownie po pewnym czasie oglądania.",
       "failedToLoad": "Nie udało się załadować statystyk oglądalności",
@@ -654,7 +654,8 @@
           "show": "Serial",
           "servers": "Serwery",
           "consecutive": "Pod rząd",
-          "bingeScore": "Wynik maratonu",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": "Maks./dzień"
         },
         "empty": {
