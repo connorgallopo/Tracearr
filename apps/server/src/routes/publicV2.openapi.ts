@@ -1576,11 +1576,11 @@ const UserStatWindow = z.object({
     .int()
     .openapi({
       description:
-        'Resume chains whose first session reached 2 minutes, from the daily rollup. Plays on ' +
-        'media Tracearr could not identify are not counted',
+        'Resume chains with at least one counted segment (2 minutes or more, or marked watched ' +
+        'by the server). Plays on media Tracearr could not identify are not counted',
     }),
   watch_time_ms: z.number().int().openapi({
-    description: 'Milliseconds summed across sessions that individually reached 2 minutes',
+    description: 'Milliseconds summed across counted segments',
   }),
 });
 
