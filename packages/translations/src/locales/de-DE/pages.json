@@ -195,7 +195,7 @@
     "suggestionsPairEmail": "",
     "suggestionsPairEmailUsername": "",
     "suggestionsPairUsername": "",
-    "suggestionsSheetDescription": "",
+    "suggestionsSheetDescription": "Beim Zusammenführen wird ein Benutzer beibehalten und der andere gelöscht. Ein Paar, das als nicht identisch markiert wurde, wird nicht mehr angezeigt, bis Sie es wiederherstellen.",
     "suggestionsReview": "Überprüfung",
     "suggestionsNotSame": "",
     "suggestionsMatchEmail": "",
@@ -577,7 +577,7 @@
       "quietest": "Ruhe:",
       "bingeHighlights": "Serienmarathon-Highlights",
       "bingeHighlightsDesc": "",
-      "consecutivePlays": "",
+      "consecutivePlays": "Aufeinanderfolgende Wiedergaben",
       "noData": "Noch keine Wiedergabedaten",
       "noDataDesc": "Die Analyse wird hier angezeigt, sobald der Inhalt wiedergegeben wurde. Schauen Sie nach einer Aktivität wieder vorbei.",
       "failedToLoad": "Fehler beim Laden der Wiedergabeanalyse",
@@ -589,7 +589,7 @@
           "servers": "",
           "consecutive": "",
           "people": "",
-          "episodesPerViewer": "",
+          "episodesPerViewer": "Folgen pro Zuschauer",
           "maxPerDay": ""
         },
         "empty": {
