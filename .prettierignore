@@ -8,3 +8,6 @@ pnpm-lock.yaml
 .claude
 .superpowers
 .playwright-mcp
+# Crowdin writes the translated locales without a trailing newline; reformatting them churns its next sync
+packages/translations/src/locales/*/
+!packages/translations/src/locales/en/
