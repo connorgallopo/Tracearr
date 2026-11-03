@@ -1,0 +1,18 @@
+{
+  "version": "3.1.3",
+  "date": "2026-11-03",
+  "changes": [
+    {
+      "type": "fix",
+      "text": "user details include the correct identity membership fields"
+    },
+    {
+      "type": "fix",
+      "text": "fuzzy duplicate matching uses the upstream matching rules for shows and music"
+    },
+    {
+      "type": "improved",
+      "text": "GeoLite2 databases are updated for current IP geolocation data"
+    }
+  ]
+}
