@@ -1175,30 +1175,6 @@ export const engagementQuerySchema = z
     serverId: uuidSchema.optional(),
     serverIds: serverIdsQuerySchema,
     timezone: timezoneSchema,
-    // Engagement-specific filters
-    mediaType: mediaTypeSchema.optional(),
-    limit: z.coerce.number().int().positive().max(100).default(10),
-  })
-  .refine(dateValidationRefinements.customPeriodRequiresDates.refinement, {
-    message: dateValidationRefinements.customPeriodRequiresDates.message,
-  })
-  .refine(dateValidationRefinements.startBeforeEnd.refinement, {
-    message: dateValidationRefinements.startBeforeEnd.message,
-  });
-
-// Show stats query schema
-export const showsQuerySchema = z
-  .object({
-    period: statPeriodSchema.default('month'),
-    startDate: z.iso.datetime().optional(),
-    endDate: z.iso.datetime().optional(),
-    serverId: uuidSchema.optional(),
-    serverIds: serverIdsQuerySchema,
-    timezone: timezoneSchema,
-    limit: z.coerce.number().int().positive().max(100).default(20),
-    orderBy: z
-      .enum(['totalEpisodeViews', 'totalWatchHours', 'bingeScore', 'uniqueViewers'])
-      .default('totalEpisodeViews'),
   })
   .refine(dateValidationRefinements.customPeriodRequiresDates.refinement, {
     message: dateValidationRefinements.customPeriodRequiresDates.message,
@@ -1501,4 +1477,3 @@ export type ImportJobStatus = z.infer<typeof importJobStatusSchema>;
 
 // Engagement types
 export type EngagementQueryInput = z.infer<typeof engagementQuerySchema>;
-export type ShowsQueryInput = z.infer<typeof showsQuerySchema>;

@@ -14,7 +14,6 @@ export {
   useTopContent,
   useConcurrentStats,
   useEngagementStats,
-  useShowStats,
   // Device compatibility
   useDeviceCompatibility,
   useDeviceCompatibilityMatrix,
@@ -27,7 +26,6 @@ export {
   type LocationStatsFilters,
   type StatsTimeRange,
   type EngagementStatsOptions,
-  type ShowStatsOptions,
 } from './useStats';
 
 // Session hooks

@@ -124,7 +124,8 @@ function topContentCtes(type: 'movie' | 'show', input: TopContentQuery): SQL {
     ),
     titles AS (
       SELECT ident, SUM(plays) AS total_plays, SUM(watched_ms) AS watched_ms,
-        COUNT(*) FILTER (WHERE watched_ms > 0) AS unique_viewers,
+        -- countedViewersSql's rule at per-identity grain: a viewer has a counted play
+        COUNT(*) FILTER (WHERE plays > 0) AS unique_viewers,
         ROUND(100.0 * SUM(completed_episodes) / NULLIF(SUM(episodes_watched), 0), 1) AS completion_rate,
         LEAST(100, ROUND(
           40 * (AVG(episodes_watched) * ROUND(100.0 * SUM(completed_episodes) / NULLIF(SUM(episodes_watched), 0), 1) / 100 / 10) +

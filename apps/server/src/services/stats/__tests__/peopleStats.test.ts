@@ -15,6 +15,7 @@ vi.mock('../../requests/analytics.js', () => ({
 }));
 
 import { db } from '../../../db/client.js';
+import { countedSession } from '../../../db/sessions/rules.js';
 import { getRequestsAnalytics } from '../../requests/analytics.js';
 import { queryPlaysOverTime } from '../../../routes/stats/queries.js';
 import {
@@ -265,7 +266,7 @@ describe('queryIdentityRangeStats', () => {
     expect(stats.daysInRange).toBe(7);
   });
 
-  it('divides the server average by people, through server_users, not by accounts', async () => {
+  it('divides the server average by people with a counted play, through server_users, not by accounts', async () => {
     await queryIdentityRangeStats({
       serverUserIds: [A],
       resolvedServerIds: undefined,
@@ -273,7 +274,9 @@ describe('queryIdentityRangeStats', () => {
     });
     const average = executedSql().find((text) => text.includes('su.user_id'));
     expect(average).toContain('JOIN server_users su ON su.id = s.server_user_id');
-    expect(average).toContain('NULLIF(COUNT(DISTINCT su.user_id), 0)');
+    expect(average).toContain(
+      `NULLIF(COUNT(DISTINCT su.user_id) FILTER (WHERE ${countedSession('s')}), 0)`
+    );
     expect(average).not.toContain('COUNT(DISTINCT server_user_id)');
   });
 

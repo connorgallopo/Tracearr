@@ -23,7 +23,6 @@ import { db } from '../../src/db/client.js';
 import { peopleRoutes } from '../../src/routes/stats/people.js';
 import { bandwidthRoutes } from '../../src/routes/stats/bandwidth.js';
 import { contentRoutes } from '../../src/routes/stats/content.js';
-import { engagementRoutes } from '../../src/routes/stats/engagement.js';
 import { sessionRoutes } from '../../src/routes/sessions/index.js';
 import { libraryTopContentRoute } from '../../src/routes/library/topContent.js';
 import { mergeUsers } from '../../src/services/mergeService.js';
@@ -788,86 +787,6 @@ describe('merged identity stats', () => {
       expect(response.statusCode).toBe(200);
       const movies = response.json().movies as { title: string; playCount: number }[];
       expect(movies.filter((m) => m.title === '')).toHaveLength(0);
-    });
-  });
-
-  describe('GET /stats/shows (multi-server, date-filtered)', () => {
-    it('counts a show merged after the fact once, with episode views summed', async () => {
-      const serverA = await createTestServer({ type: 'plex' });
-      const serverB = await createTestServer({ type: 'jellyfin' });
-      const viewerA = await createTestUser({ role: 'member' });
-      const viewerB = await createTestUser({ role: 'member' });
-      const viewerASu = await createTestServerUser({ userId: viewerA.id, serverId: serverA.id });
-      const viewerBSu = await createTestServerUser({ userId: viewerB.id, serverId: serverB.id });
-
-      const winnerId = await resolveMediaForItem({
-        mediaType: 'show',
-        tvdbId: Math.floor(Math.random() * 1_000_000),
-        title: 'Shows Winner',
-        serverId: serverA.id,
-        ratingKey: 'shows-winner',
-      });
-      const loserId = await resolveMediaForItem({
-        mediaType: 'show',
-        tvdbId: Math.floor(Math.random() * 1_000_000),
-        title: 'Shows Loser',
-        serverId: serverB.id,
-        ratingKey: 'shows-loser',
-      });
-      await mergeMediaRows(winnerId, loserId);
-
-      await createTestSession({
-        serverId: serverA.id,
-        serverUserId: viewerASu.id,
-        mediaType: 'episode',
-        grandparentTitle: 'Shows Winner',
-        showMediaId: winnerId,
-        ratingKey: 'shows-winner-e1',
-        seasonNumber: 1,
-        episodeNumber: 1,
-        state: 'stopped',
-        watched: true,
-        durationMs: 1_800_000,
-        totalDurationMs: 1_800_000,
-        progressMs: 1_800_000,
-      });
-      // Stamped with the pre-merge loser id, as historical sessions stay after a merge
-      await createTestSession({
-        serverId: serverB.id,
-        serverUserId: viewerBSu.id,
-        mediaType: 'episode',
-        grandparentTitle: 'Shows Loser',
-        showMediaId: loserId,
-        ratingKey: 'shows-loser-e1',
-        seasonNumber: 1,
-        episodeNumber: 1,
-        state: 'stopped',
-        watched: true,
-        durationMs: 1_800_000,
-        totalDurationMs: 1_800_000,
-        progressMs: 1_800_000,
-      });
-
-      await db.execute(
-        sql`CALL refresh_continuous_aggregate('daily_content_engagement'::regclass, NULL, NULL)`
-      );
-
-      const app = await buildApp(engagementRoutes);
-      const response = await app.inject({
-        method: 'GET',
-        url: `/shows?period=week&serverIds=${serverA.id}&serverIds=${serverB.id}`,
-      });
-      await app.close();
-
-      expect(response.statusCode).toBe(200);
-      const body = response.json();
-      const shows = body.data as { showTitle: string; totalEpisodeViews: number }[];
-      const matches = shows.filter(
-        (s) => s.showTitle === 'Shows Winner' || s.showTitle === 'Shows Loser'
-      );
-
-      expect(matches).toHaveLength(1);
-      expect(matches[0]?.totalEpisodeViews).toBe(2);
     });
   });
 });

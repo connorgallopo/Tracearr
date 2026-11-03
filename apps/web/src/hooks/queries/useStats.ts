@@ -1,6 +1,6 @@
 import { keepPreviousData, skipToken, useQuery } from '@tanstack/react-query';
 import { serverScopeFromIds, serverScopeKey } from '@tracearr/shared';
-import type { MediaType, DeviceCompatibilityMatrix, PeopleRank } from '@tracearr/shared';
+import type { DeviceCompatibilityMatrix, PeopleRank } from '@tracearr/shared';
 import {
   api,
   type LocationFilterParams,
@@ -187,8 +187,6 @@ export function useConcurrentStats(timeRange?: StatsTimeRange, serverIds?: strin
 }
 
 export interface EngagementStatsOptions {
-  mediaType?: MediaType;
-  limit?: number;
   self?: boolean;
 }
 
@@ -201,25 +199,6 @@ export function useEngagementStats(
   return useQuery({
     queryKey: ['stats', 'engagement', timeRange, serverIdsKey, options],
     queryFn: () => api.stats.engagement(timeRange ?? { period: 'week' }, serverIds, options),
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
-}
-
-export interface ShowStatsOptions {
-  limit?: number;
-  orderBy?: 'totalEpisodeViews' | 'totalWatchHours' | 'bingeScore' | 'uniqueViewers';
-  self?: boolean;
-}
-
-export function useShowStats(
-  timeRange?: StatsTimeRange,
-  serverIds?: string[],
-  options?: ShowStatsOptions
-) {
-  const serverIdsKey = serverScopeKey(serverScopeFromIds(serverIds));
-  return useQuery({
-    queryKey: ['stats', 'shows', timeRange, serverIdsKey, options],
-    queryFn: () => api.stats.shows(timeRange ?? { period: 'month' }, serverIds, options),
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }

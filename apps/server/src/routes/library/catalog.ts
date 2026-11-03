@@ -55,6 +55,7 @@ import {
   type WatchedState,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
+import { countedViewersSql } from '../../db/sessions/rules.js';
 import { resolutionBucketPredicate, resolutionRankSql } from '../../utils/resolutionBuckets.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import {
@@ -323,7 +324,7 @@ export function buildValueRollupCte(
       SELECT COALESCE(am.merged_into_id, ${mediaCol}) AS canonical_id,
              COUNT(DISTINCT p.chain_id) FILTER (WHERE p.counted)::bigint AS plays,
              SUM(p.watched_ms)::bigint AS watch_time_ms,
-             COUNT(DISTINCT su.user_id)::bigint AS viewers
+             ${countedViewersSql(sql`p.counted`)}::bigint AS viewers
       FROM user_media_plays_daily p
       ${artistJoin}
       JOIN media am ON am.id = ${mediaCol}

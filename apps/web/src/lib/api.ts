@@ -89,9 +89,7 @@ import type {
   VersionInfo,
   WhatsNewState,
   EngagementStats,
-  ShowStatsResponse,
   SetupStatus,
-  MediaType,
   ServerConnectionStatus,
   ServerLocationEntry,
   ServerLocationsResponse,
@@ -1400,34 +1398,14 @@ class ApiClient {
     engagement: async (
       timeRange?: StatsTimeRange,
       serverIds?: string[],
-      options?: { mediaType?: MediaType; limit?: number; self?: boolean }
+      options?: { self?: boolean }
     ) => {
       const params = this.buildStatsParamsMulti(
         timeRange ?? { period: 'week' },
         serverIds,
         options?.self
       );
-      if (options?.mediaType) params.set('mediaType', options.mediaType);
-      if (options?.limit) params.set('limit', String(options.limit));
       return this.request<EngagementStats>(`/stats/engagement?${params.toString()}`);
-    },
-    shows: async (
-      timeRange?: StatsTimeRange,
-      serverIds?: string[],
-      options?: {
-        limit?: number;
-        orderBy?: 'totalEpisodeViews' | 'totalWatchHours' | 'bingeScore' | 'uniqueViewers';
-        self?: boolean;
-      }
-    ) => {
-      const params = this.buildStatsParamsMulti(
-        timeRange ?? { period: 'month' },
-        serverIds,
-        options?.self
-      );
-      if (options?.limit) params.set('limit', String(options.limit));
-      if (options?.orderBy) params.set('orderBy', options.orderBy);
-      return this.request<ShowStatsResponse>(`/stats/shows?${params.toString()}`);
     },
 
     // Device compatibility stats

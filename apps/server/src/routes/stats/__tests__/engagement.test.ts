@@ -1,9 +1,7 @@
 /**
  * Engagement statistics route tests
  *
- * Tests the engagement statistics endpoints:
- * - GET /engagement - Comprehensive engagement metrics
- * - GET /shows - Show-level stats with episode rollup
+ * Tests GET /engagement - Comprehensive engagement metrics
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
@@ -11,8 +9,6 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '@tracearr/shared';
-import type { SQL } from 'drizzle-orm';
-import { renderSql } from '../../../test/helpers.js';
 
 // Mock database before imports
 vi.mock('../../../db/client.js', () => ({
@@ -98,32 +94,11 @@ function createViewerUser(serverIds: string[]): AuthUser {
   };
 }
 
-// Mock engagement query results — 2 queries: combined (JSON columns) + shows
-function mockEngagementResults() {
-  const combinedResult = {
+// Mock the single combined engagement statement (JSON columns)
+function mockEngagementResult() {
+  return {
     rows: [
       {
-        top_content: [
-          {
-            rating_key: 'movie-123',
-            media_title: 'Test Movie',
-            show_title: null,
-            media_type: 'movie',
-            thumb_path: '/thumb.jpg',
-            server_id: randomUUID(),
-            year: 2024,
-            total_plays: 50,
-            total_watch_hours: 25.5,
-            unique_viewers: 10,
-            valid_sessions: 45,
-            total_sessions: 60,
-            completions: 40,
-            rewatches: 5,
-            abandonments: 5,
-            completion_rate: 80.0,
-            abandonment_rate: 10.0,
-          },
-        ],
         tier_breakdown: [
           { tier: 'rewatched', count: 30 },
           { tier: 'watched', count: 20 },
@@ -161,27 +136,6 @@ function mockEngagementResults() {
       },
     ],
   };
-
-  const topShowsResult = {
-    rows: [
-      {
-        show_title: 'Test Show',
-        thumb_path: '/show-thumb.jpg',
-        server_id: randomUUID(),
-        year: 2024,
-        total_episode_views: '100',
-        total_watch_hours: '50.0',
-        unique_viewers: '15',
-        avg_episodes_per_viewer: '6.7',
-        avg_completion_rate: '85.0',
-        binge_score: '75.5',
-        valid_sessions: '90',
-        total_sessions: '110',
-      },
-    ],
-  };
-
-  return [combinedResult, topShowsResult];
 }
 
 describe('Engagement Routes', () => {
@@ -233,10 +187,7 @@ describe('Engagement Routes', () => {
         const validServerId = randomUUID();
         app = await buildTestApp(ownerUser);
 
-        // Mock the 2 db.execute calls for the engagement endpoint (combined + shows)
-        const mockResults = mockEngagementResults();
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+        vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
         const response = await app.inject({
           method: 'GET',
@@ -252,9 +203,7 @@ describe('Engagement Routes', () => {
         const ownerUser = createOwnerUser();
         app = await buildTestApp(ownerUser);
 
-        const mockResults = mockEngagementResults();
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+        vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
         const response = await app.inject({
           method: 'GET',
@@ -271,9 +220,7 @@ describe('Engagement Routes', () => {
         const viewerUser = createViewerUser([serverId]);
         app = await buildTestApp(viewerUser);
 
-        const mockResults = mockEngagementResults();
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+        vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
         const response = await app.inject({
           method: 'GET',
@@ -290,9 +237,7 @@ describe('Engagement Routes', () => {
         const viewerUser = createViewerUser([serverId1, serverId2]);
         app = await buildTestApp(viewerUser);
 
-        const mockResults = mockEngagementResults();
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+        vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
         const response = await app.inject({
           method: 'GET',
@@ -307,9 +252,7 @@ describe('Engagement Routes', () => {
         const viewerUser = createViewerUser([]);
         app = await buildTestApp(viewerUser);
 
-        const mockResults = mockEngagementResults();
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+        vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
         const response = await app.inject({
           method: 'GET',
@@ -326,9 +269,7 @@ describe('Engagement Routes', () => {
         const viewerUser = createViewerUser(['invalid-uuid', 'also-invalid']);
         app = await buildTestApp(viewerUser);
 
-        const mockResults = mockEngagementResults();
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+        vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
         const response = await app.inject({
           method: 'GET',
@@ -367,9 +308,7 @@ describe('Engagement Routes', () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
-      const mockResults = mockEngagementResults();
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+      vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
       const response = await app.inject({
         method: 'GET',
@@ -379,15 +318,8 @@ describe('Engagement Routes', () => {
       expect(response.statusCode).toBe(200);
       const body = response.json();
 
-      expect(body).toHaveProperty('topContent');
-      expect(body).toHaveProperty('topShows');
-      expect(body).toHaveProperty('engagementBreakdown');
-      expect(body).toHaveProperty('userProfiles');
-      expect(body).toHaveProperty('summary');
-
-      expect(body.topContent).toHaveLength(1);
-      expect(body.topContent[0].title).toBe('Test Movie');
-      expect(body.topContent[0].totalPlays).toBe(50);
+      expect(Object.keys(body).sort()).toEqual(['engagementBreakdown', 'summary', 'userProfiles']);
+      expect(vi.mocked(db.execute)).toHaveBeenCalledTimes(1);
 
       expect(body.summary.totalPlays).toBe(500);
       expect(body.summary.sessionInflationPct).toBeGreaterThan(0);
@@ -421,30 +353,11 @@ describe('Engagement Routes', () => {
       expect(body.message).toContain('access');
     });
 
-    it('should filter by mediaType when provided', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      const mockResults = mockEngagementResults();
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/engagement?mediaType=movie',
-      });
-
-      expect(response.statusCode).toBe(200);
-      // SQL should include mediaType filter
-    });
-
     it('should respect custom date range', async () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
-      const mockResults = mockEngagementResults();
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+      vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
       const response = await app.inject({
         method: 'GET',
@@ -454,30 +367,11 @@ describe('Engagement Routes', () => {
       expect(response.statusCode).toBe(200);
     });
 
-    it('should respect limit parameter', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      const mockResults = mockEngagementResults();
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/engagement?limit=5',
-      });
-
-      expect(response.statusCode).toBe(200);
-      // SQL queries should use LIMIT 5
-    });
-
     it('should calculate engagement tier percentages correctly', async () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
-      const mockResults = mockEngagementResults();
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+      vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
       const response = await app.inject({
         method: 'GET',
@@ -501,9 +395,7 @@ describe('Engagement Routes', () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
 
-      const mockResults = mockEngagementResults();
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[0] as never);
-      vi.mocked(db.execute).mockResolvedValueOnce(mockResults[1] as never);
+      vi.mocked(db.execute).mockResolvedValueOnce(mockEngagementResult() as never);
 
       const response = await app.inject({
         method: 'GET',
@@ -524,257 +416,7 @@ describe('Engagement Routes', () => {
 
       const response = await app.inject({
         method: 'GET',
-        url: '/stats/engagement?period=invalid&limit=-1',
-      });
-
-      expect(response.statusCode).toBe(400);
-    });
-  });
-
-  describe('GET /stats/shows', () => {
-    it('should require authentication', async () => {
-      const app = Fastify({ logger: false });
-      await app.register(sensible);
-      app.decorate('authenticate', async () => {
-        throw new Error('Unauthorized');
-      });
-      app.decorate('requirePermission', permissionGuard(app));
-
-      await app.register(engagementRoutes, { prefix: '/stats' });
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/shows',
-      });
-
-      expect(response.statusCode).toBe(500);
-      await app.close();
-    });
-
-    it('should return show stats with default parameters', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      vi.mocked(db.execute).mockResolvedValueOnce({
-        rows: [
-          {
-            show_title: 'Test Show',
-            thumb_path: '/thumb.jpg',
-            server_id: randomUUID(),
-            year: 2024,
-            total_episode_views: '100',
-            total_watch_hours: '50.5',
-            unique_viewers: '15',
-            avg_episodes_per_viewer: '6.7',
-            avg_completion_rate: '85.0',
-            binge_score: '75.5',
-            valid_sessions: '90',
-            total_sessions: '110',
-          },
-        ],
-      } as never);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/shows',
-      });
-
-      expect(response.statusCode).toBe(200);
-      const body = response.json();
-
-      expect(body).toHaveProperty('data');
-      expect(body).toHaveProperty('total');
-      expect(body.data).toHaveLength(1);
-      expect(body.data[0].showTitle).toBe('Test Show');
-      expect(body.data[0].totalEpisodeViews).toBe(100);
-      expect(body.data[0].bingeScore).toBe(75.5);
-    });
-
-    it('should validate and reject invalid serverId', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/shows?serverId=not-a-uuid',
-      });
-
-      expect(response.statusCode).toBe(400);
-    });
-
-    it('should reject access to unauthorized server', async () => {
-      const authorizedServer = randomUUID();
-      const unauthorizedServer = randomUUID();
-      const viewerUser = createViewerUser([authorizedServer]);
-      app = await buildTestApp(viewerUser);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: `/stats/shows?serverId=${unauthorizedServer}`,
-      });
-
-      expect(response.statusCode).toBe(403);
-    });
-
-    it('should support different orderBy options', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      const mockResult = {
-        rows: [
-          {
-            show_title: 'Test Show',
-            thumb_path: '/thumb.jpg',
-            server_id: randomUUID(),
-            year: 2024,
-            total_episode_views: '100',
-            total_watch_hours: '50.5',
-            unique_viewers: '15',
-            avg_episodes_per_viewer: '6.7',
-            avg_completion_rate: '85.0',
-            binge_score: '75.5',
-            valid_sessions: '90',
-            total_sessions: '110',
-          },
-        ],
-      };
-
-      for (const orderBy of [
-        'totalEpisodeViews',
-        'totalWatchHours',
-        'bingeScore',
-        'uniqueViewers',
-      ]) {
-        vi.mocked(db.execute).mockResolvedValueOnce(mockResult as never);
-
-        const response = await app.inject({
-          method: 'GET',
-          url: `/stats/shows?orderBy=${orderBy}`,
-        });
-
-        expect(response.statusCode).toBe(200);
-      }
-    });
-
-    it('should use materialized view for all-time queries', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      vi.mocked(db.execute).mockResolvedValueOnce({
-        rows: [],
-      } as never);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/shows?period=all',
-      });
-
-      expect(response.statusCode).toBe(200);
-      // Should query top_shows_by_engagement view
-    });
-
-    it('should use daily aggregates for date-filtered queries', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      vi.mocked(db.execute).mockResolvedValueOnce({
-        rows: [],
-      } as never);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/shows?period=week',
-      });
-
-      expect(response.statusCode).toBe(200);
-      // Should query daily_content_engagement
-    });
-
-    it('grades dated show episodes with the same tiers as the all-time view', async () => {
-      app = await buildTestApp(createOwnerUser());
-      vi.mocked(db.execute).mockResolvedValueOnce({ rows: [] } as never);
-
-      const response = await app.inject({ method: 'GET', url: '/stats/shows?period=month' });
-
-      expect(response.statusCode).toBe(200);
-      const { sql } = renderSql(vi.mocked(db.execute).mock.calls[0]![0] as SQL);
-      expect(sql).toContain("* 0.85 THEN 'watched'");
-      expect(sql).not.toContain("'finished'");
-      expect(sql).not.toContain("'completed'");
-    });
-
-    it('should respect limit parameter', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      vi.mocked(db.execute).mockResolvedValueOnce({
-        rows: [],
-      } as never);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/shows?limit=20',
-      });
-
-      expect(response.statusCode).toBe(200);
-      // SQL should use LIMIT 20
-    });
-
-    it('should transform database rows to ShowEngagement format', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      const serverId = randomUUID();
-      vi.mocked(db.execute).mockResolvedValueOnce({
-        rows: [
-          {
-            show_title: 'Breaking Bad',
-            thumb_path: '/breaking-bad.jpg',
-            server_id: serverId,
-            year: 2008,
-            total_episode_views: '200',
-            total_watch_hours: '100.5',
-            unique_viewers: '25',
-            avg_episodes_per_viewer: '8.0',
-            avg_completion_rate: '90.5',
-            binge_score: '85.5',
-            valid_sessions: '180',
-            total_sessions: '220',
-          },
-        ],
-      } as never);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/shows',
-      });
-
-      expect(response.statusCode).toBe(200);
-      const body = response.json();
-
-      expect(body.data[0]).toEqual({
-        showTitle: 'Breaking Bad',
-        thumbPath: '/breaking-bad.jpg',
-        serverId: serverId,
-        year: 2008,
-        totalEpisodeViews: 200,
-        totalWatchHours: 100.5,
-        uniqueViewers: 25,
-        avgEpisodesPerViewer: 8.0,
-        avgCompletionRate: 90.5,
-        bingeScore: 85.5,
-        validSessions: 180,
-        totalSessions: 220,
-      });
-    });
-
-    it('should reject invalid query parameters', async () => {
-      const ownerUser = createOwnerUser();
-      app = await buildTestApp(ownerUser);
-
-      const response = await app.inject({
-        method: 'GET',
-        url: '/stats/shows?orderBy=invalid&limit=-5',
+        url: '/stats/engagement?period=invalid',
       });
 
       expect(response.statusCode).toBe(400);

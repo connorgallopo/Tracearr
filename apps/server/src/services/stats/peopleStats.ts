@@ -18,7 +18,7 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { serverUsers, servers } from '../../db/schema.js';
-import { countedSessionSql, localSessionSql } from '../../db/sessions/rules.js';
+import { countedSessionSql, countedViewersSql, localSessionSql } from '../../db/sessions/rules.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { likePattern } from '../../utils/listQuery.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
@@ -338,7 +338,7 @@ export async function queryIdentityRangeStats(input: {
         time_bucket(${bucketInterval}::interval, s.started_at AT TIME ZONE ${timezone})::text AS date,
         ROUND(
           COUNT(DISTINCT ${CHAIN_S}) FILTER (WHERE ${countedSessionSql('s')})::numeric
-            / NULLIF(COUNT(DISTINCT su.user_id), 0),
+            / NULLIF(${countedViewersSql(countedSessionSql('s'))}, 0),
           2
         )::float8 AS count
       FROM sessions s

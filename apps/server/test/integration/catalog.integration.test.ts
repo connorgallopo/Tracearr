@@ -355,7 +355,8 @@ describe('catalog browse endpoint against a real database', () => {
       ratingKey: 'sort-alpha',
       durationMs: 500_000,
     });
-    // Bravo: 2 plays (2 long sessions) + 1 short (viewer-only) session -> 3 viewers, 300_000ms.
+    // Bravo: 2 plays (2 long sessions) + 1 short session, which is not a play and so not a
+    // viewer -> 2 viewers, 300_000ms.
     await seedSession({
       serverId: server.id,
       serverUserId: suB1.id,
@@ -421,8 +422,10 @@ describe('catalog browse endpoint against a real database', () => {
     expect(watchTimeBody.data.map((r) => r.mediaId)).toEqual([charlie, alpha, bravo, delta]);
 
     const { body: viewersBody } = await fetchCatalog(app, 'type=movie&sort=viewers&pageSize=60');
-    expect(viewersBody.data.map((r) => r.mediaId)).toEqual([bravo, charlie, alpha, delta]);
-    expect(viewersBody.data.map((r) => r.viewers)).toEqual([3, 2, 1, 0]);
+    // Bravo and Charlie tie on 2 viewers; the sort breaks ties on media id, descending.
+    const tied = [bravo, charlie].sort().reverse();
+    expect(viewersBody.data.map((r) => r.mediaId)).toEqual([...tied, alpha, delta]);
+    expect(viewersBody.data.map((r) => r.viewers)).toEqual([2, 2, 1, 0]);
   });
 
   it('folds a merged loser movies plays, viewers and watched state onto the winner row', async () => {

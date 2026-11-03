@@ -33,7 +33,6 @@ const ROUTES = [
   '/stats/plays-by-hourofday',
   '/stats/top-content',
   '/stats/engagement',
-  '/stats/shows',
 ];
 
 let app: FastifyInstance;

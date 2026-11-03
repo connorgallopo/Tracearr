@@ -5,6 +5,10 @@
     {
       "type": "note",
       "text": "Tracearr now runs on Node.js 26; servers behind an HTTPS reverse proxy are reached over HTTP/2 when the proxy offers it"
+    },
+    {
+      "type": "fix",
+      "text": "viewer counts on Overview shelves, Browse and Top movies and shows no longer count people who opened a title for seconds"
     }
   ]
 }

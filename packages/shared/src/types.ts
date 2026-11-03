@@ -2267,43 +2267,6 @@ export interface ContentEngagement {
   lastWatchedAt: Date;
 }
 
-// Top content with engagement metrics (from top_content_by_plays view)
-export interface TopContentEngagement {
-  ratingKey: string;
-  title: string;
-  showTitle: string | null;
-  type: MediaType;
-  thumbPath: string | null;
-  serverId: string | null;
-  year: number | null;
-  totalPlays: number;
-  totalWatchHours: number;
-  uniqueViewers: number;
-  validSessions: number;
-  totalSessions: number;
-  completions: number;
-  rewatches: number;
-  abandonments: number;
-  completionRate: number;
-  abandonmentRate: number;
-}
-
-// Show-level engagement (from top_shows_by_engagement view)
-export interface ShowEngagement {
-  showTitle: string;
-  thumbPath: string | null;
-  serverId: string | null;
-  year: number | null;
-  totalEpisodeViews: number;
-  totalWatchHours: number;
-  uniqueViewers: number;
-  avgEpisodesPerViewer: number;
-  avgCompletionRate: number;
-  bingeScore: number;
-  validSessions: number;
-  totalSessions: number;
-}
-
 // User engagement profile (from user_engagement_profile view)
 export interface UserEngagementProfile {
   serverUserId: string;
@@ -2334,8 +2297,6 @@ export interface EngagementTierBreakdown {
 
 // Main engagement stats response
 export interface EngagementStats {
-  topContent: TopContentEngagement[];
-  topShows: ShowEngagement[];
   engagementBreakdown: EngagementTierBreakdown[];
   userProfiles: UserEngagementProfile[];
   // Summary metrics
@@ -2346,12 +2307,6 @@ export interface EngagementStats {
     sessionInflationPct: number; // How much overcounting would occur with raw sessions
     avgCompletionRate: number;
   };
-}
-
-// Show stats response (for GET /stats/shows)
-export interface ShowStatsResponse {
-  data: ShowEngagement[];
-  total: number;
 }
 
 // =============================================================================

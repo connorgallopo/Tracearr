@@ -208,12 +208,9 @@ export type {
   EngagementTier,
   UserBehaviorType,
   ContentEngagement,
-  TopContentEngagement,
-  ShowEngagement,
   UserEngagementProfile,
   EngagementTierBreakdown,
   EngagementStats,
-  ShowStatsResponse,
   // Device compatibility
   DeviceCompatibilityRow,
   DeviceCompatibilityResponse,
@@ -600,7 +597,6 @@ export {
   engagementTierSchema,
   userBehaviorTypeSchema,
   engagementQuerySchema,
-  showsQuerySchema,
   // Library stats
   libraryStatsQuerySchema,
   libraryStatusQuerySchema,
@@ -803,7 +799,6 @@ export type {
   ImportJobStatus,
   // Engagement tracking
   EngagementQueryInput,
-  ShowsQueryInput,
   // Library stats
   LibraryStatsQueryInput,
   LibraryStatusQueryInput,

@@ -47,6 +47,15 @@ export function countedSession(alias = ''): string {
 
 export const countedSessionSql = (alias?: string): SQL => sql.raw(countedSession(alias));
 
+/**
+ * Viewers of a title, show, genre or library: distinct identities with at least one counted
+ * play, so viewers never exceed plays. `counted` is the row shape's counted test:
+ * countedSessionSql(alias) on sessions, `p.counted` on user_media_plays_daily.
+ */
+export function countedViewersSql(counted: SQL, userCol: SQL = sql`su.user_id`): SQL {
+  return sql`COUNT(DISTINCT ${userCol}) FILTER (WHERE ${counted})`;
+}
+
 /** History's default media filter when no type is asked for: everything but trailers. */
 export function historyMediaTypeDefault(alias = 's'): SQL {
   return sql.raw(`${alias}.media_type <> 'trailer'`);
