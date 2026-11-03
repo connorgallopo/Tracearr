@@ -112,10 +112,19 @@
     "noViolationSender": "Для мобильных push-уведомлений выключено получение нарушений",
     "noAutomationSends": "Ни одна автоматизация не отправляет это в мобильные push-уведомления",
     "eventsFooter": "Сервер отправляет событие, когда автоматизация направляет его в канал доставки \"Мобильные push-уведомления\". Эти переключатели определяют, какие из таких событий показывать на этом устройстве. Автоматизации настраиваются в веб-панели.",
+    "sharedEventsFooter": "",
     "sentByAutomations_one": "Отправляет {{count}} автоматизация",
     "sentByAutomations_few": "Отправляют {{count}} автоматизации",
     "sentByAutomations_many": "Отправляют {{count}} автоматизаций",
-    "sentByAutomations_other": "Отправляют {{count}} автоматизаций"
+    "sentByAutomations_other": "Отправляют {{count}} автоматизаций",
+    "alsoSentBy_one": "",
+    "alsoSentBy_few": "",
+    "alsoSentBy_many": "",
+    "alsoSentBy_other": "",
+    "scopedSenders_one": "",
+    "scopedSenders_few": "",
+    "scopedSenders_many": "",
+    "scopedSenders_other": ""
   },
   "session": {
     "streamTerminated": "Поток завершён",
