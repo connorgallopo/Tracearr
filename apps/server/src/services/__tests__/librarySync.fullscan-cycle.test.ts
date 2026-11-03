@@ -346,24 +346,30 @@ describe('LibrarySyncService full-scan cycle', () => {
   });
 
   it('stamps the completed-scan marker with the time the scan started listing', async () => {
-    const client = makeMockClient({ totalCount: 100 });
-    client.getLibraryItems.mockImplementation(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 25));
-      return { items: [], totalCount: 100 };
-    });
-    mockCreateClient.mockReturnValue(client);
-    const before = Date.now();
+    // A real sleep can wake a millisecond short of Date.now(), so the listing moves the clock instead.
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      const client = makeMockClient({ totalCount: 100 });
+      client.getLibraryItems.mockImplementation(async () => {
+        vi.setSystemTime(Date.now() + 60_000);
+        return { items: [], totalCount: 100 };
+      });
+      mockCreateClient.mockReturnValue(client);
+      const before = Date.now();
 
-    await service.syncServer('srv-1', undefined, 'manual');
+      await service.syncServer('srv-1', undefined, 'manual');
 
-    const marker = Date.parse(
-      (await mockRedis.get('tracearr:library:sync:fullscan-done:srv-1:1')) ?? ''
-    );
-    const dueClock = Date.parse(
-      (await mockRedis.get('tracearr:library:sync:fullscan:srv-1:1')) ?? ''
-    );
-    expect(marker).toBeGreaterThanOrEqual(before);
-    expect(dueClock - marker).toBeGreaterThanOrEqual(25);
+      const marker = Date.parse(
+        (await mockRedis.get('tracearr:library:sync:fullscan-done:srv-1:1')) ?? ''
+      );
+      const dueClock = Date.parse(
+        (await mockRedis.get('tracearr:library:sync:fullscan:srv-1:1')) ?? ''
+      );
+      expect(marker).toBeGreaterThanOrEqual(before);
+      expect(dueClock - marker).toBeGreaterThanOrEqual(60_000);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it('always forces full scan for manual triggers', async () => {
