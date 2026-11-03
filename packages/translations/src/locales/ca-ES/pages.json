@@ -88,9 +88,9 @@
         "availableThisWeek_other": "{{count}} han estat disponible aquesta setmana"
       },
       "link": {
-        "title": "",
-        "description": "",
-        "action": ""
+        "title": "El vostre compte encara no està enllaçat",
+        "description": "Les reproduccions del vostre compte de Jellyfin o Emby es registren a nom d'una persona separada fins que l'enllaceu des de la fila d'aquest servidor a Configuració.",
+        "action": "Obre la configuració del servidor"
       },
       "episodes_one": "{{count}} episodi",
       "episodes_other": "{{count}} episodis"
@@ -549,7 +549,7 @@
         },
         "columns": {
           "hoursPerGb": "Hores/GB",
-          "lastWatched": ""
+          "lastWatched": "Darrera visualització"
         }
       },
       "matchBadge": {
@@ -572,7 +572,7 @@
       "peakHour": "Hora punta",
       "viewingHours": "Hores de visionament",
       "peak": "Màxim:",
-      "viewingTrend": "",
+      "viewingTrend": "Tendència de visionament",
       "busiest": "Amb més activitat:",
       "quietest": "Amb menys activitat:",
       "bingeHighlights": "Destacats de marató",
@@ -694,8 +694,8 @@
       "monthly": {
         "watchCount": "Visualitzacions",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "No hi ha dades de visionament",
+          "description": "Les tendències de visionament apareixeran aquí quan hi hagi dades disponibles"
         }
       },
       "growth": {
@@ -2193,7 +2193,7 @@
         "reset": "Connexió reiniciada",
         "tls": "Error de TLS",
         "http": "HTTP {{status}}",
-        "relay": "",
+        "relay": "Retransmissor de Plex",
         "unknown": "Ha fallat la connexió"
       },
       "connectionsReachable": "{{reachable}} de {{total}} connexions accessibles",
