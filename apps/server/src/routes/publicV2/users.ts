@@ -11,6 +11,7 @@ import { sql } from 'drizzle-orm';
 import type { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { db } from '../../db/client.js';
+import { lastDaysWindow, rollupDayWindowSql } from '../../db/sessions/rules.js';
 import { decodeCursor, encodeCursor } from '../../utils/cursor.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 import {
@@ -19,7 +20,6 @@ import {
   idList,
   runHistoryPage,
   STATS_WINDOWS,
-  windowDayFilter,
   type RouteConfig,
   type StatsWindowKey,
 } from './shared.js';
@@ -229,7 +229,7 @@ export function registerUsersRoutes(app: FastifyInstance, routeConfig: RouteConf
             COUNT(DISTINCT p.chain_id) FILTER (WHERE p.counted) AS plays,
             COALESCE(SUM(p.watched_ms), 0) AS watch_time_ms
           FROM user_media_plays_daily p
-          WHERE ${scope}${windowDayFilter(sql`p.day`, win.days)}
+          WHERE ${scope}${rollupDayWindowSql(lastDaysWindow(win.days), sql`p.day`)}
         `);
         const row = result.rows[0] as { plays: string | number; watch_time_ms: string | number };
         windows[win.key] = {

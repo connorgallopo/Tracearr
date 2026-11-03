@@ -16,7 +16,7 @@ import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 import sensible from '@fastify/sensible';
 import type { Redis } from 'ioredis';
 import { eq, sql } from 'drizzle-orm';
-import type { AuthUser, ShelvesResponse } from '@tracearr/shared';
+import type { AuthUser, ShelvesResponse, TopMoviesResponse } from '@tracearr/shared';
 import { REDIS_KEYS } from '@tracearr/shared';
 import {
   createTestServer,
@@ -29,7 +29,9 @@ import { createMockRedis } from '@tracearr/test-utils/mocks';
 import { db } from '../../src/db/client.js';
 import { media } from '../../src/db/schema.js';
 import { libraryShelvesRoute } from '../../src/routes/library/shelves.js';
+import { libraryTopContentRoute } from '../../src/routes/library/topContent.js';
 import { buildLibraryCacheKey } from '../../src/routes/library/utils.js';
+import { getMediaStats } from '../../src/services/library/mediaDetailService.js';
 import { resolveMediaForItem } from '../../src/services/library/mediaResolutionService.js';
 import { setSetting } from '../../src/services/settings.js';
 import {
@@ -50,6 +52,7 @@ async function buildApp(authUser: AuthUser): Promise<{ app: FastifyInstance; red
   const redis = createMockRedis() as unknown as Redis;
   app.decorate('redis', redis);
   await app.register(libraryShelvesRoute, { prefix: '/library' });
+  await app.register(libraryTopContentRoute, { prefix: '/library' });
   return { app, redis };
 }
 
@@ -64,6 +67,10 @@ async function refreshPlaysAggregate(): Promise<void> {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+function startOfTodayUtc(): number {
+  return new Date().setUTCHours(0, 0, 0, 0);
+}
 
 interface SeedMovieOptions {
   serverId: string;
@@ -307,92 +314,182 @@ describe('shelves command center endpoint against a real database', () => {
     expect(allBody.kpis.watchedInPeriod.titlesTouched).toBe(2);
   });
 
-  it('period=day counts a play from yesterdays UTC day bucket, not just todays partial bucket', async () => {
+  it('period=week covers 7 UTC days ending today: midnight 6 days back is in, noon 7 days back is out', async () => {
     const server = await createTestServer({ type: 'plex' });
     const user = await createTestUser();
     const account = await createTestServerUser({ serverId: server.id, userId: user.id });
     const { app } = await buildApp(ownerFor());
+    const today = startOfTodayUtc();
 
-    // user_media_plays_daily.day is time_bucket('1 day', started_at) - always
-    // midnight UTC of the session's calendar date. A session anywhere on
-    // "yesterday" (relative to whenever this test runs) buckets to yesterday
-    // 00:00 UTC, which sits before "now minus 24h" for any time of day except
-    // exactly midnight, so this reliably lands on the wrong side of an
-    // unbucketed comparison regardless of when the suite runs.
-    const now = new Date();
-    const yesterdayNoon = new Date(
-      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 1, 12, 0, 0)
-    );
-
-    const movie = await seedMovie({
+    const inside = await seedMovie({
       serverId: server.id,
-      ratingKey: 'day-bucket-yesterday',
-      title: 'Day Bucket Yesterday Movie',
-      year: 2020,
-      tmdbId: 906_001,
-    });
-    await seedSession({
-      serverId: server.id,
-      serverUserId: account.id,
-      mediaId: movie,
-      ratingKey: 'day-bucket-yesterday',
-      durationMs: 300_000,
-      startedAt: yesterdayNoon,
-    });
-
-    await refreshPlaysAggregate();
-
-    const { statusCode, body } = await fetchShelves(app, '?period=day');
-    expect(statusCode).toBe(200);
-    expect(body.mostPopularMovies.map((r) => r.mediaId)).toContain(movie);
-    expect(body.kpis.watchedInPeriod.titlesTouched).toBe(1);
-    expect(body.kpis.hoursWatched).toBeGreaterThan(0);
-  });
-
-  it('period=week includes a play at the exact truncated window edge (day-bucket boundary, not a comfortable 1d/10d gap)', async () => {
-    const server = await createTestServer({ type: 'plex' });
-    const user = await createTestUser();
-    const account = await createTestServerUser({ serverId: server.id, userId: user.id });
-    const { app } = await buildApp(ownerFor());
-
-    // Midnight UTC of the day exactly 7 days back. After truncation the
-    // window's lower bound is this same instant, so the play lands right on
-    // the boundary; before truncation the raw instant threshold (now - 7d)
-    // falls later that same day, excluding it.
-    const boundaryInstant = new Date(Date.now() - 7 * DAY_MS);
-    const boundaryDayStart = new Date(
-      Date.UTC(
-        boundaryInstant.getUTCFullYear(),
-        boundaryInstant.getUTCMonth(),
-        boundaryInstant.getUTCDate(),
-        0,
-        0,
-        0
-      )
-    );
-
-    const movie = await seedMovie({
-      serverId: server.id,
-      ratingKey: 'week-boundary-edge',
-      title: 'Week Boundary Edge Movie',
+      ratingKey: 'week-first-day',
+      title: 'Week First Day Movie',
       year: 2020,
       tmdbId: 906_002,
     });
     await seedSession({
       serverId: server.id,
       serverUserId: account.id,
-      mediaId: movie,
-      ratingKey: 'week-boundary-edge',
+      mediaId: inside,
+      ratingKey: 'week-first-day',
       durationMs: 300_000,
-      startedAt: boundaryDayStart,
+      startedAt: new Date(today - 6 * DAY_MS),
+    });
+    const outside = await seedMovie({
+      serverId: server.id,
+      ratingKey: 'week-eighth-day',
+      title: 'Week Eighth Day Movie',
+      year: 2020,
+      tmdbId: 906_003,
+    });
+    await seedSession({
+      serverId: server.id,
+      serverUserId: account.id,
+      mediaId: outside,
+      ratingKey: 'week-eighth-day',
+      durationMs: 300_000,
+      startedAt: new Date(today - 7 * DAY_MS + 12 * 60 * 60 * 1000),
     });
 
     await refreshPlaysAggregate();
 
     const { statusCode, body } = await fetchShelves(app, '?period=week');
     expect(statusCode).toBe(200);
-    expect(body.mostPopularMovies.map((r) => r.mediaId)).toContain(movie);
+    const popularIds = body.mostPopularMovies.map((r) => r.mediaId);
+    expect(popularIds).toContain(inside);
+    expect(popularIds).not.toContain(outside);
     expect(body.kpis.watchedInPeriod.titlesTouched).toBe(1);
+  });
+
+  it("period=day covers today's UTC day only", async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const account = await createTestServerUser({ serverId: server.id, userId: user.id });
+    const { app } = await buildApp(ownerFor());
+    const today = startOfTodayUtc();
+
+    const todayMovie = await seedMovie({
+      serverId: server.id,
+      ratingKey: 'day-today',
+      title: 'Day Today Movie',
+      year: 2020,
+      tmdbId: 906_001,
+    });
+    await seedSession({
+      serverId: server.id,
+      serverUserId: account.id,
+      mediaId: todayMovie,
+      ratingKey: 'day-today',
+      durationMs: 300_000,
+      startedAt: new Date(today),
+    });
+    const yesterdayMovie = await seedMovie({
+      serverId: server.id,
+      ratingKey: 'day-yesterday',
+      title: 'Day Yesterday Movie',
+      year: 2020,
+      tmdbId: 906_004,
+    });
+    await seedSession({
+      serverId: server.id,
+      serverUserId: account.id,
+      mediaId: yesterdayMovie,
+      ratingKey: 'day-yesterday',
+      durationMs: 300_000,
+      startedAt: new Date(today - DAY_MS + 12 * 60 * 60 * 1000),
+    });
+
+    await refreshPlaysAggregate();
+
+    const { statusCode, body } = await fetchShelves(app, '?period=day');
+    expect(statusCode).toBe(200);
+    const popularIds = body.mostPopularMovies.map((r) => r.mediaId);
+    expect(popularIds).toContain(todayMovie);
+    expect(popularIds).not.toContain(yesterdayMovie);
+    expect(body.kpis.watchedInPeriod.titlesTouched).toBe(1);
+  });
+
+  it('custom range covers its first to last day inclusive', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const account = await createTestServerUser({ serverId: server.id, userId: user.id });
+    const { app } = await buildApp(ownerFor());
+    const today = startOfTodayUtc();
+    const noon = 12 * 60 * 60 * 1000;
+
+    const movie = await seedMovie({
+      serverId: server.id,
+      ratingKey: 'custom-range',
+      title: 'Custom Range Movie',
+      year: 2020,
+      tmdbId: 906_005,
+    });
+    for (const startedAt of [today - 3 * DAY_MS + noon, today - DAY_MS + noon, today]) {
+      await seedSession({
+        serverId: server.id,
+        serverUserId: account.id,
+        mediaId: movie,
+        ratingKey: 'custom-range',
+        durationMs: 300_000,
+        startedAt: new Date(startedAt),
+      });
+    }
+
+    await refreshPlaysAggregate();
+
+    const startDate = new Date(today - 3 * DAY_MS).toISOString();
+    const endDate = new Date(today - DAY_MS).toISOString();
+    const { statusCode, body } = await fetchShelves(
+      app,
+      `?period=custom&startDate=${startDate}&endDate=${endDate}`
+    );
+    expect(statusCode).toBe(200);
+    expect(body.mostPopularMovies.find((r) => r.mediaId === movie)?.plays).toBe(2);
+  });
+
+  it('the shelf, top-movies and media stats cover the same days for the 30-day preset', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const account = await createTestServerUser({ serverId: server.id, userId: user.id });
+    const { app } = await buildApp(ownerFor());
+    const today = startOfTodayUtc();
+    const noon = 12 * 60 * 60 * 1000;
+
+    const movie = await seedMovie({
+      serverId: server.id,
+      ratingKey: 'thirty-day-edge',
+      title: 'Thirty Day Edge Movie',
+      year: 2020,
+      tmdbId: 906_006,
+    });
+    for (const daysBack of [29, 30]) {
+      await seedSession({
+        serverId: server.id,
+        serverUserId: account.id,
+        mediaId: movie,
+        ratingKey: 'thirty-day-edge',
+        durationMs: 300_000,
+        startedAt: new Date(today - daysBack * DAY_MS + noon),
+      });
+    }
+
+    await refreshPlaysAggregate();
+
+    const { body: shelves } = await fetchShelves(app, '?period=month');
+    expect.soft(shelves.mostPopularMovies.find((r) => r.mediaId === movie)?.plays).toBe(1);
+
+    const top = (
+      await app.inject({ method: 'GET', url: '/library/top-movies?period=30d' })
+    ).json<TopMoviesResponse>();
+    expect.soft(top.items.find((r) => r.title === 'Thirty Day Edge Movie')?.totalPlays).toBe(1);
+
+    const stats = await getMediaStats(
+      { kind: 'media', aliases: [movie], seasonNumber: null, showAliases: [] },
+      undefined,
+      'all'
+    );
+    expect.soft(stats.last_30.combined.plays).toBe(1);
   });
 
   it('a title played in-window but removed from the library does not surface in mostPopular or count toward titlesTouched', async () => {

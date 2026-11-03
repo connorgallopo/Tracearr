@@ -25,9 +25,8 @@ import {
   buildCatalogTotalsQuery,
   buildCatalogCandidatesQuery,
   buildLetterCountsQuery,
-  buildValueRollupCte,
-  expandMediaAliases,
 } from '../../src/routes/library/catalog.js';
+import { buildValueRollupCte, expandMediaAliases } from '../../src/routes/library/queries.js';
 import { mediaSizeSubquery } from '../../src/routes/library/utils.js';
 
 // No new filter narrows the seeded set for these plan-shape assertions -

@@ -13,6 +13,10 @@
     {
       "type": "improved",
       "text": "binge highlights rank shows by episodes watched back to back per person; Top shows lists episodes per viewer"
+    },
+    {
+      "type": "fix",
+      "text": "the Overview shelves and Browse now cover exactly the days picked; a 30-day range no longer includes a 31st day"
     }
   ]
 }

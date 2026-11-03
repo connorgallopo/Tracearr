@@ -22,6 +22,7 @@ import { registerLibrariesRoutes } from './libraries.js';
 import { registerMediaRoutes } from './media.js';
 import { registerServersRoutes } from './servers.js';
 import { registerStreamsRoutes } from './streams.js';
+import { registerTopMediaRoutes } from './topMedia.js';
 import { registerUsersRoutes } from './users.js';
 import { registerViolationsRoutes } from './violations.js';
 import { registerWatchedMediaRoutes } from './watchedMedia.js';
@@ -102,6 +103,7 @@ export const publicV2Routes: FastifyPluginAsync = async (app) => {
   registerUsersRoutes(app, routeConfig);
   registerLibrariesRoutes(app, routeConfig);
   registerWatchedMediaRoutes(app, routeConfig);
+  registerTopMediaRoutes(app, routeConfig);
   registerViolationsRoutes(app, routeConfig);
   registerServersRoutes(app, routeConfig);
   registerEventsRoutes(app, routeConfig);

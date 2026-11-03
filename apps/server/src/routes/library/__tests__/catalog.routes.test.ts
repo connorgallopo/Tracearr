@@ -38,8 +38,8 @@ import {
   buildCatalogCandidatesQuery,
   buildLetterCountsQuery,
   buildLetterBuckets,
-  expandMediaAliases,
 } from '../catalog.js';
+import { expandMediaAliases } from '../queries.js';
 import { permissionGuard } from '../../../lib/scope.js';
 
 function normalize(sql: string): string {

@@ -1959,6 +1959,91 @@ registry.registerPath({
   },
 });
 
+// ============================================================================
+// GET /top-media
+// ============================================================================
+
+const TopMediaQuery = z.object({
+  media_type: z.enum(['movie', 'show']).openapi({
+    description: 'movie lists movies; show rolls each episode up to its series',
+  }),
+  days: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(365)
+    .default(30)
+    .openapi({
+      description:
+        'Window length: today plus the previous days - 1 UTC days, so 7 and 30 match the ' +
+        'last_7 and last_30 windows of /media/{ref}/stats',
+    }),
+  server_id: z
+    .uuid()
+    .optional()
+    .openapi({ description: 'Filter to specific server. Omit it for every server combined' }),
+  sort: z
+    .enum(['plays', 'watch_time', 'viewers'])
+    .default('plays')
+    .openapi({ description: 'Rank by this number, highest first' }),
+  cursor: z.string().optional().openapi({ description: 'Opaque cursor from meta.nextCursor' }),
+  pageSize: z.coerce.number().int().positive().max(1000).default(100),
+});
+
+const TopMediaRecord = z
+  .object({
+    media_id: z.uuid().openapi({ description: 'Canonical media id; merge losers fold into it' }),
+    media_type: z.enum(['movie', 'show']),
+    title: z.string().openapi({ example: 'Inception' }),
+    year: z.number().int().nullable().openapi({ example: 2010 }),
+    imdb_id: z.string().nullable().openapi({ example: 'tt1375666' }),
+    tmdb_id: z.number().int().nullable().openapi({ example: 27205 }),
+    tvdb_id: z
+      .number()
+      .int()
+      .nullable()
+      .openapi({ description: "On a show row, the series' own tvdb id" }),
+    plays: z.number().int().openapi({ description: 'Counted plays in the window' }),
+    watch_time_ms: z.number().int().openapi({ description: 'Watch time in the window' }),
+    unique_users: z.number().int().openapi({
+      description: 'People with at least one counted play in the window',
+    }),
+    last_watched_day: z.string().openapi({
+      description: 'Last UTC day in the window with a counted play, YYYY-MM-DD',
+      example: '2026-08-30',
+    }),
+  })
+  .openapi('TopMediaRecord');
+
+const TopMediaResponse = z
+  .object({ data: z.array(TopMediaRecord), meta: CursorMeta })
+  .openapi('TopMediaResponse');
+
+registry.registerPath({
+  method: 'get',
+  path: '/api/v2/public/top-media',
+  tags: ['Media'],
+  summary: 'Top media in a window',
+  description:
+    'Movies or shows ranked by plays, watch time or viewers over the last `days` UTC days, one ' +
+    'row per title: episodes count for their show and merged duplicates fold into one title. ' +
+    'Only titles with at least one counted play in the window appear. plays, watch_time_ms and ' +
+    'unique_users equal /media/{ref}/stats for the same title and window, combined across ' +
+    'servers, or the per_server entry for server_id when it is given. Titles tied on the sort ' +
+    'value order by media_id, descending. Pages are computed live, so a title can move between pages if ' +
+    'plays land while a client is paging.',
+  security: [{ bearerAuth: [] }],
+  request: { query: TopMediaQuery },
+  responses: {
+    200: {
+      description: 'Ranked media retrieved',
+      content: { 'application/json': { schema: TopMediaResponse } },
+    },
+    400: { description: 'Invalid query parameters or cursor' },
+    ...AUTH_ERROR_RESPONSES,
+  },
+});
+
 export function generateOpenAPIDocumentV2(): unknown {
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
@@ -1985,16 +2070,16 @@ Generate your API key in **Settings > Data & API > API**.
 
 ## Pagination
 
-The history, users, recently-added, watched-media and violations endpoints use cursor pagination via
-\`cursor\` and \`pageSize\`. Most cap pageSize at 100 with a default of 25; watched-media
-carries far smaller rows and allows up to 1000, defaulting to 100. Each paginated response
+The history, users, recently-added, watched-media, top-media and violations endpoints use cursor
+pagination via \`cursor\` and \`pageSize\`. Most cap pageSize at 100 with a default of 25;
+watched-media and top-media carry far smaller rows and allow up to 1000, defaulting to 100. Each paginated response
 carries a \`meta.nextCursor\` to fetch the following page. Streams, servers and libraries return the
 full set in one response.
 
 ## Filtering
 
-History, streams, watchers, recently-added, watched-media and violations accept \`server_id\` to filter
-by media server.
+History, streams, watchers, recently-added, watched-media, top-media and violations accept
+\`server_id\` to filter by media server.
 
 ## Live events
 

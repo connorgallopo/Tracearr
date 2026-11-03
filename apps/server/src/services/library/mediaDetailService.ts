@@ -10,7 +10,12 @@
 
 import { and, eq, isNull, sql, type SQL } from 'drizzle-orm';
 import type { WatchedState } from '@tracearr/shared';
-import { countedSessionSql, countedViewersSql } from '../../db/sessions/rules.js';
+import {
+  countedSessionSql,
+  countedViewersSql,
+  lastDaysWindow,
+  rollupDayWindowSql,
+} from '../../db/sessions/rules.js';
 import { db } from '../../db/client.js';
 import { media, servers } from '../../db/schema.js';
 import { buildMultiServerFragment, serverIdCondition } from '../../utils/serverFiltering.js';
@@ -30,7 +35,6 @@ import {
   idList,
   runHistoryPage,
   STATS_WINDOWS,
-  windowDayFilter,
   type StatsWindowKey,
 } from '../../routes/publicV2/shared.js';
 
@@ -743,7 +747,7 @@ export async function getMediaStats(
               ${countedViewersSql(countedSessionSql('s'))}::int AS unique_users
             FROM sessions s
             JOIN server_users su ON su.id = s.server_user_id
-            WHERE ${scopeFilter}${windowDayFilter(sql`s.started_at`, win.days)} ${serverFragment}
+            WHERE ${scopeFilter}${rollupDayWindowSql(lastDaysWindow(win.days), sql`s.started_at`)} ${serverFragment}
             GROUP BY GROUPING SETS ((s.server_id), ())
           `)
       : await db.execute(sql`
@@ -754,7 +758,7 @@ export async function getMediaStats(
               ${countedViewersSql(sql`p.counted`)}::int AS unique_users
             FROM user_media_plays_daily p
             JOIN server_users su ON su.id = p.server_user_id
-            WHERE ${scopeFilter}${windowDayFilter(sql`p.day`, win.days)} ${serverFragment}
+            WHERE ${scopeFilter}${rollupDayWindowSql(lastDaysWindow(win.days), sql`p.day`)} ${serverFragment}
             GROUP BY GROUPING SETS ((p.server_id), ())
           `);
 
@@ -848,7 +852,7 @@ export async function getMediaWatchers(args: GetMediaWatchersArgs): Promise<Medi
       FROM sessions s
       JOIN server_users su ON su.id = s.server_user_id
       LEFT JOIN users u ON u.id = su.user_id
-      WHERE ${sql.join(scopeSessionConditions(scope), sql` AND `)}${windowDayFilter(sql`s.started_at`, days)} ${serverFilter} ${authFragment}
+      WHERE ${sql.join(scopeSessionConditions(scope), sql` AND `)}${rollupDayWindowSql(lastDaysWindow(days), sql`s.started_at`)} ${serverFilter} ${authFragment}
       GROUP BY s.server_user_id, su.user_id, su.server_id, su.username, u.name, COALESCE(u.thumbnail, su.thumb_url)
       HAVING COUNT(DISTINCT COALESCE(s.reference_id, s.id)) FILTER (WHERE ${countedSessionSql('s')}) > 0
       ORDER BY watch_time_ms DESC, s.server_user_id
@@ -879,7 +883,7 @@ export async function getMediaWatchers(args: GetMediaWatchersArgs): Promise<Medi
       FROM user_media_plays_daily p
       JOIN server_users su ON su.id = p.server_user_id
       LEFT JOIN users u ON u.id = su.user_id
-      WHERE ${scopeFilter}${windowDayFilter(sql`p.day`, days)} ${serverFilter} ${authFragment}
+      WHERE ${scopeFilter}${rollupDayWindowSql(lastDaysWindow(days), sql`p.day`)} ${serverFilter} ${authFragment}
       GROUP BY p.server_user_id, su.user_id, su.server_id, su.username, u.name, COALESCE(u.thumbnail, su.thumb_url)
       HAVING BOOL_OR(p.counted)
       ORDER BY watch_time_ms DESC, p.server_user_id

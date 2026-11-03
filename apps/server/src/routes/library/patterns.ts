@@ -25,10 +25,10 @@ import {
   type TrendBucket,
   type TrendPoint,
 } from '@tracearr/shared';
-import { countedSessionSql, playCountSql } from '../../db/sessions/rules.js';
+import { ceilToUtcDay, countedSessionSql, playCountSql } from '../../db/sessions/rules.js';
 import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
-import { buildLibraryCacheKey, ceilToUtcDay, resolveLibraryWindow } from './utils.js';
+import { buildLibraryCacheKey, resolveLibraryWindow } from './utils.js';
 import { serverCacheSegment } from '../../lib/scope.js';
 
 interface RawBingeRow {

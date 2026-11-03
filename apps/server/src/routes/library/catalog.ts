@@ -55,7 +55,6 @@ import {
   type WatchedState,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { countedViewersSql } from '../../db/sessions/rules.js';
 import { resolutionBucketPredicate, resolutionRankSql } from '../../utils/resolutionBuckets.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import {
@@ -73,9 +72,7 @@ import {
 } from '../../services/library/mediaWatchedService.js';
 import { buildProxyUrl, posterVersionFor } from '../../services/imageProxy.js';
 import { getSetting } from '../../services/settings.js';
-import type { DateRange } from '../stats/utils.js';
 import {
-  ARTIST_OF_TRACK,
   LI_HAS_KNOWN_IMAGE,
   mediaSizeSubquery,
   buildLibraryCacheKey,
@@ -88,6 +85,7 @@ import {
   type CodecKind,
   type RawCodec,
 } from './codecFilter.js';
+import { buildValueRollupCte, expandMediaAliases } from './queries.js';
 
 type CatalogQueryInput = z.infer<typeof catalogQuerySchema>;
 
@@ -219,121 +217,6 @@ const VALUE_SORT_COLUMN: Record<'plays' | 'watch_time' | 'viewers', string> = {
   watch_time: 'watch_time_ms',
   viewers: 'viewers',
 };
-
-/**
- * Time-window predicate for the value_rollup CTE's `p.day` column.
- *
- * - dateRange === undefined: the CTE's historical default (30 days), used by
- *   every catalog.ts call site that doesn't pass an explicit window, so the
- *   catalog browse endpoint's plays/watch_time/viewers sorts are unchanged.
- * - dateRange.start === null: 'all' period, no lower bound.
- * - otherwise: bounded to [start, end) - end is only a meaningful upper bound
- *   for a 'custom' range; for the preset periods (day/week/month/year)
- *   resolveDateRange() sets end to "now", which this bound never excludes.
- *   `p.day` is a time_bucket('1 day', ...) UTC-midnight-aligned column, not an
- *   exact instant, so start/end are truncated to day boundaries before the
- *   comparison (mirrors the dailyEndFilter handling in stats/engagement.ts) -
- *   otherwise a bound that lands mid-day would exclude the rest of that day's
- *   bucket instead of including it.
- */
-function buildPlaysWindowFragment(dateRange: DateRange | undefined): SQL {
-  if (dateRange === undefined) {
-    return sql`AND p.day >= now() - interval '30 days'`;
-  }
-  if (!dateRange.start) {
-    return sql``;
-  }
-  const start = sql`date_trunc('day', ${dateRange.start}::timestamptz)`;
-  const end = sql`date_trunc('day', ${dateRange.end}::timestamptz) + interval '1 day'`;
-  return sql`AND p.day >= ${start} AND p.day < ${end}`;
-}
-
-/**
- * Expands canonical media ids to include their merge losers, so a caller that
- * only knows the canonical ids of a page can still match every session/play
- * row directly - those rows carry a loser's own id, never the winner's, in
- * media_id/show_media_id. Sargable against the cagg's own indexed columns,
- * unlike filtering on COALESCE(merged_into_id, media_id) (see
- * buildValueRollupCte's idsFilter).
- */
-export async function expandMediaAliases(canonicalIds: string[]): Promise<string[]> {
-  if (canonicalIds.length === 0) return [];
-  const idsArray = uuidArraySql(canonicalIds);
-  const result = await db.execute(
-    sql`SELECT id FROM media WHERE id = ANY(${idsArray}) OR merged_into_id = ANY(${idsArray})`
-  );
-  return (result.rows as unknown as { id: string }[]).map((row) => row.id);
-}
-
-/**
- * value_rollup CTE body (no leading WITH): alias-expanded plays/watch
- * time/viewer counts per canonical media id, window-bounded per
- * buildPlaysWindowFragment. Unbounded across the catalog when idsFilter is
- * omitted (drives the plays/watch_time/viewers sorts); bounded to a specific
- * id set for page-batched display fields otherwise - idsFilter must already
- * be alias-expanded (see expandMediaAliases), since it filters mediaCol
- * directly for sargability instead of matching through the COALESCE that
- * resolves a row back to its canonical id.
- */
-export function buildValueRollupCte(
-  type: LibraryMediaType,
-  serverIds: string[] | undefined,
-  idsFilter: string[] | undefined,
-  dateRange?: DateRange
-): SQL {
-  const mediaCol = {
-    movie: sql`p.media_id`,
-    show: sql`p.show_media_id`,
-    artist: sql`artist.media_id`,
-  }[type];
-  const serverFragment = buildMultiServerFragment(serverIds, 'p.server_id');
-  // A track's plays count toward the artist copy it sits under on its server;
-  // a track whose artist row is missing drops out.
-  const artistJoin =
-    type === 'artist'
-      ? sql`JOIN LATERAL (
-          SELECT ar.media_id ${ARTIST_OF_TRACK}
-          WHERE t.media_id = p.media_id AND t.server_id = p.server_id AND t.media_type = 'track'
-          ORDER BY ar.id
-          LIMIT 1
-        ) artist ON true`
-      : sql``;
-  // The movie guard: p.media_id is set on every session-backed row regardless
-  // of type, so without it an episode with a null/unresolved show_media_id (or
-  // any future linkage regression) would join into the movie candidate list
-  // via its own media_id and get counted as a "movie".
-  const typeGuard = {
-    movie: sql`AND am.media_type = 'movie'`,
-    show: sql`AND p.show_media_id IS NOT NULL`,
-    artist: sql`AND p.media_type = 'track'`,
-  }[type];
-  // Artists also narrow p to their own tracks first, so the artist LATERAL runs
-  // only for those rows instead of every track play in the window.
-  const idsFragment =
-    idsFilter && idsFilter.length > 0
-      ? type === 'artist'
-        ? sql`AND (p.media_id, p.server_id) IN (
-            SELECT t.media_id, t.server_id ${ARTIST_OF_TRACK}
-            WHERE ar.media_id = ANY(${uuidArraySql(idsFilter)}) AND t.media_type = 'track'
-          ) AND ${mediaCol} = ANY(${uuidArraySql(idsFilter)})`
-        : sql`AND ${mediaCol} = ANY(${uuidArraySql(idsFilter)})`
-      : sql``;
-  const windowFragment = buildPlaysWindowFragment(dateRange);
-  return sql`
-    value_rollup AS (
-      SELECT COALESCE(am.merged_into_id, ${mediaCol}) AS canonical_id,
-             COUNT(DISTINCT p.chain_id) FILTER (WHERE p.counted)::bigint AS plays,
-             SUM(p.watched_ms)::bigint AS watch_time_ms,
-             ${countedViewersSql(sql`p.counted`)}::bigint AS viewers
-      FROM user_media_plays_daily p
-      ${artistJoin}
-      JOIN media am ON am.id = ${mediaCol}
-      JOIN server_users su ON su.id = p.server_user_id
-      WHERE 1=1 ${windowFragment} ${typeGuard} ${serverFragment} ${idsFragment}
-      GROUP BY COALESCE(am.merged_into_id, ${mediaCol})
-    )
-  `;
-}
 
 /** Bytes-per-GB used to convert the sizeGbMin/sizeGbMax query params into the
  * file_size column's raw byte count. Base-1024, matching formatBytes (the

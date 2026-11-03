@@ -30,6 +30,11 @@ vi.mock('../publicV2/shared.js', async (importOriginal) => ({
   runHistoryPage: vi.fn(async () => ({ data: [], nextCursor: null })),
 }));
 
+vi.mock('../library/queries.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../library/queries.js')>()),
+  listTopMedia: vi.fn(async () => ({ data: [], nextCursor: null })),
+}));
+
 vi.mock('../../services/settings.js', () => ({
   getSetting: vi.fn(() => Promise.resolve(240)),
 }));
@@ -37,6 +42,8 @@ vi.mock('../../services/settings.js', () => ({
 import { db } from '../../db/client.js';
 import { getSetting } from '../../services/settings.js';
 import { runHistoryPage } from '../publicV2/shared.js';
+import { listTopMedia } from '../library/queries.js';
+import { encodeRankCursor } from '../../utils/cursor.js';
 import { renderSql } from '../../test/helpers.js';
 import { publicV2Routes } from '../publicV2/index.js';
 import { resetPublicApiRateLimitCache } from '../publicV2/rateLimitCache.js';
@@ -277,6 +284,67 @@ describe('public API v2 skeleton', () => {
       expect(res.statusCode).toBe(400);
     });
 
+    it.each([
+      ['no media_type', ''],
+      ['days=0', 'media_type=movie&days=0'],
+      ['days=366', 'media_type=movie&days=366'],
+      ['sort=random', 'media_type=movie&sort=random'],
+      ['pageSize=1001', 'media_type=movie&pageSize=1001'],
+      ['an undecodable cursor', 'media_type=movie&cursor=not-a-cursor'],
+    ])('rejects a top-media request with %s with 400', async (_label, query) => {
+      const res = await app.inject({ method: 'GET', url: `/api/v2/public/top-media?${query}` });
+
+      expect(res.statusCode).toBe(400);
+    });
+
+    it('passes top-media defaults to the query and wraps its page in the cursor envelope', async () => {
+      const row = { media_id: '0f4d2a6e-8b1c-4e3f-9a7d-6c5b4a3f2e1d', plays: 3 };
+      vi.mocked(listTopMedia).mockClear();
+      vi.mocked(listTopMedia).mockResolvedValueOnce({
+        data: [row] as never,
+        nextCursor: 'next',
+      });
+
+      const res = await app.inject({
+        method: 'GET',
+        url: '/api/v2/public/top-media?media_type=show',
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(res.json()).toEqual({ data: [row], meta: { nextCursor: 'next', pageSize: 100 } });
+      expect(listTopMedia).toHaveBeenCalledWith({
+        kind: 'show',
+        days: 30,
+        serverIds: undefined,
+        sort: 'plays',
+        pageSize: 100,
+        after: null,
+      });
+    });
+
+    it('passes server_id, sort, days and a decoded cursor through to the top-media query', async () => {
+      const serverId = '6c5b4a3f-2e1d-4f3e-9a7d-0f4d2a6e8b1c';
+      const afterId = '0f4d2a6e-8b1c-4e3f-9a7d-6c5b4a3f2e1d';
+      vi.mocked(listTopMedia).mockClear();
+
+      const res = await app.inject({
+        method: 'GET',
+        url:
+          `/api/v2/public/top-media?media_type=movie&days=7&sort=viewers&pageSize=10` +
+          `&server_id=${serverId}&cursor=${encodeRankCursor(4, afterId)}`,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(listTopMedia).toHaveBeenCalledWith({
+        kind: 'movie',
+        days: 7,
+        serverIds: [serverId],
+        sort: 'viewers',
+        pageSize: 10,
+        after: { value: 4, id: afterId },
+      });
+    });
+
     it('returns an empty streams payload with a zeroed summary when no cache service exists', async () => {
       const res = await app.inject({ method: 'GET', url: '/api/v2/public/streams' });
 
@@ -332,6 +400,7 @@ describe('public API v2 skeleton', () => {
       '/api/v2/public/history',
       '/api/v2/public/streams',
       '/api/v2/public/watched-media?media_type=movie',
+      '/api/v2/public/top-media?media_type=movie',
       '/api/v2/public/violations',
       '/api/v2/public/violations/0f4d2a6e-8b1c-4e3f-9a7d-6c5b4a3f2e1d',
       '/api/v2/public/servers',

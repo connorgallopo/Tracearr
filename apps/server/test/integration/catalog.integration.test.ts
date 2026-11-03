@@ -28,7 +28,8 @@ import {
 import { createMockRedis } from '@tracearr/test-utils/mocks';
 import { db } from '../../src/db/client.js';
 import { media } from '../../src/db/schema.js';
-import { libraryCatalogRoute, buildValueRollupCte } from '../../src/routes/library/catalog.js';
+import { libraryCatalogRoute } from '../../src/routes/library/catalog.js';
+import { buildValueRollupCte } from '../../src/routes/library/queries.js';
 import {
   resolveMediaForItem,
   mergeMediaRows,

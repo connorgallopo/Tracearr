@@ -160,15 +160,6 @@ export const STATS_WINDOWS = [
 
 export type StatsWindowKey = (typeof STATS_WINDOWS)[number]['key'];
 
-// Compares col directly so the bound stays sargable and can exclude chunks.
-export function windowDayFilter(col: SQL, days: number | null): SQL {
-  if (days === null) return sql``;
-  const start = new Date();
-  start.setUTCHours(0, 0, 0, 0);
-  start.setUTCDate(start.getUTCDate() - (days - 1));
-  return sql` AND ${col} >= ${start}`;
-}
-
 function mapHistoryRow(row: HistoryRow) {
   return {
     id: row.chain_id,

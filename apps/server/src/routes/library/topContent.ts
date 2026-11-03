@@ -22,13 +22,9 @@ import {
 import { sql, type SQL } from 'drizzle-orm';
 import type { FastifyPluginAsync } from 'fastify';
 import { db } from '../../db/client.js';
+import { rollupDayWindowSql } from '../../db/sessions/rules.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
-import {
-  buildLibraryCacheKey,
-  LI_HAS_KNOWN_IMAGE,
-  resolveLibraryWindow,
-  rollupDayWindowSql,
-} from './utils.js';
+import { buildLibraryCacheKey, LI_HAS_KNOWN_IMAGE, resolveLibraryWindow } from './utils.js';
 import { serverCacheSegment } from '../../lib/scope.js';
 
 type SortBy = TopContentQueryInput['sortBy'];

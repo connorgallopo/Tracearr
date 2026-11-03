@@ -7,9 +7,10 @@
 
 import { sql, type SQL } from 'drizzle-orm';
 import type { Redis } from 'ioredis';
-import { REDIS_KEYS, TIME_MS } from '@tracearr/shared';
+import { REDIS_KEYS } from '@tracearr/shared';
 import { scopeFragment, type Scope } from '../../lib/scope.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
+import { lastDaysWindow, rollupDayWindowSql } from '../../db/sessions/rules.js';
 
 // A library_items row `li` whose thumb_path names a real image. Jellyfin/Emby paths carry
 // ?tag= only when the item had a Primary image at sync time; an untagged one 404s. The same
@@ -130,32 +131,7 @@ export function resolveLibraryWindow(
     };
   }
   const days = query.period === 'all' ? null : LIBRARY_PERIOD_DAYS[query.period];
-  return {
-    startDate: days === null ? null : new Date(now.getTime() - days * TIME_MS.DAY),
-    endDate: now,
-    lastDay: now,
-    cacheSegment: query.period,
-  };
-}
-
-/** The first UTC midnight at or after a date; a date already on a midnight is unchanged. */
-export function ceilToUtcDay(date: Date): Date {
-  return new Date(Math.ceil(date.getTime() / TIME_MS.DAY) * TIME_MS.DAY);
-}
-
-/**
- * A window over a user_media_plays_daily day column. `day` is a UTC bucket, so a preset's start
- * rounds up to the next UTC midnight: N days cover exactly N UTC days ending today, like the
- * show page. A custom start is already a midnight and is exact.
- */
-export function rollupDayWindowSql(
-  window: { startDate: Date | null; endDate: Date },
-  dayCol: SQL
-): SQL {
-  const lower = window.startDate
-    ? sql` AND ${dayCol} >= ${ceilToUtcDay(window.startDate)}::timestamptz`
-    : sql``;
-  return sql`${lower} AND ${dayCol} < ${window.endDate}::timestamptz`;
+  return { ...lastDaysWindow(days, now), lastDay: now, cacheSegment: query.period };
 }
 
 // Movie and episode plays keyed by the top-level title they count for: the show for an

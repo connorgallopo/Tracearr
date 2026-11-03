@@ -33,13 +33,13 @@ import { resolveServerIds } from '../../utils/serverFiltering.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import {
   albumCountSql,
-  buildValueRollupCte,
   pickBestResolution,
   buildCatalogPageQuery,
   buildPosterOrderFragment,
   posterFor,
   rowDecorationsSql,
 } from './catalog.js';
+import { buildValueRollupCte } from './queries.js';
 import {
   fetchEpisodeCounts,
   resolveWatchedStates,

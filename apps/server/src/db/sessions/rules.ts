@@ -1,5 +1,5 @@
 import { sql, type SQL } from 'drizzle-orm';
-import { LOCAL_NETWORK_COUNTRY } from '@tracearr/shared';
+import { LOCAL_NETWORK_COUNTRY, TIME_MS } from '@tracearr/shared';
 
 export interface LocalSessionFields {
   isLocal?: boolean | null;
@@ -63,3 +63,35 @@ export function historyMediaTypeDefault(alias = 's'): SQL {
 
 /** Raw watch time over every row, uncounted ones included: the users pages' total. */
 export const RAW_WATCH_TIME = sql<number>`coalesce(sum(duration_ms), 0)::bigint`;
+
+/** The first UTC midnight at or after a date; a date already on a midnight is unchanged. */
+export function ceilToUtcDay(date: Date): Date {
+  return new Date(Math.ceil(date.getTime() / TIME_MS.DAY) * TIME_MS.DAY);
+}
+
+/**
+ * A window over a UTC day column. `day` is a UTC bucket, so a preset's start rounds up to the
+ * next UTC midnight: N days cover exactly N UTC days ending today, like the show page. A
+ * custom start is already a midnight and is exact. Compares the column itself so the bound
+ * stays sargable and can exclude chunks.
+ */
+export function rollupDayWindowSql(
+  window: { startDate: Date | null; endDate: Date },
+  dayCol: SQL
+): SQL {
+  const lower = window.startDate
+    ? sql` AND ${dayCol} >= ${ceilToUtcDay(window.startDate)}::timestamptz`
+    : sql``;
+  return sql`${lower} AND ${dayCol} < ${window.endDate}::timestamptz`;
+}
+
+/** The last `days` UTC days ending today, for rollupDayWindowSql; null is all time. */
+export function lastDaysWindow(
+  days: number | null,
+  now = new Date()
+): { startDate: Date | null; endDate: Date } {
+  return {
+    startDate: days === null ? null : new Date(now.getTime() - days * TIME_MS.DAY),
+    endDate: now,
+  };
+}
