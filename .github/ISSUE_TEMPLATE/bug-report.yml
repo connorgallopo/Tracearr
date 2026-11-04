@@ -118,12 +118,17 @@ body:
     description: |
       Paste whichever one you have: your `docker-compose.yml`, your `docker run` command,
       or the container settings your UI shows you (ports, paths, environment variables).
-      A Proxmox LXC install has none of these. Write `Proxmox LXC` here instead.
+      For Kubernetes, paste your Helm values. A Proxmox LXC install has none of
+      these. Write `Proxmox LXC` here instead.
+      If your report is purely visual (layout, colors, spacing), write `UI only` here.
+      Every other report needs this filled in.
       Remove sensitive data (passwords, API keys, domains).
     render: yaml
     placeholder: |
       # Paste your docker-compose.yml here
       # Or your docker run command
+  validations:
+    required: true
 
 - type: textarea
   id: logs
@@ -132,7 +137,10 @@ body:
     description: |
       **Required.** If something isn't working, fails to start, crashes, or shows wrong
       data, we cannot act without logs. If your report is purely visual (layout, colors,
-      spacing), write `UI only` here instead.
+      spacing), write `UI only` here instead and put screenshots in Bug Description.
+      For anything else, screenshots do not replace logs.
+
+      Attach the log files in this field, not in Bug Description.
 
       Full guide, every platform: https://docs.tracearr.com/troubleshooting/logs
 
@@ -181,7 +189,6 @@ body:
       Capture all of that before you touch `LOG_LEVEL`. Raising it to `debug` takes an
       environment edit plus a restart, and the restart throws away the history you were
       about to collect. Capture first, raise the level, then reproduce it again.
-    render: shell
   validations:
     required: true
 
@@ -195,6 +202,8 @@ body:
     - "Yes, it stopped working after an update"
     - "Yes, it stopped working without any changes"
     - "Not sure"
+  validations:
+    required: true
 
 - type: textarea
   id: additional
@@ -211,7 +220,7 @@ body:
       required: true
     - label: Version number filled in above
       required: true
-    - label: Docker compose/run command included (if applicable)
+    - label: Compose file, run command or install settings included above, or this is a purely visual issue
       required: true
     - label: Logs are attached above, or this is a purely visual issue
       required: true

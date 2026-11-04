@@ -13,8 +13,9 @@
 ## Related Issue
 
 <!-- Link the issue or discussion a maintainer labelled `planned` or `help wanted`.
-     Every PR needs one, bug fixes included. Your account also has to be vouched
-     (a maintainer commented `!vouch`) or this PR closes automatically.
+     Every PR needs one, bug fixes included. Documentation-only PRs are exempt.
+     Your account also has to be vouched (a maintainer commented `!vouch`) or
+     this PR closes automatically.
      See CONTRIBUTING.md, "Getting to Yes". -->
 
 Closes #
@@ -32,8 +33,9 @@ Closes #
 
 ## Testing
 
-- [ ] Added/updated unit tests
-- [ ] Ran test suite locally (`pnpm test:unit`)
+- [ ] Added/updated tests
+- [ ] Bug fix includes a regression test, or the PR says why one isn't practical
+- [ ] `pnpm lint && pnpm typecheck && pnpm test` passes locally
 - [ ] Tested manually
 
 <!-- If manual testing, describe what you did: -->
@@ -52,6 +54,6 @@ Closes #
 
 - [ ] Code follows project style (ran `pnpm lint` and `pnpm format`)
 - [ ] Self-reviewed, and I can explain every part of this diff
-- [ ] A maintainer agreed to this change first (discussion or confirmed issue linked above)
+- [ ] A maintainer agreed to this change first (the issue or discussion linked above is labelled `planned` or `help wanted`)
 - [ ] No new warnings from `pnpm typecheck`
-- [ ] Tests pass locally
+- [ ] Only `packages/translations/src/locales/en/` changed among locale files (Crowdin handles the rest)

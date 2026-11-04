@@ -98,6 +98,22 @@ body:
     label: Screenshots / Screen Recording
     description: "If possible, attach screenshots or a screen recording showing the issue"
 
+- type: textarea
+  id: logs
+  attributes:
+    label: Server Logs
+    description: |
+      **Required.** If the app can't connect, shows wrong data, or misses a push
+      notification, attach your Tracearr server logs covering the time it happened, for
+      all three services. The commands for each deployment are in the
+      [Tracearr Bug Report](https://github.com/connorgallopo/Tracearr/issues/new?template=bug-report.yml)
+      template and at https://docs.tracearr.com/troubleshooting/logs.
+      If the problem is purely visual (layout, colors, spacing), write `UI only` here
+      instead and attach screenshots above. For anything else, screenshots do not
+      replace logs.
+  validations:
+    required: true
+
 - type: dropdown
   id: previously_worked
   attributes:
@@ -109,6 +125,8 @@ body:
     - "Yes, it stopped working after a server update"
     - "Yes, it stopped working without any changes"
     - "Not sure"
+  validations:
+    required: true
 
 - type: textarea
   id: additional
@@ -126,6 +144,10 @@ body:
     - label: App and server version numbers filled in above
       required: true
     - label: I have searched existing issues for similar reports
+      required: true
+    - label: Server logs are attached above, or this is a purely visual issue
+      required: true
+    - label: I wrote this report myself and kept the template intact
       required: true
     - label: I have searched the docs at https://docs.tracearr.com
       required: true

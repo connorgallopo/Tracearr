@@ -39,18 +39,18 @@ reviews:
       instructions: |
         Some things here are deliberate. Don't raise them unless the diff shows
         an actual bug:
-        - Rules eslint.config.js turns off on purpose: no-unnecessary-condition,
+        - Rules .oxlintrc.json turns off on purpose: no-unnecessary-condition,
           prefer-nullish-coalescing, restrict-template-expressions, array-type,
           dot-notation, no-confusing-void-expression, no-base-to-string,
-          prefer-regexp-exec, no-inferrable-types, no-empty-object-type. They
-          were judged too noisy for this codebase.
+          prefer-regexp-exec, no-inferrable-types. They were judged too noisy
+          for this codebase.
         - Calls into @deprecated APIs. That rule is a warn on purpose until the
           multi-server migration finishes.
 
     - path: '**/*.{ts,tsx}'
       instructions: |
-        eslint sets no-non-null-assertion, no-explicit-any and the no-unsafe-*
-        rules to warn, so these pass CI silently:
+        .oxlintrc.json sets no-non-null-assertion, no-explicit-any and the
+        no-unsafe-* rules to warn, so these pass CI silently:
         - Flag `!` non-null assertions outside test files. noUncheckedIndexedAccess
           is on and narrowing is the intended fix.
         - Flag new `any` where a real type or `unknown` would work.
@@ -59,8 +59,10 @@ reviews:
 
     - path: 'apps/server/**/*.ts'
       instructions: |
-        - Route input validates through Zod schemas from @tracearr/shared wired
-          into the route definition. Flag hand-rolled validation in handlers.
+        - Route input is parsed inside the handler with a Zod schema from
+          @tracearr/shared (`schema.safeParse(request.body)`, 400 on failure).
+          No route uses Fastify's `schema:` option. Flag hand-written field
+          checks where a shared schema belongs.
         - Media server behavior belongs in the shared interface under
           services/mediaServer/. Flag branching on server type in calling code.
         - Tests use factories from @tracearr/test-utils (createTestSession,
@@ -181,8 +183,9 @@ reviews:
         instructions: |
           CONTRIBUTING.md, "On AI-Assisted Code": significant AI usage must be
           disclosed, and the disclosure is not a permission slip. Quote: "A PR
-          you prompted into existence and then tested is the thing we close,
-          disclosed or not." This check enforces both halves.
+          whose implementation the tool wrote and whose author's part was to
+          review and test the output [...] is closed, disclosed or not, however
+          good it looks." This check enforces both halves.
 
           Fail if the AI Disclosure section was deleted from the PR body.
           Fail if the box is checked with no note saying how AI was used.
@@ -268,9 +271,10 @@ reviews:
           Applies to package.json files, pnpm-workspace.yaml, docker/ and
           .github/workflows/. Renovate PRs included.
 
-          Fail if typescript moves above 6.x in the root package.json or in any
-          package. typescript-eslint caps its typescript peer below 6.1 and the
-          lint parser resolves the root copy.
+          Fail if typescript drops below 7.x in the root package.json or in any
+          package. Linting runs on oxlint-tsgolint, which needs TypeScript 7.
+          Fail if eslint or typescript-eslint is added back; typescript-eslint
+          does not support TypeScript 7.
 
           Fail if a postgres or timescaledb image tag or digest changes anywhere,
           including compose files and CI service definitions. Those pins are

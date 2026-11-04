@@ -8,9 +8,12 @@ body:
 
         **Before submitting:** Search [existing requests](https://github.com/connorgallopo/Tracearr/discussions/categories/feature-requests) to avoid duplicates.
 
-        This is where features get discussed before anyone writes code. Pull requests for
-        features that were never discussed here (or on Discord) with a code owner get
-        closed, so starting here is the fast path, not the slow one.
+        This is where features get discussed before anyone writes code. A pull request
+        needs a request here that a maintainer labelled `planned` or `help wanted`.
+        Agreement on Discord doesn't count, because only GitHub carries the label.
+        PRs without it get closed, so starting here is the fast path, not the slow one.
+
+        Write it yourself. Requests that paste AI-generated specs get closed.
 
   - type: textarea
     id: feature
@@ -41,3 +44,11 @@ body:
         - label: Web Dashboard
         - label: Mobile App
         - label: Server / API
+
+  - type: checkboxes
+    id: own_words
+    attributes:
+      label: 'I confirm that:'
+      options:
+        - label: I wrote this request myself, in my own words.
+          required: true

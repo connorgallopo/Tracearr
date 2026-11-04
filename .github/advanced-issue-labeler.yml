@@ -6,10 +6,6 @@ policy:
     label:
     - name: "web"
       keys: [ "Web Dashboard" ]
-    - name: "iOS"
-      keys: [ "Mobile App (iOS)" ]
-    - name: "android"
-      keys: [ "Mobile App (Android)" ]
     - name: "server"
       keys: [ "Server/Backend", "Installation/Startup", "Notifications (Discord, webhooks, etc.)", "Rules/Violations", "Media Server Integration" ]
     - name: "database"
