@@ -87,9 +87,9 @@
         "availableThisWeek_other": "本周有 {{count}} 个已可用"
       },
       "link": {
-        "title": "",
-        "description": "",
-        "action": ""
+        "title": "你自己的账户尚未关联",
+        "description": "在你从设置中该服务器所在行关联它之前，你在 Jellyfin 或 Emby 账户上的播放会记录在一个独立成员名下。",
+        "action": "打开服务器设置"
       },
       "episodes_other": "{{count}} 集"
     },
@@ -518,7 +518,7 @@
         },
         "columns": {
           "hoursPerGb": "小时/GB",
-          "lastWatched": ""
+          "lastWatched": "最近观看"
         }
       },
       "matchBadge": {
@@ -539,12 +539,12 @@
       "peakHour": "高峰小时",
       "viewingHours": "查看时间",
       "peak": "峰值：",
-      "viewingTrend": "",
+      "viewingTrend": "观看趋势",
       "busiest": "最重要的版本：",
       "quietest": "安静：",
       "bingeHighlights": "追剧亮点",
       "bingeHighlightsDesc": "观看模式最密集的剧集。",
-      "consecutivePlays": "",
+      "consecutivePlays": "连续播放次数",
       "noData": "尚无观看数据",
       "noDataDesc": "播放内容后，观看分析将显示在这里。有观看活动后再来查看。",
       "failedToLoad": "加载观看分析失败",
@@ -555,8 +555,8 @@
           "show": "剧集",
           "servers": "服务器",
           "consecutive": "连续",
-          "people": "",
-          "episodesPerViewer": "",
+          "people": "成员",
+          "episodesPerViewer": "每位观众的集数",
           "maxPerDay": "每日最多"
         },
         "empty": {
@@ -659,8 +659,8 @@
       "monthly": {
         "watchCount": "观看次数",
         "empty": {
-          "title": "",
-          "description": ""
+          "title": "暂无观看数据",
+          "description": "数据可用后，观看趋势就会显示在这里"
         }
       },
       "growth": {
@@ -2141,7 +2141,7 @@
         "reset": "连接已重置",
         "tls": "TLS 错误",
         "http": "HTTP{{status}}",
-        "relay": "",
+        "relay": "Plex 中继",
         "unknown": "连接失败"
       },
       "connectionsReachable": "{{reachable}} 个 {{total}} 个连接可达",
