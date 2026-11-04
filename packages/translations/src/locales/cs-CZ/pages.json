@@ -643,6 +643,7 @@
       "quietest": "Nejvíce ticho:",
       "bingeHighlights": "Nejvýraznější maratony",
       "bingeHighlightsDesc": "",
+      "consecutivePlays": "",
       "noData": "Zatím žádná data o sledování",
       "noDataDesc": "Analytika se zobrazí zde, jakmile bude obsah přehrán. Po nějaké aktivitě se vraťte zpět.",
       "failedToLoad": "Nepodařilo se načíst statistiky sledování",
@@ -653,6 +654,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {

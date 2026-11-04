@@ -59,11 +59,11 @@
     "timeFormatDescription": "选择时间的显示方式。",
     "timeFormat12h": "12小时(1:30 PM)",
     "timeFormat24h": "24小时(13:30)",
-    "dateFormat": "",
-    "dateFormatDescription": "",
-    "weekStart": "",
-    "weekStartDescription": "",
-    "automatic": "",
+    "dateFormat": "日期格式",
+    "dateFormatDescription": "日期的书写方式。自动会跟随您浏览器的地区设置。",
+    "weekStart": "一周开始于",
+    "weekStartDescription": "日历和星期图表中一周的第一天。",
+    "automatic": "自动",
     "theme": "主题",
     "accentColor": "亮度颜色",
     "default": "(默认)",
@@ -257,26 +257,26 @@
       "updateAvailable": "有 {{version}} 版本可更新"
     },
     "ownerAccount": {
-      "label": "",
-      "link": "",
-      "unlink": "",
+      "label": "您的账户",
+      "link": "关联",
+      "unlink": "取消关联",
       "dialog": {
-        "title": "",
-        "description": "",
-        "admin": "",
-        "lastActive": "",
-        "neverActive": "",
-        "otherAccounts": "",
-        "signsIn": "",
-        "warningTitle": "",
-        "warning": "",
-        "warning_jellyfin": "",
-        "confirmLabel": "",
-        "submit": ""
+        "title": "在 {{server}} 上关联您的账户",
+        "description": "选择您在此服务器上使用的账户。其播放次数将归您所有，用它登录后会以您的身份打开 Tracearr。",
+        "admin": "管理员",
+        "lastActive": "活跃于 {{ago}}",
+        "neverActive": "尚无活动",
+        "otherAccounts": "在其他服务器上拥有账户。请先在其页面上将其拆分出去。",
+        "signsIn": "自行登录 Tracearr",
+        "warningTitle": "仅关联您自己的账户",
+        "warning": "任何能以 {{username}} 身份登录此服务器的人都会获得 Tracearr 的完整所有者权限：包括知道其密码的人，以及管理此服务器的任何人。",
+        "warning_jellyfin": "任何能以 {{username}} 身份登录此服务器的人都会获得 Tracearr 的完整所有者权限：包括知道其密码的人、已登录并批准快速连接代码的任何设备，以及管理此服务器的任何人。",
+        "confirmLabel": "输入 {{username}} 以确认",
+        "submit": "关联账户"
       },
       "confirmUnlink": {
-        "title": "",
-        "body": ""
+        "title": "取消关联 {{username}}？",
+        "body": "其播放次数将移回给一个独立成员。Tracearr 会在此浏览器和您已配对的手机之外的所有地方将您登出。"
       }
     }
   },
@@ -544,49 +544,49 @@
     "acknowledge": "知道了"
   },
   "storageWarning": {
-    "bannerDatabase": "",
-    "bannerData": "",
-    "showHow": "",
-    "hide": "",
-    "titleDatabase": "",
-    "titleData": "",
+    "bannerDatabase": "Tracearr 的数据库位于 Unraid 用户共享上，这会使每次读写都变慢。",
+    "bannerData": "Tracearr 的部分数据位于 Unraid 用户共享上，这会使每次读写都变慢。",
+    "showHow": "告诉我如何修复",
+    "hide": "隐藏直到 Tracearr 重启",
+    "titleDatabase": "将数据库移出用户共享",
+    "titleData": "将 Tracearr 的数据移出用户共享",
     "fields": {
-      "postgres": "",
-      "redis": "",
-      "appData": ""
+      "postgres": "PostgreSQL 数据",
+      "redis": "Redis 数据",
+      "appData": "应用数据"
     },
-    "isSetTo": "",
-    "overheadDatabase": "",
-    "overheadData": "",
+    "isSetTo": "<strong>{{field}}</strong> 被设置为 <code>{{path}}</code>。",
+    "overheadDatabase": "<code>/mnt/user</code> 下的路径会经过 Unraid 的用户共享 FUSE 层（shfs），这会给每次数据库读写增加开销。",
+    "overheadData": "<code>/mnt/user</code> 下的路径会经过 Unraid 的用户共享 FUSE 层（shfs），这会给每次读写增加开销。",
     "pool": {
-      "alreadyDatabase": "",
-      "alreadyData": "",
-      "alreadyPools": "",
-      "openEdit": "",
-      "change": "",
-      "copyPath": "",
-      "apply": "",
-      "clears": ""
+      "alreadyDatabase": "您的数据库文件已经位于 <code>{{pool}}</code> 池上，因此无需移动任何内容。请将 Tracearr 直接指向该池：",
+      "alreadyData": "您的 Tracearr 文件已经位于 <code>{{pool}}</code> 池上，因此无需移动任何内容。请将 Tracearr 直接指向该池：",
+      "alreadyPools": "您的 Tracearr 文件已经位于各自的池上，因此无需移动任何内容。请将 Tracearr 直接指向每个池：",
+      "openEdit": "在 Unraid 中，打开 Docker，点击 Tracearr 图标并选择编辑。",
+      "change": "将 <strong>{{field}}</strong> 更改为：",
+      "copyPath": "复制 {{field}} 路径",
+      "apply": "点击应用。Unraid 会使用新路径重新创建容器。",
+      "clears": "Tracearr 每次启动时都会检查这一点，因此此提示会在重启后消失。"
     },
     "split": {
-      "arrayDatabase": "",
-      "arrayData": "",
-      "poolsDatabase": "",
-      "poolsData": "",
-      "stop": "",
-      "shares": "",
-      "move": "",
-      "start": ""
+      "arrayDatabase": "您的数据库有一部分位于阵列（<code>{{disks}}</code>）上，因此池中尚未包含全部数据。暂时保持路径不变：将 Tracearr 指向缺少文件的文件夹会启动一个新的空数据库。",
+      "arrayData": "<strong>{{field}}</strong> 的部分文件位于阵列（<code>{{disks}}</code>）上，因此池中尚未包含全部文件。暂时保持路径不变：将 Tracearr 指向缺少文件的文件夹会遗漏这些文件。",
+      "poolsDatabase": "您的数据库分散在多个池（<code>{{pools}}</code>）中，因此没有任何一个池包含全部数据。暂时保持路径不变：将 Tracearr 指向缺少文件的文件夹会启动一个新的空数据库。请先将其移到单个池上，此提示随后会显示需要设置的确切路径。",
+      "poolsData": "<strong>{{field}}</strong> 的文件分散在多个池（<code>{{pools}}</code>）中，因此没有任何一个池包含全部文件。暂时保持路径不变：将 Tracearr 指向缺少文件的文件夹会遗漏这些文件。请先将它们移到单个池上，此提示随后会显示需要设置的确切路径。",
+      "stop": "停止 Tracearr 容器。",
+      "shares": "在共享中，打开 <code>{{share}}</code>。将主存储设置为您的池，辅助存储设置为阵列，并将 Mover 操作设置为阵列 → 池。",
+      "move": "在主界面中，点击移动并等待其完成。",
+      "start": "启动 Tracearr。一旦所有文件都位于池上，此提示就会显示需要设置的确切路径。"
     },
     "unknown": {
-      "isSetToDatabase": "",
-      "isSetToData": "",
-      "otherFuseDatabase": "",
-      "otherFuseData": "",
-      "fixDatabase": "",
-      "fixData": ""
+      "isSetToDatabase": "<strong>{{field}}</strong> 被设置为 <code>{{path}}</code>，该路径经过 Unraid 的 FUSE 层（shfs），会使每次数据库读写变慢。",
+      "isSetToData": "<strong>{{field}}</strong> 被设置为 <code>{{path}}</code>，该路径经过 Unraid 的 FUSE 层（shfs），会使每次读写变慢。",
+      "otherFuseDatabase": "<strong>{{field}}</strong> 位于 <code>{{fsType}}</code> 挂载上，这是一种会拖慢每次数据库读写的 FUSE 文件系统。",
+      "otherFuseData": "<strong>{{field}}</strong> 位于 <code>{{fsType}}</code> 挂载上，这是一种会拖慢每次读写的 FUSE 文件系统。",
+      "fixDatabase": "如果 appdata 位于池上，请在容器的编辑页面中将 <strong>{{field}}</strong> 更改为该池上的同一文件夹，例如 <code>{{example}}</code>。请先确认池上的文件夹包含名为 PG_VERSION 的文件。没有它，Tracearr 会启动一个新的空数据库。",
+      "fixData": "如果 appdata 位于池上，请在容器的编辑页面中将 <strong>{{field}}</strong> 更改为该池上的同一文件夹，例如 <code>{{example}}</code>。请先确认池上的文件夹包含与当前文件夹相同的文件。"
     },
-    "faq": ""
+    "faq": "为什么用户共享很慢"
   },
   "backup": {
     "title": "备份",

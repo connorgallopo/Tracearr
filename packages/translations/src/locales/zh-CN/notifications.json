@@ -155,8 +155,8 @@
       "brandingSaved": "邮件标记已保存",
       "suppressionAdded": "地址添加到抑制列表",
       "suppressionRemoved": "地址已从抑制列表中删除",
-      "ownerAccountLinked": "",
-      "ownerAccountUnlinked": "",
+      "ownerAccountLinked": "账户已链接",
+      "ownerAccountUnlinked": "账户已断开链接",
       "newsletterRetryQueued_other": "正在重试 {{count}} 位收件人"
     },
     "error": {
@@ -165,7 +165,7 @@
       "serverSyncFailed": "同步服务器失败",
       "serverHistoricalFailed": "无法更改服务器状态",
       "settingsUpdateFailed": "更新设置失败",
-      "copyManual": "",
+      "copyManual": "按 Ctrl+C 或 ⌘C 复制",
       "acknowledgeFailed": "确认违规失败",
       "dismissFailed": "忽略违规失败",
       "authFailed": "验证失败",
@@ -216,8 +216,8 @@
       "brandingSaveFailed": "无法保存邮件品牌设置：{{error}}",
       "suppressionAddFailed": "无法添加该地址：{{error}}",
       "suppressionRemoveFailed": "无法移除该地址：{{error}}",
-      "ownerAccountLinkFailed": "",
-      "ownerAccountUnlinkFailed": ""
+      "ownerAccountLinkFailed": "链接账户失败",
+      "ownerAccountUnlinkFailed": "断开链接账户失败"
     },
     "warning": {
       "jobFailed": {

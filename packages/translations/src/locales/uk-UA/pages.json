@@ -643,6 +643,7 @@
       "quietest": "Тест:",
       "bingeHighlights": "Помітні марафони перегляду",
       "bingeHighlightsDesc": "",
+      "consecutivePlays": "",
       "noData": "Ще немає даних про перегляди",
       "noDataDesc": "Аналітика переглядів з'явиться тут після відтворення вмісту. Перевірте пізніше, коли будуть перегляди.",
       "failedToLoad": "Не вдалося завантажити аналітику переглядів",
@@ -653,6 +654,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {

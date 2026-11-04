@@ -577,6 +577,7 @@
       "quietest": "Rolig:",
       "bingeHighlights": "Højdepunkter fra maratonvisninger",
       "bingeHighlightsDesc": "",
+      "consecutivePlays": "",
       "noData": "Ingen visningsdata endnu",
       "noDataDesc": "Visningsanalysen vises her, når der er afspillet indhold. Kig forbi igen efter lidt seeraktivitet.",
       "failedToLoad": "Kunne ikke indlæse visningsanalyse",
@@ -587,6 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {

@@ -544,6 +544,7 @@
       "quietest": "",
       "bingeHighlights": "一気見ハイライト",
       "bingeHighlightsDesc": "",
+      "consecutivePlays": "",
       "noData": "視聴データはまだありません",
       "noDataDesc": "コンテンツが再生されると、視聴分析がここに表示されます。視聴が行われた後にもう一度確認してください。",
       "failedToLoad": "視聴分析の読み込みに失敗しました",
@@ -554,6 +555,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {

@@ -577,6 +577,7 @@
       "quietest": "",
       "bingeHighlights": "Destaques de maratonas",
       "bingeHighlightsDesc": "",
+      "consecutivePlays": "",
       "noData": "Ainda não há dados do relógio",
       "noDataDesc": "A análise de visualização aparecerá aqui quando algum conteúdo for reproduzido. Volte a verificar após alguma atividade de visualização.",
       "failedToLoad": "Falha ao carregar a análise de visualização",
@@ -587,6 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {

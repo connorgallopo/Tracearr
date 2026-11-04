@@ -91,7 +91,7 @@
       },
       "link": {
         "title": "Twoje konto nie jest jeszcze połączone",
-        "description": "",
+        "description": "Odtworzenia na Twoim koncie Jellyfin lub Emby są przypisywane do osobnej osoby, dopóki nie połączysz go w wierszu tego serwera w Ustawieniach.",
         "action": "Otwórz ustawienia serwera"
       },
       "episodes_one": "{{count}} odcinek",
@@ -643,6 +643,7 @@
       "quietest": "Najspokojniejszy:",
       "bingeHighlights": "Maratony serialowe",
       "bingeHighlightsDesc": "Seriale oglądane najintensywniej.",
+      "consecutivePlays": "Odtworzenia pod rząd",
       "noData": "Brak danych o oglądalności",
       "noDataDesc": "Statystyki oglądalności pojawią się tutaj, gdy zawartość zostanie odtworzona. Sprawdź ponownie po pewnym czasie oglądania.",
       "failedToLoad": "Nie udało się załadować statystyk oglądalności",
@@ -653,6 +654,8 @@
           "show": "Serial",
           "servers": "Serwery",
           "consecutive": "Pod rząd",
+          "people": "Osoby",
+          "episodesPerViewer": "Odcinków na widza",
           "maxPerDay": "Maks./dzień"
         },
         "empty": {
