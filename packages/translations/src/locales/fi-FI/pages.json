@@ -577,6 +577,7 @@
       "quietest": "Kysely:",
       "bingeHighlights": "Ahmimiskatselun kohokohdat",
       "bingeHighlightsDesc": "",
+      "consecutivePlays": "",
       "noData": "Ei vielä katselutietoja",
       "noDataDesc": "Katseluanalytiikka näkyy täällä, kun sisältöä on toistettu. Palaa katsomaan, kun katselua on kertynyt.",
       "failedToLoad": "Katseluanalytiikan lataaminen epäonnistui",
@@ -587,6 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {
