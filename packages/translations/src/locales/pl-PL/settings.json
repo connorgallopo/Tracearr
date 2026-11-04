@@ -269,17 +269,17 @@
         "admin": "Administrator",
         "lastActive": "Aktywny {{ago}}",
         "neverActive": "Brak aktywności",
-        "otherAccounts": "",
-        "signsIn": "",
+        "otherAccounts": "Ma konta na innych serwerach. Najpierw odłącz to konto na stronie tej osoby.",
+        "signsIn": "Loguje się do Tracearr samodzielnie",
         "warningTitle": "Połącz tylko swoje własne konto",
-        "warning": "",
-        "warning_jellyfin": "",
+        "warning": "Każdy, kto może zalogować się na tym serwerze jako {{username}}, uzyskuje pełny dostęp właściciela do Tracearr: osoby znające hasło do tego konta oraz osoby zarządzające tym serwerem.",
+        "warning_jellyfin": "Każdy, kto może zalogować się na tym serwerze jako {{username}}, uzyskuje pełny dostęp właściciela do Tracearr: osoby znające hasło do tego konta, każde zalogowane na nie urządzenie, które zatwierdzi kod Quick Connect, oraz osoby zarządzające tym serwerem.",
         "confirmLabel": "Wpisz {{username}} aby potwierdzić",
         "submit": "Polacz konto"
       },
       "confirmUnlink": {
         "title": "Rozłączyć {{username}}?",
-        "body": ""
+        "body": "Jego odtworzenia wrócą do osobnej osoby. Tracearr wyloguje Cię wszędzie poza tą przeglądarką i sparowanymi telefonami."
       }
     }
   },
@@ -562,49 +562,49 @@
     "acknowledge": "Rozumiem"
   },
   "storageWarning": {
-    "bannerDatabase": "",
-    "bannerData": "",
+    "bannerDatabase": "Baza danych Tracearr znajduje się w udziale użytkownika Unraid, co spowalnia każdy odczyt i zapis.",
+    "bannerData": "Część danych Tracearr znajduje się w udziale użytkownika Unraid, co spowalnia każdy odczyt i zapis.",
     "showHow": "Pokaż mi jak to naprawić",
     "hide": "Ukryj do czasu ponownego uruchomienia Tracearr",
-    "titleDatabase": "",
-    "titleData": "",
+    "titleDatabase": "Przenieś bazę danych poza udział użytkownika",
+    "titleData": "Przenieś dane Tracearr poza udział użytkownika",
     "fields": {
       "postgres": "Dane PostgreSQL",
       "redis": "Dane Redis",
       "appData": "Dane aplikacji"
     },
-    "isSetTo": "",
-    "overheadDatabase": "",
-    "overheadData": "",
+    "isSetTo": "Ścieżka <strong>{{field}}</strong> jest ustawiona na <code>{{path}}</code>.",
+    "overheadDatabase": "Ścieżki w <code>/mnt/user</code> przechodzą przez warstwę FUSE systemu Unraid (shfs), co zwiększa narzut przy każdym odczycie i zapisie bazy danych.",
+    "overheadData": "Ścieżki w <code>/mnt/user</code> przechodzą przez warstwę FUSE systemu Unraid (shfs), co zwiększa narzut przy każdym odczycie i zapisie.",
     "pool": {
-      "alreadyDatabase": "",
-      "alreadyData": "",
-      "alreadyPools": "",
+      "alreadyDatabase": "Pliki bazy danych znajdują się już w puli <code>{{pool}}</code>, więc nic nie trzeba przenosić. Skieruj Tracearr bezpośrednio na tę pulę:",
+      "alreadyData": "Pliki Tracearr znajdują się już w puli <code>{{pool}}</code>, więc nic nie trzeba przenosić. Skieruj Tracearr bezpośrednio na tę pulę:",
+      "alreadyPools": "Pliki Tracearr znajdują się już w swoich pulach, więc nic nie trzeba przenosić. Skieruj Tracearr bezpośrednio na każdą pulę:",
       "openEdit": "W Unraid, otwórz Docker, kliknij ikonę Tracearr i wybierz Edytuj.",
-      "change": "",
+      "change": "Zmień ścieżkę <strong>{{field}}</strong> na:",
       "copyPath": "Skopiuj ścieżkę {{field}}",
-      "apply": "",
-      "clears": ""
+      "apply": "Kliknij Zastosuj. Unraid utworzy kontener ponownie z nowymi ścieżkami.",
+      "clears": "Tracearr sprawdza to przy każdym uruchomieniu, więc ten komunikat zniknie po restarcie."
     },
     "split": {
-      "arrayDatabase": "",
-      "arrayData": "",
-      "poolsDatabase": "",
-      "poolsData": "",
+      "arrayDatabase": "Część bazy danych znajduje się w macierzy (<code>{{disks}}</code>), więc pula nie zawiera jeszcze całości. Na razie nie zmieniaj ścieżki: skierowanie Tracearr na folder, w którym brakuje plików, spowoduje utworzenie nowej, pustej bazy danych.",
+      "arrayData": "Część plików dla <strong>{{field}}</strong> znajduje się w macierzy (<code>{{disks}}</code>), więc pula nie zawiera jeszcze wszystkich. Na razie nie zmieniaj ścieżki: po skierowaniu Tracearr na folder, w którym brakuje plików, te pliki pozostaną w starej lokalizacji.",
+      "poolsDatabase": "Baza danych jest rozłożona na kilka pul (<code>{{pools}}</code>), więc żadna pula nie zawiera jej w całości. Na razie nie zmieniaj ścieżki: skierowanie Tracearr na folder, w którym brakuje plików, spowoduje utworzenie nowej, pustej bazy danych. Najpierw przenieś ją do jednej puli, a ten komunikat pokaże dokładną ścieżkę do ustawienia.",
+      "poolsData": "Pliki dla <strong>{{field}}</strong> są rozłożone na kilka pul (<code>{{pools}}</code>), więc żadna pula nie zawiera ich wszystkich. Na razie nie zmieniaj ścieżki: po skierowaniu Tracearr na folder, w którym brakuje plików, te pliki pozostaną w starej lokalizacji. Najpierw przenieś je do jednej puli, a ten komunikat pokaże dokładną ścieżkę do ustawienia.",
       "stop": "Zatrzymaj kontener Tracearr.",
-      "shares": "",
-      "move": "",
-      "start": ""
+      "shares": "W zakładce Shares otwórz <code>{{share}}</code>. Ustaw Primary storage na swoją pulę, Secondary storage na Array, a Mover action na Array → pool.",
+      "move": "W zakładce Main kliknij Move i poczekaj na zakończenie.",
+      "start": "Uruchom Tracearr. Gdy wszystkie pliki znajdą się w puli, ten komunikat pokaże dokładną ścieżkę do ustawienia."
     },
     "unknown": {
-      "isSetToDatabase": "",
-      "isSetToData": "",
-      "otherFuseDatabase": "",
-      "otherFuseData": "",
-      "fixDatabase": "",
-      "fixData": ""
+      "isSetToDatabase": "Ścieżka <strong>{{field}}</strong> jest ustawiona na <code>{{path}}</code>, która przechodzi przez warstwę FUSE systemu Unraid (shfs) i spowalnia każdy odczyt i zapis bazy danych.",
+      "isSetToData": "Ścieżka <strong>{{field}}</strong> jest ustawiona na <code>{{path}}</code>, która przechodzi przez warstwę FUSE systemu Unraid (shfs) i spowalnia każdy odczyt i zapis.",
+      "otherFuseDatabase": "Ścieżka <strong>{{field}}</strong> korzysta z montowania <code>{{fsType}}</code>, czyli systemu plików FUSE, który spowalnia każdy odczyt i zapis bazy danych.",
+      "otherFuseData": "Ścieżka <strong>{{field}}</strong> korzysta z montowania <code>{{fsType}}</code>, czyli systemu plików FUSE, który spowalnia każdy odczyt i zapis.",
+      "fixDatabase": "Jeśli appdata znajduje się w puli, na stronie edycji kontenera zmień ścieżkę <strong>{{field}}</strong> na ten sam folder w tej puli, na przykład <code>{{example}}</code>. Najpierw sprawdź, czy folder w puli zawiera plik o nazwie PG_VERSION. Bez niego Tracearr utworzy nową, pustą bazę danych.",
+      "fixData": "Jeśli appdata znajduje się w puli, na stronie edycji kontenera zmień ścieżkę <strong>{{field}}</strong> na ten sam folder w tej puli, na przykład <code>{{example}}</code>. Najpierw sprawdź, czy folder w puli zawiera te same pliki co obecny folder."
     },
-    "faq": ""
+    "faq": "Dlaczego udziały użytkownika są wolne"
   },
   "backup": {
     "title": "Kopia zapasowa",
