@@ -610,6 +610,7 @@
       "quietest": "",
       "bingeHighlights": "",
       "bingeHighlightsDesc": "",
+      "consecutivePlays": "",
       "noData": "",
       "noDataDesc": "",
       "failedToLoad": "",
@@ -620,6 +621,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
+          "people": "",
+          "episodesPerViewer": "",
           "maxPerDay": ""
         },
         "empty": {
