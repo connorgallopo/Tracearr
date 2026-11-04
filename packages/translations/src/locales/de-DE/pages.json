@@ -133,29 +133,29 @@
     "span": {
       "minutes_one": "",
       "minutes_other": "",
-      "hours_one": "",
-      "hours_other": "",
-      "days_one": "",
-      "days_other": "",
-      "weeks_one": "",
-      "weeks_other": ""
+      "hours_one": "{{count}} Stunde",
+      "hours_other": "{{count}} Stunden",
+      "days_one": "{{count}} Tag",
+      "days_other": "{{count}} Tage",
+      "weeks_one": "{{count}} Woche",
+      "weeks_other": "{{count}} Wochen"
     },
     "longestStreak": "",
-    "firstPlay": "",
-    "biggestBinge": "",
-    "topGenres": "",
+    "firstPlay": "Erste Wiedergabe",
+    "biggestBinge": "Längster Serienmarathon",
+    "topGenres": "Beliebteste Genres",
     "allTimeCaption": "",
     "tier": {
-      "watched": "",
+      "watched": "Gesehen",
       "engaged": "",
       "sampled": "",
       "abandoned": "",
-      "rewatched": ""
+      "rewatched": "Noch einmal angesehen"
     },
-    "days_one": "",
-    "days_other": "",
-    "bingeValue_one": "",
-    "bingeValue_other": ""
+    "days_one": "{{count}} Tag",
+    "days_other": "{{count}} Tage",
+    "bingeValue_one": "{{count}} Folge von {{show}}",
+    "bingeValue_other": "{{count}} Folgen von {{show}}"
   },
   "users": {
     "title": "Benutzer",
@@ -163,28 +163,28 @@
     "noUsersFound": "Keine Benutzer gefunden.",
     "resetTrustScore": "Vertrauenswert zurücksetzen",
     "resetTrustScoreConfirm": "Möchten Sie den Vertrauenswert für {{count}} Benutzer wirklich auf 100 zurücksetzen? Diese Aktion kann nicht rückgängig gemacht werden.",
-    "mergeUsers": "",
-    "mergeTitleSuggestion": "",
-    "mergeTitleBulk": "",
+    "mergeUsers": "Benutzer zusammenführen",
+    "mergeTitleSuggestion": "Sind das dieselben Personen?",
+    "mergeTitleBulk": "Diese Benutzer zusammenführen?",
     "mergeReasonEmail": "",
     "mergeReasonEmailUsername": "",
-    "mergeReasonUsername": "",
-    "mergeKeep": "",
+    "mergeReasonUsername": "Beide verwenden den Benutzernamen {{value}}.",
+    "mergeKeep": "Behalte",
     "mergeFoldIn": "",
-    "mergeSwap": "",
+    "mergeSwap": "Tauschen, welches behalten wird",
     "mergeRequired": "",
     "mergeLastActive": "",
     "mergeNeverActive": "",
-    "mergeMoreServers": "",
+    "mergeMoreServers": "+{{count}}",
     "mergeWhatHappens": "",
     "mergeMovesNoCount": "",
     "mergeCarriesOver": "",
     "mergeDeleted": "",
     "mergeRulesKept": "",
-    "mergeIrreversibleTitle": "",
+    "mergeIrreversibleTitle": "Das kann nicht rückgängig gemacht werden",
     "mergeIrreversibleBody": "",
-    "mergeServerLabel": "",
-    "mergeServerUnknown": "",
+    "mergeServerLabel": "Server",
+    "mergeServerUnknown": "Unbekannter Server",
     "mergeIrreversibleAcknowledge": "",
     "mergeServerAccountRemoved": "",
     "mergeConfirmInto": "",
@@ -195,7 +195,7 @@
     "suggestionsPairEmail": "",
     "suggestionsPairEmailUsername": "",
     "suggestionsPairUsername": "",
-    "suggestionsSheetDescription": "",
+    "suggestionsSheetDescription": "Beim Zusammenführen wird ein Benutzer beibehalten und der andere gelöscht. Ein Paar, das als nicht identisch markiert wurde, wird nicht mehr angezeigt, bis Sie es wiederherstellen.",
     "suggestionsReview": "Überprüfung",
     "suggestionsNotSame": "",
     "suggestionsMatchEmail": "",
@@ -220,7 +220,7 @@
     "signInOff": "",
     "signedInAgo": "",
     "neverSignedIn": "",
-    "selectAllUsers_one": "",
+    "selectAllUsers_one": "Wähle {{count}} Benutzer",
     "selectAllUsers_other": "Alle {{count}} Benutzer auswählen",
     "resetTrustScoreTitle_one": "Vertrauenswert für {{count}} Benutzer zurücksetzen",
     "resetTrustScoreTitle_other": "Vertrauenswert für {{count}} Benutzer zurücksetzen",
@@ -369,23 +369,23 @@
       "selected_other": ""
     },
     "detail": {
-      "watch": "",
-      "summary": "",
+      "watch": "Wiedergabe",
+      "summary": "Zusammenfassung",
       "segmentsShown_one": "",
       "segmentsShown_other": ""
     },
     "stream": {
-      "notAvailable": "",
-      "bitrateUnavailable": "",
-      "stereo": "",
-      "mono": "",
-      "noDetails": "",
-      "source": "",
-      "stream": "",
+      "notAvailable": "N/A",
+      "bitrateUnavailable": "Jellyfin und Emby geben während der Transkodierung keine individuellen Video- und Audio-Bitraten an. Es wird lediglich die Gesamtbitrate des Streams angezeigt.",
+      "stereo": "Stereo",
+      "mono": "Mono",
+      "noDetails": "Es liegen keine detaillierten Informationen zum Stream vor",
+      "source": "Quelle",
+      "stream": "Stream",
       "container": "",
-      "bitrate": "",
-      "video": "",
-      "audio": "",
+      "bitrate": "Bitrate",
+      "video": "Video",
+      "audio": "Audio",
       "subtitles": "",
       "codec": "",
       "framerate": "",
@@ -577,6 +577,7 @@
       "quietest": "Ruhe:",
       "bingeHighlights": "Serienmarathon-Highlights",
       "bingeHighlightsDesc": "",
+      "consecutivePlays": "Aufeinanderfolgende Wiedergaben",
       "noData": "Noch keine Wiedergabedaten",
       "noDataDesc": "Die Analyse wird hier angezeigt, sobald der Inhalt wiedergegeben wurde. Schauen Sie nach einer Aktivität wieder vorbei.",
       "failedToLoad": "Fehler beim Laden der Wiedergabeanalyse",
@@ -587,6 +588,8 @@
           "show": "",
           "servers": "",
           "consecutive": "",
+          "people": "",
+          "episodesPerViewer": "Folgen pro Zuschauer",
           "maxPerDay": ""
         },
         "empty": {
@@ -1103,13 +1106,13 @@
         "notification": "",
         "notificationDescription": ""
       },
-      "severityLabel": "",
-      "activeLabel": "",
-      "saving": "",
-      "selectPlaceholder": "",
-      "searchPlaceholder": "",
-      "noMatches": "",
-      "clearSelection": "",
+      "severityLabel": "Wie ernst?",
+      "activeLabel": "Aktiv",
+      "saving": "Speichern...",
+      "selectPlaceholder": "Auswählen...",
+      "searchPlaceholder": "Suche...",
+      "noMatches": "Keine Treffer",
+      "clearSelection": "Auswahl leeren",
       "scope": {
         "label": "",
         "global": "",
@@ -1139,25 +1142,25 @@
         "uniqueIpsHint": "",
         "allDeviceTypes": "",
         "deviceTypesHint": "",
-        "yes": "",
-        "no": "",
+        "yes": "Ja",
+        "no": "Nein",
         "recentlySeen": "",
-        "allCountries": "",
+        "allCountries": "Alle Länder",
         "sectionTitle": "",
-        "optional": "",
+        "optional": "optional",
         "helper": "",
         "emptyLine": "",
-        "all": "",
-        "any": "",
-        "allHint": "",
-        "anyHint": "",
+        "all": "und",
+        "any": "oder",
+        "allHint": "und: Jede Prüfung muss bestanden werden",
+        "anyHint": "oder: Eine einzige Prüfung reicht aus",
         "matchLabel": "",
         "fieldLabel": "",
         "operatorLabel": "",
-        "valueLabel": "",
+        "valueLabel": "Wert",
         "canNeverPass": "",
         "noFields": "",
-        "groupSeparator": "",
+        "groupSeparator": "und auch",
         "addAnother": "",
         "addFirst": "",
         "removeGroup": ""
@@ -1165,7 +1168,7 @@
       "actions": {
         "add": "",
         "sectionTitle": "",
-        "ifTitle": "",
+        "ifTitle": "Falls...",
         "helper": "",
         "emptyTitle": "",
         "emptyDescription": "",
@@ -1205,13 +1208,13 @@
       },
       "inactiveFor": {
         "prefix": "",
-        "daysLabel": "",
-        "unit": ""
+        "daysLabel": "Tage",
+        "unit": "Tage"
       },
       "rows": {
         "toggle": "",
         "remove": "",
-        "skipped": "",
+        "skipped": "Übersprungen",
         "toggleHint": "",
         "removeHint": "",
         "expandHint": "",
@@ -1257,8 +1260,8 @@
         "sampleGone": "",
         "backToLive": ""
       },
-      "selectedCount_one": "",
-      "selectedCount_other": ""
+      "selectedCount_one": "{{count}} ausgewählt",
+      "selectedCount_other": "{{count}} ausgewählte"
     },
     "categories": {
       "session_behavior": "",
@@ -1650,30 +1653,30 @@
         "description": ""
       },
       "audio_channels_after": {
-        "label": "",
+        "label": "Audio Kanäle",
         "description": ""
       },
       "file_size_after": {
-        "label": "",
+        "label": "Dateigröße",
         "description": ""
       }
     },
     "gallery": {
-      "title": "",
+      "title": "Neue Automatisierung",
       "description": "",
-      "searchPlaceholder": "",
+      "searchPlaceholder": "Suche",
       "noMatches": "",
       "noMatchesHint": "",
       "group": {
-        "notifications": "",
-        "server_health": "",
-        "policies": "",
+        "notifications": "Benachrichtigungen",
+        "server_health": "Server Zustand",
+        "policies": "Grenzen und Regeln",
         "housekeeping": "",
         "other": ""
       },
       "builtin": "",
       "kind": {
-        "policy": "",
+        "policy": "Ein Verstoß",
         "notification": ""
       },
       "paste": {
@@ -1681,7 +1684,7 @@
         "description": ""
       },
       "scratch": {
-        "title": "",
+        "title": "Von vorne anfangen",
         "description": ""
       },
       "failed": "",
@@ -1768,26 +1771,26 @@
       "not_contains": ""
     },
     "options": {
-      "4K": "",
-      "1080p": "",
-      "720p": "",
-      "480p": "",
-      "SD": "",
-      "unknown": "",
+      "4K": "4K (2160p)",
+      "1080p": "1080p",
+      "720p": "720p",
+      "480p": "480p",
+      "SD": "SD",
+      "unknown": "Unknown",
       "mobile": "",
-      "tablet": "",
-      "tv": "",
-      "desktop": "",
+      "tablet": "Tablet",
+      "tv": "TV",
+      "desktop": "Desktop",
       "browser": "",
-      "ios": "",
-      "android": "",
-      "windows": "",
-      "macos": "",
-      "linux": "",
-      "tvos": "",
-      "androidtv": "",
-      "roku": "",
-      "webos": "",
+      "ios": "iOS",
+      "android": "Android",
+      "windows": "Windows",
+      "macos": "macOS",
+      "linux": "Linux",
+      "tvos": "tvOS",
+      "androidtv": "Android TV",
+      "roku": "Roku",
+      "webos": "webOS",
       "tizen": "",
       "movie": "",
       "episode": "",
@@ -1905,12 +1908,12 @@
     },
     "templates": {
       "account-inactivity": {
-        "name": "",
-        "description": "",
+        "name": "Inaktives Konto",
+        "description": "Einen Verstoß auslösen, wenn ein Konto länger als die von Ihnen festgelegte Anzahl von Tagen ungenutzt bleibt.",
         "keywords": ""
       },
       "concurrent-streams": {
-        "name": "",
+        "name": "Zu viele Streams gleichzeitig",
         "description": "",
         "keywords": ""
       },
@@ -1925,17 +1928,17 @@
         "keywords": ""
       },
       "geo-restriction": {
-        "name": "",
+        "name": "Gesperrte Länder",
         "description": "",
         "keywords": ""
       },
       "impossible-travel": {
-        "name": "",
-        "description": "",
+        "name": "Unmögliche Reise",
+        "description": "Löst einen Verstoß aus, wenn zwei Sitzungen so weit voneinander entfernt sind, dass niemand die Strecke zwischen ihnen zurücklegen könnte.",
         "keywords": ""
       },
       "kill-paused-streams": {
-        "name": "",
+        "name": "Angehaltene Streams beenden",
         "description": "",
         "keywords": ""
       },
@@ -1955,17 +1958,17 @@
         "keywords": ""
       },
       "newsletter-failed": {
-        "name": "",
+        "name": "Newsletter fehlgeschlagen",
         "description": "",
         "keywords": ""
       },
       "no-4k-transcodes": {
-        "name": "",
-        "description": "",
+        "name": "Keine 4K Transkodierung",
+        "description": "Einen Stream anhalten, der 4K-Quellvideos transkodiert.",
         "keywords": ""
       },
       "paused-too-long": {
-        "name": "",
+        "name": "Zu lange pausiert",
         "description": "",
         "keywords": ""
       },
@@ -2746,7 +2749,7 @@
       },
       "watchers": {
         "title": "",
-        "titleMusic": "",
+        "titleMusic": "Zuhörer",
         "loadError": "",
         "empty": "",
         "emptyMusic": "",
@@ -2754,25 +2757,25 @@
         "completionLabel": "",
         "columns": {
           "plays": "",
-          "episodes": "",
+          "episodes": "Episoden",
           "completion": "",
-          "lastWatched": "",
-          "lastPlayed": ""
+          "lastWatched": "Zuletzt gesehen",
+          "lastPlayed": "Zuletzt gespielt"
         }
       },
       "seasons": {
         "title": "",
         "loadError": "",
         "empty": "",
-        "watchedPct": "",
-        "stripSummary": "",
+        "watchedPct": "{{percent}}% gesehen",
+        "stripSummary": "{{season}}: {{percent}}% gesehen",
         "episodeLabel": {
-          "watched": "",
+          "watched": "{{code}}: gesehen",
           "partial": "",
           "unwatched": ""
         },
         "episodeCount_one": "",
-        "episodeCount_other": ""
+        "episodeCount_other": "{{count}} Episoden"
       },
       "albums": {
         "title": "",
@@ -2781,14 +2784,14 @@
         "trackCount_other": ""
       },
       "album": {
-        "kind": "",
+        "kind": "Album",
         "loadError": "",
         "finishedCaption": "",
         "vsPrior30": "",
         "tracksCaption": "",
         "columns": {
-          "title": "",
-          "length": ""
+          "title": "Titel",
+          "length": "Länge"
         }
       },
       "platforms": {
@@ -2801,7 +2804,7 @@
         }
       },
       "history": {
-        "title": "",
+        "title": "Verlauf",
         "loadError": "",
         "empty": "",
         "notWatched": "",
@@ -2810,12 +2813,12 @@
         }
       },
       "copies": {
-        "title": "",
+        "title": "Kopien",
         "loadError": "",
         "unknownLibrary": "",
         "columns": {
-          "library": "",
-          "episodes": "",
+          "library": "Bibliothek",
+          "episodes": "Episoden",
           "added": ""
         },
         "versionLabel": ""
@@ -2850,46 +2853,46 @@
         "done": "",
         "watchedLabel": "",
         "watched": {
-          "all": "",
+          "all": "Alle",
           "watched": "",
-          "partial": "",
-          "unwatched": ""
+          "partial": "Teilweise gesehen",
+          "unwatched": "Ungesehen"
         },
-        "unwatchedByLens": "",
-        "resolutionLabel": "",
+        "unwatchedByLens": "Ungesehen von {{name}}",
+        "resolutionLabel": "Auflösung",
         "resolutionAll": "",
         "videoCodecLabel": "",
         "videoCodecAll": "",
         "hdrLabel": "",
         "hdrAll": "",
         "hdrOnly": "",
-        "hdrChip": "",
+        "hdrChip": "HDR",
         "audioCodecLabel": "",
         "audioCodecAll": "",
         "audioChannelsLabel": "",
         "audioChannelsAll": "",
-        "atmosLabel": "",
+        "atmosLabel": "Audio",
         "atmosAll": "",
         "atmosOnly": "",
-        "atmosChip": "",
-        "genreLabel": "",
+        "atmosChip": "Atmos",
+        "genreLabel": "Genre",
         "genreAll": "",
-        "serverLabel": "",
+        "serverLabel": "Server",
         "serverAll": "",
-        "libraryLabel": "",
+        "libraryLabel": "Bibliothek",
         "libraryAll": "",
-        "yearFromLabel": "",
-        "yearToLabel": "",
+        "yearFromLabel": "Von Jahr",
+        "yearToLabel": "Zu Jahr",
         "sizeGbMinLabel": "",
         "sizeGbMaxLabel": "",
-        "sizeChipAtLeast": "",
-        "sizeChipAtMost": "",
-        "sizeChipRange": "",
-        "sortLabel": "",
+        "sizeChipAtLeast": "≥ {{min}} GB",
+        "sizeChipAtMost": "≤ {{max}} GB",
+        "sizeChipRange": "{{min}}–{{max}} GB",
+        "sortLabel": "Sortieren",
         "sort": {
-          "title": "",
+          "title": "Titel A–Z",
           "added": "",
-          "year": "",
+          "year": "Jahr",
           "plays": "",
           "watch_time": "",
           "viewers": ""
@@ -2943,36 +2946,36 @@
       "waiting": ""
     },
     "mediaPanel": {
-      "title": "",
+      "title": "Anfragen",
       "loadError": "",
       "empty": ""
     },
     "userCard": {
-      "title": "",
+      "title": "Anfragen",
       "loadError": "",
       "viewAll": "",
-      "showLess": "",
+      "showLess": "Weniger zeigen",
       "summary": {
-        "requests": "",
+        "requests": "Anfragen",
         "medianWait": "",
         "approvalRate": "",
         "neverWatched": ""
       },
-      "empty": ""
+      "empty": "Keine Anfragen bisher"
     },
-    "unattributed": "",
+    "unattributed": "Nicht auf dem Server",
     "watched": {
       "byRequester": "",
       "byOthers": ""
     },
     "page": {
-      "title": "",
+      "title": "Anfragen",
       "failedToLoad": "",
       "notConfigured": "",
       "notConfiguredDescription": "",
       "linkSeerr": "",
       "kpi": {
-        "requested": "",
+        "requested": "Angefragt",
         "watched": "",
         "neverPlayed": "",
         "ofLanded": "",
@@ -2984,7 +2987,7 @@
     "funnel": {
       "title": "",
       "description": "",
-      "requested": "",
+      "requested": "Abgefragt",
       "landed": "",
       "watched": "",
       "share": "",
