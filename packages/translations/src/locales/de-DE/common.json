@@ -134,7 +134,7 @@
     "serverOwner": "Server-Besitzer",
     "resolution": "Auflösung",
     "watchTime": "Wiedergabezeit",
-    "listenTime": "",
+    "listenTime": "Hörzeit",
     "pausedTime": "Pausierte Zeit",
     "sessionDetails": "Sitzungsdetails",
     "recentSessions": "Letzte Sitzungen",
@@ -154,11 +154,11 @@
     "streamDetails": "Streamdetails",
     "transcodeReason": "Transkodierungsgrund",
     "loadMore": "Mehr laden",
-    "playback": "",
+    "playback": "Wiedergabe",
     "plays": "",
-    "weekOf": "",
-    "viewers": "",
-    "watchHours": "",
+    "weekOf": "Woche vom {{date}}",
+    "viewers": "Zuschauer",
+    "watchHours": "Wiedergabezeit",
     "completion": "",
     "serverLegend": ""
   },
@@ -218,8 +218,8 @@
     "user_other": "{{count}} Benutzer",
     "session_one": "{{count}} Sitzung",
     "session_other": "{{count}} Sitzungen",
-    "download_one": "",
-    "download_other": "",
+    "download_one": "{{count}} download",
+    "download_other": "{{count}} downloads",
     "stream_one": "{{count}} Stream",
     "stream_other": "{{count}} Streams",
     "server_one": "{{count}} Server",
@@ -244,8 +244,8 @@
     "device_other": "{{count}} Geräte",
     "play_one": "{{count}} Wiedergabe",
     "play_other": "{{count}} Wiedergaben",
-    "segment_one": "",
-    "segment_other": ""
+    "segment_one": "{{count}} Segment",
+    "segment_other": "{{count}} Segmente"
   },
   "messages": {
     "noChangesDetected": "Keine Änderungen erkannt"
@@ -268,7 +268,7 @@
     "noSessionsFound": "Keine Sitzungen gefunden",
     "noUserData": "Keine Benutzerdaten verfügbar",
     "noPlayData": "",
-    "noLocationData": ""
+    "noLocationData": "Es liegen keine Standortdaten vor"
   },
   "confirmations": {
     "unsavedChanges": "Ungespeicherte Änderungen gehen verloren. Fortfahren?"
