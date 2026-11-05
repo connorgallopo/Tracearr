@@ -37,8 +37,8 @@ const base = {
 };
 
 describe('catalog', () => {
-  it('has nineteen triggers with a context and a group', () => {
-    expect(TRIGGER_TYPES).toHaveLength(19);
+  it('has twenty triggers with a context and a group', () => {
+    expect(TRIGGER_TYPES).toHaveLength(20);
     for (const t of TRIGGER_TYPES)
       expect(TRIGGERS[t].context).toMatch(/session|account|media|server|install/);
     expect(TRIGGERS['server.down'].context).toBe('server');

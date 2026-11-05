@@ -196,6 +196,7 @@ describe('season-heat against a real database', () => {
     expect(byNumber.get(1)).toBe('watched');
     expect(byNumber.get(2)).toBe('partial');
     expect(byNumber.get(3)).toBe('unwatched');
+    expect(season.episodes[0]).toMatchObject({ mediaId: ep1Id, title: 'Watched Episode' });
   });
 
   it('never counts an episode watched on server B as watched when scoped to server A', async () => {

@@ -1262,6 +1262,9 @@ export const catalogQuerySchema = z.object({
   videoCodec: z.string().max(50).optional(),
   audioCodec: z.string().max(50).optional(),
   audioChannels: z.string().max(20).optional(),
+  /** Calendar days, inclusive. A show matches on an episode that arrived in the window. */
+  addedAfter: listDateBoundSchema,
+  addedBefore: listDateBoundSchema,
 });
 
 // A custom window on a library period endpoint: both dates or neither; with them the period

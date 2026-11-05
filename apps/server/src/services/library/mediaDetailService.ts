@@ -624,6 +624,8 @@ export async function getChildren(
 }
 
 export interface SeasonHeatEpisodeRow {
+  media_id: string;
+  title: string;
   episode_number: number | null;
   watched_state: WatchedState;
 }
@@ -681,7 +683,9 @@ export async function getSeasonHeat(
     season_number: s.season_number,
     title: s.title,
     year: s.year,
-    episodes: seasonEpisodes[i]!.map((e) => ({
+    episodes: (seasonEpisodes[i] ?? []).map((e) => ({
+      media_id: e.id,
+      title: e.title,
       episode_number: e.episode_number,
       watched_state: watchedStates.get(e.id) ?? 'unwatched',
     })),

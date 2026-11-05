@@ -115,6 +115,7 @@ export const TRIGGERS = {
     group: 'sessions',
     variables: [...STREAM_VARS, 'minutes'],
   },
+  'session.watched': { context: 'session', group: 'sessions', variables: STREAM_VARS },
   'account.inactive_for': {
     context: 'account',
     group: 'accounts',
@@ -198,6 +199,7 @@ export const TRIGGER_INTRODUCED_IN: Partial<Record<TriggerType, string>> = {
   'newsletter.sent': '2.3.0',
   'newsletter.failed': '2.3.0',
   'account.media_downloaded': '3.0.0',
+  'session.watched': '3.1.4',
 };
 export const TRIGGER_TYPES = Object.keys(TRIGGERS) as TriggerType[];
 

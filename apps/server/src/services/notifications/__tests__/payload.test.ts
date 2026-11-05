@@ -732,6 +732,7 @@ describe('variables per trigger', () => {
     'session.transcode_changed': ['session_started', 'violation'],
     'session.paused': ['session_started', 'violation'],
     'session.held_for': ['violation'],
+    'session.watched': ['session_started', 'violation'],
     'account.inactive_for': ['violation'],
     'account.new_device': ['new_device'],
     'account.trust_changed': ['trust_score_changed'],

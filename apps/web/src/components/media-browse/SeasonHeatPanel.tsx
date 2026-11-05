@@ -1,8 +1,10 @@
+import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import type { SeasonHeatEpisode, SeasonHeatSeason } from '@tracearr/shared';
 import { Skeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { InlineErrorState } from '@/components/library/ErrorState';
 import { cn } from '@/lib/utils';
 
@@ -19,8 +21,8 @@ const EPISODE_LABEL_KEYS = {
   unwatched: 'media.detail.seasons.episodeLabel.unwatched',
 } as const;
 
-/** "S1E4: watched" when both numbers resolve, degrading to the season title when a number is missing. */
-export function episodeAriaLabel(
+/** "S1E4 · Pilot: watched" when both numbers resolve, degrading to the season title when a number is missing. */
+export function episodeLabel(
   t: TFunction<'pages'>,
   season: SeasonHeatSeason,
   episode: SeasonHeatEpisode,
@@ -31,7 +33,7 @@ export function episodeAriaLabel(
     season.seasonNumber != null
       ? `S${season.seasonNumber}E${episodeNumber}`
       : `${season.title} · E${episodeNumber}`;
-  return t(EPISODE_LABEL_KEYS[episode.watchedState], { code });
+  return t(EPISODE_LABEL_KEYS[episode.watchedState], { code: `${code} · ${episode.title}` });
 }
 
 function SeasonHeatSkeleton() {
@@ -67,7 +69,7 @@ export function SeasonHeatPanel({ seasons, isLoading, isError, onRetry }: Season
       ) : seasons.length === 0 ? (
         <EmptyState title={t('media.detail.seasons.empty')} className="py-6" />
       ) : (
-        <div>
+        <TooltipProvider delayDuration={100}>
           {seasons.map((season) => {
             const percent = Math.round(season.watchedPct);
             return (
@@ -90,18 +92,25 @@ export function SeasonHeatPanel({ seasons, isLoading, isError, onRetry }: Season
                   })}
                   className="grid auto-cols-fr grid-flow-col gap-[3px]"
                 >
-                  {season.episodes.map((episode, index) => (
-                    <span
-                      key={`${season.seasonNumber ?? season.title}-${episode.episodeNumber ?? index}`}
-                      role="img"
-                      aria-label={episodeAriaLabel(t, season, episode, index)}
-                      className={cn(
-                        'bg-muted h-[18px] rounded-[3px]',
-                        episode.watchedState === 'watched' && 'bg-primary/85',
-                        episode.watchedState === 'partial' && 'bg-primary/35'
-                      )}
-                    />
-                  ))}
+                  {season.episodes.map((episode, index) => {
+                    const label = episodeLabel(t, season, episode, index);
+                    return (
+                      <Tooltip key={episode.mediaId}>
+                        <TooltipTrigger asChild>
+                          <Link
+                            to={`/media/${episode.mediaId}`}
+                            aria-label={label}
+                            className={cn(
+                              'bg-muted focus-visible:ring-ring h-[18px] rounded-[3px] hover:opacity-75 focus-visible:ring-2 focus-visible:outline-none',
+                              episode.watchedState === 'watched' && 'bg-primary/85',
+                              episode.watchedState === 'partial' && 'bg-primary/35'
+                            )}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent>{label}</TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
                 </div>
                 <div className="text-muted-foreground text-right text-xs tabular-nums">
                   {t('media.detail.seasons.watchedPct', { percent })}
@@ -109,7 +118,7 @@ export function SeasonHeatPanel({ seasons, isLoading, isError, onRetry }: Season
               </div>
             );
           })}
-        </div>
+        </TooltipProvider>
       )}
     </section>
   );

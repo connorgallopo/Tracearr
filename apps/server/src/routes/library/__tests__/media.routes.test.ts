@@ -826,8 +826,8 @@ describe('GET /library/media/:id and sub-resources', () => {
         watchedCount: 1,
         watchedPct: 50,
         episodes: [
-          { episodeNumber: 1, watchedState: 'watched' },
-          { episodeNumber: 2, watchedState: 'unwatched' },
+          { mediaId: ep1Id, title: 'Pilot', episodeNumber: 1, watchedState: 'watched' },
+          { mediaId: ep2Id, title: 'Episode 2', episodeNumber: 2, watchedState: 'unwatched' },
         ],
       },
       {

@@ -77,7 +77,7 @@ async function findMobileSessionForUserFallback(_userId: string): Promise<Mobile
   return session[0] ?? null;
 }
 
-/** The switches read the server-wide senders; the row's own columns are no longer consulted. */
+/** The switch fields come from the server-wide senders, so they overwrite the row's columns. */
 async function withDelivery(
   row: typeof notificationPreferences.$inferSelect,
   mobileSession: MobileSessionRef
@@ -228,14 +228,6 @@ export const notificationPreferencesRoutes: FastifyPluginAsync = async (app) => 
 
     const prefsId = existing[0]!.id;
 
-    await setPushSwitches(
-      Object.fromEntries(
-        PUSH_PREFERENCES.flatMap((key) =>
-          body.data[key] === undefined ? [] : [[key, body.data[key]]]
-        )
-      )
-    );
-
     // Build update object
     const updateData: Partial<typeof notificationPreferences.$inferInsert> = {
       updatedAt: new Date(),
@@ -280,6 +272,15 @@ export const notificationPreferencesRoutes: FastifyPluginAsync = async (app) => 
       .update(notificationPreferences)
       .set(updateData)
       .where(eq(notificationPreferences.id, prefsId));
+
+    // After the row, so a failed device write never leaves a server-wide switch half applied
+    await setPushSwitches(
+      Object.fromEntries(
+        PUSH_PREFERENCES.flatMap((key) =>
+          body.data[key] === undefined ? [] : [[key, body.data[key]]]
+        )
+      )
+    );
 
     // Return updated preferences
     const updated = await db

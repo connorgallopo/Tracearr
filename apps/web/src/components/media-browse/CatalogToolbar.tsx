@@ -14,6 +14,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import type { DateRangeValue } from '@/components/ui/filters';
+import { DateRangeField } from '@/components/ui/filters/fields/date-range-field';
 import {
   Sheet,
   SheetContent,
@@ -34,6 +36,7 @@ import {
 import { MediaTypeControl } from '@/components/layout/MediaTypeControl';
 import { stableSerialize, type CatalogSort } from '@/hooks/queries';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { formatFilterDateRange, formatIsoDay } from '@/lib/dateFormat';
 import { formatBytes } from '@/lib/formatters';
 import { liveFirst } from '@/lib/servers';
 import { cn } from '@/lib/utils';
@@ -58,6 +61,8 @@ export interface PersistedGridFilters {
   audioCodec?: string;
   /** Channel layout as the charts name it ('Stereo', '5.1'). */
   audioChannels?: string;
+  /** Calendar days (YYYY-MM-DD), inclusive. */
+  added?: DateRangeValue;
   sort: CatalogSort;
 }
 
@@ -79,6 +84,7 @@ export function activeFilterCount(filters: PersistedGridFilters): number {
     filters.videoCodec,
     filters.audioCodec,
     filters.audioChannels,
+    filters.added,
   ].filter((value) => value !== undefined).length;
 }
 const SORT_OPTIONS: CatalogSort[] = ['title', 'added', 'year', 'plays', 'watch_time', 'viewers'];
@@ -524,6 +530,13 @@ export function CatalogToolbar({
         onRemove: () => onFiltersChange({ ...filters, sizeGbMin: undefined, sizeGbMax: undefined }),
       });
     }
+    if (filters.added) {
+      list.push({
+        key: 'added',
+        label: `${t('media.grid.toolbar.addedLabel')}: ${formatFilterDateRange(filters.added, t)}`,
+        onRemove: () => onFiltersChange({ ...filters, added: undefined }),
+      });
+    }
     return list;
   }, [filters, servers, selectedLibrary, t, watchedLabel, onFiltersChange]);
 
@@ -718,6 +731,30 @@ export function CatalogToolbar({
               onChange={(e) => setYearToInput(e.target.value)}
             />
           </div>
+        </div>
+      )}
+
+      {!isArtist && (
+        <div className="space-y-1.5">
+          <span id="catalog-added-label" className="text-muted-foreground block text-xs">
+            {t('media.grid.toolbar.addedLabel')}
+          </span>
+          <DateRangeField
+            aria-labelledby="catalog-added-label"
+            value={filters.added}
+            onChange={(added) => onFiltersChange({ ...filters, added })}
+            labels={{
+              placeholder: t('common:filters.anyDate'),
+              apply: t('common:actions.apply'),
+              cancel: t('common:actions.cancel'),
+              clear: t('common:filters.clearDates'),
+              clearStart: t('common:filters.clearStartDate'),
+              clearEnd: t('common:filters.clearEndDate'),
+            }}
+            formatValue={(value) => formatFilterDateRange(value, t)}
+            formatDate={formatIsoDay}
+            maxDate={new Date()}
+          />
         </div>
       )}
 

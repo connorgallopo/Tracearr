@@ -374,6 +374,21 @@ describe('MediaGrid', () => {
     );
   });
 
+  it('applies the added range from a growth chart link on arrival', () => {
+    mockUseServer.mockReturnValue(serverReturn());
+    mockUseCatalogWindow.mockReturnValue(windowResult({ totalItems: 5 }));
+
+    renderGrid('/media/browse?type=show&addedAfter=2026-10-01&addedBefore=2026-10-31');
+
+    expect(mockUseCatalogWindow).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        type: 'show',
+        filters: expect.objectContaining({ addedAfter: '2026-10-01', addedBefore: '2026-10-31' }),
+      }),
+      expect.anything()
+    );
+  });
+
   it('seeds the watched filter from a `watched` link param', () => {
     mockUseServer.mockReturnValue(serverReturn());
     mockUseCatalogWindow.mockReturnValue(windowResult({ totalItems: 5 }));

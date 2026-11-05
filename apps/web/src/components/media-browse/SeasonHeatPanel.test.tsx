@@ -1,8 +1,12 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render as rtlRender, screen } from '@testing-library/react';
+import type { ReactElement } from 'react';
+import { MemoryRouter } from 'react-router';
 import { initI18n } from '@tracearr/translations';
 import type { SeasonHeatSeason } from '@tracearr/shared';
 import { SeasonHeatPanel } from './SeasonHeatPanel';
+
+const render = (ui: ReactElement) => rtlRender(<MemoryRouter>{ui}</MemoryRouter>);
 
 beforeAll(async () => {
   await initI18n({ lng: 'en' });
@@ -16,10 +20,10 @@ const season1: SeasonHeatSeason = {
   watchedCount: 7,
   watchedPct: 92,
   episodes: [
-    { episodeNumber: 1, watchedState: 'watched' },
-    { episodeNumber: 2, watchedState: 'watched' },
-    { episodeNumber: 3, watchedState: 'partial' },
-    { episodeNumber: 4, watchedState: 'unwatched' },
+    { mediaId: 'ep-1', title: 'Pilot', episodeNumber: 1, watchedState: 'watched' },
+    { mediaId: 'ep-2', title: 'Second', episodeNumber: 2, watchedState: 'watched' },
+    { mediaId: 'ep-3', title: 'Third', episodeNumber: 3, watchedState: 'partial' },
+    { mediaId: 'ep-4', title: 'Fourth', episodeNumber: 4, watchedState: 'unwatched' },
   ],
 };
 
@@ -41,14 +45,27 @@ describe('SeasonHeatPanel', () => {
     expect(screen.getByText('No season data yet')).toBeInTheDocument();
   });
 
+  it('links each episode cell to its detail page', () => {
+    render(
+      <SeasonHeatPanel seasons={[season1]} isLoading={false} isError={false} onRetry={vi.fn()} />
+    );
+
+    expect(screen.getByRole('link', { name: 'S1E1 · Pilot: watched' })).toHaveAttribute(
+      'href',
+      '/media/ep-1'
+    );
+  });
+
   it('maps each episode watched state to its aria-label using the S{n}E{n} pattern', () => {
     render(
       <SeasonHeatPanel seasons={[season1]} isLoading={false} isError={false} onRetry={vi.fn()} />
     );
 
-    expect(screen.getByRole('img', { name: 'S1E1: watched' })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'S1E3: partially watched' })).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'S1E4: unwatched' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'S1E1 · Pilot: watched' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'S1E3 · Third: partially watched' })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'S1E4 · Fourth: unwatched' })).toBeInTheDocument();
   });
 
   it('maps watchedState to the full/part css classes and leaves unwatched bare', () => {
@@ -56,9 +73,9 @@ describe('SeasonHeatPanel', () => {
       <SeasonHeatPanel seasons={[season1]} isLoading={false} isError={false} onRetry={vi.fn()} />
     );
 
-    const watched = screen.getByRole('img', { name: 'S1E1: watched' });
-    const partial = screen.getByRole('img', { name: 'S1E3: partially watched' });
-    const unwatched = screen.getByRole('img', { name: 'S1E4: unwatched' });
+    const watched = screen.getByRole('link', { name: 'S1E1 · Pilot: watched' });
+    const partial = screen.getByRole('link', { name: 'S1E3 · Third: partially watched' });
+    const unwatched = screen.getByRole('link', { name: 'S1E4 · Fourth: unwatched' });
 
     expect(watched.className).toContain('bg-primary/85');
     expect(partial.className).toContain('bg-primary/35');
@@ -82,12 +99,16 @@ describe('SeasonHeatPanel', () => {
       episodeCount: 1,
       watchedCount: 0,
       watchedPct: 0,
-      episodes: [{ episodeNumber: null, watchedState: 'unwatched' }],
+      episodes: [
+        { mediaId: 'sp-1', title: 'Special', episodeNumber: null, watchedState: 'unwatched' },
+      ],
     };
     render(
       <SeasonHeatPanel seasons={[specials]} isLoading={false} isError={false} onRetry={vi.fn()} />
     );
 
-    expect(screen.getByRole('img', { name: 'Specials · E1: unwatched' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Specials · E1 · Special: unwatched' })
+    ).toBeInTheDocument();
   });
 });

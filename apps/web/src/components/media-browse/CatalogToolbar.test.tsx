@@ -376,6 +376,25 @@ describe('CatalogToolbar', () => {
     );
   });
 
+  it('renders an added-range chip and removes the range', async () => {
+    const onFiltersChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <CatalogToolbar
+        {...baseProps}
+        filters={{ ...DEFAULT_GRID_FILTERS, added: { from: '2026-10-01' } }}
+        onFiltersChange={onFiltersChange}
+      />
+    );
+    const chip = screen.getByText(/^media\.grid\.toolbar\.addedLabel: common:filters\.dateAfter/);
+    await user.click(
+      screen.getByRole('button', {
+        name: `common:filters.remove:${JSON.stringify({ label: chip.textContent })}`,
+      })
+    );
+    expect(onFiltersChange).toHaveBeenCalledWith(expect.objectContaining({ added: undefined }));
+  });
+
   it('shows the active filter count including HDR, library and size-on-disk', () => {
     render(
       <CatalogToolbar

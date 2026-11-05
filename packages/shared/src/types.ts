@@ -723,6 +723,9 @@ export interface DashboardStats {
   watchTimeHours: number;
   /** Music tracks since the start of the day; watchTimeHours covers movies and episodes */
   listenTimeHours: number;
+  /** The same two totals unrounded; the hour fields keep 0.1 h for the mobile app and the public API */
+  watchTimeMs: number;
+  listenTimeMs: number;
   /** Absent for members, who never see violations */
   alertsLast24h?: number;
   /** Absent for members, who get othersActive instead */
@@ -3238,6 +3241,8 @@ export interface MediaPlatformBreakdownResponse {
 }
 
 export interface SeasonHeatEpisode {
+  mediaId: string;
+  title: string;
   episodeNumber: number | null;
   watchedState: WatchedState;
 }

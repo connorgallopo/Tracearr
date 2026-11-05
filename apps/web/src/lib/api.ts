@@ -302,6 +302,31 @@ function listSearchParams(params: Record<string, unknown>): string {
   return searchParams.toString();
 }
 
+/** The filters /library/catalog and /library/catalog/letters share. */
+type CatalogRequestParams = {
+  type: LibraryMediaType;
+  serverIds?: string[];
+  resolution?: string;
+  genre?: string;
+  yearFrom?: number;
+  yearTo?: number;
+  watched?: WatchedState;
+  lens?: string;
+  search?: string;
+  sort?: 'title' | 'added' | 'year' | 'plays' | 'watch_time' | 'viewers';
+  libraryKey?: string;
+  hdr?: boolean;
+  atmos?: boolean;
+  sizeGbMin?: number;
+  sizeGbMax?: number;
+  videoCodec?: string;
+  audioCodec?: string;
+  audioChannels?: string;
+  /** Calendar days, inclusive. */
+  addedAfter?: string;
+  addedBefore?: string;
+};
+
 /** The filters /sessions/history and /sessions/history/aggregates share. */
 function appendHistoryFilterParams(
   searchParams: URLSearchParams,
@@ -1735,102 +1760,10 @@ class ApiClient {
         `/library/status?${params.toString()}`
       );
     },
-    catalog: (params: {
-      type: LibraryMediaType;
-      serverIds?: string[];
-      resolution?: string;
-      genre?: string;
-      yearFrom?: number;
-      yearTo?: number;
-      watched?: WatchedState;
-      lens?: string;
-      search?: string;
-      sort?: 'title' | 'added' | 'year' | 'plays' | 'watch_time' | 'viewers';
-      offset?: number;
-      pageSize?: number;
-      libraryKey?: string;
-      hdr?: boolean;
-      atmos?: boolean;
-      sizeGbMin?: number;
-      sizeGbMax?: number;
-      videoCodec?: string;
-      audioCodec?: string;
-      audioChannels?: string;
-    }) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set('type', params.type);
-      if (params.serverIds?.length) {
-        for (const id of params.serverIds) {
-          searchParams.append('serverIds', id);
-        }
-      }
-      if (params.resolution) searchParams.set('resolution', params.resolution);
-      if (params.genre) searchParams.set('genre', params.genre);
-      if (params.yearFrom !== undefined) searchParams.set('yearFrom', String(params.yearFrom));
-      if (params.yearTo !== undefined) searchParams.set('yearTo', String(params.yearTo));
-      if (params.watched) searchParams.set('watched', params.watched);
-      if (params.lens) searchParams.set('lens', params.lens);
-      if (params.search) searchParams.set('search', params.search);
-      if (params.sort) searchParams.set('sort', params.sort);
-      if (params.offset !== undefined) searchParams.set('offset', String(params.offset));
-      if (params.pageSize) searchParams.set('pageSize', String(params.pageSize));
-      if (params.libraryKey) searchParams.set('libraryKey', params.libraryKey);
-      if (params.hdr) searchParams.set('hdr', 'true');
-      if (params.atmos) searchParams.set('atmos', 'true');
-      if (params.sizeGbMin !== undefined) searchParams.set('sizeGbMin', String(params.sizeGbMin));
-      if (params.sizeGbMax !== undefined) searchParams.set('sizeGbMax', String(params.sizeGbMax));
-      if (params.videoCodec) searchParams.set('videoCodec', params.videoCodec);
-      if (params.audioCodec) searchParams.set('audioCodec', params.audioCodec);
-      if (params.audioChannels) searchParams.set('audioChannels', params.audioChannels);
-      return this.request<CatalogResponse>(`/library/catalog?${searchParams.toString()}`);
-    },
-    catalogLetters: (params: {
-      type: LibraryMediaType;
-      serverIds?: string[];
-      resolution?: string;
-      genre?: string;
-      yearFrom?: number;
-      yearTo?: number;
-      watched?: WatchedState;
-      lens?: string;
-      search?: string;
-      sort?: 'title' | 'added' | 'year' | 'plays' | 'watch_time' | 'viewers';
-      libraryKey?: string;
-      hdr?: boolean;
-      atmos?: boolean;
-      sizeGbMin?: number;
-      sizeGbMax?: number;
-      videoCodec?: string;
-      audioCodec?: string;
-      audioChannels?: string;
-    }) => {
-      const searchParams = new URLSearchParams();
-      searchParams.set('type', params.type);
-      if (params.serverIds?.length) {
-        for (const id of params.serverIds) {
-          searchParams.append('serverIds', id);
-        }
-      }
-      if (params.resolution) searchParams.set('resolution', params.resolution);
-      if (params.genre) searchParams.set('genre', params.genre);
-      if (params.yearFrom !== undefined) searchParams.set('yearFrom', String(params.yearFrom));
-      if (params.yearTo !== undefined) searchParams.set('yearTo', String(params.yearTo));
-      if (params.watched) searchParams.set('watched', params.watched);
-      if (params.lens) searchParams.set('lens', params.lens);
-      if (params.search) searchParams.set('search', params.search);
-      if (params.sort) searchParams.set('sort', params.sort);
-      if (params.libraryKey) searchParams.set('libraryKey', params.libraryKey);
-      if (params.hdr) searchParams.set('hdr', 'true');
-      if (params.atmos) searchParams.set('atmos', 'true');
-      if (params.sizeGbMin !== undefined) searchParams.set('sizeGbMin', String(params.sizeGbMin));
-      if (params.sizeGbMax !== undefined) searchParams.set('sizeGbMax', String(params.sizeGbMax));
-      if (params.videoCodec) searchParams.set('videoCodec', params.videoCodec);
-      if (params.audioCodec) searchParams.set('audioCodec', params.audioCodec);
-      if (params.audioChannels) searchParams.set('audioChannels', params.audioChannels);
-      return this.request<CatalogLettersResponse>(
-        `/library/catalog/letters?${searchParams.toString()}`
-      );
-    },
+    catalog: (params: CatalogRequestParams & { offset?: number; pageSize?: number }) =>
+      this.request<CatalogResponse>(`/library/catalog?${listSearchParams(params)}`),
+    catalogLetters: (params: CatalogRequestParams) =>
+      this.request<CatalogLettersResponse>(`/library/catalog/letters?${listSearchParams(params)}`),
     shelves: (
       params: {
         timeRange?: StatsTimeRange;

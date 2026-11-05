@@ -61,6 +61,7 @@
     "playing": "Playing",
     "paused": "Paused",
     "buffering": "Buffering",
+    "endsAt": "Ends at {{time}}",
     "stopped": "Stopped",
     "directPlay": "Direct Play",
     "directStream": "Direct Stream",

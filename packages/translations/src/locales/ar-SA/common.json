@@ -61,6 +61,7 @@
     "playing": "تشغيل",
     "paused": "متوقف",
     "buffering": "",
+    "endsAt": "",
     "stopped": "توقفت",
     "directPlay": "تشغيل مباشر",
     "directStream": "البث المباشر",

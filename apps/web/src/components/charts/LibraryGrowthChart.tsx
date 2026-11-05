@@ -9,11 +9,14 @@ import { formatDate, axisDateTimeLabelFormats, parseChartDate } from '@/lib/date
 import { TrendingUp } from 'lucide-react';
 import { chartLang } from './chartUtils';
 
+export type GrowthSeries = 'movies' | 'episodes';
+
 interface LibraryGrowthChartProps {
   data: LibraryGrowthResponse | undefined;
   isLoading?: boolean;
   height?: number;
-  period?: string;
+  /** Clicking the movies or episodes area; music has no catalog filter to land on. */
+  onSeriesClick?: (series: GrowthSeries) => void;
 }
 
 // Colors for each media type
@@ -68,7 +71,12 @@ function alignSeries(series: GrowthDataPoint[] | undefined, allDates: string[]):
   return result;
 }
 
-export function LibraryGrowthChart({ data, isLoading, height = 250 }: LibraryGrowthChartProps) {
+export function LibraryGrowthChart({
+  data,
+  isLoading,
+  height = 250,
+  onSeriesClick,
+}: LibraryGrowthChartProps) {
   const { t } = useTranslation(['pages', 'common']);
   const options = useMemo<Highcharts.Options>(() => {
     if (!data) return {};
@@ -89,6 +97,8 @@ export function LibraryGrowthChart({ data, isLoading, height = 250 }: LibraryGro
     if (!hasMovies && !hasEpisodes && !hasMusic) return {};
 
     const series: Highcharts.SeriesOptionsType[] = [];
+    const clickable = (name: GrowthSeries) =>
+      onSeriesClick ? { cursor: 'pointer', events: { click: () => onSeriesClick(name) } } : {};
 
     if (hasMovies) {
       series.push({
@@ -98,6 +108,7 @@ export function LibraryGrowthChart({ data, isLoading, height = 250 }: LibraryGro
         color: SERIES_COLORS.movies,
         fillOpacity: 0.2,
         marker: { enabled: false, states: { hover: { enabled: true, radius: 4 } } },
+        ...clickable('movies'),
       });
     }
 
@@ -109,6 +120,7 @@ export function LibraryGrowthChart({ data, isLoading, height = 250 }: LibraryGro
         color: SERIES_COLORS.episodes,
         fillOpacity: 0.2,
         marker: { enabled: false, states: { hover: { enabled: true, radius: 4 } } },
+        ...clickable('episodes'),
       });
     }
 
@@ -210,7 +222,7 @@ export function LibraryGrowthChart({ data, isLoading, height = 250 }: LibraryGro
         ],
       },
     };
-  }, [data, height, t]);
+  }, [data, height, onSeriesClick, t]);
 
   if (isLoading) {
     return <ChartSkeleton height={height} />;

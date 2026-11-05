@@ -93,6 +93,7 @@ export function edgeKeyOf(event: ContextEvaluatingEvent, node: TriggerNode | nul
   switch (event.type) {
     case 'session.started':
     case 'session.first_seen':
+    case 'session.watched':
     case 'media.added':
     case 'account.new_device':
       return null;
@@ -328,6 +329,7 @@ export function registerRuleSubscribers(): void {
   subscribe('session.transcode_changed', 'session-rules', sessionRules({ transcodeReEval: true }));
   subscribe('session.paused', 'session-rules', sessionRules({ pauseReEval: true }));
   subscribe('session.held_for', 'session-rules', sessionRules({ heldFor: true }));
+  subscribe('session.watched', 'session-rules', sessionRules());
   // Not fresh: the probe runs inside the insert transaction and the dispatch follows the commit.
   subscribe('account.new_device', 'session-rules', sessionRules());
   for (const trigger of ACCOUNT_TRIGGERS) {

@@ -7,7 +7,7 @@ export { QualityChart } from './QualityChart';
 export { TopListChart } from './TopListChart';
 export { ConcurrentChart } from './ConcurrentChart';
 export { EngagementBreakdownChart, PlaysVsSessionsChart } from './EngagementChart';
-export { LibraryGrowthChart } from './LibraryGrowthChart';
+export { LibraryGrowthChart, type GrowthSeries } from './LibraryGrowthChart';
 export { QualityTimelineChart } from './QualityTimelineChart';
 export { StoragePredictionChart } from './StoragePredictionChart';
 export { CompletionDonutChart } from './CompletionDonutChart';

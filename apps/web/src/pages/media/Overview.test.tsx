@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { fireEvent, render, screen, within } from '@testing-library/react';
+import { MemoryRouter, useLocation } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { MostPopularShelfRow, ShelvesResponse } from '@tracearr/shared';
 import { MediaOverview } from './Overview';
@@ -28,7 +28,9 @@ const auth = vi.hoisted(() => ({ user: { role: 'owner' } }));
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => auth }));
 
 vi.mock('@/components/charts', () => ({
-  LibraryGrowthChart: () => <div data-testid="library-growth-chart" />,
+  LibraryGrowthChart: ({ onSeriesClick }: { onSeriesClick?: (series: 'episodes') => void }) => (
+    <button data-testid="library-growth-chart" onClick={() => onSeriesClick?.('episodes')} />
+  ),
 }));
 
 vi.mock('@/components/library/LibraryEmptyState', () => ({
@@ -208,11 +210,17 @@ function fullShelves(): ShelvesResponse {
   };
 }
 
+function LocationProbe() {
+  const location = useLocation();
+  return <output data-testid="location">{`${location.pathname}${location.search}`}</output>;
+}
+
 function renderOverview(initialEntries: string[] = ['/'], client = new QueryClient()) {
   return render(
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={initialEntries}>
         <MediaOverview />
+        <LocationProbe />
       </MemoryRouter>
     </QueryClientProvider>
   );
@@ -460,6 +468,17 @@ describe('MediaOverview', () => {
 
     // The series' own copy sits at 2024-01-01, which would read in years.
     expect(screen.getByText('media.landing.card.addedCompactAgo:{"age":"3d"}')).toBeInTheDocument();
+  });
+
+  it('opens Browse on shows added in the picked range from the episodes growth series', () => {
+    mockShelvesReturn({ data: fullShelves() });
+
+    renderOverview(['/?period=custom&from=2026-10-01&to=2026-10-31']);
+    fireEvent.click(screen.getByTestId('library-growth-chart'));
+
+    expect(screen.getByTestId('location')).toHaveTextContent(
+      '/media/browse?type=show&addedAfter=2026-10-01&addedBefore=2026-10-31'
+    );
   });
 
   it('reads the shelves period from the time range in the URL', () => {

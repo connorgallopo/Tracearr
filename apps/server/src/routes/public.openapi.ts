@@ -316,7 +316,6 @@ const StatsTodayResponse = z
       description: 'People who played a movie, episode or music track today',
       example: 8,
     }),
-    timestamp: z.iso.datetime(),
   })
   .openapi('StatsTodayResponse');
 

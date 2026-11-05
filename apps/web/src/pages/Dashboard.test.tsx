@@ -342,9 +342,9 @@ describe('Dashboard', () => {
   });
 
   it('adds listen time under watch time only when music was played today', () => {
-    const stats = (listenTimeHours: number) =>
+    const stats = (listenTimeMs: number) =>
       ({
-        data: { todayPlays: 4, todaySessions: 4, watchTimeHours: 2.5, listenTimeHours },
+        data: { todayPlays: 4, todaySessions: 4, watchTimeMs: 9_180_000, listenTimeMs },
         isLoading: false,
         isError: false,
         error: null,
@@ -359,13 +359,13 @@ describe('Dashboard', () => {
 
     mockUseDashboardStats.mockReturnValue(stats(0));
     const { unmount } = renderDashboard();
-    expect(screen.getByText('2.5h')).toBeInTheDocument();
+    expect(screen.getByText('2h 33m')).toBeInTheDocument();
     expect(screen.queryByText(/common:labels\.listenTime/)).not.toBeInTheDocument();
     unmount();
 
-    mockUseDashboardStats.mockReturnValue(stats(1));
+    mockUseDashboardStats.mockReturnValue(stats(3_600_000));
     renderDashboard();
-    expect(screen.getByText('(common:labels.listenTime 1h)')).toBeInTheDocument();
+    expect(screen.getByText('(common:labels.listenTime 1h 0m)')).toBeInTheDocument();
   });
 
   it('leaves the server view with the active users tile and no member extras', () => {

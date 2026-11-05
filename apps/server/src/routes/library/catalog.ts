@@ -64,6 +64,7 @@ import {
   type Scope,
   serverCacheSegment,
 } from '../../lib/scope.js';
+import { utcDayEnd, utcDayStart } from '../../utils/listQuery.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { normalizeTitle } from '../../services/library/mediaMatchKey.js';
 import {
@@ -143,49 +144,15 @@ export function parseLibraryKey(
   return { serverId: libraryKey.slice(0, separator), libraryId: libraryKey.slice(separator + 1) };
 }
 
-export interface CatalogPageQueryParams {
-  type: LibraryMediaType;
+export interface CatalogPageQueryParams extends CatalogFilterParams {
   sort: CatalogSort;
   offset: number;
-  genre: string | null;
-  yearFrom: number | null;
-  yearTo: number | null;
-  searchNormalized: string | null;
-  resolution: string | null;
-  libraryServerId: string | null;
-  libraryId: string | null;
-  hdr: boolean;
-  atmos: boolean;
-  sizeGbMin: number | null;
-  sizeGbMax: number | null;
-  videoCodecs?: RawCodec[] | null;
-  audioCodecs?: RawCodec[] | null;
-  audioChannels?: RawCodec[] | null;
-  serverIds: string[] | undefined;
-  scope: Scope;
   pageSize: number;
   preferredPosterServerId?: string | null;
 }
 
-export interface CatalogTotalsQueryParams {
-  type: LibraryMediaType;
+export interface CatalogTotalsQueryParams extends CatalogFilterParams {
   sort: CatalogSort;
-  genre: string | null;
-  yearFrom: number | null;
-  yearTo: number | null;
-  searchNormalized: string | null;
-  resolution: string | null;
-  libraryServerId: string | null;
-  libraryId: string | null;
-  hdr: boolean;
-  atmos: boolean;
-  sizeGbMin: number | null;
-  sizeGbMax: number | null;
-  videoCodecs?: RawCodec[] | null;
-  audioCodecs?: RawCodec[] | null;
-  audioChannels?: RawCodec[] | null;
-  serverIds: string[] | undefined;
-  scope: Scope;
 }
 
 interface RawCatalogRow {
@@ -255,6 +222,8 @@ function buildCommonWhere(params: {
   videoCodecs?: RawCodec[] | null;
   audioCodecs?: RawCodec[] | null;
   audioChannels?: RawCodec[] | null;
+  addedAfter?: Date | null;
+  addedBefore?: Date | null;
   serverFragmentLi: SQL;
 }): SQL {
   const {
@@ -273,6 +242,8 @@ function buildCommonWhere(params: {
     videoCodecs,
     audioCodecs,
     audioChannels,
+    addedAfter,
+    addedBefore,
     serverFragmentLi,
   } = params;
   const sizeMinBytes = sizeGbMin !== null ? Math.round(sizeGbMin * BYTES_PER_GB) : null;
@@ -341,6 +312,24 @@ function buildCommonWhere(params: {
               BETWEEN COALESCE(${sizeMinBytes}::bigint, 0) AND COALESCE(${sizeMaxBytes}::bigint, 9223372036854775807)`
         : sql`AND (${sizeMinBytes}::bigint IS NULL OR li.file_size >= ${sizeMinBytes}::bigint)
               AND (${sizeMaxBytes}::bigint IS NULL OR li.file_size <= ${sizeMaxBytes}::bigint)`;
+  // `col` is a trusted column expression, never user input.
+  const addedRange = (col: string): SQL =>
+    sql`${addedAfter ? sql`AND ${sql.raw(col)} >= ${addedAfter}` : sql``}
+        ${addedBefore ? sql`AND ${sql.raw(col)} < ${addedBefore}` : sql``}`;
+  // A show container's own date stays put while seasons arrive, so a show copy
+  // counts as added when one of its episodes in that server + library did.
+  const addedFilter =
+    !addedAfter && !addedBefore
+      ? sql``
+      : type === 'show'
+        ? sql`AND EXISTS (
+            SELECT 1 FROM media em
+            JOIN library_items epi ON epi.media_id = em.id AND epi.removed_at IS NULL
+            WHERE em.show_media_id = m.id AND em.media_type = 'episode'
+              AND epi.server_id = li.server_id AND epi.library_id = li.library_id
+              ${addedRange('epi.created_at')}
+          )`
+        : addedRange('li.created_at');
   return sql`
     AND (${genre}::text IS NULL OR ${genre} = ANY(m.genres))
     AND (${yearFrom}::int IS NULL OR m.year >= ${yearFrom})
@@ -358,6 +347,7 @@ function buildCommonWhere(params: {
         ${codecFilter('audio', audioCodecs)}
         ${codecFilter('channels', audioChannels)}
         ${sizeFilter}
+        ${addedFilter}
     )
   `;
 }
@@ -663,6 +653,9 @@ export interface CatalogFilterParams {
   videoCodecs?: RawCodec[] | null;
   audioCodecs?: RawCodec[] | null;
   audioChannels?: RawCodec[] | null;
+  /** Half-open UTC bounds from the picked calendar days; null or absent means unbounded. */
+  addedAfter?: Date | null;
+  addedBefore?: Date | null;
   serverIds: string[] | undefined;
   /** Narrows a member's titles to the libraries their accounts can open */
   scope: Scope;
@@ -689,6 +682,8 @@ function filterKeyParts(params: CatalogFilterParams): (string | number)[] {
     params.videoCodecs ? `v:${params.videoCodecs.join(',')}` : '',
     params.audioCodecs ? `a:${params.audioCodecs.join(',')}` : '',
     params.audioChannels ? `c:${params.audioChannels.join(',')}` : '',
+    params.addedAfter?.toISOString() ?? '',
+    params.addedBefore?.toISOString() ?? '',
     libraryCacheSegment(params.scope),
   ];
 }
@@ -1034,6 +1029,8 @@ async function toFilterParams(
     videoCodecs,
     audioCodecs,
     audioChannels,
+    addedAfter: utcDayStart(data.addedAfter) ?? null,
+    addedBefore: utcDayEnd(data.addedBefore) ?? null,
     serverIds,
     scope,
   };

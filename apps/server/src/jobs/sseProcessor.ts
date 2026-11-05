@@ -38,6 +38,7 @@ import { dispatch } from '../services/automations/events/dispatcher.js';
 import {
   dispatchServerHealthById,
   dispatchSessionFirstSeen,
+  dispatchSessionWatched,
 } from '../services/automations/events/producers.js';
 import { registerService, unregisterService } from '../services/serviceTracker.js';
 import { getWatchedThreshold } from '../services/settings.js';
@@ -678,6 +679,15 @@ async function applySessionProgress(
 
   if (wasStoppedConcurrently) {
     return;
+  }
+
+  if (watchedTransition) {
+    const violations = await dispatchSessionWatched(
+      existingSession,
+      { progressMs: viewOffset },
+      now
+    );
+    await broadcastViolations(violations, existingSession, pubSubService);
   }
 
   if (cacheService) {
@@ -1504,6 +1514,15 @@ async function updateExistingSession(
       sessionId: existingSession.id,
       serverId: existingSession.serverId,
     });
+  }
+
+  if (watched && !existingSession.watched) {
+    const violations = await dispatchSessionWatched(
+      existingSession,
+      pickLiveSessionFields(processed),
+      now
+    );
+    await broadcastViolations(violations, existingSession, pubSubService);
   }
 
   if (cacheService) {

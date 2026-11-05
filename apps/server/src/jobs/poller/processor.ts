@@ -46,6 +46,7 @@ import { dispatch } from '../../services/automations/events/dispatcher.js';
 import {
   dispatchServerHealth,
   dispatchSessionFirstSeen,
+  sessionWatchedEvent,
 } from '../../services/automations/events/producers.js';
 import { registerRuleSubscribers } from '../../services/automations/events/subscribers.js';
 import {
@@ -1820,6 +1821,33 @@ async function processServerSessions(
               sessionId: existingSession.id,
               serverId: server.id,
             });
+          }
+
+          if (watchedThresholdReached && activeAutomations.length > 0) {
+            try {
+              const recentSessions = await getOrFetchRecentSessions(
+                recentSessionsMap,
+                serverUserId
+              );
+              const { violations } = await dispatch(
+                sessionWatchedEvent(
+                  existingSession,
+                  pickLiveSessionFields(processed),
+                  now,
+                  { id: server.id, name: server.name, type: server.type },
+                  userDetail
+                ),
+                { activeAutomations, activeSessions: ruleEvalSessions, recentSessions }
+              );
+              if (violations.length > 0 && pubSubService) {
+                await broadcastViolations(violations, existingSession, pubSubService);
+              }
+            } catch (error) {
+              console.error(
+                `[Poller] Error dispatching watched rules for session ${existingSession.id}:`,
+                error
+              );
+            }
           }
 
           // Build active session for cache/broadcast (with updated pause tracking values)

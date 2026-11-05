@@ -1,5 +1,5 @@
-import { useMemo, type ReactNode } from 'react';
-import { Link } from 'react-router';
+import { useCallback, useMemo, type ReactNode } from 'react';
+import { Link, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import {
@@ -31,7 +31,7 @@ import {
 } from '@/components/media-browse/PosterCard';
 import { ErrorState } from '@/components/library/ErrorState';
 import { LibraryEmptyState } from '@/components/library/LibraryEmptyState';
-import { LibraryGrowthChart } from '@/components/charts';
+import { LibraryGrowthChart, type GrowthSeries } from '@/components/charts';
 import { ServerBadge } from '@/components/server';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -48,10 +48,10 @@ import {
 } from '@/hooks/queries';
 import { useAuth } from '@/hooks/useAuth';
 import { useServer } from '@/hooks/useServer';
-import { toApiDayParams, useTimeRange } from '@/hooks/useTimeRange';
+import { resolveWindow, toApiDayParams, useTimeRange } from '@/hooks/useTimeRange';
 import { browseHref } from '@/lib/browseLinks';
 import { formatBytes } from '@/lib/formatters';
-import { formatCompactAge, formatLastUpdated } from '@/lib/dateFormat';
+import { formatCompactAge, formatLastUpdated, toIsoDate } from '@/lib/dateFormat';
 
 /**
  * Aggregate multi-server growth response into a single-server-shaped object.
@@ -114,6 +114,16 @@ function mostRecentAddedAt(entries: CatalogRowServerEntry[]): string | null {
     (latest, entry) => (entry.addedAt > latest ? entry.addedAt : latest),
     first.addedAt
   );
+}
+
+/** The picked range as Browse's added bounds, inclusive calendar days; all time sets none. */
+function addedBounds(range: TimeRangeValue): { addedAfter?: string; addedBefore?: string } {
+  if (range.period === 'custom' && range.startDate && range.endDate) {
+    return { addedAfter: toIsoDate(range.startDate), addedBefore: toIsoDate(range.endDate) };
+  }
+  // The chart buckets presets by UTC day and the server reads the bound as UTC midnight.
+  const window = resolveWindow(range.period, undefined, undefined);
+  return window ? { addedAfter: window.startDate.toISOString().slice(0, 10) } : {};
 }
 
 function joinMeta(parts: (string | null | undefined)[]): string {
@@ -326,6 +336,12 @@ export function MediaOverview() {
   const queryClient = useQueryClient();
   const { value: pickedRange } = useTimeRange();
   const timeRange = isMember ? MEMBER_TIME_RANGE : pickedRange;
+  const navigate = useNavigate();
+  const openAddedInBrowse = useCallback(
+    (series: GrowthSeries) =>
+      void navigate(browseHref(series === 'movies' ? 'movie' : 'show', addedBounds(timeRange))),
+    [navigate, timeRange]
+  );
 
   // A member has no sync state or growth to read, and an empty list keeps both hooks idle
   const ownerServerIds = isMember ? NO_SERVERS : selectedServerIds;
@@ -690,7 +706,7 @@ export function MediaOverview() {
                     data={aggregatedGrowth}
                     isLoading={growth.isLoading}
                     height={250}
-                    period={timeRange.period}
+                    onSeriesClick={openAddedInBrowse}
                   />
                 </CardContent>
               </Card>

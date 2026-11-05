@@ -179,6 +179,7 @@ interface SeedEpisodeOptions {
   tvdbId: number;
   showMediaId: string;
   fileSize?: number | null;
+  addedAt?: Date;
 }
 
 /** A distinct ratingKey with the same tvdbId (same or different serverId)
@@ -201,6 +202,7 @@ async function seedEpisode(opts: SeedEpisodeOptions): Promise<string> {
     title: opts.title,
     mediaType: 'episode',
     mediaId: episodeId,
+    createdAt: opts.addedAt,
   });
   const fileSize = opts.fileSize === undefined ? 0 : opts.fileSize;
   await db.execute(sql`
@@ -1827,6 +1829,81 @@ describe('catalog letter index and offset windows against a real database', () =
     const totalFromLetters = combinedLetters.letters.reduce((sum, b) => sum + b.count, 0);
     expect(totalFromLetters).toBe(1);
     expect(combinedLetters.letters.find((b) => b.letter === 'A')!.count).toBe(1);
+  });
+
+  it('the added range keeps whole calendar days and matches a show by the episodes it got', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const app = await buildApp(ownerFor());
+
+    const inRange = await seedMovie({
+      serverId: server.id,
+      ratingKey: 'added-late-oct',
+      title: 'Added Late October',
+      year: 2020,
+      tmdbId: 994_001,
+      addedAt: new Date('2026-10-31T23:00:00Z'),
+    });
+    await seedMovie({
+      serverId: server.id,
+      ratingKey: 'added-november',
+      title: 'Added November',
+      year: 2020,
+      tmdbId: 994_002,
+      addedAt: new Date('2026-11-01T00:00:00Z'),
+    });
+    await seedMovie({
+      serverId: server.id,
+      ratingKey: 'added-september',
+      title: 'Added September',
+      year: 2020,
+      tmdbId: 994_003,
+      addedAt: new Date('2026-09-30T12:00:00Z'),
+    });
+
+    const returning = await seedShow({
+      serverId: server.id,
+      ratingKey: 'added-returning-show',
+      title: 'Returning Show',
+      year: 2015,
+      tvdbId: 994_101,
+      addedAt: new Date('2015-01-01T00:00:00Z'),
+    });
+    await seedEpisode({
+      serverId: server.id,
+      ratingKey: 'added-returning-s5e1',
+      title: 'Season Five Premiere',
+      year: 2026,
+      tvdbId: 994_111,
+      showMediaId: returning,
+      addedAt: new Date('2026-10-15T00:00:00Z'),
+    });
+    const recentRow = await seedShow({
+      serverId: server.id,
+      ratingKey: 'added-recent-row-show',
+      title: 'Recent Row Old Episodes',
+      year: 2010,
+      tvdbId: 994_102,
+      addedAt: new Date('2026-10-15T00:00:00Z'),
+    });
+    await seedEpisode({
+      serverId: server.id,
+      ratingKey: 'added-recent-row-e1',
+      title: 'Pilot',
+      year: 2010,
+      tvdbId: 994_112,
+      showMediaId: recentRow,
+      addedAt: new Date('2010-01-01T00:00:00Z'),
+    });
+
+    const range = 'addedAfter=2026-10-01&addedBefore=2026-10-31&pageSize=60';
+    const { body: movies } = await fetchCatalog(app, `type=movie&${range}`);
+    expect(movies.data.map((r) => r.mediaId)).toEqual([inRange]);
+    expect(movies.meta.totalItems).toBe(1);
+
+    const { body: shows } = await fetchCatalog(app, `type=show&${range}`);
+    expect(shows.data.map((r) => r.mediaId)).toEqual([returning]);
+    const { body: showLetters } = await fetchLetters(app, `type=show&${range}`);
+    expect(showLetters.letters.reduce((sum, b) => sum + b.count, 0)).toBe(1);
   });
 
   it('a watched filter keeps letters and catalog windows on one shared filtered ordering', async () => {

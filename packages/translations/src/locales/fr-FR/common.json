@@ -61,6 +61,7 @@
     "playing": "Lecture en cours",
     "paused": "En pause",
     "buffering": "Mise en mémoire tampon",
+    "endsAt": "",
     "stopped": "Arrêté",
     "directPlay": "Lecture directe",
     "directStream": "Flux direct",

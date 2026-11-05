@@ -199,4 +199,17 @@ describe('push switches', () => {
     const prefs = await db.select().from(notificationPreferences);
     expect(prefs.every((row) => row.onServerDown && row.onNewDevice)).toBe(true);
   });
+
+  it('keeps the device mutes while Mobile push is disabled', async () => {
+    const serverDown = await instance('server-down', [pushId]);
+    await pairDevice({ onServerDown: false });
+    await db.update(destinations).set({ enabled: false }).where(eq(destinations.id, pushId));
+
+    await reconcileDeviceMutes();
+
+    const [down] = await db.select().from(automations).where(eq(automations.id, serverDown.id));
+    expect(down?.isActive).toBe(true);
+    const [prefs] = await db.select().from(notificationPreferences);
+    expect(prefs?.onServerDown).toBe(false);
+  });
 });

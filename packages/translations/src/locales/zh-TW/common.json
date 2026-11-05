@@ -61,6 +61,7 @@
     "playing": "",
     "paused": "已暫停",
     "buffering": "",
+    "endsAt": "",
     "stopped": "",
     "directPlay": "",
     "directStream": "",

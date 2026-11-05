@@ -48,8 +48,8 @@ export interface GetDashboardStatsOptions {
 const CACHE_TTL_SECONDS = 60;
 
 /** Milliseconds as hours to one decimal place */
-function toHours(ms: number | string | undefined): number {
-  return Math.round((Number(ms ?? 0) / TIME_MS.HOUR) * 10) / 10;
+function toHours(ms: number): number {
+  return Math.round((ms / TIME_MS.HOUR) * 10) / 10;
 }
 
 /**
@@ -127,8 +127,8 @@ async function computeDashboardStats(
 
   let todayPlays: number;
   let todaySessions: number;
-  let watchTimeHours: number;
-  let listenTimeHours: number;
+  let watchTimeMs: number;
+  let listenTimeMs: number;
   let alertsLast24h: number;
   let activeUsersToday: number;
 
@@ -156,8 +156,8 @@ async function computeDashboardStats(
 
     todaySessions = todayPlaysResult[0]?.count ?? 0;
     todayPlays = (validatedPlaysResult.rows[0] as { count: number })?.count ?? 0;
-    watchTimeHours = toHours(watchTimeResult[0]?.totalMs);
-    listenTimeHours = toHours(watchTimeResult[0]?.listenMs);
+    watchTimeMs = Number(watchTimeResult[0]?.totalMs ?? 0);
+    listenTimeMs = Number(watchTimeResult[0]?.listenMs ?? 0);
     alertsLast24h = alertsResult[0]?.count ?? 0;
     activeUsersToday = activeUsersResult[0]?.count ?? 0;
   } else {
@@ -243,12 +243,20 @@ async function computeDashboardStats(
 
     todaySessions = todaySessionsResult[0]?.count ?? 0;
     todayPlays = (validatedPlaysResult.rows[0] as { count: number })?.count ?? 0;
-    watchTimeHours = toHours(watchTimeResult[0]?.totalMs);
-    listenTimeHours = toHours(watchTimeResult[0]?.listenMs);
+    watchTimeMs = Number(watchTimeResult[0]?.totalMs ?? 0);
+    listenTimeMs = Number(watchTimeResult[0]?.listenMs ?? 0);
     alertsLast24h = alertsResult[0]?.count ?? 0;
     activeUsersToday = activeUsersResult[0]?.count ?? 0;
   }
 
-  const base = { activeStreams, todayPlays, todaySessions, watchTimeHours, listenTimeHours };
+  const base = {
+    activeStreams,
+    todayPlays,
+    todaySessions,
+    watchTimeHours: toHours(watchTimeMs),
+    listenTimeHours: toHours(listenTimeMs),
+    watchTimeMs,
+    listenTimeMs,
+  };
   return scope === 'all' ? { ...base, alertsLast24h, activeUsersToday } : { ...base, othersActive };
 }

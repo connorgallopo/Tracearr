@@ -48,6 +48,7 @@ const TRIGGER_PREFERENCE = {
   'session.transcode_changed': 'onViolationDetected',
   'session.paused': 'onViolationDetected',
   'session.held_for': 'onViolationDetected',
+  'session.watched': 'onViolationDetected',
   'account.inactive_for': 'onViolationDetected',
   'account.new_device': 'onNewDevice',
   'account.trust_changed': 'onTrustScoreChanged',
@@ -97,7 +98,7 @@ const sendsTo = (automation: Pick<EngineAutomation, 'actions'>, destinationId: s
     );
 
 /** The automations that send each event to the destination. */
-function pushSenders<T extends Pick<EngineAutomation, 'kind' | 'triggers' | 'actions'>>(
+export function pushSenders<T extends Pick<EngineAutomation, 'kind' | 'triggers' | 'actions'>>(
   automations: readonly T[],
   destinationId: string
 ): Record<PushEventPreference, T[]> {
@@ -117,12 +118,10 @@ function pushSenders<T extends Pick<EngineAutomation, 'kind' | 'triggers' | 'act
   return senders;
 }
 
-/** How many of the automations send each event to the destination, one count per automation. */
+/** How many automations send each event to the destination, one count per automation. */
 export function pushSenderCounts(
-  automations: readonly Pick<EngineAutomation, 'kind' | 'triggers' | 'actions'>[],
-  destinationId: string
+  senders: Record<PushEventPreference, readonly unknown[]>
 ): Record<PushEventPreference, number> {
-  const senders = pushSenders(automations, destinationId);
   return byPreference((key) => senders[key].length);
 }
 
@@ -290,7 +289,8 @@ const PREFERENCE_COLUMNS = {
 /**
  * The switches used to be per-device filters. An event every device had off is switched off
  * at its senders; a mute only some devices held is dropped and logged. The columns are then
- * reset, which is what makes every later boot a no-op.
+ * reset, which is what makes every later boot a no-op. While Mobile push is disabled a flip
+ * changes nothing, so the columns stay until a boot finds it enabled.
  */
 export async function reconcileDeviceMutes(): Promise<void> {
   await writeSwitches(async (tx) => {
@@ -298,6 +298,8 @@ export async function reconcileDeviceMutes(): Promise<void> {
       .select({ mobileSessionId: notificationPreferences.mobileSessionId, ...PREFERENCE_COLUMNS })
       .from(notificationPreferences);
     if (rows.every((row) => PUSH_PREFERENCES.every((key) => row[key]))) return false;
+    const [push] = await tx.select().from(destinations).where(eq(destinations.type, 'push'));
+    if (!push?.enabled) return false;
 
     const change: SwitchChange = {};
     for (const key of PUSH_PREFERENCES) {
@@ -330,7 +332,7 @@ export async function getPushDelivery(): Promise<Omit<PushDeliveryStatus, 'token
   return {
     destinationEnabled: enabled,
     violationsSubscribed: subscribed,
-    automations: byPreference((key) => senders[key].length),
+    automations: pushSenderCounts(senders),
     switches: byPreference((key): PushSwitch => {
       const list = senders[key];
       // The violation switch is the subscription, so every automation sender is someone else's.

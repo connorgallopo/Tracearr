@@ -1307,6 +1307,7 @@
         "sessionPaused": "",
         "sessionHeldFor": "",
         "sessionHeldForTotal": "",
+        "sessionWatched": "",
         "accountInactiveFor": "",
         "accountNewDevice": "",
         "accountTrustChanged": "",
@@ -2073,6 +2074,10 @@
         },
         "sessionHeldFor": {
           "label": "",
+          "description": "",
+          "synonyms": ""
+        },
+        "sessionWatched": {
           "description": "",
           "synonyms": ""
         },
@@ -2883,6 +2888,7 @@
         "libraryAll": "",
         "yearFromLabel": "",
         "yearToLabel": "",
+        "addedLabel": "",
         "sizeGbMinLabel": "",
         "sizeGbMaxLabel": "",
         "sizeChipAtLeast": "",

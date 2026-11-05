@@ -81,6 +81,11 @@ export interface SessionHeldForEvent extends SessionEventBase {
   triggerNodeId?: string;
 }
 
+/** The tick that crossed the watched threshold set for its media type; the row's flag keeps it to one per session. */
+export interface SessionWatchedEvent extends SessionEventBase {
+  type: 'session.watched';
+}
+
 /** Wake cancellations carry ids and no evaluation inputs. */
 interface SessionRefBase extends BaseEvent {
   sessionId: string;
@@ -220,6 +225,7 @@ export type RuleEvent =
   | SessionTranscodeChangedEvent
   | SessionPausedEvent
   | SessionHeldForEvent
+  | SessionWatchedEvent
   | SessionStoppedEvent
   | SessionRefEvent
   | AccountInactiveForEvent

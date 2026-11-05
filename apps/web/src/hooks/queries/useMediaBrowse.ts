@@ -33,6 +33,9 @@ export interface CatalogFilters {
   videoCodec?: string;
   audioCodec?: string;
   audioChannels?: string;
+  /** Calendar days, inclusive. */
+  addedAfter?: string;
+  addedBefore?: string;
 }
 
 /**
@@ -107,6 +110,8 @@ function catalogRequestParams(args: UseCatalogArgs & { sortedServerIds: string[]
     videoCodec: filters.videoCodec,
     audioCodec: filters.audioCodec,
     audioChannels: filters.audioChannels,
+    addedAfter: filters.addedAfter,
+    addedBefore: filters.addedBefore,
   };
 }
 

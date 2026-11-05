@@ -61,6 +61,7 @@
     "playing": "Přehrává se",
     "paused": "Pozastaveno",
     "buffering": "",
+    "endsAt": "",
     "stopped": "Zastaveno",
     "directPlay": "Přímé přehrávání",
     "directStream": "Přímé streamování",

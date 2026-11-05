@@ -61,6 +61,7 @@
     "playing": "S'està reproduïnt",
     "paused": "En pausa",
     "buffering": "Emmagatzemant a la memòria intermèdia",
+    "endsAt": "",
     "stopped": "Aturat",
     "directPlay": "Reproducció directa",
     "directStream": "Transmissió directa",

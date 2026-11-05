@@ -61,6 +61,7 @@
     "playing": "Afspiller",
     "paused": "Pauset",
     "buffering": "",
+    "endsAt": "",
     "stopped": "Stoppet",
     "directPlay": "Direkte afspilning",
     "directStream": "Direkte Stream",

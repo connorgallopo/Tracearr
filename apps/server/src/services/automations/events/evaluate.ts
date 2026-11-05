@@ -24,6 +24,7 @@ import type {
   SessionStartedEvent,
   SessionStoppedEvent,
   SessionTranscodeChangedEvent,
+  SessionWatchedEvent,
   TracearrUpdateEvent,
   TriggerType,
 } from './types.js';
@@ -35,6 +36,7 @@ export type SessionEvaluatingEvent =
   | SessionTranscodeChangedEvent
   | SessionPausedEvent
   | SessionHeldForEvent
+  | SessionWatchedEvent
   | AccountNewDeviceEvent;
 
 /** The events that carry the account a run is about. */

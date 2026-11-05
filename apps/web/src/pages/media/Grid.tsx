@@ -51,8 +51,9 @@ import { cn } from '@/lib/utils';
 const WATCHED_STATES: readonly WatchedState[] = ['watched', 'partial', 'unwatched'];
 
 /** Filters a link can set on arrival: `?genre=` from the Genres page,
- * resolution, codec, channel and server params from the Quality page charts, and
- * `?watched=` from a member's "Not watched by you" link. */
+ * resolution, codec, channel and server params from the Quality page charts,
+ * `?watched=` from a member's "Not watched by you" link, and `?addedAfter=` /
+ * `?addedBefore=` from the Overview's growth chart. */
 function linkedFilters(search: string): Partial<PersistedGridFilters> {
   const params = new URLSearchParams(search);
   const linked: Partial<PersistedGridFilters> = {};
@@ -70,6 +71,9 @@ function linkedFilters(search: string): Partial<PersistedGridFilters> {
   const watched = params.get('watched');
   const watchedState = WATCHED_STATES.find((state) => state === watched);
   if (watchedState) linked.watched = watchedState;
+  const addedAfter = params.get('addedAfter') ?? undefined;
+  const addedBefore = params.get('addedBefore') ?? undefined;
+  if (addedAfter || addedBefore) linked.added = { from: addedAfter, to: addedBefore };
   return linked;
 }
 
@@ -359,6 +363,8 @@ export function MediaGrid() {
       videoCodec: filters.videoCodec,
       audioCodec: filters.audioCodec,
       audioChannels: filters.audioChannels,
+      addedAfter: filters.added?.from,
+      addedBefore: filters.added?.to,
     },
     sort,
   };

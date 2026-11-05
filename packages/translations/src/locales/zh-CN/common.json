@@ -61,6 +61,7 @@
     "playing": "播放中",
     "paused": "已暂停",
     "buffering": "缓冲中",
+    "endsAt": "",
     "stopped": "已停止",
     "directPlay": "直接播放",
     "directStream": "直接串流",

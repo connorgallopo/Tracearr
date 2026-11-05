@@ -10,8 +10,8 @@ import { encodeRankCursor } from '../../utils/cursor.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { startOfUtcDay } from '../../services/stats/windows.js';
-import type { DateRange } from '../stats/utils.js';
 import { ARTIST_OF_TRACK } from './utils.js';
+import type { DateRange } from '../stats/utils.js';
 
 /**
  * Expands canonical media ids to include their merge losers, so a caller that

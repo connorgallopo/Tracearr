@@ -1307,6 +1307,7 @@
         "sessionPaused": "striimi on keskeytetty",
         "sessionHeldFor": "striimi on ollut keskeytettynä {{duration}}",
         "sessionHeldForTotal": "striimi on ollut keskeytettynä yhteensä {{duration}}",
+        "sessionWatched": "",
         "accountInactiveFor": "tili on ollut käyttämätön {{duration}}",
         "accountNewDevice": "tili toistaa uuden laitteen kautta",
         "accountTrustChanged": "tilin luottamuspisteet muuttuvat",
@@ -2073,6 +2074,10 @@
         },
         "sessionHeldFor": {
           "label": "",
+          "description": "",
+          "synonyms": ""
+        },
+        "sessionWatched": {
           "description": "",
           "synonyms": ""
         },
@@ -2883,6 +2888,7 @@
         "libraryAll": "Mikä tahansa kirjasto",
         "yearFromLabel": "Vuodesta",
         "yearToLabel": "Vuoteen",
+        "addedLabel": "",
         "sizeGbMinLabel": "Minimikoko (GB)",
         "sizeGbMaxLabel": "Maksimikoko (GB)",
         "sizeChipAtLeast": "≥ {{min}} GB",

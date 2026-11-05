@@ -1,6 +1,7 @@
 /**
  * The poller dispatches session.paused on the playing→paused edge only; the
  * scheduled wakes carry the re-evaluation while the session stays paused.
+ * session.watched rides the same per-tick path, once, on the tick that sets the flag.
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -138,6 +139,10 @@ vi.mock('../sessionMapper.js', async (importOriginal) => ({
   mapMediaSession: mockMapMediaSession,
 }));
 vi.mock('../violations.js', () => ({ broadcastViolations: vi.fn() }));
+vi.mock('../../../services/settings.js', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  getWatchedThreshold: vi.fn().mockResolvedValue(0.85),
+}));
 
 import { initializePoller, triggerServerPoll } from '../processor.js';
 import { getActiveAutomations } from '../database.js';
@@ -257,6 +262,23 @@ describe('poller pause edge', () => {
     const types = mockDispatch.mock.calls.map((c) => (c[0] as { type: string }).type);
     expect(types.filter((t) => t === 'session.paused')).toHaveLength(1);
     expect(types).not.toContain('session.resumed');
+  });
+
+  it('dispatches session.watched once on the tick that crosses the watched threshold', async () => {
+    mockBatchFindActiveSessionsByComposite.mockResolvedValue(
+      new Map([['server-user-1::1001', [existingSessionRow({ watched: false })]]])
+    );
+    mockMapMediaSession.mockReturnValue(
+      processedSession({ state: 'playing', progressMs: 3_300_000 })
+    );
+
+    await triggerServerPoll('server-1');
+
+    const watched = mockDispatch.mock.calls
+      .map((c) => c[0] as { type: string; session?: { watched: boolean } })
+      .filter((e) => e.type === 'session.watched');
+    expect(watched).toHaveLength(1);
+    expect(watched[0]?.session?.watched).toBe(true);
   });
 
   it('dispatches nothing for a paused→paused update', async () => {

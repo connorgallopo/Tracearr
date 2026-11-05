@@ -217,6 +217,8 @@ function toSeasonHeatSeason(r: SeasonHeatSeasonRow): SeasonHeatSeason {
     watchedCount,
     watchedPct: episodeCount > 0 ? (watchedCount / episodeCount) * 100 : 0,
     episodes: r.episodes.map((e) => ({
+      mediaId: e.media_id,
+      title: e.title,
       episodeNumber: e.episode_number,
       watchedState: e.watched_state,
     })),
@@ -401,7 +403,7 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     const lensUserId = request.scope === 'all' ? null : request.scope.userId;
     const cacheKey = mediaCacheKey(
       canonical.id,
-      `season-heat${memberCacheSegment(request.scope)}`,
+      `season-heat-v2${memberCacheSegment(request.scope)}`,
       resolvedIds
     );
     const cached = await readCache<MediaSeasonHeatResponse>(app.redis, cacheKey);

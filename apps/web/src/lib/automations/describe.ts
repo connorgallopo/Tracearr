@@ -103,6 +103,7 @@ export const TRIGGER_KEYS = {
   'session.transcode_changed': 'sessionTranscodeChanged',
   'session.paused': 'sessionPaused',
   'session.held_for': 'sessionHeldFor',
+  'session.watched': 'sessionWatched',
   'account.inactive_for': 'accountInactiveFor',
   'account.new_device': 'accountNewDevice',
   'account.trust_changed': 'accountTrustChanged',

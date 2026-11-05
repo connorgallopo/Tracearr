@@ -130,6 +130,8 @@ describe('Dashboard Stats Routes', () => {
         todaySessions: 30,
         watchTimeHours: 12.5,
         listenTimeHours: 1.5,
+        watchTimeMs: 45_000_000,
+        listenTimeMs: 5_400_000,
         alertsLast24h: 3,
         activeUsersToday: 8,
       };
@@ -342,6 +344,7 @@ describe('Dashboard Stats Routes', () => {
       expect(response.statusCode).toBe(200);
       const body = JSON.parse(response.body);
       expect(body.watchTimeHours).toBe(5.6);
+      expect(body.watchTimeMs).toBe(20000000);
     });
 
     it('reports listen time apart from watch time and counts music in todayPlays', async () => {

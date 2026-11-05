@@ -61,6 +61,7 @@
     "playing": "Speelt af",
     "paused": "Gepauzeerd",
     "buffering": "",
+    "endsAt": "",
     "stopped": "Gestopt",
     "directPlay": "Direct afspelen",
     "directStream": "Direct streamen",

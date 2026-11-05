@@ -61,6 +61,7 @@
     "playing": "Toistetaan",
     "paused": "Keskeytetty",
     "buffering": "Puskurointi",
+    "endsAt": "",
     "stopped": "Pysäytetty",
     "directPlay": "Suora toisto",
     "directStream": "Suora striimaus",
