@@ -1,7 +1,27 @@
 {
   "version": "3.1.4",
-  "date": "2026-11-03",
+  "date": "2026-11-05",
   "changes": [
+    {
+      "type": "new",
+      "text": "automations can fire when a stream passes the watched threshold set in Settings"
+    },
+    {
+      "type": "new",
+      "text": "Browse filters by added date; clicking Movies or Episodes on the library growth chart opens it for the picked range"
+    },
+    {
+      "type": "improved",
+      "text": "each episode in a show's season strip names itself on hover and opens its own page"
+    },
+    {
+      "type": "improved",
+      "text": "the dashboard shows today's watch time in hours and minutes"
+    },
+    {
+      "type": "improved",
+      "text": "hovering the time left on a Now Playing card shows when the stream ends"
+    },
     {
       "type": "note",
       "text": "Tracearr now runs on Node.js 26; servers behind an HTTPS reverse proxy are reached over HTTP/2 when the proxy offers it"
