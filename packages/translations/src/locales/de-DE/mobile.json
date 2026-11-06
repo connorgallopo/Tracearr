@@ -113,7 +113,7 @@
     "noAutomationSends": "Keine Automatisierung sendet dies an den Mobile-Push",
     "eventsFooter": "",
     "sharedEventsFooter": "Diese Schalter ändern, was Ihr Server an Mobile Push sendet, sodass sie für jedes gekoppelte Gerät gelten. Push-Benachrichtigungen und Ruhezeiten gelten nur für dieses Gerät.",
-    "sentByAutomations_one": "",
+    "sentByAutomations_one": "Gesendet von {{count}}-Automatisierung",
     "sentByAutomations_other": "Gesendet von {{count}} Automatisierungen",
     "alsoSentBy_one": "Wird außerdem von {{count}} Automatisierung über das Web-Dashboard gesendet, was durch diesen Schalter nicht geändert wird",
     "alsoSentBy_other": "Wird außerdem von {{count}} Automatisierungen über das Web-Dashboard gesendet, was durch diesen Schalter nicht geändert wird",
@@ -242,7 +242,7 @@
     "turnOnFailed": "",
     "unsupportedDescription": "",
     "unsupportedTitle": "",
-    "versionCheckFailed": "",
+    "versionCheckFailed": "Die Serverversion konnte nicht überprüft werden",
     "conditions_one": "",
     "conditions_other": ""
   },
@@ -273,7 +273,7 @@
     "stereo": "Stereo",
     "stream": "Stream",
     "subtitles": "Untertitel",
-    "throttled": "",
+    "throttled": "gedrosselt",
     "transcodeDetails": "Transkodierungsdetails"
   },
   "widget": {
@@ -281,7 +281,7 @@
     "signedOut": "Öffnen Sie Tracearr, um einen Server zu koppeln.",
     "serversDown_one": "",
     "serversDown_other": "",
-    "transcodes_one": "",
-    "transcodes_other": "{{count}} Transcodes"
+    "transcodes_one": "{{count}} Transkodierung",
+    "transcodes_other": "{{count}} Transkodierungen"
   }
 }
