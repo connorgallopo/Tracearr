@@ -61,6 +61,7 @@
     "playing": "재생 중",
     "paused": "일시정지됨",
     "buffering": "",
+    "endsAt": "",
     "stopped": "중지됨",
     "directPlay": "다이렉트 재생",
     "directStream": "다이렉트 스트림",
