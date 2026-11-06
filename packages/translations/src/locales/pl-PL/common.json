@@ -61,6 +61,7 @@
     "playing": "Odtwarzanie",
     "paused": "Wstrzymano",
     "buffering": "Buforowanie",
+    "endsAt": "",
     "stopped": "Zatrzymano",
     "directPlay": "Bezpośrednie odtwarzanie",
     "directStream": "Bezpośredni strumień",
