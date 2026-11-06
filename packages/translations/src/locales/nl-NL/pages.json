@@ -1307,6 +1307,7 @@
         "sessionPaused": "een stream is gepauzeerd",
         "sessionHeldFor": "een stream is gepauzeerd voor {{duration}}",
         "sessionHeldForTotal": "een stream is in totaal gepauzeerd voor {{duration}}",
+        "sessionWatched": "",
         "accountInactiveFor": "een account is inactief voor {{duration}}",
         "accountNewDevice": "",
         "accountTrustChanged": "",
@@ -2073,6 +2074,10 @@
         },
         "sessionHeldFor": {
           "label": "",
+          "description": "",
+          "synonyms": ""
+        },
+        "sessionWatched": {
           "description": "",
           "synonyms": ""
         },
@@ -2883,6 +2888,7 @@
         "libraryAll": "Iedere bibliotheek",
         "yearFromLabel": "Van het jaar",
         "yearToLabel": "Tot jaar",
+        "addedLabel": "",
         "sizeGbMinLabel": "Min grootte (GB)",
         "sizeGbMaxLabel": "Max grootte (GB)",
         "sizeChipAtLeast": "",
