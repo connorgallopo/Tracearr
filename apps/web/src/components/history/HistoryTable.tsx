@@ -20,6 +20,7 @@ import {
   Clock,
   Clapperboard,
   Subtitles,
+  Layers,
 } from 'lucide-react';
 import { TableCell, TableHead, TableRow } from '@/components/ui/table';
 import { DATA_TABLE_VIEWPORT_MAX_HEIGHT } from '@/components/ui/data-table';
@@ -249,11 +250,24 @@ export const HistoryTableRow = memo(
                   <div className="text-sm font-medium">
                     {formatDate(playedAt, { dateStyle: 'medium' })}
                   </div>
-                  <div className="text-muted-foreground text-xs">
+                  <div className="text-muted-foreground flex items-center gap-1.5 text-xs">
                     {formatDate(playedAt, { hour: 'numeric', minute: '2-digit' })}
-                    {session.segmentCount && session.segmentCount > 1
-                      ? ` · ${t('count.segment', { count: session.segmentCount })}`
-                      : null}
+                    {session.segmentCount && session.segmentCount > 1 ? (
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span
+                            className="flex items-center gap-0.5"
+                            aria-label={t('count.segment', { count: session.segmentCount })}
+                          >
+                            <Layers className="h-3 w-3" />
+                            {session.segmentCount}
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {t('count.segment', { count: session.segmentCount })}
+                        </TooltipContent>
+                      </Tooltip>
+                    ) : null}
                   </div>
                 </div>
               </div>
