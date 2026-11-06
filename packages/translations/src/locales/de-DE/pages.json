@@ -1307,7 +1307,7 @@
         "sessionPaused": "",
         "sessionHeldFor": "",
         "sessionHeldForTotal": "",
-        "sessionWatched": "",
+        "sessionWatched": "Ein Stream gilt als angesehen",
         "accountInactiveFor": "",
         "accountNewDevice": "",
         "accountTrustChanged": "",
@@ -2078,8 +2078,8 @@
           "synonyms": ""
         },
         "sessionWatched": {
-          "description": "",
-          "synonyms": ""
+          "description": "Ein Stream überschreitet den in den Einstellungen für seinen Medientyp festgelegten Schwellenwert.",
+          "synonyms": "angesehen, fertiggestellt, abgeschlossen, Prozent, Fortschritt, Schwellenwert"
         },
         "accountInactiveFor": {
           "label": "",
@@ -2888,7 +2888,7 @@
         "libraryAll": "",
         "yearFromLabel": "Von Jahr",
         "yearToLabel": "Zu Jahr",
-        "addedLabel": "",
+        "addedLabel": "Hinzugefügt",
         "sizeGbMinLabel": "",
         "sizeGbMaxLabel": "",
         "sizeChipAtLeast": "≥ {{min}} GB",
