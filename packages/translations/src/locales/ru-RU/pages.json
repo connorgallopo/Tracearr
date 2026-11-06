@@ -1407,6 +1407,7 @@
         "sessionPaused": "поток приостановлен",
         "sessionHeldFor": "поток приостановлен уже {{duration}}",
         "sessionHeldForTotal": "поток приостановлен в сумме {{duration}}",
+        "sessionWatched": "",
         "accountInactiveFor": "аккаунт неактивен уже {{duration}}",
         "accountNewDevice": "аккаунт воспроизводит с нового устройства",
         "accountTrustChanged": "меняется балл доверия аккаунта",
@@ -2179,6 +2180,10 @@
           "label": "Поток стоит на паузе",
           "description": "Поток стоит на паузе дольше заданного числа минут.",
           "synonyms": "пауза, простой, брошен, завис, afk"
+        },
+        "sessionWatched": {
+          "description": "",
+          "synonyms": ""
         },
         "accountInactiveFor": {
           "label": "Аккаунт затих",
@@ -3045,6 +3050,7 @@
         "libraryAll": "Любая библиотека",
         "yearFromLabel": "С года",
         "yearToLabel": "По год",
+        "addedLabel": "",
         "sizeGbMinLabel": "Мин. размер (ГБ)",
         "sizeGbMaxLabel": "Макс. размер (ГБ)",
         "sizeChipAtLeast": "≥ {{min}} ГБ",
