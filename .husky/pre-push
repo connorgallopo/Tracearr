@@ -1,3 +1,19 @@
+# Helm installs from a git tag read Chart.yaml at that tag, so a stable tag has to
+# carry its own version. Refused here, before the tag is public, because a pushed
+# tag is never moved.
+while read -r local_ref local_oid remote_ref remote_oid; do
+  case "$remote_ref" in refs/tags/v*-*) continue ;; refs/tags/v*) ;; *) continue ;; esac
+  case "$local_oid" in *[!0]*) ;; *) continue ;; esac
+  version="${remote_ref#refs/tags/v}"
+  chart=$(git show "$local_oid:docker/helm/tracearr/Chart.yaml")
+  app=$(printf '%s\n' "$chart" | awk '/^appVersion:/ {gsub(/"/, "", $2); print $2}')
+  chart_version=$(printf '%s\n' "$chart" | awk '/^version:/ {print $2}')
+  if [ "$app" != "$version" ] || [ "$chart_version" != "$version" ]; then
+    echo "v$version: docker/helm/tracearr/Chart.yaml has version $chart_version and appVersion $app; both must be $version in the tagged commit. Cut releases with: gh workflow run cut-release.yml -f version=$version"
+    exit 1
+  fi
+done
+
 pnpm typecheck
 pnpm test:unit
 pnpm lint

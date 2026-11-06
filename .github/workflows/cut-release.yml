@@ -1,0 +1,86 @@
+name: Cut Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version without the v (e.g. 3.1.5 or 3.2.0-beta.1)'
+        required: true
+        type: string
+
+concurrency:
+  group: cut-release
+  cancel-in-progress: false
+
+env:
+  HUSKY: 0
+
+jobs:
+  cut:
+    name: Tag v${{ inputs.version }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # The tag push has to trigger release.yml, which a GITHUB_TOKEN push never does,
+      # and the chart commit has to reach main past the ruleset, which only the owner
+      # bypasses. RELEASE_PAT pushes as the owner, so it does both.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          token: ${{ secrets.RELEASE_PAT }}
+
+      - name: Check version and tag
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [ "$GITHUB_REF_TYPE" != branch ]; then
+            echo "::error::run this from a branch, not $GITHUB_REF_TYPE $GITHUB_REF_NAME"
+            exit 1
+          fi
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]]; then
+            echo "::error::$VERSION is not x.y.z or x.y.z-pre"
+            exit 1
+          fi
+          if [ -n "$(git ls-remote --tags origin "refs/tags/v$VERSION")" ]; then
+            echo "::error::v$VERSION already exists"
+            exit 1
+          fi
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@0977fd99725f1db4007ccb2928dbb4e90d06cc86 # v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 26
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter @tracearr/shared
+
+      - name: Build shared
+        run: pnpm --filter @tracearr/shared build
+
+      # Same check release.yml runs, done here so a bad notes file fails before the tag exists.
+      - name: Validate release notes
+        run: node .github/scripts/render-release-notes.mjs
+        env:
+          RELEASE_TAG: v${{ inputs.version }}
+
+      - name: Bump chart, tag and push
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [[ "$VERSION" != *-* ]]; then
+            CHART=docker/helm/tracearr/Chart.yaml
+            sed -i "s/^version: .*/version: $VERSION/" "$CHART"
+            sed -i "s/^appVersion: .*/appVersion: \"$VERSION\"/" "$CHART"
+            if ! git diff --quiet "$CHART"; then
+              git commit -m "sync helm chart to $VERSION" "$CHART"
+            fi
+          fi
+          git tag -a "v$VERSION" -m "v$VERSION"
+          git push --atomic origin "HEAD:$GITHUB_REF_NAME" "v$VERSION"
