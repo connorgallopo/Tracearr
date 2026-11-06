@@ -1257,6 +1257,7 @@
         "sessionPaused": "스트림이 일시중지되었습니다.",
         "sessionHeldFor": "스트림이 {{duration}} 동안 일시중지됨",
         "sessionHeldForTotal": "스트림이 총 {{duration}} 동안 일시중지됨",
+        "sessionWatched": "",
         "accountInactiveFor": "계정이 {{duration}} 동안 비활성화되었습니다",
         "accountNewDevice": "계정이 새 기기에서 재생함",
         "accountTrustChanged": "계정의 신뢰 점수가 변경됩니다.",
@@ -2023,6 +2024,10 @@
           "label": "설정된 시간(분)보다 오랫동안 스트림이 일시중지되었습니다.",
           "description": "계정은 설정된 일수 동안 아무것도 시청하지 않았습니다.",
           "synonyms": "일시중지, 유휴, 포기, 멈춤, afk"
+        },
+        "sessionWatched": {
+          "description": "",
+          "synonyms": ""
         },
         "accountInactiveFor": {
           "label": "계정이 조용해짐",
@@ -2802,6 +2807,7 @@
         "libraryAll": "모든 라이브러리",
         "yearFromLabel": "연도부터",
         "yearToLabel": "연도까지",
+        "addedLabel": "",
         "sizeGbMinLabel": "최소 크기(GB)",
         "sizeGbMaxLabel": "최대 크기(GB)",
         "sizeChipAtLeast": "≥ {{min}}GB",
