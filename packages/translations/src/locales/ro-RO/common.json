@@ -61,6 +61,7 @@
     "playing": "Redare",
     "paused": "Pauză",
     "buffering": "",
+    "endsAt": "",
     "stopped": "Oprit",
     "directPlay": "Redare directă",
     "directStream": "Stream direct",
