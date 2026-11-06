@@ -6,7 +6,10 @@ import type { Server, TemplateDefinition, TemplateInput } from '@tracearr/shared
 import { TemplateInputField } from '../TemplateInputField';
 import { STREAM_STARTED } from './fixtures';
 
-vi.mock('@/hooks/queries/useUsers', () => ({ useUsers: () => ({ data: undefined }) }));
+const { useUsers } = vi.hoisted(() => ({
+  useUsers: vi.fn((..._args: unknown[]): { data: unknown } => ({ data: undefined })),
+}));
+vi.mock('@/hooks/queries/useUsers', () => ({ useUsers }));
 
 beforeAll(async () => {
   await initI18n({ lng: 'en' });
@@ -118,5 +121,62 @@ describe('TemplateInputField send text', () => {
     );
 
     expect(screen.getByRole('combobox')).toHaveAttribute('maxlength', '80');
+  });
+});
+
+describe('TemplateInputField accounts', () => {
+  it('offers every account on every server when the template binds no server', async () => {
+    useUsers.mockImplementation(() => ({
+      data: {
+        data: [
+          {
+            id: 'account-plex',
+            username: 'ada',
+            identityName: 'Ada',
+            identityServers: [
+              { id: 'server-1', name: 'Beehive', serverUserId: 'account-plex', removedAt: null },
+              { id: 'server-2', name: 'Hive', serverUserId: 'account-jf', removedAt: null },
+              {
+                id: 'server-3',
+                name: 'Old',
+                serverUserId: 'account-gone',
+                removedAt: '2026-01-01',
+              },
+            ],
+          },
+        ],
+      },
+    }));
+    const account: TemplateInput = {
+      key: 'account',
+      kind: 'account',
+      label: 'Account',
+      required: true,
+    };
+    const twoServers = [...servers, { id: 'server-2', name: 'Hive' }] as unknown as Server[];
+    render(
+      <TemplateInputField
+        input={account}
+        definition={STREAM_STARTED.version.definition}
+        value=""
+        onChange={() => undefined}
+        servers={twoServers}
+        boundServerId=""
+        filterOptions={undefined}
+        unitSystem="metric"
+        invalid={false}
+      />
+    );
+
+    await userEvent.setup().click(screen.getByRole('combobox'));
+
+    expect(useUsers).toHaveBeenCalledWith(
+      { serverId: undefined, pageSize: 100 },
+      { enabled: true }
+    );
+    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
+      'Ada · Beehive',
+      'Ada · Hive',
+    ]);
   });
 });

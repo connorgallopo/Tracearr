@@ -6,6 +6,11 @@
       "type": "fix",
       "text": "a play resumed later shows in History at the time it resumed, with its segment count beside the time",
       "refs": ["#1419"]
+    },
+    {
+      "type": "fix",
+      "text": "importing a shared automation scoped to one account lists your accounts on every server to pick from",
+      "refs": ["#1418"]
     }
   ]
 }
