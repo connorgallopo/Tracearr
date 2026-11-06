@@ -1311,6 +1311,7 @@
         "sessionPaused": "a stream is paused",
         "sessionHeldFor": "a stream has been paused for {{duration}}",
         "sessionHeldForTotal": "a stream has been paused for {{duration}} in total",
+        "sessionWatched": "a stream counts as watched",
         "accountInactiveFor": "an account has been inactive for {{duration}}",
         "accountNewDevice": "an account plays from a new device",
         "accountTrustChanged": "an account's trust score changes",
@@ -2077,6 +2078,10 @@
           "label": "A stream sits paused",
           "description": "A stream has been paused longer than the set number of minutes.",
           "synonyms": "pause, idle, abandoned, stuck, afk"
+        },
+        "sessionWatched": {
+          "description": "A stream passes the watched threshold set in Settings for its media type.",
+          "synonyms": "watched, finished, completed, percent, progress, threshold"
         },
         "accountInactiveFor": {
           "label": "An account goes quiet",
@@ -2883,6 +2888,7 @@
         "libraryAll": "Any library",
         "yearFromLabel": "From year",
         "yearToLabel": "To year",
+        "addedLabel": "Added",
         "sizeGbMinLabel": "Min size (GB)",
         "sizeGbMaxLabel": "Max size (GB)",
         "sizeChipAtLeast": "≥ {{min}} GB",
