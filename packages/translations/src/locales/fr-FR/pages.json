@@ -1307,6 +1307,7 @@
         "sessionPaused": "un flux est mis en pause",
         "sessionHeldFor": "un flux a été mis en pause depuis {{duration}}",
         "sessionHeldForTotal": "un flux a été mis en pause pendant {{duration}} au total",
+        "sessionWatched": "",
         "accountInactiveFor": "un compte est inactif depuis {{duration}}",
         "accountNewDevice": "un compte lance une lecture depuis un nouvel appareil",
         "accountTrustChanged": "changement de score de confiance d'un compte",
@@ -2073,6 +2074,10 @@
         },
         "sessionHeldFor": {
           "label": "",
+          "description": "",
+          "synonyms": ""
+        },
+        "sessionWatched": {
           "description": "",
           "synonyms": ""
         },
@@ -2883,6 +2888,7 @@
         "libraryAll": "Toutes les bibliothèques",
         "yearFromLabel": "Depuis l'année",
         "yearToLabel": "Vers l'année",
+        "addedLabel": "",
         "sizeGbMinLabel": "Taille min. (Go)",
         "sizeGbMaxLabel": "Taille max. (Go)",
         "sizeChipAtLeast": "≥ {{min}} Go",
