@@ -11,11 +11,11 @@
     "completeInPopup": "Schließen Sie die Anmeldung im Popup-Fenster ab",
     "reopenPlexLogin": "Plex-Anmeldung erneut öffnen",
     "continueWith": "",
-    "usernameOrEmail": "",
-    "identifierPlaceholder": "",
-    "username": "",
+    "usernameOrEmail": "Benutzername oder E-Mail",
+    "identifierPlaceholder": "Benutzername oder E-Mail-Adresse",
+    "username": "Benutzername",
     "usernamePlaceholder": "",
-    "emailPlaceholder": "",
+    "emailPlaceholder": "deine@email.com",
     "displayNamePlaceholder": "Wählen Sie einen Anzeigenamen",
     "passwordPlaceholder": "Mindestens 8 Zeichen",
     "yourPasswordPlaceholder": "Dein Password",
@@ -38,20 +38,20 @@
     "validateClaimCode": "Bestätigungscode validieren",
     "claimCodeSecurityNote": "Diese Sicherheitsmaßnahme stellt sicher, dass nur autorisierte Benutzer die Erstinstallation abschließen können",
     "member": {
-      "tabLocal": "",
-      "tabMember": "",
-      "server": "",
+      "tabLocal": "Tracearr Konto",
+      "tabMember": "Medienserver",
+      "server": "Server",
       "signingInTo": "",
       "passwordHint": "",
       "quickConnectHint": "",
       "waiting": "",
-      "copyCode": "",
-      "usePassword": "",
+      "copyCode": "Kopiere Code",
+      "usePassword": "Stattdessen Passwort verwenden",
       "useQuickConnect": "",
-      "codeExpired": "",
-      "newCode": "",
+      "codeExpired": "Dieser Code ist abgelaufen.",
+      "newCode": "Neuer Code",
       "refused": "",
-      "notPermitted": ""
+      "notPermitted": "Sie sind nicht berechtigt, sich anzumelden. Bitte wenden Sie sich an den Serverbetreiber."
     }
   },
   "dashboard": {
@@ -68,11 +68,11 @@
     "dayStreak": "",
     "view": {
       "label": "",
-      "admin": "",
-      "me": ""
+      "admin": "Server",
+      "me": "Persönlich"
     },
     "me": {
-      "last30": "",
+      "last30": "Letzte 30 Tage",
       "streakDetail": "",
       "topTitles": "",
       "welcome": {
@@ -81,9 +81,9 @@
         "browse": ""
       },
       "requests": {
-        "title": "",
+        "title": "Deine Anfragen",
         "requestedAgo": "",
-        "seeAll": "",
+        "seeAll": "Alle anzeigen",
         "availableThisWeek_one": "",
         "availableThisWeek_other": ""
       },
@@ -96,12 +96,12 @@
       "episodes_other": ""
     },
     "resources": {
-      "system": "",
+      "system": "System",
       "perServer": "",
       "average": ""
     },
-    "unknownLocation": "",
-    "unknownQuality": "",
+    "unknownLocation": "Unbekannter Standort",
+    "unknownQuality": "Unbekannte Qualität",
     "othersStreaming_one": "",
     "othersStreaming_other": ""
   },
@@ -186,12 +186,12 @@
     "mergeServerLabel": "Server",
     "mergeServerUnknown": "Unbekannter Server",
     "mergeIrreversibleAcknowledge": "",
-    "mergeServerAccountRemoved": "",
+    "mergeServerAccountRemoved": "Entfernt",
     "mergeConfirmInto": "",
     "mergeSelectTwo": "",
     "mergeSameIdentity": "",
     "mergeSelectAllActive": "",
-    "suggestionsTitle": "",
+    "suggestionsTitle": "Mögliche doppelte Benutzer",
     "suggestionsPairEmail": "",
     "suggestionsPairEmailUsername": "",
     "suggestionsPairUsername": "",
@@ -205,19 +205,19 @@
     "suggestionsDismissed": "",
     "suggestionsDismissedPair": "",
     "suggestionsDismissedAt": "",
-    "suggestionsRestore": "",
+    "suggestionsRestore": "Wiederherstellen",
     "suggestionsError": "",
     "filterHasAccessTo": "",
     "filterHasAccessToPlaceholder": "",
     "filterHasAccessToHint": "",
-    "merged": "",
+    "merged": "Zusammengeführt",
     "filterRoleAll": "",
     "filterSignInAll": "",
     "filterPendingOnly": "",
     "rowActions": "",
     "menuOpenViolations": "",
-    "signInOn": "",
-    "signInOff": "",
+    "signInOn": "An",
+    "signInOff": "Aus",
     "signedInAgo": "",
     "neverSignedIn": "",
     "selectAllUsers_one": "Wähle {{count}} Benutzer",
@@ -226,8 +226,8 @@
     "resetTrustScoreTitle_other": "Vertrauenswert für {{count}} Benutzer zurücksetzen",
     "mergeMoves_one": "",
     "mergeMoves_other": "",
-    "suggestionsCount_one": "",
-    "suggestionsCount_other": "",
+    "suggestionsCount_one": "{{count}} möglicher doppelter Benutzer",
+    "suggestionsCount_other": "{{count}} mögliche doppelte Benutzer",
     "suggestionsPairEmailMore_one": "",
     "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsernameMore_one": "{{first}} und {{second}} verwenden die gleiche Adresse wie eine Benutzername oder Konto-E-Mail, plus {{count}} mehr",
@@ -240,7 +240,7 @@
   "userDetail": {
     "backToUsers": "Zurück zu den Benutzern",
     "userNotFound": "Benutzer nicht gefunden",
-    "sessions": "",
+    "sessions": "Sitzungen",
     "violations": "Verstöße",
     "terminationHistory": "Verlauf beendeter Streams",
     "noViolationsFound": "Für diesen Benutzer wurden keine Verstöße festgestellt.",
@@ -256,13 +256,13 @@
     "splitConfirmLoading": "",
     "acrossAllServers": "",
     "overallTrust": "",
-    "serverScope": "",
-    "allServers": "",
-    "title": "",
-    "editIdentity": "",
+    "serverScope": "Server",
+    "allServers": "Alle Server",
+    "title": "Benutzer Details",
+    "editIdentity": "Name und E-Mail-Adresse bearbeiten",
     "editIdentityDescription": "",
     "displayName": "",
-    "contactEmail": "",
+    "contactEmail": "Kontakt E-Mail",
     "contactEmailHelp": "",
     "contactEmailLabel": "",
     "contactEmailNone": "",
@@ -271,15 +271,15 @@
     "access": {
       "title": "",
       "signIn": "",
-      "signInAllow": "",
+      "signInAllow": "Erlaube",
       "signInDefault": "",
       "signInBlock": "",
       "signInDefaultOn": "",
       "signInDefaultOff": "",
       "signInDefaultUnknown": "",
       "role": "",
-      "roleAdmin": "",
-      "roleMember": "",
+      "roleAdmin": "Admin",
+      "roleMember": "Mitglied",
       "roleHint": "",
       "disabled": "",
       "pending": "",
@@ -339,15 +339,15 @@
     "uniqueUsers": "",
     "searchPlaceholder": "",
     "columns": {
-      "duration": "",
-      "progress": ""
+      "duration": "Dauer",
+      "progress": "Fortschritt"
     },
     "location": {
-      "city": "",
-      "region": "",
-      "country": "",
-      "continent": "",
-      "postalCode": "",
+      "city": "Stadt",
+      "region": "Region",
+      "country": "Land",
+      "continent": "Kontinent",
+      "postalCode": "Postleitzahl",
       "coordinates": "",
       "asn": "",
       "asnOrg": ""
@@ -355,12 +355,12 @@
     "trailer": "",
     "filters": {
       "columns": "",
-      "countries": "",
-      "mediaType": "",
+      "countries": "Länder",
+      "mediaType": "Medientyp",
       "types": "",
-      "network": "",
+      "network": "Netzwerk",
       "remote": "",
-      "trailers": "",
+      "trailers": "Vorschau",
       "clearUsers": "",
       "clearPlatforms": "",
       "clearCountries": "",
@@ -382,11 +382,11 @@
       "noDetails": "Es liegen keine detaillierten Informationen zum Stream vor",
       "source": "Quelle",
       "stream": "Stream",
-      "container": "",
+      "container": "Container",
       "bitrate": "Bitrate",
       "video": "Video",
       "audio": "Audio",
-      "subtitles": "",
+      "subtitles": "Untertitel",
       "codec": "",
       "framerate": "",
       "hdr": "",
@@ -460,7 +460,7 @@
         }
       },
       "resolution": {
-        "tooltip": "",
+        "tooltip": "<b>title=\"Variablen nicht übersetzen\">{{name}}</b>: {{value, number}} von {{total, number}} Titeln (title=\"Variablen nicht übersetzen\">{{percent}} %)",
         "empty": "",
         "itemCount_one": "",
         "itemCount_other": ""
@@ -492,19 +492,19 @@
       "duplicatesFailed": "",
       "noDuplicatesTitle": "",
       "noDuplicatesDesc": "",
-      "colTitle": "",
+      "colTitle": "Titel",
       "colMatchType": "",
-      "colCopies": "",
+      "colCopies": "Kopien",
       "colRecoverable": "",
       "sameServer": "",
       "mirror": "",
-      "missingOnServer": "",
+      "missingOnServer": "Fehlt auf dem Server",
       "missingOnServerHint": "",
       "copyPath": "",
       "libraries": {
-        "title": "",
+        "title": "Bibliotheken",
         "columns": {
-          "library": "",
+          "library": "Bibliothek",
           "share": ""
         },
         "serverFailed": ""
@@ -549,7 +549,7 @@
         },
         "columns": {
           "hoursPerGb": "",
-          "lastWatched": ""
+          "lastWatched": "Zuletzt gesehen"
         }
       },
       "matchBadge": {
@@ -557,7 +557,7 @@
         "likely": "",
         "possible": "",
         "fuzzy": "",
-        "versions": "",
+        "versions": "Versionen",
         "label": ""
       },
       "groupCount_one": "",
@@ -586,7 +586,7 @@
       "binge": {
         "columns": {
           "show": "",
-          "servers": "",
+          "servers": "Server",
           "consecutive": "",
           "people": "",
           "episodesPerViewer": "Folgen pro Zuschauer",
@@ -675,8 +675,8 @@
     "charts": {
       "storage": {
         "historical": "",
-        "prediction": "",
-        "now": "",
+        "prediction": "Prognose",
+        "now": "Jetzt",
         "axis": "",
         "range": "",
         "empty": {
@@ -768,11 +768,11 @@
     "detail": {
       "notFound": "Verstoß nicht gefunden",
       "violationDetails": "Verstoß Details",
-      "userInfo": "",
-      "sessions": "",
+      "userInfo": "Benutzer",
+      "sessions": "Sitzungen",
       "noSessions": "Keine Sitzungen mit diesem Verstoß verbunden",
-      "trigger": "",
-      "map": "",
+      "trigger": "Auslöser",
+      "map": "Sitzung Standort",
       "actions": "Aktionen durchgeführt",
       "timestamps": "Zeitstempel",
       "created": "Erstellt",
@@ -800,25 +800,25 @@
   },
   "automations": {
     "message": {
-      "heading": "",
+      "heading": "Nachricht",
       "defaultText": "",
-      "title": "",
-      "body": "",
+      "title": "Titel",
+      "body": "Nachricht",
       "blankHint": "",
       "insertVariable": "",
       "searchVariables": "",
       "noVariables": "",
-      "preview": "",
+      "preview": "Vorschau",
       "previewSamples": "",
       "previewDefault": "",
       "previewDefaultHint": "",
       "previewPickDestination": "",
-      "fieldTitle": "",
-      "fieldMessage": "",
-      "fieldSubject": "",
+      "fieldTitle": "Titel",
+      "fieldMessage": "Nachricht",
+      "fieldSubject": "Betreff",
       "fieldHeading": "",
       "fieldEmbedTitle": "",
-      "fieldDescription": "",
+      "fieldDescription": "Beschreibung",
       "addedDiscord": "",
       "addedEmail": "",
       "addedPushSubtitle": "",
@@ -830,21 +830,21 @@
       "webhookNotSent": ""
     },
     "priorities": {
-      "automatic": "",
-      "lowest": "",
-      "low": "",
-      "normal": "",
-      "high": "",
-      "urgent": ""
+      "automatic": "Automatisch",
+      "lowest": "Niedrigste",
+      "low": "Niedrig",
+      "normal": "Normal",
+      "high": "Hoch",
+      "urgent": "Dringend"
     },
     "variableGroups": {
-      "account": "",
-      "stream": "",
-      "server": "",
-      "media": "",
-      "device": "",
+      "account": "Konto",
+      "stream": "Stream",
+      "server": "Server",
+      "media": "Medien",
+      "device": "Gerät",
       "trust": "",
-      "newsletter": "",
+      "newsletter": "Newsletter",
       "event": ""
     },
     "variables": {
@@ -862,14 +862,14 @@
         "name": ""
       },
       "server": {
-        "name": "",
+        "name": "Server Name",
         "type": ""
       },
       "device": {
         "name": "",
         "platform": "",
         "product": "",
-        "location": ""
+        "location": "Standort"
       },
       "download": {
         "title": "",
@@ -887,12 +887,12 @@
         "name": "",
         "show": "",
         "season": "",
-        "episode": "",
-        "episodeCount": "",
+        "episode": "Episode",
+        "episodeCount": "Episode hinzugefügt",
         "type": "",
-        "year": "",
-        "library": "",
-        "server": "",
+        "year": "Jahr",
+        "library": "Bibliothek",
+        "server": "Server",
         "from": {
           "resolution": "",
           "dynamicRange": "",
@@ -911,10 +911,10 @@
         }
       },
       "newsletter": {
-        "name": "",
+        "name": "Newsletter",
         "outcome": "",
-        "recipientCount": "",
-        "error": ""
+        "recipientCount": "Empfänger",
+        "error": "Fehler"
       },
       "durationMinutes": "",
       "minutes": "",
@@ -997,7 +997,7 @@
       "who": "",
       "where": "",
       "playing": "",
-      "from": "",
+      "from": "Von",
       "summary": "",
       "started": "",
       "finished": "",
@@ -1014,7 +1014,7 @@
       "triggeredBy": "",
       "unknownStep": "",
       "tabs": {
-        "all": "",
+        "all": "Alle",
         "completed": "",
         "stopped_by_condition": "",
         "error": ""
@@ -1119,7 +1119,7 @@
         "server": "",
         "account": "",
         "person": "",
-        "serverLabel": "",
+        "serverLabel": "Server",
         "serverPlaceholder": "",
         "accountLabel": "",
         "accountPlaceholder": "",
@@ -1217,7 +1217,7 @@
         "skipped": "Übersprungen",
         "toggleHint": "",
         "removeHint": "",
-        "expandHint": "",
+        "expandHint": "öffnen",
         "moveHint": ""
       },
       "picker": {
@@ -1225,7 +1225,7 @@
         "empty": "",
         "navigate": "",
         "select": "",
-        "close": ""
+        "close": "schließen"
       },
       "sentence": {
         "label": "",
@@ -1270,7 +1270,7 @@
       "device_client": "",
       "network_location": "",
       "scope": "",
-      "media": ""
+      "media": "Medien"
     },
     "createAutomation": "",
     "customAutomation": "",
@@ -1288,8 +1288,8 @@
       "andAlso": "",
       "allOf": "",
       "anyOf": "",
-      "joinAll": "",
-      "joinAny": "",
+      "joinAll": "und",
+      "joinAny": "oder",
       "then": "",
       "otherwise": "",
       "appliesTo": "",
@@ -1331,8 +1331,8 @@
         "lte": "",
         "in": "",
         "not_in": "",
-        "contains": "",
-        "not_contains": ""
+        "contains": "beinhaltet",
+        "not_contains": "beinhaltet nicht"
       },
       "fields": {
         "concurrent_streams": "",
@@ -1353,7 +1353,7 @@
         "is_transcode_downgrade": "",
         "is_subtitle_burn_in": "",
         "source_bitrate_mbps": "",
-        "user_id": "",
+        "user_id": "der Benutzer",
         "trust_score": "",
         "account_age_days": "",
         "device_type": "",
@@ -1446,7 +1446,7 @@
     "description": "",
     "detail": {
       "notFound": "",
-      "title": "",
+      "title": "Automatisierung",
       "unsaved": "",
       "noRuns": "",
       "runsLine_one": "",
@@ -1468,8 +1468,8 @@
     "emptyTitle": "",
     "emptyDescription": "",
     "emptySeeAll": "",
-    "emptySeeAllLoading": "",
-    "enable": "",
+    "emptySeeAllLoading": "Alle anzeigen",
+    "enable": "Aktivieren",
     "evaluations": {
       "disclosure": "",
       "reasons": {
@@ -1485,12 +1485,12 @@
       "carries": "",
       "copyCode": "",
       "copyJson": "",
-      "authorLabel": "",
-      "authorPlaceholder": "",
+      "authorLabel": "Autor",
+      "authorPlaceholder": "Name",
       "authorHelper": "",
       "save": "",
       "saved": "",
-      "saveFailed": "",
+      "saveFailed": "Konnte nicht gespeichert werden.",
       "failed": "",
       "saveHelper": "",
       "authorInCode": "",
@@ -1581,15 +1581,15 @@
         "placeholder": ""
       },
       "trust_score": {
-        "label": "",
+        "label": "Vertrauenswert",
         "description": ""
       },
       "account_age_days": {
-        "label": "",
+        "label": "Kontoalter",
         "description": ""
       },
       "device_type": {
-        "label": "",
+        "label": "Geräte Typ",
         "description": ""
       },
       "client_name": {
@@ -1602,11 +1602,11 @@
         "description": ""
       },
       "is_local_network": {
-        "label": "",
+        "label": "Lokales Netzwerk",
         "description": ""
       },
       "country": {
-        "label": "",
+        "label": "Land",
         "description": "",
         "placeholder": ""
       },
@@ -1616,7 +1616,7 @@
         "placeholder": ""
       },
       "server_id": {
-        "label": "",
+        "label": "Server",
         "description": "",
         "placeholder": ""
       },
@@ -1637,9 +1637,9 @@
         "description": ""
       },
       "library_name": {
-        "label": "",
+        "label": "Bibliothek",
         "description": "",
-        "placeholder": ""
+        "placeholder": "Filme"
       },
       "resolution_after": {
         "label": "",
@@ -1694,7 +1694,7 @@
       "hint": {
         "move": "",
         "use": "",
-        "close": ""
+        "close": "schließen"
       },
       "loading": ""
     },
@@ -1702,7 +1702,7 @@
       "title": "",
       "description": "",
       "reviewDescription": "",
-      "placeholder": "",
+      "placeholder": "tracearr1.…",
       "formatHint": "",
       "check": "",
       "checking": "",
@@ -1742,17 +1742,17 @@
       "builtinMatch": ""
     },
     "kind": {
-      "policy": "",
-      "notification": ""
+      "policy": "Verstoß",
+      "notification": "Warnung"
     },
     "kindColumn": "",
-    "name": "",
-    "newAutomation": "",
+    "name": "Name",
+    "newAutomation": "Neue Automatisierung",
     "namePlaceholder": "",
     "nameInvalid": "",
-    "descriptionLabel": "",
+    "descriptionLabel": "Beschreibung",
     "descriptionPlaceholder": "",
-    "thisAutomation": "",
+    "thisAutomation": "Diese Automatisierung",
     "cooldownLabel": "",
     "cooldownInvalid": "",
     "retentionLabel": "",
@@ -1762,9 +1762,9 @@
     "operators": {
       "eq": "",
       "neq": "",
-      "gt": "",
+      "gt": "größer als",
       "gte": "",
-      "lt": "",
+      "lt": "weniger als",
       "lte": "",
       "in": "",
       "not_in": "",
@@ -1793,7 +1793,7 @@
       "roku": "Roku",
       "webos": "webOS",
       "tizen": "",
-      "movie": "",
+      "movie": "Film",
       "episode": "",
       "track": "",
       "photo": "",
@@ -1812,7 +1812,7 @@
       "hlg": "",
       "dolby vision": "",
       "libraryItemType": {
-        "movie": "",
+        "movie": "Film",
         "show": "",
         "season": "",
         "episode": "",
@@ -1863,13 +1863,13 @@
         "label": ""
       },
       "priority": {
-        "label": ""
+        "label": "Priorität"
       },
       "target": {
-        "label": ""
+        "label": "Ziel"
       },
       "message": {
-        "label": ""
+        "label": "Nachricht"
       }
     },
     "trustModes": {
@@ -1884,9 +1884,9 @@
       }
     },
     "severity": {
-      "low": "",
-      "warning": "",
-      "high": ""
+      "low": "Niedrig",
+      "warning": "Warnung",
+      "high": "Hoch"
     },
     "template": {
       "version": "",
@@ -2042,7 +2042,7 @@
       "groups": {
         "sessions": "",
         "accounts": "",
-        "library": "",
+        "library": "Bibliothek",
         "servers": "",
         "updates": "",
         "notifications": "",
@@ -2557,7 +2557,7 @@
       "failedToLoad": "",
       "jobQueues": "",
       "jobQueuesDesc": "",
-      "description": "",
+      "description": "Beschreibung",
       "schedule": "",
       "completed": "",
       "scheduled": "",
@@ -2779,7 +2779,7 @@
           "partial": "",
           "unwatched": ""
         },
-        "episodeCount_one": "",
+        "episodeCount_one": "{{count}} Episode",
         "episodeCount_other": "{{count}} Episoden"
       },
       "albums": {
