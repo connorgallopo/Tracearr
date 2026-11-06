@@ -5,7 +5,7 @@
   "stats": "Statistiken",
   "activity": "Aktivität",
   "library": "Bibliothek",
-  "people": "",
+  "people": "Menschen",
   "rules": "Regeln",
   "users": "Benutzer",
   "automations": "Automatisierungen",
@@ -23,7 +23,7 @@
   "jobs": "Aufträge",
   "mediaBrowse": "Durchsuchen",
   "mediaGenres": "Genres",
-  "session": "",
+  "session": "Sitzung",
   "user": "Benutzer",
   "violation": "Verstoß",
   "toggleSidebar": "Navigation an-/ausschalten"
