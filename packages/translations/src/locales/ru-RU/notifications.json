@@ -116,7 +116,7 @@
       },
       "violationsDismissed": {
         "title": "Нарушения отклонены",
-        "message_one": "Нарушение {{count}} отклонено",
+        "message_one": "Отклонено нарушений: {{count}}",
         "message_few": "Отклонено нарушений: {{count}}",
         "message_many": "Отклонено нарушений: {{count}}",
         "message_other": "Отклонено нарушений: {{count}}"
@@ -140,10 +140,10 @@
       "identityUpdated": "Профиль обновлён",
       "trustScoresReset": {
         "title": "Сброс баллов доверия",
-        "message_one": "Пользователь {{count}} сброшен на 100",
+        "message_one": "Балл сброшен до 100 у {{count}} пользователя",
         "message_few": "Балл сброшен до 100 у {{count}} пользователей",
         "message_many": "Балл сброшен до 100 у {{count}} пользователей",
-        "message_other": "{{count}} пользователей сброшены на 100"
+        "message_other": "Балл сброшен до 100 у {{count}} пользователей"
       },
       "claimCodeValidated": {
         "title": "Код подтверждения подтвержден",
