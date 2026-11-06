@@ -1257,6 +1257,7 @@
         "sessionPaused": "媒体流暂停",
         "sessionHeldFor": "媒体流已暂停 {{duration}}",
         "sessionHeldForTotal": "媒体流累计已暂停 {{duration}}",
+        "sessionWatched": "",
         "accountInactiveFor": "账户已不活跃 {{duration}}",
         "accountNewDevice": "一个帐户从新设备播放",
         "accountTrustChanged": "账户信任分数发生变化",
@@ -2023,6 +2024,10 @@
           "label": "媒体流处于暂停状态",
           "description": "媒体流暂停的时间超过了设定分钟数。",
           "synonyms": "暂停、空闲、弃置、卡住、离开"
+        },
+        "sessionWatched": {
+          "description": "",
+          "synonyms": ""
         },
         "accountInactiveFor": {
           "label": "账户进入静默状态",
@@ -2802,6 +2807,7 @@
         "libraryAll": "任何库",
         "yearFromLabel": "起始年份",
         "yearToLabel": "结束年份",
+        "addedLabel": "",
         "sizeGbMinLabel": "最小 (GB)",
         "sizeGbMaxLabel": "最大 (GB)",
         "sizeChipAtLeast": "≥ {{min}} GB",
