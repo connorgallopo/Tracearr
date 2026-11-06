@@ -61,6 +61,7 @@
     "playing": "Jugando",
     "paused": "En pausa",
     "buffering": "",
+    "endsAt": "",
     "stopped": "Parado",
     "directPlay": "Reproducción Directa",
     "directStream": "Transmisión directa",
