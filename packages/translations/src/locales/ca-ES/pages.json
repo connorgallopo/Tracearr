@@ -1307,7 +1307,7 @@
         "sessionPaused": "es posa en pausa una transmissió",
         "sessionHeldFor": "una transmissió ha estat en pausa durant {{duration}}",
         "sessionHeldForTotal": "una transmissió ha estat en pausa durant {{duration}} en total",
-        "sessionWatched": "",
+        "sessionWatched": "es considera vista una transmissió",
         "accountInactiveFor": "un compte fa {{duration}} que està inactiu",
         "accountNewDevice": "un compte reprodueix des d'un dispositiu nou",
         "accountTrustChanged": "canvia la puntuació de confiança d'un compte",
@@ -2078,8 +2078,8 @@
           "synonyms": "pausa, inactiu, abandonat, encallat, afk"
         },
         "sessionWatched": {
-          "description": "",
-          "synonyms": ""
+          "description": "Una transmissió supera el llindar per considerar-la vista que s'ha establert a Configuració per al seu tipus de contingut.",
+          "synonyms": "vist, acabat, completat, percentatge, progrés, llindar"
         },
         "accountInactiveFor": {
           "label": "Un compte queda inactiu",
@@ -2888,7 +2888,7 @@
         "libraryAll": "Qualsevol biblioteca",
         "yearFromLabel": "Des de l'any",
         "yearToLabel": "Fins a l'any",
-        "addedLabel": "",
+        "addedLabel": "Afegit",
         "sizeGbMinLabel": "Mida mínima (GB)",
         "sizeGbMaxLabel": "Mida màxima (GB)",
         "sizeChipAtLeast": "≥ {{min}} GB",
