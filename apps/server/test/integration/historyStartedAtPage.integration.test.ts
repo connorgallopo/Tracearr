@@ -74,7 +74,11 @@ async function seed() {
   await session(1, 10 - 0.01, { referenceId: chainA.id, platform: 'Android' });
   await session(1, 10 - 0.02, { referenceId: chainA.id, platform: 'Android', watched: true });
   const chainB = await session(2, 95, { mediaType: 'episode', grandparentTitle: 'Show 1' });
-  await session(2, 50, { referenceId: chainB.id, mediaType: 'episode', grandparentTitle: 'Show 1' });
+  await session(2, 50, {
+    referenceId: chainB.id,
+    mediaType: 'episode',
+    grandparentTitle: 'Show 1',
+  });
   const chainC = await session(3, 40, { platform: 'Roku', watched: false });
   await session(3, 39.9, { referenceId: chainC.id, platform: 'Android', watched: true });
 
@@ -123,7 +127,7 @@ function paramsFor(query: Record<string, string>, cursor?: string): HistoryPageP
 function nextCursor(rows: HistoryRow[]): string | undefined {
   const last = rows.at(-1);
   if (!last || !(Number(rows[0]?.page_candidate_count) > PAGE_SIZE)) return undefined;
-  return `${new Date(last.started_at).getTime()}_${last.id}`;
+  return `${new Date(last.last_started_at).getTime()}_${last.id}`;
 }
 
 describe('history started-at pages', () => {
@@ -187,6 +191,57 @@ describe('history started-at pages', () => {
     expect(new Set(settings.map((result) => (result.rows[0] as { v: string }).v))).toEqual(
       new Set(['on'])
     );
+  });
+
+  it('date a resumed play by its latest segment and list both segments', async () => {
+    const user = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'jellyfin' });
+    const account = await createTestServerUser({ userId: user.id, serverId: server.id });
+    const now = Date.now();
+    const at = (days: number) => new Date(now - days * DAY_MS);
+    const play = (days: number, extra: Record<string, unknown> = {}) =>
+      createTestSession({
+        serverId: server.id,
+        serverUserId: account.id,
+        state: 'stopped',
+        mediaType: 'movie',
+        startedAt: at(days),
+        ...extra,
+      });
+    const resumed = await play(5, { watched: false });
+    await play(3, { referenceId: resumed.id });
+    const between = await play(4);
+    const oldest = await play(10);
+
+    const walk = async (query: Record<string, string>) => {
+      const pages: HistoryRow[] = [];
+      const cursors: string[] = [];
+      let cursor: string | undefined;
+      do {
+        const rows = await fetchHistoryPage({ ...paramsFor(query, cursor), pageSize: 1 });
+        pages.push(...rows.slice(0, 1));
+        cursor =
+          rows.length > 0 && Number(rows[0]!.page_candidate_count) > 1
+            ? `${new Date(rows[0]!.last_started_at).getTime()}_${rows[0]!.id}`
+            : undefined;
+        if (cursor) cursors.push(cursor);
+      } while (cursor);
+      return { pages, cursors };
+    };
+
+    const { pages, cursors } = await walk({});
+    expect(pages.map((row) => row.id)).toEqual([resumed.id, between.id, oldest.id]);
+    const first = pages[0]!;
+    expect(new Date(first.started_at)).toEqual(at(5));
+    expect(new Date(first.last_started_at)).toEqual(at(3));
+    expect(Number(first.segment_count)).toBe(2);
+    expect(first.segments?.map((seg) => new Date(seg.started_at))).toEqual([at(5), at(3)]);
+    expect(cursors[0]).toBe(`${at(3).getTime()}_${resumed.id}`);
+
+    const windowed = await walk({ startDate: at(3.5).toISOString() });
+    expect(windowed.pages.map((row) => row.id)).toEqual([resumed.id]);
+    expect(new Date(windowed.pages[0]!.started_at)).toEqual(at(3));
+    expect(Number(windowed.pages[0]!.segment_count)).toBe(1);
   });
 
   it.each(['durationMs', 'mediaTitle'])('keep the single statement for %s', async (orderBy) => {

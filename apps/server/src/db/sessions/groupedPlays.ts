@@ -10,14 +10,16 @@ export function whereClause(where: SQL[]): SQL {
 
 /**
  * The body of a CTE with one row per play (a reference_id chain or a lone session) over
- * sessions aliased s: play_id, started_at, stopped_at, duration_ms, paused_duration_ms,
- * progress_ms, total_duration_ms, segment_count, watched, first_session_id, state.
+ * sessions aliased s: play_id, started_at, last_started_at, stopped_at, duration_ms,
+ * paused_duration_ms, progress_ms, total_duration_ms, segment_count, watched,
+ * first_session_id, state.
  */
 export function groupedPlaysCte(opts: { where: SQL[]; having?: SQL; orderLimit?: SQL }): SQL {
   return sql`
     SELECT
       COALESCE(s.reference_id, s.id) as play_id,
       MIN(s.started_at) as started_at,
+      MAX(s.started_at) as last_started_at,
       MAX(s.stopped_at) as stopped_at,
       SUM(COALESCE(s.duration_ms, 0)) as duration_ms,
       SUM(COALESCE(s.paused_duration_ms, 0)) as paused_duration_ms,
@@ -44,8 +46,7 @@ export function groupedPlaysCte(opts: { where: SQL[]; having?: SQL; orderLimit?:
  */
 export function firstSegmentJoin(
   plays: { alias: string; startColumn?: string } & (
-    | { boundsFrom: string }
-    | { bounds: { min: SQL; max: SQL } }
+    { boundsFrom: string } | { bounds: { min: SQL; max: SQL } }
   ),
   windowConditions: SQL[]
 ): SQL {
@@ -73,7 +74,9 @@ export function firstSegmentJoin(
 /**
  * History's per-play segments breakdown as lat.segments, up to 20 segments of a chain.
  * `floor`, a constant at or below every play's start, only gives the planner a bound to
- * drop chunks with; the per-play bound already implies it.
+ * drop chunks with; the per-play bound already implies it. The breakdown ends at the play's
+ * last matching segment. s2.id in the ORDER BY keeps the planner on the play id index
+ * rather than an ordered scan of a time index that filters by play afterward.
  */
 export function playSegmentsLateral(alias: string, startDate: Date | undefined, floor?: SQL): SQL {
   const c = sql.raw(alias);
@@ -90,9 +93,10 @@ export function playSegmentsLateral(alias: string, startDate: Date | undefined, 
         WHERE COALESCE(s2.reference_id, s2.id) = ${c}.play_id
           AND ${c}.segment_count > 1
           AND s2.started_at >= ${c}.started_at - ${CHAIN_WINDOW_INTERVAL}
+          AND s2.started_at <= ${c}.last_started_at
           ${segmentWindow}
           ${floorWindow}
-        ORDER BY s2.started_at
+        ORDER BY s2.started_at, s2.id
         LIMIT 20
       ) sub
     ) lat ON true

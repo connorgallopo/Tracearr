@@ -124,6 +124,7 @@ describe('Session Routes', () => {
         {
           id: randomUUID(),
           started_at: new Date(),
+          last_started_at: new Date(),
           stopped_at: new Date(),
           duration_ms: '3600000',
           paused_duration_ms: '0',
@@ -256,6 +257,7 @@ describe('Session Routes', () => {
           {
             id: randomUUID(),
             started_at: new Date(),
+            last_started_at: new Date(),
             segment_count: '1',
             media_type: 'episode',
             media_id: mediaId,
@@ -730,9 +732,11 @@ describe('Session Routes', () => {
 
   describe('GET /sessions/history', () => {
     function createMockHistoryRow(overrides: Record<string, unknown> = {}) {
+      const startedAt = overrides.started_at ?? new Date();
       return {
         id: randomUUID(),
-        started_at: new Date(),
+        last_started_at: startedAt,
+        started_at: startedAt,
         stopped_at: new Date(),
         duration_ms: '3600000',
         paused_duration_ms: '0',
@@ -804,6 +808,7 @@ describe('Session Routes', () => {
         rows: rows.map((row) => ({
           play_id: row.id,
           started_utc: (row.started_at as Date).toISOString(),
+          last_started_utc: (row.last_started_at as Date).toISOString(),
         })),
       });
       if (rows.length > 0) mockDb.execute.mockResolvedValueOnce({ rows });
@@ -858,9 +863,10 @@ describe('Session Routes', () => {
       app = await buildTestApp(createOwnerUser());
       const newer = new Date('2024-06-02T00:00:00Z');
       const older = new Date('2024-06-01T00:00:00Z');
+      const latest = new Date('2024-06-03T00:00:00Z');
       mockStartedAtPage([
         createMockHistoryRow({ started_at: newer }),
-        createMockHistoryRow({ started_at: older }),
+        createMockHistoryRow({ started_at: older, last_started_at: latest }),
       ]);
 
       await app.inject({ method: 'GET', url: '/sessions/history' });
@@ -870,14 +876,18 @@ describe('Session Routes', () => {
         'COALESCE(s.reference_id, s.id) IN (SELECT play_id FROM history_page_ids)'
       );
       expect(query).not.toContain('SELECT MIN(started_at)');
-      const bounds =
-        /AND s\.started_at >= \$(\d+)::timestamptz\s+AND s\.started_at <= \$(\d+)::timestamptz/.exec(
-          query
-        );
-      expect([params[Number(bounds?.[1]) - 1], params[Number(bounds?.[2]) - 1]]).toEqual([
-        older.toISOString(),
-        newer.toISOString(),
+      const ranges = [
+        ...query.matchAll(
+          /AND s\.started_at >= \$(\d+)::timestamptz\s+AND s\.started_at <= \$(\d+)::timestamptz/g
+        ),
+      ].map((m) => [params[Number(m[1]) - 1], params[Number(m[2]) - 1]]);
+      // The aggregation's bounds, then the first-segment join's.
+      expect(ranges).toEqual([
+        [older.toISOString(), latest.toISOString()],
+        [older.toISOString(), newer.toISOString()],
       ]);
+      expect(query).toContain('s2.started_at <= gs.last_started_at');
+      expect(query).toContain('ORDER BY s2.started_at, s2.id');
     });
 
     it('scopes the sorted join-back to the page-id CTE and time-bounds it by the page minimum', async () => {
@@ -895,6 +905,9 @@ describe('Session Routes', () => {
         'COALESCE(s.reference_id, s.id) IN (SELECT play_id FROM history_page_ids)'
       );
       expect(query).toContain('s.started_at >= (SELECT MIN(started_at) FROM history_page_ids)');
+      expect(query).toContain(
+        's.started_at <= (SELECT MAX(last_started_at) FROM history_page_ids)'
+      );
       expect(query).toContain('s.started_at = gs.started_at');
     });
 
@@ -966,6 +979,7 @@ describe('Session Routes', () => {
 
       const playX = randomUUID();
       const playXStart = new Date('2024-06-10T00:00:00Z');
+      const playXLastStart = new Date('2024-06-11T00:00:00Z');
       const playY = randomUUID();
       const playYStart = new Date('2024-05-01T00:00:00Z');
 
@@ -973,7 +987,8 @@ describe('Session Routes', () => {
         createMockHistoryRow({
           id: playX,
           started_at: playXStart,
-          segment_count: '1',
+          last_started_at: playXLastStart,
+          segment_count: '2',
           page_candidate_count: 2,
         }),
       ]);
@@ -982,7 +997,9 @@ describe('Session Routes', () => {
       const page1Body = JSON.parse(page1.body);
       expect(page1Body.data.map((row: { id: string }) => row.id)).toEqual([playX]);
       expect(page1Body.hasMore).toBe(true);
-      expect(page1Body.nextCursor).toBe(`${playXStart.getTime()}_${playX}`);
+      expect(page1Body.data[0].startedAt).toBe(playXStart.toISOString());
+      expect(page1Body.data[0].lastStartedAt).toBe(playXLastStart.toISOString());
+      expect(page1Body.nextCursor).toBe(`${playXLastStart.getTime()}_${playX}`);
 
       mockStartedAtPage([
         createMockHistoryRow({
@@ -1105,9 +1122,9 @@ describe('Session Routes', () => {
 
       const normalized = (call: number) => sentSql(call).sql.replace(/\s+/g, ' ');
       expect(normalized(1)).toContain(
-        'MIN(s.started_at) DESC, COALESCE(s.reference_id, s.id)::text DESC'
+        'MAX(s.started_at) DESC, COALESCE(s.reference_id, s.id)::text DESC'
       );
-      expect(normalized(1)).toContain('ORDER BY started_at DESC, play_id::text DESC');
+      expect(normalized(1)).toContain('ORDER BY last_started_at DESC, play_id::text DESC');
       expect(normalized(2)).toContain('JOIN history_page_ids hp ON hp.play_id = gs.play_id');
       expect(normalized(2)).toContain('ORDER BY hp.rn');
     });

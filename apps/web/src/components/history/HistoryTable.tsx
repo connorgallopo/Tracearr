@@ -222,6 +222,7 @@ export const HistoryTableRow = memo(
       const { title: primary, subtitle: secondary } = getMediaDisplay(session);
       const mediaLinks = getMediaLinks(session);
       const progress = getSessionProgress(session);
+      const playedAt = new Date(session.lastStartedAt ?? session.startedAt);
       const colorMap = useServerColorMap();
       const { t } = useTranslation(['common', 'pages']);
       const verbKeys = verbKeysFor(session.mediaType);
@@ -246,13 +247,13 @@ export const HistoryTableRow = memo(
                 <StateIcon state={session.state} />
                 <div>
                   <div className="text-sm font-medium">
-                    {formatDate(new Date(session.startedAt), { dateStyle: 'medium' })}
+                    {formatDate(playedAt, { dateStyle: 'medium' })}
                   </div>
                   <div className="text-muted-foreground text-xs">
-                    {formatDate(new Date(session.startedAt), {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    })}
+                    {formatDate(playedAt, { hour: 'numeric', minute: '2-digit' })}
+                    {session.segmentCount && session.segmentCount > 1
+                      ? ` · ${t('count.segment', { count: session.segmentCount })}`
+                      : null}
                   </div>
                 </div>
               </div>

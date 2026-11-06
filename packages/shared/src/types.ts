@@ -564,6 +564,8 @@ export interface SessionSegment {
 export interface SessionWithDetails extends Omit<Session, 'ratingKey' | 'externalSessionId'> {
   user: Pick<ServerUser, 'id' | 'username' | 'thumbUrl'> & { identityName: string | null };
   server: Pick<Server, 'id' | 'name' | 'type'>;
+  /** Start of the play's latest segment; History dates and sorts plays by it. */
+  lastStartedAt?: Date;
   // Number of pause/resume segments in this grouped play (1 = no pauses)
   segmentCount?: number;
   // Individual segment details (up to 20), only present when segmentCount > 1

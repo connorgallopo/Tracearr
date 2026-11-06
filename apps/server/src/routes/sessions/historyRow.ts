@@ -1,6 +1,7 @@
 export interface HistoryRow {
   id: string;
   started_at: Date;
+  last_started_at: Date;
   stopped_at: Date | null;
   duration_ms: string | null;
   paused_duration_ms: string | null;
@@ -105,6 +106,7 @@ export function mapHistoryRow(row: HistoryRow) {
     mediaId: row.media_id,
     showMediaId: row.show_media_id,
     startedAt: row.started_at ? new Date(row.started_at).toISOString() : null,
+    lastStartedAt: new Date(row.last_started_at).toISOString(),
     stoppedAt: row.stopped_at ? new Date(row.stopped_at).toISOString() : null,
     durationMs: row.duration_ms ? Number(row.duration_ms) : null,
     pausedDurationMs: row.paused_duration_ms ? Number(row.paused_duration_ms) : null,
