@@ -61,7 +61,7 @@
     "playing": "Играет",
     "paused": "Пауза",
     "buffering": "Буферизация",
-    "endsAt": "",
+    "endsAt": "Закончится в {{time}}",
     "stopped": "Остановлено",
     "directPlay": "Прямое воспроизведение",
     "directStream": "Прямой поток",
