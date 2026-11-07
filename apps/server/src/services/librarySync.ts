@@ -25,7 +25,7 @@ import {
   type MediaLibraryItem,
 } from './mediaServer/index.js';
 import { resolveMediaBatch, reconcileMediaDuplicates } from './library/mediaResolutionService.js';
-import { albumArtForTracks } from './library/trackArt.js';
+import { parentArtFor, posterOf } from './library/posterArt.js';
 import {
   MEDIA_ANNOUNCE_CAP,
   MEDIA_BUFFER_CAP,
@@ -1704,7 +1704,7 @@ export class LibrarySyncService {
       }))
     );
 
-    const albumArt = await albumArtForTracks(serverId, uniqueItems);
+    const parentArt = await parentArtFor(serverId, uniqueItems);
 
     // Past the cap the run announces nothing more, so it stops reading and diffing too;
     // the suppressed count then reports the batch that hit the cap, not every later one.
@@ -1770,12 +1770,7 @@ export class LibrarySyncService {
               itemIndex: item.itemIndex ?? null,
               mediaId: mediaIdByRatingKey.get(item.ratingKey) ?? null,
               genres: item.genres ?? null,
-              thumbPath:
-                (item.mediaType === 'track' && item.parentRatingKey
-                  ? albumArt.get(item.parentRatingKey)
-                  : undefined) ??
-                item.thumbPath ??
-                null,
+              ...posterOf(item, parentArt),
               removedAt: null,
               // insert-only: the conflict update never touches it
               firstSeenAt: firstSeenFromAdded ? createdAt : firstSeen,
@@ -1815,9 +1810,15 @@ export class LibrarySyncService {
             genres: truncatedGenreKeys.length
               ? sql`CASE WHEN excluded.rating_key IN (SELECT jsonb_array_elements_text(${JSON.stringify(truncatedGenreKeys)}::jsonb)) THEN ${libraryItems.genres} ELSE excluded.genres END`
               : sql`excluded.genres`,
-            // Re-synced posters must update; dominant_color is write-once by the image
-            // pipeline and deliberately excluded so a sync never nulls or overwrites it.
+            // Re-synced posters must update. dominant_color is write-once by the image
+            // pipeline, except on rows that move onto their parent's art (see posterArt.ts).
             thumbPath: sql`excluded.thumb_path`,
+            dominantColor: sql`CASE
+              WHEN excluded.media_type IN ('episode', 'track')
+                AND ${libraryItems.thumbPath} IS DISTINCT FROM excluded.thumb_path
+              THEN excluded.dominant_color
+              ELSE ${libraryItems.dominantColor}
+            END`,
             removedAt: null,
             removedSource: null,
             // Fix created_at with Plex's addedAt (for existing items with wrong dates)
@@ -1830,8 +1831,8 @@ export class LibrarySyncService {
           // below. Only fire the update when a tracked column would actually
           // change, or when reviving a tombstoned row (removed_at was set).
           // No consumer reads library_items.updated_at as a change signal, so
-          // leaving it un-bumped on a no-op conflict is safe. dominant_color
-          // is excluded from `set` above, so it's excluded from this comparison too.
+          // leaving it un-bumped on a no-op conflict is safe. dominant_color only
+          // changes with thumb_path, so it needs no clause of its own.
           setWhere: sql`
             ${libraryItems.libraryId} IS DISTINCT FROM excluded.library_id OR
             ${libraryItems.title} IS DISTINCT FROM excluded.title OR

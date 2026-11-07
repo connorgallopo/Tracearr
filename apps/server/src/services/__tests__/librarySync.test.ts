@@ -1539,7 +1539,7 @@ describe('LibrarySyncService', () => {
       ]);
     });
 
-    it('carries thumbPath into the conflict update but never touches dominantColor', async () => {
+    it('carries thumbPath into the conflict update', async () => {
       const service = new LibrarySyncService();
       const serverId = randomUUID();
       const libraryId = '1';
@@ -1553,7 +1553,6 @@ describe('LibrarySyncService', () => {
         set: Record<string, unknown>;
       };
       expect(conflictArgs.set).toHaveProperty('thumbPath');
-      expect(conflictArgs.set).not.toHaveProperty('dominantColor');
     });
 
     it('writes plexGuid on insert and guards the conflict update with a plex_guid change', async () => {
