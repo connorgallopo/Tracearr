@@ -170,8 +170,8 @@
       "brandingSaved": "Брендинг писем сохранён",
       "suppressionAdded": "Адрес добавлен в стоп-лист",
       "suppressionRemoved": "Адрес удалён из стоп-листа",
-      "ownerAccountLinked": "",
-      "ownerAccountUnlinked": "",
+      "ownerAccountLinked": "Аккаунт привязан",
+      "ownerAccountUnlinked": "Аккаунт отвязан",
       "newsletterRetryQueued_one": "Повторная отправка для {{count}} получателя",
       "newsletterRetryQueued_few": "Повторная отправка для {{count}} получателей",
       "newsletterRetryQueued_many": "Повторная отправка для {{count}} получателей",
@@ -183,7 +183,7 @@
       "serverSyncFailed": "Не удалось синхронизировать сервер",
       "serverHistoricalFailed": "Не удалось изменить статус сервера",
       "settingsUpdateFailed": "Не удалось обновить настройки",
-      "copyManual": "",
+      "copyManual": "Нажмите Ctrl+C или ⌘C, чтобы скопировать",
       "acknowledgeFailed": "Не удалось подтвердить нарушение",
       "dismissFailed": "Не удалось отклонить нарушение",
       "authFailed": "Аутентификация не удалась",
@@ -234,8 +234,8 @@
       "brandingSaveFailed": "Не удалось сохранить брендинг писем: {{error}}",
       "suppressionAddFailed": "Не удалось добавить адрес: {{error}}",
       "suppressionRemoveFailed": "Не удалось удалить адрес: {{error}}",
-      "ownerAccountLinkFailed": "",
-      "ownerAccountUnlinkFailed": ""
+      "ownerAccountLinkFailed": "Не удалось привязать аккаунт",
+      "ownerAccountUnlinkFailed": "Не удалось отвязать аккаунт"
     },
     "warning": {
       "jobFailed": {
