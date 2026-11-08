@@ -11,6 +11,7 @@ import {
   type ServerType,
   type WatchedState,
 } from '@tracearr/shared';
+import { BASE_PATH } from '@/lib/basePath';
 import { cn } from '@/lib/utils';
 import { WatchedBadge, watchedLabelKey } from './WatchedBadge';
 import { ServerDots } from './ServerDots';
@@ -38,7 +39,7 @@ export function buildPosterSrc(
   else url.searchParams.delete('v');
   if (options.lqip) url.searchParams.set('lqip', '1');
   else url.searchParams.delete('lqip');
-  return `${url.pathname}${url.search}`;
+  return `${BASE_PATH}${url.pathname}${url.search}`;
 }
 
 /**

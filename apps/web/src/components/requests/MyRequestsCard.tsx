@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { SectionHeading } from '@/components/dashboard/SectionHeading';
 import { RequestStatusBadge } from '@/components/requests/RequestStatusBadge';
 import { useMyRequests, useRequestsConfigured } from '@/hooks/queries';
+import { BASE_PATH } from '@/lib/basePath';
 import { formatCompactAge } from '@/lib/dateFormat';
 
 const PAGE_SIZE = 4;
@@ -26,7 +27,7 @@ function RequestRow({ request }: { request: UserRequestEntry }) {
     <li className="flex items-center gap-3 py-2">
       {media.posterUrl ? (
         <img
-          src={media.posterUrl}
+          src={`${BASE_PATH}${media.posterUrl}`}
           alt=""
           loading="lazy"
           className="aspect-[2/3] w-10 shrink-0 rounded-sm object-cover"

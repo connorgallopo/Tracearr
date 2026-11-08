@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
@@ -414,5 +414,19 @@ describe('buildPosterSrc', () => {
     const src = buildPosterSrc(url, 'abc12345', { lqip: true });
     const parsed = new URL(src, 'http://localhost');
     expect(parsed.searchParams.get('lqip')).toBe('1');
+  });
+
+  it('keeps the subpath when Tracearr runs under BASE_PATH', async () => {
+    const base = document.createElement('base');
+    base.href = `${window.location.origin}/tracearr/`;
+    document.head.appendChild(base);
+    try {
+      vi.resetModules();
+      const { buildPosterSrc: build } = await import('./PosterCard');
+      expect(build(url, null)).toMatch(/^\/tracearr\/api\/v1\/images\/proxy\?/);
+    } finally {
+      base.remove();
+      vi.resetModules();
+    }
   });
 });
