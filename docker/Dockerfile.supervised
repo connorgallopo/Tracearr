@@ -7,7 +7,7 @@
 # renovate: datasource=npm depName=pnpm versioning=npm
 ARG PNPM_VERSION=12.16.1
 
-FROM node:26-bookworm-slim@sha256:bc0a2afd3b74ce12222fc8bab99271e66257f021078f5f4a5d687a77d280c1d9 AS builder
+FROM node:26-bookworm-slim@sha256:add5c17c14752c54d2f3d519ec46a3815684d41c33f198bcb09fb998f7dcbf68 AS builder
 
 # pnpm's install script is what puts its native binary in place. corepack never runs it,
 # and npm 12 blocks it unless allowed, so both leave pnpm's shebang-less fallback shim instead.
@@ -39,7 +39,7 @@ RUN pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/server --f
 # =============================================================================
 # Same image and digest as the builder, so the runtime Node is the pinned one and every
 # layer below rebuilds when that pin moves instead of staying in the build cache.
-FROM node:26-bookworm-slim@sha256:bc0a2afd3b74ce12222fc8bab99271e66257f021078f5f4a5d687a77d280c1d9
+FROM node:26-bookworm-slim@sha256:add5c17c14752c54d2f3d519ec46a3815684d41c33f198bcb09fb998f7dcbf68
 
 # Install dependencies
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
