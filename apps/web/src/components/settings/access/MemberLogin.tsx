@@ -75,6 +75,26 @@ function LoginMethodSwitch({
   );
 }
 
+// Saved at once rather than debounced: turning it on signs people out.
+function SsoOnlySwitch({ checked }: { checked: boolean }) {
+  const { t } = useTranslation('settings');
+  const update = useUpdateSettings({ silent: true });
+  const status = useMutationSaveStatus(update);
+
+  return (
+    <AutosaveSwitchField
+      id="memberSsoOnly"
+      label={t('memberLogin.signIn.ssoOnly')}
+      description={t('memberLogin.signIn.ssoOnlyDesc')}
+      checked={checked}
+      onChange={(next) => update.mutate({ memberSsoOnly: next })}
+      status={status}
+      errorMessage={update.error?.message}
+      onReset={update.reset}
+    />
+  );
+}
+
 function OwnerMethods({ methods }: { methods: LoginMethods }) {
   const { t } = useTranslation('settings');
   const { data: settings } = useSettings();
@@ -351,6 +371,9 @@ export function MemberLogin() {
                   <p className="text-muted-foreground text-sm">{t('memberLogin.signIn.servers')}</p>
                   <ServerRows />
                 </div>
+                {(settings?.oidcConfigured || settings?.memberSsoOnly) && (
+                  <SsoOnlySwitch checked={settings.memberSsoOnly} />
+                )}
               </FieldGroup>
               <Overrides />
             </CardContent>

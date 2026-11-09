@@ -33,6 +33,7 @@ import {
   assertOwnerKeepsALoginMethod,
   assertCanBeImpersonated,
   canMemberLogin,
+  hasOpenServer,
   nonOwnerMayLogin,
   nonOwnerMayLoginThrough,
   recordSignIn,
@@ -350,6 +351,20 @@ describe('usableLoginMethods', () => {
       expect((await usableLoginMethods()).member).toBe(member);
     }
   );
+
+  it('closes media sign-in while single sign-on only is on, whatever the servers allow', async () => {
+    vi.mocked(getSetting).mockImplementation(async (key) =>
+      key === 'memberSsoOnly'
+        ? (true as never)
+        : ({ local: true, plex: true, oidc: true, member: true } as never)
+    );
+    queueSelects([{ id: 'server' }], [{ id: 'cred' }], creds(true, true, false));
+    expect(await usableLoginMethods()).toMatchObject({ member: false, local: true, plex: true });
+
+    queueSelects([{ id: 'server' }]);
+    await expect(hasOpenServer('plex')).resolves.toBe(false);
+    expect(db.select).toHaveBeenCalledTimes(3);
+  });
 
   it("ignores the switches for the owner's password and plex when they leave the owner no way in", async () => {
     oidc.configured = false;

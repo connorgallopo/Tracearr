@@ -330,6 +330,8 @@ export interface SetupStatus {
     oidc: boolean;
     oidcProviderName: string | null;
     member: boolean;
+    /** SSO-only is hiding the owner's and admins' other methods; /login?all shows them. */
+    ssoOnly: boolean;
   };
   memberLoginServers: { id: string; name: string; type: ServerType; quickConnect: boolean }[];
 }
@@ -1171,6 +1173,8 @@ export interface Settings {
   preferredPosterServerId: string | null;
   // Members see anonymous counts of other people's activity: others watching, title totals, Most Popular, popularity sorts
   memberServerActivity: boolean;
+  // Admins and members sign in only through SSO; their Plex, Jellyfin and Emby sign-in is refused
+  memberSsoOnly: boolean;
 }
 
 /** GET and PATCH /settings: the settings plus deployment facts that are not settings. */

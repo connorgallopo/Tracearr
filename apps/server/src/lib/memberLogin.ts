@@ -13,6 +13,7 @@ import {
   canMemberLogin,
   identityGate,
   liveServerAccount,
+  mediaSignInClosed,
   memberGateError,
   nonOwnerMayLogin,
   nonOwnerMayLoginThrough,
@@ -186,9 +187,10 @@ export async function memberStillValid(userId: string): Promise<boolean> {
     .limit(1);
   if (!identity || identity.role === 'owner') return true;
 
-  const [{ member }, usable, accounts] = await Promise.all([
+  const [{ member }, usable, mediaClosed, accounts] = await Promise.all([
     getSetting('loginMethods'),
     usableLoginMethods(),
+    mediaSignInClosed(),
     db
       .select({
         providerId: authAccounts.providerId,
@@ -208,7 +210,7 @@ export async function memberStillValid(userId: string): Promise<boolean> {
       (usable.oidc &&
         accounts.some((a) => a.providerId === 'oidc') &&
         (await oidcMemberGate(userId, null)).ok) ||
-      (await someMediaAccountIsAWayIn(userId, identity, member, accounts)));
+      (!mediaClosed && (await someMediaAccountIsAWayIn(userId, identity, member, accounts))));
   if (!stillIn) log.info('member revalidation ended a session', { userId });
   return stillIn;
 }

@@ -12,6 +12,7 @@ import { Writable } from 'node:stream';
 import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
 import Fastify from 'fastify';
 import type * as AuthGuards from '../lib/authGuards.js';
+import type * as Settings from '../services/settings.js';
 
 vi.mock('../db/client.js', () => ({ db: { select: vi.fn(), insert: vi.fn() } }));
 vi.mock('../lib/authGuards.js', async (importOriginal) => ({
@@ -19,6 +20,15 @@ vi.mock('../lib/authGuards.js', async (importOriginal) => ({
   usableLoginMethods: vi.fn(),
   canMemberLogin: vi.fn(),
 }));
+vi.mock('../services/settings.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof Settings>();
+  return {
+    ...actual,
+    getSetting: vi.fn((key: Parameters<typeof actual.getSetting>[0]) =>
+      key === 'memberSsoOnly' ? Promise.resolve(false) : actual.getSetting(key)
+    ),
+  };
+});
 vi.mock('../services/userService.js', () => ({ getOwnerUser: vi.fn() }));
 
 const mockRedis = { get: vi.fn(), setex: vi.fn(), del: vi.fn(), eval: vi.fn() };
@@ -33,6 +43,7 @@ import { canMemberLogin, notPermitted, refused, usableLoginMethods } from '../li
 import { closeAuth, getAuth } from '../lib/auth.js';
 import { createBetterAuthHandler } from '../lib/betterAuthRequest.js';
 import { memberLoginPlugin } from '../lib/memberLoginPlugin.js';
+import { getSetting } from '../services/settings.js';
 import { getOwnerUser } from '../services/userService.js';
 import { REQUEST_LOG_REDACT } from '../utils/logger.js';
 
@@ -215,9 +226,12 @@ describe('member login security', () => {
       .mockResolvedValueOnce(new Response(null, { status: 401 }));
     answers.push(await refusal('quickConnectCheck', { handle: 'b'.repeat(64) }));
 
+    vi.mocked(getSetting).mockResolvedValueOnce(true as never);
+    answers.push(await refusal('jellyfinSignIn', signIn));
+
     // The code is what makes the OIDC callback redirect to the login page instead of raw JSON.
     expect(refused().body).toMatchObject({ code: 'MEMBER_LOGIN_REFUSED' });
-    expect(answers).toHaveLength(7);
+    expect(answers).toHaveLength(8);
     expect(new Set(answers)).toEqual(
       new Set([JSON.stringify({ status: 403, body: refused().body })])
     );

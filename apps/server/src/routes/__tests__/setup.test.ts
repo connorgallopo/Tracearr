@@ -24,6 +24,7 @@ vi.mock('../../utils/claimCode.js', () => ({
 vi.mock('../../lib/authGuards.js', async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   usableLoginMethods: vi.fn(),
+  mediaSignInClosed: vi.fn(),
 }));
 
 vi.mock('../../services/mediaServer/index.js', () => ({
@@ -35,7 +36,7 @@ import { PgDialect } from 'drizzle-orm/pg-core';
 import type { SQL } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { isClaimCodeEnabled } from '../../utils/claimCode.js';
-import { usableLoginMethods } from '../../lib/authGuards.js';
+import { mediaSignInClosed, usableLoginMethods } from '../../lib/authGuards.js';
 import { JellyfinClient } from '../../services/mediaServer/index.js';
 import { setupRoutes } from '../setup.js';
 
@@ -103,6 +104,7 @@ describe('Setup Routes', () => {
     vi.clearAllMocks();
     // Reset isClaimCodeEnabled to default (false)
     vi.mocked(isClaimCodeEnabled).mockReturnValue(false);
+    vi.mocked(mediaSignInClosed).mockResolvedValue(false);
     usable({});
   });
 
@@ -143,6 +145,7 @@ describe('Setup Routes', () => {
           oidc: false,
           oidcProviderName: null,
           member: false,
+          ssoOnly: false,
         },
         memberLoginServers: [],
       });
@@ -181,6 +184,7 @@ describe('Setup Routes', () => {
           oidc: false,
           oidcProviderName: null,
           member: false,
+          ssoOnly: false,
         },
         memberLoginServers: [],
       });
@@ -216,6 +220,7 @@ describe('Setup Routes', () => {
           oidc: false,
           oidcProviderName: null,
           member: false,
+          ssoOnly: false,
         },
         memberLoginServers: [],
       });
@@ -251,6 +256,7 @@ describe('Setup Routes', () => {
           oidc: false,
           oidcProviderName: null,
           member: false,
+          ssoOnly: false,
         },
         memberLoginServers: [],
       });
@@ -286,6 +292,7 @@ describe('Setup Routes', () => {
           oidc: false,
           oidcProviderName: null,
           member: false,
+          ssoOnly: false,
         },
         memberLoginServers: [],
       });
@@ -321,6 +328,7 @@ describe('Setup Routes', () => {
           oidc: false,
           oidcProviderName: null,
           member: false,
+          ssoOnly: false,
         },
         memberLoginServers: [],
       });
@@ -356,6 +364,7 @@ describe('Setup Routes', () => {
           oidc: false,
           oidcProviderName: null,
           member: false,
+          ssoOnly: false,
         },
         memberLoginServers: [],
       });
@@ -391,6 +400,7 @@ describe('Setup Routes', () => {
           oidc: false,
           oidcProviderName: null,
           member: false,
+          ssoOnly: false,
         },
         memberLoginServers: [],
       });
@@ -409,8 +419,54 @@ describe('Setup Routes', () => {
         oidc: true,
         oidcProviderName: 'SSO',
         member: false,
+        ssoOnly: false,
       });
       expect(db.select).toHaveBeenCalledTimes(4);
+    });
+
+    it('offers only SSO while single sign-on only is on, and everything usable with ?all', async () => {
+      app = await buildTestApp();
+      vi.mocked(mediaSignInClosed).mockResolvedValue(true);
+      usable({ local: true, plex: true, oidc: true, member: false });
+      const owner = [[{ id: 'server-1' }], [], [{ id: 'owner-1' }], []];
+      mockDbSelectMultiple(owner);
+
+      const hidden = await app.inject({ method: 'GET', url: '/setup/status' });
+      expect(hidden.json().authMethods).toMatchObject({
+        local: false,
+        plex: false,
+        oidc: true,
+        member: false,
+        ssoOnly: true,
+      });
+      expect(hidden.json().memberLoginServers).toEqual([]);
+
+      mockDbSelectMultiple(owner);
+      const all = await app.inject({ method: 'GET', url: '/setup/status?all' });
+      expect(all.json().authMethods).toMatchObject({
+        local: true,
+        plex: true,
+        oidc: true,
+        member: false,
+        ssoOnly: false,
+      });
+      expect(all.json().memberLoginServers).toEqual([]);
+      expect(db.select).toHaveBeenCalledTimes(8);
+    });
+
+    it('hides nothing behind single sign-on only while SSO is not usable', async () => {
+      app = await buildTestApp();
+      vi.mocked(mediaSignInClosed).mockResolvedValue(true);
+      usable({ local: true, plex: true, oidc: false, member: false });
+      mockDbSelectMultiple([[{ id: 'server-1' }], [], [{ id: 'owner-1' }], []]);
+
+      const response = await app.inject({ method: 'GET', url: '/setup/status' });
+
+      expect(response.json().authMethods).toMatchObject({
+        local: true,
+        plex: true,
+        ssoOnly: false,
+      });
     });
 
     it('keeps local and plex open before an owner exists', async () => {

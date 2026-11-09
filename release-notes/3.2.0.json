@@ -1,0 +1,11 @@
+{
+  "version": "3.2.0",
+  "date": "2026-11-08",
+  "changes": [
+    {
+      "type": "new",
+      "text": "option under Settings → Access → Sign-in to make single sign-on the only way admins and members sign in",
+      "refs": ["#1423"]
+    }
+  ]
+}

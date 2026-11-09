@@ -67,6 +67,7 @@ function status(
       oidc: false,
       oidcProviderName: null,
       member: false,
+      ssoOnly: false,
       ...methods,
     },
     memberLoginServers,
@@ -143,6 +144,16 @@ describe('Login blocks', () => {
     setup.data = status({ plex: true, local: true });
     renderLogin();
     expect(screen.getByText('common:or')).toBeInTheDocument();
+  });
+
+  it('shows only the SSO button while SSO-only hides the other methods', () => {
+    setup.data = status({ oidc: true, oidcProviderName: 'Authentik', ssoOnly: true });
+    renderLogin();
+
+    expect(screen.getByRole('button', { name: /pages:login.continueWith/ })).toBeInTheDocument();
+    expect(screen.queryByText('pages:login.localDisabledHint')).toBeNull();
+    expect(screen.queryByLabelText('pages:login.usernameOrEmail')).toBeNull();
+    expect(plexButton()).toBeNull();
   });
 
   it('drops what the previous person left in the cache when a sign-in finishes', async () => {

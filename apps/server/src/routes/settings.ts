@@ -28,7 +28,7 @@ import {
 import { dismissStorageWarning, getStorageWarning } from '../services/storageCheck.js';
 import { assertOwnerKeepsALoginMethod } from '../lib/authGuards.js';
 import { oidcConfigured } from '../lib/oidcEnv.js';
-import { revokeSessionsForUsers } from '../lib/revoke.js';
+import { revokeSessionsForUsers, revokeUnlessStillIn } from '../lib/revoke.js';
 
 // Re-export service getters so existing import paths still work
 export {
@@ -131,6 +131,10 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
     }
 
     const { loginMethods: loginMethodsChange, ...fields } = body.data;
+    // Without an identity provider it would leave admins and members no way in at all.
+    if (fields.memberSsoOnly === true && !oidcConfigured) {
+      return reply.badRequest('Single sign-on only needs OIDC configured.');
+    }
 
     // Build update object from provided fields
     const updates: Partial<Settings> = {};
@@ -172,6 +176,19 @@ export const settingsRoutes: FastifyPluginAsync = async (app) => {
           )
         );
       await revokeSessionsForUsers(members.map((m) => m.id));
+    }
+    // Sessions that came in through a media server end now; anyone with SSO or a password stays.
+    if (fields.memberSsoOnly === true) {
+      const signedIn = await db
+        .select({ id: users.id })
+        .from(users)
+        .where(
+          and(
+            ne(users.role, 'owner'),
+            sql`exists (select 1 from auth_sessions s where s.user_id = ${users.id})`
+          )
+        );
+      await revokeUnlessStillIn(signedIn.map((u) => u.id));
     }
     if (updates.tautulliUrl !== undefined || updates.tautulliApiKey !== undefined) {
       await rearmImportedHistoryLink({ keepProviderPass: true });

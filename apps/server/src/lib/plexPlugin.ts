@@ -39,6 +39,7 @@ import {
   assertClaimCode,
   canMemberLogin,
   liveServerAccount,
+  mediaSignInClosed,
   notPermitted,
   refused,
   usableLoginMethods,
@@ -158,6 +159,7 @@ async function finishPlexMemberLogin(
   ctx: PlexEndpointCtx,
   authResult: { id: string } & PlexTokenMetadata
 ) {
+  if (await mediaSignInClosed()) throw refused();
   const rows = await db
     .select({ userId: serverUsers.userId, serverId: serverUsers.serverId })
     .from(serverUsers)

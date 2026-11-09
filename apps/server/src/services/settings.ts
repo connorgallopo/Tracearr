@@ -47,6 +47,7 @@ const PUBLIC_DEFAULTS: Settings = {
   imagePrecacheEnabled: true,
   preferredPosterServerId: null,
   memberServerActivity: false,
+  memberSsoOnly: false,
 };
 
 export interface ImportedHistoryLinkState {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { type ReactNode, useState, useEffect } from 'react';
 import { useLocation, useNavigate, useSearchParams, type Location } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
@@ -32,6 +32,7 @@ const DEFAULT_AUTH_METHODS: SetupStatus['authMethods'] = {
   oidc: false,
   oidcProviderName: null,
   member: false,
+  ssoOnly: false,
 };
 
 type AuthStep = 'initial' | 'plex-waiting' | 'server-select';
@@ -571,7 +572,7 @@ export function Login() {
   const memberLogin = <MemberLogin servers={memberServers} onSignedIn={finishSignIn} />;
 
   // Two forms with a password field each would stack into a long page on a phone
-  let formArea = (
+  let formArea: ReactNode = authMethods.ssoOnly ? null : (
     <p className="text-muted-foreground text-center text-sm">
       {t('pages:login.localDisabledHint')}
     </p>

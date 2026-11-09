@@ -8,7 +8,7 @@ import { setupStatusQuerySchema, type SetupStatus } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, users } from '../db/schema.js';
 import { isClaimCodeEnabled } from '../utils/claimCode.js';
-import { openToMemberSignIn, usableLoginMethods } from '../lib/authGuards.js';
+import { mediaSignInClosed, openToMemberSignIn, usableLoginMethods } from '../lib/authGuards.js';
 import { JellyfinClient } from '../services/mediaServer/index.js';
 
 // The status route is public, so each hit must not become a request to every Jellyfin server.
@@ -39,8 +39,9 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
   app.get('/status', async (request, reply): Promise<SetupStatus> => {
     const query = setupStatusQuerySchema.safeParse(request.query);
     if (!query.success) return reply.badRequest('Invalid query parameters');
-    // ?all only changes which servers the login page offers, never who gets in: every server
-    // someone could sign in through, including one only an Allow person can use.
+    // ?all only changes what the login page offers, never who gets in: every server someone could
+    // sign in through, including one only an Allow person can use, and the password and Plex
+    // sign-in that SSO-only hides.
     const all = query.data.all !== undefined;
 
     // Check for servers and users in parallel
@@ -53,9 +54,11 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
 
     const needsSetup = ownerList.length === 0;
 
-    const usable = await usableLoginMethods();
+    const [usable, mediaClosed] = await Promise.all([usableLoginMethods(), mediaSignInClosed()]);
+    // Hidden, not refused: an owner or admin whose identity provider is down signs in at ?all.
+    const ssoOnly = mediaClosed && usable.oidc && !needsSetup && !all;
     const loginServers =
-      all || usable.member
+      !mediaClosed && (all || usable.member)
         ? await db
             .select({ id: servers.id, name: servers.name, type: servers.type, url: servers.url })
             .from(servers)
@@ -81,11 +84,12 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
       hasPasswordAuth: passwordUserList.length > 0,
       // needsSetup keeps first-run sign-up reachable before any owner exists.
       authMethods: {
-        local: needsSetup || usable.local,
-        plex: needsSetup || usable.plex,
+        local: needsSetup || (usable.local && !ssoOnly),
+        plex: needsSetup || (usable.plex && !ssoOnly),
         oidc: usable.oidc,
         oidcProviderName: usable.oidc ? (process.env.OIDC_PROVIDER_NAME ?? 'SSO') : null,
         member: all ? loginServers.length > 0 : usable.member,
+        ssoOnly,
       },
       memberLoginServers,
     };

@@ -66,6 +66,7 @@ describe('oidc gating', () => {
         oidc: false,
         oidcProviderName: null,
         member: false,
+        ssoOnly: false,
       });
 
       await app.close();
@@ -87,6 +88,7 @@ describe('oidc gating', () => {
         oidc: true,
         oidcProviderName: 'Authentik',
         member: false,
+        ssoOnly: false,
       });
 
       await app.close();
@@ -119,6 +121,7 @@ describe('oidc gating', () => {
         oidc: false,
         oidcProviderName: null,
         member: false,
+        ssoOnly: false,
       });
 
       await app.close();

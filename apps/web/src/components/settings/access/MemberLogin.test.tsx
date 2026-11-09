@@ -32,6 +32,7 @@ const REFUSAL = 'That would leave the owner with no way to sign in.';
 const settings = {
   loginMethods: { local: true, plex: false, oidc: true, member: false },
   memberServerActivity: false,
+  memberSsoOnly: false,
   oidcConfigured: true,
 } as SettingsResponse;
 
@@ -111,6 +112,18 @@ describe('Sign-in settings', () => {
     await waitFor(() =>
       expect(api.settings.update).toHaveBeenCalledWith({ loginMethods: { plex: true } })
     );
+  });
+
+  it('offers single sign-on only when OIDC is configured and saves it without waiting', async () => {
+    const { unmount } = renderPage();
+    await userEvent.click(await switchFor('memberLogin.signIn.ssoOnly'));
+    expect(api.settings.update).toHaveBeenCalledWith({ memberSsoOnly: true });
+    unmount();
+
+    vi.mocked(api.settings.get).mockResolvedValue({ ...settings, oidcConfigured: false });
+    renderPage();
+    await switchFor('memberLogin.signIn.media');
+    expect(screen.queryByRole('switch', { name: 'memberLogin.signIn.ssoOnly' })).toBeNull();
   });
 
   it('shows the refusal under the switch and snaps it back', async () => {

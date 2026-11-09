@@ -61,6 +61,7 @@ vi.mock('../../lib/authGuards.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../lib/authGuards.js')>()),
   usableLoginMethods: vi.fn(),
   canMemberLogin: vi.fn(),
+  mediaSignInClosed: vi.fn(async () => false),
 }));
 
 vi.mock('../../utils/claimCode.js', () => ({
@@ -90,6 +91,7 @@ import { PlexClient } from '../../services/mediaServer/index.js';
 import { getUserById, getOwnerUser } from '../../services/userService.js';
 import {
   canMemberLogin,
+  mediaSignInClosed,
   MEMBER_LOGIN_REFUSED,
   MEMBER_NOT_PERMITTED,
   usableLoginMethods,
@@ -175,6 +177,7 @@ const authResult = {
 describe('plex better auth plugin', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(db.select).mockReset();
     vi.mocked(isClaimCodeEnabled).mockReturnValue(false);
     vi.mocked(db.update).mockReturnValue(makeChain([]) as never);
     vi.mocked(db.insert).mockReturnValue(makeChain([]) as never);
@@ -442,6 +445,17 @@ describe('plex better auth plugin', () => {
         statusCode: 403,
         body: { code: 'MEMBER_NOT_PERMITTED', message: MEMBER_NOT_PERMITTED },
       });
+      expect(mockSetSessionCookie).not.toHaveBeenCalled();
+    });
+
+    it('refuses every member while single sign-on only is on', async () => {
+      vi.mocked(mediaSignInClosed).mockResolvedValueOnce(true);
+
+      await expect(callEndpoint('plexCheckPin', { handle: 'handle-1' })).rejects.toMatchObject({
+        statusCode: 403,
+        body: { message: MEMBER_LOGIN_REFUSED },
+      });
+      expect(canMemberLogin).not.toHaveBeenCalled();
       expect(mockSetSessionCookie).not.toHaveBeenCalled();
     });
 

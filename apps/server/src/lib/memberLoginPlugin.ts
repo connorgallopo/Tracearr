@@ -21,7 +21,7 @@ import { EmbyClient, JellyfinClient } from '../services/mediaServer/index.js';
 import type { MediaServerAuth } from '../services/mediaServer/types.js';
 import { createLogger } from '../utils/logger.js';
 import { CLIENT_IP_HEADER } from './auth.js';
-import { openToMemberSignIn, refused } from './authGuards.js';
+import { mediaSignInClosed, openToMemberSignIn, refused } from './authGuards.js';
 import { finishMemberLogin, memberDeviceId } from './memberLogin.js';
 import { getRedis, INCREMENT_SCRIPT } from './redisShared.js';
 
@@ -37,6 +37,7 @@ export const RELEASE_SCRIPT = `if tonumber(redis.call('GET', KEYS[1]) or '0') > 
 return 0`;
 
 async function loginServer(serverId: string, type: 'jellyfin' | 'emby') {
+  if (await mediaSignInClosed()) throw refused();
   const [server] = await db
     .select({ id: servers.id, url: servers.url })
     .from(servers)

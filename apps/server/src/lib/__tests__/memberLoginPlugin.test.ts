@@ -112,6 +112,7 @@ describe('member login plugin', () => {
     vi.clearAllMocks();
     fetchMock.mockReset();
     vi.mocked(db.select).mockReset();
+    vi.mocked(getSetting).mockReset();
     vi.mocked(db.insert).mockReturnValue(makeChain() as never);
     vi.mocked(usableLoginMethods).mockResolvedValue({
       local: true,
@@ -161,6 +162,19 @@ describe('member login plugin', () => {
         statusCode: 403,
         body: { message: MEMBER_LOGIN_REFUSED },
       });
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('refuses while single sign-on only is on, without calling the server', async () => {
+      vi.mocked(getSetting).mockImplementation(async (key) => (key === 'memberSsoOnly') as never);
+      await expect(call('jellyfinSignIn', signIn)).rejects.toMatchObject({
+        statusCode: 403,
+        body: { message: MEMBER_LOGIN_REFUSED },
+      });
+      await expect(call('quickConnectInitiate', { serverId: SERVER_ID })).rejects.toMatchObject({
+        statusCode: 403,
+      });
+      expect(db.select).not.toHaveBeenCalled();
       expect(fetchMock).not.toHaveBeenCalled();
     });
 
@@ -489,6 +503,31 @@ describe('memberStillValid', () => {
     selects([{ role: 'member', loginAccess: row.loginAccess }], [jellyfinAccount], openServer);
     await expect(memberStillValid('member-1')).resolves.toBe(false);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  describe('single sign-on only', () => {
+    beforeEach(() => {
+      vi.mocked(getSetting).mockImplementation(async (key) =>
+        key === 'memberSsoOnly'
+          ? (true as never)
+          : ({ local: true, plex: true, oidc: true, member: true } as never)
+      );
+    });
+
+    it('ends a session held only through a media server without asking it', async () => {
+      selects(defaultMember, [jellyfinAccount]);
+      await expect(memberStillValid('member-1')).resolves.toBe(false);
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('keeps a session the OIDC gate still passes', async () => {
+      usable({ oidc: true });
+      vi.mocked(canMemberLogin).mockResolvedValue({ ok: true });
+      const oidc = { providerId: 'oidc', accountId: 'sub-1', token: null, password: null };
+      selects(defaultMember, [oidc, jellyfinAccount], defaultMember, [{ serverId: SERVER_ID }]);
+      await expect(memberStillValid('member-1')).resolves.toBe(true);
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
   });
 
   it('never ends the owner session', async () => {

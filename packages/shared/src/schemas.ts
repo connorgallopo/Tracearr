@@ -935,6 +935,8 @@ export const updateSettingsSchema = z.object({
   preferredPosterServerId: z.uuid().nullable().optional(),
   // Members see anonymous counts of other people's activity
   memberServerActivity: z.boolean().optional(),
+  // Admins and members sign in only through SSO
+  memberSsoOnly: z.boolean().optional(),
 });
 
 // ============================================================================

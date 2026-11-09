@@ -51,10 +51,16 @@ vi.mock('../../services/cache.js', () => ({
 }));
 
 vi.mock('../../lib/authGuards.js', () => ({ assertOwnerKeepsALoginMethod: vi.fn() }));
-vi.mock('../../lib/revoke.js', () => ({ revokeSessionsForUsers: vi.fn() }));
+vi.mock('../../lib/revoke.js', () => ({
+  revokeSessionsForUsers: vi.fn(),
+  revokeUnlessStillIn: vi.fn(),
+}));
+const oidc = vi.hoisted(() => ({ configured: true }));
 vi.mock('../../lib/oidcEnv.js', async (importOriginal) => ({
   ...(await importOriginal<object>()),
-  oidcConfigured: true,
+  get oidcConfigured() {
+    return oidc.configured;
+  },
 }));
 
 // Mock geoip service
@@ -75,7 +81,7 @@ import {
   setSettings,
 } from '../../services/settings.js';
 import { assertOwnerKeepsALoginMethod } from '../../lib/authGuards.js';
-import { revokeSessionsForUsers } from '../../lib/revoke.js';
+import { revokeSessionsForUsers, revokeUnlessStillIn } from '../../lib/revoke.js';
 import { getImageCacheStatus } from '../../services/imageCacheSweep.js';
 import { dismissStorageWarning, getStorageWarning } from '../../services/storageCheck.js';
 import { geoipService } from '../../services/geoip.js';
@@ -110,6 +116,7 @@ const mockAllSettings: Settings = {
   imagePrecacheEnabled: true,
   preferredPosterServerId: null,
   memberServerActivity: false,
+  memberSsoOnly: false,
 };
 
 const mockImageCacheStatus: ImageCacheStatus = {
@@ -374,6 +381,50 @@ describe('Settings Routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(revokeSessionsForUsers).toHaveBeenCalledWith(['member-1']);
+    });
+
+    it('turning single sign-on only on signs out whoever has no other way in', async () => {
+      app = await buildTestApp(ownerUser);
+      const where = vi.fn().mockResolvedValue([{ id: 'member-1' }, { id: 'admin-1' }]);
+      vi.mocked(db.select).mockReturnValue({
+        from: vi.fn().mockReturnValue({ where }),
+      } as never);
+
+      const on = await app.inject({
+        method: 'PATCH',
+        url: '/settings',
+        payload: { memberSsoOnly: true },
+      });
+
+      expect(on.statusCode).toBe(200);
+      expect(setSettings).toHaveBeenCalledWith({ memberSsoOnly: true });
+      expect(revokeUnlessStillIn).toHaveBeenCalledWith(['member-1', 'admin-1']);
+      const condition = renderSql(where.mock.calls[0]?.[0] as SQL);
+      expect(condition.sql).toContain('users.role <> $1');
+      expect(condition.sql).toContain('exists (select 1 from auth_sessions s');
+
+      vi.mocked(revokeUnlessStillIn).mockClear();
+      await app.inject({ method: 'PATCH', url: '/settings', payload: { memberSsoOnly: false } });
+      expect(revokeUnlessStillIn).not.toHaveBeenCalled();
+    });
+
+    it('refuses single sign-on only while OIDC is not configured', async () => {
+      app = await buildTestApp(ownerUser);
+      oidc.configured = false;
+      try {
+        const response = await app.inject({
+          method: 'PATCH',
+          url: '/settings',
+          payload: { memberSsoOnly: true },
+        });
+
+        expect(response.statusCode).toBe(400);
+        expect(response.json().message).toBe('Single sign-on only needs OIDC configured.');
+        expect(setSettings).not.toHaveBeenCalled();
+        expect(revokeUnlessStillIn).not.toHaveBeenCalled();
+      } finally {
+        oidc.configured = true;
+      }
     });
 
     it('re-arms imported history linking when Tautulli settings are saved', async () => {
