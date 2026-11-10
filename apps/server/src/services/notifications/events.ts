@@ -4,6 +4,7 @@ import type {
   NotificationEventType,
   NotificationPriority,
   ViolationWithDetails,
+  ServerType,
 } from '@tracearr/shared';
 import type { MediaQuality } from '../automations/types.js';
 
@@ -11,7 +12,7 @@ import type { MediaQuality } from '../automations/types.js';
 export interface ServerEventPayload {
   serverName: string;
   serverId: string;
-  serverType?: 'plex' | 'jellyfin' | 'emby';
+  serverType?: ServerType;
 }
 
 /** One library item, flat, with `to` holding the quality it ends the sync at. */

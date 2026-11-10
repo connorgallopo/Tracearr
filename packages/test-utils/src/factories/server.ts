@@ -4,9 +4,8 @@
  * Creates server entities with sensible defaults.
  */
 
+import type { ServerType } from '@tracearr/shared';
 import { executeRawSql } from '../db/pool.js';
-
-export type ServerType = 'plex' | 'jellyfin' | 'emby';
 
 export interface ServerData {
   id?: string;
@@ -22,6 +21,8 @@ export interface CreatedServer extends Required<ServerData> {
   updatedAt: Date;
 }
 
+const DEFAULT_PORTS: Record<ServerType, number> = { plex: 32400, jellyfin: 8096, emby: 8920 };
+
 let serverCounter = 0;
 
 /**
@@ -30,7 +31,7 @@ let serverCounter = 0;
 export function buildServer(overrides: ServerData = {}): Required<ServerData> {
   const index = ++serverCounter;
   const type = overrides.type || 'plex';
-  const port = type === 'plex' ? 32400 : type === 'jellyfin' ? 8096 : 8920;
+  const port = DEFAULT_PORTS[type];
 
   return {
     id: crypto.randomUUID(),

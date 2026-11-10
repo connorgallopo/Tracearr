@@ -17,7 +17,7 @@ import fastifyCookie from '@fastify/cookie';
 import sensible from '@fastify/sensible';
 import rateLimit from '@fastify/rate-limit';
 import { and, eq } from 'drizzle-orm';
-import { API_BASE_PATH } from '@tracearr/shared';
+import { API_BASE_PATH, type JellyfinEmbyServerType } from '@tracearr/shared';
 import { db } from '../../src/db/client.js';
 import { servers, serverUsers, users } from '../../src/db/schema.js';
 import { closeAuth } from '../../src/lib/auth.js';
@@ -29,9 +29,7 @@ import { syncServer } from '../../src/services/sync.js';
 import authPlugin from '../../src/plugins/auth.js';
 import { sessionRoutes } from '../../src/routes/sessions/index.js';
 
-type ServerType = 'jellyfin' | 'emby';
-
-const targets: { type: ServerType; url?: string; key?: string }[] = [
+const targets: { type: JellyfinEmbyServerType; url?: string; key?: string }[] = [
   {
     type: 'jellyfin',
     url: process.env.TEST_JELLYFIN_URL,

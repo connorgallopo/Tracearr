@@ -15,7 +15,12 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import fastifyCookie from '@fastify/cookie';
 import sensible from '@fastify/sensible';
 import { eq, sql } from 'drizzle-orm';
-import { DEFAULT_STREAM_DETAILS, REDIS_KEYS, type ActiveSession } from '@tracearr/shared';
+import {
+  DEFAULT_STREAM_DETAILS,
+  REDIS_KEYS,
+  type ActiveSession,
+  type ServerType,
+} from '@tracearr/shared';
 import {
   createTestUser,
   createTestServer,
@@ -57,7 +62,7 @@ function fakeActiveSession(overrides: {
   id: string;
   serverId: string;
   serverName: string;
-  serverType: 'plex' | 'jellyfin' | 'emby';
+  serverType: ServerType;
   serverUserId: string;
   username: string;
   ratingKey?: string | null;

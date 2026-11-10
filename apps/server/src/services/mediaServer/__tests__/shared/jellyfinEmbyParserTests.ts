@@ -8,6 +8,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import type { JellyfinEmbyServerType } from '@tracearr/shared';
 import type { MediaSession, MediaUser, MediaLibrary, MediaWatchHistoryItem } from '../../types.js';
 import type { JellyfinEmbyActivityEntry } from '../../shared/baseMediaServerClient.js';
 
@@ -34,7 +35,7 @@ export interface ParserFunctions {
 
 export function createSessionParsingTests(
   parsers: ParserFunctions,
-  serverType: 'jellyfin' | 'emby'
+  serverType: JellyfinEmbyServerType
 ) {
   const clientName = serverType === 'jellyfin' ? 'Jellyfin Web' : 'Emby Web';
 
@@ -320,7 +321,10 @@ export function createSessionParsingTests(
 // User Parsing Tests
 // ============================================================================
 
-export function createUserParsingTests(parsers: ParserFunctions, serverType: 'jellyfin' | 'emby') {
+export function createUserParsingTests(
+  parsers: ParserFunctions,
+  serverType: JellyfinEmbyServerType
+) {
   describe(`${serverType} User Parser`, () => {
     describe('parseUser', () => {
       it('should parse user with admin policy', () => {
@@ -436,7 +440,7 @@ export function createUserParsingTests(parsers: ParserFunctions, serverType: 'je
 
 export function createLibraryParsingTests(
   parsers: ParserFunctions,
-  serverType: 'jellyfin' | 'emby'
+  serverType: JellyfinEmbyServerType
 ) {
   describe(`${serverType} Library Parser`, () => {
     describe('parseLibrary', () => {
@@ -492,7 +496,7 @@ export function createLibraryParsingTests(
 
 export function createWatchHistoryParsingTests(
   parsers: ParserFunctions,
-  serverType: 'jellyfin' | 'emby'
+  serverType: JellyfinEmbyServerType
 ) {
   describe(`${serverType} Watch History Parser`, () => {
     describe('parseWatchHistoryItem', () => {
@@ -572,7 +576,7 @@ export function createWatchHistoryParsingTests(
 
 export function createActivityLogParsingTests(
   parsers: ParserFunctions,
-  serverType: 'jellyfin' | 'emby'
+  serverType: JellyfinEmbyServerType
 ) {
   describe(`${serverType} Activity Log Parser`, () => {
     describe('parseActivityLogItem', () => {
@@ -636,7 +640,10 @@ export function createActivityLogParsingTests(
 // PlayMethod and Transcode Detection Tests (Common)
 // ============================================================================
 
-export function createPlayMethodTests(parsers: ParserFunctions, serverType: 'jellyfin' | 'emby') {
+export function createPlayMethodTests(
+  parsers: ParserFunctions,
+  serverType: JellyfinEmbyServerType
+) {
   describe(`${serverType} Parser - PlayMethod and Transcode Detection`, () => {
     it('should use PlayMethod from PlayState for transcode detection', () => {
       const session = parsers.parseSession({
@@ -687,7 +694,7 @@ export function createPlayMethodTests(parsers: ParserFunctions, serverType: 'jel
 
 export function createTrailerFilteringTests(
   parsers: ParserFunctions,
-  serverType: 'jellyfin' | 'emby'
+  serverType: JellyfinEmbyServerType
 ) {
   describe(`${serverType} Parser - Trailer and Preroll Filtering`, () => {
     it('should filter out Trailer sessions', () => {
@@ -820,7 +827,7 @@ export function createTrailerFilteringTests(
 // Live TV Parsing Tests
 // ============================================================================
 
-export function createLiveTVTests(parsers: ParserFunctions, serverType: 'jellyfin' | 'emby') {
+export function createLiveTVTests(parsers: ParserFunctions, serverType: JellyfinEmbyServerType) {
   const clientName = serverType === 'jellyfin' ? 'Jellyfin Android TV' : 'Emby Theater';
 
   describe(`${serverType} Live TV Parser`, () => {
@@ -949,7 +956,10 @@ export function createLiveTVTests(parsers: ParserFunctions, serverType: 'jellyfi
 // Music Track Parsing Tests
 // ============================================================================
 
-export function createMusicTrackTests(parsers: ParserFunctions, serverType: 'jellyfin' | 'emby') {
+export function createMusicTrackTests(
+  parsers: ParserFunctions,
+  serverType: JellyfinEmbyServerType
+) {
   const clientName = serverType === 'jellyfin' ? 'Jellyfin Mobile' : 'Emby Mobile';
 
   describe(`${serverType} Music Track Parser`, () => {
@@ -1131,7 +1141,7 @@ export function createMusicTrackTests(parsers: ParserFunctions, serverType: 'jel
 // Edge Cases and Type Handling Tests
 // ============================================================================
 
-export function createEdgeCaseTests(parsers: ParserFunctions, serverType: 'jellyfin' | 'emby') {
+export function createEdgeCaseTests(parsers: ParserFunctions, serverType: JellyfinEmbyServerType) {
   describe(`${serverType} Parser Edge Cases`, () => {
     it('should handle media type conversion', () => {
       const makeSession = (type: string) => ({
@@ -1190,7 +1200,7 @@ export function createEdgeCaseTests(parsers: ParserFunctions, serverType: 'jelly
  */
 export function createAllSharedParserTests(
   parsers: ParserFunctions,
-  serverType: 'jellyfin' | 'emby'
+  serverType: JellyfinEmbyServerType
 ) {
   createSessionParsingTests(parsers, serverType);
   createUserParsingTests(parsers, serverType);

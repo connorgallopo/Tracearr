@@ -17,6 +17,7 @@ import {
   type LibraryDuplicateFilesQueryInput,
   type DuplicateFileStatus,
   type DuplicateFilesResponse,
+  type ServerType,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
@@ -28,7 +29,7 @@ interface ItemRow {
   id: string;
   rating_key: string;
   server_id: string;
-  server_type: 'plex' | 'jellyfin' | 'emby';
+  server_type: ServerType;
   server_url: string;
   server_token: string;
   server_historical_at: string | null;

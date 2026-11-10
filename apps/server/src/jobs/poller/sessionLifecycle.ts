@@ -14,6 +14,7 @@ import {
   type EngineAutomation,
   type Session,
   type StreamDetailFields,
+  type ServerType,
 } from '@tracearr/shared';
 import { and, desc, eq, gte, inArray, isNull, sql } from 'drizzle-orm';
 import { db } from '../../db/client.js';
@@ -165,7 +166,7 @@ export interface BuildActiveSessionInput {
   server: {
     id: string;
     name: string;
-    type: 'plex' | 'jellyfin' | 'emby';
+    type: ServerType;
   };
 
   /** Optional overrides for update scenarios */

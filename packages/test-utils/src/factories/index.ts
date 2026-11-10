@@ -34,7 +34,6 @@ export {
   resetServerCounter,
   type ServerData,
   type CreatedServer,
-  type ServerType,
 } from './server.js';
 
 export {

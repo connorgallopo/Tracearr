@@ -30,6 +30,7 @@ import type {
   MobileSession,
   MobilePairResponse,
   MobilePairTokenResponse,
+  ServerType,
 } from '@tracearr/shared';
 import {
   REDIS_KEYS,
@@ -719,7 +720,7 @@ export const mobileRoutes: FastifyPluginAsync = async (app) => {
       owner: { id: string; username: string };
       serverName: string;
       serverId: string;
-      serverType: 'plex' | 'jellyfin' | 'emby';
+      serverType: ServerType;
       serverIds: string[];
       oldRefreshTokenHash?: string; // Track old hash for cleanup outside transaction
       oldBetterAuthSessionId?: string | null; // Previous BA session to revoke on re-pair

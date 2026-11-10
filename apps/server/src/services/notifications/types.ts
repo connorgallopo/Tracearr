@@ -17,6 +17,7 @@ import type {
   ActiveSession,
   NotificationEventType,
   NotificationPriority,
+  ServerType,
 } from '@tracearr/shared';
 import type { MediaQuality } from '../automations/types.js';
 import type {
@@ -59,7 +60,7 @@ export interface SessionContext {
 export interface ServerContext {
   type: 'server_down' | 'server_up';
   serverName: string;
-  serverType?: 'plex' | 'jellyfin' | 'emby';
+  serverType?: ServerType;
 }
 
 /**
@@ -224,10 +225,7 @@ export const PayloadBuilders = {
     };
   },
 
-  fromServerDown(
-    serverName: string,
-    serverType?: 'plex' | 'jellyfin' | 'emby'
-  ): NotificationPayload {
+  fromServerDown(serverName: string, serverType?: ServerType): NotificationPayload {
     return {
       event: 'server_down',
       title: 'Server Offline',
@@ -238,7 +236,7 @@ export const PayloadBuilders = {
     };
   },
 
-  fromServerUp(serverName: string, serverType?: 'plex' | 'jellyfin' | 'emby'): NotificationPayload {
+  fromServerUp(serverName: string, serverType?: ServerType): NotificationPayload {
     return {
       event: 'server_up',
       title: 'Server Online',

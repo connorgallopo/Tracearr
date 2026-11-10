@@ -17,6 +17,7 @@
  * const users = await client.getUsers();
  */
 
+import { assertNever } from '@tracearr/shared';
 import { PlexClient } from './plex/client.js';
 import { JellyfinClient } from './jellyfin/client.js';
 import { EmbyClient } from './emby/client.js';
@@ -64,7 +65,7 @@ export function createMediaServerClient(options: CreateClientOptions): IMediaSer
     case 'emby':
       return new EmbyClient(config);
     default:
-      throw new Error(`Unknown media server type: ${options.type as string}`);
+      return assertNever(options.type);
   }
 }
 

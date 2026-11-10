@@ -7,8 +7,9 @@
 
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import type { ServerType } from '@tracearr/shared';
 
-export type ServerKey = 'plex' | 'jellyfin' | 'emby';
+export type ServerKey = ServerType;
 
 export interface ShowcaseServer {
   key: ServerKey;

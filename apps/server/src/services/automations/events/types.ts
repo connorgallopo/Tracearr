@@ -3,6 +3,7 @@ import type {
   Session,
   TriggerType as CatalogTriggerType,
   ViolationSeverity,
+  ServerType,
 } from '@tracearr/shared';
 import type { db } from '../../../db/client.js';
 import type { sessions } from '../../../db/schema.js';
@@ -22,7 +23,7 @@ export type TriggerType =
 export interface EvaluationServer {
   id: string;
   name: string;
-  type: 'plex' | 'jellyfin' | 'emby';
+  type: ServerType;
 }
 
 /** What every producer already holds about the account; matches SessionCreationInput['serverUser']. */

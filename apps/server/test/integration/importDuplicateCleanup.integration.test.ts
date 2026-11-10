@@ -8,6 +8,7 @@
 import { describe, it, expect } from 'vitest';
 import type { Job } from 'bullmq';
 import { sql } from 'drizzle-orm';
+import type { ServerType } from '@tracearr/shared';
 import {
   createTestServer,
   createTestUser,
@@ -43,7 +44,10 @@ function fakeJob(): Job<MaintenanceJobData> {
   } as unknown as Job<MaintenanceJobData>;
 }
 
-async function setup(type: 'plex' | 'jellyfin' = 'plex', createdAt = at(-60 * MIN_MS)) {
+async function setup(
+  type: Extract<ServerType, 'plex' | 'jellyfin'> = 'plex',
+  createdAt = at(-60 * MIN_MS)
+) {
   const server = await createTestServer({ type });
   await db.execute(
     sql`UPDATE servers SET created_at = ${createdAt.toISOString()}::timestamptz WHERE id = ${server.id}::uuid`

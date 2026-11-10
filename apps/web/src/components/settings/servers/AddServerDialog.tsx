@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, Loader2, Server as ServerIcon, XCircle } from 'lucide-react';
+import type { ServerType } from '@tracearr/shared';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -37,8 +38,8 @@ export interface AddServerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   isOwner: boolean;
-  serverType: 'plex' | 'jellyfin' | 'emby';
-  onServerTypeChange: (type: 'plex' | 'jellyfin' | 'emby') => void;
+  serverType: ServerType;
+  onServerTypeChange: (type: ServerType) => void;
   serverUrl: string;
   onServerUrlChange: (value: string) => void;
   publicUrl: string;
@@ -141,10 +142,7 @@ export function AddServerDialog({
         <FieldGroup className="py-4">
           <Field className="max-w-sm">
             <FieldLabel htmlFor="server-type">{t('servers.serverType')}</FieldLabel>
-            <Select
-              value={serverType}
-              onValueChange={(v) => onServerTypeChange(v as 'plex' | 'jellyfin' | 'emby')}
-            >
+            <Select value={serverType} onValueChange={(v) => onServerTypeChange(v as ServerType)}>
               <SelectTrigger id="server-type" className="w-full">
                 <SelectValue />
               </SelectTrigger>

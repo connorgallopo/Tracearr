@@ -8,6 +8,7 @@
 import { eq, and, isNull, isNotNull, inArray, notInArray } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import type pg from 'pg';
+import type { JellyfinEmbyServerType } from '@tracearr/shared';
 import { createRawPgClient, db, type Executor } from '../db/client.js';
 import * as schema from '../db/schema.js';
 import { servers, serverUsers } from '../db/schema.js';
@@ -300,7 +301,7 @@ async function syncPlexUsers(
  */
 async function syncMediaServerUsers(
   serverId: string,
-  serverType: 'jellyfin' | 'emby',
+  serverType: JellyfinEmbyServerType,
   serverUrl: string,
   token: string
 ): Promise<{

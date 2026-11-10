@@ -1,4 +1,5 @@
 import { sql } from 'drizzle-orm';
+import type { ServerType } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import type { MappedRequest } from './mapping.js';
 
@@ -100,7 +101,7 @@ async function byRatingKey(serverId: string, keys: string[]): Promise<Map<string
 
 async function requesters(
   serverId: string,
-  serverType: 'plex' | 'jellyfin' | 'emby',
+  serverType: ServerType,
   keys: string[]
 ): Promise<Map<string, string>> {
   const out = new Map<string, string>();
@@ -116,7 +117,7 @@ async function requesters(
 
 export async function resolveRequests(
   serverId: string,
-  serverType: 'plex' | 'jellyfin' | 'emby',
+  serverType: ServerType,
   rows: ResolutionInput[]
 ): Promise<Map<number, Resolved>> {
   const movies = rows.filter((r) => r.mediaType === 'movie');

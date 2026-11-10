@@ -1,6 +1,12 @@
 import { APIError } from 'better-auth/api';
 import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
-import { SIGN_IN_ERROR_CODES, canLogin, isStaff, type LoginMethods } from '@tracearr/shared';
+import {
+  SIGN_IN_ERROR_CODES,
+  canLogin,
+  isStaff,
+  type LoginMethods,
+  type ServerType,
+} from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { authAccounts, servers, serverUsers, users } from '../db/schema.js';
 import { getOwnerUser } from '../services/userService.js';
@@ -255,7 +261,7 @@ export async function mediaSignInClosed(): Promise<boolean> {
   return (await getSetting('memberSsoOnly')) === true;
 }
 
-export async function hasOpenServer(type: 'plex' | 'jellyfin' | 'emby'): Promise<boolean> {
+export async function hasOpenServer(type: ServerType): Promise<boolean> {
   if (await mediaSignInClosed()) return false;
   const [server] = await db
     .select({ id: servers.id })

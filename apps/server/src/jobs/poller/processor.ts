@@ -14,6 +14,7 @@ import {
   usernameAsEmail,
   type ActiveSession,
   type EngineAutomation,
+  type ServerType,
   type Session,
 } from '@tracearr/shared';
 import { and, eq, gte, inArray, isNull, lte } from 'drizzle-orm';
@@ -233,14 +234,14 @@ async function handleFirstMisses(
   cachedKeys: Iterable<string>,
   serverId: string,
   activeSessions: ActiveSession[],
-  serverTypeMap: Map<string, string>
+  serverTypeMap: Map<string, ServerType>
 ): Promise<void> {
   for (const cachedKey of cachedKeys) {
     if (!cachedKey.startsWith(`${serverId}:`)) continue;
     if (missedPollTracking.has(cachedKey)) continue; // Already in grace period
 
     const cachedActiveSession = activeSessions.find((s) => {
-      const sType = (serverTypeMap.get(s.serverId) ?? 'plex') as 'plex' | 'jellyfin' | 'emby';
+      const sType = serverTypeMap.get(s.serverId) ?? 'plex';
       return (
         buildCompositeKey({
           serverType: sType,
@@ -291,7 +292,7 @@ async function getOrFetchRecentSessions(
 /** A pending session that vanished pre-confirmation: mirrors sseProcessor's stop-before-confirm handling. */
 async function resolveVanishedPendingSession(
   serverId: string,
-  serverType: string,
+  serverType: ServerType,
   pendingKeySource: string
 ): Promise<void> {
   if (!cacheService) return;
@@ -407,7 +408,7 @@ async function resolveVanishedPendingSession(
 async function sweepGracePeriod(
   keysToSweep: Set<string>,
   serverId: string,
-  serverTypeMap: Map<string, string>,
+  serverTypeMap: Map<string, ServerType>,
   currentSessionKeys?: Set<string>
 ): Promise<void> {
   // Dashboard invalidation is deferred to one call after the loop (instead of

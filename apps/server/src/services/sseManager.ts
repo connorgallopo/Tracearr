@@ -23,6 +23,8 @@ import {
   type ServerConnectionStatus,
   type PluginIssue,
   type PlexPlaySessionNotification,
+  type ServerType,
+  type JellyfinEmbyServerType,
 } from '@tracearr/shared';
 import { registerService, unregisterService } from './serviceTracker.js';
 import { liveServers } from './liveServers.js';
@@ -71,7 +73,7 @@ export interface SSEManagerEvents {
 interface ServerConnection {
   serverId: string;
   serverName: string;
-  serverType: 'plex' | 'jellyfin' | 'emby';
+  serverType: ServerType;
   // Kept for the plugin-list probe when the SSE endpoint 404s
   url: string;
   token: string;
@@ -229,7 +231,7 @@ export class SSEManager extends EventEmitter {
   async addServer(
     serverId: string,
     serverName: string,
-    serverType: 'plex' | 'jellyfin' | 'emby',
+    serverType: ServerType,
     url: string,
     token: string
   ): Promise<void> {
@@ -531,7 +533,7 @@ export class SSEManager extends EventEmitter {
   private buildConnectionStatus(
     serverId: string,
     serverName: string,
-    serverType: 'plex' | 'jellyfin' | 'emby',
+    serverType: ServerType,
     status: SSEConnectionStatus
   ): ServerConnectionStatus {
     const state = status.state;
@@ -604,7 +606,7 @@ export class SSEManager extends EventEmitter {
     eventSource: JellyfinEmbyEventSource,
     serverId: string,
     serverName: string,
-    serverType: 'jellyfin' | 'emby'
+    serverType: JellyfinEmbyServerType
   ): void {
     eventSource.on('session:event', (_event: PluginSessionEvent) => {
       const connection = this.connections.get(serverId);
@@ -664,7 +666,7 @@ export class SSEManager extends EventEmitter {
   private publishJellyfinEmbyStatus(
     serverId: string,
     serverName: string,
-    serverType: 'jellyfin' | 'emby',
+    serverType: JellyfinEmbyServerType,
     status: SSEConnectionStatus
   ): void {
     const connectionStatus = this.buildConnectionStatus(serverId, serverName, serverType, status);

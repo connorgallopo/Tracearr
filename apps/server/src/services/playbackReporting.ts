@@ -9,6 +9,7 @@
 import type {
   PlaybackReportingImportProgress,
   PlaybackReportingImportResult,
+  JellyfinEmbyServerType,
 } from '@tracearr/shared';
 import { and, eq, sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
@@ -163,7 +164,7 @@ export function parseEpisodeItemName(
 
 export interface TransformContext {
   serverId: string;
-  serverType: 'jellyfin' | 'emby';
+  serverType: JellyfinEmbyServerType;
   serverUserId: string;
   timezone: string;
   geo: ReturnType<typeof geoipService.lookup> & {

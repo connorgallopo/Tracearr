@@ -15,7 +15,7 @@
 import { randomUUID } from 'node:crypto';
 import { describe, it, expect } from 'vitest';
 import { eq } from 'drizzle-orm';
-import { DEFAULT_STREAM_DETAILS } from '@tracearr/shared';
+import { DEFAULT_STREAM_DETAILS, type ServerType } from '@tracearr/shared';
 import {
   createTestUser,
   createTestServer,
@@ -52,7 +52,7 @@ async function setupServerAndUser() {
 
 function buildCreationInput(
   overrides: Partial<SessionCreationInput['processed']>,
-  server: { id: string; name: string; type: 'plex' | 'jellyfin' | 'emby' },
+  server: { id: string; name: string; type: ServerType },
   serverUser: { id: string; userId: string; username: string; thumbUrl: string | null }
 ): SessionCreationInput {
   return {

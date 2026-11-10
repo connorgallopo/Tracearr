@@ -1,6 +1,6 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import type { AuthUser } from '@tracearr/shared';
+import type { AuthUser, JellyfinEmbyServerType } from '@tracearr/shared';
 import { authClient } from '@/lib/authClient';
 import { SignInError } from '@/lib/signInRefusal';
 
@@ -30,7 +30,7 @@ export function useMemberSignIn() {
 
   return useMutation({
     mutationFn: async (credentials: {
-      type: 'jellyfin' | 'emby';
+      type: JellyfinEmbyServerType;
       serverId: string;
       username: string;
       password: string;

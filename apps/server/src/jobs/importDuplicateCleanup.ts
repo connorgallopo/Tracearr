@@ -1,4 +1,5 @@
 import { sql, type SQL } from 'drizzle-orm';
+import type { ServerType } from '@tracearr/shared';
 import { countedSessionSql } from '../db/sessions/rules.js';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
@@ -14,7 +15,7 @@ import {
 
 interface DuplicateCleanupServer {
   id: string;
-  type: 'plex' | 'jellyfin' | 'emby';
+  type: ServerType;
   /** servers.created_at: nothing before it was tracked */
   cutoff: Date;
 }

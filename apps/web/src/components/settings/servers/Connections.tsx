@@ -18,7 +18,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import type { Server } from '@tracearr/shared';
+import type { Server, ServerType } from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -68,7 +68,7 @@ export function Connections() {
   const [historicalId, setHistoricalId] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [editServer, setEditServer] = useState<Server | null>(null);
-  const [serverType, setServerType] = useState<'plex' | 'jellyfin' | 'emby'>('plex');
+  const [serverType, setServerType] = useState<ServerType>('plex');
   const [serverUrl, setServerUrl] = useState('');
   const [publicUrl, setPublicUrl] = useState('');
   const [serverName, setServerName] = useState('');

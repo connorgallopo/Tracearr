@@ -6,15 +6,13 @@ import { z } from 'zod';
 import { LOGIN_ACCESS, isValidTimezone } from './constants.js';
 import { listDateBoundSchema, listSortSchema } from './listQuery.js';
 import { PLAYBACK_DECISIONS } from './playbackDecision.js';
+import { SERVER_TYPES } from './serverTypes.js';
 
 // ============================================================================
 // Shared Enum Constants
 // ============================================================================
 
-/** Server types supported by Tracearr */
-const SERVER_TYPES = ['plex', 'jellyfin', 'emby'] as const;
 export const serverTypeSchema = z.enum(SERVER_TYPES);
-export type ServerType = z.infer<typeof serverTypeSchema>;
 
 /** Media types for content filtering */
 const MEDIA_TYPES = ['movie', 'episode', 'track', 'live'] as const;

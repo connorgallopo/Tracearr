@@ -6,6 +6,7 @@
  * are handled by abstract methods or configuration.
  */
 
+import type { JellyfinEmbyServerType } from '@tracearr/shared';
 import {
   fetchJson,
   fetchText,
@@ -128,7 +129,7 @@ export abstract class BaseMediaServerClient
   implements IMediaServerClient, IMediaServerClientWithHistory
 {
   /** Platform identifier for service tagging */
-  public abstract readonly serverType: 'jellyfin' | 'emby';
+  public abstract readonly serverType: JellyfinEmbyServerType;
 
   protected readonly baseUrl: string;
   protected readonly apiKey: string;
@@ -863,7 +864,7 @@ export abstract class BaseMediaServerClient
 
   /** POSTs a sign-in and returns the user token, or null when the server refuses it. */
   protected static async requestUserToken(
-    service: 'jellyfin' | 'emby',
+    service: JellyfinEmbyServerType,
     serverUrl: string,
     path: string,
     headers: Record<string, string>,
@@ -896,7 +897,7 @@ export abstract class BaseMediaServerClient
 
   /** Reads the user a member token belongs to; null when the server rejects the token. */
   protected static async requestTokenUser(
-    service: 'jellyfin' | 'emby',
+    service: JellyfinEmbyServerType,
     url: string,
     headers: Record<string, string>
   ): Promise<{ id: string; isDisabled: boolean } | null> {
@@ -917,7 +918,7 @@ export abstract class BaseMediaServerClient
   }
 
   protected static async postTokenLogout(
-    service: 'jellyfin' | 'emby',
+    service: JellyfinEmbyServerType,
     serverUrl: string,
     headers: Record<string, string>
   ): Promise<void> {

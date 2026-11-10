@@ -6,6 +6,7 @@
  */
 
 import { describe, it, expect, vi } from 'vitest';
+import type { ServerType } from '@tracearr/shared';
 
 // Mock crypto module before imports
 vi.mock('../../../utils/crypto.js', () => ({
@@ -72,7 +73,7 @@ describe('createMediaServerClient', () => {
         url: 'http://unknown.local:8096',
         token: 'token',
       })
-    ).toThrow('Unknown media server type');
+    ).toThrow('Unhandled value: unknown');
   });
 
   it('should pass optional config fields', () => {
@@ -140,7 +141,7 @@ describe('supportsWatchHistory', () => {
 // ============================================================================
 
 describe('IMediaServerClient Interface Compliance', () => {
-  const createTestClient = (type: 'plex' | 'jellyfin' | 'emby'): IMediaServerClient => {
+  const createTestClient = (type: ServerType): IMediaServerClient => {
     const urls = {
       plex: 'http://plex.local:32400',
       jellyfin: 'http://jellyfin.local:8096',

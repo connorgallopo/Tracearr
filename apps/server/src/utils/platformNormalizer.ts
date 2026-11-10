@@ -15,6 +15,8 @@
  * All data entering Tracearr should go through this normalizer for consistency.
  */
 
+import type { ServerType } from '@tracearr/shared';
+
 export interface NormalizedClient {
   /** Normalized platform name (e.g., "Android TV", "iOS", "Kodi") */
   platform: string;
@@ -39,7 +41,7 @@ export interface NormalizedClient {
 export function normalizeClient(
   client: string,
   deviceType?: string,
-  _serverType?: 'plex' | 'jellyfin' | 'emby'
+  _serverType?: ServerType
 ): NormalizedClient {
   // If deviceType is provided and meaningful, use it as device but still normalize platform
   const hasValidDeviceType = deviceType && deviceType.length > 0 && deviceType !== 'Unknown';

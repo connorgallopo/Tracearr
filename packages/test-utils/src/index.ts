@@ -49,7 +49,6 @@ export {
   resetServerCounter,
   type ServerData,
   type CreatedServer,
-  type ServerType,
   // ServerUser factories
   buildServerUser,
   createTestServerUser,

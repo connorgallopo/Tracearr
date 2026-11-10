@@ -3,7 +3,7 @@
  * and which of the two is newer. Every feed is public and read without a token.
  */
 
-import type { ServerType } from '@tracearr/shared';
+import type { ServerType, JellyfinEmbyServerType } from '@tracearr/shared';
 import { fetchJson } from './http.js';
 import { createLogger } from './logger.js';
 import { compareVersions, maxVersion } from './pluginVersion.js';
@@ -11,7 +11,7 @@ import { compareVersions, maxVersion } from './pluginVersion.js';
 const logger = createLogger('server-versions');
 
 const PLEX_DOWNLOADS_URL = 'https://plex.tv/api/downloads/5.json';
-const GITHUB_LATEST: Record<'jellyfin' | 'emby', string> = {
+const GITHUB_LATEST: Record<JellyfinEmbyServerType, string> = {
   jellyfin: 'https://api.github.com/repos/jellyfin/jellyfin/releases/latest',
   emby: 'https://api.github.com/repos/MediaBrowser/Emby.Releases/releases/latest',
 };
@@ -69,7 +69,7 @@ async function latestPlexVersion(): Promise<string | null> {
   return maxVersion(versions);
 }
 
-async function latestGithubVersion(type: 'jellyfin' | 'emby'): Promise<string | null> {
+async function latestGithubVersion(type: JellyfinEmbyServerType): Promise<string | null> {
   const release = await fetchJson<{ tag_name?: unknown }>(GITHUB_LATEST[type], {
     timeout: FEED_TIMEOUT_MS,
     service: 'github',

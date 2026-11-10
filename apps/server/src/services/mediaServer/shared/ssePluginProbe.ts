@@ -1,4 +1,4 @@
-import type { PluginIssue } from '@tracearr/shared';
+import type { PluginIssue, JellyfinEmbyServerType } from '@tracearr/shared';
 
 /**
  * Asks the media server's own plugin list whether the Tracearr SSE plugin is
@@ -34,7 +34,7 @@ function normalizeGuid(id: string): string {
 
 export async function probeSsePlugin(config: {
   baseUrl: string;
-  serverType: 'jellyfin' | 'emby';
+  serverType: JellyfinEmbyServerType;
   token: string;
 }): Promise<PluginIssue> {
   const { baseUrl, serverType, token } = config;

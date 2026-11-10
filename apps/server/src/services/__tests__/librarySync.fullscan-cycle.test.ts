@@ -51,6 +51,7 @@ vi.mock('../automations/events/producers.js', () => ({
 }));
 
 import type { Redis } from 'ioredis';
+import type { ServerType } from '@tracearr/shared';
 import { LibrarySyncService, initLibrarySyncRedis } from '../librarySync.js';
 import { createMediaServerClient } from '../mediaServer/index.js';
 import { db } from '../../db/client.js';
@@ -75,7 +76,7 @@ function makeMockRedis(): Redis {
 function setupDbSelectMocks(mockServer: {
   id: string;
   name: string;
-  type: 'plex' | 'jellyfin' | 'emby';
+  type: ServerType;
   url: string;
   token: string;
 }) {

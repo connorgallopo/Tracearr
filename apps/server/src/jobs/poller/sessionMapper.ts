@@ -6,7 +6,12 @@
  * - Database row → Session type (for application use)
  */
 
-import { type Session, type StreamDetailFields, MEDIA_TYPES } from '@tracearr/shared';
+import {
+  type Session,
+  type StreamDetailFields,
+  MEDIA_TYPES,
+  type ServerType,
+} from '@tracearr/shared';
 import type { MediaSession } from '../../services/mediaServer/types.js';
 import type { ProcessedSession } from './types.js';
 import { normalizeClient } from '../../utils/platformNormalizer.js';
@@ -143,20 +148,17 @@ export function pickLiveSessionFields(processed: ProcessedSession): Partial<Sess
 
 /**
  * Map unified MediaSession to ProcessedSession format
- * Works for both Plex and Jellyfin sessions from the new adapter
+ * Works for Plex, Jellyfin and Emby sessions from the mediaServer adapter
  *
  * @param session - Unified MediaSession from the mediaServer adapter
- * @param serverType - Type of media server ('plex' | 'jellyfin')
+ * @param serverType - Type of media server
  * @returns ProcessedSession ready for database storage
  *
  * @example
  * const processed = mapMediaSession(mediaSession, 'plex');
  * // Use processed for DB insert
  */
-export function mapMediaSession(
-  session: MediaSession,
-  serverType: 'plex' | 'jellyfin' | 'emby'
-): ProcessedSession {
+export function mapMediaSession(session: MediaSession, serverType: ServerType): ProcessedSession {
   // Resolve thumb path using lookup table
   const thumbPath = resolveThumbPath(session);
 

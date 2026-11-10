@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { APIError } from 'better-auth/api';
 import { setSessionCookie } from 'better-auth/cookies';
 import { and, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
-import type { LoginAccess, UserRole } from '@tracearr/shared';
+import type { LoginAccess, UserRole, JellyfinEmbyServerType } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { authAccounts, servers, serverUsers, users } from '../db/schema.js';
 import { EmbyClient, JellyfinClient } from '../services/mediaServer/index.js';
@@ -30,7 +30,7 @@ export interface MemberLoginInput {
   serverUrl: string;
   externalId: string;
   token: string;
-  providerId: 'jellyfin' | 'emby';
+  providerId: JellyfinEmbyServerType;
   deviceId: string;
 }
 
