@@ -7,7 +7,6 @@
 
 import { SESSION_LIMITS, type SessionState } from '@tracearr/shared';
 import type {
-  BuildCompositeKeyInput,
   PauseAccumulationResult,
   StopDurationResult,
   SessionPauseData,
@@ -447,25 +446,6 @@ export function updateConfirmationState(
     initialViewOffset: state.initialViewOffset ?? viewOffset,
     maxViewOffset: Math.max(state.maxViewOffset, viewOffset),
   };
-}
-
-// ============================================================================
-// Session Identity
-// ============================================================================
-
-/**
- * Build a cache/tracking key for a session.
- * Plex: `serverId:sessionKey`. JF/Emby: `serverId:userId:deviceId:ratingKey`.
- */
-export function buildCompositeKey(input: BuildCompositeKeyInput): string {
-  const { serverType, serverId, externalUserId, deviceId, ratingKey, sessionKey } = input;
-
-  if (serverType === 'plex') {
-    return `${serverId}:${sessionKey}`;
-  }
-
-  const deviceIdentifier = deviceId || sessionKey;
-  return `${serverId}:${externalUserId}:${deviceIdentifier}:${ratingKey ?? ''}`;
 }
 
 // ============================================================================

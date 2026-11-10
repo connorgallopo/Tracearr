@@ -37,6 +37,7 @@ import {
 import { isLocalSession } from '../../db/sessions/rules.js';
 import { clearDbWriteTracking } from './dbWriteThrottle.js';
 import { pickStreamDetailFields } from './sessionMapper.js';
+import { canTerminate } from './sessionIdentity.js';
 import {
   calculateStopDuration,
   checkWatchCompletion,
@@ -282,7 +283,7 @@ export function buildActiveSession(input: BuildActiveSessionInput): ActiveSessio
     server: { id: server.id, name: server.name, type: server.type },
 
     // Termination capability - Plex requires Session.id, some clients (like Plexamp) don't provide it
-    canTerminate: server.type !== 'plex' || !!processed.plexSessionId,
+    canTerminate: canTerminate(server.type, processed.plexSessionId),
   };
 }
 
@@ -396,7 +397,7 @@ export function buildPendingActiveSession(pendingData: PendingSessionData): Acti
     server: { id: server.id, name: server.name, type: server.type },
 
     // Termination capability
-    canTerminate: server.type !== 'plex' || !!processed.plexSessionId,
+    canTerminate: canTerminate(server.type, processed.plexSessionId),
 
     // Unconfirmed; excludeUncountableSessions drops this from rule evaluation
     pending: true,

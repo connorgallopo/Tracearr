@@ -13,6 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ActiveSession, EngineAutomation } from '@tracearr/shared';
 import type { CacheService, PubSubService } from '../../../services/cache.js';
 import type * as ProducersModule from '../../../services/automations/events/producers.js';
+import type * as MediaServerModule from '../../../services/mediaServer/index.js';
 import type { ProcessedSession } from '../types.js';
 
 const mockDbSelect = vi.fn();
@@ -211,6 +212,7 @@ const serverRow = {
   createdAt: new Date(),
   updatedAt: new Date(),
 };
+let serverRows: unknown[] = [serverRow];
 
 const serverUsersRows = [
   {
@@ -281,7 +283,7 @@ const activeSessionB = {
 
 mockDbSelect.mockImplementation((_cols?: unknown) => ({
   from: (table: unknown) => {
-    if (table === servers) return Promise.resolve([serverRow]);
+    if (table === servers) return Promise.resolve(serverRows);
     if (table === serverUsers) {
       return { innerJoin: () => ({ where: () => Promise.resolve(serverUsersRows) }) };
     }
@@ -520,6 +522,61 @@ describe('per-session error isolation in processServerSessions', () => {
 
     expect(gracePeriodSessionIds().has('active-a-id')).toBe(false);
     expect(mockStopSessionAtomic).not.toHaveBeenCalled();
+  });
+
+  describe('servers and cached sessions the poller has no type for', () => {
+    afterEach(() => {
+      serverRows = [serverRow];
+    });
+
+    it('fails only the poll of a server row whose type it does not know', async () => {
+      const actual = await vi.importActual<typeof MediaServerModule>(
+        '../../../services/mediaServer/index.js'
+      );
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      serverRows = [serverRow, { ...serverRow, id: 'server-2', name: 'Silo Server', type: 'silo' }];
+      cacheService.getAllActiveSessions.mockResolvedValue([
+        activeSessionB,
+        { ...activeSessionB, id: 'silo-active-id', serverId: 'server-2' },
+      ]);
+      mockCreateMediaServerClient.mockImplementation(
+        (options: Parameters<typeof actual.createMediaServerClient>[0]) =>
+          options.type === 'plex'
+            ? { getSessions: vi.fn().mockResolvedValue([processedB]) }
+            : actual.createMediaServerClient(options)
+      );
+
+      await triggerPoll();
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        'Error polling server Silo Server:',
+        expect.objectContaining({ message: 'Unhandled value: silo' })
+      );
+      expect(cacheService.incrServerFailCount).toHaveBeenCalledWith('server-2');
+      expect(cacheService.setServerHealth).toHaveBeenCalledWith('server-1', true);
+      const lastCall = mockProcessPollResults.mock.calls.at(-1)?.[0] as {
+        updatedSessions: Array<{ id: string }>;
+      };
+      expect(lastCall.updatedSessions).toEqual([
+        expect.objectContaining({ id: 'active-b-updated' }),
+      ]);
+    });
+
+    it('keeps polling when a cached session belongs to a server that is gone', async () => {
+      cacheService.getAllActiveSessions.mockResolvedValue([
+        { ...activeSessionA, id: 'orphan-id', serverId: 'server-gone' },
+        activeSessionA,
+        activeSessionB,
+      ]);
+      mockCreateMediaServerClient.mockReturnValue({
+        getSessions: vi.fn().mockResolvedValue([processedB]),
+      });
+
+      await triggerPoll();
+
+      expect(cacheService.setServerHealth).toHaveBeenCalledWith('server-1', true);
+      expect(gracePeriodSessionIds().has('active-a-id')).toBe(true);
+    });
   });
 });
 

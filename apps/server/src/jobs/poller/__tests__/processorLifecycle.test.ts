@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildCompositeKey, shouldWriteToDb } from '../stateTracker.js';
+import { buildCompositeKey } from '../sessionIdentity.js';
+import { shouldWriteToDb } from '../stateTracker.js';
 import { updatePendingSession } from '../pendingConfirmation.js';
 import { PLAYBACK_CONFIRM_THRESHOLD_MS, DB_WRITE_FLUSH_INTERVAL_MS } from '../types.js';
 import {

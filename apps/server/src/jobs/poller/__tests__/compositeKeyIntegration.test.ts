@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { buildCompositeKey, shouldWriteToDb } from '../stateTracker.js';
+import { buildCompositeKey } from '../sessionIdentity.js';
+import { shouldWriteToDb } from '../stateTracker.js';
 import { calculatePendingPauseAccumulation } from '../pendingConfirmation.js';
 
 describe('JF/Emby session lifecycle integration', () => {
