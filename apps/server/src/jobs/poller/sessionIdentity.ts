@@ -67,26 +67,26 @@ export function terminationSessionId(
   type: ServerType,
   session: { plexSessionId: string | null; sessionKey: string }
 ): string | null {
-  const identity = SERVER_PROFILES[type].sessionIdentity;
-  switch (identity) {
-    case 'sessionKey':
+  const terminatesBy = SERVER_PROFILES[type].terminatesBy;
+  switch (terminatesBy) {
+    case 'plexSessionId':
       return session.plexSessionId;
-    case 'composite':
+    case 'sessionKey':
       return session.sessionKey;
     default:
-      return assertNever(identity);
+      return assertNever(terminatesBy);
   }
 }
 
 /** Some Plex clients (Plexamp) report no Session.id, and Plex cannot stop a playback without one. */
 export function canTerminate(type: ServerType, plexSessionId: string | null | undefined): boolean {
-  const identity = SERVER_PROFILES[type].sessionIdentity;
-  switch (identity) {
-    case 'sessionKey':
+  const terminatesBy = SERVER_PROFILES[type].terminatesBy;
+  switch (terminatesBy) {
+    case 'plexSessionId':
       return !!plexSessionId;
-    case 'composite':
+    case 'sessionKey':
       return true;
     default:
-      return assertNever(identity);
+      return assertNever(terminatesBy);
   }
 }

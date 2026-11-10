@@ -1,5 +1,6 @@
 import {
   BYTES_PER_GB,
+  SERVER_PROFILES,
   TIME_MS,
   isSubtitleBurnIn,
   normalizeDynamicRange,
@@ -263,7 +264,7 @@ const evaluateConcurrentStreams: ConditionEvaluator = (
   // from another server type in a cross-server identity are the accepted
   // imprecision here (rows carry no server type).
   if (countDeviceTypes?.length) {
-    const includePlayerName = context.server.type !== 'plex';
+    const includePlayerName = SERVER_PROFILES[context.server.type].playerNameCountsTowardDevice;
     userActiveSessions = userActiveSessions.filter((s) =>
       countDeviceTypes.includes(
         normalizeDeviceType(
@@ -919,7 +920,7 @@ const evaluateDeviceType: ConditionEvaluator = (
     session.device,
     session.platform,
     session.product,
-    server.type === 'plex' ? null : session.playerName
+    SERVER_PROFILES[server.type].playerNameCountsTowardDevice ? session.playerName : null
   );
 
   return {

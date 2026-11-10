@@ -30,7 +30,7 @@ const session = createMockActiveSession();
 const pluginPayload = {
   serverId: 'server-1',
   serverName: 'Jellyfin',
-  serverType: 'jellyfin',
+  serverType: 'jellyfin' as const,
   installedVersion: '0.2.0',
   latestVersion: '0.3.0',
   downloadUrl: 'https://example.com/plugin.zip',

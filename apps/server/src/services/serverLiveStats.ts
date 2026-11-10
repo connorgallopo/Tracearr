@@ -10,7 +10,10 @@ import {
   CACHE_TTL,
   liveStatsRetentionSeconds,
   REDIS_KEYS,
+  SERVER_PROFILES,
   SERVER_STATS_CONFIG,
+  assertNever,
+  type ServerType,
 } from '@tracearr/shared';
 import type { ServerResourceDataPoint } from '@tracearr/shared';
 import { PlexClient } from './mediaServer/plex/client.js';
@@ -18,7 +21,7 @@ import type { PlexBandwidthStats, PlexStatisticsDataPoint } from './mediaServer/
 
 interface ServerRow {
   id: string;
-  type: string;
+  type: ServerType;
   url: string;
   token: string;
 }
@@ -229,16 +232,24 @@ function shiftPoints<T extends { at: number }>(points: T[], shift: number): T[] 
 }
 
 export async function getServerLiveStats(redis: Redis, server: ServerRow) {
-  if (server.type !== 'plex') {
-    return {
-      statistics: await getPluginServerStats(redis, server.id),
-      bandwidth: [],
-      bandwidthSamples: [],
-      bandwidthAccounts: [],
-      bandwidthDevices: [],
-    };
+  const hostStats = SERVER_PROFILES[server.type].hostStats;
+  switch (hostStats) {
+    case 'plexStatistics':
+      return getPlexLiveStats(redis, server);
+    case 'ssePlugin':
+      return {
+        statistics: await getPluginServerStats(redis, server.id),
+        bandwidth: [],
+        bandwidthSamples: [],
+        bandwidthAccounts: [],
+        bandwidthDevices: [],
+      };
+    default:
+      return assertNever(hostStats);
   }
+}
 
+async function getPlexLiveStats(redis: Redis, server: PlexServerRow) {
   const [statistics, bandwidthStats] = await Promise.all([
     getServerResourceStats(redis, server),
     getServerBandwidthStats(redis, server),

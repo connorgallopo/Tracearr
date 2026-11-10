@@ -41,6 +41,7 @@ import { isLiveRow } from '../../services/liveServers.js';
 import type { CacheService, PubSubService, TerminationCooldown } from '../../services/cache.js';
 import { geoipService } from '../../services/geoip.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
+import { emailFromServer } from '../../services/mediaServer/byServerType.js';
 import { resolveSessionGeo, type SessionGeo } from '../../services/serverLocations.js';
 import {
   fetchRecentSessionsForIdentity,
@@ -1014,7 +1015,9 @@ async function processServerSessions(
             .set({
               username: processed.username,
               thumbUrl: processed.userThumb || existingServerUser.thumbUrl,
-              ...(server.type === 'plex' ? {} : { email: usernameAsEmail(processed.username) }),
+              ...(SERVER_PROFILES[server.type].emailSource === 'username'
+                ? { email: usernameAsEmail(processed.username) }
+                : {}),
               updatedAt: new Date(),
             })
             .where(eq(serverUsers.id, existingServerUser.id));
@@ -1062,7 +1065,7 @@ async function processServerSessions(
               serverId: server.id,
               externalId: u.externalId,
               username: u.username,
-              email: server.type === 'plex' ? null : usernameAsEmail(u.username),
+              email: emailFromServer(server.type, { username: u.username, email: null }),
               thumbUrl: u.thumbUrl,
             }))
           )

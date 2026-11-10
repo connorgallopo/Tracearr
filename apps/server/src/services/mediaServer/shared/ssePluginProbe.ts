@@ -1,4 +1,4 @@
-import type { PluginIssue, JellyfinEmbyServerType } from '@tracearr/shared';
+import { assertNever, type PluginIssue, type JellyfinEmbyServerType } from '@tracearr/shared';
 import { mediaBrowserTokenHeader } from './baseMediaServerClient.js';
 
 /**
@@ -58,14 +58,18 @@ export async function probeSsePlugin(config: {
     ) as PluginListEntry | undefined;
     if (!entry) return 'missing';
 
-    if (serverType === 'jellyfin') {
-      // Jellyfin PluginStatus: Active, Restart (pending restart), Malfunctioned,
-      // NotSupported, Disabled, Deleted, Superceded
-      if (entry.Status === 'Restart') return 'restart_required';
-      if (entry.Status !== undefined && entry.Status !== 'Active') return 'malfunctioned';
+    switch (serverType) {
+      case 'jellyfin':
+        // Jellyfin PluginStatus: Active, Restart (pending restart), Malfunctioned,
+        // NotSupported, Disabled, Deleted, Superceded
+        if (entry.Status === 'Restart') return 'restart_required';
+        if (entry.Status !== undefined && entry.Status !== 'Active') return 'malfunctioned';
+        return 'blocked';
+      case 'emby':
+        return 'blocked';
+      default:
+        return assertNever(serverType);
     }
-
-    return 'blocked';
   } catch {
     return 'unknown';
   }

@@ -1,6 +1,8 @@
 import {
   POSTER_IMAGE_SIZE,
+  assertNever,
   buildMediaServerItemUrl,
+  isServerType,
   memberFacingUrl,
   type EmailBrandingSettings,
   type EmailRichTextDoc,
@@ -81,15 +83,25 @@ export function substitutePosterRefs(
   });
 }
 
-const SERVER_TYPES = new Set<string>(['plex', 'jellyfin', 'emby']);
+/** Plex routes through app.plex.tv; a Jellyfin or Emby link opens on the server itself and needs an address members can reach. */
+function itemLinkBase(type: ServerType, server: ServerLink): string | null {
+  switch (type) {
+    case 'plex':
+      return server.url;
+    case 'jellyfin':
+    case 'emby':
+      return memberFacingUrl(server);
+    default:
+      return assertNever(type);
+  }
+}
 
-/** The item on its media server: Plex routes through app.plex.tv; a Jellyfin or Emby link opens on the server itself and needs an address members can reach. */
 function serverItemLink(server: ServerLink, ratingKey: string): EmailLink | null {
-  if (!SERVER_TYPES.has(server.type) || !ratingKey) return null;
-  const baseUrl = server.type === 'plex' ? server.url : memberFacingUrl(server);
+  if (!isServerType(server.type) || !ratingKey) return null;
+  const baseUrl = itemLinkBase(server.type, server);
   if (baseUrl === null) return null;
   const url = buildMediaServerItemUrl({
-    serverType: server.type as ServerType,
+    serverType: server.type,
     baseUrl,
     ratingKey,
     machineIdentifier: server.machineIdentifier,

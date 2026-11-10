@@ -18,6 +18,7 @@ import type {
   NotificationEventType,
   NotificationPriority,
   ServerType,
+  JellyfinEmbyServerType,
 } from '@tracearr/shared';
 import type { MediaQuality } from '../automations/types.js';
 import type {
@@ -70,7 +71,7 @@ export interface PluginUpdateContext {
   type: 'plugin_update_available';
   serverId: string;
   serverName: string;
-  serverType: string;
+  serverType: JellyfinEmbyServerType;
   installedVersion: string | null;
   latestVersion: string;
   downloadUrl: string;
@@ -346,7 +347,7 @@ export const PayloadBuilders = {
   fromPluginUpdate(
     serverId: string,
     serverName: string,
-    serverType: string,
+    serverType: JellyfinEmbyServerType,
     installedVersion: string | null,
     latestVersion: string,
     downloadUrl: string

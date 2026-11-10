@@ -4,7 +4,12 @@
 
 import type { FastifyPluginAsync } from 'fastify';
 import { and, isNotNull, isNull, eq } from 'drizzle-orm';
-import { setupStatusQuerySchema, type SetupStatus } from '@tracearr/shared';
+import {
+  assertNever,
+  setupStatusQuerySchema,
+  type ServerType,
+  type SetupStatus,
+} from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, users } from '../db/schema.js';
 import { isClaimCodeEnabled } from '../utils/claimCode.js';
@@ -21,6 +26,19 @@ async function quickConnectEnabled(url: string): Promise<boolean> {
   const enabled = await JellyfinClient.quickConnectEnabled(url);
   quickConnectCache.set(url, { enabled, checkedAt: Date.now() });
   return enabled;
+}
+
+/** Quick Connect is a Jellyfin feature; Plex and Emby have nothing like it. */
+async function offersQuickConnect(type: ServerType, url: string): Promise<boolean> {
+  switch (type) {
+    case 'jellyfin':
+      return quickConnectEnabled(url);
+    case 'plex':
+    case 'emby':
+      return false;
+    default:
+      return assertNever(type);
+  }
 }
 
 export const setupRoutes: FastifyPluginAsync = async (app) => {
@@ -72,7 +90,7 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
     const memberLoginServers = await Promise.all(
       loginServers.map(async ({ url, ...server }) => ({
         ...server,
-        quickConnect: server.type === 'jellyfin' && (await quickConnectEnabled(url)),
+        quickConnect: await offersQuickConnect(server.type, url),
       }))
     );
 

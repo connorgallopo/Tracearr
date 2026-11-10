@@ -1,5 +1,5 @@
-import { sql } from 'drizzle-orm';
-import type { ServerType } from '@tracearr/shared';
+import { sql, type SQL } from 'drizzle-orm';
+import { assertNever, type ServerType } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import type { MappedRequest } from './mapping.js';
 
@@ -99,14 +99,32 @@ async function byRatingKey(serverId: string, keys: string[]): Promise<Map<string
   return out;
 }
 
+/** Seerr names a Plex requester by plex.tv account id, a Jellyfin or Emby requester by the server's own user id. */
+function requesterIdentity(serverType: ServerType) {
+  switch (serverType) {
+    case 'plex':
+      return {
+        column: sql`plex_account_id`,
+        key: (r: ResolutionInput) => r.remotePlexId,
+      };
+    case 'jellyfin':
+    case 'emby':
+      return {
+        column: sql`external_id`,
+        key: (r: ResolutionInput) => r.remoteJellyfinUserId,
+      };
+    default:
+      return assertNever(serverType);
+  }
+}
+
 async function requesters(
   serverId: string,
-  serverType: ServerType,
+  column: SQL,
   keys: string[]
 ): Promise<Map<string, string>> {
   const out = new Map<string, string>();
   if (keys.length === 0) return out;
-  const column = serverType === 'plex' ? sql`plex_account_id` : sql`external_id`;
   const result = await db.execute(sql`
     SELECT ${column} AS key, id FROM server_users
     WHERE server_id = ${serverId} AND ${column} = ANY(${sql.param(keys)}::text[])
@@ -122,8 +140,7 @@ export async function resolveRequests(
 ): Promise<Map<number, Resolved>> {
   const movies = rows.filter((r) => r.mediaType === 'movie');
   const shows = rows.filter((r) => r.mediaType === 'show');
-  const requesterKey = (r: ResolutionInput) =>
-    serverType === 'plex' ? r.remotePlexId : r.remoteJellyfinUserId;
+  const requester = requesterIdentity(serverType);
 
   const movieHits = await moviesByTmdb(uniqueNumbers(movies.map((r) => r.tmdbId)));
   const showHits = await showsByIds(
@@ -131,7 +148,11 @@ export async function resolveRequests(
     uniqueNumbers(shows.map((r) => r.tmdbId))
   );
   const keyHits = await byRatingKey(serverId, uniqueStrings(rows.map((r) => r.ratingKey)));
-  const userHits = await requesters(serverId, serverType, uniqueStrings(rows.map(requesterKey)));
+  const userHits = await requesters(
+    serverId,
+    requester.column,
+    uniqueStrings(rows.map(requester.key))
+  );
 
   const out = new Map<number, Resolved>();
   for (const row of rows) {
@@ -144,7 +165,7 @@ export async function resolveRequests(
         (row.tmdbId != null ? showHits.byTmdb.get(row.tmdbId) : undefined);
     }
     hit ??= row.ratingKey ? keyHits.get(row.ratingKey) : undefined;
-    const key = requesterKey(row);
+    const key = requester.key(row);
     out.set(row.remoteId, {
       mediaId: hit?.id ?? null,
       serverUserId: key ? (userHits.get(key) ?? null) : null,

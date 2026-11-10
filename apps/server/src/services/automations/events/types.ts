@@ -4,6 +4,7 @@ import type {
   TriggerType as CatalogTriggerType,
   ViolationSeverity,
   ServerType,
+  JellyfinEmbyServerType,
 } from '@tracearr/shared';
 import type { db } from '../../../db/client.js';
 import type { sessions } from '../../../db/schema.js';
@@ -191,7 +192,7 @@ export interface ServerUpEvent extends BaseEvent {
 
 export interface PluginUpdateEvent extends BaseEvent {
   type: 'plugin.update_available';
-  server: EvaluationServer;
+  server: EvaluationServer & { type: JellyfinEmbyServerType };
   installedVersion: string | null;
   latestVersion: string;
   downloadUrl: string;

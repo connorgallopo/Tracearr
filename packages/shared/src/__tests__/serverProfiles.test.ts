@@ -11,4 +11,32 @@ describe('server profiles', () => {
     expect(SERVER_PROFILES.jellyfin.sessionIdentity).toBe('composite');
     expect(SERVER_PROFILES.emby.sessionIdentity).toBe('composite');
   });
+
+  it.each([
+    ['plex', 'plexWebsocket', 'plexStatistics', 'server', false],
+    ['jellyfin', 'ssePlugin', 'ssePlugin', 'username', true],
+    ['emby', 'ssePlugin', 'ssePlugin', 'username', true],
+  ] as const)('%s', (type, liveEvents, hostStats, emailSource, playerName) => {
+    expect(SERVER_PROFILES[type]).toMatchObject({
+      liveEvents,
+      hostStats,
+      emailSource,
+      playerNameCountsTowardDevice: playerName,
+    });
+  });
+
+  it.each([
+    ['plex', 'plexSessionId', false, true],
+    ['jellyfin', 'sessionKey', true, false],
+    ['emby', 'sessionKey', true, false],
+  ] as const)(
+    '%s terminates, identifies its install and links history',
+    (type, terminatesBy, userIds, links) => {
+      expect(SERVER_PROFILES[type]).toMatchObject({
+        terminatesBy,
+        userIdsIdentifyInstall: userIds,
+        linksImportedHistory: links,
+      });
+    }
+  );
 });
