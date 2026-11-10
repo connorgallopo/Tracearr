@@ -66,6 +66,9 @@ export function createSessionParsingTests(
           },
           TranscodingInfo: {
             Bitrate: 20000000,
+            VideoCodec: 'hevc',
+            IsVideoDirect: true,
+            IsAudioDirect: true,
           },
         };
 

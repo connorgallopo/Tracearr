@@ -6,6 +6,15 @@
       "type": "new",
       "text": "option under Settings → Access → Sign-in to make single sign-on the only way admins and members sign in",
       "refs": ["#1423"]
+    },
+    {
+      "type": "fix",
+      "text": "Jellyfin plays the server sends unchanged show as Direct Play, even when the client reports Direct Stream",
+      "refs": ["#1428"]
+    },
+    {
+      "type": "fix",
+      "text": "Jellyfin music no longer shows a video transcode, and a remuxed track no longer counts as a transcode"
     }
   ]
 }

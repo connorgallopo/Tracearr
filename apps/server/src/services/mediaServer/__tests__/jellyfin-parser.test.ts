@@ -45,7 +45,7 @@ createAllSharedParserTests(
 // ============================================================================
 
 describe('Jellyfin Parser - DirectStream Behavior', () => {
-  it('should normalize DirectStream to copy (remux)', () => {
+  it('treats DirectStream without TranscodingInfo as direct play (static file)', () => {
     const session = parseSession({
       Id: 'session-1',
       NowPlayingItem: { Id: '1', Name: 'Test', Type: 'Movie' },
@@ -56,9 +56,54 @@ describe('Jellyfin Parser - DirectStream Behavior', () => {
     });
 
     expect(session!.quality.isTranscode).toBe(false);
-    // Jellyfin normalizes DirectStream to 'copy' (video/audio streams copied, container may change)
-    expect(session!.quality.videoDecision).toBe('copy');
+    expect(session!.quality.videoDecision).toBe('directplay');
+    expect(session!.quality.audioDecision).toBe('directplay');
   });
+
+  it('treats TranscodingInfo with both streams copied as a remux whatever the client reports', () => {
+    const session = parseSession({
+      Id: 'session-1',
+      NowPlayingItem: { Id: '1', Name: 'Test', Type: 'Movie' },
+      PlayState: { PlayMethod: 'DirectStream', IsPaused: false },
+      TranscodingInfo: { VideoCodec: 'h264', IsVideoDirect: true, IsAudioDirect: true },
+    });
+
+    expect(session!.quality.isTranscode).toBe(false);
+    expect(session!.quality.videoDecision).toBe('copy');
+    expect(session!.quality.audioDecision).toBe('copy');
+  });
+
+  it('treats TranscodingInfo with re-encoded video as a transcode under a DirectPlay report', () => {
+    const session = parseSession({
+      Id: 'session-1',
+      NowPlayingItem: { Id: '1', Name: 'Test', Type: 'Movie' },
+      PlayState: { PlayMethod: 'DirectPlay', IsPaused: false },
+      TranscodingInfo: { VideoCodec: 'h264', IsVideoDirect: false, IsAudioDirect: true },
+    });
+
+    expect(session!.quality.isTranscode).toBe(true);
+    expect(session!.quality.videoDecision).toBe('transcode');
+    expect(session!.quality.audioDecision).toBe('copy');
+  });
+
+  it.each([
+    { isAudioDirect: true, audioDecision: 'copy', isTranscode: false },
+    { isAudioDirect: false, audioDecision: 'transcode', isTranscode: true },
+  ])(
+    'reads an audio-only job as video direct play (audio direct: $isAudioDirect)',
+    ({ isAudioDirect, audioDecision, isTranscode }) => {
+      const session = parseSession({
+        Id: 'session-1',
+        NowPlayingItem: { Id: '1', Name: 'Song', Type: 'Audio' },
+        PlayState: { PlayMethod: 'Transcode', IsPaused: false },
+        TranscodingInfo: { VideoCodec: null, IsVideoDirect: false, IsAudioDirect: isAudioDirect },
+      });
+
+      expect(session!.quality.videoDecision).toBe('directplay');
+      expect(session!.quality.audioDecision).toBe(audioDecision);
+      expect(session!.quality.isTranscode).toBe(isTranscode);
+    }
+  );
 
   it('should fall back to TranscodingInfo when PlayMethod not available', () => {
     const session = parseSession({
@@ -68,12 +113,60 @@ describe('Jellyfin Parser - DirectStream Behavior', () => {
         IsPaused: false,
       },
       TranscodingInfo: {
+        VideoCodec: 'h264',
         IsVideoDirect: false,
       },
     });
 
     expect(session!.quality.isTranscode).toBe(true);
     expect(session!.quality.videoDecision).toBe('transcode');
+  });
+});
+
+// ============================================================================
+// Jellyfin-Specific: TranscodingInfo held across reads
+// ============================================================================
+
+describe('Jellyfin Parser - TranscodingInfo latch', () => {
+  const read = (id: string, itemId: string, playMethod: string, withInfo: boolean) =>
+    parseSessionsResponse([
+      {
+        Id: id,
+        NowPlayingItem: { Id: itemId, Name: 'Test', Type: 'Movie' },
+        PlayState: { PlayMethod: playMethod, IsPaused: false },
+        ...(withInfo && {
+          TranscodingInfo: {
+            VideoCodec: 'h264',
+            IsVideoDirect: false,
+            IsAudioDirect: true,
+            Bitrate: 4_000_000,
+          },
+        }),
+      },
+    ])[0]!;
+
+  it('keeps a transcode steady when Jellyfin clears TranscodingInfo between reads', () => {
+    read('latch-hold', 'item-1', 'DirectStream', true);
+    const next = read('latch-hold', 'item-1', 'DirectStream', false);
+
+    expect(next.quality.isTranscode).toBe(true);
+    expect(next.quality.videoDecision).toBe('transcode');
+    expect(next.quality.bitrate).toBe(4000);
+  });
+
+  it('lets go when the client reports a different play method', () => {
+    read('latch-method', 'item-1', 'Transcode', true);
+    const next = read('latch-method', 'item-1', 'DirectPlay', false);
+
+    expect(next.quality.isTranscode).toBe(false);
+    expect(next.quality.videoDecision).toBe('directplay');
+  });
+
+  it('lets go when the session moves to another item', () => {
+    read('latch-item', 'item-1', 'DirectStream', true);
+    const next = read('latch-item', 'item-2', 'DirectStream', false);
+
+    expect(next.quality.videoDecision).toBe('directplay');
   });
 });
 
