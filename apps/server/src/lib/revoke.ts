@@ -8,7 +8,7 @@ import {
   serverUsers,
   users,
 } from '../db/schema.js';
-import { EmbyClient, JellyfinClient } from '../services/mediaServer/index.js';
+import { isJellyfinEmby, logoutUserToken } from '../services/mediaServer/index.js';
 import { createLogger } from '../utils/logger.js';
 import { disconnectUserSockets } from '../websocket/index.js';
 import { getAuth } from './auth.js';
@@ -88,9 +88,8 @@ export async function logoutMemberTokens(userId: string): Promise<void> {
         .from(servers)
         .where(eq(servers.id, serverId))
         .limit(1);
-      if (!server) continue;
-      const client = server.type === 'jellyfin' ? JellyfinClient : EmbyClient;
-      await client.logoutUserToken(server.url, account.accessToken);
+      if (!server || !isJellyfinEmby(server.type)) continue;
+      await logoutUserToken(server.type, server.url, account.accessToken);
     } catch {
       log.warn('server-side logout failed', { userId, serverId });
     }

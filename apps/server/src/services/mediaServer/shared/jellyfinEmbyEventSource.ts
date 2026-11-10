@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import { SSE_CONFIG, type SSEConnectionState, type JellyfinEmbyServerType } from '@tracearr/shared';
 import type { EventSourceFetchInit } from 'eventsource';
 import { parseHelloPayload } from '../../../utils/pluginVersion.js';
+import { mediaBrowserTokenHeader } from './baseMediaServerClient.js';
 
 // Plugin SSE endpoint paths per server type
 export const PLUGIN_SSE_PATH: Record<JellyfinEmbyServerType, string> = {
@@ -225,7 +226,7 @@ export class JellyfinEmbyEventSource extends EventEmitter {
 
     const path = PLUGIN_SSE_PATH[this.serverType];
     const url = `${this.baseUrl}${path}`;
-    const authHeaders = this.buildAuthHeaders();
+    const authHeaders = mediaBrowserTokenHeader(this.serverType, this.token);
 
     console.log(`[PluginSSE] Connecting to ${this.serverName} at ${url}`);
 
@@ -595,13 +596,6 @@ export class JellyfinEmbyEventSource extends EventEmitter {
       clearTimeout(this.connectionTimer);
       this.connectionTimer = null;
     }
-  }
-
-  private buildAuthHeaders(): Record<string, string> {
-    if (this.serverType === 'jellyfin') {
-      return { Authorization: `MediaBrowser Token="${this.token}"` };
-    }
-    return { 'X-Emby-Token': this.token };
   }
 
   private setState(state: SSEConnectionState): void {

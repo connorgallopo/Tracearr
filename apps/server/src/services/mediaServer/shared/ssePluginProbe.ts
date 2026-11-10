@@ -1,4 +1,5 @@
 import type { PluginIssue, JellyfinEmbyServerType } from '@tracearr/shared';
+import { mediaBrowserTokenHeader } from './baseMediaServerClient.js';
 
 /**
  * Asks the media server's own plugin list whether the Tracearr SSE plugin is
@@ -39,14 +40,10 @@ export async function probeSsePlugin(config: {
 }): Promise<PluginIssue> {
   const { baseUrl, serverType, token } = config;
   const url = `${baseUrl.replace(/\/$/, '')}${PLUGIN_LIST_PATH[serverType]}`;
-  const headers: Record<string, string> =
-    serverType === 'jellyfin'
-      ? { Authorization: `MediaBrowser Token="${token}"` }
-      : { 'X-Emby-Token': token };
 
   try {
     const response = await fetch(url, {
-      headers,
+      headers: mediaBrowserTokenHeader(serverType, token),
       signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
     });
     if (!response.ok) return 'unknown';

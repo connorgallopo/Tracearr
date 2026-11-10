@@ -14,13 +14,12 @@ import {
   PUBLIC_URL_PLEX_MESSAGE,
   type ServerConnectionStatus,
   type ServerDownReason,
-  type ServerType,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, plexAccounts, serverUsers, users } from '../db/schema.js';
 import { nonOwnerMayLoginThrough } from '../lib/authGuards.js';
 import { revokeUnlessStillIn } from '../lib/revoke.js';
-import { PlexClient, JellyfinClient, EmbyClient } from '../services/mediaServer/index.js';
+import { PlexClient, JellyfinClient, verifyServerAdmin } from '../services/mediaServer/index.js';
 import { getServerLiveStats, getServerResourceStats } from '../services/serverLiveStats.js';
 import { syncServer } from '../services/sync.js';
 import { sseManager } from '../services/sseManager.js';
@@ -34,12 +33,6 @@ import { readServerIdentity, sharesKnownUsers } from '../services/serverIdentity
 import { getSetting, rearmImportedHistoryLink } from '../services/settings.js';
 import { buildServerAccessCondition, hasServerAccess } from '../utils/serverFiltering.js';
 import { serverOrderBy } from '../utils/serverOrder.js';
-
-function verifyServerAdmin(type: ServerType, token: string, url: string) {
-  if (type === 'plex') return PlexClient.verifyServerAdmin(token, url);
-  if (type === 'jellyfin') return JellyfinClient.verifyServerAdmin(token, url);
-  return EmbyClient.verifyServerAdmin(token, url);
-}
 
 // Plex never reports INVALID_KEY, so one mapping serves all three server types.
 function replyAdminCheckFailure(reply: FastifyReply, check: { code: string; message: string }) {

@@ -22,7 +22,7 @@ import { importPlaybackReporting } from '../services/playbackReporting.js';
 import { getPubSubService } from '../services/cache.js';
 import { syncServer } from '../services/sync.js';
 import { HISTORICAL_IMPORT_MESSAGE } from '../services/liveServers.js';
-import { JellyfinClient, EmbyClient } from '../services/mediaServer/index.js';
+import { createJellyfinEmbyClient, isJellyfinEmby } from '../services/mediaServer/index.js';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
 import {
@@ -340,7 +340,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
     if (!server) {
       return reply.notFound('Server not found');
     }
-    if (server.type !== 'jellyfin' && server.type !== 'emby') {
+    if (!isJellyfinEmby(server.type)) {
       return reply.badRequest('Jellystat import only supports Jellyfin/Emby servers');
     }
     if (server.historicalAt) {
@@ -508,7 +508,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
     if (!server) {
       return reply.notFound('Server not found');
     }
-    if (server.type !== 'jellyfin' && server.type !== 'emby') {
+    if (!isJellyfinEmby(server.type)) {
       return reply.badRequest('Playback Reporting import only supports Jellyfin/Emby servers');
     }
     if (server.historicalAt) {
@@ -594,7 +594,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       if (!server) {
         return reply.notFound('Server not found');
       }
-      if (server.type !== 'jellyfin' && server.type !== 'emby') {
+      if (!isJellyfinEmby(server.type)) {
         return reply.badRequest('Playback Reporting import only supports Jellyfin/Emby servers');
       }
       if (server.historicalAt) {
@@ -607,8 +607,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         id: server.id,
         name: server.name,
       };
-      const client: JellyfinClient | EmbyClient =
-        server.type === 'emby' ? new EmbyClient(clientConfig) : new JellyfinClient(clientConfig);
+      const client = createJellyfinEmbyClient(server.type, clientConfig);
 
       try {
         const info = await client.getPlaybackReportingInfo();

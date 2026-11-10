@@ -18,7 +18,12 @@ vi.mock('../../../utils/crypto.js', () => ({
 
 import {
   createMediaServerClient,
-  supportsWatchHistory,
+  createJellyfinEmbyClient,
+  isJellyfinEmby,
+  logoutUserToken,
+  mediaBrowserAuthHeader,
+  mediaBrowserTokenHeader,
+  verifyServerAdmin,
   PlexClient,
   JellyfinClient,
   EmbyClient,
@@ -27,6 +32,7 @@ import {
   type MediaUser,
   type MediaLibrary,
 } from '../index.js';
+import { NOT_NEEDED } from '../types.js';
 
 // ============================================================================
 // Factory Function Tests
@@ -101,38 +107,70 @@ describe('createMediaServerClient', () => {
 });
 
 // ============================================================================
-// Type Guard Tests
+// Per-Server Decisions
 // ============================================================================
 
-describe('supportsWatchHistory', () => {
-  it('should return true for PlexClient', () => {
-    const client = createMediaServerClient({
-      type: 'plex',
-      url: 'http://plex.local:32400',
-      token: 'token',
-    });
-
-    expect(supportsWatchHistory(client)).toBe(true);
+describe('per-server decisions', () => {
+  it('jellyfin and emby clients say seasons, albums and file checks are not needed', async () => {
+    const clients: IMediaServerClient[] = [
+      new JellyfinClient({ url: 'http://jellyfin.local:8096', token: 't' }),
+      new EmbyClient({ url: 'http://emby.local:8096', token: 't' }),
+    ];
+    for (const client of clients) {
+      expect(await client.getLibrarySeasons('lib')).toBe(NOT_NEEDED);
+      expect(await client.getLibraryAlbums('lib')).toBe(NOT_NEEDED);
+      expect(await client.checkFilesExist(['1'])).toBe(NOT_NEEDED);
+    }
   });
 
-  it('should return true for JellyfinClient', () => {
-    const client = createMediaServerClient({
-      type: 'jellyfin',
-      url: 'http://jellyfin.local:8096',
-      token: 'token',
-    });
-
-    expect(supportsWatchHistory(client)).toBe(true);
+  it('picks the auth header by server', () => {
+    expect(mediaBrowserAuthHeader('jellyfin')).toBe('Authorization');
+    expect(mediaBrowserAuthHeader('emby')).toBe('X-Emby-Authorization');
   });
 
-  it('should return true for EmbyClient', () => {
-    const client = createMediaServerClient({
-      type: 'emby',
-      url: 'http://emby.local:8096',
-      token: 'token',
+  it('picks the token header by server', () => {
+    expect(mediaBrowserTokenHeader('jellyfin', 't')).toEqual({
+      Authorization: 'MediaBrowser Token="t"',
     });
+    expect(mediaBrowserTokenHeader('emby', 't')).toEqual({ 'X-Emby-Token': 't' });
+  });
 
-    expect(supportsWatchHistory(client)).toBe(true);
+  it('isJellyfinEmby is false for plex', () => {
+    expect(isJellyfinEmby('plex')).toBe(false);
+    expect(isJellyfinEmby('emby')).toBe(true);
+  });
+
+  it('creates the client class named by the server type', () => {
+    const config = { url: 'http://emby.local:8096', token: 't' };
+    expect(createJellyfinEmbyClient('jellyfin', config)).toBeInstanceOf(JellyfinClient);
+    expect(createJellyfinEmbyClient('emby', config)).toBeInstanceOf(EmbyClient);
+  });
+
+  it('verifies admin through the class for the server type', async () => {
+    const plex = vi.spyOn(PlexClient, 'verifyServerAdmin').mockResolvedValue({ success: true });
+    const jellyfin = vi
+      .spyOn(JellyfinClient, 'verifyServerAdmin')
+      .mockResolvedValue({ success: true });
+    const emby = vi.spyOn(EmbyClient, 'verifyServerAdmin').mockResolvedValue({ success: true });
+
+    await verifyServerAdmin('plex', 'p', 'http://plex');
+    await verifyServerAdmin('jellyfin', 'j', 'http://jellyfin');
+    await verifyServerAdmin('emby', 'e', 'http://emby');
+
+    expect(plex).toHaveBeenCalledExactlyOnceWith('p', 'http://plex');
+    expect(jellyfin).toHaveBeenCalledExactlyOnceWith('j', 'http://jellyfin');
+    expect(emby).toHaveBeenCalledExactlyOnceWith('e', 'http://emby');
+  });
+
+  it('logs a token out through the class for the server type', async () => {
+    const jellyfin = vi.spyOn(JellyfinClient, 'logoutUserToken').mockResolvedValue();
+    const emby = vi.spyOn(EmbyClient, 'logoutUserToken').mockResolvedValue();
+
+    await logoutUserToken('jellyfin', 'http://jellyfin', 'j');
+    await logoutUserToken('emby', 'http://emby', 'e');
+
+    expect(jellyfin).toHaveBeenCalledExactlyOnceWith('http://jellyfin', 'j');
+    expect(emby).toHaveBeenCalledExactlyOnceWith('http://emby', 'e');
   });
 });
 
@@ -316,10 +354,6 @@ describe('EmbyClient Static Methods', () => {
 describe('Module Exports', () => {
   it('should export createMediaServerClient factory', () => {
     expect(typeof createMediaServerClient).toBe('function');
-  });
-
-  it('should export supportsWatchHistory type guard', () => {
-    expect(typeof supportsWatchHistory).toBe('function');
   });
 
   it('should export PlexClient class', () => {

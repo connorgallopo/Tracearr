@@ -137,8 +137,8 @@ async function enrich(
   signal: DownloadSignal & { libraryItemId: string | null }
 ): Promise<DownloadEnrichment> {
   const [server] = await db.select().from(servers).where(eq(servers.id, signal.serverId)).limit(1);
-  const client = server ? createMediaServerClient(server) : null;
-  if (!server || !client?.describeDownloadSource) return NO_ENRICHMENT;
+  if (!server) return NO_ENRICHMENT;
+  const client = createMediaServerClient(server);
   const [[item], userId] = await Promise.all([
     signal.libraryItemId
       ? db

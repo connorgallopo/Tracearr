@@ -5,7 +5,7 @@ import { and, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import type { LoginAccess, UserRole, JellyfinEmbyServerType } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { authAccounts, servers, serverUsers, users } from '../db/schema.js';
-import { EmbyClient, JellyfinClient } from '../services/mediaServer/index.js';
+import { EmbyClient, JellyfinClient, logoutUserToken } from '../services/mediaServer/index.js';
 import { getOwnerUser } from '../services/userService.js';
 import { getSetting } from '../services/settings.js';
 import { createLogger } from '../utils/logger.js';
@@ -49,8 +49,7 @@ export async function createSignedInSession(ctx: Ctx, userId: string) {
 // The token is already a device on the media server; one Tracearr will not use is logged out
 // there rather than left behind.
 async function discardToken(input: MemberLoginInput, token: string): Promise<void> {
-  const client = input.providerId === 'jellyfin' ? JellyfinClient : EmbyClient;
-  await client.logoutUserToken(input.serverUrl, token).catch(() => {
+  await logoutUserToken(input.providerId, input.serverUrl, token).catch(() => {
     log.warn('could not log out an unused member token', { serverId: input.serverId });
   });
 }

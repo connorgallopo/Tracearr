@@ -24,6 +24,7 @@ vi.mock('../../../services/mediaServer/index.js', () => ({
 
 import { db } from '../../../db/client.js';
 import { createMediaServerClient } from '../../../services/mediaServer/index.js';
+import { NOT_NEEDED } from '../../../services/mediaServer/types.js';
 import { libraryDuplicateFilesRoute } from '../duplicatesFiles.js';
 import { permissionGuard } from '../../../lib/scope.js';
 
@@ -142,7 +143,9 @@ describe('GET /library/duplicates/files', () => {
     vi.mocked(db.execute).mockResolvedValue({
       rows: [itemRow({ server_type: 'jellyfin' })],
     } as never);
-    mockCreateClient.mockReturnValue({} as never);
+    mockCreateClient.mockReturnValue({
+      checkFilesExist: vi.fn().mockResolvedValue(NOT_NEEDED),
+    } as never);
 
     const app = await buildTestApp(
       { userId: randomUUID(), username: 'owner', role: 'owner', serverIds: [] },

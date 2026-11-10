@@ -123,7 +123,11 @@ import {
   maybeEnqueueImportedHistoryLink,
 } from '../librarySync.js';
 import { MEDIA_BUFFER_CAP, flushMediaAnnounceRun } from '../library/mediaAnnounce.js';
-import type { IMediaServerClient, MediaLibraryItem } from '../mediaServer/types.js';
+import {
+  NOT_NEEDED,
+  type IMediaServerClient,
+  type MediaLibraryItem,
+} from '../mediaServer/types.js';
 import type { LibrarySyncProgress } from '@tracearr/shared';
 import type { Redis } from 'ioredis';
 
@@ -406,19 +410,26 @@ function mockMediaServerClient(options: {
       items: options.leavesSince ?? [],
       totalCount: options.leavesCountSince ?? options.leavesSince?.length ?? 0,
     }),
-    // Undefined by default (JF/Emby never implement this) - assign a vi.fn() per test to opt in.
-    getLibrarySeasons: undefined as
-      | undefined
-      | ((
-          libraryId: string,
-          opts?: { offset?: number; limit?: number }
-        ) => Promise<{ items: MediaLibraryItem[]; totalCount: number; rawCount?: number }>),
-    getLibraryLeaves: undefined as IMediaServerClient['getLibraryLeaves'],
-    getLibraryAlbums: undefined as IMediaServerClient['getLibraryAlbums'],
-    getLibraryAlbumsSince: undefined as IMediaServerClient['getLibraryAlbumsSince'],
-    findExistingRatingKeys: undefined as
-      | undefined
-      | ((ratingKeys: string[], library: { id: string; type: string }) => Promise<Set<string>>),
+    // Answers like JF/Emby by default - assign a vi.fn() per test to opt in.
+    getLibrarySeasons: vi.fn<IMediaServerClient['getLibrarySeasons']>(async () => NOT_NEEDED),
+    getLibrarySeasonsSince: vi.fn<IMediaServerClient['getLibrarySeasonsSince']>(
+      async () => NOT_NEEDED
+    ),
+    getLibraryLeaves: vi.fn<IMediaServerClient['getLibraryLeaves']>(async () => ({
+      items: [],
+      totalCount: 0,
+    })),
+    getLibraryAlbums: vi.fn<IMediaServerClient['getLibraryAlbums']>(async () => NOT_NEEDED),
+    getLibraryAlbumsSince: vi.fn<IMediaServerClient['getLibraryAlbumsSince']>(
+      async () => NOT_NEEDED
+    ),
+    checkFilesExist: vi.fn<IMediaServerClient['checkFilesExist']>(async () => NOT_NEEDED),
+    findExistingRatingKeys: vi.fn<IMediaServerClient['findExistingRatingKeys']>(
+      async () => new Set()
+    ),
+    getServerIdentity: vi.fn(),
+    getSoftwareVersion: vi.fn(),
+    describeDownloadSource: vi.fn(),
     serverType: 'plex' as const,
     getSessions: vi.fn(),
     getUsers: vi.fn(),
@@ -2256,6 +2267,8 @@ describe('LibrarySyncService', () => {
       // Growth: pre-sync count (5) trails the server total (6), the incremental sync catches it up.
       vi.mocked(db.execute)
         .mockResolvedValueOnce({ rows: [{ count: 5 }] } as never)
+        // retireReplacedCopies: no other live copy of the synced media
+        .mockResolvedValueOnce({ rows: [] } as never)
         .mockResolvedValueOnce({ rows: [{ count: 6 }] } as never)
         // Fallback: rebuildSnapshotFromDb's aggregate query
         .mockResolvedValue({
@@ -2426,6 +2439,8 @@ describe('LibrarySyncService', () => {
       mockTransaction();
       // Growth: pre-sync count (5) trails the server total (6), the incremental sync catches it up.
       vi.mocked(db.execute)
+        // retireReplacedCopies: no other live copy of the synced media
+        .mockResolvedValueOnce({ rows: [] } as never)
         .mockResolvedValueOnce({ rows: [{ count: 5 }] } as never)
         .mockResolvedValueOnce({ rows: [{ count: 6 }] } as never)
         // Fallback: rebuildSnapshotFromDb's aggregate query
@@ -2520,7 +2535,10 @@ describe('LibrarySyncService', () => {
 
       setupSelectForIncrementalTest(mockServer);
       // New episodes don't change the top-level active count.
-      vi.mocked(db.execute).mockResolvedValue({ rows: [{ count: 5 }] } as never);
+      vi.mocked(db.execute)
+        // retireReplacedCopies: no other live copy of the synced media
+        .mockResolvedValueOnce({ rows: [] } as never)
+        .mockResolvedValue({ rows: [{ count: 5 }] } as never);
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
       mockTransaction();
@@ -2560,7 +2578,10 @@ describe('LibrarySyncService', () => {
       initLibrarySyncRedis(mockRedis);
 
       setupSelectForIncrementalTest(mockServer);
-      vi.mocked(db.execute).mockResolvedValue({ rows: [{ count: 5 }] } as never);
+      vi.mocked(db.execute)
+        // retireReplacedCopies: no other live copy of the synced media
+        .mockResolvedValueOnce({ rows: [] } as never)
+        .mockResolvedValue({ rows: [{ count: 5 }] } as never);
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
       mockTransaction();

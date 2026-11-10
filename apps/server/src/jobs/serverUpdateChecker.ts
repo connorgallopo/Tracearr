@@ -54,7 +54,7 @@ export async function installedVersionOf(server: CheckedServer): Promise<string 
       token: server.token,
       id: server.id,
     });
-    reported = (await client.getSoftwareVersion?.()) ?? null;
+    reported = await client.getSoftwareVersion();
   } catch (error) {
     logger.warn(`${server.name}: could not read its version`, { error });
     return null;

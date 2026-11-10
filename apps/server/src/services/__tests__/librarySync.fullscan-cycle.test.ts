@@ -54,6 +54,7 @@ import type { Redis } from 'ioredis';
 import type { ServerType } from '@tracearr/shared';
 import { LibrarySyncService, initLibrarySyncRedis } from '../librarySync.js';
 import { createMediaServerClient } from '../mediaServer/index.js';
+import { NOT_NEEDED } from '../mediaServer/types.js';
 import { db } from '../../db/client.js';
 
 const mockCreateClient = vi.mocked(createMediaServerClient);
@@ -168,6 +169,15 @@ function makeMockClient(
     }),
     getLibraryLeavesSince: vi.fn().mockResolvedValue({ items: [], totalCount: 0 }),
     getLibraryLeaves: vi.fn().mockResolvedValue({ items: [], totalCount: 0 }),
+    getLibrarySeasons: vi.fn().mockResolvedValue(NOT_NEEDED),
+    getLibrarySeasonsSince: vi.fn().mockResolvedValue(NOT_NEEDED),
+    getLibraryAlbums: vi.fn().mockResolvedValue(NOT_NEEDED),
+    getLibraryAlbumsSince: vi.fn().mockResolvedValue(NOT_NEEDED),
+    checkFilesExist: vi.fn().mockResolvedValue(NOT_NEEDED),
+    findExistingRatingKeys: vi.fn().mockResolvedValue(new Set()),
+    getServerIdentity: vi.fn(),
+    getSoftwareVersion: vi.fn(),
+    describeDownloadSource: vi.fn(),
     getSessions: vi.fn(),
     getUsers: vi.fn(),
     testConnection: vi.fn().mockResolvedValue(true),

@@ -73,6 +73,7 @@ function stubPlexClient(albums: MediaLibraryItem[]) {
     getLibraryItems: (_id: string, options?: { offset?: number }) => page([artist], options),
     getLibraryLeaves: (_id: string, options?: { offset?: number }) => page(tracks, options),
     getLibraryAlbums: (_id: string, options?: { offset?: number }) => page(albums, options),
+    findExistingRatingKeys: () => Promise.resolve(new Set<string>()),
   } as never);
 }
 

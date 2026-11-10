@@ -74,8 +74,7 @@ import {
   isRemapVetoed,
   resolveJellystatItemKey,
 } from './import/jellystatRemapVeto.js';
-import { EmbyClient } from './mediaServer/emby/client.js';
-import { JellyfinClient } from './mediaServer/jellyfin/client.js';
+import { createJellyfinEmbyClient, isJellyfinEmby } from './mediaServer/index.js';
 import { parseMediaType } from './mediaServer/shared/jellyfinEmbyUtils.js';
 import { markImportedServerLocations } from './serverLocations.js';
 import { getWatchedThresholds, watchedThresholdFor, type WatchedThresholds } from './settings.js';
@@ -734,7 +733,7 @@ export async function importJellystatBackup(
       throw new ServerHistoricalError(serverId);
     }
 
-    if (server.type !== 'jellyfin' && server.type !== 'emby') {
+    if (!isJellyfinEmby(server.type)) {
       throw new Error(`Jellystat import only supports Jellyfin/Emby servers, got: ${server.type}`);
     }
 
@@ -760,8 +759,7 @@ export async function importJellystatBackup(
         id: server.id,
         name: server.name,
       };
-      const client =
-        server.type === 'emby' ? new EmbyClient(clientConfig) : new JellyfinClient(clientConfig);
+      const client = createJellyfinEmbyClient(server.type, clientConfig);
 
       for (let i = 0; i < uniqueMediaIds.length; i += ENRICHMENT_BATCH_SIZE) {
         const batch = uniqueMediaIds.slice(i, i + ENRICHMENT_BATCH_SIZE);

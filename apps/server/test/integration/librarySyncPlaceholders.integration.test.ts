@@ -74,6 +74,7 @@ function stubPlexClient(library: {
       page(library.leaves ?? [], options),
     getLibrarySeasons: (_id: string, options?: { offset?: number }) =>
       page(library.seasons ?? [], options),
+    findExistingRatingKeys: () => Promise.resolve(new Set<string>()),
   } as never);
 }
 

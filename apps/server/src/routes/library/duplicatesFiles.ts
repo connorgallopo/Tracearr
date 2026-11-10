@@ -21,6 +21,7 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
+import { NOT_NEEDED } from '../../services/mediaServer/types.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { buildLibraryCacheKey } from './utils.js';
 import { serverCacheSegment } from '../../lib/scope.js';
@@ -99,10 +100,10 @@ export const libraryDuplicateFilesRoute: FastifyPluginAsync = async (app) => {
           id: serverId,
           name: serverId,
         });
-        if (!client.checkFilesExist) continue;
 
         try {
           const existence = await client.checkFilesExist(serverRows.map((r) => r.rating_key));
+          if (existence === NOT_NEEDED) continue;
           checked = true;
           for (const row of serverRows) {
             for (const [serverVersionKey, exists] of existence.get(row.rating_key) ?? []) {

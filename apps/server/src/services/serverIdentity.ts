@@ -30,7 +30,7 @@ export async function readServerIdentity(
     token: server.token,
     id: server.id,
   });
-  return client.getServerIdentity ? client.getServerIdentity() : null;
+  return client.getServerIdentity();
 }
 
 /**
