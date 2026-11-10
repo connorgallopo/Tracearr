@@ -17,6 +17,16 @@ export interface ServerProfile {
   playerNameCountsTowardDevice: boolean;
   /** History imported for this server is linked to library items after a library sync. */
   linksImportedHistory: boolean;
+  /** How the owner adds the server: picked from a linked Plex account, or by URL and API key. */
+  addServerAuth: 'plexOAuth' | 'apiKey';
+  /** Members sign in with their username and password on the server instead of through plex.tv. */
+  signsInWithServerPassword: boolean;
+  /** The server measures its own bandwidth, so the dashboard can chart it. */
+  reportsBandwidth: boolean;
+  /** A transcode reports separate video and audio bitrates; without them only the total stream bitrate is known. */
+  reportsTranscodeTrackBitrates: boolean;
+  /** Tautulli tracks this server, so its play history can be imported from Tautulli. */
+  importsTautulliHistory: boolean;
 }
 
 export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
@@ -29,6 +39,11 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     userIdsIdentifyInstall: false,
     playerNameCountsTowardDevice: false,
     linksImportedHistory: true,
+    addServerAuth: 'plexOAuth',
+    signsInWithServerPassword: false,
+    reportsBandwidth: true,
+    reportsTranscodeTrackBitrates: true,
+    importsTautulliHistory: true,
   },
   jellyfin: {
     sessionIdentity: 'composite',
@@ -39,6 +54,11 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     userIdsIdentifyInstall: true,
     playerNameCountsTowardDevice: true,
     linksImportedHistory: false,
+    addServerAuth: 'apiKey',
+    signsInWithServerPassword: true,
+    reportsBandwidth: false,
+    reportsTranscodeTrackBitrates: false,
+    importsTautulliHistory: false,
   },
   emby: {
     sessionIdentity: 'composite',
@@ -49,5 +69,10 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     userIdsIdentifyInstall: true,
     playerNameCountsTowardDevice: true,
     linksImportedHistory: false,
+    addServerAuth: 'apiKey',
+    signsInWithServerPassword: true,
+    reportsBandwidth: false,
+    reportsTranscodeTrackBitrates: false,
+    importsTautulliHistory: false,
   },
 };

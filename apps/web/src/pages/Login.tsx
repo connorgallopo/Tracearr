@@ -17,7 +17,12 @@ import { api, BASE_URL } from '@/lib/api';
 import { dropUserData } from '@/lib/queryCache';
 import { useSetupStatus } from '@/hooks/queries/useSetup';
 import { isNotPermitted, toastNotPermitted } from '@/lib/signInRefusal';
-import { SIGN_IN_ERROR_CODES, type PlexDiscoveredServer, type SetupStatus } from '@tracearr/shared';
+import {
+  SERVER_PROFILES,
+  SIGN_IN_ERROR_CODES,
+  type PlexDiscoveredServer,
+  type SetupStatus,
+} from '@tracearr/shared';
 import { LogoIcon } from '@/components/brand/Logo';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import { AuthFormError } from '@/components/auth/AuthFormError';
@@ -460,12 +465,15 @@ export function Login() {
     );
   }
 
-  const memberServers = memberLoginServers.filter((server) => server.type !== 'plex');
+  const memberServers = memberLoginServers.filter(
+    (server) => SERVER_PROFILES[server.type].signsInWithServerPassword
+  );
   // authMethods.plex is the owner's own Plex sign-in; a member's Plex server arrives in the
   // member list and signs in through the same button.
   const showPlex =
     authMethods.plex ||
-    (authMethods.member && memberLoginServers.some((server) => server.type === 'plex'));
+    (authMethods.member &&
+      memberLoginServers.some((server) => !SERVER_PROFILES[server.type].signsInWithServerPassword));
   const showMember = authMethods.member && !needsSetup && memberServers.length > 0;
   const hasPrimaryMethods = showPlex || authMethods.oidc;
   const hasFormMethods = authMethods.local || showMember;

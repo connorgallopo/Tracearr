@@ -18,7 +18,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import type { Server, ServerType } from '@tracearr/shared';
+import { SERVER_PROFILES, type Server, type ServerType } from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -34,6 +34,7 @@ import { EditServerDialog } from '@/components/settings/servers/EditServerDialog
 import { ServerRow } from '@/components/settings/servers/ServerRow';
 import { api } from '@/lib/api';
 import type { PlexDiscoveredServer } from '@/lib/api';
+import { isJellyfinEmby } from '@/lib/serverType';
 import { useAuth } from '@/hooks/useAuth';
 import { useSocket } from '@/hooks/useSocket';
 import {
@@ -81,16 +82,18 @@ export function Connections() {
   const [plexAccounts, setPlexAccounts] = useState<PlexAccountOption[]>([]);
   const [selectedPlexAccountId, setSelectedPlexAccountId] = useState<string | null>(null);
 
+  const plexOAuth = SERVER_PROFILES[serverType].addServerAuth === 'plexOAuth';
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   useEffect(() => {
-    if (user && !isOwner && serverType === 'plex') {
+    if (user && !isOwner && plexOAuth) {
       setServerType('jellyfin');
     }
-  }, [user, isOwner, serverType]);
+  }, [user, isOwner, plexOAuth]);
 
   const servers = Array.isArray(serversData)
     ? serversData
@@ -144,7 +147,7 @@ export function Connections() {
   };
 
   useEffect(() => {
-    if (showAddDialog && serverType === 'plex' && isOwner) {
+    if (showAddDialog && plexOAuth && isOwner) {
       void fetchPlexAccounts();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on dialog open, not on serverType changes
@@ -191,6 +194,7 @@ export function Connections() {
   };
 
   const handleAddServer = async () => {
+    if (!isJellyfinEmby(serverType)) return;
     if (!serverUrl || !serverName || !apiKey) {
       setConnectError(t('servers.allFieldsRequired'));
       return;
@@ -200,10 +204,10 @@ export function Connections() {
     setConnectError(null);
 
     try {
-      const connectFn =
-        serverType === 'jellyfin'
-          ? api.auth.connectJellyfinWithApiKey
-          : api.auth.connectEmbyWithApiKey;
+      const connectFn = {
+        jellyfin: api.auth.connectJellyfinWithApiKey,
+        emby: api.auth.connectEmbyWithApiKey,
+      }[serverType];
       await connectFn({
         serverUrl,
         serverName,
@@ -308,7 +312,7 @@ export function Connections() {
         onServerTypeChange={(newType) => {
           setServerType(newType);
           setConnectError(null);
-          if (newType === 'plex' && isOwner) {
+          if (SERVER_PROFILES[newType].addServerAuth === 'plexOAuth' && isOwner) {
             void fetchPlexAccounts();
           }
         }}

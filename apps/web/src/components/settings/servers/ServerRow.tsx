@@ -14,11 +14,12 @@ import {
 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type {
-  OwnerLinkServer,
-  RequestService,
-  Server,
-  ServerConnectionStatus,
+import {
+  SERVER_PROFILES,
+  type OwnerLinkServer,
+  type RequestService,
+  type Server,
+  type ServerConnectionStatus,
 } from '@tracearr/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -45,6 +46,7 @@ import { RequestServiceLine } from '@/components/settings/request-services';
 import { TooltipIconButton } from '@/components/settings/shared/TooltipIconButton';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/dateFormat';
+import { isJellyfinEmby } from '@/lib/serverType';
 
 const PLUGIN_ISSUES = ['blocked', 'restart_required', 'malfunctioned'];
 
@@ -162,7 +164,7 @@ export function ServerRow({
             )}
             {ownerLink && <OwnerAccountLine server={server} link={ownerLink} />}
 
-            {server.type !== 'plex' && !historical && (
+            {SERVER_PROFILES[server.type].liveEvents === 'ssePlugin' && !historical && (
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                 {!connectionStatus ? (
                   <span className="text-muted-foreground">{t('servers.checkingConnection')}</span>
@@ -246,9 +248,9 @@ export function ServerRow({
         </Item>
       </TooltipProvider>
 
-      {server.type !== 'plex' && realtimeDialog && (
+      {isJellyfinEmby(server.type) && realtimeDialog && (
         <RealtimeSetupDialog
-          server={server}
+          serverType={server.type}
           open
           onClose={() => setRealtimeDialog(null)}
           mode={realtimeDialog}

@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Loader2 } from 'lucide-react';
-import { SERVER_COLOR_PALETTE, pickServerColor, serverLocationsSchema } from '@tracearr/shared';
+import {
+  SERVER_COLOR_PALETTE,
+  SERVER_PROFILES,
+  pickServerColor,
+  serverLocationsSchema,
+} from '@tracearr/shared';
 import type { Server } from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,12 +22,14 @@ import { Input } from '@/components/ui/input';
 import { ColorSwatchPicker } from '@/components/settings/shared/ColorSwatchPicker';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import { api } from '@/lib/api';
+import { isJellyfinEmby } from '@/lib/serverType';
 import { cn } from '@/lib/utils';
 import {
   usePlexServerConnections,
   useServerLocations,
   useUpdateServerLocations,
 } from '@/hooks/queries';
+import { API_KEY_HELP } from './AddServerDialog';
 import { SERVER_DIALOG_CONTENT_CLASS } from './dialogClasses';
 import { ServerLocationEditor } from './ServerLocationEditor';
 import { draftsKey, toDrafts, toEntries, type LocationDraft } from './serverLocationDrafts';
@@ -63,7 +70,7 @@ export function EditServerDialog({
   const [editApiKey, setEditApiKey] = useState('');
   const [editColor, setEditColor] = useState<string>(SERVER_COLOR_OPTIONS[3]?.hex ?? '#3B82F6');
   const [seededServer, setSeededServer] = useState<Server | null>(null);
-  const isPlexServer = server?.type === 'plex';
+  const plexOAuth = !!server && SERVER_PROFILES[server.type].addServerAuth === 'plexOAuth';
   const locked = !!server?.historicalAt;
   const {
     data: locationData,
@@ -76,7 +83,7 @@ export function EditServerDialog({
   const [locationsSeededFor, setLocationsSeededFor] = useState<string | null>(null);
 
   const { data: connectionsData, isLoading: isLoadingConnections } = usePlexServerConnections(
-    isPlexServer && !locked ? server?.id : undefined
+    plexOAuth && !locked ? server?.id : undefined
   );
 
   // Re-seed from the server prop each time the dialog opens for one, rather than in an
@@ -122,9 +129,9 @@ export function EditServerDialog({
   const hasNameChange = server ? editName.trim() !== server.name : false;
   const hasUrlChange = server && !locked ? manualUrl.trim() !== server.url : false;
   const hasPublicUrlChange =
-    server && !isPlexServer ? manualPublicUrl.trim() !== (server.publicUrl ?? '') : false;
+    server && !plexOAuth ? manualPublicUrl.trim() !== (server.publicUrl ?? '') : false;
   const hasColorChange = server ? editColor !== (server.color ?? '') : false;
-  const hasApiKeyChange = server && !isPlexServer && !locked ? editApiKey.trim().length > 0 : false;
+  const hasApiKeyChange = server && !plexOAuth && !locked ? editApiKey.trim().length > 0 : false;
   const hasServerChange =
     hasNameChange || hasUrlChange || hasPublicUrlChange || hasColorChange || hasApiKeyChange;
   const canSave =
@@ -170,7 +177,7 @@ export function EditServerDialog({
             />
           </Field>
 
-          {isPlexServer ? (
+          {plexOAuth ? (
             <Field>
               <FieldTitle>{t('servers.serverUrl')}</FieldTitle>
               {isLoadingConnections ? (
@@ -254,9 +261,7 @@ export function EditServerDialog({
                 <FieldDescription>
                   {locked
                     ? t('servers.resumeFirst')
-                    : server.type === 'jellyfin'
-                      ? t('servers.apiKeyHelpJellyfin')
-                      : t('servers.apiKeyHelpEmby')}
+                    : isJellyfinEmby(server.type) && t(API_KEY_HELP[server.type])}
                 </FieldDescription>
               </Field>
             </>

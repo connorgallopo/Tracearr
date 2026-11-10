@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { SERVER_TYPES, assertNever, isServerType } from '../index.js';
-import { serverTypeSchema } from '../schemas.js';
+import { createServerSchema, serverTypeSchema } from '../schemas.js';
 
 describe('server types', () => {
   it('keeps the three server types in order', () => {
@@ -15,5 +15,17 @@ describe('server types', () => {
 
   it('assertNever throws with the value', () => {
     expect(() => assertNever('silo' as never)).toThrow('Unhandled value: silo');
+  });
+
+  it.each([
+    ['plex', false],
+    ['jellyfin', true],
+    ['emby', true],
+  ] as const)('a %s server accepts a public address: %s', (type, accepted) => {
+    const server = { name: 'Den', type, url: 'http://10.0.0.2:8096', token: 'key' };
+    expect(createServerSchema.safeParse(server).success).toBe(true);
+    expect(
+      createServerSchema.safeParse({ ...server, publicUrl: 'https://media.example.com' }).success
+    ).toBe(accepted);
   });
 });

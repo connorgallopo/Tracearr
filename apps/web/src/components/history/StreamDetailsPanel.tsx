@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { cn } from '@/lib/utils';
 import {
   PLAYBACK_DECISION_LABEL_KEYS,
+  SERVER_PROFILES,
   formatBitrate,
   formatMediaTech,
   formatResolutionDisplay,
@@ -335,7 +336,7 @@ export function StreamDetailsPanel({
                   // Show N/A with tooltip for Jellyfin/Emby transcodes without stream bitrate
                   videoDecision === 'transcode' &&
                   !streamVideoDetails?.bitrate &&
-                  serverType !== 'plex' ? (
+                  !SERVER_PROFILES[serverType].reportsTranscodeTrackBitrates ? (
                     <UnavailableBitrate />
                   ) : (
                     formatBitrate(streamVideoDetails?.bitrate ?? sourceVideoDetails?.bitrate)
@@ -423,7 +424,7 @@ export function StreamDetailsPanel({
                 // Show N/A with tooltip for Jellyfin/Emby transcodes without stream bitrate
                 audioDecision === 'transcode' &&
                 !streamAudioDetails?.bitrate &&
-                serverType !== 'plex' ? (
+                !SERVER_PROFILES[serverType].reportsTranscodeTrackBitrates ? (
                   <UnavailableBitrate />
                 ) : (
                   formatBitrate(streamAudioDetails?.bitrate ?? sourceAudioDetails?.bitrate)

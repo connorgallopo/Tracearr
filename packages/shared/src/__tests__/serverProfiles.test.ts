@@ -39,4 +39,21 @@ describe('server profiles', () => {
       });
     }
   );
+
+  it.each([
+    ['plex', 'plexOAuth', false, true, true, true],
+    ['jellyfin', 'apiKey', true, false, false, false],
+    ['emby', 'apiKey', true, false, false, false],
+  ] as const)(
+    '%s adds, signs in, reports bandwidth and bitrates, and imports from Tautulli',
+    (type, addServerAuth, password, bandwidth, trackBitrates, tautulli) => {
+      expect(SERVER_PROFILES[type]).toMatchObject({
+        addServerAuth,
+        signsInWithServerPassword: password,
+        reportsBandwidth: bandwidth,
+        reportsTranscodeTrackBitrates: trackBitrates,
+        importsTautulliHistory: tautulli,
+      });
+    }
+  );
 });

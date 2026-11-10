@@ -20,7 +20,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useServer } from '@/hooks/useServer';
 import { useServerColorMap } from '@/hooks/useServerColorMap';
 import { useSocket } from '@/hooks/useSocket';
-import { pickServerColor } from '@tracearr/shared';
+import { SERVER_PROFILES, pickServerColor } from '@tracearr/shared';
 import { formatWatchTime } from '@/lib/dateFormat';
 import { cn } from '@/lib/utils';
 
@@ -56,7 +56,7 @@ function ServerDashboard({ actions }: { actions?: ReactNode }) {
   // Single-server view: Plex always shows the section; Jellyfin/Emby show it
   // once the SSE plugin's server.stats samples start arriving
   const singleServer = !isMultiServer ? selectedServers[0] : undefined;
-  const singleIsPlex = singleServer?.type === 'plex';
+  const singleProfile = singleServer && SERVER_PROFILES[singleServer.type];
 
   // Multi-server view fans out to every selected server and overlays one
   // line per server that reports data. Servers without a stats source yet
@@ -82,13 +82,13 @@ function ServerDashboard({ actions }: { actions?: ReactNode }) {
   const showServerResources =
     !!singleServer &&
     !singleServer.historicalAt &&
-    (singleIsPlex || (serverStats?.length ?? 0) > 0);
+    (singleProfile?.hostStats === 'plexStatistics' || (serverStats?.length ?? 0) > 0);
 
   const liveSelected = selectedServers.filter((s) => !s.historicalAt);
 
-  // Plex measures bandwidth; Jellyfin/Emby have no source for it
   const showBandwidthChart =
-    singleIsPlex || (isMultiServer && liveSelected.some((s) => s.type === 'plex'));
+    !!singleProfile?.reportsBandwidth ||
+    (isMultiServer && liveSelected.some((s) => SERVER_PROFILES[s.type].reportsBandwidth));
   const singleProcessLabel = singleServer
     ? { plex: 'Plex Media Server', jellyfin: 'Jellyfin', emby: 'Emby' }[singleServer.type]
     : undefined;
@@ -105,7 +105,9 @@ function ServerDashboard({ actions }: { actions?: ReactNode }) {
     (s) => s.statistics.length > 0 || s.bandwidth.length > 0
   );
   const showMultiServerResources =
-    isMultiServer && (hasAnyMultiData || liveSelected.some((s) => s.type === 'plex'));
+    isMultiServer &&
+    (hasAnyMultiData ||
+      liveSelected.some((s) => SERVER_PROFILES[s.type].hostStats === 'plexStatistics'));
 
   const seriesMeta = useCallback(
     (serverId: string) => {
