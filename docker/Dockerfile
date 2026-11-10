@@ -44,7 +44,7 @@ RUN apk upgrade --no-cache && apk add --no-cache postgresql-client
 # trails upstream, so this takes Tailscale's static build at the same pin as
 # Dockerfile.supervised.
 # renovate: datasource=deb depName=tailscale
-ARG TAILSCALE_VERSION=1.104.4
+ARG TAILSCALE_VERSION=1.104.5
 ARG TARGETARCH
 RUN wget -qO /tmp/tailscale.tgz "https://pkgs.tailscale.com/stable/tailscale_${TAILSCALE_VERSION}_${TARGETARCH}.tgz" \
     && tar -xzf /tmp/tailscale.tgz -C /tmp \
