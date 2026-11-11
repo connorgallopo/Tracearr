@@ -325,6 +325,26 @@ describe('killQueue', () => {
       ]);
     });
 
+    it('stores a refused kill once on its first attempt, without a retry', async () => {
+      mockReverifyKillCondition.mockResolvedValue({
+        outcome: 'refused',
+        error: 'this tofa API key cannot stop streams',
+      });
+      const data = makeData();
+
+      await expect(processKillJob(makeJob(data, 0, 3))).resolves.toBeUndefined();
+
+      expect(mockReverifyKillCondition).toHaveBeenCalledTimes(1);
+      expect(mockStoreActionResults).toHaveBeenCalledTimes(1);
+      expect(mockStoreActionResults).toHaveBeenCalledWith(data.violationId, data.ruleId, [
+        {
+          action: { type: 'kill_stream' },
+          success: false,
+          message: 'this tofa API key cannot stop streams',
+        },
+      ]);
+    });
+
     it('passes a null violationId through to storeActionResults unchanged', async () => {
       mockReverifyKillCondition.mockResolvedValue({ outcome: 'killed' });
 

@@ -292,3 +292,74 @@ describe('Jellyfin Parser - transcode progress parity', () => {
     expect(info?.speed).toBeUndefined();
   });
 });
+
+describe('Jellyfin Parser - Live TV', () => {
+  const channel = {
+    Id: 'channel-5',
+    Type: 'TvChannel',
+    Name: 'NBC 5',
+    ChannelNumber: '5.1',
+    ChannelId: '00000000-0000-0000-0000-000000000000',
+    ImageTags: { Primary: 'logo' },
+  };
+
+  it('names the program on air, its show and its channel', () => {
+    const session = parseSession({
+      Id: 'session-1',
+      NowPlayingItem: {
+        ...channel,
+        CurrentProgram: {
+          Id: 'program-9',
+          Name: 'Friends',
+          EpisodeTitle: "The One with Phoebe's Ex-Partner",
+          ParentIndexNumber: 3,
+          IndexNumber: 14,
+          ImageTags: { Primary: 'still' },
+        },
+      },
+    });
+
+    expect(session?.media).toMatchObject({
+      type: 'live',
+      title: "The One with Phoebe's Ex-Partner",
+      thumbPath: '/Items/program-9/Images/Primary',
+    });
+    expect(session?.episode).toEqual({ showTitle: 'Friends', seasonNumber: 3, episodeNumber: 14 });
+    expect(session?.live).toEqual({
+      channelTitle: 'NBC 5',
+      channelIdentifier: '5.1',
+      channelThumb: '/Items/channel-5/Images/Primary',
+    });
+  });
+
+  it('titles a program that is not an episode by its name', () => {
+    const session = parseSession({
+      Id: 'session-1',
+      NowPlayingItem: { ...channel, CurrentProgram: { Id: 'program-2', Name: 'News at 3' } },
+    });
+
+    expect(session?.media.title).toBe('News at 3');
+    expect(session?.episode).toBeUndefined();
+  });
+
+  it('goes back to the channel once the program it started on has ended', () => {
+    const session = parseSession({
+      Id: 'session-1',
+      NowPlayingItem: {
+        ...channel,
+        CurrentProgram: { Id: 'program-2', Name: 'News at 3', EndDate: '2020-01-01T16:00:00Z' },
+      },
+    });
+
+    expect(session?.media.title).toBe('NBC 5');
+  });
+
+  it('keeps the channel as the title when no program is known', () => {
+    const session = parseSession({ Id: 'session-1', NowPlayingItem: channel });
+
+    expect(session?.media).toMatchObject({
+      title: 'NBC 5',
+      thumbPath: '/Items/channel-5/Images/Primary',
+    });
+  });
+});

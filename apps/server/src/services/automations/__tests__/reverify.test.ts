@@ -185,6 +185,104 @@ describe('reverifyKillCondition', () => {
     });
   });
 
+  function mockRuleStillMatches() {
+    const ruleRow = makeRuleRow();
+    mockRuleSelect(ruleRow);
+    mockEvaluateRulesAsync.mockResolvedValue([
+      { ruleId: ruleRow.id, ruleName: ruleRow.name, matched: true, matchedGroups: [0], actions: [] },
+    ]);
+    return ruleRow.id;
+  }
+
+  it("records a kill tofa's key may not perform once, with the reason, when the condition still holds", async () => {
+    const target = makeSessionRow();
+    mockSessionFindFirst.mockResolvedValue({
+      ...target,
+      server: { ...(target.server as object), type: 'tofa', canStopStreams: false },
+    });
+    const ruleId = mockRuleStillMatches();
+    const violationId = randomUUID();
+
+    const result = await reverifyKillCondition({
+      triggeringSessionId: target.id as string,
+      targetSessionId: target.id as string,
+      serverId: target.serverId as string,
+      ruleId,
+      violationId,
+      message: 'Too many streams',
+    });
+
+    expect(result).toEqual({
+      outcome: 'refused',
+      error: 'this tofa API key cannot stop streams',
+    });
+    expect(mockTerminateSession).toHaveBeenCalledTimes(1);
+    expect(mockTerminateSession).toHaveBeenCalledWith(
+      expect.objectContaining({ sessionId: target.id, trigger: 'rule', ruleId, violationId })
+    );
+  });
+
+  it('records a kill of a tofa live viewer with no playback session once, with the reason, when the condition still holds', async () => {
+    const target = makeSessionRow({ mediaType: 'live', sessionKey: 'viewer:viewer-1' });
+    mockSessionFindFirst.mockResolvedValue({
+      ...target,
+      server: { ...(target.server as object), type: 'tofa', canStopStreams: true },
+    });
+
+    const result = await reverifyKillCondition({
+      triggeringSessionId: target.id as string,
+      targetSessionId: target.id as string,
+      serverId: target.serverId as string,
+      ruleId: mockRuleStillMatches(),
+      message: 'Too many streams',
+    });
+
+    expect(result).toEqual({
+      outcome: 'refused',
+      error: 'tofa has no way for Tracearr to stop a live TV viewer without a playback session',
+    });
+    expect(mockTerminateSession).toHaveBeenCalledTimes(1);
+  });
+
+  it('skips a tofa kill its key may not perform as rule gone, like any other server, without recording a failure', async () => {
+    const target = makeSessionRow();
+    mockSessionFindFirst.mockResolvedValue({
+      ...target,
+      server: { ...(target.server as object), type: 'tofa', canStopStreams: false },
+    });
+    mockRuleSelect(undefined);
+
+    const result = await reverifyKillCondition({
+      triggeringSessionId: target.id as string,
+      targetSessionId: target.id as string,
+      serverId: target.serverId as string,
+      ruleId: randomUUID(),
+    });
+
+    expect(result.outcome).toBe('skipped_rule_gone');
+    expect(mockTerminateSession).not.toHaveBeenCalled();
+  });
+
+  it('takes a Plex target on to re-verification whatever its stored stop permission', async () => {
+    const target = makeSessionRow();
+    mockSessionFindFirst.mockResolvedValue({
+      ...target,
+      server: { ...(target.server as object), canStopStreams: false },
+    });
+    mockRuleSelect(undefined);
+
+    const result = await reverifyKillCondition({
+      triggeringSessionId: target.id as string,
+      targetSessionId: target.id as string,
+      serverId: target.serverId as string,
+      ruleId: randomUUID(),
+    });
+
+    expect(result.outcome).toBe('skipped_rule_gone');
+    expect(mockDbSelect).toHaveBeenCalled();
+    expect(mockTerminateSession).not.toHaveBeenCalled();
+  });
+
   it('returns skipped_already_stopped when the session row is gone', async () => {
     mockSessionFindFirst.mockResolvedValue(undefined);
 

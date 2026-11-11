@@ -13,6 +13,7 @@ import {
   SEVERITY_LEVELS,
   getSeverityPriority,
   formatEpisodeLabel,
+  namesShow,
   fitText,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
@@ -105,19 +106,19 @@ const RECEIPT_MAX_AGE_MS = 60 * 60 * 1000; // 1 hour - receipts older than this 
  * TV Shows: "Show Name - S01E05 Episode Title" or "Show Name - S01E05"
  */
 function formatMediaTitle(session: ActiveSession): string {
-  const { mediaType, mediaTitle, grandparentTitle, seasonNumber, episodeNumber } = session;
+  const { mediaTitle, seasonNumber, episodeNumber } = session;
 
   // For episodes, format as "Show - S01E05 Episode"
-  if (mediaType === 'episode' && grandparentTitle) {
+  if (namesShow(session)) {
     // Fall back to 0 for a genuinely missing season/episode so the notification
     // still shows a code (e.g. "S00E00") instead of dropping it entirely.
     const episodeCode = formatEpisodeLabel(seasonNumber ?? 0, episodeNumber ?? 0) ?? 'S00E00';
 
     // If episode title is different from show title, include it
-    if (mediaTitle && mediaTitle !== grandparentTitle) {
-      return `${grandparentTitle} - ${episodeCode} ${mediaTitle}`;
+    if (mediaTitle && mediaTitle !== session.grandparentTitle) {
+      return `${session.grandparentTitle} - ${episodeCode} ${mediaTitle}`;
     }
-    return `${grandparentTitle} - ${episodeCode}`;
+    return `${session.grandparentTitle} - ${episodeCode}`;
   }
 
   // For movies and other media, just use the title

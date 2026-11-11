@@ -10,19 +10,21 @@ import type { Redis } from 'ioredis';
 import { automationsLogger } from '../../../utils/logger.js';
 import type { NotificationEvent } from '../../notifications/events.js';
 
-const { mockEnqueueNotification, mockApplyTrustChange, mockDispatchTrustChanged } = vi.hoisted(
-  () => ({
+const { mockEnqueueNotification, mockApplyTrustChange, mockDispatchTrustChanged, mockFindSession } =
+  vi.hoisted(() => ({
     mockEnqueueNotification: vi.fn().mockResolvedValue(2),
     mockApplyTrustChange: vi.fn(),
     mockDispatchTrustChanged: vi.fn().mockResolvedValue(undefined),
-  })
-);
+    mockFindSession: vi.fn(),
+  }));
 
 vi.mock('../../../jobs/notificationQueue.js', () => ({
   enqueueNotification: mockEnqueueNotification,
 }));
 
-vi.mock('../../../db/client.js', () => ({ db: {} }));
+vi.mock('../../../db/client.js', () => ({
+  db: { query: { sessions: { findFirst: mockFindSession } } },
+}));
 
 vi.mock('../../../jobs/poller/database.js', () => ({
   invalidateAutomationsCache: vi.fn(),
@@ -37,7 +39,7 @@ vi.mock('../events/producers.js', () => ({
   dispatchTrustChanged: mockDispatchTrustChanged,
 }));
 
-import { createActionExecutorDeps } from '../v2Integration.js';
+import { TOFA_MESSAGE_UNAVAILABLE, createActionExecutorDeps } from '../v2Integration.js';
 
 const event: NotificationEvent = {
   type: 'violation',
@@ -102,6 +104,20 @@ describe('createActionExecutorDeps - trust', () => {
     await createActionExecutorDeps(redis).resetUserTrust('su-1', 'Sharing penalty');
 
     expect(mockDispatchTrustChanged).not.toHaveBeenCalled();
+  });
+});
+
+describe('createActionExecutorDeps - sendClientMessage', () => {
+  it('fails on a tofa session with the reason, since tofa cannot message without stopping', async () => {
+    mockFindSession.mockResolvedValue({
+      id: 'sess-1',
+      sessionKey: 'tofa-session',
+      server: { type: 'tofa', url: 'http://tofa.local:33333', token: 'key', historicalAt: null },
+    });
+
+    await expect(
+      createActionExecutorDeps({} as Redis).sendClientMessage('sess-1', 'Please stop', new Date())
+    ).rejects.toThrow(TOFA_MESSAGE_UNAVAILABLE);
   });
 });
 

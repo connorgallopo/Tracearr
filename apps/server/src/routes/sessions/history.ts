@@ -237,6 +237,7 @@ const HISTORY_ROW_COLUMNS = sql`
     s.geo_asn_number,
     s.geo_asn_organization,
     ${localSessionSql('s')} AS is_local,
+    s.profile_name,
     s.player_name,
     s.device_id,
     s.product,

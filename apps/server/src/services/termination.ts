@@ -10,6 +10,7 @@ import { db } from '../db/client.js';
 import { terminationLogs, sessions } from '../db/schema.js';
 import { readSessionRow, sessionRowById } from '../db/sessions/row.js';
 import { createMediaServerClient } from './mediaServer/index.js';
+import { stopRefusal } from './mediaServer/byServerType.js';
 import { getCacheService, getPubSubService } from './cache.js';
 import { toRuleSession } from './automations/events/contextAssembly.js';
 import { dispatchSessionStopped } from './automations/events/producers.js';
@@ -36,7 +37,7 @@ export interface TerminateSessionOptions {
   /** For rule: the violation record */
   violationId?: string;
 
-  /** Message to display to user (Plex only, ignored by Jellyfin/Emby) */
+  /** Message to display to user (Plex and tofa; ignored by Jellyfin/Emby) */
   reason?: string;
 
   /** The session's start when the caller holds it, so the lookup skips the older chunks */
@@ -131,6 +132,21 @@ export async function terminateSession(
       terminationLogId: logEntries[0]?.id ?? '',
       error: 'Server is historical',
       outcome: 'server_historical',
+    };
+  }
+
+  const refusal = stopRefusal(session);
+  if (refusal) {
+    const logEntries = await db
+      .insert(terminationLogs)
+      .values({ ...logBase, success: false, errorMessage: refusal })
+      .returning({ id: terminationLogs.id });
+
+    return {
+      success: false,
+      terminationLogId: logEntries[0]?.id ?? '',
+      error: refusal,
+      outcome: 'failed',
     };
   }
 

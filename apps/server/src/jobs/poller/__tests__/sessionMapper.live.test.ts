@@ -68,10 +68,4 @@ describe('pickLiveSessionFields', () => {
     expect('ipAddress' in live).toBe(false);
     expect('id' in live).toBe(false);
   });
-
-  it('nulls season and episode for non-episode media', () => {
-    const live = pickLiveSessionFields({ ...processed, mediaType: 'movie' });
-    expect(live.seasonNumber).toBeNull();
-    expect(live.episodeNumber).toBeNull();
-  });
 });
