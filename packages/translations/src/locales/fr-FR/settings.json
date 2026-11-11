@@ -403,6 +403,8 @@
       "media": "Permettre la connexion des administrateurs et des membres",
       "mediaDesc": "",
       "servers": "",
+      "ssoOnly": "",
+      "ssoOnlyDesc": "",
       "overrides": "",
       "overridesDesc": "",
       "overridesEmpty": "",
