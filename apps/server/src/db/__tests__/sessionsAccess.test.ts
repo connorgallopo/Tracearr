@@ -74,6 +74,7 @@ const ALLOWLIST: Record<string, string> = {
   'services/dashboardStats.ts': STATS,
   'services/historicalServers.ts': OPEN_ROWS,
   'services/import/deduplication.ts': IMPORTS,
+  'services/import/tofaHistory.ts': IMPORTS,
   'services/library/importedPlayIdentity.ts': IMPORTS,
   'services/library/mediaDetailService.ts':
     'media detail plays and watch time per server, user, device',

@@ -174,3 +174,19 @@ describe('EmbyClient.resolveUserGuid', () => {
     expect(mockFetchJson.mock.calls[0]?.[0]).toBe(`${URL}/Users/16`);
   });
 });
+
+describe('EmbyClient sync cursor', () => {
+  it('reads a date cursor with the requests a date always made', async () => {
+    mockFetchJson.mockResolvedValue({ Items: [], TotalRecordCount: 0 });
+    const cursor = { kind: 'date', since: new Date('2024-06-01T00:00:00Z') } as const;
+    const client = new EmbyClient({ url: URL, token: 'key' });
+
+    await client.getLibraryItemsSince('7', cursor, { libraryType: 'movie' });
+    await client.getLibraryLeavesSince('7', cursor);
+
+    expect(mockFetchJson.mock.calls.map(([url]) => url)).toEqual([
+      'http://emby.local:8096/Items?ParentId=7&Recursive=true&IncludeItemTypes=Movie%2CSeries%2CMusicAlbum%2CAudio&CollapseBoxSetItems=false&IsMissing=false&Fields=ProviderIds%2CPath%2CMediaSources%2CDateCreated%2CProductionYear%2CSeriesName%2CSeriesId%2CParentIndexNumber%2CIndexNumber%2CAlbum%2CAlbumArtist%2CArtists%2CAlbumId%2CAlbumPrimaryImageTag%2CGenres%2CImageTags&StartIndex=0&Limit=200&SortBy=DateCreated&SortOrder=Descending&minDateLastSaved=2024-06-01T00%3A00%3A00.000Z',
+      'http://emby.local:8096/Items?ParentId=7&Recursive=true&IncludeItemTypes=Episode%2CSeason&IsMissing=false&Fields=ProviderIds%2CPath%2CMediaSources%2CDateCreated%2CProductionYear%2CSeriesName%2CSeriesId%2CParentIndexNumber%2CIndexNumber%2CGenres%2CImageTags&StartIndex=0&Limit=200&SortBy=DateCreated&SortOrder=Descending&minDateLastSaved=2024-06-01T00%3A00%3A00.000Z',
+    ]);
+  });
+});

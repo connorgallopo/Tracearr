@@ -123,7 +123,7 @@ import {
   maybeEnqueueImportedHistoryLink,
 } from '../librarySync.js';
 import { MEDIA_BUFFER_CAP, flushMediaAnnounceRun } from '../library/mediaAnnounce.js';
-import type { MediaLibraryItem } from '../mediaServer/types.js';
+import { NOT_NEEDED, type MediaLibraryItem } from '../mediaServer/types.js';
 import { fakePlexClient } from '../../test/mediaServerFakes.js';
 import type { LibrarySyncProgress } from '@tracearr/shared';
 import type { Redis } from 'ioredis';
@@ -402,6 +402,7 @@ function mockMediaServerClient(options: {
     getLibraryItemsSince: vi.fn().mockResolvedValue({
       items: options.itemsSince ?? [],
       totalCount: options.totalCountSince ?? options.itemsSince?.length ?? 0,
+      feed: NOT_NEEDED,
     }),
     getLibraryLeavesSince: vi.fn().mockResolvedValue({
       items: options.leavesSince ?? [],
@@ -2153,9 +2154,13 @@ describe('LibrarySyncService', () => {
       await service.syncServer(serverId);
 
       // Incremental is attempted first, since the undercount alone doesn't block it.
-      expect(client.getLibraryItemsSince).toHaveBeenCalledWith('1', expect.any(Date), {
-        libraryType: 'movie',
-      });
+      expect(client.getLibraryItemsSince).toHaveBeenCalledWith(
+        '1',
+        { kind: 'date', since: expect.any(Date) },
+        {
+          libraryType: 'movie',
+        }
+      );
       // The still-short post-sync count escalates to a full scan in the same run.
       expect(client.getLibraryItems).toHaveBeenCalledWith('1', {
         offset: 0,
@@ -2188,9 +2193,13 @@ describe('LibrarySyncService', () => {
       await service.syncServer(serverId);
 
       // Stays on the incremental "no changes" fast path - never escalates.
-      expect(client.getLibraryItemsSince).toHaveBeenCalledWith('1', expect.any(Date), {
-        libraryType: 'artist',
-      });
+      expect(client.getLibraryItemsSince).toHaveBeenCalledWith(
+        '1',
+        { kind: 'date', since: expect.any(Date) },
+        {
+          libraryType: 'artist',
+        }
+      );
       expect(client.getLibraryItems).not.toHaveBeenCalledWith('1', {
         offset: 0,
         limit: 200,
@@ -2280,9 +2289,13 @@ describe('LibrarySyncService', () => {
       const service = new LibrarySyncService();
       await service.syncServer(serverId);
 
-      expect(client.getLibraryItemsSince).toHaveBeenCalledWith('1', expect.any(Date), {
-        libraryType: 'movie',
-      });
+      expect(client.getLibraryItemsSince).toHaveBeenCalledWith(
+        '1',
+        { kind: 'date', since: expect.any(Date) },
+        {
+          libraryType: 'movie',
+        }
+      );
       expect(client.getLibraryItems).not.toHaveBeenCalledWith('1', {
         offset: 0,
         limit: 200,
@@ -2450,9 +2463,13 @@ describe('LibrarySyncService', () => {
       const service = new LibrarySyncService();
       const results = await service.syncServer(serverId);
 
-      expect(client.getLibraryItemsSince).toHaveBeenCalledWith('1', expect.any(Date), {
-        libraryType: 'movie',
-      });
+      expect(client.getLibraryItemsSince).toHaveBeenCalledWith(
+        '1',
+        { kind: 'date', since: expect.any(Date) },
+        {
+          libraryType: 'movie',
+        }
+      );
       // A movie section's leaves are its items, so asking for both would upsert each twice
       expect(client.getLibraryLeavesSince).not.toHaveBeenCalled();
       expect(results[0]!.itemsAdded).toBe(1);
@@ -2571,7 +2588,10 @@ describe('LibrarySyncService', () => {
       const service = new LibrarySyncService();
       const results = await service.syncServer(serverId);
 
-      expect(client.getLibraryAlbumsSince).toHaveBeenCalledWith('1', expect.any(Date));
+      expect(client.getLibraryAlbumsSince).toHaveBeenCalledWith('1', {
+        kind: 'date',
+        since: expect.any(Date),
+      });
       expect(results[0]!.itemsAdded).toBe(1);
       const albumBatch = vi
         .mocked(resolveMediaBatch)

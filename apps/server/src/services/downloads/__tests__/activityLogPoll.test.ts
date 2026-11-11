@@ -3,7 +3,8 @@ import { REDIS_KEYS, type JellyfinEmbyServerType } from '@tracearr/shared';
 import { createMockRedis, queryChain } from '../../../test/helpers.js';
 import type { JellyfinEmbyActivityEntry } from '../../mediaServer/shared/baseMediaServerClient.js';
 
-const { redis, client } = vi.hoisted(() => ({
+const { redis, client, getDownloadsAfter } = vi.hoisted(() => ({
+  getDownloadsAfter: vi.fn(),
   redis: { current: null as unknown },
   client: {
     serverType: 'jellyfin' as JellyfinEmbyServerType,
@@ -19,6 +20,9 @@ vi.mock('../../../lib/redisShared.js', () => ({ getRedis: () => redis.current })
 vi.mock('../../mediaServer/index.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../mediaServer/index.js')>()),
   createJellyfinEmbyClient: vi.fn(() => client),
+  TofaClient: class {
+    getDownloadsAfter = getDownloadsAfter;
+  },
 }));
 vi.mock('../../../jobs/poller/database.js', () => ({ getServerUserIdByExternalId: vi.fn() }));
 vi.mock('../recorder.js', () => ({ recordDownload: vi.fn() }));
@@ -26,7 +30,9 @@ vi.mock('../recorder.js', () => ({ recordDownload: vi.fn() }));
 import { db } from '../../../db/client.js';
 import { getServerUserIdByExternalId } from '../../../jobs/poller/database.js';
 import { recordDownload } from '../recorder.js';
-import { pollServerDownloads, pollServerSyncJobs } from '../activityLogPoll.js';
+import { pollAllDownloads, pollServerDownloads, pollServerSyncJobs } from '../activityLogPoll.js';
+import tofa from '../../../test/mediaServerResponses/tofa.json' with { type: 'json' };
+import { parseTofaMedia } from '../../mediaServer/tofa/parser.js';
 
 const SERVER = '11111111-1111-4111-8111-111111111111';
 const NOW = new Date('2026-10-20T15:00:00Z');
@@ -357,5 +363,44 @@ describe('pollServerSyncJobs', () => {
     await pollServerSyncJobs(SERVER);
 
     expect(recordDownload).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('pollAllDownloads on a tofa server', () => {
+  it('records each offline download once, by the episode its file holds, and keeps its time as the cursor', async () => {
+    const store = mockRedis();
+    vi.mocked(db.select).mockImplementation(
+      () =>
+        queryChain(vi.fn, [
+          { id: SERVER, type: 'tofa', name: 'tofa', url: 'u', token: 't' },
+        ]) as never
+    );
+    const [download] = tofa.downloads.items;
+    const show = tofa.mediaBatch[1];
+    if (!show) throw new Error('fixture has no show');
+    getDownloadsAfter.mockResolvedValue(
+      tofa.downloads.items.map((d) => ({
+        download: d,
+        media: d.media_id === show.id ? parseTofaMedia(show) : undefined,
+      }))
+    );
+
+    await pollAllDownloads();
+
+    expect(getDownloadsAfter).toHaveBeenCalledWith(new Date(NOW.getTime() - 24 * 60 * 60 * 1000));
+    expect(recordDownload).toHaveBeenCalledWith({
+      serverId: SERVER,
+      serverUserId: 'su-1',
+      ratingKey: tofa.mediaBatch[1]?.files[0]?.episode_id,
+      title: `${download?.title} - ${download?.episode_title}`,
+      app: null,
+      device: download?.device_name,
+      source: 'tofa',
+      seenAt: new Date('2025-03-02T10:00:00Z'),
+      partId: download?.media_file_id,
+      deviceId: download?.device_id,
+    });
+    expect(getServerUserIdByExternalId).toHaveBeenCalledWith(SERVER, download?.user_id);
+    expect(store._store.get(CURSOR_KEY)).toBe(String(Date.parse('2025-03-02T10:00:00Z')));
   });
 });

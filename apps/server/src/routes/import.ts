@@ -6,10 +6,12 @@ import type { FastifyPluginAsync } from 'fastify';
 import multipart from '@fastify/multipart';
 import { eq } from 'drizzle-orm';
 import {
+  SERVER_PROFILES,
   tautulliImportSchema,
   jellystatImportBodySchema,
   playbackReportingImportSchema,
   playbackReportingTestSchema,
+  tofaImportSchema,
 } from '@tracearr/shared';
 import { TautulliService } from '../services/tautulli.js';
 import { importJellystatBackup } from '../services/jellystat.js';
@@ -19,6 +21,7 @@ import {
   saveJellystatUpload,
 } from '../services/import/jellystatUpload.js';
 import { importPlaybackReporting } from '../services/playbackReporting.js';
+import { importTofaHistory } from '../services/import/tofaHistory.js';
 import { getPubSubService } from '../services/cache.js';
 import { syncServer } from '../services/sync.js';
 import { HISTORICAL_IMPORT_MESSAGE } from '../services/liveServers.js';
@@ -29,6 +32,7 @@ import {
   enqueueImport,
   enqueueJellystatImport,
   enqueuePlaybackReportingImport,
+  enqueueTofaImport,
   getImportStatus,
   getJellystatImportStatus,
   cancelImport,
@@ -37,6 +41,7 @@ import {
   getActiveImportForServer,
   getActiveJellystatImportForServer,
   getActivePlaybackReportingImportForServer,
+  getActiveTofaImportForServer,
 } from '../jobs/importQueue.js';
 
 export const importRoutes: FastifyPluginAsync = async (app) => {
@@ -700,4 +705,112 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       return { status: 'cancelled', jobId };
     }
   );
+
+  // ==========================================================================
+  // tofa Import Routes (the server's own watch history)
+  // ==========================================================================
+
+  /**
+   * POST /import/tofa - Start a tofa watch history import (enqueues job)
+   */
+  app.post('/tofa', writeImport, async (request, reply) => {
+    const authUser = request.user;
+
+    if (authUser.role !== 'owner') {
+      return reply.forbidden('Only server owners can import data');
+    }
+
+    const parsed = tofaImportSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.badRequest('Invalid request body');
+    }
+
+    const { serverId } = parsed.data;
+
+    const [server] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
+    if (!server) {
+      return reply.notFound('Server not found');
+    }
+    if (SERVER_PROFILES[server.type].serverHistoryImport !== 'tofa') {
+      return reply.badRequest('Watch history import only supports tofa servers');
+    }
+    if (server.historicalAt) {
+      return reply.conflict(HISTORICAL_IMPORT_MESSAGE);
+    }
+
+    try {
+      app.log.info({ serverId }, 'Syncing server before tofa history import');
+      await syncServer(serverId, { syncUsers: true, syncLibraries: false });
+    } catch (error) {
+      app.log.error({ err: error, serverId }, 'Failed to sync server before import');
+      return reply.internalServerError('Failed to sync server users before import');
+    }
+
+    try {
+      const jobId = await enqueueTofaImport(serverId, authUser.userId);
+      return {
+        status: 'queued',
+        jobId,
+        message:
+          'Import queued. Use jobId to track progress via WebSocket or GET /import/tofa/:jobId',
+      };
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('already in progress')) {
+        return reply.conflict(error.message);
+      }
+
+      app.log.warn({ err: error }, 'Import queue unavailable, falling back to direct execution');
+      importTofaHistory(serverId, getPubSubService() ?? undefined)
+        .then((result) => {
+          console.log(`[Import] tofa history import completed:`, result);
+        })
+        .catch((err: unknown) => {
+          console.error(`[Import] tofa history import failed:`, err);
+        });
+
+      return {
+        status: 'started',
+        message: 'Import started (direct execution). Watch for progress updates via WebSocket.',
+      };
+    }
+  });
+
+  /**
+   * GET /import/tofa/active/:serverId - Get the active tofa history import for a server
+   */
+  app.get<{ Params: { serverId: string } }>(
+    '/tofa/active/:serverId',
+    readImport,
+    async (request) => {
+      const jobId = await getActiveTofaImportForServer(request.params.serverId);
+      const status = jobId ? await getImportStatus(jobId) : null;
+      return status ? { active: true, ...status } : { active: false };
+    }
+  );
+
+  /**
+   * GET /import/tofa/:jobId - Get tofa history import job status
+   */
+  app.get<{ Params: { jobId: string } }>('/tofa/:jobId', readImport, async (request, reply) => {
+    const status = await getImportStatus(request.params.jobId);
+    if (!status) {
+      return reply.notFound('Import job not found');
+    }
+    return status;
+  });
+
+  /**
+   * DELETE /import/tofa/:jobId - Cancel tofa history import job
+   */
+  app.delete<{ Params: { jobId: string } }>('/tofa/:jobId', writeImport, async (request, reply) => {
+    if (request.user.role !== 'owner') {
+      return reply.forbidden('Only server owners can cancel imports');
+    }
+
+    const { jobId } = request.params;
+    if (!(await cancelImport(jobId))) {
+      return reply.badRequest('Cannot cancel job (may be active or not found)');
+    }
+    return { status: 'cancelled', jobId };
+  });
 };

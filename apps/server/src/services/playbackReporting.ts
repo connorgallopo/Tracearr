@@ -21,11 +21,8 @@ import { parseJellystatPlayMethod } from '../utils/transcodeNormalizer.js';
 import { wallTimeToUtc } from '../utils/wallClock.js';
 import { servers, sessions } from '../db/schema.js';
 import { ServerHistoricalError } from './liveServers.js';
-import { checkAggregateNeedsRebuild, refreshAggregates } from '../db/timescale.js';
-import {
-  enqueueMaintenanceJob,
-  enqueueServerLocationSyncIfBehind,
-} from '../jobs/maintenanceQueue.js';
+import { enqueueServerLocationSyncIfBehind } from '../jobs/maintenanceQueue.js';
+import { refreshImportAggregates } from './import/aggregates.js';
 import type { PubSubService } from './cache.js';
 import { geoasnService } from './geoasn.js';
 import { geoipService } from './geoip.js';
@@ -54,7 +51,6 @@ const PAGE_SIZE = 5000;
 const BATCH_SIZE = 500;
 const ENRICHMENT_BATCH_SIZE = 200;
 const PROGRESS_THROTTLE_MS = 2000;
-const AGGREGATE_BUFFER_MS = 24 * 60 * 60 * 1000;
 
 export const BASE_COLUMNS = [
   'DateCreated',
@@ -321,37 +317,6 @@ async function enrichPage(
   return enrichmentMap;
 }
 
-async function refreshImportAggregates(minDate: Date | null, maxDate: Date | null): Promise<void> {
-  try {
-    if (minDate && maxDate) {
-      const startTime = new Date(minDate.getTime() - AGGREGATE_BUFFER_MS);
-      const endTime = new Date(maxDate.getTime() + AGGREGATE_BUFFER_MS);
-      console.log(
-        `[PlaybackReporting] Refreshing aggregates for date range: ${startTime.toISOString()} to ${endTime.toISOString()}`
-      );
-      await refreshAggregates({ startTime, endTime });
-    } else {
-      await refreshAggregates();
-    }
-
-    const rebuildStatus = await checkAggregateNeedsRebuild();
-    if (rebuildStatus.needsRebuild) {
-      console.log(
-        `[PlaybackReporting] Fresh install detected - queueing safe aggregate rebuild: ${rebuildStatus.reason}`
-      );
-      try {
-        await enqueueMaintenanceJob('full_aggregate_rebuild', 'system');
-      } catch {
-        console.log(
-          '[PlaybackReporting] Could not queue aggregate rebuild (may already be running)'
-        );
-      }
-    }
-  } catch (err) {
-    console.warn('[PlaybackReporting] Failed to refresh aggregates after import:', err);
-  }
-}
-
 export async function importPlaybackReporting(
   serverId: string,
   options: { timezone: string; enrichMedia: boolean; importFullRange: boolean },
@@ -597,7 +562,7 @@ export async function importPlaybackReporting(
     progress.status = 'processing';
     progress.message = 'Refreshing aggregates...';
     publishProgress(progress);
-    await refreshImportAggregates(minImportDate, maxImportDate);
+    await refreshImportAggregates('PlaybackReporting', minImportDate, maxImportDate);
     try {
       await markImportedServerLocations(serverId);
       await enqueueServerLocationSyncIfBehind();

@@ -18,6 +18,7 @@ import {
   createMediaServerClient,
   type MediaLibraryItem,
 } from '../../src/services/mediaServer/index.js';
+import { NOT_NEEDED } from '../../src/services/mediaServer/types.js';
 import { librarySyncService } from '../../src/services/librarySync.js';
 import { dispatchMediaAdded } from '../../src/services/automations/events/producers.js';
 
@@ -75,6 +76,7 @@ function stubPlexClient(library: {
     getLibrarySeasons: (_id: string, options?: { offset?: number }) =>
       page(library.seasons ?? [], options),
     findExistingRatingKeys: () => Promise.resolve(new Set<string>()),
+    getLibraryRevision: () => Promise.resolve(NOT_NEEDED),
   } as never);
 }
 

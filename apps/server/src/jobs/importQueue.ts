@@ -7,7 +7,8 @@
  * - Progress tracking via WebSocket
  * - Checkpoint/resume on failure
  *
- * Supports both Tautulli (for Plex) and Jellystat (for Jellyfin/Emby) imports.
+ * Supports Tautulli (for Plex), Jellystat and Playback Reporting (for Jellyfin/Emby), and tofa's
+ * own watch history.
  */
 
 import { randomUUID } from 'node:crypto';
@@ -28,6 +29,8 @@ import type {
   JellystatImportResult,
   PlaybackReportingImportProgress,
   PlaybackReportingImportResult,
+  TofaImportProgress,
+  TofaImportResult,
 } from '@tracearr/shared';
 import {
   ImportInterruptedError,
@@ -43,6 +46,7 @@ import {
   sweepJellystatUploads,
 } from '../services/import/jellystatUpload.js';
 import { importPlaybackReporting } from '../services/playbackReporting.js';
+import { importTofaHistory } from '../services/import/tofaHistory.js';
 import { getPubSubService } from '../services/cache.js';
 import { extendJobLock } from './lockUtils.js';
 import {
@@ -91,11 +95,20 @@ export interface PlaybackReportingImportJobData {
   importFullRange: boolean;
 }
 
+export interface TofaImportJobData {
+  type: 'tofa';
+  serverId: string;
+  userId: string; // Audit trail - who initiated the import
+}
+
 export type ImportJobData =
-  TautulliImportJobData | JellystatImportJobData | PlaybackReportingImportJobData;
+  | TautulliImportJobData
+  | JellystatImportJobData
+  | PlaybackReportingImportJobData
+  | TofaImportJobData;
 
 export type ImportJobResult =
-  TautulliImportResult | JellystatImportResult | PlaybackReportingImportResult;
+  TautulliImportResult | JellystatImportResult | PlaybackReportingImportResult | TofaImportResult;
 
 // Queue configuration
 const QUEUE_NAME = 'imports';
@@ -110,7 +123,7 @@ let dlqQueue: Queue<ImportJobData> | null = null;
 // Cached import progress for polling access (in addition to websocket broadcasts)
 interface CachedImportProgress {
   jobId: string;
-  type: 'tautulli' | 'jellystat' | 'playback-reporting';
+  type: ImportJobData['type'];
   serverId: string;
   status: 'waiting' | 'fetching' | 'processing' | 'complete' | 'error';
   progress: TautulliImportProgress | null;
@@ -179,14 +192,38 @@ export function initImportQueue(redisUrl: string): void {
 }
 
 type ImportProgressPayload =
-  TautulliImportProgress | JellystatImportProgress | PlaybackReportingImportProgress;
+  | TautulliImportProgress
+  | JellystatImportProgress
+  | PlaybackReportingImportProgress
+  | TofaImportProgress;
 
 function importProgressChannel(
   type: ImportJobData['type']
-): 'import:progress' | 'import:jellystat:progress' | 'import:playbackreporting:progress' {
+):
+  | 'import:progress'
+  | 'import:jellystat:progress'
+  | 'import:playbackreporting:progress'
+  | 'import:tofa:progress' {
   if (type === 'jellystat') return 'import:jellystat:progress';
   if (type === 'playback-reporting') return 'import:playbackreporting:progress';
+  if (type === 'tofa') return 'import:tofa:progress';
   return 'import:progress';
+}
+
+/** A tofa import's progress outside its run, every count at zero */
+function tofaProgress(status: TofaImportProgress['status'], message: string): TofaImportProgress {
+  return {
+    status,
+    fetchedRecords: 0,
+    processedRecords: 0,
+    importedRecords: 0,
+    skippedRecords: 0,
+    duplicateRecords: 0,
+    unknownUserRecords: 0,
+    activeRecords: 0,
+    errorRecords: 0,
+    message,
+  };
 }
 
 // Payload shape must match the importing job's channel, or its UI card never updates.
@@ -214,6 +251,10 @@ function buildWaitingProgress(
       message,
       waitingFor: waitingForSummary,
     };
+  }
+
+  if (type === 'tofa') {
+    return { ...tofaProgress('waiting', message), waitingFor: waitingForSummary };
   }
 
   if (type === 'playback-reporting') {
@@ -273,6 +314,8 @@ function buildFailedProgress(
       message,
     };
   }
+
+  if (type === 'tofa') return tofaProgress('error', message);
 
   if (type === 'playback-reporting') {
     return {
@@ -355,7 +398,9 @@ export function startImportWorker(): void {
           ? 'Tautulli import'
           : job.data.type === 'jellystat'
             ? 'Jellystat import'
-            : 'Playback Reporting import';
+            : job.data.type === 'tofa'
+              ? 'tofa history import'
+              : 'Playback Reporting import';
       console.log(`[Import] Starting job ${job.id} for server ${job.data.serverId}`);
 
       // Initialize cached progress
@@ -526,6 +571,9 @@ async function processImportJob(
   }
   if (job.data.type === 'playback-reporting') {
     return processPlaybackReportingImportJob(job as Job<PlaybackReportingImportJobData>);
+  }
+  if (job.data.type === 'tofa') {
+    return processTofaImportJob(job as Job<TofaImportJobData>);
   }
   return processTautulliImportJob(job as Job<TautulliImportJobData>, signal);
 }
@@ -721,6 +769,20 @@ async function processPlaybackReportingImportJob(
     });
   }
 
+  return result;
+}
+
+async function processTofaImportJob(job: Job<TofaImportJobData>): Promise<TofaImportResult> {
+  const pubSubService = getPubSubService();
+  const result = await importTofaHistory(job.data.serverId, pubSubService ?? undefined);
+  await pubSubService?.publish('import:tofa:progress', {
+    ...tofaProgress(result.success ? 'complete' : 'error', result.message),
+    importedRecords: result.imported,
+    skippedRecords: result.skipped,
+    duplicateRecords: result.duplicates,
+    errorRecords: result.errors,
+    jobId: job.id,
+  });
   return result;
 }
 
@@ -998,6 +1060,30 @@ export async function enqueuePlaybackReportingImport(
   return jobId;
 }
 
+// ==========================================================================
+// tofa-Specific Functions
+// ==========================================================================
+
+export async function getActiveTofaImportForServer(serverId: string): Promise<string | null> {
+  if (!importQueue) return null;
+  const activeJobs = await importQueue.getJobs(['active', 'waiting', 'delayed']);
+  return activeJobs.find((j) => j.data.type === 'tofa' && j.data.serverId === serverId)?.id ?? null;
+}
+
+export async function enqueueTofaImport(serverId: string, userId: string): Promise<string> {
+  if (!importQueue) throw new Error('Import queue not initialized');
+
+  const existingJobId = await getActiveTofaImportForServer(serverId);
+  if (existingJobId) {
+    throw new Error(`Import already in progress for server ${serverId} (job ${existingJobId})`);
+  }
+
+  const job = await importQueue.add('tofa-import', { type: 'tofa', serverId, userId });
+  const jobId = job.id ?? `unknown-${Date.now()}`;
+  console.log(`[Import] Enqueued tofa history job ${jobId} for server ${serverId}`);
+  return jobId;
+}
+
 /**
  * Get cached import progress (for polling access in addition to websockets)
  */
@@ -1011,7 +1097,7 @@ export function getActiveImportProgress(): CachedImportProgress | null {
 export async function getAllActiveImports(): Promise<
   Array<{
     jobId: string;
-    type: 'tautulli' | 'jellystat' | 'playback-reporting';
+    type: ImportJobData['type'];
     serverId: string;
     state: string;
     progress: number | object | null;
