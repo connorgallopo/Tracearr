@@ -309,7 +309,7 @@ export function AddServerDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t('common:actions.cancel')}
           </Button>
-          {auth === 'apiKey' && (
+          {isJellyfinEmby(serverType) && (
             <Button onClick={onConnect} disabled={isConnecting}>
               {isConnecting ? (
                 <>

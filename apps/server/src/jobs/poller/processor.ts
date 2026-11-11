@@ -11,9 +11,9 @@ import {
   POLLER_CONFIG,
   POLLING_INTERVALS,
   SERVER_PROFILES,
-  SERVER_TYPES,
   SESSION_LIMITS,
   assertNever,
+  isServerType,
   usernameAsEmail,
   type ActiveSession,
   type EngineAutomation,
@@ -241,25 +241,24 @@ async function handleFirstMisses(
   cachedKeys: Iterable<string>,
   serverId: string,
   activeSessions: ActiveSession[],
-  serverTypeMap: Map<string, ServerType>
+  serverType: ServerType
 ): Promise<void> {
   for (const cachedKey of cachedKeys) {
     if (!cachedKey.startsWith(`${serverId}:`)) continue;
     if (missedPollTracking.has(cachedKey)) continue; // Already in grace period
 
-    const cachedActiveSession = activeSessions.find((s) => {
-      const sType = serverTypeMap.get(s.serverId) ?? 'plex';
-      return (
+    const cachedActiveSession = activeSessions.find(
+      (s) =>
+        s.serverId === serverId &&
         buildCompositeKey({
-          serverType: sType,
+          serverType,
           serverId: s.serverId,
           externalUserId: s.serverUserId,
           deviceId: s.deviceId ?? null,
           ratingKey: s.ratingKey ?? null,
           sessionKey: s.sessionKey,
         }) === cachedKey
-      );
-    });
+    );
     if (!cachedActiveSession) {
       console.warn(
         `[Poller] Cache mismatch for ${cachedKey}: in cachedSessionKeys but not in activeSessions`
@@ -303,7 +302,7 @@ function trackingKeysForCachedSessions(
   // one does not know. That server's own poll fails on it; keying its cached sessions
   // must not take every other server's poll down with it.
   const serverTypes = new Map(
-    serverRows.filter((s) => SERVER_TYPES.includes(s.type)).map((s) => [s.id, s.type])
+    serverRows.filter((s) => isServerType(s.type)).map((s) => [s.id, s.type])
   );
   return new Set(
     cachedSessions.map((s) =>
@@ -891,8 +890,7 @@ async function processServerSessions(
       const keysToSweep = new Set(
         [...missedPollTracking.keys()].filter((k) => k.startsWith(`${server.id}:`))
       );
-      const sTypeMap = new Map([[server.id, server.type]]);
-      await handleFirstMisses(cachedSessionKeys, server.id, activeSessions, sTypeMap);
+      await handleFirstMisses(cachedSessionKeys, server.id, activeSessions, server.type);
       await sweepGracePeriod(keysToSweep, server.id, server.type);
 
       // stoppedSessionKeys intentionally empty
@@ -1989,14 +1987,13 @@ async function processServerSessions(
     const keysToSweep = new Set(
       [...missedPollTracking.keys()].filter((k) => k.startsWith(`${server.id}:`))
     );
-    const sTypeMap = new Map([[server.id, server.type]]);
     await handleFirstMisses(
       [...cachedSessionKeys].filter(
         (k) => k.startsWith(`${server.id}:`) && !currentSessionKeys.has(k)
       ),
       server.id,
       activeSessions,
-      sTypeMap
+      server.type
     );
     await sweepGracePeriod(keysToSweep, server.id, server.type, currentSessionKeys);
 

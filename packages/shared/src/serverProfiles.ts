@@ -19,8 +19,8 @@ export interface ServerProfile {
   linksImportedHistory: boolean;
   /** How the owner adds the server: picked from a linked Plex account, or by URL and API key. */
   addServerAuth: 'plexOAuth' | 'apiKey';
-  /** Members sign in with their username and password on the server instead of through plex.tv. */
-  signsInWithServerPassword: boolean;
+  /** How members sign in: through plex.tv, or with their username and password on the server. */
+  memberSignIn: 'plexTv' | 'serverPassword';
   /** The server measures its own bandwidth, so the dashboard can chart it. */
   reportsBandwidth: boolean;
   /** A transcode reports separate video and audio bitrates; without them only the total stream bitrate is known. */
@@ -40,7 +40,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     playerNameCountsTowardDevice: false,
     linksImportedHistory: true,
     addServerAuth: 'plexOAuth',
-    signsInWithServerPassword: false,
+    memberSignIn: 'plexTv',
     reportsBandwidth: true,
     reportsTranscodeTrackBitrates: true,
     importsTautulliHistory: true,
@@ -55,7 +55,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     playerNameCountsTowardDevice: true,
     linksImportedHistory: false,
     addServerAuth: 'apiKey',
-    signsInWithServerPassword: true,
+    memberSignIn: 'serverPassword',
     reportsBandwidth: false,
     reportsTranscodeTrackBitrates: false,
     importsTautulliHistory: false,
@@ -70,7 +70,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     playerNameCountsTowardDevice: true,
     linksImportedHistory: false,
     addServerAuth: 'apiKey',
-    signsInWithServerPassword: true,
+    memberSignIn: 'serverPassword',
     reportsBandwidth: false,
     reportsTranscodeTrackBitrates: false,
     importsTautulliHistory: false,

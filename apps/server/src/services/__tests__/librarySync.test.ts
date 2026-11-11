@@ -73,7 +73,7 @@ vi.mock('../settings.js', () => ({
 }));
 
 vi.mock('../../jobs/importedHistoryLinking.js', () => ({
-  listPlexServers: vi.fn(),
+  listLinkingServers: vi.fn(),
   MAX_AUTO_LINK_ATTEMPTS: 5,
   AUTO_LINK_WINDOW_MS: 14 * 24 * 60 * 60 * 1000,
 }));
@@ -104,7 +104,7 @@ import {
 } from '../../jobs/sessionIdentityBackfill.js';
 import { maybeEnqueueMaintenanceJob } from '../../jobs/maintenanceQueue.js';
 import { getHeavyOpsStatus } from '../../jobs/heavyOpsLock.js';
-import { listPlexServers } from '../../jobs/importedHistoryLinking.js';
+import { listLinkingServers } from '../../jobs/importedHistoryLinking.js';
 import { getSessionsCompressionHorizon, refreshAggregates } from '../../db/timescale.js';
 import {
   getImportedHistoryLinkState,
@@ -481,7 +481,7 @@ beforeEach(() => {
   // Settings read as a current install: the passes version is the code's, counters are zero.
   vi.mocked(getSetting).mockImplementation((async (key: string) =>
     key === 'identityPassesVersion' ? IDENTITY_PASSES_VERSION : 0) as never);
-  vi.mocked(listPlexServers).mockResolvedValue([]);
+  vi.mocked(listLinkingServers).mockResolvedValue([]);
 });
 
 // clearAllMocks only clears call history, not implementations - restore db.execute so a test's override can't leak into the next.
@@ -1156,7 +1156,7 @@ describe('LibrarySyncService', () => {
           generation: 4,
           armedAt,
         } as never);
-        vi.mocked(listPlexServers).mockResolvedValue([
+        vi.mocked(listLinkingServers).mockResolvedValue([
           { id: 'plex-a', name: 'Home', machineIdentifier: null },
           { id: 'plex-b', name: 'Office', machineIdentifier: null },
         ]);
@@ -1181,7 +1181,7 @@ describe('LibrarySyncService', () => {
           generation: 1,
           armedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
         } as never);
-        vi.mocked(listPlexServers).mockResolvedValue([
+        vi.mocked(listLinkingServers).mockResolvedValue([
           { id: 'plex-a', name: 'Home', machineIdentifier: null },
         ]);
 
@@ -1203,7 +1203,7 @@ describe('LibrarySyncService', () => {
           generation: 0,
           armedAt: new Date().toISOString(),
         } as never);
-        vi.mocked(listPlexServers).mockResolvedValue([
+        vi.mocked(listLinkingServers).mockResolvedValue([
           { id: 'plex-a', name: 'Home', machineIdentifier: null },
           { id: 'plex-b', name: 'Office', machineIdentifier: null },
         ]);
@@ -1248,7 +1248,7 @@ describe('LibrarySyncService', () => {
           generation: 0,
           armedAt: new Date().toISOString(),
         } as never);
-        vi.mocked(listPlexServers).mockResolvedValue([
+        vi.mocked(listLinkingServers).mockResolvedValue([
           { id: 'plex-a', name: 'Home', machineIdentifier: null },
         ]);
         vi.mocked(maybeEnqueueMaintenanceJob).mockResolvedValueOnce(null);

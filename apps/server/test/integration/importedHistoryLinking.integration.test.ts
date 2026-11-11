@@ -21,6 +21,7 @@ import { db, recreatePool } from '../../src/db/client.js';
 import { compressSessionChunks } from '../../src/test/compressChunks.js';
 import { libraries, media } from '../../src/db/schema.js';
 import { getRedis } from '../../src/lib/redisShared.js';
+import { listLinkingServers } from '../../src/jobs/importedHistoryLinking.js';
 import {
   runImportedHistoryLinking,
   type MaintenanceJobData,
@@ -394,6 +395,14 @@ describe('link_imported_history on a compressed chunk', { timeout: 120_000 }, ()
       tmdb_id: 603,
       tvdb_id: 169,
     });
+  });
+
+  it('lists only Plex servers for linking', async () => {
+    const plex = await createTestServer({ type: 'plex' });
+    await createTestServer({ type: 'jellyfin' });
+    await createTestServer({ type: 'emby' });
+
+    expect((await listLinkingServers()).map((s) => s.id)).toEqual([plex.id]);
   });
 
   it('drops its state write when a re-arm with identical values lands mid-run', async () => {

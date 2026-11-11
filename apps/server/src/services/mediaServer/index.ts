@@ -136,8 +136,6 @@ export type {
   MediaWatchHistoryItem,
 } from './types.js';
 
-export { mediaBrowserAuthHeader, mediaBrowserTokenHeader } from './shared/baseMediaServerClient.js';
-
 // Clients (for static method access and direct instantiation)
 export { PlexClient } from './plex/client.js';
 export { JellyfinClient } from './jellyfin/client.js';

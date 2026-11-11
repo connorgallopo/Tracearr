@@ -466,14 +466,14 @@ export function Login() {
   }
 
   const memberServers = memberLoginServers.filter(
-    (server) => SERVER_PROFILES[server.type].signsInWithServerPassword
+    (server) => SERVER_PROFILES[server.type].memberSignIn === 'serverPassword'
   );
   // authMethods.plex is the owner's own Plex sign-in; a member's Plex server arrives in the
   // member list and signs in through the same button.
   const showPlex =
     authMethods.plex ||
     (authMethods.member &&
-      memberLoginServers.some((server) => !SERVER_PROFILES[server.type].signsInWithServerPassword));
+      memberLoginServers.some((server) => SERVER_PROFILES[server.type].memberSignIn === 'plexTv'));
   const showMember = authMethods.member && !needsSetup && memberServers.length > 0;
   const hasPrimaryMethods = showPlex || authMethods.oidc;
   const hasFormMethods = authMethods.local || showMember;

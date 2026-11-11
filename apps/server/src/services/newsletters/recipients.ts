@@ -1,9 +1,11 @@
 import { sql } from 'drizzle-orm';
-import type {
-  NewsletterExcludedPerson,
-  NewsletterRecipientPerson,
-  NewsletterRecipients,
-  NewsletterScope,
+import {
+  SERVER_PROFILES,
+  SERVER_TYPES,
+  type NewsletterExcludedPerson,
+  type NewsletterRecipientPerson,
+  type NewsletterRecipients,
+  type NewsletterScope,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { compareNames } from '../../utils/collation.js';
@@ -174,6 +176,10 @@ interface CandidateRow {
   blocked: 'banned' | 'pending' | null;
 }
 
+const USERNAME_EMAIL_TYPES = SERVER_TYPES.filter(
+  (type) => SERVER_PROFILES[type].emailSource === 'username'
+);
+
 /** One row per identity with an active account on a scoped server; disabled identities never receive mail, banned and pending ones are reported. */
 export async function loadCandidates(serverIds: string[]): Promise<RecipientCandidate[]> {
   const scope = serverIds.length === 0 ? sql`` : sql`AND su.server_id IN ${serverIds}`;
@@ -183,8 +189,8 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
            u.name,
            u.contact_email,
            u.email AS identity_email,
-           array_remove(array_agg(su.email ORDER BY s.type <> 'plex', su.created_at, su.id), NULL) AS account_emails,
-           bool_and(su.email IS NULL OR s.type <> 'plex') AS account_emails_from_usernames,
+           array_remove(array_agg(su.email ORDER BY s.type IN ${USERNAME_EMAIL_TYPES}, su.created_at, su.id), NULL) AS account_emails,
+           bool_and(su.email IS NULL OR s.type IN ${USERNAME_EMAIL_TYPES}) AS account_emails_from_usernames,
            array_agg(su.username ORDER BY su.created_at, su.id) AS usernames,
            array_agg(su.server_id ORDER BY su.created_at, su.id) AS server_ids,
            array_agg(s.name ORDER BY su.created_at, su.id) AS server_names,

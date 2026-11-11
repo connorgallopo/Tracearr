@@ -14,11 +14,11 @@ import {
 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import {
-  type OwnerLinkServer,
-  type RequestService,
-  type Server,
-  type ServerConnectionStatus,
+import type {
+  OwnerLinkServer,
+  RequestService,
+  Server,
+  ServerConnectionStatus,
 } from '@tracearr/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

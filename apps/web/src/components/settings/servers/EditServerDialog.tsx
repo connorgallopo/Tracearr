@@ -129,9 +129,12 @@ export function EditServerDialog({
   const hasNameChange = server ? editName.trim() !== server.name : false;
   const hasUrlChange = server && !locked ? manualUrl.trim() !== server.url : false;
   const hasPublicUrlChange =
-    server && !plexOAuth ? manualPublicUrl.trim() !== (server.publicUrl ?? '') : false;
+    server && isJellyfinEmby(server.type)
+      ? manualPublicUrl.trim() !== (server.publicUrl ?? '')
+      : false;
   const hasColorChange = server ? editColor !== (server.color ?? '') : false;
-  const hasApiKeyChange = server && !plexOAuth && !locked ? editApiKey.trim().length > 0 : false;
+  const hasApiKeyChange =
+    server && isJellyfinEmby(server.type) && !locked ? editApiKey.trim().length > 0 : false;
   const hasServerChange =
     hasNameChange || hasUrlChange || hasPublicUrlChange || hasColorChange || hasApiKeyChange;
   const canSave =
@@ -177,7 +180,7 @@ export function EditServerDialog({
             />
           </Field>
 
-          {plexOAuth ? (
+          {plexOAuth && (
             <Field>
               <FieldTitle>{t('servers.serverUrl')}</FieldTitle>
               {isLoadingConnections ? (
@@ -224,7 +227,8 @@ export function EditServerDialog({
                 </>
               )}
             </Field>
-          ) : (
+          )}
+          {isJellyfinEmby(server.type) && (
             <>
               <Field>
                 <FieldLabel htmlFor="edit-url">{t('servers.serverUrl')}</FieldLabel>
@@ -259,9 +263,7 @@ export function EditServerDialog({
                   disabled={locked}
                 />
                 <FieldDescription>
-                  {locked
-                    ? t('servers.resumeFirst')
-                    : isJellyfinEmby(server.type) && t(API_KEY_HELP[server.type])}
+                  {locked ? t('servers.resumeFirst') : t(API_KEY_HELP[server.type])}
                 </FieldDescription>
               </Field>
             </>

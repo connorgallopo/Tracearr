@@ -41,15 +41,15 @@ describe('server profiles', () => {
   );
 
   it.each([
-    ['plex', 'plexOAuth', false, true, true, true],
-    ['jellyfin', 'apiKey', true, false, false, false],
-    ['emby', 'apiKey', true, false, false, false],
+    ['plex', 'plexOAuth', 'plexTv', true, true, true],
+    ['jellyfin', 'apiKey', 'serverPassword', false, false, false],
+    ['emby', 'apiKey', 'serverPassword', false, false, false],
   ] as const)(
     '%s adds, signs in, reports bandwidth and bitrates, and imports from Tautulli',
-    (type, addServerAuth, password, bandwidth, trackBitrates, tautulli) => {
+    (type, addServerAuth, memberSignIn, bandwidth, trackBitrates, tautulli) => {
       expect(SERVER_PROFILES[type]).toMatchObject({
         addServerAuth,
-        signsInWithServerPassword: password,
+        memberSignIn,
         reportsBandwidth: bandwidth,
         reportsTranscodeTrackBitrates: trackBitrates,
         importsTautulliHistory: tautulli,

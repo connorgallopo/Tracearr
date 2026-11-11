@@ -1,5 +1,5 @@
-import { eq, sql, type SQL } from 'drizzle-orm';
-import { REDIS_KEYS } from '@tracearr/shared';
+import { inArray, sql, type SQL } from 'drizzle-orm';
+import { REDIS_KEYS, SERVER_PROFILES, SERVER_TYPES } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
 import { uncapDecompressionForTx } from '../db/timescale.js';
@@ -316,13 +316,15 @@ async function collectOrphanKeys(
   return collected;
 }
 
-export async function listPlexServers(): Promise<
+const LINKING_TYPES = SERVER_TYPES.filter((type) => SERVER_PROFILES[type].linksImportedHistory);
+
+export async function listLinkingServers(): Promise<
   Array<{ id: string; name: string; machineIdentifier: string | null }>
 > {
   return db
     .select({ id: servers.id, name: servers.name, machineIdentifier: servers.machineIdentifier })
     .from(servers)
-    .where(eq(servers.type, 'plex'));
+    .where(inArray(servers.type, LINKING_TYPES));
 }
 
 /**
@@ -599,8 +601,8 @@ export async function runImportedHistoryLinkingWalk(
   };
 
   try {
-    const plexServers = await listPlexServers();
-    const runs = plexServers.map((server) => {
+    const linkingServers = await listLinkingServers();
+    const runs = linkingServers.map((server) => {
       const outcome: ServerOutcome = {
         serverId: server.id,
         ready: false,

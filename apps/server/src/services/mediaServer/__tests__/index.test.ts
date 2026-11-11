@@ -21,8 +21,6 @@ import {
   createJellyfinEmbyClient,
   isJellyfinEmby,
   logoutUserToken,
-  mediaBrowserAuthHeader,
-  mediaBrowserTokenHeader,
   verifyServerAdmin,
   PlexClient,
   JellyfinClient,
@@ -32,6 +30,10 @@ import {
   type MediaUser,
   type MediaLibrary,
 } from '../index.js';
+import {
+  mediaBrowserAuthHeader,
+  mediaBrowserTokenHeader,
+} from '../shared/baseMediaServerClient.js';
 import { NOT_NEEDED } from '../types.js';
 
 // ============================================================================

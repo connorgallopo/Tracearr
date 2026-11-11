@@ -51,7 +51,7 @@ import {
 import { maybeEnqueueMaintenanceJob } from '../jobs/maintenanceQueue.js';
 import {
   AUTO_LINK_WINDOW_MS,
-  listPlexServers,
+  listLinkingServers,
   MAX_AUTO_LINK_ATTEMPTS,
 } from '../jobs/importedHistoryLinking.js';
 import { getSessionsCompressionHorizon, refreshAggregates } from '../db/timescale.js';
@@ -323,10 +323,10 @@ export async function maybeEnqueueImportedHistoryLink(
     return;
   }
 
-  const plexServers = await listPlexServers();
+  const linkingServers = await listLinkingServers();
   const tautulli = await getSettings(['tautulliUrl', 'tautulliApiKey']);
   if (!tautulli.tautulliUrl || !tautulli.tautulliApiKey) {
-    if (plexServers.every((server) => link.providerPassDoneServers.includes(server.id))) {
+    if (linkingServers.every((server) => link.providerPassDoneServers.includes(server.id))) {
       await setImportedHistoryLinkState(link.generation, {
         ...link,
         state: 'done',
@@ -348,7 +348,7 @@ export async function maybeEnqueueImportedHistoryLink(
     now - lastLinkEnqueueAt >= AUTO_BACKFILL_ENQUEUE_INTERVAL_MS &&
     (addedItems || now - lastLinkProbeAt >= AUTO_BACKFILL_PROBE_INTERVAL_MS);
   if (!allowed) return;
-  for (const server of plexServers) {
+  for (const server of linkingServers) {
     if (await hasPendingLibrarySync(server.id)) return;
   }
   const enqueued = await maybeEnqueueMaintenanceJob('link_imported_history', 'system', {

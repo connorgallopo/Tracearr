@@ -12,7 +12,10 @@ const { redis, client } = vi.hoisted(() => ({
 
 vi.mock('../../../db/client.js', () => ({ db: { select: vi.fn(), update: vi.fn() } }));
 vi.mock('../../../lib/redisShared.js', () => ({ getRedis: () => redis.current }));
-vi.mock('../../mediaServer/index.js', () => ({ createMediaServerClient: vi.fn(() => client) }));
+vi.mock('../../mediaServer/index.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../mediaServer/index.js')>()),
+  createJellyfinEmbyClient: vi.fn(() => client),
+}));
 vi.mock('../../../jobs/poller/database.js', () => ({ getServerUserIdByExternalId: vi.fn() }));
 vi.mock('../recorder.js', () => ({ insertDownload: vi.fn(), matchLibraryItem: vi.fn() }));
 vi.mock('../enrich.js', async (importOriginal) => ({
@@ -31,7 +34,7 @@ import {
   recordTranscodePullEvent,
 } from '../transcodePull.js';
 
-const SERVER = { id: '11111111-1111-4111-8111-111111111111' } as ServerRow;
+const SERVER = { id: '11111111-1111-4111-8111-111111111111', type: 'jellyfin' } as ServerRow;
 const T = new Date('2026-10-20T15:00:00Z').getTime();
 const DEVICE = 'streamyfin-device-1';
 const USER_GUID = '72decdb0b0124b43b9086978ba823d1f';

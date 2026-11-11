@@ -16,7 +16,10 @@ const { redis, client } = vi.hoisted(() => ({
 
 vi.mock('../../../db/client.js', () => ({ db: { select: vi.fn() } }));
 vi.mock('../../../lib/redisShared.js', () => ({ getRedis: () => redis.current }));
-vi.mock('../../mediaServer/index.js', () => ({ createMediaServerClient: vi.fn(() => client) }));
+vi.mock('../../mediaServer/index.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../mediaServer/index.js')>()),
+  createJellyfinEmbyClient: vi.fn(() => client),
+}));
 vi.mock('../../../jobs/poller/database.js', () => ({ getServerUserIdByExternalId: vi.fn() }));
 vi.mock('../recorder.js', () => ({ recordDownload: vi.fn() }));
 
