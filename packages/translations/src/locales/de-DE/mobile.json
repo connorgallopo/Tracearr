@@ -51,7 +51,7 @@
     "disconnectConfirmGeneric": "Sind Sie sicher, dass Sie sich trennen möchten? Sie müssen danach erneut koppeln, um die App zu nutzen.",
     "currentlyConnected": "Derzeit verbunden mit {{serverName}}",
     "version": "Version {{version}}",
-    "build": ""
+    "build": "Build {{build}}"
   },
   "navigation": {
     "selectServer": "Server wählen",
@@ -109,12 +109,12 @@
     "tokenMissing": "Ihr Server verfügt noch über kein Push-Token für dieses Gerät. Die App registriert sich bei jedem Start erneut.",
     "destinationOff": "Das mobile Push-Ziel ist auf Ihrem Server deaktiviert. Aktivieren Sie es im Web-Dashboard unter „Einstellungen“, „Benachrichtigungen“ und „Ziele“.",
     "everyViolationSent": "Jeder Verstoß wird per Push-Benachrichtigung an das Mobilgerät gesendet",
-    "noViolationSender": "",
-    "noAutomationSends": "",
+    "noViolationSender": "Verstöße erhalten ist für mobile Push-Benachrichtigungen deaktiviert",
+    "noAutomationSends": "Keine Automatisierung sendet dies an den Mobile-Push",
     "eventsFooter": "",
     "sharedEventsFooter": "Diese Schalter ändern, was Ihr Server an Mobile Push sendet, sodass sie für jedes gekoppelte Gerät gelten. Push-Benachrichtigungen und Ruhezeiten gelten nur für dieses Gerät.",
-    "sentByAutomations_one": "",
-    "sentByAutomations_other": "",
+    "sentByAutomations_one": "Gesendet von {{count}}-Automatisierung",
+    "sentByAutomations_other": "Gesendet von {{count}} Automatisierungen",
     "alsoSentBy_one": "Wird außerdem von {{count}} Automatisierung über das Web-Dashboard gesendet, was durch diesen Schalter nicht geändert wird",
     "alsoSentBy_other": "Wird außerdem von {{count}} Automatisierungen über das Web-Dashboard gesendet, was durch diesen Schalter nicht geändert wird",
     "scopedSenders_one": "{{count}} ist auf einen Server beschränkt",
@@ -148,7 +148,7 @@
     "clearFilters": "Filter zurücksetzen",
     "acknowledgeAll": "Bestätige alle",
     "acknowledgeAllBody": "Alle ausstehenden Warnungen auf {{servers}} werden als bestätigt markiert. Dieser Vorgang kann nicht rückgängig gemacht werden.",
-    "acknowledgeAllBodySeverity": "",
+    "acknowledgeAllBodySeverity": "Alle ausstehenden Warnungen mit dem Schweregrad {{severity}} auf {{servers}} werden als bestätigt markiert.\nDieser Vorgang kann nicht rückgängig gemacht werden.",
     "all": "Alle",
     "allClear": "",
     "allServers": "Alle Server",
@@ -158,7 +158,7 @@
     "acknowledgeAllTitle_one": "",
     "acknowledgeAllTitle_other": "",
     "pendingCount_one": "",
-    "pendingCount_other": ""
+    "pendingCount_other": "{{count}} ausstehende"
   },
   "history": {
     "adjustFilters": "Versuche die Filter anzupassen",
@@ -183,7 +183,7 @@
     "noUsersMatch": "Keine Benutzer gefunden zu \"{{query}}\"",
     "joinedRelative": "",
     "sortActive": "Aktiv",
-    "sortTrust": "",
+    "sortTrust": "Vertrauen",
     "selectUser": "Wählen Sie einen Benutzer aus"
   },
   "activity": {
@@ -195,54 +195,54 @@
   "unauthenticated": {
     "connectionLost": "Verbindung abgebrochen",
     "accessRevoked": "Ihr Zugriff auf {{serverName}} wurde widerrufen. Fragen Sie den Serverbesitzer nach einem neuen Kopplungscode.",
-    "deviceRemoved": "",
+    "deviceRemoved": "Dieses Gerät wurde von {{serverName}} entfernt. Koppeln Sie es erneut mit einem neuen Code aus der Web-App.",
     "expired": "{{serverName}} hat dieses Gerät nach 30 Tagen ohne Nutzung abgemeldet. Koppeln Sie es erneut mit einem neuen Code aus der Web-App.",
     "scanQrCode": "QR-Code scannen"
   },
   "clientTooOld": {
     "title": "Aktualisiere Tracearr",
-    "body": "",
+    "body": "{{serverName}} benötigt eine neuere Version der Tracearr-App.",
     "update": "Aktualisierung"
   },
   "serverSelector": {
     "servers": "Server",
     "selectServers": "Server auswählen",
     "serversSelected": "{{selected}} von {{total}} Servern ausgewählt",
-    "allServers": ""
+    "allServers": "Alle Server"
   },
   "reconnected": "Wiederverbunden",
   "a11y": {
-    "selectServer": "",
-    "alerts": "",
-    "settings": "",
-    "trustScore": "",
-    "decreaseTrustScore": "",
-    "increaseTrustScore": "",
-    "sortAscending": "",
-    "sortDescending": "",
-    "alertsCount_one": "",
-    "alertsCount_other": "",
-    "filtersActive_one": "",
-    "filtersActive_other": ""
+    "selectServer": "Server auswählen",
+    "alerts": "Warnungen",
+    "settings": "Einstellungen",
+    "trustScore": "Vertrauenswert {{score}}",
+    "decreaseTrustScore": "Vertrauenswert senken",
+    "increaseTrustScore": "Erhöhe Vertrauenswert",
+    "sortAscending": "Aufsteigend sortiert, zum Umkehren antippen",
+    "sortDescending": "Absteigend sortiert, zum Umkehren antippen",
+    "alertsCount_one": "{{count}} Warnung ungelesen",
+    "alertsCount_other": "{{count}} Warnungen ungelesen",
+    "filtersActive_one": "{{count}} Filter aktiv",
+    "filtersActive_other": "{{count}} Filter aktiv"
   },
   "map": {
-    "noData": "",
-    "unavailable": ""
+    "noData": "Keine Standortdaten verfügbar",
+    "unavailable": "Karte nicht verfügbar"
   },
   "automations": {
-    "editOnWeb": "",
-    "emptyDescription": "",
+    "editOnWeb": "Automatisierungen werden in der Tracearr-Webanwendung erstellt und bearbeitet.",
+    "emptyDescription": "Erstellen Sie Automatisierungen in der Tracearr-Webanwendung, und sie werden hier angezeigt.",
     "kind": {
-      "notification": "",
+      "notification": "Benachrichtigung",
       "policy": ""
     },
-    "lastRun": "",
-    "truncated": "",
-    "turnOffFailed": "",
-    "turnOnFailed": "",
+    "lastRun": "Letzter Lauf {{when}}",
+    "truncated": "Es werden die ersten {{shown}} von {{total}} Automatisierungen angezeigt. Die übrigen befinden sich in der Tracearr-Webanwendung.",
+    "turnOffFailed": "Konnte nicht ausgeschalten werden. Es ist immer noch eingeschaltet.",
+    "turnOnFailed": "Konnte nicht eingeschalten werden. Es ist immer noch ausgeschaltet.",
     "unsupportedDescription": "",
-    "unsupportedTitle": "",
-    "versionCheckFailed": "",
+    "unsupportedTitle": "Automatisierungen benötigt Server 2.2 oder neuer",
+    "versionCheckFailed": "Die Serverversion konnte nicht überprüft werden",
     "conditions_one": "",
     "conditions_other": ""
   },
@@ -258,13 +258,13 @@
     "codec": "Codec",
     "color": "Farbe",
     "container": "Container",
-    "forced": "",
-    "format": "",
+    "forced": "Erzwungen",
+    "format": "Format:",
     "framerate": "",
     "hwDecode": "",
     "hwEncode": "",
     "mono": "Mono",
-    "noDetails": "",
+    "noDetails": "Keine detaillierten Stream-Informationen verfügbar",
     "notAvailable": "N/A",
     "profile": "Profil",
     "sampleRate": "",
@@ -273,7 +273,7 @@
     "stereo": "Stereo",
     "stream": "Stream",
     "subtitles": "Untertitel",
-    "throttled": "",
+    "throttled": "gedrosselt",
     "transcodeDetails": "Transkodierungsdetails"
   },
   "widget": {
@@ -281,7 +281,7 @@
     "signedOut": "Öffnen Sie Tracearr, um einen Server zu koppeln.",
     "serversDown_one": "",
     "serversDown_other": "",
-    "transcodes_one": "",
-    "transcodes_other": "{{count}} Transcodes"
+    "transcodes_one": "{{count}} Transkodierung",
+    "transcodes_other": "{{count}} Transkodierungen"
   }
 }
