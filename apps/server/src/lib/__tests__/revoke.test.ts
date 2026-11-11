@@ -1,10 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const { selectResults, deleteUserSessions, jellyfinLogout, embyLogout } = vi.hoisted(() => ({
+const { selectResults, deleteUserSessions, logoutUserToken } = vi.hoisted(() => ({
   selectResults: [] as unknown[][],
   deleteUserSessions: vi.fn(),
-  jellyfinLogout: vi.fn(),
-  embyLogout: vi.fn(),
+  logoutUserToken: vi.fn(),
 }));
 
 vi.mock('../../db/client.js', () => ({ db: { select: vi.fn() } }));
@@ -14,9 +13,9 @@ vi.mock('../auth.js', () => ({
 vi.mock('../../websocket/index.js', () => ({ disconnectUserSockets: vi.fn() }));
 vi.mock('../scope.js', () => ({ clearScope: vi.fn() }));
 vi.mock('../memberLogin.js', () => ({ memberStillValid: vi.fn(async () => false) }));
-vi.mock('../../services/mediaServer/index.js', () => ({
-  JellyfinClient: { logoutUserToken: jellyfinLogout },
-  EmbyClient: { logoutUserToken: embyLogout },
+vi.mock('../../services/mediaServer/index.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../services/mediaServer/index.js')>()),
+  logoutUserToken,
 }));
 
 import { db } from '../../db/client.js';
@@ -84,12 +83,13 @@ describe('revokeSessionsForUsers', () => {
       [{ url: 'http://emby.local:8096', type: 'emby' }]
     );
     await revokeSessionsForUsers(['u1']);
-    expect(jellyfinLogout).toHaveBeenCalledExactlyOnceWith('http://jf.local:8096', 'jf-token');
-    expect(embyLogout).toHaveBeenCalledExactlyOnceWith('http://emby.local:8096', 'emby-token');
+    expect(logoutUserToken).toHaveBeenCalledTimes(2);
+    expect(logoutUserToken).toHaveBeenCalledWith('jellyfin', 'http://jf.local:8096', 'jf-token');
+    expect(logoutUserToken).toHaveBeenCalledWith('emby', 'http://emby.local:8096', 'emby-token');
   });
 
   it('swallows a logout failure and still logs out the next account', async () => {
-    jellyfinLogout.mockRejectedValueOnce(new Error('server down'));
+    logoutUserToken.mockRejectedValueOnce(new Error('server down'));
     queueSelects(
       [],
       [
@@ -100,7 +100,11 @@ describe('revokeSessionsForUsers', () => {
       [{ url: 'http://emby.local:8096', type: 'emby' }]
     );
     await expect(revokeSessionsForUsers(['u1'])).resolves.toBeUndefined();
-    expect(embyLogout).toHaveBeenCalledOnce();
+    expect(logoutUserToken).toHaveBeenLastCalledWith(
+      'emby',
+      'http://emby.local:8096',
+      'emby-token'
+    );
   });
 });
 

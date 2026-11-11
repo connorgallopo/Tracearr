@@ -6,7 +6,9 @@ import type { DownloadSignal } from '../recorder.js';
 const { client } = vi.hoisted(() => ({ client: { describeDownloadSource: vi.fn() } }));
 
 vi.mock('../../../db/client.js', () => ({ db: { select: vi.fn() } }));
-vi.mock('../../mediaServer/index.js', () => ({ createMediaServerClient: vi.fn(() => client) }));
+vi.mock('../../mediaServer/index.js', () => ({
+  createMediaServerClient: vi.fn(() => fakeJellyfinClient(client)),
+}));
 vi.mock('../../serverLocations.js', () => ({ resolveSessionGeo: vi.fn() }));
 vi.mock('../../settings.js', () => ({
   getGeoIPSettings: vi.fn(async () => ({ usePlexGeoip: false })),
@@ -16,6 +18,7 @@ import { db } from '../../../db/client.js';
 import { libraryItems, libraryItemVersions, servers, serverUsers } from '../../../db/schema.js';
 import { resolveSessionGeo } from '../../serverLocations.js';
 import { deliveredFromTranscode, enrichDownload } from '../enrich.js';
+import { fakeJellyfinClient } from '../../../test/mediaServerFakes.js';
 
 const SERVER = '11111111-1111-4111-8111-111111111111';
 const USER = '22222222-2222-4222-8222-222222222222';

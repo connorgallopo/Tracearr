@@ -996,6 +996,14 @@ export {
   type TrustLevel,
 } from './trustLevel.js';
 
+export {
+  SERVER_TYPES,
+  assertNever,
+  isServerType,
+  type JellyfinEmbyServerType,
+} from './serverTypes.js';
+export { SERVER_PROFILES, type ServerProfile } from './serverProfiles.js';
+
 // Server-scope selection (cache-key and query-param builders)
 export {
   ALL_SERVERS,

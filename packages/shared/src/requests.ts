@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { serverIdsQuerySchema, uuidSchema } from './schemas.js';
-import type { WatchedState } from './types.js';
+import type { ServerType, WatchedState } from './types.js';
 
 export const REQUEST_SERVICE_TYPES = ['seerr'] as const;
 export type RequestServiceType = (typeof REQUEST_SERVICE_TYPES)[number];
@@ -55,7 +55,7 @@ export interface RequestService {
 export interface RequestServiceProbeResult {
   applicationTitle: string;
   version: string;
-  mediaServerType: 'plex' | 'jellyfin' | 'emby';
+  mediaServerType: ServerType;
   remoteServerId: string;
   matchedServerId: string | null;
 }

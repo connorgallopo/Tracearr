@@ -8,6 +8,7 @@
 import { eq, and, isNull, isNotNull, inArray, notInArray } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import type pg from 'pg';
+import { assertNever, type JellyfinEmbyServerType } from '@tracearr/shared';
 import { createRawPgClient, db, type Executor } from '../db/client.js';
 import * as schema from '../db/schema.js';
 import { servers, serverUsers } from '../db/schema.js';
@@ -300,7 +301,7 @@ async function syncPlexUsers(
  */
 async function syncMediaServerUsers(
   serverId: string,
-  serverType: 'jellyfin' | 'emby',
+  serverType: JellyfinEmbyServerType,
   serverUrl: string,
   token: string
 ): Promise<{
@@ -387,23 +388,24 @@ export async function syncServer(
 
   // Sync users
   if (options.syncUsers) {
-    if (server.type === 'plex') {
-      const userResult = await syncPlexUsers(serverId, token, serverUrl);
-      result.usersAdded = userResult.added;
-      result.usersUpdated = userResult.updated;
-      result.usersSkipped = userResult.skipped;
-      result.usersRemoved = userResult.removed;
-      result.usersRestored = userResult.restored;
-      result.errors.push(...userResult.errors);
-    } else if (server.type === 'jellyfin' || server.type === 'emby') {
-      const userResult = await syncMediaServerUsers(serverId, server.type, serverUrl, server.token);
-      result.usersAdded = userResult.added;
-      result.usersUpdated = userResult.updated;
-      result.usersSkipped = userResult.skipped;
-      result.usersRemoved = userResult.removed;
-      result.usersRestored = userResult.restored;
-      result.errors.push(...userResult.errors);
+    let userResult: Awaited<ReturnType<typeof syncPlexUsers>>;
+    switch (server.type) {
+      case 'plex':
+        userResult = await syncPlexUsers(serverId, token, serverUrl);
+        break;
+      case 'jellyfin':
+      case 'emby':
+        userResult = await syncMediaServerUsers(serverId, server.type, serverUrl, token);
+        break;
+      default:
+        return assertNever(server.type);
     }
+    result.usersAdded = userResult.added;
+    result.usersUpdated = userResult.updated;
+    result.usersSkipped = userResult.skipped;
+    result.usersRemoved = userResult.removed;
+    result.usersRestored = userResult.restored;
+    result.errors.push(...userResult.errors);
   }
 
   // Sync libraries (just count for now - libraries stored on server)

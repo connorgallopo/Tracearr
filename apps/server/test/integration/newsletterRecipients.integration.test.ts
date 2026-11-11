@@ -169,6 +169,68 @@ describe('recipient candidates', () => {
     });
   });
 
+  it('ranks Plex account emails first and treats Jellyfin and Emby ones as usernames', async () => {
+    const [plex, jellyfin, emby] = await db
+      .insert(servers)
+      .values([
+        { name: 'Kind Plex', type: 'plex', url: 'http://localhost:32403', token: 'tok' },
+        { name: 'Kind Jellyfin', type: 'jellyfin', url: 'http://localhost:8099', token: 'tok' },
+        { name: 'Kind Emby', type: 'emby', url: 'http://localhost:8100', token: 'tok' },
+      ])
+      .returning();
+    const [all, embyOnly] = await db
+      .insert(users)
+      .values([
+        { username: 'kind-all', name: null, role: 'member' },
+        { username: 'kind-emby', name: null, role: 'member' },
+      ])
+      .returning();
+    await db.insert(serverUsers).values([
+      {
+        userId: all!.id,
+        serverId: emby!.id,
+        externalId: 'emby-kind-all',
+        username: 'all@emby.example',
+        email: 'all@emby.example',
+        createdAt: new Date('2026-01-01T00:00:00Z'),
+      },
+      {
+        userId: all!.id,
+        serverId: jellyfin!.id,
+        externalId: 'jf-kind-all',
+        username: 'all@jellyfin.example',
+        email: 'all@jellyfin.example',
+        createdAt: new Date('2026-02-01T00:00:00Z'),
+      },
+      {
+        userId: all!.id,
+        serverId: plex!.id,
+        externalId: 'plex-kind-all',
+        username: 'kindplex',
+        email: 'all@plex.example',
+        createdAt: new Date('2026-03-01T00:00:00Z'),
+      },
+      {
+        userId: embyOnly!.id,
+        serverId: emby!.id,
+        externalId: 'emby-kind-only',
+        username: 'only@emby.example',
+        email: 'only@emby.example',
+      },
+    ]);
+
+    const candidates = await loadCandidates([plex!.id, jellyfin!.id, emby!.id]);
+    const byUser = new Map(candidates.map((c) => [c.userId, c]));
+    expect(byUser.get(all!.id)).toMatchObject({
+      accountEmails: ['all@plex.example', 'all@emby.example', 'all@jellyfin.example'],
+      accountEmailsFromUsernames: false,
+    });
+    expect(byUser.get(embyOnly!.id)).toMatchObject({
+      accountEmails: ['only@emby.example'],
+      accountEmailsFromUsernames: true,
+    });
+  });
+
   it("orders an identity's account emails by the account's own age", async () => {
     const seeded = await seedBasicOwner();
     const older = new Date('2026-01-01T00:00:00Z');

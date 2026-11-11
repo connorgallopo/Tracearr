@@ -13,6 +13,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ActiveSession, EngineAutomation } from '@tracearr/shared';
 import type { CacheService, PubSubService } from '../../../services/cache.js';
 import type * as ProducersModule from '../../../services/automations/events/producers.js';
+import type * as MediaServerModule from '../../../services/mediaServer/index.js';
+import type { MediaSession } from '../../../services/mediaServer/types.js';
 import type { ProcessedSession } from '../types.js';
 
 const mockDbSelect = vi.fn();
@@ -144,6 +146,7 @@ import {
   dispatchServerHealthById,
 } from '../../../services/automations/events/producers.js';
 import { HttpClientError } from '../../../utils/http.js';
+import { fakePlexClient } from '../../../test/mediaServerFakes.js';
 
 const mockDispatchServerHealth = vi.mocked(dispatchServerHealth);
 const mockDispatchServerHealthById = vi.mocked(dispatchServerHealthById);
@@ -211,6 +214,7 @@ const serverRow = {
   createdAt: new Date(),
   updatedAt: new Date(),
 };
+let serverRows: unknown[] = [serverRow];
 
 const serverUsersRows = [
   {
@@ -281,7 +285,7 @@ const activeSessionB = {
 
 mockDbSelect.mockImplementation((_cols?: unknown) => ({
   from: (table: unknown) => {
-    if (table === servers) return Promise.resolve([serverRow]);
+    if (table === servers) return Promise.resolve(serverRows);
     if (table === serverUsers) {
       return { innerJoin: () => ({ where: () => Promise.resolve(serverUsersRows) }) };
     }
@@ -383,9 +387,11 @@ describe('per-session error isolation in processServerSessions', () => {
   });
 
   it('lands the other session and keeps the server healthy when one session throws mid-poll', async () => {
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([processedA, processedB]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([processedA, processedB]),
+      })
+    );
 
     await triggerPoll();
 
@@ -401,9 +407,11 @@ describe('per-session error isolation in processServerSessions', () => {
   });
 
   it('never trips the DOWN_THRESHOLD notification across repeated ticks where the same session keeps throwing', async () => {
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([processedA, processedB]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([processedA, processedB]),
+      })
+    );
 
     await triggerPoll();
     await triggerPoll();
@@ -414,9 +422,11 @@ describe('per-session error isolation in processServerSessions', () => {
   });
 
   it('still reports the server unhealthy when client.getSessions() itself fails', async () => {
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockRejectedValue(new Error('ECONNREFUSED')),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockRejectedValue(new Error('ECONNREFUSED')),
+      })
+    );
 
     await triggerPoll();
     await triggerPoll();
@@ -427,16 +437,18 @@ describe('per-session error isolation in processServerSessions', () => {
 
   it('marks the server down as unauthorized when the poll gets a 401', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockRejectedValue(
-        new HttpClientError({
-          service: 'plex',
-          statusCode: 401,
-          statusText: 'Unauthorized',
-          url: 'http://plex.local:32400/status/sessions',
-        })
-      ),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockRejectedValue(
+          new HttpClientError({
+            service: 'plex',
+            statusCode: 401,
+            statusText: 'Unauthorized',
+            url: 'http://plex.local:32400/status/sessions',
+          })
+        ),
+      })
+    );
 
     await triggerPoll();
     await triggerPoll();
@@ -454,9 +466,11 @@ describe('per-session error isolation in processServerSessions', () => {
 
   it('dispatches server.down once the threshold trips, and enqueues nothing', async () => {
     mockGetActiveAutomations.mockResolvedValue([serverDownAutomation]);
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockRejectedValue(new Error('ECONNREFUSED')),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockRejectedValue(new Error('ECONNREFUSED')),
+      })
+    );
 
     await triggerPoll();
     await triggerPoll();
@@ -476,25 +490,31 @@ describe('per-session error isolation in processServerSessions', () => {
     mockGetActiveAutomations.mockResolvedValue([
       { ...serverDownAutomation, triggers: [{ id: 'up-node', type: 'server.up', enabled: true }] },
     ]);
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockRejectedValue(new Error('ECONNREFUSED')),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockRejectedValue(new Error('ECONNREFUSED')),
+      })
+    );
     await triggerPoll();
     await triggerPoll();
     await triggerPoll();
 
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([]),
+      })
+    );
     await triggerPoll();
 
     expect(dispatchedOfType('server.up')).toHaveLength(1);
   });
 
   it('dispatches no health event when no automation listens', async () => {
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockRejectedValue(new Error('ECONNREFUSED')),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockRejectedValue(new Error('ECONNREFUSED')),
+      })
+    );
 
     await triggerPoll();
     await triggerPoll();
@@ -505,21 +525,85 @@ describe('per-session error isolation in processServerSessions', () => {
 
   it('does not treat a session that throws mid-processing as missing for grace-period purposes', async () => {
     // Tick 1: session A is genuinely absent from the response - it enters grace.
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([processedB]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([processedB]),
+      })
+    );
     await triggerPoll();
 
     expect(gracePeriodSessionIds().has('active-a-id')).toBe(true);
 
     // Tick 2: session A is back in the response but throws while being processed.
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([processedA, processedB]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([processedA, processedB]),
+      })
+    );
     await triggerPoll();
 
     expect(gracePeriodSessionIds().has('active-a-id')).toBe(false);
     expect(mockStopSessionAtomic).not.toHaveBeenCalled();
+  });
+
+  describe('servers and cached sessions the poller has no type for', () => {
+    afterEach(() => {
+      serverRows = [serverRow];
+    });
+
+    it('fails only the poll of a server row whose type it does not know', async () => {
+      const actual = await vi.importActual<typeof MediaServerModule>(
+        '../../../services/mediaServer/index.js'
+      );
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+      serverRows = [
+        serverRow,
+        { ...serverRow, id: 'server-2', name: 'Unknown Server', type: 'not-a-server' },
+      ];
+      cacheService.getAllActiveSessions.mockResolvedValue([
+        activeSessionB,
+        { ...activeSessionB, id: 'unknown-active-id', serverId: 'server-2' },
+      ]);
+      mockCreateMediaServerClient.mockImplementation(
+        (options: Parameters<typeof actual.createMediaServerClient>[0]) =>
+          options.type === 'plex'
+            ? fakePlexClient({ getSessions: vi.fn().mockResolvedValue([processedB]) })
+            : actual.createMediaServerClient(options)
+      );
+
+      await triggerPoll();
+
+      expect(errorSpy).toHaveBeenCalledWith(
+        'Error polling server Unknown Server:',
+        expect.objectContaining({ message: 'Unhandled value: not-a-server' })
+      );
+      expect(cacheService.incrServerFailCount).toHaveBeenCalledWith('server-2');
+      expect(cacheService.setServerHealth).toHaveBeenCalledWith('server-1', true);
+      const lastCall = mockProcessPollResults.mock.calls.at(-1)?.[0] as {
+        updatedSessions: Array<{ id: string }>;
+      };
+      expect(lastCall.updatedSessions).toEqual([
+        expect.objectContaining({ id: 'active-b-updated' }),
+      ]);
+    });
+
+    it('keeps polling when a cached session belongs to a server that is gone', async () => {
+      cacheService.getAllActiveSessions.mockResolvedValue([
+        { ...activeSessionA, id: 'orphan-id', serverId: 'server-gone' },
+        activeSessionA,
+        activeSessionB,
+      ]);
+      mockCreateMediaServerClient.mockReturnValue(
+        fakePlexClient({
+          getSessions: vi.fn().mockResolvedValue([processedB]),
+        })
+      );
+
+      await triggerPoll();
+
+      expect(cacheService.setServerHealth).toHaveBeenCalledWith('server-1', true);
+      expect(gracePeriodSessionIds().has('active-a-id')).toBe(true);
+    });
   });
 });
 
@@ -528,8 +612,10 @@ describe('server health across the poller and the live connection', () => {
     [...mockDispatchServerHealth.mock.calls, ...mockDispatchServerHealthById.mock.calls].filter(
       ([eventType]) => eventType === type
     ).length;
-  const pollsAnswer = (getSessions: () => Promise<unknown[]>) =>
-    mockCreateMediaServerClient.mockReturnValue({ getSessions: vi.fn(getSessions) });
+  const pollsAnswer = (getSessions: () => Promise<MediaSession[]>) =>
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({ getSessions: vi.fn(getSessions) })
+    );
   const pollsFail = () => pollsAnswer(() => Promise.reject(new Error('ECONNREFUSED')));
   const pollsSucceed = () => pollsAnswer(() => Promise.resolve([]));
   /** The real manager flips its fallback flag before it emits, so the poller sees the new state. */
@@ -606,8 +692,8 @@ describe('server health across the poller and the live connection', () => {
     liveConnection(false);
     await vi.advanceTimersByTimeAsync(30_000);
 
-    let answer!: (sessions: unknown[]) => void;
-    const inFlight = new Promise<unknown[]>((resolve) => {
+    let answer!: (sessions: MediaSession[]) => void;
+    const inFlight = new Promise<MediaSession[]>((resolve) => {
       answer = resolve;
     });
     pollsAnswer(() => inFlight);

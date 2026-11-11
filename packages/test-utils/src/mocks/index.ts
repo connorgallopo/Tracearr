@@ -6,7 +6,6 @@
 
 // Import reset functions for local use in resetAllMocks()
 import { resetMockRedis } from './redis.js';
-import { resetMockMediaCounters } from './mediaServer.js';
 import { resetExpoPushCounter } from './expoPush.js';
 import { resetSocketCounter } from './websocket.js';
 
@@ -18,24 +17,6 @@ export {
   createSimpleMockRedis,
   type SimpleMockRedis,
 } from './redis.js';
-
-// Media server mocks (Plex, Jellyfin, Emby)
-export {
-  createMockMediaServerClient,
-  createMockPlexClient,
-  createMockJellyfinClient,
-  createMockEmbyClient,
-  buildMockSession,
-  buildMockUser,
-  buildMockLibrary,
-  resetMockMediaCounters,
-  type IMediaServerClient,
-  type MediaSession,
-  type MediaUser,
-  type MediaLibrary,
-  type MockMediaServerClient,
-  type MockMediaServerOptions,
-} from './mediaServer.js';
 
 // Expo Push notification mocks
 export {
@@ -74,7 +55,6 @@ export {
  */
 export function resetAllMocks(): void {
   resetMockRedis();
-  resetMockMediaCounters();
   resetExpoPushCounter();
   resetSocketCounter();
 }

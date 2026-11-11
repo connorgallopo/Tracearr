@@ -685,9 +685,10 @@ describe('server and install producers', () => {
   it('carries the plugin versions and the download url', async () => {
     mockGetActiveAutomations.mockResolvedValue([automation([node('plugin.update_available')])]);
     const seen = captureEvents('plugin.update_available');
+    const jellyfin = { ...server, type: 'jellyfin' as const };
 
     await dispatchPluginUpdate({
-      server,
+      server: jellyfin,
       installedVersion: '0.2.0',
       latestVersion: '0.3.0',
       downloadUrl: 'https://example.test/releases',
@@ -695,7 +696,7 @@ describe('server and install producers', () => {
 
     expect(seen[0]?.event).toMatchObject({
       type: 'plugin.update_available',
-      server,
+      server: jellyfin,
       installedVersion: '0.2.0',
       latestVersion: '0.3.0',
       downloadUrl: 'https://example.test/releases',

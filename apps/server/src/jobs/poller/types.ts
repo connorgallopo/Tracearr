@@ -11,6 +11,7 @@ import type {
   EngineAutomation,
   ActiveSession,
   StreamDetailFields,
+  ServerType,
 } from '@tracearr/shared';
 import type { sessions } from '../../db/schema.js';
 import type { SessionIdentity as MediaItemIdentity } from './database.js';
@@ -44,7 +45,7 @@ export interface PollerConfig {
 export interface ServerWithToken {
   id: string;
   name: string;
-  type: 'plex' | 'jellyfin';
+  type: ServerType;
   url: string;
   token: string;
   createdAt: Date;
@@ -74,7 +75,7 @@ export interface CompositeSessionIdentity {
 
 /** Input for building a session cache/tracking key. */
 export interface BuildCompositeKeyInput {
-  serverType: 'plex' | 'jellyfin' | 'emby';
+  serverType: ServerType;
   serverId: string;
   externalUserId: string;
   deviceId: string | null;
@@ -287,7 +288,7 @@ export interface PendingSessionData {
   /** Processed session data from media server */
   processed: ProcessedSession;
   /** Server info */
-  server: { id: string; name: string; type: 'plex' | 'jellyfin' | 'emby' };
+  server: { id: string; name: string; type: ServerType };
   /** Server user info (matches SessionCreationInput.serverUser) */
   serverUser: {
     id: string;
@@ -355,7 +356,7 @@ export interface SessionCreationInput {
   /** Processed session data from media server */
   processed: ProcessedSession;
   /** Server info */
-  server: { id: string; name: string; type: 'plex' | 'jellyfin' | 'emby' };
+  server: { id: string; name: string; type: ServerType };
   /** Server user info */
   serverUser: {
     id: string;
@@ -435,7 +436,7 @@ export interface ResolvePendingSessionInput {
   cacheService: CacheService;
   pubSubService: PubSubService | null;
   /** Server info */
-  server: { id: string; name: string; type: 'plex' | 'jellyfin' | 'emby' };
+  server: { id: string; name: string; type: ServerType };
   /** Redis key for the pending session lookup (sessionKey for Plex, composite key otherwise) */
   pendingKey: string;
   /** Processed session data from media server */
@@ -503,7 +504,7 @@ export interface MediaChangeInput {
   /** New media data from the poll */
   processed: ProcessedSession;
   /** Server info */
-  server: { id: string; name: string; type: 'plex' | 'jellyfin' | 'emby' };
+  server: { id: string; name: string; type: ServerType };
   /** Server user info */
   serverUser: {
     id: string;

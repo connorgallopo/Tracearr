@@ -3,6 +3,8 @@ import type {
   Session,
   TriggerType as CatalogTriggerType,
   ViolationSeverity,
+  ServerType,
+  JellyfinEmbyServerType,
 } from '@tracearr/shared';
 import type { db } from '../../../db/client.js';
 import type { sessions } from '../../../db/schema.js';
@@ -22,7 +24,7 @@ export type TriggerType =
 export interface EvaluationServer {
   id: string;
   name: string;
-  type: 'plex' | 'jellyfin' | 'emby';
+  type: ServerType;
 }
 
 /** What every producer already holds about the account; matches SessionCreationInput['serverUser']. */
@@ -190,7 +192,7 @@ export interface ServerUpEvent extends BaseEvent {
 
 export interface PluginUpdateEvent extends BaseEvent {
   type: 'plugin.update_available';
-  server: EvaluationServer;
+  server: EvaluationServer & { type: JellyfinEmbyServerType };
   installedVersion: string | null;
   latestVersion: string;
   downloadUrl: string;

@@ -15,12 +15,14 @@ import {
   POSTER_IMAGE_SIZE,
   SQUARE_POSTER_SIZE,
   TIME_MS,
+  assertNever,
   isDirectAvatarUrl,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, libraryItems } from '../db/schema.js';
 import { assertSafeProbeUrl, SsrfBlockedError } from '../utils/ssrf.js';
 import { cacheWriteAllowed, noteCacheWrite } from './imageCacheGuard.js';
+import { mediaBrowserTokenHeader } from './mediaServer/shared/baseMediaServerClient.js';
 
 // libvips defaults its thread pool to the core count, so one background
 // precache walk can own every core of a small box. Inputs are server-resized
@@ -397,46 +399,51 @@ export function buildUpstreamRequest(
     throw new SsrfBlockedError(`Not a media server image path: ${imagePath}`);
   }
 
-  if (server.type === 'plex') {
-    // Plex image URLs are relative paths like /library/metadata/123/thumb/456
-    if (resize) {
-      // Plex's photo transcoder resizes and caches server-side - a 240px
-      // poster arrives as ~20KB instead of the multi-MB original. upscale=0
-      // keeps small sources untouched; minSize=1 fills the requested box.
-      const params = new URLSearchParams({
-        width: String(resize.width),
-        height: String(resize.height),
-        minSize: '1',
-        upscale: '0',
-        url: imagePath,
-        'X-Plex-Token': server.token,
-      });
-      return { imageUrl: `${baseUrl}/photo/:/transcode?${params.toString()}`, headers };
+  switch (server.type) {
+    case 'plex': {
+      // Plex image URLs are relative paths like /library/metadata/123/thumb/456
+      if (resize) {
+        // Plex's photo transcoder resizes and caches server-side - a 240px
+        // poster arrives as ~20KB instead of the multi-MB original. upscale=0
+        // keeps small sources untouched; minSize=1 fills the requested box.
+        const params = new URLSearchParams({
+          width: String(resize.width),
+          height: String(resize.height),
+          minSize: '1',
+          upscale: '0',
+          url: imagePath,
+          'X-Plex-Token': server.token,
+        });
+        return { imageUrl: `${baseUrl}/photo/:/transcode?${params.toString()}`, headers };
+      }
+      const separator = imagePath.includes('?') ? '&' : '?';
+      return {
+        imageUrl: `${baseUrl}${imagePath}${separator}X-Plex-Token=${server.token}`,
+        headers,
+      };
     }
-    const separator = imagePath.includes('?') ? '&' : '?';
-    return { imageUrl: `${baseUrl}${imagePath}${separator}X-Plex-Token=${server.token}`, headers };
+    case 'jellyfin':
+    case 'emby': {
+      // imagePath includes the full endpoint
+      Object.assign(headers, mediaBrowserTokenHeader(server.type, server.token));
+      if (resize) {
+        // Both accept max-dimension params on image endpoints and cache the
+        // result. Constrain only the target's long axis so the cover crop below
+        // always has enough pixels where it matters; sharp still normalizes to
+        // the exact box, but it decodes a thumbnail instead of the original.
+        const separator = imagePath.includes('?') ? '&' : '?';
+        const dimension =
+          resize.height >= resize.width ? `maxHeight=${resize.height}` : `maxWidth=${resize.width}`;
+        return {
+          imageUrl: `${baseUrl}${imagePath}${separator}${dimension}&quality=90`,
+          headers,
+        };
+      }
+      return { imageUrl: `${baseUrl}${imagePath}`, headers };
+    }
+    default:
+      return assertNever(server.type);
   }
-
-  // Jellyfin/Emby - imagePath should include the full endpoint
-  if (server.type === 'jellyfin') {
-    headers['Authorization'] = `MediaBrowser Token="${server.token}"`;
-  } else {
-    headers['X-Emby-Token'] = server.token;
-  }
-  if (resize) {
-    // Both accept max-dimension params on image endpoints and cache the
-    // result. Constrain only the target's long axis so the cover crop below
-    // always has enough pixels where it matters; sharp still normalizes to
-    // the exact box, but it decodes a thumbnail instead of the original.
-    const separator = imagePath.includes('?') ? '&' : '?';
-    const dimension =
-      resize.height >= resize.width ? `maxHeight=${resize.height}` : `maxWidth=${resize.width}`;
-    return {
-      imageUrl: `${baseUrl}${imagePath}${separator}${dimension}&quality=90`,
-      headers,
-    };
-  }
-  return { imageUrl: `${baseUrl}${imagePath}`, headers };
 }
 
 interface MissPipelineArgs {

@@ -25,7 +25,7 @@ import { eq } from 'drizzle-orm';
 import { betterAuth } from 'better-auth';
 import { username as usernamePlugin } from 'better-auth/plugins';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { API_BASE_PATH, type LoginAccess } from '@tracearr/shared';
+import { API_BASE_PATH, type LoginAccess, type ServerType } from '@tracearr/shared';
 import { db } from '../../src/db/client.js';
 import {
   users,
@@ -948,7 +948,10 @@ describe('better auth security (integration)', () => {
       return cookieHeader(setCookieArray(res).filter((c) => !/Max-Age=0/i.test(c)));
     }
 
-    async function loginServer(type: 'jellyfin' | 'plex' = 'jellyfin', allowMemberLogin = true) {
+    async function loginServer(
+      type: Extract<ServerType, 'jellyfin' | 'plex'> = 'jellyfin',
+      allowMemberLogin = true
+    ) {
       const [server] = await db
         .insert(servers)
         .values({

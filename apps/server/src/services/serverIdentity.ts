@@ -10,7 +10,7 @@ import { servers, serverUsers } from '../db/schema.js';
 import { createMediaServerClient } from './mediaServer/index.js';
 import { isLiveServer, liveServerCondition } from './liveServers.js';
 import { invalidateServersCache } from '../jobs/poller/database.js';
-import type { ServerType } from '@tracearr/shared';
+import { SERVER_PROFILES, type ServerType } from '@tracearr/shared';
 
 interface IdentifiableServer {
   id: string;
@@ -30,7 +30,7 @@ export async function readServerIdentity(
     token: server.token,
     id: server.id,
   });
-  return client.getServerIdentity ? client.getServerIdentity() : null;
+  return client.getServerIdentity();
 }
 
 /**
@@ -41,7 +41,7 @@ export async function readServerIdentity(
 export async function sharesKnownUsers(
   server: Omit<IdentifiableServer, 'machineIdentifier'>
 ): Promise<boolean> {
-  if (server.type === 'plex') return false;
+  if (!SERVER_PROFILES[server.type].userIdsIdentifyInstall) return false;
 
   const known = await db
     .select({ externalId: serverUsers.externalId })

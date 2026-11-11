@@ -50,14 +50,12 @@ import {
   type RequestSeason,
   type RequestServiceType,
   type RunOutcome,
+  type ServerType,
   type TEMPLATE_GROUPS,
   type TemplateDefinition,
   type TemplateInput,
   type TriggerNode,
 } from '@tracearr/shared';
-
-// Server types enum
-export const serverTypeEnum = ['plex', 'jellyfin', 'emby'] as const;
 
 // Session state enum
 export const sessionStateEnum = ['playing', 'paused', 'stopped'] as const;
@@ -100,7 +98,7 @@ export const servers = pgTable(
   {
     id: uuid('id').primaryKey().defaultRandom(),
     name: varchar('name', { length: 100 }).notNull(),
-    type: varchar('type', { length: 20 }).notNull().$type<(typeof serverTypeEnum)[number]>(),
+    type: varchar('type', { length: 20 }).notNull().$type<ServerType>(),
     url: text('url').notNull(),
     // The address members open a Jellyfin or Emby server at; always null for Plex, which links through app.plex.tv.
     publicUrl: text('public_url'),

@@ -131,6 +131,7 @@ vi.mock('../sessionMapper.js', () => ({
 }));
 
 import { initializePoller, stopPoller, triggerPoll } from '../processor.js';
+import { fakeJellyfinClient, fakePlexClient } from '../../../test/mediaServerFakes.js';
 
 const serverRow = {
   id: 'server-1',
@@ -282,9 +283,11 @@ beforeEach(() => {
   stopPoller();
 
   stubServerListAndExistingRows([serverRow]);
-  mockCreateMediaServerClient.mockReturnValue({
-    getSessions: vi.fn().mockResolvedValue([]),
-  });
+  mockCreateMediaServerClient.mockReturnValue(
+    fakePlexClient({
+      getSessions: vi.fn().mockResolvedValue([]),
+    })
+  );
 });
 
 afterEach(() => {
@@ -450,6 +453,9 @@ describe('poller resolves a pending session that vanishes before confirmation', 
     );
 
     stubServerListAndExistingRows([jellyfinServerRow]);
+    mockCreateMediaServerClient.mockReturnValue(
+      fakeJellyfinClient({ getSessions: vi.fn().mockResolvedValue([]) })
+    );
     mockConfirmAndPersistSession.mockResolvedValue({
       insertedSession: {
         id: 'pending-vanish-id',

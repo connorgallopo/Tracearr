@@ -19,6 +19,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { useDestinations, useNewsletterVariants, useServers, useSettings } from '@/hooks/queries';
 import { formatList } from '@/lib/listFormat';
+import { isJellyfinEmby } from '@/lib/serverType';
 import { cn } from '@/lib/utils';
 import type { Translate } from '../newsletterFormat';
 import { EditorCard } from './EditorCard';
@@ -94,7 +95,7 @@ export function readinessChecks(input: {
   const user = domainOf(input.destination?.config?.['username']);
   const recipients = recipientsState(input.recipients.empty, input.recipients.view);
   const privateServers: ReadinessCheck[] = input.servers
-    .filter((s) => s.type !== 'plex' && memberFacingUrl(s) === null)
+    .filter((s) => isJellyfinEmby(s.type) && memberFacingUrl(s) === null)
     .map((s) => ({
       id: 'privateServer',
       status: 'warn',

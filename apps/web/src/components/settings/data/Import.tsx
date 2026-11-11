@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
 import { api } from '@/lib/api';
+import { isJellyfinEmby } from '@/lib/serverType';
 import { useSocket } from '@/hooks/useSocket';
 import {
   ImportProgressCard,
@@ -39,11 +40,12 @@ import {
   PlaybackReportingImportSection,
   type ImportProgressData,
 } from '@/components/import';
-import type {
-  Server,
-  TautulliImportProgress,
-  JellystatImportProgress,
-  PlaybackReportingImportProgress,
+import {
+  SERVER_PROFILES,
+  type Server,
+  type TautulliImportProgress,
+  type JellystatImportProgress,
+  type PlaybackReportingImportProgress,
 } from '@tracearr/shared';
 import { useSettings, useUpdateSettings, useServers } from '@/hooks/queries';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
@@ -590,8 +592,8 @@ export function Import() {
     : ((serversData as unknown as { data?: Server[] })?.data ?? []);
 
   // Split servers by type
-  const plexServers = servers.filter((s) => s.type === 'plex');
-  const jellyfinEmbyServers = servers.filter((s) => s.type === 'jellyfin' || s.type === 'emby');
+  const plexServers = servers.filter((s) => SERVER_PROFILES[s.type].importsTautulliHistory);
+  const jellyfinEmbyServers = servers.filter((s) => isJellyfinEmby(s.type));
 
   // Initialize form with saved settings
   useEffect(() => {

@@ -1,4 +1,5 @@
-import type { PluginIssue } from '@tracearr/shared';
+import { assertNever, type PluginIssue, type JellyfinEmbyServerType } from '@tracearr/shared';
+import { mediaBrowserTokenHeader } from './baseMediaServerClient.js';
 
 /**
  * Asks the media server's own plugin list whether the Tracearr SSE plugin is
@@ -34,19 +35,15 @@ function normalizeGuid(id: string): string {
 
 export async function probeSsePlugin(config: {
   baseUrl: string;
-  serverType: 'jellyfin' | 'emby';
+  serverType: JellyfinEmbyServerType;
   token: string;
 }): Promise<PluginIssue> {
   const { baseUrl, serverType, token } = config;
   const url = `${baseUrl.replace(/\/$/, '')}${PLUGIN_LIST_PATH[serverType]}`;
-  const headers: Record<string, string> =
-    serverType === 'jellyfin'
-      ? { Authorization: `MediaBrowser Token="${token}"` }
-      : { 'X-Emby-Token': token };
 
   try {
     const response = await fetch(url, {
-      headers,
+      headers: mediaBrowserTokenHeader(serverType, token),
       signal: AbortSignal.timeout(PROBE_TIMEOUT_MS),
     });
     if (!response.ok) return 'unknown';
@@ -61,14 +58,18 @@ export async function probeSsePlugin(config: {
     ) as PluginListEntry | undefined;
     if (!entry) return 'missing';
 
-    if (serverType === 'jellyfin') {
-      // Jellyfin PluginStatus: Active, Restart (pending restart), Malfunctioned,
-      // NotSupported, Disabled, Deleted, Superceded
-      if (entry.Status === 'Restart') return 'restart_required';
-      if (entry.Status !== undefined && entry.Status !== 'Active') return 'malfunctioned';
+    switch (serverType) {
+      case 'jellyfin':
+        // Jellyfin PluginStatus: Active, Restart (pending restart), Malfunctioned,
+        // NotSupported, Disabled, Deleted, Superceded
+        if (entry.Status === 'Restart') return 'restart_required';
+        if (entry.Status !== undefined && entry.Status !== 'Active') return 'malfunctioned';
+        return 'blocked';
+      case 'emby':
+        return 'blocked';
+      default:
+        return assertNever(serverType);
     }
-
-    return 'blocked';
   } catch {
     return 'unknown';
   }

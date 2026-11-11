@@ -1,10 +1,10 @@
-import { REDIS_KEYS } from '@tracearr/shared';
+import { REDIS_KEYS, SERVER_TYPES } from '@tracearr/shared';
 import { and, eq, inArray } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { servers } from '../../db/schema.js';
 import { getRedis } from '../../lib/redisShared.js';
 import { liveServerCondition, type ServerRow } from '../liveServers.js';
-import { createMediaServerClient } from '../mediaServer/index.js';
+import { createJellyfinEmbyClient, isJellyfinEmby } from '../mediaServer/index.js';
 import { getServerUserIdByExternalId } from '../../jobs/poller/database.js';
 import { deliveredFile } from './enrich.js';
 import { recordDownload, type DownloadSignal } from './recorder.js';
@@ -92,8 +92,10 @@ async function toSignal(
 }
 
 async function pollServer(server: ServerRow): Promise<void> {
+  const { type } = server;
+  if (!isJellyfinEmby(type)) return;
   await exclusive(server.id, async () => {
-    const client = createMediaServerClient(server) as ActivityLogClient;
+    const client = createJellyfinEmbyClient(type, server);
     const redis = getRedis();
     const key = REDIS_KEYS.DOWNLOAD_CURSOR(server.id);
     const stored = await redis.get(key);
@@ -144,8 +146,10 @@ function syncSignal(
 }
 
 async function pollSync(server: ServerRow): Promise<void> {
+  const { type } = server;
+  if (!isJellyfinEmby(type)) return;
   await exclusive(`sync:${server.id}`, async () => {
-    const client = createMediaServerClient(server) as ActivityLogClient;
+    const client = createJellyfinEmbyClient(type, server);
     const redis = getRedis();
     const cursorKey = REDIS_KEYS.SYNC_CURSOR(server.id);
     const recordedKey = REDIS_KEYS.SYNC_RECORDED(server.id);
@@ -195,7 +199,7 @@ export async function pollServerDownloads(serverId: string): Promise<void> {
     .where(
       and(
         eq(servers.id, serverId),
-        inArray(servers.type, ['jellyfin', 'emby']),
+        inArray(servers.type, SERVER_TYPES.filter(isJellyfinEmby)),
         liveServerCondition
       )
     )
@@ -211,7 +215,7 @@ export async function pollServerSyncJobs(serverId: string): Promise<void> {
     .where(
       and(
         eq(servers.id, serverId),
-        inArray(servers.type, ['jellyfin', 'emby']),
+        inArray(servers.type, SERVER_TYPES.filter(isJellyfinEmby)),
         liveServerCondition
       )
     )
@@ -223,7 +227,7 @@ export async function pollAllDownloads(): Promise<void> {
   const rows = await db
     .select()
     .from(servers)
-    .where(and(inArray(servers.type, ['jellyfin', 'emby']), liveServerCondition));
+    .where(and(inArray(servers.type, SERVER_TYPES.filter(isJellyfinEmby)), liveServerCondition));
   await Promise.all(
     rows.flatMap((server) => [
       pollServer(server).catch((error: unknown) => {

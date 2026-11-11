@@ -73,7 +73,7 @@ vi.mock('../settings.js', () => ({
 }));
 
 vi.mock('../../jobs/importedHistoryLinking.js', () => ({
-  listPlexServers: vi.fn(),
+  listLinkingServers: vi.fn(),
   MAX_AUTO_LINK_ATTEMPTS: 5,
   AUTO_LINK_WINDOW_MS: 14 * 24 * 60 * 60 * 1000,
 }));
@@ -104,7 +104,7 @@ import {
 } from '../../jobs/sessionIdentityBackfill.js';
 import { maybeEnqueueMaintenanceJob } from '../../jobs/maintenanceQueue.js';
 import { getHeavyOpsStatus } from '../../jobs/heavyOpsLock.js';
-import { listPlexServers } from '../../jobs/importedHistoryLinking.js';
+import { listLinkingServers } from '../../jobs/importedHistoryLinking.js';
 import { getSessionsCompressionHorizon, refreshAggregates } from '../../db/timescale.js';
 import {
   getImportedHistoryLinkState,
@@ -123,7 +123,8 @@ import {
   maybeEnqueueImportedHistoryLink,
 } from '../librarySync.js';
 import { MEDIA_BUFFER_CAP, flushMediaAnnounceRun } from '../library/mediaAnnounce.js';
-import type { IMediaServerClient, MediaLibraryItem } from '../mediaServer/types.js';
+import type { MediaLibraryItem } from '../mediaServer/types.js';
+import { fakePlexClient } from '../../test/mediaServerFakes.js';
 import type { LibrarySyncProgress } from '@tracearr/shared';
 import type { Redis } from 'ioredis';
 
@@ -392,7 +393,7 @@ function mockMediaServerClient(options: {
   leavesSince?: MediaLibraryItem[];
   leavesCountSince?: number;
 }) {
-  const client = {
+  const client = fakePlexClient({
     getLibraries: vi.fn().mockResolvedValue(options.libraries ?? [createMockLibrary()]),
     getLibraryItems: vi.fn().mockResolvedValue({
       items: options.items ?? [],
@@ -406,25 +407,7 @@ function mockMediaServerClient(options: {
       items: options.leavesSince ?? [],
       totalCount: options.leavesCountSince ?? options.leavesSince?.length ?? 0,
     }),
-    // Undefined by default (JF/Emby never implement this) - assign a vi.fn() per test to opt in.
-    getLibrarySeasons: undefined as
-      | undefined
-      | ((
-          libraryId: string,
-          opts?: { offset?: number; limit?: number }
-        ) => Promise<{ items: MediaLibraryItem[]; totalCount: number; rawCount?: number }>),
-    getLibraryLeaves: undefined as IMediaServerClient['getLibraryLeaves'],
-    getLibraryAlbums: undefined as IMediaServerClient['getLibraryAlbums'],
-    getLibraryAlbumsSince: undefined as IMediaServerClient['getLibraryAlbumsSince'],
-    findExistingRatingKeys: undefined as
-      | undefined
-      | ((ratingKeys: string[], library: { id: string; type: string }) => Promise<Set<string>>),
-    serverType: 'plex' as const,
-    getSessions: vi.fn(),
-    getUsers: vi.fn(),
-    testConnection: vi.fn().mockResolvedValue(true),
-    terminateSession: vi.fn(),
-  };
+  });
   vi.mocked(createMediaServerClient).mockReturnValue(client);
   return client;
 }
@@ -498,7 +481,7 @@ beforeEach(() => {
   // Settings read as a current install: the passes version is the code's, counters are zero.
   vi.mocked(getSetting).mockImplementation((async (key: string) =>
     key === 'identityPassesVersion' ? IDENTITY_PASSES_VERSION : 0) as never);
-  vi.mocked(listPlexServers).mockResolvedValue([]);
+  vi.mocked(listLinkingServers).mockResolvedValue([]);
 });
 
 // clearAllMocks only clears call history, not implementations - restore db.execute so a test's override can't leak into the next.
@@ -573,11 +556,11 @@ describe('LibrarySyncService', () => {
         items: [createMockLibraryItem({ ratingKey: 'item-1' })],
         totalCount: 1,
       });
-      const listing = client.getLibraryItems.getMockImplementation();
-      client.getLibraryItems.mockImplementation((libraryId: string, ...rest: unknown[]) =>
+      const listing = client.getLibraryItems;
+      client.getLibraryItems = vi.fn((libraryId: string, options?: { offset?: number }) =>
         libraryId === '1'
           ? Promise.reject(new Error('plex request to /library/sections/1/all timed out'))
-          : listing?.(libraryId, ...rest)
+          : listing(libraryId, options)
       );
 
       const error = await service.syncServer(mockServer.id).catch((e: unknown) => e);
@@ -1173,7 +1156,7 @@ describe('LibrarySyncService', () => {
           generation: 4,
           armedAt,
         } as never);
-        vi.mocked(listPlexServers).mockResolvedValue([
+        vi.mocked(listLinkingServers).mockResolvedValue([
           { id: 'plex-a', name: 'Home', machineIdentifier: null },
           { id: 'plex-b', name: 'Office', machineIdentifier: null },
         ]);
@@ -1198,7 +1181,7 @@ describe('LibrarySyncService', () => {
           generation: 1,
           armedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
         } as never);
-        vi.mocked(listPlexServers).mockResolvedValue([
+        vi.mocked(listLinkingServers).mockResolvedValue([
           { id: 'plex-a', name: 'Home', machineIdentifier: null },
         ]);
 
@@ -1220,7 +1203,7 @@ describe('LibrarySyncService', () => {
           generation: 0,
           armedAt: new Date().toISOString(),
         } as never);
-        vi.mocked(listPlexServers).mockResolvedValue([
+        vi.mocked(listLinkingServers).mockResolvedValue([
           { id: 'plex-a', name: 'Home', machineIdentifier: null },
           { id: 'plex-b', name: 'Office', machineIdentifier: null },
         ]);
@@ -1265,7 +1248,7 @@ describe('LibrarySyncService', () => {
           generation: 0,
           armedAt: new Date().toISOString(),
         } as never);
-        vi.mocked(listPlexServers).mockResolvedValue([
+        vi.mocked(listLinkingServers).mockResolvedValue([
           { id: 'plex-a', name: 'Home', machineIdentifier: null },
         ]);
         vi.mocked(maybeEnqueueMaintenanceJob).mockResolvedValueOnce(null);
@@ -2256,6 +2239,8 @@ describe('LibrarySyncService', () => {
       // Growth: pre-sync count (5) trails the server total (6), the incremental sync catches it up.
       vi.mocked(db.execute)
         .mockResolvedValueOnce({ rows: [{ count: 5 }] } as never)
+        // retireReplacedCopies: no other live copy of the synced media
+        .mockResolvedValueOnce({ rows: [] } as never)
         .mockResolvedValueOnce({ rows: [{ count: 6 }] } as never)
         // Fallback: rebuildSnapshotFromDb's aggregate query
         .mockResolvedValue({
@@ -2426,6 +2411,8 @@ describe('LibrarySyncService', () => {
       mockTransaction();
       // Growth: pre-sync count (5) trails the server total (6), the incremental sync catches it up.
       vi.mocked(db.execute)
+        // retireReplacedCopies: no other live copy of the synced media
+        .mockResolvedValueOnce({ rows: [] } as never)
         .mockResolvedValueOnce({ rows: [{ count: 5 }] } as never)
         .mockResolvedValueOnce({ rows: [{ count: 6 }] } as never)
         // Fallback: rebuildSnapshotFromDb's aggregate query
@@ -2520,7 +2507,10 @@ describe('LibrarySyncService', () => {
 
       setupSelectForIncrementalTest(mockServer);
       // New episodes don't change the top-level active count.
-      vi.mocked(db.execute).mockResolvedValue({ rows: [{ count: 5 }] } as never);
+      vi.mocked(db.execute)
+        // retireReplacedCopies: no other live copy of the synced media
+        .mockResolvedValueOnce({ rows: [] } as never)
+        .mockResolvedValue({ rows: [{ count: 5 }] } as never);
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
       mockTransaction();
@@ -2560,7 +2550,10 @@ describe('LibrarySyncService', () => {
       initLibrarySyncRedis(mockRedis);
 
       setupSelectForIncrementalTest(mockServer);
-      vi.mocked(db.execute).mockResolvedValue({ rows: [{ count: 5 }] } as never);
+      vi.mocked(db.execute)
+        // retireReplacedCopies: no other live copy of the synced media
+        .mockResolvedValueOnce({ rows: [] } as never)
+        .mockResolvedValue({ rows: [{ count: 5 }] } as never);
       mockInsertChain([{ id: randomUUID() }]);
       mockDeleteChain();
       mockTransaction();
@@ -2608,7 +2601,7 @@ describe('LibrarySyncService', () => {
         totalCount: 1,
       });
       // Make incremental fetch throw
-      client.getLibraryItemsSince.mockRejectedValue(new Error('API error'));
+      vi.mocked(client.getLibraryItemsSince).mockRejectedValue(new Error('API error'));
 
       const service = new LibrarySyncService();
       const results = await service.syncServer(serverId);

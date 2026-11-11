@@ -71,9 +71,7 @@ const {
     mockBatchGetLibraryItemIdentity: vi.fn().mockResolvedValue(new Map()),
     mockBroadcastViolations: vi.fn(),
     mockMapMediaSession: vi.fn(),
-    mockCreateMediaServerClient: vi.fn().mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([]),
-    }),
+    mockCreateMediaServerClient: vi.fn(),
     mockGetIdentityServerUserIds: vi.fn().mockResolvedValue([]),
     mockDispatch: vi.fn().mockResolvedValue({ violations: [], outcomes: [] }),
     mockDb: {
@@ -208,6 +206,11 @@ import {
   stopSSEProcessor,
   cleanupOrphanedPendingSessions,
 } from '../sseProcessor.js';
+import { fakePlexClient } from '../../test/mediaServerFakes.js';
+
+mockCreateMediaServerClient.mockReturnValue(
+  fakePlexClient({ getSessions: vi.fn().mockResolvedValue([]) })
+);
 
 // Mock cache service with pending session methods
 const mockCacheService = {
@@ -387,11 +390,13 @@ describe('SSE Processor - Pending Session Flow', () => {
         }),
       });
 
-      mockCreateMediaServerClient.mockReturnValueOnce({
-        getSessions: vi
-          .fn()
-          .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: '12345' }]),
-      });
+      mockCreateMediaServerClient.mockReturnValueOnce(
+        fakePlexClient({
+          getSessions: vi
+            .fn()
+            .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: '12345' }]),
+        })
+      );
       mockMapMediaSession.mockReturnValueOnce({
         sessionKey: 'test-session-key',
         ratingKey: '12345',
@@ -450,11 +455,13 @@ describe('SSE Processor - Pending Session Flow', () => {
         }),
       });
 
-      mockCreateMediaServerClient.mockReturnValueOnce({
-        getSessions: vi
-          .fn()
-          .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: '12345' }]),
-      });
+      mockCreateMediaServerClient.mockReturnValueOnce(
+        fakePlexClient({
+          getSessions: vi
+            .fn()
+            .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: '12345' }]),
+        })
+      );
       mockMapMediaSession.mockReturnValueOnce({
         sessionKey: 'test-session-key',
         ratingKey: '12345',
@@ -1091,7 +1098,9 @@ describe('SSE Processor - Pending Session Flow', () => {
       const mockGetSessions = vi
         .fn()
         .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: 'new-rating-key' }]);
-      mockCreateMediaServerClient.mockReturnValueOnce({ getSessions: mockGetSessions });
+      mockCreateMediaServerClient.mockReturnValueOnce(
+        fakePlexClient({ getSessions: mockGetSessions })
+      );
 
       // Map the new session data
       mockMapMediaSession.mockReturnValueOnce({
@@ -1161,7 +1170,9 @@ describe('SSE Processor - Pending Session Flow', () => {
       const mockGetSessions = vi
         .fn()
         .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: '12345' }]);
-      mockCreateMediaServerClient.mockReturnValueOnce({ getSessions: mockGetSessions });
+      mockCreateMediaServerClient.mockReturnValueOnce(
+        fakePlexClient({ getSessions: mockGetSessions })
+      );
       mockMapMediaSession.mockReturnValueOnce({
         sessionKey: 'test-session-key',
         ratingKey: '12345', // Same as pending session
@@ -1224,11 +1235,13 @@ describe('SSE Processor - Pending Session Flow', () => {
 
     it('createNewSession creates fresh when the in-lock row belongs to another user', async () => {
       setupDbForCreate();
-      mockCreateMediaServerClient.mockReturnValueOnce({
-        getSessions: vi
-          .fn()
-          .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: '12345' }]),
-      });
+      mockCreateMediaServerClient.mockReturnValueOnce(
+        fakePlexClient({
+          getSessions: vi
+            .fn()
+            .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: '12345' }]),
+        })
+      );
       mockMapMediaSession.mockReturnValueOnce({
         sessionKey: 'test-session-key',
         ratingKey: '12345',
@@ -1260,11 +1273,13 @@ describe('SSE Processor - Pending Session Flow', () => {
 
     it('createNewSession skips when the in-lock row belongs to the same user', async () => {
       setupDbForCreate();
-      mockCreateMediaServerClient.mockReturnValueOnce({
-        getSessions: vi
-          .fn()
-          .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: '12345' }]),
-      });
+      mockCreateMediaServerClient.mockReturnValueOnce(
+        fakePlexClient({
+          getSessions: vi
+            .fn()
+            .mockResolvedValue([{ sessionKey: 'test-session-key', ratingKey: '12345' }]),
+        })
+      );
       mockMapMediaSession.mockReturnValueOnce({
         sessionKey: 'test-session-key',
         ratingKey: '12345',

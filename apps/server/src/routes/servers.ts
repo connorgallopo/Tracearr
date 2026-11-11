@@ -12,15 +12,16 @@ import {
   pickServerColor,
   setServerHistoricalSchema,
   PUBLIC_URL_PLEX_MESSAGE,
+  SERVER_PROFILES,
+  assertNever,
   type ServerConnectionStatus,
   type ServerDownReason,
-  type ServerType,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, plexAccounts, serverUsers, users } from '../db/schema.js';
 import { nonOwnerMayLoginThrough } from '../lib/authGuards.js';
 import { revokeUnlessStillIn } from '../lib/revoke.js';
-import { PlexClient, JellyfinClient, EmbyClient } from '../services/mediaServer/index.js';
+import { PlexClient, JellyfinClient, verifyServerAdmin } from '../services/mediaServer/index.js';
 import { getServerLiveStats, getServerResourceStats } from '../services/serverLiveStats.js';
 import { syncServer } from '../services/sync.js';
 import { sseManager } from '../services/sseManager.js';
@@ -34,12 +35,6 @@ import { readServerIdentity, sharesKnownUsers } from '../services/serverIdentity
 import { getSetting, rearmImportedHistoryLink } from '../services/settings.js';
 import { buildServerAccessCondition, hasServerAccess } from '../utils/serverFiltering.js';
 import { serverOrderBy } from '../utils/serverOrder.js';
-
-function verifyServerAdmin(type: ServerType, token: string, url: string) {
-  if (type === 'plex') return PlexClient.verifyServerAdmin(token, url);
-  if (type === 'jellyfin') return JellyfinClient.verifyServerAdmin(token, url);
-  return EmbyClient.verifyServerAdmin(token, url);
-}
 
 // Plex never reports INVALID_KEY, so one mapping serves all three server types.
 function replyAdminCheckFailure(reply: FastifyReply, check: { code: string; message: string }) {
@@ -159,27 +154,31 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
 
     // For Plex servers, find the owning plex account to set plexAccountId
     let plexAccountId: string | undefined;
-    if (type === 'plex') {
-      try {
-        const accountInfo = await PlexClient.getAccountInfo(token);
-        const matchingAccount = await db
-          .select({ id: plexAccounts.id })
-          .from(plexAccounts)
-          .where(
-            and(
-              eq(plexAccounts.userId, authUser.userId),
-              eq(plexAccounts.plexAccountId, accountInfo.id)
+    switch (type) {
+      case 'plex':
+        try {
+          const accountInfo = await PlexClient.getAccountInfo(token);
+          const [matchingAccount] = await db
+            .select({ id: plexAccounts.id })
+            .from(plexAccounts)
+            .where(
+              and(
+                eq(plexAccounts.userId, authUser.userId),
+                eq(plexAccounts.plexAccountId, accountInfo.id)
+              )
             )
-          )
-          .limit(1);
-
-        if (matchingAccount.length > 0) {
-          plexAccountId = matchingAccount[0]!.id;
+            .limit(1);
+          plexAccountId = matchingAccount?.id;
+        } catch {
+          // Non-fatal: server will be orphaned but auto-repair can fix it later
+          app.log.debug('Could not link Plex server to account at creation time');
         }
-      } catch {
-        // Non-fatal: server will be orphaned but auto-repair can fix it later
-        app.log.debug('Could not link Plex server to account at creation time');
-      }
+        break;
+      case 'jellyfin':
+      case 'emby':
+        break;
+      default:
+        assertNever(type);
     }
 
     // Auto-assign a color based on server type and already-used colors
@@ -226,7 +225,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       );
     });
 
-    if (server.type === 'plex') {
+    if (SERVER_PROFILES[server.type].linksImportedHistory) {
       await rearmImportedHistoryLink({ keepProviderPass: false });
     }
 
@@ -300,12 +299,22 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       return reply.notFound('Server not found');
     }
 
-    if (server.type === 'plex' && newPublicUrl !== undefined) {
-      return reply.badRequest(PUBLIC_URL_PLEX_MESSAGE);
-    }
-
-    if (server.type === 'plex' && newApiKey !== undefined) {
-      return reply.badRequest('Plex servers sign in through plex.tv and have no API key to change');
+    switch (server.type) {
+      case 'plex':
+        if (newPublicUrl !== undefined) {
+          return reply.badRequest(PUBLIC_URL_PLEX_MESSAGE);
+        }
+        if (newApiKey !== undefined) {
+          return reply.badRequest(
+            'Plex servers sign in through plex.tv and have no API key to change'
+          );
+        }
+        break;
+      case 'jellyfin':
+      case 'emby':
+        break;
+      default:
+        assertNever(server.type);
     }
 
     const same = <T>(next: T | undefined, current: T): boolean =>
@@ -346,13 +355,24 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
 
     if (urlChanging || keyChanging) {
       // For Plex servers: Validate machineIdentifier if provided
-      if (server.type === 'plex' && clientIdentifier) {
-        if (server.machineIdentifier && server.machineIdentifier !== clientIdentifier) {
-          return reply.badRequest(
-            'Server mismatch: The selected connection belongs to a different server. ' +
-              'Please select a connection for the correct server.'
-          );
-        }
+      switch (server.type) {
+        case 'plex':
+          if (
+            clientIdentifier &&
+            server.machineIdentifier &&
+            server.machineIdentifier !== clientIdentifier
+          ) {
+            return reply.badRequest(
+              'Server mismatch: The selected connection belongs to a different server. ' +
+                'Please select a connection for the correct server.'
+            );
+          }
+          break;
+        case 'jellyfin':
+        case 'emby':
+          break;
+        default:
+          assertNever(server.type);
       }
 
       let adminCheck: Awaited<ReturnType<typeof verifyServerAdmin>>;
@@ -725,7 +745,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     }
 
     // Reads Plex's own statistics endpoint; Jellyfin and Emby are served by /live-stats
-    if (server.type !== 'plex') {
+    if (SERVER_PROFILES[server.type].hostStats !== 'plexStatistics') {
       return reply.badRequest('Server statistics are only available for Plex servers');
     }
 

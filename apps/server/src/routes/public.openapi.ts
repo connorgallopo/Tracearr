@@ -11,6 +11,7 @@ import {
   OpenApiGeneratorV3,
 } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
+import { SERVER_TYPES } from '@tracearr/shared';
 
 extendZodWithOpenApi(z);
 
@@ -30,7 +31,7 @@ registry.registerComponent('securitySchemes', 'bearerAuth', {
 // Shared Enums (single source of truth)
 // ============================================================================
 
-const ServerTypeEnum = z.enum(['plex', 'jellyfin', 'emby']);
+const ServerTypeEnum = z.enum(SERVER_TYPES);
 const MediaTypeEnum = z.enum(['movie', 'episode', 'track', 'live', 'photo', 'trailer', 'unknown']);
 const PlaybackStateEnum = z.enum(['playing', 'paused', 'stopped']);
 const SeverityEnum = z.enum(['low', 'warning', 'high']);

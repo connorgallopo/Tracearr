@@ -129,6 +129,172 @@ describe('mediaResolutionService', () => {
     expect(new Set(aliases)).toEqual(new Set([byImdb, byTmdb]));
   });
 
+  it("keeps episodes apart when a server gives each one the next episode's imdb id", async () => {
+    const episode = (serverId: string, n: number, imdbId: string) => ({
+      mediaType: 'episode',
+      tvdbId: 5000100 + n,
+      imdbId,
+      title: `Episode ${n}`,
+      seasonNumber: 1,
+      episodeNumber: n,
+      serverId,
+      ratingKey: `${serverId}-${n}`,
+    });
+    const s1 = await createTestServer({ type: 'jellyfin' });
+    const s2 = await createTestServer({ type: 'emby' });
+    const first = await resolveMediaBatch([
+      episode(s1.id, 1, 'tt7000101'),
+      episode(s1.id, 2, 'tt7000102'),
+      episode(s1.id, 3, 'tt7000103'),
+    ]);
+    const second = await resolveMediaBatch([
+      episode(s2.id, 1, 'tt7000102'),
+      episode(s2.id, 2, 'tt7000103'),
+      episode(s2.id, 3, 'tt7000101'),
+    ]);
+    for (const n of [1, 2, 3]) expect(second.get(`${s2.id}-${n}`)).toBe(first.get(`${s1.id}-${n}`));
+    const rows = await db.select().from(media);
+    expect(rows.filter((r) => !r.mergedIntoId)).toHaveLength(3);
+    expect(await reconcileMediaDuplicates()).toBe(0);
+  });
+
+  it('merges the hits that agree with the named row and leaves a conflicting hit alone', async () => {
+    const createdAt = new Date();
+    await db.insert(media).values([
+      {
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:5000101',
+        tvdbId: 5000101,
+        title: 'Episode 1',
+        createdAt,
+      },
+      {
+        mediaType: 'episode',
+        matchKey: 'episode:tmdb:6000101',
+        tmdbId: 6000101,
+        title: 'Episode 1',
+        createdAt,
+      },
+      {
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:5000102',
+        tvdbId: 5000102,
+        imdbId: 'tt7000102',
+        title: 'Episode 2',
+        createdAt,
+      },
+    ]);
+    const resolved = await resolveMediaForItem({
+      mediaType: 'episode',
+      tvdbId: 5000101,
+      tmdbId: 6000101,
+      imdbId: 'tt7000102',
+      title: 'Episode 1',
+      serverId: 's2',
+      ratingKey: '1',
+    });
+    const rows = await db.select().from(media);
+    const byKey = new Map(rows.map((r) => [r.matchKey, r]));
+    expect(resolved).toBe(byKey.get('episode:tmdb:6000101')?.id);
+    expect(byKey.get('episode:tvdb:5000101')?.mergedIntoId).toBe(resolved);
+    expect(byKey.get('episode:tvdb:5000102')?.mergedIntoId).toBeNull();
+    expect(byKey.get('episode:tmdb:6000101')?.imdbId).toBeNull();
+    expect(await reconcileMediaDuplicates()).toBe(0);
+  });
+
+  it('gives an episode with another tvdb id its own row instead of the row sharing its imdb id', async () => {
+    const jellyfin = await createTestServer({ type: 'jellyfin' });
+    const emby = await createTestServer({ type: 'emby' });
+    const episode = (serverId: string, tvdbId: number) => ({
+      mediaType: 'episode',
+      tvdbId,
+      imdbId: 'tt7000148',
+      title: 'Episode 48',
+      seasonNumber: 3,
+      episodeNumber: 48,
+      serverId,
+      ratingKey: `${serverId}-48`,
+    });
+    const fromJellyfin = await resolveMediaBatch([episode(jellyfin.id, 5000143)]);
+    const fromEmby = await resolveMediaBatch([episode(emby.id, 5000148)]);
+    const jellyfinRow = fromJellyfin.get(`${jellyfin.id}-48`);
+    const embyRow = fromEmby.get(`${emby.id}-48`);
+    expect(embyRow).not.toBe(jellyfinRow);
+    const rows = await db.select().from(media);
+    expect(rows.find((r) => r.id === embyRow)?.matchKey).toBe('episode:tvdb:5000148');
+    expect(rows.find((r) => r.id === jellyfinRow)?.tvdbId).toBe(5000143);
+    expect(await reconcileMediaDuplicates()).toBe(0);
+  });
+
+  it('among rows sharing the named id, takes the one that agrees with the input', async () => {
+    const at = (micros: number) =>
+      sql`${`2026-01-01T00:00:00.000${String(micros).padStart(3, '0')}Z`}::timestamptz`;
+    await db.insert(media).values([
+      {
+        mediaType: 'movie',
+        matchKey: 'movie:tmdb:6000101',
+        imdbId: 'tt7000101',
+        tmdbId: 6000101,
+        title: 'Film',
+        createdAt: at(100),
+      },
+      {
+        mediaType: 'movie',
+        matchKey: 'movie:tmdb:6000102',
+        imdbId: 'tt7000101',
+        tmdbId: 6000102,
+        title: 'Film',
+        createdAt: at(300),
+      },
+    ]);
+    const resolved = await resolveMediaForItem({
+      mediaType: 'movie',
+      imdbId: 'tt7000101',
+      tmdbId: 6000102,
+      title: 'Film',
+      serverId: 's2',
+      ratingKey: '1',
+    });
+    const rows = await db.select().from(media);
+    expect(resolved).toBe(rows.find((r) => r.matchKey === 'movie:tmdb:6000102')?.id);
+    expect(rows.every((r) => r.mergedIntoId === null)).toBe(true);
+  });
+
+  it('reconcile merges rows that share an id only when they agree on every id both carry', async () => {
+    const createdAt = new Date();
+    await db.insert(media).values([
+      {
+        mediaType: 'episode',
+        matchKey: 'episode:tmdb:6000101',
+        imdbId: 'tt7000101',
+        tmdbId: 6000101,
+        title: 'Episode 1',
+        createdAt,
+      },
+      {
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:5000101',
+        imdbId: 'tt7000101',
+        tvdbId: 5000101,
+        title: 'Episode 1',
+        createdAt,
+      },
+      {
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:5000102',
+        imdbId: 'tt7000101',
+        tvdbId: 5000102,
+        title: 'Episode 2',
+        createdAt,
+      },
+    ]);
+    expect(await reconcileMediaDuplicates()).toBe(1);
+    const byKey = new Map((await db.select().from(media)).map((r) => [r.matchKey, r]));
+    const survivor = byKey.get('episode:tmdb:6000101')?.id;
+    expect(byKey.get('episode:tvdb:5000101')?.mergedIntoId).toBe(survivor);
+    expect(byKey.get('episode:tvdb:5000102')?.mergedIntoId).toBeNull();
+  });
+
   it('path-compresses merge chains', async () => {
     const a = await resolveMediaForItem({
       mediaType: 'movie',
@@ -1208,5 +1374,169 @@ describe('mediaResolutionService', () => {
     ]);
     const merged = await reconcileMediaDuplicates();
     expect(merged).toBe(1);
+  });
+
+  // Rows written by one statement share created_at. Unless noted, the expected loser holds the
+  // lower id and sits first on disk, so neither decides the survivor.
+  const lowId = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+  const survivingKeys = async () =>
+    (await db.select().from(media))
+      .filter((r) => !r.mergedIntoId)
+      .map((r) => r.matchKey)
+      .sort();
+
+  it('a resolve hitting two rows created together merges into the lower match key', async () => {
+    const createdAt = new Date();
+    await db.insert(media).values([
+      {
+        id: lowId(1),
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:5000101',
+        tvdbId: 5000101,
+        title: 'Episode 1',
+        normalizedTitle: 'episode 1',
+        createdAt,
+      },
+      {
+        id: lowId(2),
+        mediaType: 'episode',
+        matchKey: 'episode:imdb:tt7000101',
+        imdbId: 'tt7000101',
+        title: 'Episode 1',
+        normalizedTitle: 'episode 1',
+        createdAt,
+      },
+    ]);
+    const resolved = await resolveMediaForItem({
+      mediaType: 'episode',
+      imdbId: 'tt7000101',
+      tvdbId: 5000101,
+      title: 'Episode 1',
+      serverId: 's2',
+      ratingKey: '1',
+    });
+    expect(resolved).toBe(lowId(2));
+    expect(await survivingKeys()).toEqual(['episode:imdb:tt7000101']);
+  });
+
+  it('title lookups pick the lower match key among rows created together, batched or not', async () => {
+    const createdAt = new Date();
+    await db.insert(media).values([
+      {
+        id: lowId(1),
+        mediaType: 'movie',
+        matchKey: 'movie:title:heat:1996',
+        title: 'Heat',
+        normalizedTitle: 'heat',
+        year: 1996,
+        createdAt,
+      },
+      {
+        id: lowId(2),
+        mediaType: 'movie',
+        matchKey: 'movie:title:heat:1995',
+        title: 'Heat',
+        normalizedTitle: 'heat',
+        year: 1995,
+        createdAt,
+      },
+    ]);
+    const server = await createTestServer({ type: 'plex' });
+    const input = { mediaType: 'movie', title: 'Heat', year: 1995, serverId: server.id };
+    expect(await resolveMediaForItem({ ...input, ratingKey: 'rk-1' })).toBe(lowId(2));
+    const batch = await resolveMediaBatch([{ ...input, ratingKey: 'rk-2' }]);
+    expect(batch.get('rk-2')).toBe(lowId(2));
+  });
+
+  it('reconcile keeps the lower match key among rows created together, in every pass', async () => {
+    const createdAt = new Date();
+    const row = (
+      n: number,
+      matchKey: string,
+      fields: Omit<typeof media.$inferInsert, 'id' | 'mediaType' | 'matchKey'>
+    ) => ({ id: lowId(n), mediaType: 'movie', matchKey, createdAt, ...fields });
+    await db.insert(media).values([
+      // Shared tmdb id; the second pair puts the winner first on disk with the lower id
+      row(1, 'movie:tvdb:70', { tvdbId: 70, tmdbId: 7, title: 'A', normalizedTitle: 'a' }),
+      row(5, 'movie:imdb:ttA', { imdbId: 'ttA', tmdbId: 7, title: 'A', normalizedTitle: 'a' }),
+      row(2, 'movie:imdb:ttC', { imdbId: 'ttC', tmdbId: 8, title: 'B', normalizedTitle: 'b' }),
+      row(6, 'movie:tvdb:80', { tvdbId: 80, tmdbId: 8, title: 'B', normalizedTitle: 'b' }),
+      // Title-keyed race artifact
+      row(3, 'movie:title:heat:1996', { title: 'Heat', normalizedTitle: 'heat', year: 1996 }),
+      row(7, 'movie:title:heat:1995', { title: 'Heat', normalizedTitle: 'heat', year: 1995 }),
+      // Split provider ids for one title and year
+      row(4, 'movie:tmdb:18', { tmdbId: 18, title: 'Fifth', normalizedTitle: 'fifth', year: 1997 }),
+      row(8, 'movie:imdb:tt0119116', {
+        imdbId: 'tt0119116',
+        title: 'Fifth',
+        normalizedTitle: 'fifth',
+        year: 1997,
+      }),
+    ]);
+    expect(await reconcileMediaDuplicates()).toBe(4);
+    expect(await survivingKeys()).toEqual([
+      'movie:imdb:tt0119116',
+      'movie:imdb:ttA',
+      'movie:imdb:ttC',
+      'movie:title:heat:1995',
+    ]);
+  });
+
+  it('a row older by microseconds wins even when both share a millisecond', async () => {
+    const at = (micros: number) =>
+      sql`${`2026-01-01T00:00:00.000${String(micros).padStart(3, '0')}Z`}::timestamptz`;
+    // In each pair the older row carries the higher match key and the lower id
+    await db.insert(media).values([
+      {
+        id: lowId(1),
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:5000101',
+        tvdbId: 5000101,
+        title: 'Episode 1',
+        normalizedTitle: 'episode 1',
+        createdAt: at(100),
+      },
+      {
+        id: lowId(2),
+        mediaType: 'episode',
+        matchKey: 'episode:imdb:tt7000101',
+        imdbId: 'tt7000101',
+        title: 'Episode 1',
+        normalizedTitle: 'episode 1',
+        createdAt: at(300),
+      },
+      {
+        id: lowId(3),
+        mediaType: 'movie',
+        matchKey: 'movie:title:heat:1996',
+        title: 'Heat',
+        normalizedTitle: 'heat',
+        year: 1996,
+        createdAt: at(100),
+      },
+      {
+        id: lowId(4),
+        mediaType: 'movie',
+        matchKey: 'movie:title:heat:1995',
+        title: 'Heat',
+        normalizedTitle: 'heat',
+        year: 1995,
+        createdAt: at(300),
+      },
+    ]);
+    const resolved = await resolveMediaForItem({
+      mediaType: 'episode',
+      imdbId: 'tt7000101',
+      tvdbId: 5000101,
+      title: 'Episode 1',
+      serverId: 's2',
+      ratingKey: '1',
+    });
+    expect(resolved).toBe(lowId(1));
+    const server = await createTestServer({ type: 'plex' });
+    const batch = await resolveMediaBatch([
+      { mediaType: 'movie', title: 'Heat', year: 1995, serverId: server.id, ratingKey: 'rk-1' },
+    ]);
+    expect(batch.get('rk-1')).toBe(lowId(3));
   });
 });

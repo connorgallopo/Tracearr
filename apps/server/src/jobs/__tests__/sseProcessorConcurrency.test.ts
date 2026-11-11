@@ -50,9 +50,7 @@ const {
     mockGetIdentityServerUserIds: vi.fn().mockResolvedValue(['server-user-1']),
     mockLookupGeoIP: vi.fn(),
     mockMapMediaSession: vi.fn(),
-    mockCreateMediaServerClient: vi.fn().mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([{ sessionKey: 'test-session-key' }]),
-    }),
+    mockCreateMediaServerClient: vi.fn(),
     mockDispatch: vi.fn().mockResolvedValue({ violations: [], outcomes: [] }),
     mockDb: {
       select: vi.fn().mockReturnValue({
@@ -173,6 +171,11 @@ vi.mock('../../services/serviceTracker.js', () => ({
 }));
 
 import { initializeSSEProcessor, startSSEProcessor, stopSSEProcessor } from '../sseProcessor.js';
+import { fakePlexClient } from '../../test/mediaServerFakes.js';
+
+mockCreateMediaServerClient.mockReturnValue(
+  fakePlexClient({ getSessions: vi.fn().mockResolvedValue([{ sessionKey: 'test-session-key' }]) })
+);
 
 const mockGeo: GeoLocation = {
   city: null,

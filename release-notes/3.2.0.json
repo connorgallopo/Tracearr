@@ -15,6 +15,14 @@
     {
       "type": "fix",
       "text": "Jellyfin music no longer shows a video transcode, and a remuxed track no longer counts as a transcode"
+    },
+    {
+      "type": "fix",
+      "text": "duplicate titles merged in a library sync keep the copy Tracearr added first, so a library always merges the same way"
+    },
+    {
+      "type": "fix",
+      "text": "episodes whose TVDB ids differ are no longer merged into one, even with the same IMDb id; earlier merges stay merged"
     }
   ]
 }

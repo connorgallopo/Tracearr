@@ -7,10 +7,16 @@
  */
 
 import { eq, inArray, sql } from 'drizzle-orm';
-import type { OwnerLinkServer, ServerUserSplitResult, UserMergeResult } from '@tracearr/shared';
+import {
+  SERVER_TYPES,
+  type OwnerLinkServer,
+  type ServerUserSplitResult,
+  type UserMergeResult,
+} from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, serverUsers, users } from '../db/schema.js';
 import { revokeOtherWebSessions } from '../lib/revoke.js';
+import { isJellyfinEmby } from './mediaServer/index.js';
 import {
   isLoginCapable,
   MEDIA_AUTH_PROVIDERS,
@@ -20,7 +26,7 @@ import {
 } from './mergeService.js';
 import { ServerUserNotFoundError } from './userService.js';
 
-const LINKABLE_TYPES: ('jellyfin' | 'emby')[] = ['jellyfin', 'emby'];
+const LINKABLE_TYPES = SERVER_TYPES.filter(isJellyfinEmby);
 
 const mediaProviders = sql.join(
   MEDIA_AUTH_PROVIDERS.map((provider) => sql`${provider}`),
@@ -108,7 +114,7 @@ async function loadAccount(serverUserId: string) {
     .where(eq(serverUsers.id, serverUserId))
     .limit(1);
   if (!account) throw new ServerUserNotFoundError(serverUserId);
-  if (!LINKABLE_TYPES.includes(account.type as 'jellyfin' | 'emby')) {
+  if (!isJellyfinEmby(account.type)) {
     throw new MergeValidationError('Only Jellyfin and Emby accounts are linked to the owner here');
   }
   return account;

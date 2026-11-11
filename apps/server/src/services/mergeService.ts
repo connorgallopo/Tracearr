@@ -23,6 +23,7 @@ import {
 } from 'drizzle-orm';
 import {
   rankMergeTarget,
+  SERVER_PROFILES,
   TIME_MS,
   type LoginAccess,
   type MergeRankInput,
@@ -766,8 +767,11 @@ export async function splitServerUser(
       : {
           username: serverUser.username,
           name: null as string | null,
-          // A Jellyfin or Emby account's email is its username, never an identity email.
-          email: accountServer?.type === 'plex' ? serverUser.email : null,
+          // An email derived from the username is never an identity email.
+          email:
+            accountServer && SERVER_PROFILES[accountServer.type].emailSource === 'server'
+              ? serverUser.email
+              : null,
           thumbnail: serverUser.thumbUrl,
           role: 'member',
           contactEmail: null,

@@ -484,6 +484,10 @@ export interface MediaServerConfig {
   name?: string;
 }
 
+/** A client's answer for a step its server does not need. */
+export const NOT_NEEDED = Symbol('not needed');
+export type NotNeeded = typeof NOT_NEEDED;
+
 /**
  * Common interface for media server clients
  *
@@ -525,16 +529,16 @@ export interface IMediaServerClient {
    * The server's own identifier, as its web client addresses it. Distinct from
    * the Tracearr `servers.id` row uuid.
    */
-  getServerIdentity?(): Promise<string | null>;
+  getServerIdentity(): Promise<string | null>;
 
   /** The version the server reports for itself, unnormalized (Plex carries a build hash). */
-  getSoftwareVersion?(): Promise<string | null>;
+  getSoftwareVersion(): Promise<string | null>;
 
   /**
    * The file and client behind a download. Best effort per lookup: a failed
    * request leaves its fields null and keeps the rest.
    */
-  describeDownloadSource?(request: DownloadSourceRequest): Promise<DownloadSourceDescription>;
+  describeDownloadSource(request: DownloadSourceRequest): Promise<DownloadSourceDescription>;
 
   /**
    * Terminate a playback session
@@ -572,10 +576,10 @@ export interface IMediaServerClient {
 
   /**
    * Which of the given rating keys the server still has as items of this
-   * library. Optional - the full scan uses it to confirm that an item missing
-   * from the listing is gone before tombstoning it.
+   * library. The full scan uses it to confirm that an item missing from the
+   * listing is gone before tombstoning it.
    */
-  findExistingRatingKeys?(
+  findExistingRatingKeys(
     ratingKeys: string[],
     library: { id: string; type: string }
   ): Promise<Set<string>>;
@@ -584,14 +588,13 @@ export interface IMediaServerClient {
    * Get all leaf items (episodes) from a library with pagination support
    *
    * For TV show libraries, returns all episodes across all shows.
-   * Optional - only implemented by servers that support hierarchical libraries.
    *
    * @param libraryId - The library identifier
    * @param options - Pagination options
-   * @returns Promise with episode items and total count, or undefined if not supported.
-   *   See getLibraryItems for the rawCount caveat.
+   * @returns Promise with episode items and total count. See getLibraryItems for
+   *   the rawCount caveat.
    */
-  getLibraryLeaves?(
+  getLibraryLeaves(
     libraryId: string,
     options?: {
       offset?: number;
@@ -601,14 +604,13 @@ export interface IMediaServerClient {
 
   /**
    * Get items added or changed since a given date. Used for incremental sync.
-   * Optional — falls back to full fetch if not implemented.
    *
    * @param libraryId - The library identifier
    * @param since - Only return items added or modified after this date
    * @param options - Pagination options
    * @returns Promise with items array and total count for pagination
    */
-  getLibraryItemsSince?(
+  getLibraryItemsSince(
     libraryId: string,
     since: Date,
     options?: { offset?: number; limit?: number; libraryType?: string }
@@ -616,64 +618,62 @@ export interface IMediaServerClient {
 
   /**
    * Get leaf items (episodes/tracks) added or changed since a given date.
-   * Optional — falls back to full fetch if not implemented.
    *
    * @param libraryId - The library identifier
    * @param since - Only return items added or modified after this date
    * @param options - Pagination options
    * @returns Promise with items array and total count for pagination
    */
-  getLibraryLeavesSince?(
+  getLibraryLeavesSince(
     libraryId: string,
     since: Date,
     options?: { offset?: number; limit?: number }
   ): Promise<{ items: MediaLibraryItem[]; totalCount: number }>;
 
   /**
-   * Get all seasons for a library with pagination support. Plex-only: JF/Emby
-   * return season items through getLibraryLeaves/getLibraryLeavesSince instead,
-   * so this stays undefined for those clients.
+   * Get all seasons for a library with pagination support. JF/Emby return
+   * season items through getLibraryLeaves/getLibraryLeavesSince instead, so
+   * they answer NOT_NEEDED.
    *
    * @param libraryId - The library identifier
    * @param options - Pagination options
    * @returns Promise with season items and total count
    */
-  getLibrarySeasons?(
+  getLibrarySeasons(
     libraryId: string,
     options?: { offset?: number; limit?: number }
-  ): Promise<{ items: MediaLibraryItem[]; totalCount: number; rawCount?: number }>;
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number; rawCount?: number } | NotNeeded>;
 
   /**
-   * Get seasons added or changed since a given date. Plex-only counterpart to
-   * getLibrarySeasons; see that method's doc for why JF/Emby don't implement this.
+   * Get seasons added or changed since a given date. Counterpart to
+   * getLibrarySeasons; see that method's doc for why JF/Emby answer NOT_NEEDED.
    *
    * @param libraryId - The library identifier
    * @param since - Only return seasons added or modified after this date
    * @param options - Pagination options
    * @returns Promise with season items and total count
    */
-  getLibrarySeasonsSince?(
+  getLibrarySeasonsSince(
     libraryId: string,
     since: Date,
     options?: { offset?: number; limit?: number }
-  ): Promise<{ items: MediaLibraryItem[]; totalCount: number }>;
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number } | NotNeeded>;
 
   /**
-   * Get all albums for a music library with pagination support. Plex-only:
-   * JF/Emby return MusicAlbum items through getLibraryItems, so this stays
-   * undefined for those clients.
+   * Get all albums for a music library with pagination support. JF/Emby
+   * return MusicAlbum items through getLibraryItems, so they answer NOT_NEEDED.
    *
    * @param libraryId - The library identifier
    * @param options - Pagination options
    * @returns Promise with album items and total count
    */
-  getLibraryAlbums?(
+  getLibraryAlbums(
     libraryId: string,
     options?: { offset?: number; limit?: number }
-  ): Promise<{ items: MediaLibraryItem[]; totalCount: number }>;
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number } | NotNeeded>;
 
   /**
-   * Get albums added or changed since a given date. Plex-only counterpart to
+   * Get albums added or changed since a given date. Counterpart to
    * getLibraryAlbums.
    *
    * @param libraryId - The library identifier
@@ -681,22 +681,22 @@ export interface IMediaServerClient {
    * @param options - Pagination options
    * @returns Promise with album items and total count
    */
-  getLibraryAlbumsSince?(
+  getLibraryAlbumsSince(
     libraryId: string,
     since: Date,
     options?: { offset?: number; limit?: number }
-  ): Promise<{ items: MediaLibraryItem[]; totalCount: number }>;
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number } | NotNeeded>;
 
   /**
-   * Ask the server whether each item's files are still on disk. Plex-only:
-   * its listings keep reporting a file until the library trash is emptied, and
-   * only the metadata endpoint says whether the file is really there. JF/Emby
-   * drop the item instead, so they leave this undefined.
+   * Ask the server whether each item's files are still on disk. Plex listings
+   * keep reporting a file until the library trash is emptied, and only the
+   * metadata endpoint says whether the file is really there. JF/Emby drop the
+   * item instead, so they answer NOT_NEEDED.
    *
    * @param ratingKeys - Server item identifiers to check
    * @returns Rating key -> version key -> whether the file exists
    */
-  checkFilesExist?(ratingKeys: string[]): Promise<Map<string, Map<string, boolean>>>;
+  checkFilesExist(ratingKeys: string[]): Promise<Map<string, Map<string, boolean>> | NotNeeded>;
 }
 
 /**

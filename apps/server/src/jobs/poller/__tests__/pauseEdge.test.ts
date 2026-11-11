@@ -148,6 +148,7 @@ import { initializePoller, triggerServerPoll } from '../processor.js';
 import { getActiveAutomations } from '../database.js';
 import { updatePendingSession } from '../pendingConfirmation.js';
 import { buildPendingActiveSession } from '../sessionLifecycle.js';
+import { fakeJellyfinClient } from '../../../test/mediaServerFakes.js';
 
 const EXISTING_SESSION_ID = 'session-1';
 
@@ -230,9 +231,11 @@ describe('poller pause edge', () => {
       ReturnType<typeof getActiveAutomations>
     >);
 
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([{}]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakeJellyfinClient({
+        getSessions: vi.fn().mockResolvedValue([{}]),
+      })
+    );
     mockMapMediaSession.mockReturnValue(processedSession());
     mockBuildActiveSession.mockReturnValue({ id: EXISTING_SESSION_ID, sessionKey: 'sess-key-1' });
 

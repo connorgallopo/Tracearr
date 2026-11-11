@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { REDIS_KEYS } from '@tracearr/shared';
+import { REDIS_KEYS, type JellyfinEmbyServerType } from '@tracearr/shared';
 import { createMockRedis, queryChain } from '../../../test/helpers.js';
 import type { JellyfinEmbyActivityEntry } from '../../mediaServer/shared/baseMediaServerClient.js';
 
 const { redis, client } = vi.hoisted(() => ({
   redis: { current: null as unknown },
   client: {
-    serverType: 'jellyfin' as 'jellyfin' | 'emby',
+    serverType: 'jellyfin' as JellyfinEmbyServerType,
     getActivityLog: vi.fn(),
     resolveUserGuid: vi.fn(),
     getSyncJobs: vi.fn(),
@@ -16,7 +16,10 @@ const { redis, client } = vi.hoisted(() => ({
 
 vi.mock('../../../db/client.js', () => ({ db: { select: vi.fn() } }));
 vi.mock('../../../lib/redisShared.js', () => ({ getRedis: () => redis.current }));
-vi.mock('../../mediaServer/index.js', () => ({ createMediaServerClient: vi.fn(() => client) }));
+vi.mock('../../mediaServer/index.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../mediaServer/index.js')>()),
+  createJellyfinEmbyClient: vi.fn(() => client),
+}));
 vi.mock('../../../jobs/poller/database.js', () => ({ getServerUserIdByExternalId: vi.fn() }));
 vi.mock('../recorder.js', () => ({ recordDownload: vi.fn() }));
 

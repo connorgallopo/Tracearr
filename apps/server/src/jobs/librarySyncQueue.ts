@@ -14,7 +14,7 @@ import { isMaintenance } from '../serverState.js';
 import { getRedisPrefix, LEGACY_VERSION_SENTINEL } from '@tracearr/shared';
 import { Redis } from 'ioredis';
 import { eq, sql } from 'drizzle-orm';
-import { WS_EVENTS, REDIS_KEYS } from '@tracearr/shared';
+import { WS_EVENTS, REDIS_KEYS, SERVER_PROFILES } from '@tracearr/shared';
 import type { LibrarySyncProgress } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { getSetting, setSetting } from '../services/settings.js';
@@ -425,7 +425,7 @@ async function handOffImportedHistoryLink(job: Job<LibrarySyncJobData>): Promise
       .select({ type: servers.type })
       .from(servers)
       .where(eq(servers.id, job.data.serverId));
-    if (server?.type !== 'plex') return;
+    if (!server || !SERVER_PROFILES[server.type].linksImportedHistory) return;
     const results = (job.returnvalue as { results?: SyncResult[] } | undefined)?.results ?? [];
     await maybeEnqueueImportedHistoryLink(
       results.some((r) => r.itemsAdded > 0),

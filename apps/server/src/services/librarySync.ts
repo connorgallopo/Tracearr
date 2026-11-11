@@ -24,6 +24,7 @@ import {
   type MediaLibrary,
   type MediaLibraryItem,
 } from './mediaServer/index.js';
+import { NOT_NEEDED, type NotNeeded } from './mediaServer/types.js';
 import { resolveMediaBatch, reconcileMediaDuplicates } from './library/mediaResolutionService.js';
 import { parentArtFor, posterOf } from './library/posterArt.js';
 import {
@@ -50,7 +51,7 @@ import {
 import { maybeEnqueueMaintenanceJob } from '../jobs/maintenanceQueue.js';
 import {
   AUTO_LINK_WINDOW_MS,
-  listPlexServers,
+  listLinkingServers,
   MAX_AUTO_LINK_ATTEMPTS,
 } from '../jobs/importedHistoryLinking.js';
 import { getSessionsCompressionHorizon, refreshAggregates } from '../db/timescale.js';
@@ -322,10 +323,10 @@ export async function maybeEnqueueImportedHistoryLink(
     return;
   }
 
-  const plexServers = await listPlexServers();
+  const linkingServers = await listLinkingServers();
   const tautulli = await getSettings(['tautulliUrl', 'tautulliApiKey']);
   if (!tautulli.tautulliUrl || !tautulli.tautulliApiKey) {
-    if (plexServers.every((server) => link.providerPassDoneServers.includes(server.id))) {
+    if (linkingServers.every((server) => link.providerPassDoneServers.includes(server.id))) {
       await setImportedHistoryLinkState(link.generation, {
         ...link,
         state: 'done',
@@ -347,7 +348,7 @@ export async function maybeEnqueueImportedHistoryLink(
     now - lastLinkEnqueueAt >= AUTO_BACKFILL_ENQUEUE_INTERVAL_MS &&
     (addedItems || now - lastLinkProbeAt >= AUTO_BACKFILL_PROBE_INTERVAL_MS);
   if (!allowed) return;
-  for (const server of plexServers) {
+  for (const server of linkingServers) {
     if (await hasPendingLibrarySync(server.id)) return;
   }
   const enqueued = await maybeEnqueueMaintenanceJob('link_imported_history', 'system', {
@@ -912,7 +913,7 @@ export class LibrarySyncService {
     // INCREMENTAL PATH
     // =========================================================================
     const { lastSyncedAt } = syncState;
-    if (isIncremental && lastSyncedAt && client.getLibraryItemsSince) {
+    if (isIncremental && lastSyncedAt) {
       try {
         const { items: newItems, totalCount: incrementalCount } = await client.getLibraryItemsSince(
           libraryId,
@@ -923,7 +924,7 @@ export class LibrarySyncService {
         // Check for new episodes/tracks independently — new episodes can arrive
         // for shows that were added months ago (no new Series in the result).
         let newLeaves: MediaLibraryItem[] = [];
-        if (client.getLibraryLeavesSince && !FLAT_LIBRARY_TYPES.has(libraryType.toLowerCase())) {
+        if (!FLAT_LIBRARY_TYPES.has(libraryType.toLowerCase())) {
           try {
             const { items: leaves } = await client.getLibraryLeavesSince(libraryId, lastSyncedAt);
             newLeaves = leaves;
@@ -935,20 +936,18 @@ export class LibrarySyncService {
           }
         }
 
-        // Plex only - JF/Emby seasons arrive via getLibraryLeavesSince and albums via
-        // getLibraryItemsSince above
         let newContainers: MediaLibraryItem[] = [];
         const sectionType = libraryType.toLowerCase();
         const fetchContainersSince =
           sectionType === 'show'
-            ? client.getLibrarySeasonsSince?.bind(client)
+            ? client.getLibrarySeasonsSince.bind(client)
             : sectionType === 'artist'
-              ? client.getLibraryAlbumsSince?.bind(client)
+              ? client.getLibraryAlbumsSince.bind(client)
               : undefined;
         if (fetchContainersSince) {
           try {
-            const { items: containers } = await fetchContainersSince(libraryId, lastSyncedAt);
-            newContainers = containers;
+            const containers = await fetchContainersSince(libraryId, lastSyncedAt);
+            if (containers !== NOT_NEEDED) newContainers = containers.items;
           } catch (containerErr) {
             console.warn(
               `[LibrarySync] Incremental season/album fetch failed for ${libraryName}, skipping them:`,
@@ -1199,7 +1198,9 @@ export class LibrarySyncService {
       fetchPage: (page: {
         offset: number;
         limit: number;
-      }) => Promise<{ items: MediaLibraryItem[]; totalCount: number; rawCount?: number }>,
+      }) => Promise<
+        { items: MediaLibraryItem[]; totalCount: number; rawCount?: number } | NotNeeded
+      >,
       label?: string
     ): Promise<void> => {
       if (label && onProgress) {
@@ -1218,19 +1219,21 @@ export class LibrarySyncService {
         });
       }
 
-      const { totalCount: listingCount } = await fetchPage({ offset: 0, limit: 1 });
+      const probe = await fetchPage({ offset: 0, limit: 1 });
+      if (probe === NOT_NEEDED) return;
+      const listingCount = probe.totalCount;
 
       let listingOffset = 0;
       let listingProcessed = 0;
 
       while (listingOffset < listingCount) {
         const pageStartedAt = Date.now();
-        const { items: pageItems, rawCount } = await fetchPage({
+        const page = await fetchPage({
           offset: listingOffset,
           limit: BATCH_SIZE,
         });
-
-        if ((rawCount ?? pageItems.length) === 0) break;
+        if (page === NOT_NEEDED || (page.rawCount ?? page.items.length) === 0) break;
+        const pageItems = page.items;
 
         for (const item of pageItems) {
           noteItem(item);
@@ -1274,30 +1277,18 @@ export class LibrarySyncService {
       processedItems += listingProcessed;
     };
 
-    const getLeaves = client.getLibraryLeaves?.bind(client);
-    const getSeasons = client.getLibrarySeasons?.bind(client);
-    const getAlbums = client.getLibraryAlbums?.bind(client);
-
-    // For TV libraries (contains shows), also fetch all episodes
+    // For TV libraries (contains shows), also fetch all episodes and seasons
     const hasShows = (typeCounts.show ?? 0) > 0;
-    if (hasShows && getLeaves) {
-      await syncListing((page) => getLeaves(libraryId, page), 'episodes');
-    }
-
-    // Plex seasons and albums: dedicated type=3 and type=9 fetches. JF/Emby get
-    // seasons through getLibraryLeaves and albums through getLibraryItems, so
-    // these client methods are undefined there.
-    if (hasShows && getSeasons) {
-      await syncListing((page) => getSeasons(libraryId, page));
+    if (hasShows) {
+      await syncListing((page) => client.getLibraryLeaves(libraryId, page), 'episodes');
+      await syncListing((page) => client.getLibrarySeasons(libraryId, page));
     }
 
     // For music libraries (contains artists), also fetch all albums and tracks
     const hasArtists = (typeCounts.artist ?? 0) > 0;
-    if (hasArtists && getAlbums) {
-      await syncListing((page) => getAlbums(libraryId, page));
-    }
-    if (hasArtists && getLeaves) {
-      await syncListing((page) => getLeaves(libraryId, page), 'tracks');
+    if (hasArtists) {
+      await syncListing((page) => client.getLibraryAlbums(libraryId, page));
+      await syncListing((page) => client.getLibraryLeaves(libraryId, page), 'tracks');
     }
 
     await this.dropPlaceholderContainers(
@@ -1951,7 +1942,8 @@ export class LibrarySyncService {
     if (genreMediaIds.size > 0) {
       // Rebuilt from every server's active copy so an edit on the server lands.
       // Servers that disagree settle on the longest list, then the lowest
-      // server id, so they never take turns overwriting the row.
+      // server id and rating key, so they never take turns overwriting the
+      // row; the random row id would pick differently in another database.
       const ids = `{${[...genreMediaIds].join(',')}}`;
       await db.execute(sql`
         UPDATE media m SET genres = best.genres, updated_at = now()
@@ -1959,7 +1951,7 @@ export class LibrarySyncService {
           SELECT DISTINCT ON (media_id) media_id, genres
           FROM library_items
           WHERE removed_at IS NULL AND cardinality(genres) > 0 AND media_id = ANY(${ids}::uuid[])
-          ORDER BY media_id, cardinality(genres) DESC, server_id, id
+          ORDER BY media_id, cardinality(genres) DESC, server_id, rating_key COLLATE "C"
         ) best
         WHERE m.id = best.media_id AND m.genres IS DISTINCT FROM best.genres
       `);
@@ -2398,7 +2390,7 @@ export class LibrarySyncService {
   private async getServer(serverId: string): Promise<{
     id: string;
     name: string;
-    type: 'plex' | 'jellyfin' | 'emby';
+    type: ServerType;
     url: string;
     token: string;
   } | null> {
@@ -2477,7 +2469,7 @@ export class LibrarySyncService {
     library: { id: string; name: string; type: string },
     missingKeys: string[]
   ): Promise<string[]> {
-    if (missingKeys.length === 0 || !client.findExistingRatingKeys) return missingKeys;
+    if (missingKeys.length === 0) return missingKeys;
 
     let stillPresent: Set<string>;
     try {
@@ -2509,7 +2501,7 @@ export class LibrarySyncService {
     syncedKeys: string[],
     touchedMediaIds: Set<string>
   ): Promise<number> {
-    if (syncedKeys.length === 0 || !client.findExistingRatingKeys) return 0;
+    if (syncedKeys.length === 0) return 0;
     const keys = JSON.stringify(syncedKeys);
     const result = await db.execute(sql`
       SELECT DISTINCT old.rating_key

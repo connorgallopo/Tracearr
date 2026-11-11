@@ -4,6 +4,7 @@ import { maxVersion, compareVersions } from '../utils/pluginVersion.js';
 import { sseManager } from '../services/sseManager.js';
 import { getSettings } from '../services/settings.js';
 import { liveServers } from '../services/liveServers.js';
+import { isJellyfinEmby } from '../services/mediaServer/index.js';
 import { dispatchPluginUpdate } from '../services/automations/events/producers.js';
 
 const DEFAULT_MANIFEST_URL =
@@ -52,7 +53,7 @@ export async function runPluginUpdateCheck(): Promise<void> {
 
     const allServers = await liveServers();
     for (const server of allServers) {
-      if (server.type === 'plex') continue;
+      if (!isJellyfinEmby(server.type)) continue;
       if (sseManager.isInFallback(server.id)) continue;
 
       const installed = sseManager.getPluginVersion(server.id);

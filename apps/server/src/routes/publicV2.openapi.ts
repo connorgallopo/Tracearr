@@ -12,6 +12,7 @@ import {
   OpenApiGeneratorV3,
 } from '@asteasolutions/zod-to-openapi';
 import { z } from 'zod';
+import { SERVER_TYPES } from '@tracearr/shared';
 
 extendZodWithOpenApi(z);
 
@@ -136,7 +137,7 @@ const PLAY_SEMANTICS =
   '(COALESCE(duration_ms, 0) >= 120000 OR watched), including a chain that crosses UTC ' +
   'midnight. Rating keys the media server never provided are returned as null.';
 
-const ServerTypeEnum = z.enum(['plex', 'jellyfin', 'emby']);
+const ServerTypeEnum = z.enum(SERVER_TYPES);
 const MediaTypeEnum = z.enum(['movie', 'episode', 'track', 'live', 'photo', 'trailer', 'unknown']);
 const TranscodeDecisionEnum = z.enum(['directplay', 'copy', 'transcode']);
 const ActiveStateEnum = z.enum(['playing', 'paused']).openapi({

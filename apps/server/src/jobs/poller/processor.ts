@@ -10,10 +10,15 @@
 import {
   POLLER_CONFIG,
   POLLING_INTERVALS,
+  SERVER_PROFILES,
   SESSION_LIMITS,
+  assertNever,
+  isServerType,
   usernameAsEmail,
   type ActiveSession,
   type EngineAutomation,
+  type ServerProfile,
+  type ServerType,
   type Session,
 } from '@tracearr/shared';
 import { and, eq, gte, inArray, isNull, lte } from 'drizzle-orm';
@@ -36,6 +41,7 @@ import { isLiveRow } from '../../services/liveServers.js';
 import type { CacheService, PubSubService, TerminationCooldown } from '../../services/cache.js';
 import { geoipService } from '../../services/geoip.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
+import { emailForSessionUser } from '../../services/mediaServer/byServerType.js';
 import { resolveSessionGeo, type SessionGeo } from '../../services/serverLocations.js';
 import {
   fetchRecentSessionsForIdentity,
@@ -91,6 +97,10 @@ import {
 import { mapMediaSession, pickLiveSessionFields, pickStreamDetailFields } from './sessionMapper.js';
 import {
   buildCompositeKey,
+  pendingKeyFromTrackingKey,
+  pendingSessionKey,
+} from './sessionIdentity.js';
+import {
   calculatePauseAccumulation,
   checkWatchCompletion,
   createInitialConfirmationState,
@@ -212,8 +222,6 @@ const defaultConfig: PollerConfig = {
 // Key: `serverId:sessionKey`, Value: ActiveSession snapshot for notification on confirmed stop.
 const missedPollTracking = new Map<string, ActiveSession>();
 
-const warnedMissingServerTypes = new Set<string>();
-
 /**
  * Ids of sessions with at least one confirmed missed poll. Rule evaluation
  * excludes these; the dashboard keeps showing them until the stop is
@@ -233,25 +241,24 @@ async function handleFirstMisses(
   cachedKeys: Iterable<string>,
   serverId: string,
   activeSessions: ActiveSession[],
-  serverTypeMap: Map<string, string>
+  serverType: ServerType
 ): Promise<void> {
   for (const cachedKey of cachedKeys) {
     if (!cachedKey.startsWith(`${serverId}:`)) continue;
     if (missedPollTracking.has(cachedKey)) continue; // Already in grace period
 
-    const cachedActiveSession = activeSessions.find((s) => {
-      const sType = (serverTypeMap.get(s.serverId) ?? 'plex') as 'plex' | 'jellyfin' | 'emby';
-      return (
+    const cachedActiveSession = activeSessions.find(
+      (s) =>
+        s.serverId === serverId &&
         buildCompositeKey({
-          serverType: sType,
+          serverType,
           serverId: s.serverId,
           externalUserId: s.serverUserId,
           deviceId: s.deviceId ?? null,
           ratingKey: s.ratingKey ?? null,
           sessionKey: s.sessionKey,
         }) === cachedKey
-      );
-    });
+    );
     if (!cachedActiveSession) {
       console.warn(
         `[Poller] Cache mismatch for ${cachedKey}: in cachedSessionKeys but not in activeSessions`
@@ -266,6 +273,51 @@ async function handleFirstMisses(
     // confirmed on the next poll.
     missedPollTracking.set(cachedKey, cachedActiveSession);
   }
+}
+
+/** Composite-keyed kills are read once per poll; a session-keyed kill is checked per session. */
+async function readCompositeKillCooldowns(
+  serverId: string,
+  sessionIdentity: ServerProfile['sessionIdentity']
+): Promise<Map<string, TerminationCooldown>> {
+  switch (sessionIdentity) {
+    case 'sessionKey':
+      return new Map();
+    case 'composite':
+      return cacheService ? cacheService.getTerminationCooldownsComposite(serverId) : new Map();
+    default:
+      return assertNever(sessionIdentity);
+  }
+}
+
+/**
+ * Tracking keys for the cached sessions, built the way processServerSessions keys
+ * the sessions it polls so the two can be compared.
+ */
+function trackingKeysForCachedSessions(
+  cachedSessions: ActiveSession[],
+  serverRows: { id: string; type: ServerType }[]
+): Set<string> {
+  // servers.type is varchar, so a row written by a newer release can hold a type this
+  // one does not know. That server's own poll fails on it; keying its cached sessions
+  // must not take every other server's poll down with it.
+  const serverTypes = new Map(
+    serverRows.filter((s) => isServerType(s.type)).map((s) => [s.id, s.type])
+  );
+  return new Set(
+    cachedSessions.map((s) =>
+      buildCompositeKey({
+        // Only the polled server's own keys are ever compared, so a session on a server
+        // outside `serverRows` keeps the session-key form.
+        serverType: serverTypes.get(s.serverId) ?? 'plex',
+        serverId: s.serverId,
+        externalUserId: s.serverUserId,
+        deviceId: s.deviceId ?? null,
+        ratingKey: s.ratingKey ?? null,
+        sessionKey: s.sessionKey,
+      })
+    )
+  );
 }
 
 /**
@@ -291,13 +343,12 @@ async function getOrFetchRecentSessions(
 /** A pending session that vanished pre-confirmation: mirrors sseProcessor's stop-before-confirm handling. */
 async function resolveVanishedPendingSession(
   serverId: string,
-  serverType: string,
+  serverType: ServerType,
   pendingKeySource: string
 ): Promise<void> {
   if (!cacheService) return;
   const cache = cacheService;
-  const pendingKey =
-    serverType === 'plex' ? pendingKeySource.slice(serverId.length + 1) : pendingKeySource;
+  const pendingKey = pendingKeyFromTrackingKey(serverType, serverId, pendingKeySource);
 
   const pendingData = await cache.getPendingSession(serverId, pendingKey);
   if (!pendingData) return;
@@ -399,6 +450,34 @@ async function resolveVanishedPendingSession(
   );
 }
 
+/** The open row a grace-period snapshot tracks, matched the way its server keys sessions. */
+async function findTrackedSessionRow(
+  serverId: string,
+  serverType: ServerType,
+  snapshot: ActiveSession
+): Promise<typeof sessions.$inferSelect | null> {
+  const identity = SERVER_PROFILES[serverType].sessionIdentity;
+  switch (identity) {
+    case 'sessionKey':
+      return findActiveSession({
+        serverId,
+        sessionKey: snapshot.sessionKey,
+        // Close only the tracked user's row: after a PMS restart the
+        // same sessionKey can sit on another user's live row
+        serverUserId: snapshot.serverUserId,
+      });
+    case 'composite':
+      return findActiveSessionByComposite({
+        serverId,
+        serverUserId: snapshot.serverUserId,
+        deviceId: snapshot.deviceId || null,
+        ratingKey: snapshot.ratingKey ?? '',
+      });
+    default:
+      return assertNever(identity);
+  }
+}
+
 /**
  * Sweep grace period entries that were tracked in a PREVIOUS poll cycle.
  * For each entry still absent, confirm the stop in DB and send notification.
@@ -407,7 +486,7 @@ async function resolveVanishedPendingSession(
 async function sweepGracePeriod(
   keysToSweep: Set<string>,
   serverId: string,
-  serverTypeMap: Map<string, string>,
+  serverType: ServerType,
   currentSessionKeys?: Set<string>
 ): Promise<void> {
   // Dashboard invalidation is deferred to one call after the loop (instead of
@@ -427,35 +506,9 @@ async function sweepGracePeriod(
 
         // Pending sessions never wrote a DB row, so they resolve via Redis instead.
         if (snapshot.pending) {
-          const pendingServerType = serverTypeMap.get(serverId);
-          if (!pendingServerType) {
-            if (!warnedMissingServerTypes.has(serverId)) {
-              warnedMissingServerTypes.add(serverId);
-              console.warn(
-                `[Poller] No server type known for ${serverId}, skipping vanished pending session ${key} until it resolves`
-              );
-            }
-            continue;
-          }
-
-          await resolveVanishedPendingSession(serverId, pendingServerType, key);
+          await resolveVanishedPendingSession(serverId, serverType, key);
         } else {
-          const serverType = serverTypeMap.get(serverId);
-          const session =
-            serverType && serverType !== 'plex'
-              ? await findActiveSessionByComposite({
-                  serverId,
-                  serverUserId: snapshot.serverUserId,
-                  deviceId: snapshot.deviceId || null,
-                  ratingKey: snapshot.ratingKey ?? '',
-                })
-              : await findActiveSession({
-                  serverId,
-                  sessionKey: snapshot.sessionKey,
-                  // Close only the tracked user's row: after a PMS restart the
-                  // same sessionKey can sit on another user's live row
-                  serverUserId: snapshot.serverUserId,
-                });
+          const session = await findTrackedSessionRow(serverId, serverType, snapshot);
           if (session) {
             // session.lastSeenAt is the last poll that confirmed this session
             // alive - it vanished 1-2 polls before this sweep, so `new Date()`
@@ -567,6 +620,66 @@ function stateThroughBuffering(
   processed: ProcessedSession
 ): 'playing' | 'paused' {
   return processed.buffering && current !== 'stopped' ? current : processed.state;
+}
+
+/**
+ * Issue #121: Plex can reassign a playback's sessionKey, so an open row for the same
+ * user and item means a new key is a duplicate. JF/Emby key sessions by user, device
+ * and item, so their tracking key already covers this.
+ */
+async function findOpenRowForSameContent(
+  serverType: ServerType,
+  serverUserId: string,
+  ratingKey: string | null
+): Promise<{ id: string; sessionKey: string } | undefined> {
+  switch (serverType) {
+    case 'plex': {
+      if (!ratingKey) return undefined;
+      // Time bound reduces TimescaleDB chunk scanning
+      const chunkBound = new Date(Date.now() - ACTIVE_SESSION_CHUNK_BOUND_MS);
+      const [row] = await db
+        .select({ id: sessions.id, sessionKey: sessions.sessionKey })
+        .from(sessions)
+        .where(
+          and(
+            eq(sessions.serverUserId, serverUserId),
+            eq(sessions.ratingKey, ratingKey),
+            isNull(sessions.stoppedAt),
+            gte(sessions.startedAt, chunkBound)
+          )
+        )
+        .limit(1);
+      return row;
+    }
+    case 'jellyfin':
+    case 'emby':
+      return undefined;
+    default:
+      return assertNever(serverType);
+  }
+}
+
+/**
+ * Issue #57: Plex keeps a sessionKey across items (e.g. "Play Next Episode"), so a
+ * tracked session can change media. JF/Emby key sessions by item.
+ * Normalize '' to null: a row stored during a metadata blip carries an empty
+ * ratingKey, which detectMediaChange would otherwise read as a real key and treat
+ * the arrival of the true key as a media change.
+ */
+function isMediaChange(
+  serverType: ServerType,
+  existingRatingKey: string | null,
+  ratingKey: string | null
+): boolean {
+  switch (serverType) {
+    case 'plex':
+      return detectMediaChange(existingRatingKey || null, ratingKey || null);
+    case 'jellyfin':
+    case 'emby':
+      return false;
+    default:
+      return assertNever(serverType);
+  }
 }
 
 /**
@@ -734,31 +847,34 @@ async function processServerSessions(
     });
     const mediaSessions = await client.getSessions();
     sseManager.nudgeReconnect(server.id);
+    const { sessionIdentity } = SERVER_PROFILES[server.type];
 
     const processedSessions = mediaSessions.map((s) => mapMediaSession(s, server.type));
 
-    const killCooldowns =
-      server.type !== 'plex' && cacheService
-        ? await cacheService.getTerminationCooldownsComposite(server.id)
-        : new Map<string, TerminationCooldown>();
+    const killCooldowns = await readCompositeKillCooldowns(server.id, sessionIdentity);
     const wasJustKilled = async (
       processed: ProcessedSession,
       sessionKey: string
     ): Promise<boolean> => {
       if (!cacheService || !processed.ratingKey) return false;
-      if (server.type === 'plex') {
-        return cacheService.hasTerminationCooldown(
-          server.id,
-          processed.sessionKey,
-          processed.ratingKey
-        );
+      switch (sessionIdentity) {
+        case 'sessionKey':
+          return cacheService.hasTerminationCooldown(
+            server.id,
+            processed.sessionKey,
+            processed.ratingKey
+          );
+        case 'composite': {
+          const kill = killCooldowns.get(sessionKey);
+          if (!kill) return false;
+          if (isLeftoverOfKill(kill, processed.progressMs, Date.now())) return true;
+          killCooldowns.delete(sessionKey);
+          await cacheService.clearTerminationCooldownsComposite(server.id, [sessionKey]);
+          return false;
+        }
+        default:
+          return assertNever(sessionIdentity);
       }
-      const kill = killCooldowns.get(sessionKey);
-      if (!kill) return false;
-      if (isLeftoverOfKill(kill, processed.progressMs, Date.now())) return true;
-      killCooldowns.delete(sessionKey);
-      await cacheService.clearTerminationCooldownsComposite(server.id, [sessionKey]);
-      return false;
     };
     // The client reported its stop once the server stops listing the killed playback, so
     // whatever that device plays next is a new playback.
@@ -774,9 +890,8 @@ async function processServerSessions(
       const keysToSweep = new Set(
         [...missedPollTracking.keys()].filter((k) => k.startsWith(`${server.id}:`))
       );
-      const sTypeMap = new Map([[server.id, server.type]]);
-      await handleFirstMisses(cachedSessionKeys, server.id, activeSessions, sTypeMap);
-      await sweepGracePeriod(keysToSweep, server.id, sTypeMap);
+      await handleFirstMisses(cachedSessionKeys, server.id, activeSessions, server.type);
+      await sweepGracePeriod(keysToSweep, server.id, server.type);
 
       // stoppedSessionKeys intentionally empty
       return {
@@ -898,7 +1013,9 @@ async function processServerSessions(
             .set({
               username: processed.username,
               thumbUrl: processed.userThumb || existingServerUser.thumbUrl,
-              ...(server.type === 'plex' ? {} : { email: usernameAsEmail(processed.username) }),
+              ...(SERVER_PROFILES[server.type].emailSource === 'username'
+                ? { email: usernameAsEmail(processed.username) }
+                : {}),
               updatedAt: new Date(),
             })
             .where(eq(serverUsers.id, existingServerUser.id));
@@ -946,7 +1063,7 @@ async function processServerSessions(
               serverId: server.id,
               externalId: u.externalId,
               username: u.username,
-              email: server.type === 'plex' ? null : usernameAsEmail(u.username),
+              email: emailForSessionUser(server.type, u.username),
               thumbUrl: u.thumbUrl,
             }))
           )
@@ -976,7 +1093,7 @@ async function processServerSessions(
     // OPTIMIZATION: Batch load recent sessions for rule evaluation (new sessions only)
     // and batch the active-session lookup for already-tracked sessions.
     const serverUsersWithNewSessions = new Set<string>();
-    const plexSessionKeysToCheck: string[] = [];
+    const sessionKeysToCheck: string[] = [];
     const compositeIdentitiesToCheck: { serverUserId: string; ratingKey: string }[] = [];
     for (let i = 0; i < processedSessions.length; i++) {
       const processed = processedSessions[i]!;
@@ -990,25 +1107,31 @@ async function processServerSessions(
         ratingKey: processed.ratingKey,
         sessionKey: processed.sessionKey,
       });
-      const isNew = !cachedSessionKeys.has(sessionKey);
-      if (isNew) {
+      if (!cachedSessionKeys.has(sessionKey)) {
         if (serverUserId) serverUsersWithNewSessions.add(serverUserId);
-      } else if (server.type === 'plex') {
-        plexSessionKeysToCheck.push(processed.sessionKey);
-      } else if (serverUserId) {
-        compositeIdentitiesToCheck.push({ serverUserId, ratingKey: processed.ratingKey ?? '' });
+        continue;
+      }
+      switch (sessionIdentity) {
+        case 'sessionKey':
+          sessionKeysToCheck.push(processed.sessionKey);
+          break;
+        case 'composite':
+          if (serverUserId) {
+            compositeIdentitiesToCheck.push({ serverUserId, ratingKey: processed.ratingKey ?? '' });
+          }
+          break;
+        default:
+          assertNever(sessionIdentity);
       }
     }
 
     const recentSessionsMap = await batchGetRecentUserSessions([...serverUsersWithNewSessions]);
-    const plexActiveBatch =
-      server.type === 'plex'
-        ? await batchFindActiveSessionsByKey(server.id, plexSessionKeysToCheck)
-        : new Map<string, (typeof sessions.$inferSelect)[]>();
-    const compositeActiveBatch =
-      server.type !== 'plex'
-        ? await batchFindActiveSessionsByComposite(server.id, compositeIdentitiesToCheck)
-        : new Map<string, (typeof sessions.$inferSelect)[]>();
+    // Each lookup returns an empty map without querying when its list is empty.
+    const sessionKeyActiveBatch = await batchFindActiveSessionsByKey(server.id, sessionKeysToCheck);
+    const compositeActiveBatch = await batchFindActiveSessionsByComposite(
+      server.id,
+      compositeIdentitiesToCheck
+    );
 
     // One query per poll cycle resolves identity for every rating key; the insert path reads it off processed.
     const identityRatingKeys = processedSessions
@@ -1134,7 +1257,7 @@ async function processServerSessions(
           }
 
           // cachedSessionKeys only tracks confirmed sessions, so an SSE-created pending one still reads as new.
-          const pendingKey = server.type === 'plex' ? processed.sessionKey : sessionKey;
+          const pendingKey = pendingSessionKey(server.type, sessionKey, processed.sessionKey);
           const pendingOutcome = await resolvePendingSession({
             cacheService,
             pubSubService,
@@ -1208,32 +1331,19 @@ async function processServerSessions(
               return null;
             }
 
-            // Duplicate check: Plex-only (JF/Emby use composite keys)
-            if (server.type === 'plex' && processed.ratingKey && userDetail?.id) {
-              const chunkBound = new Date(Date.now() - ACTIVE_SESSION_CHUNK_BOUND_MS);
-
-              const [existingForContent] = await db
-                .select({ id: sessions.id, sessionKey: sessions.sessionKey })
-                .from(sessions)
-                .where(
-                  and(
-                    eq(sessions.serverUserId, userDetail.id),
-                    eq(sessions.ratingKey, processed.ratingKey),
-                    isNull(sessions.stoppedAt),
-                    gte(sessions.startedAt, chunkBound)
-                  )
-                )
-                .limit(1);
-
-              if (existingForContent) {
-                console.log(
-                  `[Poller] Session_key ${processed.sessionKey} is new, but active session ${existingForContent.id} exists for same content (key: ${existingForContent.sessionKey}). Skipping duplicate.`
-                );
-                // Add both session keys to cache
-                cachedSessionKeys.add(sessionKey);
-                cachedSessionKeys.add(`${server.id}:${existingForContent.sessionKey}`);
-                return null;
-              }
+            const existingForContent = await findOpenRowForSameContent(
+              server.type,
+              userDetail.id,
+              processed.ratingKey
+            );
+            if (existingForContent) {
+              console.log(
+                `[Poller] Session_key ${processed.sessionKey} is new, but active session ${existingForContent.id} exists for same content (key: ${existingForContent.sessionKey}). Skipping duplicate.`
+              );
+              // Add both session keys to cache
+              cachedSessionKeys.add(sessionKey);
+              cachedSessionKeys.add(`${server.id}:${existingForContent.sessionKey}`);
+              return null;
             }
 
             // Rules and the DB row wait for confirmation on a later tick, same as the SSE path.
@@ -1329,7 +1439,7 @@ async function processServerSessions(
         } else {
           // Pending session check (cache-first for JF/Emby, SSE for Plex)
           if (cacheService) {
-            const pendingKey = server.type === 'plex' ? processed.sessionKey : sessionKey;
+            const pendingKey = pendingSessionKey(server.type, sessionKey, processed.sessionKey);
             const outcome = await resolvePendingSession({
               cacheService,
               pubSubService,
@@ -1363,14 +1473,22 @@ async function processServerSessions(
           // incoming ratingKey here would drop the still-active old row on a
           // real media change (same sessionKey, new ratingKey) and leave the
           // detectMediaChange branch below unreachable.
-          const existingRow =
-            server.type === 'plex'
-              ? (plexActiveBatch.get(processed.sessionKey)?.[0] ?? null)
-              : ((
+          let existingRow: typeof sessions.$inferSelect | null;
+          switch (sessionIdentity) {
+            case 'sessionKey':
+              existingRow = sessionKeyActiveBatch.get(processed.sessionKey)?.[0] ?? null;
+              break;
+            case 'composite':
+              existingRow =
+                (
                   compositeActiveBatch.get(`${userDetail.id}::${processed.ratingKey ?? ''}`) ?? []
                 ).find((r) =>
                   processed.deviceId ? r.deviceId === processed.deviceId : r.deviceId === null
-                ) ?? null);
+                ) ?? null;
+              break;
+            default:
+              assertNever(sessionIdentity);
+          }
 
           // Plex reuses sessionKey counters across PMS restarts, so a stale open
           // row matched by sessionKey alone can belong to a different user than
@@ -1452,33 +1570,19 @@ async function processServerSessions(
                   return null;
                 }
 
-                // Issue #121: Plex-only duplicate check for session key reassignment.
-                if (server.type === 'plex' && processed.ratingKey && userDetail?.id) {
-                  // Time bound reduces TimescaleDB chunk scanning
-                  const chunkBound = new Date(Date.now() - ACTIVE_SESSION_CHUNK_BOUND_MS);
-
-                  const [existingForContent] = await db
-                    .select({ id: sessions.id, sessionKey: sessions.sessionKey })
-                    .from(sessions)
-                    .where(
-                      and(
-                        eq(sessions.serverUserId, userDetail.id),
-                        eq(sessions.ratingKey, processed.ratingKey),
-                        isNull(sessions.stoppedAt),
-                        gte(sessions.startedAt, chunkBound)
-                      )
-                    )
-                    .limit(1);
-
-                  if (existingForContent) {
-                    console.log(
-                      `[Poller] Stale session_key ${processed.sessionKey} but active session ${existingForContent.id} exists for same content (key: ${existingForContent.sessionKey}). Skipping duplicate creation.`
-                    );
-                    // Add both session keys to cache to prevent future stale detection
-                    cachedSessionKeys.add(sessionKey);
-                    cachedSessionKeys.add(`${server.id}:${existingForContent.sessionKey}`);
-                    return null;
-                  }
+                const existingForContent = await findOpenRowForSameContent(
+                  server.type,
+                  userDetail.id,
+                  processed.ratingKey
+                );
+                if (existingForContent) {
+                  console.log(
+                    `[Poller] Stale session_key ${processed.sessionKey} but active session ${existingForContent.id} exists for same content (key: ${existingForContent.sessionKey}). Skipping duplicate creation.`
+                  );
+                  // Add both session keys to cache to prevent future stale detection
+                  cachedSessionKeys.add(sessionKey);
+                  cachedSessionKeys.add(`${server.id}:${existingForContent.sessionKey}`);
+                  return null;
                 }
 
                 return createSessionWithRulesAtomic({
@@ -1547,14 +1651,7 @@ async function processServerSessions(
             continue;
           }
 
-          // Issue #57: Plex-only media change detection (e.g. "Play Next Episode").
-          // Normalize '' to null: a row stored during a metadata blip carries an
-          // empty ratingKey, which detectMediaChange would otherwise read as a
-          // real key and treat the arrival of the true key as a media change.
-          if (
-            server.type === 'plex' &&
-            detectMediaChange(existingSession.ratingKey || null, processed.ratingKey || null)
-          ) {
+          if (isMediaChange(server.type, existingSession.ratingKey, processed.ratingKey)) {
             const recentSessions = await getOrFetchRecentSessions(recentSessionsMap, serverUserId);
 
             const mediaChangeResult = await handleMediaChangeAtomic({
@@ -1641,8 +1738,9 @@ async function processServerSessions(
             existingSession.videoDecision !== processed.videoDecision ||
             existingSession.audioDecision !== processed.audioDecision;
 
-          // JF/Emby: session.Id changed (restart)
-          if (server.type !== 'plex' && existingSession.sessionKey !== processed.sessionKey) {
+          // Only a composite-keyed row can carry another session.Id (JF/Emby restart); a Plex row
+          // is matched by its sessionKey.
+          if (existingSession.sessionKey !== processed.sessionKey) {
             console.log(
               `[Poller] [${server.type.toUpperCase()}] Session ${sessionKey} session.Id changed: ${existingSession.sessionKey} → ${processed.sessionKey}`
             );
@@ -1889,16 +1987,15 @@ async function processServerSessions(
     const keysToSweep = new Set(
       [...missedPollTracking.keys()].filter((k) => k.startsWith(`${server.id}:`))
     );
-    const sTypeMap = new Map([[server.id, server.type]]);
     await handleFirstMisses(
       [...cachedSessionKeys].filter(
         (k) => k.startsWith(`${server.id}:`) && !currentSessionKeys.has(k)
       ),
       server.id,
       activeSessions,
-      sTypeMap
+      server.type
     );
-    await sweepGracePeriod(keysToSweep, server.id, sTypeMap, currentSessionKeys);
+    await sweepGracePeriod(keysToSweep, server.id, server.type, currentSessionKeys);
 
     // stoppedSessionKeys intentionally empty - grace period handles stops inline.
     // processPollResults still processes newSessions and updatedSessions normally.
@@ -1991,25 +2088,7 @@ async function pollServers(): Promise<void> {
     // Get cached session keys from atomic SET-based cache
     const cachedSessions = cacheService ? await cacheService.getAllActiveSessions() : [];
 
-    const serverTypeMap = new Map(allServers.map((s) => [s.id, s.type]));
-
-    // Plex: serverId:sessionKey, JF/Emby: composite key
-    const cachedSessionKeys = new Set(
-      cachedSessions.map((s) => {
-        const sType = serverTypeMap.get(s.serverId);
-        if (sType && sType !== 'plex') {
-          return buildCompositeKey({
-            serverType: sType,
-            serverId: s.serverId,
-            externalUserId: s.serverUserId,
-            deviceId: s.deviceId ?? null,
-            ratingKey: s.ratingKey ?? null,
-            sessionKey: s.sessionKey,
-          });
-        }
-        return `${s.serverId}:${s.sessionKey}`;
-      })
-    );
+    const cachedSessionKeys = trackingKeysForCachedSessions(cachedSessions, allServers);
 
     // Get active V2 rules
     const activeAutomations = await getActiveAutomations();
@@ -2396,24 +2475,7 @@ export async function triggerServerPoll(serverId: string): Promise<void> {
     if (!server || !isLiveRow(server)) return;
 
     const cachedSessions = cacheService ? await cacheService.getAllActiveSessions() : [];
-    const serverTypeMap = new Map([[server.id, server.type]]);
-
-    const cachedSessionKeys = new Set(
-      cachedSessions.map((s) => {
-        const sType = serverTypeMap.get(s.serverId);
-        if (sType && sType !== 'plex') {
-          return buildCompositeKey({
-            serverType: sType,
-            serverId: s.serverId,
-            externalUserId: s.serverUserId,
-            deviceId: s.deviceId ?? null,
-            ratingKey: s.ratingKey ?? null,
-            sessionKey: s.sessionKey,
-          });
-        }
-        return `${s.serverId}:${s.sessionKey}`;
-      })
-    );
+    const cachedSessionKeys = trackingKeysForCachedSessions(cachedSessions, [server]);
 
     const activeAutomations = await getActiveAutomations();
     const {
@@ -2477,26 +2539,8 @@ export async function triggerReconciliationPoll(): Promise<void> {
       `Running reconciliation poll for ${sseServers.length} SSE-connected server(s)`
     );
 
-    // Get cached session keys from atomic SET-based cache. Build keys with the
-    // same composite logic the main poller uses so JF/Emby sessions match.
-    const serverTypeMap = new Map(allServers.map((s) => [s.id, s.type]));
     const cachedSessions = cacheService ? await cacheService.getAllActiveSessions() : [];
-    const cachedSessionKeys = new Set(
-      cachedSessions.map((s) => {
-        const sType = serverTypeMap.get(s.serverId);
-        if (sType && sType !== 'plex') {
-          return buildCompositeKey({
-            serverType: sType,
-            serverId: s.serverId,
-            externalUserId: s.serverUserId,
-            deviceId: s.deviceId ?? null,
-            ratingKey: s.ratingKey ?? null,
-            sessionKey: s.sessionKey,
-          });
-        }
-        return `${s.serverId}:${s.sessionKey}`;
-      })
-    );
+    const cachedSessionKeys = trackingKeysForCachedSessions(cachedSessions, allServers);
 
     // Get active V2 rules
     const activeAutomations = await getActiveAutomations();

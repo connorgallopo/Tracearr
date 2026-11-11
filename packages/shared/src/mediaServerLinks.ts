@@ -8,7 +8,7 @@
  * Null means a required identifier is missing; link to the server root.
  */
 
-import type { ServerType } from './types.js';
+import { assertNever, type ServerType } from './serverTypes.js';
 
 export interface MediaServerItemLinkInput {
   serverType: ServerType;
@@ -52,7 +52,7 @@ export function buildMediaServerItemUrl({
       return `${root}/web/index.html#/details?id=${encodeURIComponent(ratingKey)}`;
     }
     default:
-      return null;
+      return assertNever(serverType);
   }
 }
 

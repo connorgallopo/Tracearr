@@ -2204,7 +2204,7 @@ describe('edgeKeyOf', () => {
         {
           type: 'plugin.update_available',
           at,
-          server,
+          server: { ...server, type: 'jellyfin' },
           installedVersion: '0.2.0',
           latestVersion: '0.3.1',
           downloadUrl: 'https://example.invalid/plugin',

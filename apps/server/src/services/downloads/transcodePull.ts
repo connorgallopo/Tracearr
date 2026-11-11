@@ -3,13 +3,12 @@ import { REDIS_KEYS } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { mediaDownloads } from '../../db/schema.js';
 import { getRedis } from '../../lib/redisShared.js';
-import { createMediaServerClient } from '../mediaServer/index.js';
+import { createJellyfinEmbyClient, isJellyfinEmby } from '../mediaServer/index.js';
 import { createLogger } from '../../utils/logger.js';
 import { getServerUserIdByExternalId } from '../../jobs/poller/database.js';
 import { deliveredFile, enrichDownload, sourceColumns } from './enrich.js';
 import { insertDownload, matchLibraryItem, type DownloadSignal } from './recorder.js';
 import type { ServerRow } from '../liveServers.js';
-import type { BaseMediaServerClient } from '../mediaServer/shared/baseMediaServerClient.js';
 import type { PluginTranscodePullEvent } from '../mediaServer/shared/jellyfinEmbyEventSource.js';
 
 export const TRANSCODE_PULL_MIN_AGE_MS = 20_000;
@@ -75,7 +74,8 @@ function completionPercent(completion: number | null | undefined) {
  * on a session that is not playing (verified 2026-10-20).
  */
 export async function pollServerTranscodePulls(server: ServerRow): Promise<void> {
-  const client = createMediaServerClient(server) as BaseMediaServerClient;
+  if (!isJellyfinEmby(server.type)) return;
+  const client = createJellyfinEmbyClient(server.type, server);
   const sessions = await client.getTranscodePullSessions();
   await withPulls(server.id, async (pulls) => {
     const now = Date.now();

@@ -26,6 +26,7 @@ import { db } from '../../../db/client.js';
 import { createMediaServerClient } from '../../../services/mediaServer/index.js';
 import { libraryDuplicateFilesRoute } from '../duplicatesFiles.js';
 import { permissionGuard } from '../../../lib/scope.js';
+import { fakeJellyfinClient, fakePlexClient } from '../../../test/mediaServerFakes.js';
 
 const mockCreateClient = vi.mocked(createMediaServerClient);
 
@@ -89,7 +90,7 @@ describe('GET /library/duplicates/files', () => {
         ],
       ])
     );
-    mockCreateClient.mockReturnValue({ checkFilesExist } as never);
+    mockCreateClient.mockReturnValue(fakePlexClient({ checkFilesExist }));
 
     const app = await buildTestApp(
       { userId: randomUUID(), username: 'owner', role: 'owner', serverIds: [] },
@@ -142,7 +143,7 @@ describe('GET /library/duplicates/files', () => {
     vi.mocked(db.execute).mockResolvedValue({
       rows: [itemRow({ server_type: 'jellyfin' })],
     } as never);
-    mockCreateClient.mockReturnValue({} as never);
+    mockCreateClient.mockReturnValue(fakeJellyfinClient());
 
     const app = await buildTestApp(
       { userId: randomUUID(), username: 'owner', role: 'owner', serverIds: [] },
@@ -155,9 +156,9 @@ describe('GET /library/duplicates/files', () => {
 
   it('answers unchecked when the probe throws instead of failing the request', async () => {
     vi.mocked(db.execute).mockResolvedValue({ rows: [itemRow()] } as never);
-    mockCreateClient.mockReturnValue({
-      checkFilesExist: vi.fn().mockRejectedValue(new Error('ECONNRESET')),
-    } as never);
+    mockCreateClient.mockReturnValue(
+      fakePlexClient({ checkFilesExist: vi.fn().mockRejectedValue(new Error('ECONNRESET')) })
+    );
 
     const app = await buildTestApp(
       { userId: randomUUID(), username: 'owner', role: 'owner', serverIds: [] },
@@ -188,7 +189,7 @@ describe('GET /library/duplicates/files', () => {
     const checkFilesExist = vi
       .fn()
       .mockResolvedValue(new Map([['2733', new Map([['42858', false]])]]));
-    mockCreateClient.mockReturnValue({ checkFilesExist } as never);
+    mockCreateClient.mockReturnValue(fakePlexClient({ checkFilesExist }));
 
     const redis = createSpyRedis();
     const app = await buildTestApp(

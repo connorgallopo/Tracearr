@@ -1,4 +1,5 @@
 import { sql, type SQL } from 'drizzle-orm';
+import { assertNever, type ServerType } from '@tracearr/shared';
 import { countedSessionSql } from '../db/sessions/rules.js';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
@@ -14,7 +15,7 @@ import {
 
 interface DuplicateCleanupServer {
   id: string;
-  type: 'plex' | 'jellyfin' | 'emby';
+  type: ServerType;
   /** servers.created_at: nothing before it was tracked */
   cutoff: Date;
 }
@@ -29,9 +30,15 @@ const uuids = (ids: string[]) => sql`${sql.param(ids)}::uuid[]`;
 
 export function importForm(alias: string, type: DuplicateCleanupServer['type']): SQL {
   const a = sql.raw(alias);
-  return type === 'plex'
-    ? sql`(${a}.session_key = 'tautulli-' || ${a}.external_session_id)`
-    : sql`(${a}.external_session_id IS NOT NULL AND ${a}.session_key = ${a}.external_session_id)`;
+  switch (type) {
+    case 'plex':
+      return sql`(${a}.session_key = 'tautulli-' || ${a}.external_session_id)`;
+    case 'jellyfin':
+    case 'emby':
+      return sql`(${a}.external_session_id IS NOT NULL AND ${a}.session_key = ${a}.external_session_id)`;
+    default:
+      return assertNever(type);
+  }
 }
 
 function near(from: string, to: string): SQL {

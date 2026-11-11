@@ -7,7 +7,7 @@
 import { Queue, Worker, type Job, type ConnectionOptions } from 'bullmq';
 import { eq, and, isNull, lte, or, type SQL } from 'drizzle-orm';
 import type { Redis } from 'ioredis';
-import { TIME_MS, type EngineAutomation } from '@tracearr/shared';
+import { TIME_MS, type EngineAutomation, type ServerType } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { serverUsers, users, servers } from '../db/schema.js';
 import { dispatch } from '../services/automations/events/dispatcher.js';
@@ -196,7 +196,7 @@ interface CandidateRow {
   createdAt: Date;
   serverId: string;
   serverName: string;
-  serverType: 'plex' | 'jellyfin' | 'emby';
+  serverType: ServerType;
 }
 
 /** The trigger's own threshold, so an automation only ever sees accounts idle long enough for it. */

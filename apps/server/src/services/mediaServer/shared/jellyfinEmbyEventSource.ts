@@ -1,10 +1,11 @@
 import { EventEmitter } from 'events';
-import { SSE_CONFIG, type SSEConnectionState } from '@tracearr/shared';
+import { SSE_CONFIG, type SSEConnectionState, type JellyfinEmbyServerType } from '@tracearr/shared';
 import type { EventSourceFetchInit } from 'eventsource';
 import { parseHelloPayload } from '../../../utils/pluginVersion.js';
+import { mediaBrowserTokenHeader } from './baseMediaServerClient.js';
 
 // Plugin SSE endpoint paths per server type
-export const PLUGIN_SSE_PATH: Record<'jellyfin' | 'emby', string> = {
+export const PLUGIN_SSE_PATH: Record<JellyfinEmbyServerType, string> = {
   jellyfin: '/api/sse/events',
   emby: '/emby/sse/events',
 };
@@ -143,7 +144,7 @@ export class JellyfinEmbyEventSource extends EventEmitter {
   private readonly serverId: string;
   private readonly serverName: string;
   private readonly baseUrl: string;
-  private readonly serverType: 'jellyfin' | 'emby';
+  private readonly serverType: JellyfinEmbyServerType;
   private readonly token: string;
 
   private eventSource: EventSource | null = null;
@@ -173,7 +174,7 @@ export class JellyfinEmbyEventSource extends EventEmitter {
     serverId: string;
     serverName: string;
     url: string;
-    serverType: 'jellyfin' | 'emby';
+    serverType: JellyfinEmbyServerType;
     token: string;
   }) {
     super();
@@ -225,7 +226,7 @@ export class JellyfinEmbyEventSource extends EventEmitter {
 
     const path = PLUGIN_SSE_PATH[this.serverType];
     const url = `${this.baseUrl}${path}`;
-    const authHeaders = this.buildAuthHeaders();
+    const authHeaders = mediaBrowserTokenHeader(this.serverType, this.token);
 
     console.log(`[PluginSSE] Connecting to ${this.serverName} at ${url}`);
 
@@ -595,13 +596,6 @@ export class JellyfinEmbyEventSource extends EventEmitter {
       clearTimeout(this.connectionTimer);
       this.connectionTimer = null;
     }
-  }
-
-  private buildAuthHeaders(): Record<string, string> {
-    if (this.serverType === 'jellyfin') {
-      return { Authorization: `MediaBrowser Token="${this.token}"` };
-    }
-    return { 'X-Emby-Token': this.token };
   }
 
   private setState(state: SSEConnectionState): void {

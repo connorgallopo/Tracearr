@@ -4,12 +4,11 @@
  * so a destination renders only the links it actually has.
  */
 
-import { buildMediaServerItemUrl, serverLinkBase } from '@tracearr/shared';
+import { buildMediaServerItemUrl, isServerType, serverLinkBase } from '@tracearr/shared';
 import { eq } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { servers } from '../../db/schema.js';
 import { getNetworkSettings } from '../settings.js';
-import type { ServerType } from '@tracearr/shared';
 import type { MediaEventPayload } from './events.js';
 
 export interface MediaLink {
@@ -47,8 +46,6 @@ async function serverRow(serverId: string): Promise<ServerLinkRow | null> {
   return row ?? null;
 }
 
-const SERVER_TYPES = new Set<string>(['plex', 'jellyfin', 'emby']);
-
 /**
  * A season carries no IMDb or TMDB id of its own - only the show does - so a season links
  * to Tracearr and the media server and nothing else.
@@ -64,12 +61,12 @@ export async function buildMediaLinks(ctx: MediaEventPayload): Promise<MediaLink
     });
   }
 
-  if (SERVER_TYPES.has(ctx.serverType)) {
+  if (isServerType(ctx.serverType)) {
     const server = await serverRow(ctx.serverId).catch(() => null);
     const url =
       server &&
       buildMediaServerItemUrl({
-        serverType: ctx.serverType as ServerType,
+        serverType: ctx.serverType,
         baseUrl: serverLinkBase(server),
         ratingKey: ctx.ratingKey,
         machineIdentifier: server.machineIdentifier,

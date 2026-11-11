@@ -9,6 +9,7 @@
 import type {
   PlaybackReportingImportProgress,
   PlaybackReportingImportResult,
+  JellyfinEmbyServerType,
 } from '@tracearr/shared';
 import { and, eq, sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
@@ -39,8 +40,12 @@ import {
   queryExistingByExternalIds,
   type TimeBounds,
 } from './import/index.js';
-import { EmbyClient } from './mediaServer/emby/client.js';
-import { JellyfinClient } from './mediaServer/jellyfin/client.js';
+import {
+  createJellyfinEmbyClient,
+  isJellyfinEmby,
+  type EmbyClient,
+  type JellyfinClient,
+} from './mediaServer/index.js';
 import { parseMediaType } from './mediaServer/shared/jellyfinEmbyUtils.js';
 import { markImportedServerLocations } from './serverLocations.js';
 import { getWatchedThresholds, watchedThresholdFor, type WatchedThresholds } from './settings.js';
@@ -163,7 +168,7 @@ export function parseEpisodeItemName(
 
 export interface TransformContext {
   serverId: string;
-  serverType: 'jellyfin' | 'emby';
+  serverType: JellyfinEmbyServerType;
   serverUserId: string;
   timezone: string;
   geo: ReturnType<typeof geoipService.lookup> & {
@@ -388,7 +393,7 @@ export async function importPlaybackReporting(
       throw new ServerHistoricalError(serverId);
     }
 
-    if (server.type !== 'jellyfin' && server.type !== 'emby') {
+    if (!isJellyfinEmby(server.type)) {
       throw new Error(
         `Playback Reporting import only supports Jellyfin/Emby servers, got: ${server.type}`
       );
@@ -402,8 +407,7 @@ export async function importPlaybackReporting(
       id: server.id,
       name: server.name,
     };
-    const client: PluginClient =
-      server.type === 'emby' ? new EmbyClient(clientConfig) : new JellyfinClient(clientConfig);
+    const client = createJellyfinEmbyClient(server.type, clientConfig);
 
     progress.status = 'detecting';
     progress.message = 'Checking for the Playback Reporting plugin...';

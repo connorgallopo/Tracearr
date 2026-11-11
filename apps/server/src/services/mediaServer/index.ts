@@ -17,15 +17,11 @@
  * const users = await client.getUsers();
  */
 
+import { assertNever, type JellyfinEmbyServerType, type ServerType } from '@tracearr/shared';
 import { PlexClient } from './plex/client.js';
 import { JellyfinClient } from './jellyfin/client.js';
 import { EmbyClient } from './emby/client.js';
-import type {
-  IMediaServerClient,
-  IMediaServerClientWithHistory,
-  MediaServerConfig,
-  CreateClientOptions,
-} from './types.js';
+import type { IMediaServerClient, MediaServerConfig, CreateClientOptions } from './types.js';
 
 // ============================================================================
 // Factory Function
@@ -64,20 +60,63 @@ export function createMediaServerClient(options: CreateClientOptions): IMediaSer
     case 'emby':
       return new EmbyClient(config);
     default:
-      throw new Error(`Unknown media server type: ${options.type as string}`);
+      return assertNever(options.type);
   }
 }
 
-/**
- * Type guard to check if a client supports watch history
- */
-export function supportsWatchHistory(
-  client: IMediaServerClient
-): client is IMediaServerClientWithHistory {
-  return (
-    'getWatchHistory' in client &&
-    typeof (client as IMediaServerClientWithHistory).getWatchHistory === 'function'
-  );
+export function createJellyfinEmbyClient(
+  type: JellyfinEmbyServerType,
+  config: MediaServerConfig
+): JellyfinClient | EmbyClient {
+  switch (type) {
+    case 'jellyfin':
+      return new JellyfinClient(config);
+    case 'emby':
+      return new EmbyClient(config);
+    default:
+      return assertNever(type);
+  }
+}
+
+export function isJellyfinEmby(type: ServerType): type is JellyfinEmbyServerType {
+  switch (type) {
+    case 'plex':
+      return false;
+    case 'jellyfin':
+      return true;
+    case 'emby':
+      return true;
+    default:
+      return assertNever(type);
+  }
+}
+
+export function verifyServerAdmin(type: ServerType, token: string, url: string) {
+  switch (type) {
+    case 'plex':
+      return PlexClient.verifyServerAdmin(token, url);
+    case 'jellyfin':
+      return JellyfinClient.verifyServerAdmin(token, url);
+    case 'emby':
+      return EmbyClient.verifyServerAdmin(token, url);
+    default:
+      return assertNever(type);
+  }
+}
+
+export function logoutUserToken(
+  type: JellyfinEmbyServerType,
+  serverUrl: string,
+  token: string
+): Promise<void> {
+  switch (type) {
+    case 'jellyfin':
+      return JellyfinClient.logoutUserToken(serverUrl, token);
+    case 'emby':
+      return EmbyClient.logoutUserToken(serverUrl, token);
+    default:
+      return assertNever(type);
+  }
 }
 
 // ============================================================================

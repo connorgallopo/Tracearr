@@ -15,6 +15,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
+import type { ServerType } from '@tracearr/shared';
 import { db } from '../../src/db/client.js';
 import { authAccounts, plexAccounts, servers, users } from '../../src/db/schema.js';
 import { PlexClient } from '../../src/services/mediaServer/index.js';
@@ -54,7 +55,7 @@ async function seedAccount(plexTvId = `plex-tv-${randomUUID()}`) {
 async function seedServer(overrides: {
   plexAccountId?: string | null;
   machineIdentifier?: string | null;
-  type?: 'plex' | 'jellyfin';
+  type?: Extract<ServerType, 'plex' | 'jellyfin'>;
 }) {
   const [server] = await db
     .insert(servers)
