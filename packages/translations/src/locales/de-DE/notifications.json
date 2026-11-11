@@ -67,16 +67,16 @@
         "title": "Aufgabe abgeschlossen"
       },
       "automationCreated": {
-        "title": "",
-        "message": ""
+        "title": "Automatisierung erstellt",
+        "message": "Die Automatisierung wurde erfolgreich erstellt"
       },
       "automationUpdated": {
-        "title": "",
+        "title": "Automatisierung aktualisiert",
         "message": ""
       },
       "automationDeleted": {
-        "title": "",
-        "message": ""
+        "title": "Automatisierung gelöscht",
+        "message": "Die Automatisierung wurde erfolgreich gelöscht"
       },
       "streamTerminated": {
         "title": "Stream beendet",
@@ -91,7 +91,7 @@
         "message": "Der Server wurde erfolgreich aktualisiert"
       },
       "serverLocationSaved": {
-        "title": "",
+        "title": "Server Standort gespeichert",
         "queued": "",
         "waiting": ""
       },
@@ -129,7 +129,7 @@
         "title": "Kopplungs-Token generiert",
         "message": "Scannen Sie den QR-Code mit Ihrem Mobilgerät"
       },
-      "identityUpdated": "",
+      "identityUpdated": "Profil aktualisiert",
       "trustScoresReset": {
         "title": "Vertrauenswerte zurückgesetzt",
         "message_one": "{{count}} Benutzer auf 100 zurückgesetzt",
@@ -140,7 +140,7 @@
         "message": "Sie können nun mit dem Setup fortfahren"
       },
       "usersMerged": {
-        "title": "",
+        "title": "Benutzer wurden zusammengeführt",
         "automationsKept": ""
       },
       "serverUserSplit": {
@@ -148,13 +148,13 @@
       },
       "mergeSuggestionDismissed": "",
       "mergeSuggestionRestored": "",
-      "destinationSaved": "",
-      "destinationDeleted": "",
-      "destinationTestSent": "",
-      "destinationTestSentTo": "",
-      "newsletterSaved": "",
-      "newsletterDeleted": "",
-      "newsletterDuplicated": "",
+      "destinationSaved": "Ziel gespeichert",
+      "destinationDeleted": "Ziel gelöscht",
+      "destinationTestSent": "Test Benachrichtigung gesendet",
+      "destinationTestSentTo": "Test an {{address}} gesendet",
+      "newsletterSaved": "Newsletter gespeichert",
+      "newsletterDeleted": "Newsletter gelöscht",
+      "newsletterDuplicated": "Newsletter dupliziert",
       "newsletterTestQueued": "",
       "newsletterSendQueued": "",
       "brandingSaved": "",
@@ -171,13 +171,13 @@
       "serverSyncFailed": "Server-Synchronisation fehlgeschlagen",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Einstellungen aktualisieren fehlgeschlagen",
-      "copyManual": "",
+      "copyManual": "Drücke Ctrl+C oder ⌘C zum Kopieren",
       "acknowledgeFailed": "Verstoß bestätigen fehlgeschlagen",
       "dismissFailed": "Verstoß verwerfen fehlgeschlagen",
       "authFailed": "Authentifizierung fehlgeschlagen",
       "automationCreateFailed": "",
       "automationUpdateFailed": "",
-      "automationDeleteFailed": "",
+      "automationDeleteFailed": "Löschen der Automatisierung fehlgeschlagen",
       "streamTerminateFailed": "Stream konnte nicht beendet werden",
       "serverUrlUpdateFailed": "Server-URL aktualisieren fehlgeschlagen",
       "serverUpdateFailed": "Server aktualisieren fehlgeschlagen",
@@ -191,29 +191,29 @@
       "deviceRemoveFailed": "Gerät entfernen fehlgeschlagen",
       "deviceRenameFailed": "Gerät umbenennen fehlgeschlagen",
       "sessionsRevokeFailed": "Sitzungen widerrufen fehlgeschlagen",
-      "identityUpdateFailed": "",
+      "identityUpdateFailed": "Konnte Profil nicht aktualisieren",
       "trustScoresResetFailed": "Vertrauenswerte konnten nicht zurückgesetzt werden",
       "plexUnlinkFailed": "Plex-Konto trennen fehlgeschlagen",
       "plexReauthorizeFailed": "",
       "jobAlreadyRunning": "Aufgabe läuft bereits",
       "jobStartFailed": "Aufgabe starten fehlgeschlagen",
       "jobLoadFailed": "Wartungsaufgaben laden fehlgeschlagen",
-      "userMergeFailed": "",
-      "serverUserSplitFailed": "",
-      "mergeSuggestionDismissFailed": "",
-      "mergeSuggestionRestoreFailed": "",
+      "userMergeFailed": "Zusammenführen der Benutzer ist fehlgeschlagen",
+      "serverUserSplitFailed": "Die Aufteilung des Kontos ist fehlgeschlagen",
+      "mergeSuggestionDismissFailed": "Der Vorschlag konnte nicht verworfen werden",
+      "mergeSuggestionRestoreFailed": "Der Vorschlag konnte nicht wiederhergestellt werden",
       "invalidClaimCode": {
         "title": "Ungültiger Claim Code",
         "message": "Bitte überprüfen Sie die Server Logs"
       },
       "destinationSaveFailed": "",
       "destinationDeleteFailed": "Fehler beim Löschen des Ziels: {{error}}",
-      "destinationTestFailed": "",
-      "destinationInUse": "",
+      "destinationTestFailed": "Test fehlgeschlagen: {{error}}",
+      "destinationInUse": "Weiterhin verwendet von: {{rules}}",
       "destinationUsedByNewsletters": "",
-      "newsletterSaveFailed": "",
-      "newsletterDeleteFailed": "",
-      "newsletterDuplicateFailed": "",
+      "newsletterSaveFailed": "Der Newsletter konnte nicht gespeichert werden: {{error}}",
+      "newsletterDeleteFailed": "Der Newsletter konnte nicht gelöscht werden: {{error}}",
+      "newsletterDuplicateFailed": "Der Newsletter konnte nicht dupliziert werden: {{error}}",
       "newsletterPreviewFailed": "",
       "newsletterTestFailed": "",
       "newsletterSendFailed": "",
