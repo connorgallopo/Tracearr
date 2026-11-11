@@ -1,7 +1,12 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExternalLink, MoreHorizontal, RefreshCw, Trash2 } from 'lucide-react';
-import type { RequestService, Server } from '@tracearr/shared';
+import {
+  REQUEST_SERVICE_BUILT_IN,
+  SERVER_PROFILES,
+  type RequestService,
+  type Server,
+} from '@tracearr/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
@@ -13,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { BASE_URL } from '@/lib/basePath';
+import { RequestServiceIcon } from '@/components/icons/RequestServiceIcon';
 import { safeFormatDistanceToNow } from '@/lib/dateFormat';
 import { cn } from '@/lib/utils';
 import {
@@ -60,6 +65,8 @@ export function RequestServiceLine({
   );
 
   if (service === undefined) {
+    // A server with its own requests always has its service; it is never linked to Seerr
+    if (SERVER_PROFILES[server.type].builtInRequests !== null) return null;
     return (
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
         <span className="text-muted-foreground">{t('requests.label')}</span>
@@ -76,28 +83,35 @@ export function RequestServiceLine({
   }
 
   const isSyncing = syncService.isPending && syncService.variables === service.id;
+  const builtIn = REQUEST_SERVICE_BUILT_IN[service.type];
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-        <span className="text-muted-foreground flex items-center gap-1">
-          <img
-            src={`${BASE_URL}images/services/seerr.svg`}
-            alt=""
-            aria-hidden="true"
-            className="h-3 w-3"
-          />
-          {service.name}
-        </span>
+        {builtIn ? (
+          <>
+            <span className="text-muted-foreground">{t('requests.label')}</span>
+            <span className="text-muted-foreground">
+              {t('requests.builtIn', { server: SERVER_PROFILES[server.type].displayName })}
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="text-muted-foreground flex items-center gap-1">
+              <RequestServiceIcon type={service.type} className="h-3 w-3" />
+              {service.name}
+            </span>
 
-        {service.version !== null && <VersionText version={service.version} />}
+            {service.version !== null && <VersionText version={service.version} />}
 
-        <span className="flex items-center gap-1">
-          <a href={service.url} target="_blank" rel="noopener noreferrer">
-            {hostOf(service.url)}
-          </a>
-          <ExternalLink className="h-3 w-3" aria-hidden="true" />
-        </span>
+            <span className="flex items-center gap-1">
+              <a href={service.url} target="_blank" rel="noopener noreferrer">
+                {hostOf(service.url)}
+              </a>
+              <ExternalLink className="h-3 w-3" aria-hidden="true" />
+            </span>
+          </>
+        )}
 
         <Dot />
         <span className="text-muted-foreground">
@@ -127,7 +141,9 @@ export function RequestServiceLine({
             <Button
               variant="ghost"
               size="icon-xs"
-              aria-label={t('requests.menuLabel', { server: server.name })}
+              aria-label={t(builtIn ? 'requests.builtInMenuLabel' : 'requests.menuLabel', {
+                server: server.name,
+              })}
             >
               <MoreHorizontal />
             </Button>
@@ -142,9 +158,11 @@ export function RequestServiceLine({
                 {t('requests.syncNow')}
               </DropdownMenuItem>
             )}
-            <DropdownMenuItem onSelect={() => setLinkOpen(true)}>
-              {t('common:actions.edit')}
-            </DropdownMenuItem>
+            {!builtIn && (
+              <DropdownMenuItem onSelect={() => setLinkOpen(true)}>
+                {t('common:actions.edit')}
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem
               onSelect={() =>
                 updateService.mutate({ id: service.id, data: { enabled: !service.enabled } })
@@ -152,11 +170,15 @@ export function RequestServiceLine({
             >
               {service.enabled ? t('requests.disable') : t('requests.enable')}
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onSelect={() => setUnlinkOpen(true)}>
-              <Trash2 />
-              {t('requests.unlink')}
-            </DropdownMenuItem>
+            {!builtIn && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem variant="destructive" onSelect={() => setUnlinkOpen(true)}>
+                  <Trash2 />
+                  {t('requests.unlink')}
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

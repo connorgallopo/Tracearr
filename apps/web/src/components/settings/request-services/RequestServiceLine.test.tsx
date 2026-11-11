@@ -166,4 +166,36 @@ describe('RequestServiceLine', () => {
 
     expect(deleteMutate).toHaveBeenCalledWith('rs-1');
   });
+
+  it('shows tofa requests as built in, with the switch and no link, edit or unlink', async () => {
+    const user = userEvent.setup();
+    const tofa = { ...server, name: 'Den', type: 'tofa' } as Server;
+    render(
+      <TooltipProvider>
+        <RequestServiceLine
+          server={tofa}
+          service={service({ type: 'tofa', name: 'Den', remoteServerId: null, version: null })}
+        />
+      </TooltipProvider>
+    );
+
+    expect(screen.getByText('requests.builtIn:{"server":"tofa"}')).toBeInTheDocument();
+    expect(screen.queryByRole('link')).not.toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: 'requests.builtInMenuLabel:{"server":"Den"}' })
+    );
+    expect(screen.getByRole('menuitem', { name: 'requests.disable' })).toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'common:actions.edit' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('menuitem', { name: 'requests.unlink' })).not.toBeInTheDocument();
+  });
+
+  it('offers no Seerr link on a server whose requests are built in', () => {
+    render(
+      <TooltipProvider>
+        <RequestServiceLine server={{ ...server, type: 'tofa' } as Server} service={undefined} />
+      </TooltipProvider>
+    );
+
+    expect(screen.queryByRole('button', { name: 'requests.link' })).not.toBeInTheDocument();
+  });
 });

@@ -12,12 +12,14 @@ vi.mock('../../../db/client.js', () => ({ db: mockDb }));
 vi.mock('../../library/mediaWatchedService.js', () => watched);
 vi.mock('../../settings.js', () => ({ getSetting: vi.fn(async () => null) }));
 
+import { buildPosterUrl } from '../../imageProxy.js';
 import { listMediaRequests, listUserRequests } from '../reads.js';
 
 const SHOW_ID = '11111111-1111-4111-8111-111111111111';
 const USER_ID = '22222222-2222-4222-8222-222222222222';
 const SERVER_ID = '33333333-3333-4333-8333-333333333333';
 const SERVER_USER_ID = '44444444-4444-4444-8444-444444444444';
+const SERVICE_ID = '55555555-5555-4555-8555-555555555555';
 
 function showScope(): MediaScope {
   return { kind: 'show', aliases: [SHOW_ID], seasonNumber: null, showAliases: [] };
@@ -269,6 +271,43 @@ describe('listUserRequests', () => {
       mediaType: 'show',
       posterUrl: null,
     });
+  });
+
+  async function posterUrlFor(row: Record<string, unknown>) {
+    mockDb.execute
+      .mockResolvedValueOnce({ rows: [{ ...mediaRow(), title: 'X', year: 2020, ...row }] })
+      .mockResolvedValueOnce({ rows: [summaryRow()] })
+      .mockResolvedValueOnce({ rows: [] });
+    const result = await listUserRequests({
+      showOthers: true,
+      serverUserIds: [SERVER_USER_ID],
+      serverIds: undefined,
+      page: 1,
+      pageSize: 5,
+    });
+    return result.data[0]?.media.posterUrl;
+  }
+
+  it("shows the request service's poster while the title is in no library", async () => {
+    const posterUrl = await posterUrlFor({
+      service_id: SERVICE_ID,
+      poster_path: '/cache/images/posters/abc.jpg',
+      poster_server_id: null,
+      poster_thumb_path: null,
+    });
+
+    expect(posterUrl).toBe(buildPosterUrl(SERVICE_ID, '/cache/images/posters/abc.jpg'));
+  });
+
+  it("prefers the library's poster to the request service's", async () => {
+    const posterUrl = await posterUrlFor({
+      service_id: SERVICE_ID,
+      poster_path: '/cache/images/posters/abc.jpg',
+      poster_server_id: SERVER_ID,
+      poster_thumb_path: '/library/metadata/1/thumb/2',
+    });
+
+    expect(posterUrl).toBe(buildPosterUrl(SERVER_ID, '/library/metadata/1/thumb/2'));
   });
 
   it('divides approvals by decided requests', async () => {

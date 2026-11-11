@@ -2,7 +2,8 @@
  * The only thing that deletes a versioned poster: a sweep against library_items.
  * Expected names come from every row with a thumb path, removed rows included, so
  * a removed item keeps its last poster and only a gone row orphans one. Every row
- * expects its 2:3 poster; artists and albums also expect their square one.
+ * expects its 2:3 poster; artists and albums also expect their square one. A
+ * request for a title in no library expects the 2:3 poster from its service.
  */
 
 import { readdir, stat as fsStat, unlink } from 'node:fs/promises';
@@ -10,7 +11,7 @@ import { join } from 'node:path';
 import { and, asc, gt, isNotNull, sql } from 'drizzle-orm';
 import { REDIS_KEYS, TIME_MS, posterSizeFor, type ImageCacheStatus } from '@tracearr/shared';
 import { db } from '../db/client.js';
-import { libraryItems } from '../db/schema.js';
+import { libraryItems, mediaRequests } from '../db/schema.js';
 import { getRedis } from '../lib/redisShared.js';
 import { isMaintenance } from '../serverState.js';
 import {
@@ -74,6 +75,13 @@ export async function buildExpectedFileNames(): Promise<Set<string>> {
     const last = rows.at(-1);
     if (rows.length < PAGE || !last) break;
     cursor = last.id;
+  }
+  const requestPosters = await db
+    .selectDistinct({ serviceId: mediaRequests.serviceId, posterPath: mediaRequests.posterPath })
+    .from(mediaRequests)
+    .where(isNotNull(mediaRequests.posterPath));
+  for (const row of requestPosters) {
+    if (row.posterPath) expected.add(posterCacheFileName(row.serviceId, row.posterPath).fileName);
   }
   return expected;
 }

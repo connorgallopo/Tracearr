@@ -61,10 +61,11 @@ function countsFor(results: SeerrRequest[]): SeerrCounts {
 function fixtureClient(results: SeerrRequest[]): SeerrClientLike {
   return {
     status: () => Promise.resolve({ version: '3.5.0' }),
+    mainSettings: () => Promise.resolve({ cacheImages: false }),
     requestCount: () => Promise.resolve(countsFor(results)),
     requestsPage: () => Promise.resolve({ pageInfo: { pages: 1 }, results }),
-    movie: () => Promise.resolve({ title: 'Fixture', year: 2020 }),
-    tv: () => Promise.resolve({ title: 'Fixture', year: 2020 }),
+    movie: () => Promise.resolve({ title: 'Fixture', year: 2020, posterPath: null }),
+    tv: () => Promise.resolve({ title: 'Fixture', year: 2020, posterPath: null }),
   };
 }
 
@@ -252,6 +253,6 @@ describe('Seerr request sync', () => {
     expect(rows).toHaveLength(40);
     const deleted = rows.filter((r) => r.deleted_at !== null);
     expect(deleted).toHaveLength(1);
-    expect(deleted[0]?.remote_id).toBe(dropped.id);
+    expect(deleted[0]?.remote_id).toBe(String(dropped.id));
   });
 });

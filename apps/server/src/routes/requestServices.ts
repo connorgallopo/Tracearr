@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import {
+  REQUEST_SERVICE_BUILT_IN,
   createRequestServiceSchema,
   testRequestServiceSchema,
   updateRequestServiceSchema,
@@ -120,6 +121,14 @@ export async function requestServiceRoutes(app: FastifyInstance): Promise<void> 
     }
     const current = await getRequestService(params.data.id);
     if (!current) return reply.notFound('Request service not found');
+    if (
+      REQUEST_SERVICE_BUILT_IN[current.type] &&
+      (parsed.data.name !== undefined ||
+        parsed.data.url !== undefined ||
+        parsed.data.apiKey !== undefined)
+    ) {
+      return reply.badRequest("Built-in requests take the server's own name, address and API key");
+    }
 
     let probe: RequestServiceProbeResult | null = null;
     if (parsed.data.url !== undefined || parsed.data.apiKey !== undefined) {
@@ -149,7 +158,15 @@ export async function requestServiceRoutes(app: FastifyInstance): Promise<void> 
     const params = idParamSchema.safeParse(request.params);
     if (!params.success) return reply.badRequest('Invalid request service id');
     const deleted = await deleteRequestService(params.data.id);
-    if (!deleted) return reply.notFound('Request service not found');
+    if (!deleted) {
+      const current = await getRequestService(params.data.id);
+      if (current && REQUEST_SERVICE_BUILT_IN[current.type]) {
+        return reply.conflict(
+          'Built-in requests are removed with their server; turn their sync off instead'
+        );
+      }
+      return reply.notFound('Request service not found');
+    }
     await scheduleRequestSync();
     return reply.code(204).send();
   });

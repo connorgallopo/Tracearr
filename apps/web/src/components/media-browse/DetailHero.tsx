@@ -22,9 +22,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { InlineErrorState } from '@/components/library/ErrorState';
+import { RequestServiceIcon } from '@/components/icons/RequestServiceIcon';
 import { Skeleton } from '@/components/ui/skeleton';
 import { heroRequestLine, type Translate } from '@/components/requests/format';
-import { BASE_URL } from '@/lib/basePath';
 import { cn } from '@/lib/utils';
 import { formatBytes } from '@/lib/formatters';
 import { formatDate } from '@/lib/dateFormat';
@@ -186,8 +186,10 @@ export interface OpenOnServerTarget {
 
 /** One deep link per copy whose server is known, falling back to the server's own address. */
 export function openOnServerTargets(
-  copies: Pick<MediaAvailabilityEntry, 'serverId' | 'ratingKey'>[],
-  serverById: Map<string, HeroServerLookupEntry>
+  copies: (Pick<MediaAvailabilityEntry, 'serverId' | 'ratingKey'> &
+    Partial<Pick<MediaAvailabilityEntry, 'showRatingKey' | 'seasonNumber' | 'episodeNumber'>>)[],
+  serverById: Map<string, HeroServerLookupEntry>,
+  mediaType?: string
 ): OpenOnServerTarget[] {
   return copies.flatMap((entry) => {
     const server = serverById.get(entry.serverId);
@@ -197,6 +199,10 @@ export function openOnServerTargets(
       serverType: server.type,
       baseUrl: base ?? '',
       ratingKey: entry.ratingKey,
+      mediaType,
+      showRatingKey: entry.showRatingKey,
+      seasonNumber: entry.seasonNumber,
+      episodeNumber: entry.episodeNumber,
       machineIdentifier: server.machineIdentifier,
     });
     const url = itemUrl ?? base;
@@ -458,12 +464,7 @@ export function DetailHero({
 
               {request && (
                 <p className="text-muted-foreground mt-2 flex items-center gap-2 text-[12.5px]">
-                  <img
-                    src={`${BASE_URL}images/services/seerr.svg`}
-                    alt=""
-                    aria-hidden="true"
-                    className="h-3.5 w-3.5"
-                  />
+                  <RequestServiceIcon type={request.serviceType} className="h-3.5 w-3.5" />
                   <span>{heroRequestText(request, t as Translate)}</span>
                 </p>
               )}
@@ -474,7 +475,7 @@ export function DetailHero({
                 </Button>
                 {!removedEverywhere && (
                   <OpenOnServerAction
-                    targets={openOnServerTargets(activeAvailability, serverById)}
+                    targets={openOnServerTargets(activeAvailability, serverById, mediaType)}
                   />
                 )}
               </div>
