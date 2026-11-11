@@ -61,14 +61,14 @@
     "playing": "Läuft",
     "paused": "Pausiert",
     "buffering": "",
-    "endsAt": "",
+    "endsAt": "Endet um {{time}}",
     "stopped": "Gestoppt",
     "directPlay": "Direkte Wiedergabe",
     "directStream": "Direkter Stream",
     "audioTranscode": "Audio-Transkodierung",
     "transcode": "Transkodierung",
     "hwTranscode": "HW Transkodierung",
-    "burnIn": "",
+    "burnIn": "Einbrennen",
     "watched": "Geschaut",
     "played": "Gespielt"
   },
@@ -161,7 +161,7 @@
     "viewers": "Zuschauer",
     "watchHours": "Wiedergabezeit",
     "completion": "",
-    "serverLegend": ""
+    "serverLegend": "Server Legende"
   },
   "search": {
     "searchUsers": "Suche Benutzer...",
@@ -268,7 +268,7 @@
     "noJobHistory": "Noch keine Aufgabenhistorie",
     "noSessionsFound": "Keine Sitzungen gefunden",
     "noUserData": "Keine Benutzerdaten verfügbar",
-    "noPlayData": "",
+    "noPlayData": "Keine Wiedergabedaten verfügbar",
     "noLocationData": "Es liegen keine Standortdaten vor"
   },
   "confirmations": {
@@ -279,7 +279,7 @@
   "serverSelector": {
     "all": "Alle Server",
     "some": "{{count}} von {{total}} Servern",
-    "search": "",
+    "search": "Suche Server...",
     "noMatches": "Keine Server gefunden",
     "historical": "historisch"
   }
