@@ -84,6 +84,7 @@ vi.mock('../sessionMapper.js', () => ({
 
 import { servers, serverUsers, sessions as sessionsTable } from '../../../db/schema.js';
 import { initializePoller, stopPoller, triggerPoll } from '../processor.js';
+import { fakeJellyfinClient } from '../../../test/mediaServerFakes.js';
 
 const KILLED_KEY = 'server-1:su-1:firestick-1:item-777';
 
@@ -201,7 +202,9 @@ function createCache(kill: TerminationCooldown) {
 }
 
 async function pollWith(kill: TerminationCooldown, plays: ProcessedSession[]) {
-  mockCreateMediaServerClient.mockReturnValue({ getSessions: vi.fn().mockResolvedValue(plays) });
+  mockCreateMediaServerClient.mockReturnValue(
+    fakeJellyfinClient({ getSessions: vi.fn().mockResolvedValue(plays) })
+  );
   const cache = createCache(kill);
   initializePoller(
     cache as unknown as CacheService,

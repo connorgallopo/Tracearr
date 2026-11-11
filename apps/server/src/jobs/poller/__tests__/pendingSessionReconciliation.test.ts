@@ -74,9 +74,7 @@ const {
       nudgeReconnect: vi.fn(),
     }),
     mockEnqueueNotification: vi.fn().mockResolvedValue('job-id'),
-    mockCreateMediaServerClient: vi.fn().mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([{}]),
-    }),
+    mockCreateMediaServerClient: vi.fn(),
     mockMapMediaSession: vi.fn(),
     mockUpdatePendingSession: vi.fn(),
     mockConfirmAndPersistSession: vi.fn(),
@@ -172,6 +170,11 @@ vi.mock('../violations.js', () => ({ broadcastViolations: vi.fn() }));
 
 import { initializePoller, triggerServerPoll } from '../processor.js';
 import { evaluateRulesAsync } from '../../../services/automations/engine.js';
+import { fakePlexClient } from '../../../test/mediaServerFakes.js';
+
+mockCreateMediaServerClient.mockReturnValue(
+  fakePlexClient({ getSessions: vi.fn().mockResolvedValue([{}]) })
+);
 
 function createPendingSessionData(): PendingSessionData {
   const now = Date.now();
@@ -514,9 +517,11 @@ describe('poller isNew branch defers to a pending session', () => {
       };
     });
 
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([{}, {}]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([{}, {}]),
+      })
+    );
 
     // Restore the plain default (server lookup + single server user, no
     // existingById match) - mockImplementation from an earlier test in this
@@ -711,9 +716,11 @@ describe('poller isNew branch defers to a pending session', () => {
       };
     });
 
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([{}, {}]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([{}, {}]),
+      })
+    );
 
     const mockServerRow = {
       id: 'server-1',

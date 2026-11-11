@@ -115,6 +115,7 @@ vi.mock('../sessionMapper.js', () => ({
 
 import { servers, serverUsers, sessions as sessionsTable } from '../../../db/schema.js';
 import { initializePoller, stopPoller, triggerPoll } from '../processor.js';
+import { fakePlexClient } from '../../../test/mediaServerFakes.js';
 
 function createMockProcessedSession(overrides: Partial<ProcessedSession> = {}): ProcessedSession {
   return {
@@ -282,9 +283,11 @@ describe('poller routes a real next-episode transition through the media-change 
     stopPoller();
     mockGetActiveAutomations.mockResolvedValue([]);
     mockBatchFindActiveSessionsByKey.mockResolvedValue(new Map([['sk-42', [oldSessionRow]]]));
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([createMockProcessedSession()]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([createMockProcessedSession()]),
+      })
+    );
     mockBuildActiveSession.mockReturnValue({ id: 'new-id' });
 
     cacheService = createCacheService();
@@ -346,9 +349,13 @@ describe('poller routes a real next-episode transition through the media-change 
   });
 
   it('takes the normal update path (no media change) when the ratingKey is unchanged', async () => {
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([createMockProcessedSession({ ratingKey: 'rk-old' })]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi
+          .fn()
+          .mockResolvedValue([createMockProcessedSession({ ratingKey: 'rk-old' })]),
+      })
+    );
 
     await triggerPoll();
 

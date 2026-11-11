@@ -123,11 +123,8 @@ import {
   maybeEnqueueImportedHistoryLink,
 } from '../librarySync.js';
 import { MEDIA_BUFFER_CAP, flushMediaAnnounceRun } from '../library/mediaAnnounce.js';
-import {
-  NOT_NEEDED,
-  type IMediaServerClient,
-  type MediaLibraryItem,
-} from '../mediaServer/types.js';
+import type { MediaLibraryItem } from '../mediaServer/types.js';
+import { fakePlexClient } from '../../test/mediaServerFakes.js';
 import type { LibrarySyncProgress } from '@tracearr/shared';
 import type { Redis } from 'ioredis';
 
@@ -396,7 +393,7 @@ function mockMediaServerClient(options: {
   leavesSince?: MediaLibraryItem[];
   leavesCountSince?: number;
 }) {
-  const client = {
+  const client = fakePlexClient({
     getLibraries: vi.fn().mockResolvedValue(options.libraries ?? [createMockLibrary()]),
     getLibraryItems: vi.fn().mockResolvedValue({
       items: options.items ?? [],
@@ -410,32 +407,7 @@ function mockMediaServerClient(options: {
       items: options.leavesSince ?? [],
       totalCount: options.leavesCountSince ?? options.leavesSince?.length ?? 0,
     }),
-    // Answers like JF/Emby by default - assign a vi.fn() per test to opt in.
-    getLibrarySeasons: vi.fn<IMediaServerClient['getLibrarySeasons']>(async () => NOT_NEEDED),
-    getLibrarySeasonsSince: vi.fn<IMediaServerClient['getLibrarySeasonsSince']>(
-      async () => NOT_NEEDED
-    ),
-    getLibraryLeaves: vi.fn<IMediaServerClient['getLibraryLeaves']>(async () => ({
-      items: [],
-      totalCount: 0,
-    })),
-    getLibraryAlbums: vi.fn<IMediaServerClient['getLibraryAlbums']>(async () => NOT_NEEDED),
-    getLibraryAlbumsSince: vi.fn<IMediaServerClient['getLibraryAlbumsSince']>(
-      async () => NOT_NEEDED
-    ),
-    checkFilesExist: vi.fn<IMediaServerClient['checkFilesExist']>(async () => NOT_NEEDED),
-    findExistingRatingKeys: vi.fn<IMediaServerClient['findExistingRatingKeys']>(
-      async () => new Set()
-    ),
-    getServerIdentity: vi.fn(),
-    getSoftwareVersion: vi.fn(),
-    describeDownloadSource: vi.fn(),
-    serverType: 'plex' as const,
-    getSessions: vi.fn(),
-    getUsers: vi.fn(),
-    testConnection: vi.fn().mockResolvedValue(true),
-    terminateSession: vi.fn(),
-  };
+  });
   vi.mocked(createMediaServerClient).mockReturnValue(client);
   return client;
 }
@@ -584,11 +556,11 @@ describe('LibrarySyncService', () => {
         items: [createMockLibraryItem({ ratingKey: 'item-1' })],
         totalCount: 1,
       });
-      const listing = client.getLibraryItems.getMockImplementation();
-      client.getLibraryItems.mockImplementation((libraryId: string, ...rest: unknown[]) =>
+      const listing = client.getLibraryItems;
+      client.getLibraryItems = vi.fn((libraryId: string, options?: { offset?: number }) =>
         libraryId === '1'
           ? Promise.reject(new Error('plex request to /library/sections/1/all timed out'))
-          : listing?.(libraryId, ...rest)
+          : listing(libraryId, options)
       );
 
       const error = await service.syncServer(mockServer.id).catch((e: unknown) => e);
@@ -2629,7 +2601,7 @@ describe('LibrarySyncService', () => {
         totalCount: 1,
       });
       // Make incremental fetch throw
-      client.getLibraryItemsSince.mockRejectedValue(new Error('API error'));
+      vi.mocked(client.getLibraryItemsSince).mockRejectedValue(new Error('API error'));
 
       const service = new LibrarySyncService();
       const results = await service.syncServer(serverId);

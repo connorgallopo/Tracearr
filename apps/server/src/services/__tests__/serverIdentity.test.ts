@@ -1,8 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { fakeEmbyClient, fakeJellyfinClient, fakePlexClient } from '../../test/mediaServerFakes.js';
 
+const fakeClients = { plex: fakePlexClient, jellyfin: fakeJellyfinClient, emby: fakeEmbyClient };
 const getServerIdentity = vi.fn();
 const getUsers = vi.fn();
-const createMediaServerClient = vi.fn((_opts: unknown) => ({ getServerIdentity, getUsers }));
+const createMediaServerClient = vi.fn((opts: { type: keyof typeof fakeClients }) =>
+  fakeClients[opts.type]({ getServerIdentity, getUsers })
+);
 const invalidateServersCache = vi.fn();
 const where = vi.fn(async (_cond: unknown) => undefined);
 const set = vi.fn((_values: unknown) => ({ where }));
@@ -21,7 +25,8 @@ vi.mock('../../db/client.js', () => ({
   },
 }));
 vi.mock('../mediaServer/index.js', () => ({
-  createMediaServerClient: (arg: unknown) => createMediaServerClient(arg),
+  createMediaServerClient: (arg: Parameters<typeof createMediaServerClient>[0]) =>
+    createMediaServerClient(arg),
 }));
 vi.mock('../../jobs/poller/database.js', () => ({
   invalidateServersCache: () => invalidateServersCache(),

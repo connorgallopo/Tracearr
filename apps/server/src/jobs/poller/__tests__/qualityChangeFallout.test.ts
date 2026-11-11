@@ -164,6 +164,7 @@ import {
   triggerPoll,
   triggerServerPoll,
 } from '../processor.js';
+import { fakePlexClient } from '../../../test/mediaServerFakes.js';
 
 function createMockProcessedSession(overrides: Partial<ProcessedSession> = {}): ProcessedSession {
   return {
@@ -332,9 +333,11 @@ afterEach(() => {
 
 describe('quality-change fallout: brand-new session defers instead of running fallout immediately', () => {
   it('creates a pending entry with no DB row and no quality-change check on first sight', async () => {
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([createMockProcessedSession()]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([createMockProcessedSession()]),
+      })
+    );
 
     await triggerServerPoll('server-1');
 
@@ -361,9 +364,11 @@ describe('quality-change fallout: stale-recovery path', () => {
       },
     ]);
 
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([createMockProcessedSession()]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([createMockProcessedSession()]),
+      })
+    );
     mockCreateSessionWithRulesAtomic.mockResolvedValue({
       insertedSession: { id: 'recovered-session-id', sessionKey: 'sk-1' },
       violationResults: [],
@@ -429,9 +434,11 @@ describe('quality-change fallout: media-change path', () => {
     );
     mockDetectMediaChange.mockReturnValue(true);
 
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([createMockProcessedSession()]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([createMockProcessedSession()]),
+      })
+    );
     mockHandleMediaChangeAtomic.mockResolvedValue({
       stoppedSession: { id: 'existing-session-id', serverUserId: 'su-a', sessionKey: 'sk-1' },
       insertedSession: { id: 'new-session-id', sessionKey: 'sk-1' },
@@ -469,9 +476,11 @@ describe('grace-period sweep stamps the honest stop time', () => {
 
   it('stamps stoppedAt from the DB row lastSeenAt, not the sweep tick', async () => {
     cacheService.getAllActiveSessions.mockResolvedValue([activeSessionA]);
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([]),
+      })
+    );
 
     // Tick 1: session A absent -> enters grace period (first miss), not swept yet.
     await triggerPoll();

@@ -1,0 +1,1656 @@
+{
+  "systemInfo": {
+    "OperatingSystemDisplayName": "",
+    "HasPendingRestart": false,
+    "IsShuttingDown": false,
+    "SupportsLibraryMonitor": true,
+    "WebSocketPortNumber": 8097,
+    "CompletedInstallations": [],
+    "CanSelfRestart": true,
+    "CanLaunchWebBrowser": false,
+    "ProgramDataPath": "/config",
+    "WebPath": "/jellyfin/jellyfin-web",
+    "ItemsByNamePath": "/config/metadata",
+    "CachePath": "/cache",
+    "LogPath": "/config/log",
+    "InternalMetadataPath": "/config/metadata",
+    "TranscodingTempPath": "/cache/transcodes",
+    "CastReceiverApplications": [
+      {
+        "Id": "F007D354",
+        "Name": "Stable"
+      },
+      {
+        "Id": "6F511C87",
+        "Name": "Unstable"
+      }
+    ],
+    "HasUpdateAvailable": false,
+    "EncoderLocation": "System",
+    "SystemArchitecture": "X64",
+    "LocalAddress": "10.0.0.11",
+    "ServerName": "Test Server",
+    "Version": "12.4.0",
+    "ProductName": "Jellyfin Server",
+    "OperatingSystem": "",
+    "Id": "316b123c9f9c278fd4822c088cddd8a5",
+    "StartupWizardCompleted": true
+  },
+  "users": [
+    {
+      "Name": "user1",
+      "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+      "Id": "2d25e87cd654590f51890ae168b28306",
+      "HasPassword": true,
+      "HasConfiguredPassword": true,
+      "HasConfiguredEasyPassword": false,
+      "EnableAutoLogin": false,
+      "LastLoginDate": "2023-09-06T15:56:25.2185936Z",
+      "LastActivityDate": "2023-09-06T15:57:51.7219187Z",
+      "Configuration": {
+        "PlayDefaultAudioTrack": true,
+        "SubtitleLanguagePreference": "",
+        "DisplayMissingEpisodes": false,
+        "GroupedFolders": [],
+        "SubtitleMode": "Default",
+        "DisplayCollectionsView": false,
+        "EnableLocalPassword": false,
+        "OrderedViews": [],
+        "LatestItemsExcludes": [],
+        "MyMediaExcludes": [],
+        "HidePlayedInLatest": true,
+        "RememberAudioSelections": true,
+        "RememberSubtitleSelections": true,
+        "EnableNextEpisodeAutoPlay": true,
+        "CastReceiverId": "F007D354"
+      },
+      "Policy": {
+        "IsAdministrator": true,
+        "IsHidden": true,
+        "EnableCollectionManagement": false,
+        "EnableSubtitleManagement": false,
+        "EnableLyricManagement": false,
+        "IsDisabled": false,
+        "BlockedTags": [],
+        "AllowedTags": [],
+        "EnableUserPreferenceAccess": true,
+        "AccessSchedules": [],
+        "BlockUnratedItems": [],
+        "EnableRemoteControlOfOtherUsers": true,
+        "EnableSharedDeviceControl": true,
+        "EnableRemoteAccess": true,
+        "EnableLiveTvManagement": true,
+        "EnableLiveTvAccess": true,
+        "EnableMediaPlayback": true,
+        "EnableAudioPlaybackTranscoding": true,
+        "EnableVideoPlaybackTranscoding": true,
+        "EnablePlaybackRemuxing": true,
+        "ForceRemoteSourceTranscoding": false,
+        "EnableContentDeletion": true,
+        "EnableContentDeletionFromFolders": [],
+        "EnableContentDownloading": true,
+        "EnableSyncTranscoding": true,
+        "EnableMediaConversion": true,
+        "EnabledDevices": [],
+        "EnableAllDevices": true,
+        "EnabledChannels": [],
+        "EnableAllChannels": true,
+        "EnabledFolders": [],
+        "EnableAllFolders": true,
+        "InvalidLoginAttemptCount": 0,
+        "LoginAttemptsBeforeLockout": -1,
+        "MaxActiveSessions": 0,
+        "EnablePublicSharing": true,
+        "BlockedMediaFolders": [],
+        "BlockedChannels": [],
+        "RemoteClientBitrateLimit": 0,
+        "AuthenticationProviderId": "Jellyfin.Server.Implementations.Users.DefaultAuthenticationProvider",
+        "PasswordResetProviderId": "Jellyfin.Server.Implementations.Users.DefaultPasswordResetProvider",
+        "SyncPlayAccess": "CreateAndJoinGroups"
+      }
+    }
+  ],
+  "libraries": [
+    {
+      "Name": "Movies",
+      "Locations": ["/media/library/folder1"],
+      "CollectionType": "movies",
+      "LibraryOptions": {
+        "Enabled": true,
+        "EnablePhotos": true,
+        "EnableRealtimeMonitor": true,
+        "EnableLUFSScan": true,
+        "EnableChapterImageExtraction": false,
+        "ExtractChapterImagesDuringLibraryScan": false,
+        "EnableTrickplayImageExtraction": false,
+        "ExtractTrickplayImagesDuringLibraryScan": false,
+        "PathInfos": [
+          {
+            "Path": "/media/library/folder1"
+          }
+        ],
+        "SaveLocalMetadata": false,
+        "EnableInternetProviders": false,
+        "EnableAutomaticSeriesGrouping": false,
+        "EnableEmbeddedTitles": false,
+        "EnableEmbeddedExtrasTitles": false,
+        "EnableEmbeddedEpisodeInfos": false,
+        "AutomaticRefreshIntervalDays": 0,
+        "PreferredMetadataLanguage": "",
+        "MetadataCountryCode": "",
+        "SeasonZeroDisplayName": "Specials",
+        "MetadataSavers": [],
+        "DisabledLocalMetadataReaders": [],
+        "LocalMetadataReaderOrder": ["Nfo"],
+        "DisabledSubtitleFetchers": [],
+        "SubtitleFetcherOrder": [],
+        "DisabledMediaSegmentProviders": [],
+        "MediaSegmentProviderOrder": [],
+        "SkipSubtitlesIfEmbeddedSubtitlesPresent": false,
+        "SkipSubtitlesIfAudioTrackMatches": false,
+        "SubtitleDownloadLanguages": [],
+        "RequirePerfectSubtitleMatch": true,
+        "SaveSubtitlesWithMedia": true,
+        "SaveLyricsWithMedia": false,
+        "SaveTrickplayWithMedia": false,
+        "DisabledLyricFetchers": [],
+        "LyricFetcherOrder": [],
+        "PreferNonstandardArtistsTag": false,
+        "UseCustomTagDelimiters": false,
+        "CustomTagDelimiters": ["/", "|", ";", "\\"],
+        "DelimiterWhitelist": [],
+        "AutomaticallyAddToCollection": false,
+        "AllowEmbeddedSubtitles": "AllowAll",
+        "TypeOptions": [
+          {
+            "Type": "Movie",
+            "MetadataFetchers": ["TheMovieDb", "The Open Movie Database"],
+            "MetadataFetcherOrder": ["TheMovieDb", "The Open Movie Database"],
+            "ImageFetchers": [
+              "TheMovieDb",
+              "The Open Movie Database",
+              "Embedded Image Extractor",
+              "Screen Grabber"
+            ],
+            "ImageFetcherOrder": [
+              "TheMovieDb",
+              "The Open Movie Database",
+              "Embedded Image Extractor",
+              "Screen Grabber"
+            ],
+            "ImageOptions": [],
+            "SimilarItemProviders": ["Local Genre/Tag"],
+            "SimilarItemProviderOrder": []
+          }
+        ]
+      },
+      "ItemId": "f5e0be2017f7ce35fa390685b8ae98d3",
+      "PrimaryImageItemId": "f5e0be2017f7ce35fa390685b8ae98d3",
+      "RefreshStatus": "Idle"
+    },
+    {
+      "Name": "Shows",
+      "Locations": ["/media/library/folder2"],
+      "CollectionType": "tvshows",
+      "LibraryOptions": {
+        "Enabled": true,
+        "EnablePhotos": true,
+        "EnableRealtimeMonitor": true,
+        "EnableLUFSScan": true,
+        "EnableChapterImageExtraction": false,
+        "ExtractChapterImagesDuringLibraryScan": false,
+        "EnableTrickplayImageExtraction": false,
+        "ExtractTrickplayImagesDuringLibraryScan": false,
+        "PathInfos": [
+          {
+            "Path": "/media/library/folder2"
+          }
+        ],
+        "SaveLocalMetadata": false,
+        "EnableInternetProviders": false,
+        "EnableAutomaticSeriesGrouping": false,
+        "EnableEmbeddedTitles": false,
+        "EnableEmbeddedExtrasTitles": false,
+        "EnableEmbeddedEpisodeInfos": false,
+        "AutomaticRefreshIntervalDays": 0,
+        "PreferredMetadataLanguage": "",
+        "MetadataCountryCode": "",
+        "SeasonZeroDisplayName": "Specials",
+        "MetadataSavers": [],
+        "DisabledLocalMetadataReaders": [],
+        "LocalMetadataReaderOrder": ["Nfo"],
+        "DisabledSubtitleFetchers": [],
+        "SubtitleFetcherOrder": [],
+        "DisabledMediaSegmentProviders": [],
+        "MediaSegmentProviderOrder": [],
+        "SkipSubtitlesIfEmbeddedSubtitlesPresent": false,
+        "SkipSubtitlesIfAudioTrackMatches": false,
+        "SubtitleDownloadLanguages": [],
+        "RequirePerfectSubtitleMatch": true,
+        "SaveSubtitlesWithMedia": true,
+        "SaveLyricsWithMedia": false,
+        "SaveTrickplayWithMedia": false,
+        "DisabledLyricFetchers": [],
+        "LyricFetcherOrder": [],
+        "PreferNonstandardArtistsTag": false,
+        "UseCustomTagDelimiters": false,
+        "CustomTagDelimiters": ["/", "|", ";", "\\"],
+        "DelimiterWhitelist": [],
+        "AutomaticallyAddToCollection": false,
+        "AllowEmbeddedSubtitles": "AllowAll",
+        "TypeOptions": [
+          {
+            "Type": "Series",
+            "MetadataFetchers": ["TheMovieDb", "The Open Movie Database"],
+            "MetadataFetcherOrder": ["TheMovieDb", "The Open Movie Database"],
+            "ImageFetchers": ["TheMovieDb"],
+            "ImageFetcherOrder": ["TheMovieDb"],
+            "ImageOptions": [],
+            "SimilarItemProviders": ["Local Genre/Tag"],
+            "SimilarItemProviderOrder": []
+          },
+          {
+            "Type": "Season",
+            "MetadataFetchers": ["TheMovieDb"],
+            "MetadataFetcherOrder": ["TheMovieDb"],
+            "ImageFetchers": ["TheMovieDb"],
+            "ImageFetcherOrder": ["TheMovieDb"],
+            "ImageOptions": [],
+            "SimilarItemProviders": [],
+            "SimilarItemProviderOrder": []
+          },
+          {
+            "Type": "Episode",
+            "MetadataFetchers": ["TheMovieDb", "The Open Movie Database"],
+            "MetadataFetcherOrder": ["TheMovieDb", "The Open Movie Database"],
+            "ImageFetchers": [
+              "TheMovieDb",
+              "The Open Movie Database",
+              "Embedded Image Extractor",
+              "Screen Grabber"
+            ],
+            "ImageFetcherOrder": [
+              "TheMovieDb",
+              "The Open Movie Database",
+              "Embedded Image Extractor",
+              "Screen Grabber"
+            ],
+            "ImageOptions": [],
+            "SimilarItemProviders": [],
+            "SimilarItemProviderOrder": []
+          }
+        ]
+      },
+      "ItemId": "677da746c8f9dc6075716c2df74319be",
+      "PrimaryImageItemId": "677da746c8f9dc6075716c2df74319be",
+      "RefreshStatus": "Idle"
+    },
+    {
+      "Name": "Collections",
+      "Locations": ["/media/library/folder3"],
+      "CollectionType": "boxsets",
+      "LibraryOptions": {
+        "Enabled": true,
+        "EnablePhotos": true,
+        "EnableRealtimeMonitor": false,
+        "EnableLUFSScan": false,
+        "EnableChapterImageExtraction": false,
+        "ExtractChapterImagesDuringLibraryScan": false,
+        "EnableTrickplayImageExtraction": false,
+        "ExtractTrickplayImagesDuringLibraryScan": false,
+        "PathInfos": [
+          {
+            "Path": "/media/library/folder3"
+          }
+        ],
+        "SaveLocalMetadata": true,
+        "EnableInternetProviders": false,
+        "EnableAutomaticSeriesGrouping": true,
+        "EnableEmbeddedTitles": false,
+        "EnableEmbeddedExtrasTitles": false,
+        "EnableEmbeddedEpisodeInfos": false,
+        "AutomaticRefreshIntervalDays": 0,
+        "SeasonZeroDisplayName": "Specials",
+        "DisabledLocalMetadataReaders": [],
+        "DisabledSubtitleFetchers": [],
+        "SubtitleFetcherOrder": [],
+        "DisabledMediaSegmentProviders": [],
+        "MediaSegmentProviderOrder": [],
+        "SkipSubtitlesIfEmbeddedSubtitlesPresent": false,
+        "SkipSubtitlesIfAudioTrackMatches": true,
+        "RequirePerfectSubtitleMatch": true,
+        "SaveSubtitlesWithMedia": true,
+        "SaveLyricsWithMedia": false,
+        "SaveTrickplayWithMedia": false,
+        "DisabledLyricFetchers": [],
+        "LyricFetcherOrder": [],
+        "PreferNonstandardArtistsTag": false,
+        "UseCustomTagDelimiters": false,
+        "CustomTagDelimiters": ["/", "|", ";", "\\"],
+        "DelimiterWhitelist": [],
+        "AutomaticallyAddToCollection": false,
+        "AllowEmbeddedSubtitles": "AllowAll",
+        "TypeOptions": []
+      },
+      "ItemId": "4de3e4ad6c4784c4e55342ad5db7b9ce",
+      "RefreshStatus": "Idle"
+    }
+  ],
+  "sessions": [
+    {
+      "PlayState": {
+        "PositionTicks": 34546625,
+        "CanSeek": true,
+        "IsPaused": false,
+        "IsMuted": false,
+        "MediaSourceId": "27f46eecc3eeb86b32d347662a9a1e64",
+        "PlayMethod": "Transcode",
+        "RepeatMode": "RepeatNone",
+        "PlaybackOrder": "Default"
+      },
+      "AdditionalUsers": [],
+      "Capabilities": {
+        "PlayableMediaTypes": [],
+        "SupportedCommands": [],
+        "SupportsMediaControl": false,
+        "SupportsPersistentIdentifier": true
+      },
+      "RemoteEndPoint": "10.0.0.12",
+      "PlayableMediaTypes": [],
+      "Id": "218fa1f765e36135effc3bb01324eb22",
+      "UserId": "c92a102a933ba2396a4ba76414c4828b",
+      "UserName": "user2",
+      "Client": "Fixture Player",
+      "LastActivityDate": "2023-10-09T02:29:29.4710653Z",
+      "LastPlaybackCheckIn": "2023-10-09T02:29:28.4568231Z",
+      "DeviceName": "Fixture fixture-transcode",
+      "NowPlayingItem": {
+        "Name": "Title 1",
+        "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+        "Id": "27f46eecc3eeb86b32d347662a9a1e64",
+        "DateCreated": "2022-09-15T08:46:16.4610488Z",
+        "HasSubtitles": true,
+        "Container": "mkv",
+        "PremiereDate": "2011-11-13T05:00:00.0000000Z",
+        "ExternalUrls": [
+          {
+            "Name": "IMDb",
+            "Url": "https://example.com/1"
+          },
+          {
+            "Name": "TMDB",
+            "Url": "https://example.com/2"
+          }
+        ],
+        "Path": "/media/library/item4.mkv",
+        "EnableMediaSourceDisplay": true,
+        "ChannelId": null,
+        "Overview": "Sample summary 1",
+        "Taglines": [],
+        "Genres": [],
+        "CommunityRating": 8.1,
+        "RunTimeTicks": 39443048481,
+        "ProductionYear": 2011,
+        "IndexNumber": 1,
+        "ParentIndexNumber": 0,
+        "ProviderIds": {
+          "Imdb": "tt9000001",
+          "Tvdb": "900001"
+        },
+        "IsHD": true,
+        "IsFolder": false,
+        "ParentId": "052201ca583a4c1fd53ebce731232e18",
+        "Type": "Episode",
+        "Studios": [],
+        "GenreItems": [],
+        "ParentLogoItemId": "4e3b6ebd9238210ad7e7b85d276f525b",
+        "ParentBackdropItemId": "4e3b6ebd9238210ad7e7b85d276f525b",
+        "ParentBackdropImageTags": ["c54c8211ef7a563b787f809509c6edc2"],
+        "LocalTrailerCount": 0,
+        "SeriesName": "Title 2",
+        "SeriesId": "4e3b6ebd9238210ad7e7b85d276f525b",
+        "SeasonId": "052201ca583a4c1fd53ebce731232e18",
+        "SpecialFeatureCount": 0,
+        "PrimaryImageAspectRatio": 1.7775,
+        "SeriesPrimaryImageTag": "bbcb8d13f6f87b91931ab8b8b3b8326a",
+        "SeasonName": "Specials",
+        "MediaStreams": [
+          {
+            "Codec": "h264",
+            "Language": "eng",
+            "TimeBase": "1/1000",
+            "VideoRange": "SDR",
+            "VideoRangeType": "SDR",
+            "AudioSpatialFormat": "None",
+            "DisplayTitle": "1080p H264 SDR",
+            "NalLengthSize": "4",
+            "IsInterlaced": false,
+            "IsAVC": true,
+            "BitRate": 5928215,
+            "BitDepth": 8,
+            "RefFrames": 1,
+            "IsDefault": true,
+            "IsForced": false,
+            "IsHearingImpaired": false,
+            "IsOriginal": false,
+            "Height": 1080,
+            "Width": 1920,
+            "AverageFrameRate": 25,
+            "RealFrameRate": 25,
+            "ReferenceFrameRate": 25,
+            "Profile": "High",
+            "Type": "Video",
+            "AspectRatio": "16:9",
+            "Index": 0,
+            "IsExternal": false,
+            "IsTextSubtitleStream": false,
+            "SupportsExternalStream": false,
+            "PixelFormat": "yuv420p",
+            "Level": 40,
+            "IsAnamorphic": false
+          },
+          {
+            "Codec": "eac3",
+            "Language": "eng",
+            "TimeBase": "1/1000",
+            "VideoRange": "Unknown",
+            "VideoRangeType": "Unknown",
+            "AudioSpatialFormat": "None",
+            "LocalizedDefault": "Default",
+            "LocalizedExternal": "External",
+            "LocalizedLanguage": "English",
+            "LocalizedOriginal": "Original",
+            "DisplayTitle": "English - Dolby Digital+ - Stereo - Default",
+            "IsInterlaced": false,
+            "IsAVC": false,
+            "ChannelLayout": "stereo",
+            "BitRate": 105908,
+            "Channels": 2,
+            "SampleRate": 48000,
+            "IsDefault": true,
+            "IsForced": false,
+            "IsHearingImpaired": false,
+            "IsOriginal": false,
+            "Type": "Audio",
+            "Index": 1,
+            "IsExternal": false,
+            "IsTextSubtitleStream": false,
+            "SupportsExternalStream": false,
+            "Level": 0
+          },
+          {
+            "Codec": "subrip",
+            "Language": "eng",
+            "TimeBase": "1/1000",
+            "VideoRange": "Unknown",
+            "VideoRangeType": "Unknown",
+            "AudioSpatialFormat": "None",
+            "LocalizedUndefined": "Undefined",
+            "LocalizedDefault": "Default",
+            "LocalizedForced": "Forced",
+            "LocalizedExternal": "External",
+            "LocalizedHearingImpaired": "Hearing Impaired",
+            "LocalizedLanguage": "English",
+            "DisplayTitle": "English - SUBRIP",
+            "IsInterlaced": false,
+            "IsAVC": false,
+            "IsDefault": false,
+            "IsForced": false,
+            "IsHearingImpaired": false,
+            "IsOriginal": false,
+            "Height": 0,
+            "Width": 0,
+            "Type": "Subtitle",
+            "Index": 2,
+            "IsExternal": false,
+            "IsTextSubtitleStream": true,
+            "SupportsExternalStream": true,
+            "Level": 0
+          }
+        ],
+        "VideoType": "VideoFile",
+        "ImageTags": {
+          "Primary": "53df37fc7946b06340540b7b4b9e2255"
+        },
+        "BackdropImageTags": [],
+        "ParentLogoImageTag": "c0b059097929832eff1962c756f1da06",
+        "ImageBlurHashes": {
+          "Primary": {
+            "53df37fc7946b06340540b7b4b9e2255": "LEHV6nWB2yk8pyo0adR*.7kCMdnj",
+            "bbcb8d13f6f87b91931ab8b8b3b8326a": "LEHV6nWB2yk8pyo0adR*.7kCMdnj",
+            "b256ca0b5079ddb10ab58f9bcc3770bd": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          },
+          "Logo": {
+            "c0b059097929832eff1962c756f1da06": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          },
+          "Thumb": {
+            "876baa5d36237f4de03d946114df2d1c": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          },
+          "Backdrop": {
+            "c54c8211ef7a563b787f809509c6edc2": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          }
+        },
+        "SeriesStudio": "Studio 1",
+        "ParentThumbItemId": "4e3b6ebd9238210ad7e7b85d276f525b",
+        "ParentThumbImageTag": "876baa5d36237f4de03d946114df2d1c",
+        "ParentPrimaryImageItemId": "052201ca583a4c1fd53ebce731232e18",
+        "ParentPrimaryImageTag": "b256ca0b5079ddb10ab58f9bcc3770bd",
+        "Chapters": [
+          {
+            "StartPositionTicks": 0,
+            "Name": "Chapter 1",
+            "ImageDateModified": "0001-01-01T04:57:00.0000000Z"
+          },
+          {
+            "StartPositionTicks": 39908315,
+            "Name": "Chapter 2",
+            "ImageDateModified": "0001-01-01T04:57:00.0000000Z"
+          }
+        ],
+        "Trickplay": {},
+        "LocationType": "FileSystem",
+        "MediaType": "Video",
+        "Width": 1920,
+        "Height": 1080
+      },
+      "DeviceId": "fixture-transcode",
+      "ApplicationVersion": "1.0.0",
+      "TranscodingInfo": {
+        "AudioCodec": "aac",
+        "VideoCodec": "h264",
+        "Container": "ts",
+        "IsVideoDirect": false,
+        "IsAudioDirect": false,
+        "Bitrate": 928000,
+        "Framerate": 630,
+        "CompletionPercentage": 2.82331446334599,
+        "Width": 640,
+        "Height": 360,
+        "AudioChannels": 2,
+        "HardwareAccelerationType": "none",
+        "TranscodeReasons": ["AudioCodecNotSupported", "ContainerBitrateExceedsLimit"]
+      },
+      "IsActive": true,
+      "SupportsMediaControl": false,
+      "SupportsRemoteControl": false,
+      "NowPlayingQueue": [],
+      "HasCustomDeviceName": false,
+      "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+      "SupportedCommands": []
+    },
+    {
+      "PlayState": {
+        "PositionTicks": 5407593410,
+        "CanSeek": true,
+        "IsPaused": true,
+        "IsMuted": false,
+        "MediaSourceId": "6bbdf10806ab97a5c906a1cde8452f3d",
+        "PlayMethod": "DirectPlay",
+        "RepeatMode": "RepeatNone",
+        "PlaybackOrder": "Default"
+      },
+      "AdditionalUsers": [],
+      "Capabilities": {
+        "PlayableMediaTypes": [],
+        "SupportedCommands": [],
+        "SupportsMediaControl": false,
+        "SupportsPersistentIdentifier": true
+      },
+      "RemoteEndPoint": "10.0.0.12",
+      "PlayableMediaTypes": [],
+      "Id": "cd177a95dbd8a0273d42d62818366a43",
+      "UserId": "c92a102a933ba2396a4ba76414c4828b",
+      "UserName": "user2",
+      "Client": "Fixture Player",
+      "LastActivityDate": "2023-10-09T02:29:28.6093925Z",
+      "LastPlaybackCheckIn": "2023-10-09T02:29:28.6093926Z",
+      "LastPausedDate": "2023-10-09T02:29:28.6093933Z",
+      "DeviceName": "Fixture fixture-direct",
+      "NowPlayingItem": {
+        "Name": "Title 3",
+        "OriginalTitle": "Title 3",
+        "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+        "Id": "6bbdf10806ab97a5c906a1cde8452f3d",
+        "DateCreated": "2020-06-26T03:15:49.0000000Z",
+        "HasSubtitles": true,
+        "Container": "mkv",
+        "PremiereDate": "2006-06-14T04:00:00.0000000Z",
+        "ExternalUrls": [
+          {
+            "Name": "IMDb",
+            "Url": "https://example.com/3"
+          },
+          {
+            "Name": "TMDB",
+            "Url": "https://example.com/4"
+          }
+        ],
+        "CriticRating": 97,
+        "Path": "/media/library/item5.mkv",
+        "EnableMediaSourceDisplay": true,
+        "OfficialRating": "PG-13",
+        "ChannelId": null,
+        "Overview": "Sample summary 2",
+        "Taglines": ["Sample summary 3"],
+        "Genres": ["Drama", "Comedy", "Documentary"],
+        "CommunityRating": 6.9,
+        "RunTimeTicks": 53804000780,
+        "ProductionYear": 2006,
+        "ProviderIds": {
+          "Imdb": "tt9000002",
+          "Tmdb": "900002"
+        },
+        "IsHD": true,
+        "IsFolder": false,
+        "ParentId": "5953679f8bc7b1cc62d73da089ab32b5",
+        "Type": "Movie",
+        "Studios": [
+          {
+            "Name": "Studio 2",
+            "Id": "3cebcfb360a83f06ea2ac91deef1db8e"
+          },
+          {
+            "Name": "Studio 3",
+            "Id": "67b5522b0111ed57ef738676cc3a33b1"
+          },
+          {
+            "Name": "Studio 4",
+            "Id": "dc4d76c3a5a0454c20a0a8fa6bb759ad"
+          }
+        ],
+        "GenreItems": [
+          {
+            "Name": "Drama",
+            "Id": "db0c843daade54ba17bda30148fdfceb"
+          },
+          {
+            "Name": "Comedy",
+            "Id": "605ce255686bdd86ba1ccfd10c7aec68"
+          },
+          {
+            "Name": "Documentary",
+            "Id": "483de1d43b231313889ee6f01e2d298f"
+          }
+        ],
+        "LocalTrailerCount": 1,
+        "SpecialFeatureCount": 0,
+        "PrimaryImageAspectRatio": 0.6666666666666666,
+        "MediaStreams": [
+          {
+            "Codec": "subrip",
+            "Language": "eng",
+            "TimeBase": "1/1000",
+            "VideoRange": "Unknown",
+            "VideoRangeType": "Unknown",
+            "AudioSpatialFormat": "None",
+            "LocalizedUndefined": "Undefined",
+            "LocalizedDefault": "Default",
+            "LocalizedForced": "Forced",
+            "LocalizedExternal": "External",
+            "LocalizedHearingImpaired": "Hearing Impaired",
+            "LocalizedLanguage": "English",
+            "DisplayTitle": "English - SUBRIP - External",
+            "IsInterlaced": false,
+            "IsAVC": false,
+            "IsDefault": false,
+            "IsForced": false,
+            "IsHearingImpaired": false,
+            "IsOriginal": false,
+            "Height": 0,
+            "Width": 0,
+            "Type": "Subtitle",
+            "Index": 0,
+            "IsExternal": true,
+            "IsTextSubtitleStream": true,
+            "SupportsExternalStream": true,
+            "Path": "/media/library/item6.srt",
+            "Level": 0
+          },
+          {
+            "Codec": "hevc",
+            "Language": "eng",
+            "ColorSpace": "bt2020nc",
+            "ColorTransfer": "smpte2084",
+            "ColorPrimaries": "bt2020",
+            "TimeBase": "1/1000",
+            "Title": "",
+            "VideoRange": "HDR",
+            "VideoRangeType": "HDR10",
+            "AudioSpatialFormat": "None",
+            "DisplayTitle": "4K HEVC HDR",
+            "IsInterlaced": false,
+            "IsAVC": false,
+            "BitRate": 14390917,
+            "BitDepth": 10,
+            "RefFrames": 1,
+            "IsDefault": true,
+            "IsForced": false,
+            "IsHearingImpaired": false,
+            "IsOriginal": false,
+            "Height": 2160,
+            "Width": 3840,
+            "AverageFrameRate": 23.976025,
+            "RealFrameRate": 23.976025,
+            "ReferenceFrameRate": 23.976025,
+            "Profile": "Main 10",
+            "Type": "Video",
+            "AspectRatio": "16:9",
+            "Index": 1,
+            "IsExternal": false,
+            "IsTextSubtitleStream": false,
+            "SupportsExternalStream": false,
+            "PixelFormat": "yuv420p10le",
+            "Level": 150,
+            "IsAnamorphic": false
+          },
+          {
+            "Codec": "eac3",
+            "Language": "eng",
+            "TimeBase": "1/1000",
+            "Title": "",
+            "VideoRange": "Unknown",
+            "VideoRangeType": "Unknown",
+            "AudioSpatialFormat": "None",
+            "LocalizedDefault": "Default",
+            "LocalizedExternal": "External",
+            "LocalizedLanguage": "English",
+            "LocalizedOriginal": "Original",
+            "DisplayTitle": "English - Dolby Digital+ - 5.1 - Default",
+            "IsInterlaced": false,
+            "IsAVC": false,
+            "ChannelLayout": "5.1",
+            "BitRate": 237341,
+            "Channels": 6,
+            "SampleRate": 48000,
+            "IsDefault": true,
+            "IsForced": false,
+            "IsHearingImpaired": false,
+            "IsOriginal": false,
+            "Type": "Audio",
+            "Index": 2,
+            "IsExternal": false,
+            "IsTextSubtitleStream": false,
+            "SupportsExternalStream": false,
+            "Level": 0
+          }
+        ],
+        "VideoType": "VideoFile",
+        "ImageTags": {
+          "Thumb": "2c582a28233e9decef81b8c0870b12c0",
+          "Logo": "d5e3ac53837293ec367d5f1116606880",
+          "Primary": "d11eedcc9cfce26abedbca3385df0eb8"
+        },
+        "BackdropImageTags": ["9432e1452f5e681ec125078c796255c8"],
+        "ImageBlurHashes": {
+          "Backdrop": {
+            "9432e1452f5e681ec125078c796255c8": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          },
+          "Thumb": {
+            "2c582a28233e9decef81b8c0870b12c0": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          },
+          "Logo": {
+            "d5e3ac53837293ec367d5f1116606880": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          },
+          "Primary": {
+            "d11eedcc9cfce26abedbca3385df0eb8": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+          }
+        },
+        "Chapters": [
+          {
+            "StartPositionTicks": 50424802699,
+            "Name": "Chapter 3",
+            "ImageDateModified": "0001-01-01T04:57:00.0000000Z"
+          }
+        ],
+        "Trickplay": {},
+        "LocationType": "FileSystem",
+        "MediaType": "Video",
+        "Width": 3840,
+        "Height": 2160
+      },
+      "DeviceId": "fixture-direct",
+      "ApplicationVersion": "1.0.0",
+      "IsActive": true,
+      "SupportsMediaControl": false,
+      "SupportsRemoteControl": false,
+      "NowPlayingQueue": [],
+      "HasCustomDeviceName": false,
+      "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+      "SupportedCommands": []
+    }
+  ],
+  "items": {
+    "f5e0be2017f7ce35fa390685b8ae98d3": {
+      "Items": [
+        {
+          "Name": "Title 4",
+          "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+          "Id": "1d86f584f26ac58c41912a3b7166be67",
+          "DateCreated": "2023-10-08T08:45:45.0000000Z",
+          "HasSubtitles": true,
+          "Container": "mkv",
+          "PremiereDate": "2023-07-18T04:00:00.0000000Z",
+          "MediaSources": [
+            {
+              "Protocol": "File",
+              "Id": "1d86f584f26ac58c41912a3b7166be67",
+              "Path": "/media/library/item7.mkv",
+              "Type": "Default",
+              "Container": "mkv",
+              "Size": 48598327848,
+              "Name": "Version 1",
+              "IsRemote": false,
+              "ETag": "019f06d14a5745b53483bf02e059d6e1",
+              "RunTimeTicks": 54831420967,
+              "ReadAtNativeFramerate": false,
+              "IgnoreDts": false,
+              "IgnoreIndex": false,
+              "GenPtsInput": false,
+              "SupportsTranscoding": true,
+              "SupportsDirectStream": true,
+              "SupportsDirectPlay": true,
+              "IsInfiniteStream": false,
+              "UseMostCompatibleTranscodingProfile": false,
+              "RequiresOpening": false,
+              "RequiresClosing": false,
+              "RequiresLooping": false,
+              "SupportsProbing": true,
+              "VideoType": "VideoFile",
+              "MediaStreams": [
+                {
+                  "Codec": "hevc",
+                  "ColorSpace": "bt2020nc",
+                  "ColorTransfer": "smpte2084",
+                  "ColorPrimaries": "bt2020",
+                  "DvVersionMajor": 1,
+                  "DvVersionMinor": 0,
+                  "DvProfile": 7,
+                  "DvLevel": 6,
+                  "RpuPresentFlag": 1,
+                  "ElPresentFlag": 1,
+                  "BlPresentFlag": 1,
+                  "DvBlSignalCompatibilityId": 6,
+                  "TimeBase": "1/1000",
+                  "Hdr10PlusPresentFlag": true,
+                  "VideoRange": "HDR",
+                  "VideoRangeType": "DOVIWithELHDR10Plus",
+                  "VideoDoViTitle": "Dolby Vision Profile 7.6 (HDR10)",
+                  "AudioSpatialFormat": "None",
+                  "DisplayTitle": "4K HEVC Dolby Vision Profile 7.6 (HDR10)",
+                  "IsInterlaced": false,
+                  "BitRate": 54855250,
+                  "BitDepth": 10,
+                  "RefFrames": 1,
+                  "IsDefault": true,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": false,
+                  "Height": 2160,
+                  "Width": 3840,
+                  "AverageFrameRate": 23.976025,
+                  "RealFrameRate": 23.976025,
+                  "ReferenceFrameRate": 23.976025,
+                  "Profile": "Main 10",
+                  "Type": "Video",
+                  "AspectRatio": "16:9",
+                  "Index": 0,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": false,
+                  "SupportsExternalStream": false,
+                  "PixelFormat": "yuv420p10le",
+                  "Level": 153,
+                  "IsAnamorphic": false
+                },
+                {
+                  "Codec": "dts",
+                  "Language": "eng",
+                  "TimeBase": "1/1000",
+                  "Title": "DTS-HD MA 5.1",
+                  "VideoRange": "Unknown",
+                  "VideoRangeType": "Unknown",
+                  "AudioSpatialFormat": "None",
+                  "LocalizedDefault": "Default",
+                  "LocalizedExternal": "External",
+                  "LocalizedLanguage": "English",
+                  "LocalizedOriginal": "Original",
+                  "DisplayTitle": "DTS-HD MA 5.1 - English - Default",
+                  "IsInterlaced": false,
+                  "ChannelLayout": "5.1",
+                  "BitRate": 3610201,
+                  "BitDepth": 24,
+                  "Channels": 6,
+                  "SampleRate": 48000,
+                  "IsDefault": true,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": false,
+                  "Profile": "DTS-HD MA",
+                  "Type": "Audio",
+                  "Index": 1,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": false,
+                  "SupportsExternalStream": false
+                },
+                {
+                  "Codec": "subrip",
+                  "Language": "eng",
+                  "TimeBase": "1/1000",
+                  "Title": "English",
+                  "VideoRange": "Unknown",
+                  "VideoRangeType": "Unknown",
+                  "AudioSpatialFormat": "None",
+                  "LocalizedUndefined": "Undefined",
+                  "LocalizedDefault": "Default",
+                  "LocalizedForced": "Forced",
+                  "LocalizedExternal": "External",
+                  "LocalizedHearingImpaired": "Hearing Impaired",
+                  "LocalizedLanguage": "English",
+                  "DisplayTitle": "English - SUBRIP",
+                  "IsInterlaced": false,
+                  "IsDefault": false,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": false,
+                  "Type": "Subtitle",
+                  "Index": 2,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": true,
+                  "SupportsExternalStream": true
+                }
+              ],
+              "MediaAttachments": [],
+              "Formats": [],
+              "Bitrate": 62860115,
+              "RequiredHttpHeaders": {},
+              "TranscodingSubProtocol": "http",
+              "HasSegments": false
+            }
+          ],
+          "Path": "/media/library/item7.mkv",
+          "OfficialRating": "PG",
+          "ChannelId": null,
+          "Genres": ["Drama", "Action", "Drama", "Comedy"],
+          "CommunityRating": 9.3,
+          "RunTimeTicks": 54831420967,
+          "ProductionYear": 2023,
+          "ProviderIds": {
+            "Imdb": "tt9000003",
+            "Tmdb": "900003"
+          },
+          "IsFolder": false,
+          "Type": "Movie",
+          "GenreItems": [
+            {
+              "Name": "Drama",
+              "Id": "db0c843daade54ba17bda30148fdfceb"
+            },
+            {
+              "Name": "Action",
+              "Id": "3f6937b515dea5199e57ac2a4101e130"
+            },
+            {
+              "Name": "Drama",
+              "Id": "a0d07f300b9d11ff2393813ced807c10"
+            },
+            {
+              "Name": "Comedy",
+              "Id": "3d990d95a75926658388767979d8831f"
+            }
+          ],
+          "VideoType": "VideoFile",
+          "ImageTags": {
+            "Primary": "6b6bcb40d93e78f9265842e8b4ffeee3",
+            "Logo": "ef398f5399a847569e277700f0013e7f",
+            "Thumb": "ab9963c56e9d42a4ed2214c1c4e6b847"
+          },
+          "BackdropImageTags": ["3f6c6346f6538c196c7e1da0ced015e9"],
+          "ImageBlurHashes": {
+            "Backdrop": {
+              "3f6c6346f6538c196c7e1da0ced015e9": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Primary": {
+              "6b6bcb40d93e78f9265842e8b4ffeee3": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Logo": {
+              "ef398f5399a847569e277700f0013e7f": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Thumb": {
+              "ab9963c56e9d42a4ed2214c1c4e6b847": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            }
+          },
+          "LocationType": "FileSystem",
+          "MediaType": "Video",
+          "OriginalLanguage": "en"
+        },
+        {
+          "Name": "Title 5",
+          "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+          "Id": "9f1fd9c5d58910e04738471599787072",
+          "DateCreated": "2020-04-11T01:42:43.0000000Z",
+          "HasSubtitles": true,
+          "Container": "mkv",
+          "PremiereDate": "2020-03-16T04:00:00.0000000Z",
+          "MediaSources": [
+            {
+              "Protocol": "File",
+              "Id": "9f1fd9c5d58910e04738471599787072",
+              "Path": "/media/library/item8.mkv",
+              "Type": "Default",
+              "Container": "mkv",
+              "Size": 12084432262,
+              "Name": "Version 2",
+              "IsRemote": false,
+              "ETag": "b58ecb6db4d5b829b9b68229e86e7456",
+              "RunTimeTicks": 69704007171,
+              "ReadAtNativeFramerate": false,
+              "IgnoreDts": false,
+              "IgnoreIndex": false,
+              "GenPtsInput": false,
+              "SupportsTranscoding": true,
+              "SupportsDirectStream": true,
+              "SupportsDirectPlay": true,
+              "IsInfiniteStream": false,
+              "UseMostCompatibleTranscodingProfile": false,
+              "RequiresOpening": false,
+              "RequiresClosing": false,
+              "RequiresLooping": false,
+              "SupportsProbing": true,
+              "VideoType": "VideoFile",
+              "MediaStreams": [
+                {
+                  "Codec": "hevc",
+                  "Language": "eng",
+                  "ColorSpace": "bt709",
+                  "ColorTransfer": "bt709",
+                  "ColorPrimaries": "bt709",
+                  "TimeBase": "1/1000",
+                  "VideoRange": "SDR",
+                  "VideoRangeType": "SDR",
+                  "AudioSpatialFormat": "None",
+                  "DisplayTitle": "4K HEVC SDR",
+                  "IsInterlaced": false,
+                  "IsAVC": false,
+                  "BitRate": 14064531,
+                  "BitDepth": 8,
+                  "RefFrames": 1,
+                  "IsDefault": true,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": false,
+                  "Height": 1600,
+                  "Width": 3840,
+                  "AverageFrameRate": 23.976025,
+                  "RealFrameRate": 23.976025,
+                  "ReferenceFrameRate": 23.976025,
+                  "Profile": "Main",
+                  "Type": "Video",
+                  "AspectRatio": "2.40:1",
+                  "Index": 0,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": false,
+                  "SupportsExternalStream": false,
+                  "PixelFormat": "yuv420p",
+                  "Level": 150,
+                  "IsAnamorphic": false
+                },
+                {
+                  "Codec": "eac3",
+                  "Language": "eng",
+                  "TimeBase": "1/1000",
+                  "Title": "None",
+                  "VideoRange": "Unknown",
+                  "VideoRangeType": "Unknown",
+                  "AudioSpatialFormat": "DolbyAtmos",
+                  "LocalizedDefault": "Default",
+                  "LocalizedExternal": "External",
+                  "LocalizedLanguage": "English",
+                  "LocalizedOriginal": "Original",
+                  "DisplayTitle": "None - English - Dolby Digital Plus + Dolby Atmos - 5.1 - Default",
+                  "IsInterlaced": false,
+                  "IsAVC": false,
+                  "ChannelLayout": "5.1",
+                  "BitRate": 617729,
+                  "Channels": 6,
+                  "SampleRate": 48000,
+                  "IsDefault": true,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": false,
+                  "Profile": "Dolby Digital Plus + Dolby Atmos",
+                  "Type": "Audio",
+                  "Index": 1,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": false,
+                  "SupportsExternalStream": false,
+                  "Level": 0
+                },
+                {
+                  "Codec": "subrip",
+                  "Language": "eng",
+                  "TimeBase": "1/1000",
+                  "Title": "Forced",
+                  "VideoRange": "Unknown",
+                  "VideoRangeType": "Unknown",
+                  "AudioSpatialFormat": "None",
+                  "LocalizedUndefined": "Undefined",
+                  "LocalizedDefault": "Default",
+                  "LocalizedForced": "Forced",
+                  "LocalizedExternal": "External",
+                  "LocalizedHearingImpaired": "Hearing Impaired",
+                  "LocalizedLanguage": "English",
+                  "DisplayTitle": "Forced - English - Default - SUBRIP",
+                  "IsInterlaced": false,
+                  "IsAVC": false,
+                  "IsDefault": true,
+                  "IsForced": true,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": false,
+                  "Height": 0,
+                  "Width": 0,
+                  "Type": "Subtitle",
+                  "Index": 2,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": true,
+                  "SupportsExternalStream": true,
+                  "Level": 0
+                }
+              ],
+              "MediaAttachments": [],
+              "Formats": [],
+              "Bitrate": 14948793,
+              "RequiredHttpHeaders": {},
+              "TranscodingSubProtocol": "http",
+              "HasSegments": false
+            },
+            {
+              "Protocol": "File",
+              "Id": "8b649d0b7f215fe8cf8013c5417bb174",
+              "Path": "/media/library/item9.mkv",
+              "Type": "Grouping",
+              "Container": "mkv",
+              "Size": 11239100108,
+              "Name": "Version 3",
+              "IsRemote": false,
+              "ETag": "681c2991d63f22d3b90cd4369c74a558",
+              "RunTimeTicks": 69704007171,
+              "ReadAtNativeFramerate": false,
+              "IgnoreDts": false,
+              "IgnoreIndex": false,
+              "GenPtsInput": false,
+              "SupportsTranscoding": true,
+              "SupportsDirectStream": true,
+              "SupportsDirectPlay": true,
+              "IsInfiniteStream": false,
+              "UseMostCompatibleTranscodingProfile": false,
+              "RequiresOpening": false,
+              "RequiresClosing": false,
+              "RequiresLooping": false,
+              "SupportsProbing": true,
+              "VideoType": "VideoFile",
+              "MediaStreams": [
+                {
+                  "Codec": "hevc",
+                  "Language": "eng",
+                  "ColorSpace": "bt2020nc",
+                  "ColorTransfer": "smpte2084",
+                  "ColorPrimaries": "bt2020",
+                  "TimeBase": "1/1000",
+                  "Title": "",
+                  "Hdr10PlusPresentFlag": true,
+                  "VideoRange": "HDR",
+                  "VideoRangeType": "HDR10Plus",
+                  "AudioSpatialFormat": "None",
+                  "DisplayTitle": "4K HEVC HDR",
+                  "IsInterlaced": false,
+                  "BitRate": 14455304,
+                  "BitDepth": 10,
+                  "RefFrames": 1,
+                  "IsDefault": true,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": true,
+                  "Height": 1600,
+                  "Width": 3840,
+                  "AverageFrameRate": 23.976025,
+                  "RealFrameRate": 23.976025,
+                  "ReferenceFrameRate": 23.976025,
+                  "Profile": "Main 10",
+                  "Type": "Video",
+                  "AspectRatio": "2.40:1",
+                  "Index": 0,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": false,
+                  "SupportsExternalStream": false,
+                  "PixelFormat": "yuv420p10le",
+                  "Level": 150,
+                  "IsAnamorphic": false
+                },
+                {
+                  "Codec": "eac3",
+                  "Language": "eng",
+                  "TimeBase": "1/1000",
+                  "Title": "",
+                  "VideoRange": "Unknown",
+                  "VideoRangeType": "Unknown",
+                  "AudioSpatialFormat": "DolbyAtmos",
+                  "LocalizedDefault": "Default",
+                  "LocalizedExternal": "External",
+                  "LocalizedLanguage": "English",
+                  "LocalizedOriginal": "Original",
+                  "DisplayTitle": "English - Dolby Digital Plus + Dolby Atmos - 5.1 - Default - Original",
+                  "IsInterlaced": false,
+                  "ChannelLayout": "5.1",
+                  "BitRate": 617729,
+                  "Channels": 6,
+                  "SampleRate": 48000,
+                  "IsDefault": true,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": true,
+                  "Profile": "Dolby Digital Plus + Dolby Atmos",
+                  "Type": "Audio",
+                  "Index": 1,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": false,
+                  "SupportsExternalStream": false
+                },
+                {
+                  "Codec": "subrip",
+                  "Language": "eng",
+                  "TimeBase": "1/1000",
+                  "Title": "",
+                  "VideoRange": "Unknown",
+                  "VideoRangeType": "Unknown",
+                  "AudioSpatialFormat": "None",
+                  "LocalizedUndefined": "Undefined",
+                  "LocalizedDefault": "Default",
+                  "LocalizedForced": "Forced",
+                  "LocalizedExternal": "External",
+                  "LocalizedHearingImpaired": "Hearing Impaired",
+                  "LocalizedLanguage": "English",
+                  "DisplayTitle": "English - Default - Forced - SUBRIP",
+                  "IsInterlaced": false,
+                  "IsDefault": true,
+                  "IsForced": true,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": true,
+                  "Type": "Subtitle",
+                  "Index": 2,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": true,
+                  "SupportsExternalStream": true
+                }
+              ],
+              "MediaAttachments": [],
+              "Formats": [],
+              "Bitrate": 13447834,
+              "RequiredHttpHeaders": {},
+              "TranscodingSubProtocol": "http",
+              "HasSegments": false
+            }
+          ],
+          "CriticRating": 71,
+          "Path": "/media/library/item8.mkv",
+          "OfficialRating": "R",
+          "ChannelId": null,
+          "Genres": ["Documentary", "Action", "Drama"],
+          "CommunityRating": 6.9,
+          "RunTimeTicks": 69704007171,
+          "ProductionYear": 2020,
+          "ProviderIds": {
+            "Imdb": "tt9000004",
+            "Tmdb": "900004"
+          },
+          "IsFolder": false,
+          "Type": "Movie",
+          "GenreItems": [
+            {
+              "Name": "Documentary",
+              "Id": "70e2bb2d9fe2f75de030d7be92b1cbb3"
+            },
+            {
+              "Name": "Action",
+              "Id": "9c13d4231367fd03dbef3c720b98f508"
+            },
+            {
+              "Name": "Drama",
+              "Id": "9b79dffdbeb3ea0bd5fe82a2fa46918f"
+            }
+          ],
+          "VideoType": "VideoFile",
+          "ImageTags": {
+            "Primary": "de63c0727ecaff72d64d4c824509cec4",
+            "Logo": "e07326b298345ad8635a6edf543548d7",
+            "Thumb": "32b85d6dff01151b28bc1849cd700b7a"
+          },
+          "BackdropImageTags": ["7dd232d2f5aa0a2c08615aba9deb6eaa"],
+          "ImageBlurHashes": {
+            "Backdrop": {
+              "7dd232d2f5aa0a2c08615aba9deb6eaa": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Primary": {
+              "de63c0727ecaff72d64d4c824509cec4": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Logo": {
+              "e07326b298345ad8635a6edf543548d7": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Thumb": {
+              "32b85d6dff01151b28bc1849cd700b7a": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            }
+          },
+          "LocationType": "FileSystem",
+          "MediaType": "Video"
+        }
+      ],
+      "TotalRecordCount": 2,
+      "StartIndex": 0
+    },
+    "677da746c8f9dc6075716c2df74319be": {
+      "Items": [
+        {
+          "Name": "Title 6",
+          "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+          "Id": "859944b6df9246ffb02b24c6fbf23ab7",
+          "DateCreated": "2022-11-05T20:30:50.9963645Z",
+          "PremiereDate": "2021-11-19T05:00:00.0000000Z",
+          "Path": "/media/library/folder10",
+          "OfficialRating": "TV-14",
+          "ChannelId": null,
+          "Genres": ["Comedy", "Comedy", "Documentary"],
+          "CommunityRating": 7.3,
+          "RunTimeTicks": 28983344517,
+          "ProductionYear": 2021,
+          "ProviderIds": {
+            "Imdb": "tt9000005",
+            "Tmdb": "900005",
+            "Tvdb": "900006"
+          },
+          "IsFolder": true,
+          "Type": "Series",
+          "GenreItems": [
+            {
+              "Name": "Comedy",
+              "Id": "99ba09990d7935ef22ea41ad5313d88d"
+            },
+            {
+              "Name": "Comedy",
+              "Id": "605ce255686bdd86ba1ccfd10c7aec68"
+            },
+            {
+              "Name": "Documentary",
+              "Id": "4279c9ae5d7c1eea2260c23d84cd064c"
+            }
+          ],
+          "Status": "Continuing",
+          "AirDays": [],
+          "ImageTags": {
+            "Thumb": "73bd8f797d606ae63718d89254201daf",
+            "Logo": "784c77506282ab6eb7506961f5190d5c",
+            "Primary": "db808cc2bbc0ed068e2ceb57e54c8127"
+          },
+          "BackdropImageTags": ["8ad3047716b87564dce1b2c5f568eee5"],
+          "ImageBlurHashes": {
+            "Backdrop": {
+              "8ad3047716b87564dce1b2c5f568eee5": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Thumb": {
+              "73bd8f797d606ae63718d89254201daf": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Logo": {
+              "784c77506282ab6eb7506961f5190d5c": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Primary": {
+              "db808cc2bbc0ed068e2ceb57e54c8127": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            }
+          },
+          "LocationType": "FileSystem",
+          "MediaType": "Unknown",
+          "EndDate": "2021-11-19T05:00:00.0000000Z"
+        }
+      ],
+      "TotalRecordCount": 1,
+      "StartIndex": 0
+    }
+  },
+  "leaves": {
+    "677da746c8f9dc6075716c2df74319be": {
+      "Items": [
+        {
+          "Name": "Season 2",
+          "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+          "Id": "22dac06ddfd00e27a5fa07481c5eed51",
+          "DateCreated": "2023-10-06T03:28:01.6049966Z",
+          "PremiereDate": "2023-10-01T05:00:00.0000000Z",
+          "Path": "/media/library/folder11",
+          "ChannelId": null,
+          "Genres": [],
+          "ProductionYear": 2023,
+          "IndexNumber": 2,
+          "ProviderIds": {
+            "Tmdb": "900007"
+          },
+          "IsFolder": true,
+          "Type": "Season",
+          "GenreItems": [],
+          "ParentLogoItemId": "859944b6df9246ffb02b24c6fbf23ab7",
+          "ParentBackdropItemId": "859944b6df9246ffb02b24c6fbf23ab7",
+          "ParentBackdropImageTags": ["8ad3047716b87564dce1b2c5f568eee5"],
+          "SeriesName": "Title 6",
+          "SeriesId": "859944b6df9246ffb02b24c6fbf23ab7",
+          "SeriesPrimaryImageTag": "db808cc2bbc0ed068e2ceb57e54c8127",
+          "ImageTags": {
+            "Primary": "90bb5e22f713bc4ebe657c765ea6e720"
+          },
+          "BackdropImageTags": [],
+          "ParentLogoImageTag": "784c77506282ab6eb7506961f5190d5c",
+          "ImageBlurHashes": {
+            "Primary": {
+              "90bb5e22f713bc4ebe657c765ea6e720": "LEHV6nWB2yk8pyo0adR*.7kCMdnj",
+              "db808cc2bbc0ed068e2ceb57e54c8127": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Logo": {
+              "784c77506282ab6eb7506961f5190d5c": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Thumb": {
+              "73bd8f797d606ae63718d89254201daf": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Backdrop": {
+              "8ad3047716b87564dce1b2c5f568eee5": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            }
+          },
+          "ParentThumbItemId": "859944b6df9246ffb02b24c6fbf23ab7",
+          "ParentThumbImageTag": "73bd8f797d606ae63718d89254201daf",
+          "LocationType": "FileSystem",
+          "MediaType": "Unknown"
+        },
+        {
+          "Name": "Title 7",
+          "ServerId": "316b123c9f9c278fd4822c088cddd8a5",
+          "Id": "401971b43c4544095590b7889e8d4351",
+          "DateCreated": "2023-10-08T22:32:22.0986207Z",
+          "HasSubtitles": true,
+          "Container": "mkv",
+          "PremiereDate": "2023-10-08T05:00:00.0000000Z",
+          "MediaSources": [
+            {
+              "Protocol": "File",
+              "Id": "401971b43c4544095590b7889e8d4351",
+              "Path": "/media/library/item12.mkv",
+              "Type": "Default",
+              "Container": "mkv",
+              "Size": 521339433,
+              "Name": "Version 4",
+              "IsRemote": false,
+              "ETag": "2e3db93f289b8a3abd94389cebb2bbb0",
+              "RunTimeTicks": 24538554689,
+              "ReadAtNativeFramerate": false,
+              "IgnoreDts": false,
+              "IgnoreIndex": false,
+              "GenPtsInput": false,
+              "SupportsTranscoding": true,
+              "SupportsDirectStream": true,
+              "SupportsDirectPlay": true,
+              "IsInfiniteStream": false,
+              "UseMostCompatibleTranscodingProfile": false,
+              "RequiresOpening": false,
+              "RequiresClosing": false,
+              "RequiresLooping": false,
+              "SupportsProbing": true,
+              "VideoType": "VideoFile",
+              "MediaStreams": [
+                {
+                  "Codec": "h264",
+                  "Language": "eng",
+                  "ColorSpace": "bt709",
+                  "ColorTransfer": "bt709",
+                  "ColorPrimaries": "bt709",
+                  "TimeBase": "1/1000",
+                  "VideoRange": "SDR",
+                  "VideoRangeType": "SDR",
+                  "AudioSpatialFormat": "None",
+                  "DisplayTitle": "1080p H264 SDR",
+                  "NalLengthSize": "4",
+                  "IsInterlaced": false,
+                  "IsAVC": true,
+                  "BitRate": 1257597,
+                  "BitDepth": 8,
+                  "RefFrames": 1,
+                  "IsDefault": true,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": true,
+                  "Height": 804,
+                  "Width": 1920,
+                  "AverageFrameRate": 23.976025,
+                  "RealFrameRate": 23.976025,
+                  "ReferenceFrameRate": 23.976025,
+                  "Profile": "High",
+                  "Type": "Video",
+                  "AspectRatio": "2.40:1",
+                  "Index": 0,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": false,
+                  "SupportsExternalStream": false,
+                  "PixelFormat": "yuv420p",
+                  "Level": 41,
+                  "IsAnamorphic": false
+                },
+                {
+                  "Codec": "eac3",
+                  "Language": "eng",
+                  "TimeBase": "1/1000",
+                  "Title": "English",
+                  "VideoRange": "Unknown",
+                  "VideoRangeType": "Unknown",
+                  "AudioSpatialFormat": "None",
+                  "LocalizedDefault": "Default",
+                  "LocalizedExternal": "External",
+                  "LocalizedLanguage": "English",
+                  "LocalizedOriginal": "Original",
+                  "DisplayTitle": "English - Dolby Digital+ - 5.1 - Default - Original",
+                  "IsInterlaced": false,
+                  "ChannelLayout": "5.1",
+                  "BitRate": 329150,
+                  "Channels": 6,
+                  "SampleRate": 48000,
+                  "IsDefault": true,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": true,
+                  "Type": "Audio",
+                  "Index": 1,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": false,
+                  "SupportsExternalStream": false
+                },
+                {
+                  "Codec": "subrip",
+                  "Language": "eng",
+                  "TimeBase": "1/1000",
+                  "Title": "English",
+                  "VideoRange": "Unknown",
+                  "VideoRangeType": "Unknown",
+                  "AudioSpatialFormat": "None",
+                  "LocalizedUndefined": "Undefined",
+                  "LocalizedDefault": "Default",
+                  "LocalizedForced": "Forced",
+                  "LocalizedExternal": "External",
+                  "LocalizedHearingImpaired": "Hearing Impaired",
+                  "LocalizedLanguage": "English",
+                  "DisplayTitle": "English - SUBRIP",
+                  "IsInterlaced": false,
+                  "IsDefault": false,
+                  "IsForced": false,
+                  "IsHearingImpaired": false,
+                  "IsOriginal": true,
+                  "Type": "Subtitle",
+                  "Index": 2,
+                  "IsExternal": false,
+                  "IsTextSubtitleStream": true,
+                  "SupportsExternalStream": true
+                }
+              ],
+              "MediaAttachments": [],
+              "Formats": [],
+              "Bitrate": 1632438,
+              "RequiredHttpHeaders": {},
+              "TranscodingSubProtocol": "http",
+              "HasSegments": false
+            }
+          ],
+          "Path": "/media/library/item12.mkv",
+          "ChannelId": null,
+          "Genres": [],
+          "RunTimeTicks": 24538554689,
+          "ProductionYear": 2023,
+          "IndexNumber": 2,
+          "ParentIndexNumber": 2,
+          "ProviderIds": {
+            "Tmdb": "900008"
+          },
+          "IsFolder": false,
+          "Type": "Episode",
+          "GenreItems": [],
+          "ParentLogoItemId": "859944b6df9246ffb02b24c6fbf23ab7",
+          "ParentBackdropItemId": "859944b6df9246ffb02b24c6fbf23ab7",
+          "ParentBackdropImageTags": ["8ad3047716b87564dce1b2c5f568eee5"],
+          "SeriesName": "Title 6",
+          "SeriesId": "859944b6df9246ffb02b24c6fbf23ab7",
+          "SeasonId": "22dac06ddfd00e27a5fa07481c5eed51",
+          "SeriesPrimaryImageTag": "db808cc2bbc0ed068e2ceb57e54c8127",
+          "SeasonName": "Season 2",
+          "VideoType": "VideoFile",
+          "ImageTags": {
+            "Primary": "9a947f4f1b46191e897ab7ef95ca6bef"
+          },
+          "BackdropImageTags": [],
+          "ParentLogoImageTag": "784c77506282ab6eb7506961f5190d5c",
+          "ImageBlurHashes": {
+            "Primary": {
+              "9a947f4f1b46191e897ab7ef95ca6bef": "LEHV6nWB2yk8pyo0adR*.7kCMdnj",
+              "db808cc2bbc0ed068e2ceb57e54c8127": "LEHV6nWB2yk8pyo0adR*.7kCMdnj",
+              "90bb5e22f713bc4ebe657c765ea6e720": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Logo": {
+              "784c77506282ab6eb7506961f5190d5c": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Thumb": {
+              "73bd8f797d606ae63718d89254201daf": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            },
+            "Backdrop": {
+              "8ad3047716b87564dce1b2c5f568eee5": "LEHV6nWB2yk8pyo0adR*.7kCMdnj"
+            }
+          },
+          "ParentThumbItemId": "859944b6df9246ffb02b24c6fbf23ab7",
+          "ParentThumbImageTag": "73bd8f797d606ae63718d89254201daf",
+          "ParentPrimaryImageItemId": "22dac06ddfd00e27a5fa07481c5eed51",
+          "ParentPrimaryImageTag": "90bb5e22f713bc4ebe657c765ea6e720",
+          "LocationType": "FileSystem",
+          "MediaType": "Video"
+        }
+      ],
+      "TotalRecordCount": 2,
+      "StartIndex": 0
+    }
+  }
+}

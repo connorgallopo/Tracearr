@@ -141,6 +141,7 @@ vi.mock('../../services/serviceTracker.js', () => ({
 }));
 
 import { initializeSSEProcessor, startSSEProcessor, stopSSEProcessor } from '../sseProcessor.js';
+import { fakePlexClient } from '../../test/mediaServerFakes.js';
 
 const EXISTING_SESSION_ID = 'session-paused-1';
 
@@ -182,9 +183,11 @@ describe('SSE Processor - updateExistingSession guard against stop races', () =>
 
     mockFindActiveSession.mockResolvedValue(existingSession);
     mockCalculatePauseAccumulation.mockReturnValue({ lastPausedAt: null, pausedDurationMs: 0 });
-    mockCreateMediaServerClient.mockReturnValue({
-      getSessions: vi.fn().mockResolvedValue([{ sessionKey: 'sess-key-1' }]),
-    });
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({
+        getSessions: vi.fn().mockResolvedValue([{ sessionKey: 'sess-key-1' }]),
+      })
+    );
     mockMapMediaSession.mockReturnValue({
       sessionKey: 'sess-key-1',
       ratingKey: '1001',

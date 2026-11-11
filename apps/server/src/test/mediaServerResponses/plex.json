@@ -1,0 +1,2631 @@
+{
+  "identity": {
+    "MediaContainer": {
+      "size": 0,
+      "apiVersion": "1.2.3",
+      "claimed": true,
+      "machineIdentifier": "316b123c9f9c278fd4822c088cddd8a5fc68ea43",
+      "version": "1.43.5.11079-b3b13e506"
+    }
+  },
+  "accounts": {
+    "MediaContainer": {
+      "size": 1,
+      "identifier": "com.plexapp.system.accounts",
+      "Account": [
+        {
+          "id": 1,
+          "key": "/accounts/1",
+          "name": "user1",
+          "defaultAudioLanguage": "en",
+          "autoSelectAudio": true,
+          "defaultSubtitleLanguage": "en",
+          "subtitleMode": 1,
+          "thumb": ""
+        }
+      ]
+    }
+  },
+  "sections": {
+    "MediaContainer": {
+      "size": 3,
+      "allowSync": false,
+      "title1": "Plex Library",
+      "Directory": [
+        {
+          "allowSync": true,
+          "filters": true,
+          "refreshing": false,
+          "key": "3",
+          "type": "movie",
+          "title": "Movies",
+          "agent": "tv.plex.agents.movie",
+          "scanner": "Plex Movie",
+          "language": "en-US",
+          "metadataAgentProviderGroupId": 1,
+          "uuid": "2d25e87c-d654-590f-5189-0ae168b28306",
+          "updatedAt": 1676770502,
+          "createdAt": 1586151809,
+          "scannedAt": 1676770447,
+          "content": true,
+          "directory": true,
+          "contentChangedAt": 30212763,
+          "hidden": 0,
+          "Location": [
+            {
+              "id": 20001,
+              "path": "/media/library/folder1"
+            }
+          ]
+        },
+        {
+          "allowSync": true,
+          "filters": true,
+          "refreshing": false,
+          "key": "2",
+          "type": "show",
+          "title": "TV Shows",
+          "agent": "tv.plex.agents.series",
+          "scanner": "Plex TV Series",
+          "language": "en-US",
+          "metadataAgentProviderGroupId": 2,
+          "uuid": "f5e0be20-17f7-ce35-fa39-0685b8ae98d3",
+          "updatedAt": 1676772715,
+          "createdAt": 1586143669,
+          "scannedAt": 1676773614,
+          "content": true,
+          "directory": true,
+          "contentChangedAt": 30216800,
+          "hidden": 0,
+          "Location": [
+            {
+              "id": 20002,
+              "path": "/media/library/folder2"
+            }
+          ]
+        },
+        {
+          "allowSync": true,
+          "filters": true,
+          "refreshing": false,
+          "key": "4",
+          "type": "artist",
+          "title": "Music",
+          "agent": "tv.plex.agents.music",
+          "scanner": "Plex Music",
+          "language": "en-US",
+          "uuid": "677da746-c8f9-dc60-7571-6c2df74319be",
+          "updatedAt": 1676770161,
+          "createdAt": 1593126350,
+          "scannedAt": 1676770106,
+          "content": true,
+          "directory": true,
+          "contentChangedAt": 30200614,
+          "hidden": 0,
+          "Location": [
+            {
+              "id": 20003,
+              "path": "/media/library/folder3"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "sessions": {
+    "MediaContainer": {
+      "size": 2,
+      "Metadata": [
+        {
+          "addedAt": 1676149523,
+          "art": "/library/metadata/1004/art/1675754486",
+          "audienceRating": 8.9,
+          "audienceRatingImage": "themoviedb://image.rating",
+          "contentRating": "TV-14",
+          "duration": 2408734,
+          "grandparentArt": "/library/metadata/1004/art/1675754486",
+          "grandparentGuid": "plex://show/4de3e4ad6c4784c4e55342ad",
+          "grandparentKey": "/library/metadata/1004",
+          "grandparentRatingKey": "1004",
+          "grandparentSlug": "sample-slug-1",
+          "grandparentThumb": "/library/metadata/1004/thumb/1675754486",
+          "grandparentTitle": "Title 1",
+          "guid": "plex://episode/27f46eecc3eeb86b32d34766",
+          "index": 1,
+          "key": "/library/metadata/1005",
+          "librarySectionID": "2",
+          "librarySectionKey": "/library/sections/2",
+          "librarySectionTitle": "TV Shows",
+          "originalTitle": "Episode #2.1",
+          "originallyAvailableAt": "2023-02-11",
+          "parentGuid": "plex://season/218fa1f765e36135effc3bb0",
+          "parentIndex": 2,
+          "parentKey": "/library/metadata/1006",
+          "parentRatingKey": "1006",
+          "parentThumb": "/library/metadata/1006/thumb/1676149523",
+          "parentTitle": "Season 2",
+          "ratingKey": "1005",
+          "sessionKey": "867",
+          "summary": "Sample summary 1",
+          "thumb": "/library/metadata/1005/thumb/1676626035",
+          "title": "Title 2",
+          "type": "episode",
+          "updatedAt": 1676626035,
+          "viewOffset": 283785,
+          "year": 2023,
+          "Media": [
+            {
+              "aspectRatio": "2.35",
+              "audioChannels": 6,
+              "audioCodec": "eac3",
+              "bitrate": 1892,
+              "container": "mkv",
+              "duration": 2408734,
+              "hasVoiceActivity": "1",
+              "height": 804,
+              "id": "20007",
+              "videoCodec": "h264",
+              "videoFrameRate": "24p",
+              "videoProfile": "high",
+              "videoResolution": "1080",
+              "width": 1920,
+              "selected": true,
+              "Part": [
+                {
+                  "container": "mkv",
+                  "duration": 2408734,
+                  "file": "/media/library/item4.mkv",
+                  "id": "20008",
+                  "key": "/library/parts/20008/1676149515/file.mkv",
+                  "size": 619174557,
+                  "videoProfile": "high",
+                  "decision": "directplay",
+                  "selected": true,
+                  "Stream": [
+                    {
+                      "bitDepth": 8,
+                      "bitrate": 1692,
+                      "chromaLocation": "left",
+                      "chromaSubsampling": "4:2:0",
+                      "codec": "h264",
+                      "codedHeight": 816,
+                      "codedWidth": 1920,
+                      "colorPrimaries": "bt709",
+                      "colorRange": "tv",
+                      "colorSpace": "bt709",
+                      "colorTrc": "bt709",
+                      "default": true,
+                      "displayTitle": "1080p (H.264)",
+                      "extendedDisplayTitle": "1080p (H.264)",
+                      "frameRate": 23.976,
+                      "hasScalingMatrix": false,
+                      "height": 804,
+                      "id": "20009",
+                      "index": 0,
+                      "language": "English",
+                      "languageCode": "eng",
+                      "languageTag": "en",
+                      "level": 41,
+                      "original": true,
+                      "profile": "high",
+                      "refFrames": 3,
+                      "scanType": "progressive",
+                      "streamType": 1,
+                      "width": 1920,
+                      "location": "direct"
+                    },
+                    {
+                      "audioChannelLayout": "5.1(side)",
+                      "bitrate": 314,
+                      "canNormalizeLoudness": "0",
+                      "channels": 6,
+                      "codec": "eac3",
+                      "default": true,
+                      "displayTitle": "English (EAC3 5.1)",
+                      "extendedDisplayTitle": "English (EAC3 5.1)",
+                      "id": "20010",
+                      "index": 1,
+                      "language": "English",
+                      "languageCode": "eng",
+                      "languageTag": "en",
+                      "original": true,
+                      "samplingRate": 48000,
+                      "selected": true,
+                      "streamType": 2,
+                      "title": "English",
+                      "location": "direct"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "UltraBlurColors": [
+            {
+              "bottomLeft": "151515",
+              "bottomRight": "0a0a0a",
+              "topLeft": "1f1f1f",
+              "topRight": "2a2a2a"
+            }
+          ],
+          "Rating": [
+            {
+              "image": "themoviedb://image.rating",
+              "type": "audience",
+              "value": "9.4"
+            }
+          ],
+          "Director": [
+            {
+              "filter": "director=7011",
+              "id": "7011",
+              "tag": "Person 1",
+              "tagKey": "c92a102a933ba2396a4ba764",
+              "thumb": "https://metadata-static.plex.tv/b/people/052201ca583a4c1fd53ebce731232e18.jpg"
+            }
+          ],
+          "Writer": [
+            {
+              "filter": "writer=7012",
+              "id": "7012",
+              "tag": "Person 2",
+              "tagKey": "4e3b6ebd9238210ad7e7b85d"
+            }
+          ],
+          "Role": [
+            {
+              "filter": "actor=7013",
+              "id": "7013",
+              "role": "Character 1",
+              "tag": "Person 3",
+              "tagKey": "c54c8211ef7a563b787f8095",
+              "thumb": "https://metadata-static.plex.tv/4/people/bbcb8d13f6f87b91931ab8b8b3b8326a.jpg"
+            },
+            {
+              "filter": "actor=7014",
+              "id": "7014",
+              "role": "Character 2",
+              "tag": "Person 4",
+              "tagKey": "53df37fc7946b06340540b7b",
+              "thumb": "https://metadata-static.plex.tv/7/people/c0b059097929832eff1962c756f1da06.jpg"
+            }
+          ],
+          "Producer": [
+            {
+              "filter": "producer=7015",
+              "id": "7015",
+              "tag": "Person 5",
+              "tagKey": "b256ca0b5079ddb10ab58f9b",
+              "thumb": "https://metadata-static.plex.tv/4/people/876baa5d36237f4de03d946114df2d1c.jpg"
+            }
+          ],
+          "User": {
+            "id": "1",
+            "thumb": "https://plex.tv/users/6bbdf10806ab97a5/avatar?c=1794314154",
+            "title": "user1"
+          },
+          "Player": {
+            "address": "10.0.0.11",
+            "machineIdentifier": "1dex4z9ibijf2e02kqj5st2y",
+            "model": "standalone",
+            "platform": "macos",
+            "platformVersion": "27.2",
+            "playbackId": "cd177a95-dbd8-a027-3d42-d62818366a43",
+            "playbackSessionId": "5953679f-8bc7-b1cc-62d7-3da089ab32b5",
+            "product": "Plex for Mac",
+            "profile": "Plex Desktop",
+            "remotePublicAddress": "10.0.0.11",
+            "state": "paused",
+            "title": "Device 1",
+            "version": "1.115.0.426-4e960a1d",
+            "local": false,
+            "relayed": false,
+            "secure": true,
+            "userID": 1
+          },
+          "Session": {
+            "id": "q54ts9ocidvtr49sfrhbpxjf",
+            "bandwidth": 3942,
+            "location": "wan"
+          }
+        },
+        {
+          "addedAt": 1676597515,
+          "art": "/library/metadata/1016/art/1676626060",
+          "audienceRating": 7.0,
+          "audienceRatingImage": "themoviedb://image.rating",
+          "chapterSource": "media",
+          "contentRating": "TV-MA",
+          "duration": 2642820,
+          "grandparentArt": "/library/metadata/1016/art/1676626060",
+          "grandparentGuid": "plex://show/3cebcfb360a83f06ea2ac91d",
+          "grandparentKey": "/library/metadata/1016",
+          "grandparentRatingKey": "1016",
+          "grandparentSlug": "sample-slug-2",
+          "grandparentTheme": "/library/metadata/1016/theme/1676626060",
+          "grandparentThumb": "/library/metadata/1016/thumb/1676626060",
+          "grandparentTitle": "Title 3",
+          "guid": "plex://episode/67b5522b0111ed57ef738676",
+          "index": 3,
+          "key": "/library/metadata/1017",
+          "lastViewedAt": 1676680525,
+          "librarySectionID": "2",
+          "librarySectionKey": "/library/sections/2",
+          "librarySectionTitle": "TV Shows",
+          "originallyAvailableAt": "2022-01-13",
+          "parentGuid": "plex://season/dc4d76c3a5a0454c20a0a8fa",
+          "parentIndex": 3,
+          "parentKey": "/library/metadata/1018",
+          "parentRatingKey": "1018",
+          "parentThumb": "/library/metadata/1018/thumb/1653609908",
+          "parentTitle": "Season 3",
+          "ratingKey": "1017",
+          "sessionKey": "866",
+          "skipCount": "1",
+          "summary": "Sample summary 2",
+          "thumb": "/library/metadata/1017/thumb/1676617437",
+          "title": "Title 4",
+          "titleSort": "Title 5",
+          "type": "episode",
+          "updatedAt": 1676617437,
+          "viewCount": 1,
+          "viewOffset": 1970819,
+          "year": 2022,
+          "Media": [
+            {
+              "hasVoiceActivity": "0",
+              "id": "20019",
+              "videoProfile": "main",
+              "audioChannels": 2,
+              "audioCodec": "opus",
+              "bitrate": 17777,
+              "container": "mkv",
+              "duration": 2642820,
+              "height": 1080,
+              "videoCodec": "h264",
+              "videoFrameRate": "24p",
+              "videoResolution": "1080p",
+              "width": 1920,
+              "selected": true,
+              "Part": [
+                {
+                  "id": "20020",
+                  "videoProfile": "main",
+                  "bitrate": 17777,
+                  "container": "mkv",
+                  "duration": 2642820,
+                  "height": 1080,
+                  "width": 1920,
+                  "decision": "transcode",
+                  "selected": true,
+                  "Stream": [
+                    {
+                      "bitDepth": 8,
+                      "bitrate": 17371,
+                      "codec": "h264",
+                      "colorTrc": "bt709",
+                      "default": true,
+                      "displayTitle": "4K (HEVC Main)",
+                      "extendedDisplayTitle": "4K (HEVC Main)",
+                      "frameRate": 23.97599983215332,
+                      "height": 1080,
+                      "id": "20021",
+                      "language": "English",
+                      "languageCode": "eng",
+                      "languageTag": "en",
+                      "streamType": 1,
+                      "width": 1920,
+                      "decision": "transcode",
+                      "location": "direct"
+                    },
+                    {
+                      "bitrate": 220,
+                      "bitrateMode": "cbr",
+                      "canNormalizeLoudness": "0",
+                      "channels": 2,
+                      "codec": "opus",
+                      "default": true,
+                      "displayTitle": "English (EAC3 5.1)",
+                      "extendedDisplayTitle": "English (EAC3 5.1)",
+                      "id": "20022",
+                      "language": "English",
+                      "languageCode": "eng",
+                      "languageTag": "en-US",
+                      "selected": true,
+                      "streamType": 2,
+                      "decision": "transcode",
+                      "location": "direct"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "UltraBlurColors": [
+            {
+              "bottomLeft": "151515",
+              "bottomRight": "0a0a0a",
+              "topLeft": "1f1f1f",
+              "topRight": "2a2a2a"
+            }
+          ],
+          "Rating": [
+            {
+              "image": "imdb://image.rating",
+              "type": "audience",
+              "value": "7.7"
+            },
+            {
+              "image": "themoviedb://image.rating",
+              "type": "audience",
+              "value": "7.6"
+            }
+          ],
+          "Director": [
+            {
+              "filter": "director=7023",
+              "id": "7023",
+              "tag": "Person 6",
+              "tagKey": "db0c843daade54ba17bda301",
+              "thumb": "https://metadata-static.plex.tv/7/people/605ce255686bdd86ba1ccfd10c7aec68.jpg"
+            }
+          ],
+          "Writer": [
+            {
+              "filter": "writer=7024",
+              "id": "7024",
+              "tag": "Person 7",
+              "tagKey": "483de1d43b231313889ee6f0",
+              "thumb": "https://metadata-static.plex.tv/c/people/2c582a28233e9decef81b8c0870b12c0.jpg"
+            }
+          ],
+          "Role": [
+            {
+              "filter": "actor=7025",
+              "id": "7025",
+              "role": "Character 3",
+              "tag": "Person 8",
+              "tagKey": "d5e3ac53837293ec367d5f11",
+              "thumb": "https://metadata-static.plex.tv/e/people/d11eedcc9cfce26abedbca3385df0eb8.jpg"
+            },
+            {
+              "filter": "actor=7026",
+              "id": "7026",
+              "role": "Character 4",
+              "tag": "Person 9",
+              "tagKey": "9432e1452f5e681ec125078c",
+              "thumb": "https://metadata-static.plex.tv/2/people/1d86f584f26ac58c41912a3b7166be67.jpg"
+            }
+          ],
+          "Producer": [
+            {
+              "filter": "producer=7027",
+              "id": "7027",
+              "tag": "Person 10",
+              "tagKey": "019f06d14a5745b53483bf02"
+            }
+          ],
+          "User": {
+            "id": "400028",
+            "thumb": "https://plex.tv/users/3f6937b515dea519/avatar?c=1794274225",
+            "title": "user2"
+          },
+          "Player": {
+            "address": "203.0.113.12",
+            "device": "Android",
+            "machineIdentifier": "7y1222xp7aqlerchzjpz43zx",
+            "platform": "Chromecast",
+            "product": "Plex Cast",
+            "profile": "Generic",
+            "remotePublicAddress": "203.0.113.12",
+            "state": "playing",
+            "title": "Device 2",
+            "version": "5.0.0",
+            "local": false,
+            "relayed": false,
+            "secure": true,
+            "userID": 400028
+          },
+          "Session": {
+            "id": "7y1222xp7aqlerchzjpz43zx",
+            "bandwidth": 21398,
+            "location": "wan"
+          },
+          "TranscodeSession": {
+            "key": "/transcode/sessions/7y1222xp7aqlerchzjpz43zx",
+            "throttled": true,
+            "complete": true,
+            "progress": 100.0,
+            "size": -1,
+            "speed": 0.0,
+            "error": false,
+            "duration": 2481777,
+            "remaining": 0,
+            "context": "streaming",
+            "sourceVideoCodec": "hevc",
+            "sourceAudioCodec": "eac3",
+            "videoDecision": "transcode",
+            "audioDecision": "transcode",
+            "protocol": "http",
+            "container": "mkv",
+            "videoCodec": "h264",
+            "audioCodec": "opus",
+            "audioChannels": 2,
+            "transcodeHwRequested": true,
+            "transcodeHwDecoding": "vaapi",
+            "transcodeHwEncoding": "vaapi",
+            "transcodeHwDecodingTitle": "Intel (VA API)",
+            "transcodeHwFullPipeline": true,
+            "transcodeHwEncodingTitle": "Intel (VA API)",
+            "timeStamp": 1676771615.1096392,
+            "maxOffsetAvailable": 2634.131,
+            "minOffsetAvailable": 0.0
+          }
+        }
+      ]
+    }
+  },
+  "sessionMetadata": {
+    "MediaContainer": {
+      "size": 1,
+      "allowSync": true,
+      "identifier": "com.plexapp.plugins.library",
+      "librarySectionID": 2,
+      "librarySectionTitle": "TV Shows",
+      "librarySectionUUID": "f5e0be20-17f7-ce35-fa39-0685b8ae98d3",
+      "mediaTagPrefix": "/system/bundle/media/flags/",
+      "mediaTagVersion": 1675161398,
+      "Metadata": [
+        {
+          "ratingKey": "1017",
+          "key": "/library/metadata/1017",
+          "parentRatingKey": "1018",
+          "grandparentRatingKey": "1016",
+          "guid": "plex://episode/67b5522b0111ed57ef738676",
+          "parentGuid": "plex://season/dc4d76c3a5a0454c20a0a8fa",
+          "grandparentGuid": "plex://show/3cebcfb360a83f06ea2ac91d",
+          "grandparentSlug": "sample-slug-2",
+          "type": "episode",
+          "title": "Title 4",
+          "titleSort": "Title 5",
+          "grandparentKey": "/library/metadata/1016",
+          "parentKey": "/library/metadata/1018",
+          "librarySectionTitle": "TV Shows",
+          "librarySectionID": 2,
+          "librarySectionKey": "/library/sections/2",
+          "grandparentTitle": "Title 3",
+          "parentTitle": "Season 3",
+          "contentRating": "TV-MA",
+          "summary": "Sample summary 2",
+          "index": 3,
+          "parentIndex": 3,
+          "audienceRating": 9.1,
+          "year": 2022,
+          "thumb": "/library/metadata/1017/thumb/1676617437",
+          "art": "/library/metadata/1016/art/1676626060",
+          "parentThumb": "/library/metadata/1018/thumb/1653609908",
+          "grandparentThumb": "/library/metadata/1016/thumb/1676626060",
+          "grandparentArt": "/library/metadata/1016/art/1676626060",
+          "grandparentTheme": "/library/metadata/1016/theme/1676626060",
+          "duration": 2642820,
+          "originallyAvailableAt": "2022-01-13",
+          "addedAt": 1676597515,
+          "updatedAt": 1676617437,
+          "audienceRatingImage": "themoviedb://image.rating",
+          "chapterSource": "media",
+          "Media": [
+            {
+              "id": 20019,
+              "duration": 2642820,
+              "bitrate": 13397,
+              "width": 3840,
+              "height": 2160,
+              "aspectRatio": 1.78,
+              "audioChannels": 6,
+              "audioCodec": "eac3",
+              "videoCodec": "hevc",
+              "videoResolution": "4k",
+              "container": "mkv",
+              "videoFrameRate": "24p",
+              "videoProfile": "main",
+              "hasVoiceActivity": false,
+              "Part": [
+                {
+                  "id": 20020,
+                  "key": "/library/parts/20020/1676597500/file.mkv",
+                  "duration": 2642820,
+                  "file": "/media/library/item5.mkv",
+                  "size": 4890196054,
+                  "container": "mkv",
+                  "videoProfile": "main",
+                  "Stream": [
+                    {
+                      "id": 20021,
+                      "streamType": 1,
+                      "default": true,
+                      "codec": "hevc",
+                      "index": 0,
+                      "bitrate": 12639,
+                      "language": "English",
+                      "languageTag": "en",
+                      "languageCode": "eng",
+                      "bitDepth": 8,
+                      "chromaLocation": "left",
+                      "chromaSubsampling": "4:2:0",
+                      "codedHeight": 2160,
+                      "codedWidth": 3840,
+                      "colorPrimaries": "bt709",
+                      "colorRange": "tv",
+                      "colorSpace": "bt709",
+                      "colorTrc": "bt709",
+                      "frameRate": 23.976,
+                      "height": 2160,
+                      "level": 150,
+                      "profile": "main",
+                      "refFrames": 1,
+                      "width": 3840,
+                      "displayTitle": "4K",
+                      "extendedDisplayTitle": "4K (HEVC Main)"
+                    },
+                    {
+                      "id": 20022,
+                      "streamType": 2,
+                      "canNormalizeLoudness": false,
+                      "selected": true,
+                      "default": true,
+                      "codec": "eac3",
+                      "index": 1,
+                      "channels": 6,
+                      "bitrate": 518,
+                      "language": "English",
+                      "languageTag": "en-US",
+                      "languageCode": "eng",
+                      "audioChannelLayout": "5.1(side)",
+                      "samplingRate": 48000,
+                      "displayTitle": "English (EAC3 5.1)",
+                      "extendedDisplayTitle": "English (EAC3 5.1)"
+                    },
+                    {
+                      "id": 20029,
+                      "streamType": 3,
+                      "canAutoSync": false,
+                      "codec": "srt",
+                      "index": 2,
+                      "bitrate": 0,
+                      "language": "English",
+                      "languageTag": "en-US",
+                      "languageCode": "eng",
+                      "displayTitle": "English",
+                      "extendedDisplayTitle": "English (SRT)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Image": [
+            {
+              "alt": "Title 4",
+              "type": "coverPoster",
+              "url": "/library/metadata/1016/thumb/1676626060"
+            },
+            {
+              "alt": "Title 4",
+              "type": "snapshot",
+              "url": "/library/metadata/1017/thumb/1676617437"
+            },
+            {
+              "alt": "Title 4",
+              "type": "background",
+              "url": "/library/metadata/1016/art/1676626060"
+            },
+            {
+              "alt": "Title 4",
+              "type": "clearLogo",
+              "url": "/library/metadata/1016/clearLogo/1676626060"
+            },
+            {
+              "alt": "Title 4",
+              "type": "backgroundSquare",
+              "url": "/library/metadata/1016/squareArt/1676626060"
+            }
+          ],
+          "UltraBlurColors": {
+            "topLeft": "1f1f1f",
+            "topRight": "2a2a2a",
+            "bottomRight": "0a0a0a",
+            "bottomLeft": "151515"
+          },
+          "Guid": [
+            {
+              "id": "imdb://tt9000001"
+            },
+            {
+              "id": "tmdb://900001"
+            },
+            {
+              "id": "tvdb://900002"
+            }
+          ],
+          "Rating": [
+            {
+              "image": "imdb://image.rating",
+              "value": 7.7,
+              "type": "audience"
+            },
+            {
+              "image": "themoviedb://image.rating",
+              "value": 7.6,
+              "type": "audience"
+            }
+          ],
+          "Director": [
+            {
+              "id": 7023,
+              "filter": "director=7023",
+              "tag": "Person 6",
+              "tagKey": "db0c843daade54ba17bda301",
+              "thumb": "https://metadata-static.plex.tv/7/people/605ce255686bdd86ba1ccfd10c7aec68.jpg"
+            }
+          ],
+          "Writer": [
+            {
+              "id": 7024,
+              "filter": "writer=7024",
+              "tag": "Person 7",
+              "tagKey": "483de1d43b231313889ee6f0",
+              "thumb": "https://metadata-static.plex.tv/c/people/2c582a28233e9decef81b8c0870b12c0.jpg"
+            }
+          ],
+          "Role": [
+            {
+              "id": 7025,
+              "filter": "actor=7025",
+              "tag": "Person 8",
+              "tagKey": "d5e3ac53837293ec367d5f11",
+              "role": "Character 3",
+              "thumb": "https://metadata-static.plex.tv/e/people/d11eedcc9cfce26abedbca3385df0eb8.jpg"
+            },
+            {
+              "id": 7026,
+              "filter": "actor=7026",
+              "tag": "Person 9",
+              "tagKey": "9432e1452f5e681ec125078c",
+              "role": "Character 4",
+              "thumb": "https://metadata-static.plex.tv/2/people/1d86f584f26ac58c41912a3b7166be67.jpg"
+            }
+          ],
+          "Producer": [
+            {
+              "id": 7027,
+              "filter": "producer=7027",
+              "tag": "Person 10",
+              "tagKey": "019f06d14a5745b53483bf02"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "items": {
+    "3": {
+      "MediaContainer": {
+        "size": 2,
+        "totalSize": 2,
+        "offset": 0,
+        "allowSync": true,
+        "art": "/:/resources/movie-fanart.jpg",
+        "identifier": "com.plexapp.plugins.library",
+        "librarySectionID": 3,
+        "librarySectionTitle": "Movies",
+        "librarySectionUUID": "2d25e87c-d654-590f-5189-0ae168b28306",
+        "mediaTagPrefix": "/system/bundle/media/flags/",
+        "mediaTagVersion": 1675161398,
+        "thumb": "/:/resources/movie.png",
+        "title1": "Movies",
+        "title2": "All Movies",
+        "viewGroup": "movie",
+        "viewMode": 65592,
+        "Metadata": [
+          {
+            "ratingKey": "1030",
+            "key": "/library/metadata/1030",
+            "guid": "plex://movie/a0d07f300b9d11ff2393813c",
+            "slug": "sample-slug-3",
+            "studio": "Studio 1",
+            "type": "movie",
+            "title": "Title 6",
+            "titleSort": "Title 7",
+            "contentRating": "PG-13",
+            "contentRatingAge": 12,
+            "summary": "Sample summary 3",
+            "rating": 6.6,
+            "audienceRating": 9.4,
+            "viewCount": 1,
+            "lastViewedAt": 1614615476,
+            "year": 2007,
+            "tagline": "Sample summary 4",
+            "thumb": "/library/metadata/1030/thumb/1676626052",
+            "art": "/library/metadata/1030/art/1676626052",
+            "duration": 7804746,
+            "originallyAvailableAt": "2007-11-18",
+            "addedAt": 1586737723,
+            "updatedAt": 1676626052,
+            "audienceRatingImage": "rottentomatoes://image.rating.upright",
+            "chapterSource": "media",
+            "primaryExtraKey": "/library/metadata/1031",
+            "ratingImage": "rottentomatoes://image.rating.ripe",
+            "Media": [
+              {
+                "id": 20032,
+                "duration": 7804746,
+                "bitrate": 23648,
+                "width": 1920,
+                "height": 1080,
+                "aspectRatio": 1.78,
+                "audioChannels": 6,
+                "audioCodec": "dca-ma",
+                "videoCodec": "h264",
+                "videoResolution": "1080",
+                "container": "mkv",
+                "videoFrameRate": "24p",
+                "audioProfile": "ma",
+                "videoProfile": "high",
+                "hasVoiceActivity": true,
+                "Part": [
+                  {
+                    "id": 20033,
+                    "key": "/library/parts/20033/1410265250/file.mkv",
+                    "duration": 7804746,
+                    "file": "/media/library/item6.mkv",
+                    "size": 23968817119,
+                    "audioProfile": "ma",
+                    "container": "mkv",
+                    "videoProfile": "high"
+                  }
+                ]
+              }
+            ],
+            "Image": [
+              {
+                "alt": "Title 6",
+                "type": "coverPoster",
+                "url": "/library/metadata/1030/thumb/1676626052"
+              },
+              {
+                "alt": "Title 6",
+                "type": "background",
+                "url": "/library/metadata/1030/art/1676626052"
+              },
+              {
+                "alt": "Title 6",
+                "type": "clearLogo",
+                "url": "/library/metadata/1030/clearLogo/1676626052"
+              },
+              {
+                "alt": "Title 6",
+                "type": "backgroundSquare",
+                "url": "/library/metadata/1030/squareArt/1676626052"
+              }
+            ],
+            "UltraBlurColors": {
+              "topLeft": "1f1f1f",
+              "topRight": "2a2a2a",
+              "bottomRight": "0a0a0a",
+              "bottomLeft": "151515"
+            },
+            "Guid": [
+              {
+                "id": "imdb://tt9000002"
+              },
+              {
+                "id": "tmdb://900003"
+              },
+              {
+                "id": "tvdb://900004"
+              }
+            ],
+            "Genre": [
+              {
+                "tag": "Drama"
+              }
+            ],
+            "Country": [
+              {
+                "tag": "Sample Country"
+              }
+            ],
+            "Director": [
+              {
+                "tag": "Person 11"
+              }
+            ],
+            "Writer": [
+              {
+                "tag": "Person 11"
+              },
+              {
+                "tag": "Person 12"
+              }
+            ],
+            "Role": [
+              {
+                "tag": "Person 13"
+              },
+              {
+                "tag": "Person 14"
+              }
+            ]
+          },
+          {
+            "ratingKey": "1034",
+            "key": "/library/metadata/1034",
+            "guid": "plex://movie/3d990d95a759266583887679",
+            "slug": "sample-slug-4",
+            "studio": "Studio 2",
+            "type": "movie",
+            "title": "Title 8",
+            "titleSort": "Title 9",
+            "contentRating": "R",
+            "contentRatingAge": 16,
+            "summary": "Sample summary 5",
+            "rating": 7.6,
+            "audienceRating": 9.1,
+            "viewCount": 1,
+            "lastViewedAt": 1671330314,
+            "year": 2019,
+            "tagline": "Sample summary 6",
+            "thumb": "/library/metadata/1034/thumb/1672304010",
+            "art": "/library/metadata/1034/art/1672304010",
+            "duration": 6529684,
+            "originallyAvailableAt": "2019-07-28",
+            "addedAt": 1586231064,
+            "updatedAt": 1672304010,
+            "audienceRatingImage": "rottentomatoes://image.rating.upright",
+            "chapterSource": "media",
+            "loudnessAnalysisVersion": "0.02",
+            "primaryExtraKey": "/library/metadata/1035",
+            "ratingImage": "rottentomatoes://image.rating.ripe",
+            "Media": [
+              {
+                "id": 20036,
+                "duration": 6529684,
+                "bitrate": 12459,
+                "width": 3840,
+                "height": 1600,
+                "aspectRatio": 2.35,
+                "audioChannels": 6,
+                "audioCodec": "eac3",
+                "videoCodec": "hevc",
+                "videoResolution": "4k",
+                "container": "mkv",
+                "videoFrameRate": "24p",
+                "audioProfile": "dolby digital plus + dolby atmos",
+                "videoProfile": "main",
+                "hasVoiceActivity": true,
+                "Part": [
+                  {
+                    "id": 20037,
+                    "key": "/library/parts/20037/1566524563/file.mkv",
+                    "duration": 6529684,
+                    "file": "/media/library/item7.mkv",
+                    "size": 12813443128,
+                    "audioProfile": "dolby digital plus + dolby atmos",
+                    "container": "mkv",
+                    "videoProfile": "main"
+                  }
+                ]
+              },
+              {
+                "id": 20038,
+                "duration": 6529684,
+                "bitrate": 12951,
+                "width": 3840,
+                "height": 1600,
+                "aspectRatio": 2.35,
+                "audioChannels": 6,
+                "audioCodec": "eac3",
+                "videoCodec": "hevc",
+                "videoResolution": "4k",
+                "container": "mkv",
+                "videoFrameRate": "24p",
+                "audioProfile": "dolby digital plus + dolby atmos",
+                "videoProfile": "main 10",
+                "hasVoiceActivity": true,
+                "Part": [
+                  {
+                    "id": 20039,
+                    "key": "/library/parts/20039/1592461689/file.mkv",
+                    "duration": 6529684,
+                    "file": "/media/library/item8.mkv",
+                    "size": 12171991682,
+                    "audioProfile": "dolby digital plus + dolby atmos",
+                    "container": "mkv",
+                    "videoProfile": "main 10"
+                  }
+                ]
+              }
+            ],
+            "Image": [
+              {
+                "alt": "Title 8",
+                "type": "coverPoster",
+                "url": "/library/metadata/1034/thumb/1672304010"
+              },
+              {
+                "alt": "Title 8",
+                "type": "background",
+                "url": "/library/metadata/1034/art/1672304010"
+              },
+              {
+                "alt": "Title 8",
+                "type": "clearLogo",
+                "url": "/library/metadata/1034/clearLogo/1672304010"
+              },
+              {
+                "alt": "Title 8",
+                "type": "backgroundSquare",
+                "url": "/library/metadata/1034/squareArt/1672304010"
+              }
+            ],
+            "UltraBlurColors": {
+              "topLeft": "1f1f1f",
+              "topRight": "2a2a2a",
+              "bottomRight": "0a0a0a",
+              "bottomLeft": "151515"
+            },
+            "Guid": [
+              {
+                "id": "imdb://tt9000003"
+              },
+              {
+                "id": "tmdb://900005"
+              },
+              {
+                "id": "tvdb://900006"
+              }
+            ],
+            "Genre": [
+              {
+                "tag": "Comedy"
+              }
+            ],
+            "Country": [
+              {
+                "tag": "Sample Country"
+              },
+              {
+                "tag": "Sample Country"
+              }
+            ],
+            "Director": [
+              {
+                "tag": "Person 15"
+              }
+            ],
+            "Writer": [
+              {
+                "tag": "Person 15"
+              },
+              {
+                "tag": "Person 16"
+              }
+            ],
+            "Role": [
+              {
+                "tag": "Person 17"
+              },
+              {
+                "tag": "Person 18"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "2": {
+      "MediaContainer": {
+        "size": 1,
+        "totalSize": 1,
+        "offset": 0,
+        "allowSync": true,
+        "art": "/:/resources/show-fanart.jpg",
+        "identifier": "com.plexapp.plugins.library",
+        "librarySectionID": 2,
+        "librarySectionTitle": "TV Shows",
+        "librarySectionUUID": "f5e0be20-17f7-ce35-fa39-0685b8ae98d3",
+        "mediaTagPrefix": "/system/bundle/media/flags/",
+        "mediaTagVersion": 1675161398,
+        "nocache": true,
+        "thumb": "/:/resources/show.png",
+        "title1": "TV Shows",
+        "title2": "All Shows",
+        "viewGroup": "show",
+        "viewMode": 65592,
+        "Metadata": [
+          {
+            "ratingKey": "1040",
+            "key": "/library/metadata/1040/children",
+            "guid": "plex://show/6b6bcb40d93e78f9265842e8",
+            "slug": "sample-slug-5",
+            "studio": "Studio 3",
+            "type": "show",
+            "title": "Title 10",
+            "contentRating": "TV-MA",
+            "contentRatingAge": 14,
+            "summary": "Sample summary 7",
+            "index": 1,
+            "audienceRating": 5.6,
+            "year": 2016,
+            "tagline": "Sample summary 8",
+            "thumb": "/library/metadata/1040/thumb/1676626062",
+            "art": "/library/metadata/1040/art/1676626062",
+            "duration": 3410422,
+            "originallyAvailableAt": "2016-05-23",
+            "leafCount": 36,
+            "viewedLeafCount": 0,
+            "childCount": 1,
+            "addedAt": 1643000383,
+            "updatedAt": 1676626062,
+            "audienceRatingImage": "themoviedb://image.rating",
+            "primaryExtraKey": "/library/metadata/1041",
+            "Image": [
+              {
+                "alt": "Title 10",
+                "type": "coverPoster",
+                "url": "/library/metadata/1040/thumb/1676626062"
+              },
+              {
+                "alt": "Title 10",
+                "type": "background",
+                "url": "/library/metadata/1040/art/1676626062"
+              },
+              {
+                "alt": "Title 10",
+                "type": "clearLogo",
+                "url": "/library/metadata/1040/clearLogo/1676626062"
+              },
+              {
+                "alt": "Title 10",
+                "type": "backgroundSquare",
+                "url": "/library/metadata/1040/squareArt/1676626062"
+              }
+            ],
+            "UltraBlurColors": {
+              "topLeft": "1f1f1f",
+              "topRight": "2a2a2a",
+              "bottomRight": "0a0a0a",
+              "bottomLeft": "151515"
+            },
+            "Guid": [
+              {
+                "id": "imdb://tt9000004"
+              },
+              {
+                "id": "tmdb://900007"
+              },
+              {
+                "id": "tvdb://900008"
+              },
+              {
+                "id": "tvdb://900009"
+              }
+            ],
+            "Genre": [
+              {
+                "tag": "Documentary"
+              }
+            ],
+            "Country": [
+              {
+                "tag": "Sample Country"
+              }
+            ],
+            "Role": [
+              {
+                "tag": "Person 19"
+              },
+              {
+                "tag": "Person 20"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "4": {
+      "MediaContainer": {
+        "size": 1,
+        "totalSize": 1,
+        "offset": 0,
+        "allowSync": true,
+        "art": "/:/resources/artist-fanart.jpg",
+        "identifier": "com.plexapp.plugins.library",
+        "librarySectionID": 4,
+        "librarySectionTitle": "Music",
+        "librarySectionUUID": "677da746-c8f9-dc60-7571-6c2df74319be",
+        "mediaTagPrefix": "/system/bundle/media/flags/",
+        "mediaTagVersion": 1675161398,
+        "nocache": true,
+        "thumb": "/:/resources/artist.png",
+        "title1": "Music",
+        "title2": "All Artists",
+        "viewGroup": "artist",
+        "viewMode": 65592,
+        "Metadata": [
+          {
+            "ratingKey": "1042",
+            "key": "/library/metadata/1042/children",
+            "guid": "plex://artist/ef398f5399a847569e277700",
+            "type": "artist",
+            "title": "Title 11",
+            "summary": "Sample summary 9",
+            "index": 1,
+            "thumb": "/library/metadata/1042/thumb/1676710407",
+            "art": "/library/metadata/1042/art/1676710407",
+            "addedAt": 1675360658,
+            "updatedAt": 1676710407,
+            "Image": [
+              {
+                "alt": "Title 11",
+                "type": "coverPoster",
+                "url": "/library/metadata/1042/thumb/1676710407"
+              },
+              {
+                "alt": "Title 11",
+                "type": "background",
+                "url": "/library/metadata/1042/art/1676710407"
+              }
+            ],
+            "UltraBlurColors": {
+              "topLeft": "1f1f1f",
+              "topRight": "2a2a2a",
+              "bottomRight": "0a0a0a",
+              "bottomLeft": "151515"
+            },
+            "Guid": [
+              {
+                "id": "mbid://900010"
+              }
+            ],
+            "Genre": [
+              {
+                "tag": "Action"
+              }
+            ],
+            "Country": [
+              {
+                "tag": "Sample Country"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "leaves": {
+    "2": {
+      "MediaContainer": {
+        "size": 1,
+        "totalSize": 1,
+        "offset": 0,
+        "allowSync": false,
+        "art": "/:/resources/show-fanart.jpg",
+        "identifier": "com.plexapp.plugins.library",
+        "mediaTagPrefix": "/system/bundle/media/flags/",
+        "mediaTagVersion": 1675161398,
+        "nocache": true,
+        "thumb": "/:/resources/show.png",
+        "title1": "TV Shows",
+        "viewGroup": "show",
+        "viewMode": 65592,
+        "Metadata": [
+          {
+            "ratingKey": "1043",
+            "key": "/library/metadata/1043",
+            "parentRatingKey": "1044",
+            "grandparentRatingKey": "1040",
+            "guid": "plex://episode/ab9963c56e9d42a4ed2214c1",
+            "parentGuid": "plex://season/3f6c6346f6538c196c7e1da0",
+            "grandparentGuid": "plex://show/6b6bcb40d93e78f9265842e8",
+            "grandparentSlug": "sample-slug-5",
+            "type": "episode",
+            "title": "Title 12",
+            "grandparentKey": "/library/metadata/1040",
+            "parentKey": "/library/metadata/1044",
+            "grandparentTitle": "Title 10",
+            "parentTitle": "Season 11",
+            "contentRating": "TV-MA",
+            "summary": "Sample summary 10",
+            "index": 6,
+            "parentIndex": 11,
+            "year": 2023,
+            "thumb": "/library/metadata/1043/thumb/1676714147",
+            "art": "/library/metadata/1040/art/1676626062",
+            "parentThumb": "/library/metadata/1044/thumb/1674372438",
+            "grandparentThumb": "/library/metadata/1040/thumb/1676626062",
+            "grandparentArt": "/library/metadata/1040/art/1676626062",
+            "duration": 2911804,
+            "originallyAvailableAt": "2023-01-29",
+            "addedAt": 1674980235,
+            "updatedAt": 1676714147,
+            "chapterSource": "media",
+            "Media": [
+              {
+                "id": 20045,
+                "duration": 2911804,
+                "bitrate": 6624,
+                "width": 1920,
+                "height": 1080,
+                "aspectRatio": 1.78,
+                "audioChannels": 6,
+                "audioCodec": "eac3",
+                "videoCodec": "h264",
+                "videoResolution": "1080",
+                "container": "mkv",
+                "videoFrameRate": "24p",
+                "videoProfile": "high",
+                "hasVoiceActivity": true,
+                "Part": [
+                  {
+                    "id": 20046,
+                    "key": "/library/parts/20046/1675036950/file.mkv",
+                    "duration": 2911804,
+                    "file": "/media/library/item9.mkv",
+                    "size": 2609140586,
+                    "container": "mkv",
+                    "videoProfile": "high"
+                  }
+                ]
+              }
+            ],
+            "Image": [
+              {
+                "alt": "Title 12",
+                "type": "coverPoster",
+                "url": "/library/metadata/1040/thumb/1676626062"
+              },
+              {
+                "alt": "Title 12",
+                "type": "snapshot",
+                "url": "/library/metadata/1043/thumb/1676714147"
+              },
+              {
+                "alt": "Title 12",
+                "type": "background",
+                "url": "/library/metadata/1040/art/1676626062"
+              },
+              {
+                "alt": "Title 12",
+                "type": "clearLogo",
+                "url": "/library/metadata/1040/clearLogo/1676626062"
+              },
+              {
+                "alt": "Title 12",
+                "type": "backgroundSquare",
+                "url": "/library/metadata/1040/squareArt/1676626062"
+              }
+            ],
+            "UltraBlurColors": {
+              "topLeft": "1f1f1f",
+              "topRight": "2a2a2a",
+              "bottomRight": "0a0a0a",
+              "bottomLeft": "151515"
+            },
+            "Guid": [
+              {
+                "id": "imdb://tt9000005"
+              },
+              {
+                "id": "tmdb://900011"
+              },
+              {
+                "id": "tvdb://900012"
+              }
+            ],
+            "Role": [
+              {
+                "tag": "Person 19"
+              },
+              {
+                "tag": "Person 20"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "4": {
+      "MediaContainer": {
+        "size": 1,
+        "totalSize": 1,
+        "offset": 0,
+        "allowSync": false,
+        "art": "/:/resources/artist-fanart.jpg",
+        "identifier": "com.plexapp.plugins.library",
+        "mediaTagPrefix": "/system/bundle/media/flags/",
+        "mediaTagVersion": 1675161398,
+        "nocache": true,
+        "thumb": "/:/resources/artist.png",
+        "title1": "Music",
+        "viewGroup": "artist",
+        "viewMode": 65592,
+        "Metadata": [
+          {
+            "ratingKey": "1047",
+            "key": "/library/metadata/1047",
+            "parentRatingKey": "1048",
+            "grandparentRatingKey": "1042",
+            "guid": "plex://track/9f1fd9c5d58910e047384715",
+            "parentGuid": "plex://album/b58ecb6db4d5b829b9b68229",
+            "grandparentGuid": "plex://artist/ef398f5399a847569e277700",
+            "parentStudio": "Studio 4",
+            "type": "track",
+            "title": "Title 13",
+            "grandparentKey": "/library/metadata/1042",
+            "parentKey": "/library/metadata/1048",
+            "grandparentTitle": "Title 11",
+            "parentTitle": "Title 14",
+            "summary": "",
+            "index": 1,
+            "parentIndex": 1,
+            "ratingCount": 13587,
+            "parentYear": 2021,
+            "thumb": "/library/metadata/1048/thumb/1676710407",
+            "art": "/library/metadata/1042/art/1676710407",
+            "parentThumb": "/library/metadata/1048/thumb/1676710407",
+            "grandparentThumb": "/library/metadata/1042/thumb/1676710407",
+            "grandparentArt": "/library/metadata/1042/art/1676710407",
+            "duration": 176408,
+            "addedAt": 1676051565,
+            "updatedAt": 1676710407,
+            "musicAnalysisVersion": "1",
+            "Media": [
+              {
+                "id": 20049,
+                "duration": 176408,
+                "bitrate": 1764,
+                "audioChannels": 2,
+                "audioCodec": "flac",
+                "container": "flac",
+                "hasVoiceActivity": false,
+                "Part": [
+                  {
+                    "id": 20050,
+                    "key": "/library/parts/20050/1676048974/file.flac",
+                    "duration": 176408,
+                    "file": "/media/library/item10.flac",
+                    "size": 40256000,
+                    "container": "flac",
+                    "hasThumbnail": "1"
+                  }
+                ]
+              }
+            ],
+            "Image": [
+              {
+                "alt": "Title 13",
+                "type": "coverPoster",
+                "url": "/library/metadata/1042/thumb/1676710407"
+              },
+              {
+                "alt": "Title 13",
+                "type": "background",
+                "url": "/library/metadata/1042/art/1676710407"
+              }
+            ],
+            "Guid": [
+              {
+                "id": "mbid://900013"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "seasons": {
+    "2": {
+      "MediaContainer": {
+        "size": 1,
+        "totalSize": 1,
+        "offset": 0,
+        "allowSync": true,
+        "art": "/:/resources/show-fanart.jpg",
+        "identifier": "com.plexapp.plugins.library",
+        "librarySectionID": 2,
+        "librarySectionTitle": "TV Shows",
+        "librarySectionUUID": "f5e0be20-17f7-ce35-fa39-0685b8ae98d3",
+        "mediaTagPrefix": "/system/bundle/media/flags/",
+        "mediaTagVersion": 1675161398,
+        "nocache": true,
+        "thumb": "/:/resources/show.png",
+        "title1": "TV Shows",
+        "title2": "All Shows",
+        "viewGroup": "show",
+        "viewMode": 65592,
+        "Metadata": [
+          {
+            "ratingKey": "1044",
+            "key": "/library/metadata/1044/children",
+            "parentRatingKey": "1040",
+            "guid": "plex://season/3f6c6346f6538c196c7e1da0",
+            "parentGuid": "plex://show/6b6bcb40d93e78f9265842e8",
+            "parentSlug": "sample-slug-5",
+            "parentStudio": "Studio 3",
+            "type": "season",
+            "title": "Season 11",
+            "parentKey": "/library/metadata/1040",
+            "parentTitle": "Title 10",
+            "summary": "",
+            "index": 11,
+            "parentIndex": 1,
+            "parentYear": 2016,
+            "thumb": "/library/metadata/1044/thumb/1674372438",
+            "art": "/library/metadata/1040/art/1676626062",
+            "parentThumb": "/library/metadata/1040/thumb/1676626062",
+            "addedAt": 1674372437,
+            "updatedAt": 1674372438,
+            "Image": [
+              {
+                "alt": "Season 11",
+                "type": "coverPoster",
+                "url": "/library/metadata/1044/thumb/1674372438"
+              },
+              {
+                "alt": "Season 11",
+                "type": "background",
+                "url": "/library/metadata/1040/art/1676626062"
+              },
+              {
+                "alt": "Season 11",
+                "type": "clearLogo",
+                "url": "/library/metadata/1040/clearLogo/1676626062"
+              },
+              {
+                "alt": "Season 11",
+                "type": "backgroundSquare",
+                "url": "/library/metadata/1040/squareArt/1676626062"
+              }
+            ],
+            "UltraBlurColors": {
+              "topLeft": "1f1f1f",
+              "topRight": "2a2a2a",
+              "bottomRight": "0a0a0a",
+              "bottomLeft": "151515"
+            },
+            "Guid": [
+              {
+                "id": "tvdb://900014"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "albums": {
+    "4": {
+      "MediaContainer": {
+        "size": 1,
+        "totalSize": 1,
+        "offset": 0,
+        "allowSync": true,
+        "art": "/:/resources/artist-fanart.jpg",
+        "identifier": "com.plexapp.plugins.library",
+        "librarySectionID": 4,
+        "librarySectionTitle": "Music",
+        "librarySectionUUID": "677da746-c8f9-dc60-7571-6c2df74319be",
+        "mediaTagPrefix": "/system/bundle/media/flags/",
+        "mediaTagVersion": 1675161398,
+        "nocache": true,
+        "thumb": "/:/resources/artist.png",
+        "title1": "Music",
+        "title2": "All Artists",
+        "viewGroup": "artist",
+        "viewMode": 65592,
+        "Metadata": [
+          {
+            "ratingKey": "1048",
+            "key": "/library/metadata/1048/children",
+            "parentRatingKey": "1042",
+            "guid": "plex://album/b58ecb6db4d5b829b9b68229",
+            "parentGuid": "plex://artist/ef398f5399a847569e277700",
+            "studio": "Studio 4",
+            "type": "album",
+            "title": "Title 14",
+            "parentKey": "/library/metadata/1042",
+            "parentTitle": "Title 11",
+            "summary": "",
+            "index": 1,
+            "year": 2021,
+            "thumb": "/library/metadata/1048/thumb/1676710407",
+            "art": "/library/metadata/1042/art/1676710407",
+            "parentThumb": "/library/metadata/1042/thumb/1676710407",
+            "originallyAvailableAt": "2021-11-16",
+            "addedAt": 1676051565,
+            "updatedAt": 1676710407,
+            "loudnessAnalysisVersion": "2",
+            "musicAnalysisVersion": "1",
+            "Image": [
+              {
+                "alt": "Title 14",
+                "type": "coverPoster",
+                "url": "/library/metadata/1048/thumb/1676710407"
+              },
+              {
+                "alt": "Title 14",
+                "type": "background",
+                "url": "/library/metadata/1042/art/1676710407"
+              }
+            ],
+            "UltraBlurColors": {
+              "topLeft": "1f1f1f",
+              "topRight": "2a2a2a",
+              "bottomRight": "0a0a0a",
+              "bottomLeft": "151515"
+            },
+            "Guid": [
+              {
+                "id": "mbid://900015"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "checkFiles": {
+    "MediaContainer": {
+      "size": 3,
+      "allowSync": true,
+      "identifier": "com.plexapp.plugins.library",
+      "librarySectionID": 3,
+      "librarySectionTitle": "Movies",
+      "librarySectionUUID": "2d25e87c-d654-590f-5189-0ae168b28306",
+      "mediaTagPrefix": "/system/bundle/media/flags/",
+      "mediaTagVersion": 1675161398,
+      "Metadata": [
+        {
+          "ratingKey": "1030",
+          "key": "/library/metadata/1030",
+          "guid": "plex://movie/a0d07f300b9d11ff2393813c",
+          "slug": "sample-slug-3",
+          "studio": "Studio 1",
+          "type": "movie",
+          "title": "Title 6",
+          "titleSort": "Title 7",
+          "librarySectionTitle": "Movies",
+          "librarySectionID": 3,
+          "librarySectionKey": "/library/sections/3",
+          "contentRating": "PG-13",
+          "contentRatingAge": 12,
+          "summary": "Sample summary 3",
+          "rating": 6.6,
+          "audienceRating": 9.4,
+          "viewCount": 1,
+          "lastViewedAt": 1614615476,
+          "year": 2007,
+          "tagline": "Sample summary 4",
+          "thumb": "/library/metadata/1030/thumb/1676626052",
+          "art": "/library/metadata/1030/art/1676626052",
+          "duration": 7804746,
+          "originallyAvailableAt": "2007-11-18",
+          "addedAt": 1586737723,
+          "updatedAt": 1676626052,
+          "audienceRatingImage": "rottentomatoes://image.rating.upright",
+          "chapterSource": "media",
+          "primaryExtraKey": "/library/metadata/1031",
+          "ratingImage": "rottentomatoes://image.rating.ripe",
+          "Media": [
+            {
+              "id": 20032,
+              "duration": 7804746,
+              "bitrate": 23648,
+              "width": 1920,
+              "height": 1080,
+              "aspectRatio": 1.78,
+              "audioChannels": 6,
+              "audioCodec": "dca-ma",
+              "videoCodec": "h264",
+              "videoResolution": "1080",
+              "container": "mkv",
+              "videoFrameRate": "24p",
+              "audioProfile": "ma",
+              "videoProfile": "high",
+              "hasVoiceActivity": true,
+              "Part": [
+                {
+                  "accessible": true,
+                  "exists": true,
+                  "id": 20033,
+                  "key": "/library/parts/20033/1410265250/file.mkv",
+                  "duration": 7804746,
+                  "file": "/media/library/item6.mkv",
+                  "size": 23968817119,
+                  "audioProfile": "ma",
+                  "container": "mkv",
+                  "videoProfile": "high",
+                  "Stream": [
+                    {
+                      "id": 20051,
+                      "streamType": 1,
+                      "default": true,
+                      "codec": "h264",
+                      "index": 0,
+                      "bitrate": 23648,
+                      "language": "English",
+                      "languageTag": "en",
+                      "languageCode": "eng",
+                      "bitDepth": 8,
+                      "chromaLocation": "left",
+                      "chromaSubsampling": "4:2:0",
+                      "codedHeight": 1088,
+                      "codedWidth": 1920,
+                      "frameRate": 23.976,
+                      "hasScalingMatrix": false,
+                      "height": 1080,
+                      "level": 41,
+                      "profile": "high",
+                      "refFrames": 4,
+                      "scanType": "progressive",
+                      "width": 1920,
+                      "displayTitle": "1080p",
+                      "extendedDisplayTitle": "1080p (H.264)"
+                    },
+                    {
+                      "id": 20052,
+                      "streamType": 2,
+                      "canNormalizeLoudness": false,
+                      "selected": true,
+                      "default": true,
+                      "codec": "dca",
+                      "index": 1,
+                      "channels": 6,
+                      "language": "English",
+                      "languageTag": "en",
+                      "languageCode": "eng",
+                      "audioChannelLayout": "5.1(side)",
+                      "bitDepth": 24,
+                      "profile": "ma",
+                      "samplingRate": 48000,
+                      "title": "DTS-HD MA 5.1",
+                      "displayTitle": "English (DTS-HD MA 5.1)",
+                      "extendedDisplayTitle": "DTS-HD MA 5.1 (English)"
+                    },
+                    {
+                      "id": 20053,
+                      "streamType": 3,
+                      "canAutoSync": false,
+                      "codec": "pgs",
+                      "index": 2,
+                      "language": "English",
+                      "languageTag": "en",
+                      "languageCode": "eng",
+                      "title": "English",
+                      "displayTitle": "English",
+                      "extendedDisplayTitle": "English (PGS)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Image": [
+            {
+              "alt": "Title 6",
+              "type": "coverPoster",
+              "url": "/library/metadata/1030/thumb/1676626052"
+            },
+            {
+              "alt": "Title 6",
+              "type": "background",
+              "url": "/library/metadata/1030/art/1676626052"
+            },
+            {
+              "alt": "Title 6",
+              "type": "clearLogo",
+              "url": "/library/metadata/1030/clearLogo/1676626052"
+            },
+            {
+              "alt": "Title 6",
+              "type": "backgroundSquare",
+              "url": "/library/metadata/1030/squareArt/1676626052"
+            }
+          ],
+          "UltraBlurColors": {
+            "topLeft": "1f1f1f",
+            "topRight": "2a2a2a",
+            "bottomRight": "0a0a0a",
+            "bottomLeft": "151515"
+          },
+          "Genre": [
+            {
+              "id": 20054,
+              "filter": "genre=20054",
+              "tag": "Drama"
+            }
+          ],
+          "Country": [
+            {
+              "id": 20055,
+              "filter": "country=20055",
+              "tag": "Sample Country"
+            }
+          ],
+          "Guid": [
+            {
+              "id": "imdb://tt9000002"
+            },
+            {
+              "id": "tmdb://900003"
+            },
+            {
+              "id": "tvdb://900004"
+            }
+          ],
+          "Rating": [
+            {
+              "image": "imdb://image.rating",
+              "value": 7.7,
+              "type": "audience"
+            },
+            {
+              "image": "rottentomatoes://image.rating.ripe",
+              "value": 8.5,
+              "type": "critic"
+            },
+            {
+              "image": "rottentomatoes://image.rating.upright",
+              "value": 8.1,
+              "type": "audience"
+            },
+            {
+              "image": "themoviedb://image.rating",
+              "value": 7.6,
+              "type": "audience"
+            }
+          ],
+          "Director": [
+            {
+              "id": 20056,
+              "filter": "director=20056",
+              "tag": "Person 11",
+              "tagKey": "8b649d0b7f215fe8cf8013c5",
+              "thumb": "https://metadata-static.plex.tv/5/people/681c2991d63f22d3b90cd4369c74a558.jpg"
+            }
+          ],
+          "Writer": [
+            {
+              "id": 20057,
+              "filter": "writer=20057",
+              "tag": "Person 11",
+              "tagKey": "8b649d0b7f215fe8cf8013c5",
+              "thumb": "https://metadata-static.plex.tv/5/people/681c2991d63f22d3b90cd4369c74a558.jpg"
+            },
+            {
+              "id": 20058,
+              "filter": "writer=20058",
+              "tag": "Person 12",
+              "tagKey": "70e2bb2d9fe2f75de030d7be",
+              "thumb": "https://metadata-static.plex.tv/6/people/9c13d4231367fd03dbef3c720b98f508.jpg"
+            }
+          ],
+          "Role": [
+            {
+              "id": 20059,
+              "filter": "actor=20059",
+              "tag": "Person 13",
+              "tagKey": "9b79dffdbeb3ea0bd5fe82a2",
+              "role": "Character 5",
+              "thumb": "https://metadata-static.plex.tv/e/people/de63c0727ecaff72d64d4c824509cec4.jpg"
+            },
+            {
+              "id": 20060,
+              "filter": "actor=20060",
+              "tag": "Person 14",
+              "tagKey": "e07326b298345ad8635a6edf",
+              "role": "Character 6",
+              "thumb": "https://metadata-static.plex.tv/a/people/32b85d6dff01151b28bc1849cd700b7a.jpg"
+            }
+          ],
+          "Producer": [
+            {
+              "id": 20061,
+              "filter": "producer=20061",
+              "tag": "Person 21",
+              "tagKey": "7dd232d2f5aa0a2c08615aba",
+              "thumb": "https://metadata-static.plex.tv/6/people/859944b6df9246ffb02b24c6fbf23ab7.jpg"
+            },
+            {
+              "id": 20062,
+              "filter": "producer=20062",
+              "tag": "Person 22",
+              "tagKey": "99ba09990d7935ef22ea41ad",
+              "thumb": "https://metadata-static.plex.tv/b/people/4279c9ae5d7c1eea2260c23d84cd064c.jpg"
+            }
+          ],
+          "Label": [
+            {
+              "id": 20063,
+              "filter": "label=20063",
+              "tag": "Collection 1"
+            },
+            {
+              "id": 20064,
+              "filter": "label=20064",
+              "tag": "Collection 2"
+            }
+          ],
+          "CommonSenseMedia": [
+            {
+              "id": 20065,
+              "oneLiner": "Sample summary 11",
+              "AgeRating": [
+                {
+                  "type": "official",
+                  "rating": 3,
+                  "age": 12
+                }
+              ]
+            }
+          ],
+          "Field": [
+            {
+              "locked": true,
+              "name": "thumb"
+            },
+            {
+              "locked": true,
+              "name": "collection"
+            },
+            {
+              "locked": true,
+              "name": "label"
+            }
+          ]
+        },
+        {
+          "ratingKey": "1034",
+          "key": "/library/metadata/1034",
+          "guid": "plex://movie/3d990d95a759266583887679",
+          "slug": "sample-slug-4",
+          "studio": "Studio 2",
+          "type": "movie",
+          "title": "Title 8",
+          "titleSort": "Title 9",
+          "librarySectionTitle": "Movies",
+          "librarySectionID": 3,
+          "librarySectionKey": "/library/sections/3",
+          "contentRating": "R",
+          "contentRatingAge": 16,
+          "summary": "Sample summary 5",
+          "rating": 7.6,
+          "audienceRating": 9.1,
+          "viewCount": 1,
+          "lastViewedAt": 1671330314,
+          "year": 2019,
+          "tagline": "Sample summary 6",
+          "thumb": "/library/metadata/1034/thumb/1672304010",
+          "art": "/library/metadata/1034/art/1672304010",
+          "duration": 6529684,
+          "originallyAvailableAt": "2019-07-28",
+          "addedAt": 1586231064,
+          "updatedAt": 1672304010,
+          "audienceRatingImage": "rottentomatoes://image.rating.upright",
+          "chapterSource": "media",
+          "loudnessAnalysisVersion": "0.02",
+          "primaryExtraKey": "/library/metadata/1035",
+          "ratingImage": "rottentomatoes://image.rating.ripe",
+          "Media": [
+            {
+              "id": 20036,
+              "duration": 6529684,
+              "bitrate": 12459,
+              "width": 3840,
+              "height": 1600,
+              "aspectRatio": 2.35,
+              "audioChannels": 6,
+              "audioCodec": "eac3",
+              "videoCodec": "hevc",
+              "videoResolution": "4k",
+              "container": "mkv",
+              "videoFrameRate": "24p",
+              "audioProfile": "dolby digital plus + dolby atmos",
+              "videoProfile": "main",
+              "hasVoiceActivity": true,
+              "Part": [
+                {
+                  "accessible": true,
+                  "exists": true,
+                  "id": 20037,
+                  "key": "/library/parts/20037/1566524563/file.mkv",
+                  "duration": 6529684,
+                  "file": "/media/library/item7.mkv",
+                  "size": 12813443128,
+                  "audioProfile": "dolby digital plus + dolby atmos",
+                  "container": "mkv",
+                  "videoProfile": "main",
+                  "Stream": [
+                    {
+                      "id": 20066,
+                      "streamType": 1,
+                      "default": true,
+                      "codec": "hevc",
+                      "index": 0,
+                      "bitrate": 12987,
+                      "language": "English",
+                      "languageTag": "en-US",
+                      "languageCode": "eng",
+                      "bitDepth": 8,
+                      "chromaLocation": "left",
+                      "chromaSubsampling": "4:2:0",
+                      "codedHeight": 1600,
+                      "codedWidth": 3840,
+                      "colorPrimaries": "bt709",
+                      "colorRange": "tv",
+                      "colorSpace": "bt709",
+                      "colorTrc": "bt709",
+                      "frameRate": 23.976,
+                      "height": 1600,
+                      "level": 150,
+                      "original": true,
+                      "profile": "main",
+                      "refFrames": 1,
+                      "width": 3840,
+                      "displayTitle": "4K",
+                      "extendedDisplayTitle": "4K (HEVC Main)"
+                    },
+                    {
+                      "id": 20067,
+                      "streamType": 2,
+                      "canNormalizeLoudness": true,
+                      "selected": true,
+                      "default": true,
+                      "codec": "eac3",
+                      "index": 1,
+                      "channels": 6,
+                      "bitrate": 629,
+                      "language": "English",
+                      "languageTag": "en-US",
+                      "languageCode": "eng",
+                      "audioChannelLayout": "5.1(side)",
+                      "gainOffset": "0.52",
+                      "loudness": "-18.07",
+                      "loudnessAnalysisVersion": "0.02",
+                      "lra": "19.88",
+                      "original": true,
+                      "peak": "0.59",
+                      "profile": "dolby digital plus + dolby atmos",
+                      "samplingRate": 48000,
+                      "threshold": "-30.19",
+                      "title": "None",
+                      "displayTitle": "English (EAC3 5.1 + Atmos)",
+                      "extendedDisplayTitle": "None (English EAC3 5.1 + Atmos)"
+                    },
+                    {
+                      "id": 20068,
+                      "streamType": 3,
+                      "canAutoSync": false,
+                      "selected": true,
+                      "default": true,
+                      "forced": true,
+                      "codec": "srt",
+                      "index": 2,
+                      "bitrate": 0,
+                      "language": "English",
+                      "languageTag": "en-US",
+                      "languageCode": "eng",
+                      "original": true,
+                      "title": "Forced",
+                      "displayTitle": "English Forced",
+                      "extendedDisplayTitle": "Forced (English SRT)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 20038,
+              "duration": 6529684,
+              "bitrate": 12951,
+              "width": 3840,
+              "height": 1600,
+              "aspectRatio": 2.35,
+              "audioChannels": 6,
+              "audioCodec": "eac3",
+              "videoCodec": "hevc",
+              "videoResolution": "4k",
+              "container": "mkv",
+              "videoFrameRate": "24p",
+              "audioProfile": "dolby digital plus + dolby atmos",
+              "videoProfile": "main 10",
+              "hasVoiceActivity": true,
+              "Part": [
+                {
+                  "accessible": true,
+                  "exists": true,
+                  "id": 20039,
+                  "key": "/library/parts/20039/1592461689/file.mkv",
+                  "duration": 6529684,
+                  "file": "/media/library/item8.mkv",
+                  "size": 12171991682,
+                  "audioProfile": "dolby digital plus + dolby atmos",
+                  "container": "mkv",
+                  "videoProfile": "main 10",
+                  "Stream": [
+                    {
+                      "id": 20069,
+                      "streamType": 1,
+                      "default": true,
+                      "codec": "hevc",
+                      "index": 0,
+                      "bitrate": 13214,
+                      "language": "English",
+                      "languageTag": "en-US",
+                      "languageCode": "eng",
+                      "HDR10PlusPresent": true,
+                      "bitDepth": 10,
+                      "chromaLocation": "left",
+                      "chromaSubsampling": "4:2:0",
+                      "codedHeight": 1600,
+                      "codedWidth": 3840,
+                      "colorPrimaries": "bt2020",
+                      "colorRange": "tv",
+                      "colorSpace": "bt2020nc",
+                      "colorTrc": "smpte2084",
+                      "frameRate": 23.976,
+                      "height": 1600,
+                      "level": 150,
+                      "original": true,
+                      "profile": "main 10",
+                      "refFrames": 1,
+                      "width": 3840,
+                      "displayTitle": "4K HDR10+",
+                      "extendedDisplayTitle": " (4K HDR10+ HEVC Main 10)"
+                    },
+                    {
+                      "id": 20070,
+                      "streamType": 2,
+                      "canNormalizeLoudness": true,
+                      "selected": true,
+                      "default": true,
+                      "codec": "eac3",
+                      "index": 1,
+                      "channels": 6,
+                      "bitrate": 629,
+                      "language": "English",
+                      "languageTag": "en-US",
+                      "languageCode": "eng",
+                      "audioChannelLayout": "5.1(side)",
+                      "gainOffset": "0.52",
+                      "loudness": "-18.07",
+                      "loudnessAnalysisVersion": "0.02",
+                      "lra": "19.88",
+                      "original": true,
+                      "peak": "0.59",
+                      "profile": "dolby digital plus + dolby atmos",
+                      "samplingRate": 48000,
+                      "threshold": "-30.19",
+                      "displayTitle": "English (EAC3 5.1 + Atmos)",
+                      "extendedDisplayTitle": " (English EAC3 5.1 + Atmos)"
+                    },
+                    {
+                      "id": 20071,
+                      "streamType": 3,
+                      "canAutoSync": false,
+                      "selected": true,
+                      "default": true,
+                      "forced": true,
+                      "codec": "srt",
+                      "index": 2,
+                      "language": "English",
+                      "languageTag": "en-US",
+                      "languageCode": "eng",
+                      "original": true,
+                      "displayTitle": "English Forced",
+                      "extendedDisplayTitle": " (English Forced SRT)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Image": [
+            {
+              "alt": "Title 8",
+              "type": "coverPoster",
+              "url": "/library/metadata/1034/thumb/1672304010"
+            },
+            {
+              "alt": "Title 8",
+              "type": "background",
+              "url": "/library/metadata/1034/art/1672304010"
+            },
+            {
+              "alt": "Title 8",
+              "type": "clearLogo",
+              "url": "/library/metadata/1034/clearLogo/1672304010"
+            },
+            {
+              "alt": "Title 8",
+              "type": "backgroundSquare",
+              "url": "/library/metadata/1034/squareArt/1672304010"
+            }
+          ],
+          "UltraBlurColors": {
+            "topLeft": "1f1f1f",
+            "topRight": "2a2a2a",
+            "bottomRight": "0a0a0a",
+            "bottomLeft": "151515"
+          },
+          "Genre": [
+            {
+              "id": 20072,
+              "filter": "genre=20072",
+              "tag": "Comedy"
+            },
+            {
+              "id": 20073,
+              "filter": "genre=20073",
+              "tag": "Drama"
+            },
+            {
+              "id": 20054,
+              "filter": "genre=20054",
+              "tag": "Drama"
+            },
+            {
+              "id": 20074,
+              "filter": "genre=20074",
+              "tag": "Comedy"
+            }
+          ],
+          "Country": [
+            {
+              "id": 20075,
+              "filter": "country=20075",
+              "tag": "Sample Country"
+            },
+            {
+              "id": 20055,
+              "filter": "country=20055",
+              "tag": "Sample Country"
+            }
+          ],
+          "Guid": [
+            {
+              "id": "imdb://tt9000003"
+            },
+            {
+              "id": "tmdb://900005"
+            },
+            {
+              "id": "tvdb://900006"
+            }
+          ],
+          "Rating": [
+            {
+              "image": "imdb://image.rating",
+              "value": 8.5,
+              "type": "audience"
+            },
+            {
+              "image": "rottentomatoes://image.rating.ripe",
+              "value": 7.6,
+              "type": "critic"
+            },
+            {
+              "image": "rottentomatoes://image.rating.upright",
+              "value": 10.0,
+              "type": "audience"
+            },
+            {
+              "image": "themoviedb://image.rating",
+              "value": 8.3,
+              "type": "audience"
+            }
+          ],
+          "Director": [
+            {
+              "id": 20076,
+              "filter": "director=20076",
+              "tag": "Person 15",
+              "tagKey": "73bd8f797d606ae63718d892",
+              "thumb": "https://metadata-static.plex.tv/8/people/784c77506282ab6eb7506961f5190d5c.jpg"
+            }
+          ],
+          "Writer": [
+            {
+              "id": 20077,
+              "filter": "writer=20077",
+              "tag": "Person 15",
+              "tagKey": "73bd8f797d606ae63718d892",
+              "thumb": "https://metadata-static.plex.tv/8/people/784c77506282ab6eb7506961f5190d5c.jpg"
+            },
+            {
+              "id": 20078,
+              "filter": "writer=20078",
+              "tag": "Person 16",
+              "tagKey": "db808cc2bbc0ed068e2ceb57",
+              "thumb": "https://metadata-static.plex.tv/3/people/8ad3047716b87564dce1b2c5f568eee5.jpg"
+            }
+          ],
+          "Role": [
+            {
+              "id": 20079,
+              "filter": "actor=20079",
+              "tag": "Person 17",
+              "tagKey": "22dac06ddfd00e27a5fa0748",
+              "role": "Character 7",
+              "thumb": "https://metadata-static.plex.tv/0/people/90bb5e22f713bc4ebe657c765ea6e720.jpg"
+            },
+            {
+              "id": 20080,
+              "filter": "actor=20080",
+              "tag": "Person 18",
+              "tagKey": "401971b43c4544095590b788",
+              "role": "Character 8",
+              "thumb": "https://metadata-static.plex.tv/1/people/2e3db93f289b8a3abd94389cebb2bbb0.jpg"
+            }
+          ],
+          "Producer": [
+            {
+              "id": 20081,
+              "filter": "producer=20081",
+              "tag": "Person 16",
+              "tagKey": "db808cc2bbc0ed068e2ceb57",
+              "thumb": "https://metadata-static.plex.tv/3/people/8ad3047716b87564dce1b2c5f568eee5.jpg"
+            },
+            {
+              "id": 20082,
+              "filter": "producer=20082",
+              "tag": "Person 23",
+              "tagKey": "9a947f4f1b46191e897ab7ef"
+            }
+          ],
+          "Label": [
+            {
+              "id": 20063,
+              "filter": "label=20063",
+              "tag": "Collection 1"
+            },
+            {
+              "id": 20064,
+              "filter": "label=20064",
+              "tag": "Collection 2"
+            }
+          ],
+          "CommonSenseMedia": [
+            {
+              "id": 20065,
+              "oneLiner": "Sample summary 12",
+              "AgeRating": [
+                {
+                  "type": "official",
+                  "rating": 4,
+                  "age": 16
+                }
+              ]
+            }
+          ],
+          "Field": [
+            {
+              "locked": true,
+              "name": "thumb"
+            },
+            {
+              "locked": true,
+              "name": "collection"
+            },
+            {
+              "locked": true,
+              "name": "label"
+            }
+          ]
+        },
+        {
+          "ratingKey": "1043",
+          "key": "/library/metadata/1043",
+          "parentRatingKey": "1044",
+          "grandparentRatingKey": "1040",
+          "guid": "plex://episode/ab9963c56e9d42a4ed2214c1",
+          "parentGuid": "plex://season/3f6c6346f6538c196c7e1da0",
+          "grandparentGuid": "plex://show/6b6bcb40d93e78f9265842e8",
+          "grandparentSlug": "sample-slug-5",
+          "type": "episode",
+          "title": "Title 12",
+          "grandparentKey": "/library/metadata/1040",
+          "parentKey": "/library/metadata/1044",
+          "librarySectionTitle": "TV Shows",
+          "librarySectionID": 2,
+          "librarySectionKey": "/library/sections/2",
+          "grandparentTitle": "Title 10",
+          "parentTitle": "Season 11",
+          "contentRating": "TV-MA",
+          "summary": "Sample summary 10",
+          "index": 6,
+          "parentIndex": 11,
+          "year": 2023,
+          "thumb": "/library/metadata/1043/thumb/1676714147",
+          "art": "/library/metadata/1040/art/1676626062",
+          "parentThumb": "/library/metadata/1044/thumb/1674372438",
+          "grandparentThumb": "/library/metadata/1040/thumb/1676626062",
+          "grandparentArt": "/library/metadata/1040/art/1676626062",
+          "duration": 2911804,
+          "originallyAvailableAt": "2023-01-29",
+          "addedAt": 1674980235,
+          "updatedAt": 1676714147,
+          "chapterSource": "media",
+          "Media": [
+            {
+              "id": 20045,
+              "duration": 2911804,
+              "bitrate": 6624,
+              "width": 1920,
+              "height": 1080,
+              "aspectRatio": 1.78,
+              "audioChannels": 6,
+              "audioCodec": "eac3",
+              "videoCodec": "h264",
+              "videoResolution": "1080",
+              "container": "mkv",
+              "videoFrameRate": "24p",
+              "videoProfile": "high",
+              "hasVoiceActivity": true,
+              "Part": [
+                {
+                  "accessible": true,
+                  "exists": true,
+                  "id": 20046,
+                  "key": "/library/parts/20046/1675036950/file.mkv",
+                  "duration": 2911804,
+                  "file": "/media/library/item9.mkv",
+                  "size": 2609140586,
+                  "container": "mkv",
+                  "videoProfile": "high",
+                  "Stream": [
+                    {
+                      "id": 20083,
+                      "streamType": 1,
+                      "default": true,
+                      "codec": "h264",
+                      "index": 0,
+                      "bitrate": 6502,
+                      "language": "English",
+                      "languageTag": "en",
+                      "languageCode": "eng",
+                      "bitDepth": 8,
+                      "chromaLocation": "left",
+                      "chromaSubsampling": "4:2:0",
+                      "codedHeight": 1088,
+                      "codedWidth": 1920,
+                      "dub": true,
+                      "frameRate": 23.976,
+                      "hasScalingMatrix": false,
+                      "height": 1080,
+                      "level": 40,
+                      "profile": "high",
+                      "refFrames": 4,
+                      "scanType": "progressive",
+                      "width": 1920,
+                      "displayTitle": "1080p",
+                      "extendedDisplayTitle": "1080p (H.264)"
+                    },
+                    {
+                      "id": 20084,
+                      "streamType": 2,
+                      "canNormalizeLoudness": false,
+                      "selected": true,
+                      "default": true,
+                      "codec": "eac3",
+                      "index": 1,
+                      "channels": 6,
+                      "bitrate": 518,
+                      "language": "English",
+                      "languageTag": "en",
+                      "languageCode": "eng",
+                      "audioChannelLayout": "5.1(side)",
+                      "original": true,
+                      "samplingRate": 48000,
+                      "title": "Original | English",
+                      "displayTitle": "English (EAC3 5.1)",
+                      "extendedDisplayTitle": "Original | English (EAC3 5.1)"
+                    },
+                    {
+                      "id": 20085,
+                      "streamType": 3,
+                      "canAutoSync": false,
+                      "selected": true,
+                      "default": true,
+                      "forced": true,
+                      "codec": "srt",
+                      "index": 2,
+                      "bitrate": 0,
+                      "language": "English",
+                      "languageTag": "en",
+                      "languageCode": "eng",
+                      "original": true,
+                      "title": "Original | English | (Forced)",
+                      "displayTitle": "English Forced",
+                      "extendedDisplayTitle": "Original | English | (Forced) (SRT)"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Image": [
+            {
+              "alt": "Title 12",
+              "type": "coverPoster",
+              "url": "/library/metadata/1040/thumb/1676626062"
+            },
+            {
+              "alt": "Title 12",
+              "type": "snapshot",
+              "url": "/library/metadata/1043/thumb/1676714147"
+            },
+            {
+              "alt": "Title 12",
+              "type": "background",
+              "url": "/library/metadata/1040/art/1676626062"
+            },
+            {
+              "alt": "Title 12",
+              "type": "clearLogo",
+              "url": "/library/metadata/1040/clearLogo/1676626062"
+            },
+            {
+              "alt": "Title 12",
+              "type": "backgroundSquare",
+              "url": "/library/metadata/1040/squareArt/1676626062"
+            }
+          ],
+          "UltraBlurColors": {
+            "topLeft": "1f1f1f",
+            "topRight": "2a2a2a",
+            "bottomRight": "0a0a0a",
+            "bottomLeft": "151515"
+          },
+          "Guid": [
+            {
+              "id": "imdb://tt9000005"
+            },
+            {
+              "id": "tmdb://900011"
+            },
+            {
+              "id": "tvdb://900012"
+            }
+          ],
+          "Rating": [
+            {
+              "image": "imdb://image.rating",
+              "value": 4.9,
+              "type": "audience"
+            }
+          ],
+          "Role": [
+            {
+              "id": 20086,
+              "filter": "actor=20086",
+              "tag": "Person 19",
+              "tagKey": "fd117ef50d077c9a3546e6ea",
+              "role": "Character 9",
+              "thumb": "https://metadata-static.plex.tv/6/people/cc884b90b8b2ce5ea4bc3ca46e890407.jpg"
+            },
+            {
+              "id": 20087,
+              "filter": "actor=20087",
+              "tag": "Person 20",
+              "tagKey": "fa5fc0fb074ba495787a3177",
+              "role": "Character 9",
+              "thumb": "https://metadata-static.plex.tv/6/people/38e88c7921c17264ebcdeed700564d92.jpg"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

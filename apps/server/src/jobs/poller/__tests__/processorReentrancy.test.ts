@@ -101,6 +101,8 @@ vi.mock('../violations.js', () => ({
 }));
 
 import { triggerReconciliationPoll, triggerServerPoll } from '../processor.js';
+import { fakePlexClient } from '../../../test/mediaServerFakes.js';
+import type { MediaSession } from '../../../services/mediaServer/types.js';
 
 /** Deferred promise helper for controlling when a mocked async call resolves. */
 function deferred<T>(): { promise: Promise<T>; resolve: (value: T) => void } {
@@ -223,8 +225,10 @@ describe('cross-entry-point server lock', () => {
 
   it('skips a server in triggerReconciliationPoll while triggerServerPoll is still processing it', async () => {
     mockDbSelect.mockReturnValue({ from: () => chainResolving([serverRow1]) });
-    const gate = deferred<unknown[]>();
-    mockCreateMediaServerClient.mockReturnValue({ getSessions: () => gate.promise });
+    const gate = deferred<MediaSession[]>();
+    mockCreateMediaServerClient.mockReturnValue(
+      fakePlexClient({ getSessions: () => gate.promise })
+    );
 
     const first = triggerServerPoll('server-1');
     await vi.waitFor(() => expect(mockCreateMediaServerClient).toHaveBeenCalledTimes(1));
@@ -244,12 +248,12 @@ describe('cross-entry-point server lock', () => {
     mockDbSelect.mockReturnValue({
       from: () => chainResolving([serverRow1, serverRow2], [serverRow1]),
     });
-    const gate1 = deferred<unknown[]>();
-    const gate2 = deferred<unknown[]>();
+    const gate1 = deferred<MediaSession[]>();
+    const gate2 = deferred<MediaSession[]>();
     let call = 0;
     mockCreateMediaServerClient.mockImplementation(() => {
       call++;
-      return { getSessions: () => (call === 1 ? gate1.promise : gate2.promise) };
+      return fakePlexClient({ getSessions: () => (call === 1 ? gate1.promise : gate2.promise) });
     });
 
     const first = triggerServerPoll('server-1');
