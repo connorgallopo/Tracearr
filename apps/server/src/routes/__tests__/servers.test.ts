@@ -1086,6 +1086,7 @@ describe('Server Routes', () => {
       expect(db.update).not.toHaveBeenCalled();
 
       mockDbSelectLimit([mockServer]);
+      vi.mocked(verifyServerAdmin).mockClear();
       const plex = await app.inject({
         method: 'PATCH',
         url: `/servers/${mockServer.id}`,
@@ -1095,11 +1096,7 @@ describe('Server Routes', () => {
       expect(plex.json().message).toBe(
         'Plex servers sign in through plex.tv and have no API key to change'
       );
-      expect(verifyServerAdmin).not.toHaveBeenCalledWith(
-        'plex',
-        expect.anything(),
-        expect.anything()
-      );
+      expect(verifyServerAdmin).not.toHaveBeenCalled();
       expect(readServerIdentity).not.toHaveBeenCalled();
       expect(db.update).not.toHaveBeenCalled();
     });

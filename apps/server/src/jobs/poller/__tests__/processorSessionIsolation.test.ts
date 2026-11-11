@@ -534,10 +534,13 @@ describe('per-session error isolation in processServerSessions', () => {
         '../../../services/mediaServer/index.js'
       );
       const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-      serverRows = [serverRow, { ...serverRow, id: 'server-2', name: 'Silo Server', type: 'silo' }];
+      serverRows = [
+        serverRow,
+        { ...serverRow, id: 'server-2', name: 'Unknown Server', type: 'not-a-server' },
+      ];
       cacheService.getAllActiveSessions.mockResolvedValue([
         activeSessionB,
-        { ...activeSessionB, id: 'silo-active-id', serverId: 'server-2' },
+        { ...activeSessionB, id: 'unknown-active-id', serverId: 'server-2' },
       ]);
       mockCreateMediaServerClient.mockImplementation(
         (options: Parameters<typeof actual.createMediaServerClient>[0]) =>
@@ -549,8 +552,8 @@ describe('per-session error isolation in processServerSessions', () => {
       await triggerPoll();
 
       expect(errorSpy).toHaveBeenCalledWith(
-        'Error polling server Silo Server:',
-        expect.objectContaining({ message: 'Unhandled value: silo' })
+        'Error polling server Unknown Server:',
+        expect.objectContaining({ message: 'Unhandled value: not-a-server' })
       );
       expect(cacheService.incrServerFailCount).toHaveBeenCalledWith('server-2');
       expect(cacheService.setServerHealth).toHaveBeenCalledWith('server-1', true);

@@ -50,7 +50,7 @@ import { recordTranscodePullEvent } from './downloads/transcodePull.js';
 import { getServerUserIdByExternalId } from '../jobs/poller/database.js';
 import { getRedis } from '../lib/redisShared.js';
 import { probeSsePlugin } from './mediaServer/shared/ssePluginProbe.js';
-import { hasSsePlugin } from './mediaServer/byServerType.js';
+import { isJellyfinEmby } from './mediaServer/index.js';
 import { broadcastToSessions } from '../websocket/index.js';
 import { isLeader } from './leaderLease.js';
 import { triggerServerPoll } from '../jobs/poller/index.js';
@@ -555,7 +555,7 @@ export class SSEManager extends EventEmitter {
       status.connectedAt !== null &&
       Date.now() - status.connectedAt.getTime() > 30_000;
     const pluginUpdateAvailable =
-      hasSsePlugin(serverType) &&
+      SERVER_PROFILES[serverType].liveEvents === 'ssePlugin' &&
       latest !== null &&
       state === 'connected' &&
       (pluginVersion === null ? connectedLongEnough : compareVersions(pluginVersion, latest) < 0);
@@ -700,7 +700,7 @@ export class SSEManager extends EventEmitter {
    */
   private diagnoseUnsupported(serverId: string): void {
     const connection = this.connections.get(serverId);
-    if (!connection || !hasSsePlugin(connection.serverType)) return;
+    if (!connection || !isJellyfinEmby(connection.serverType)) return;
     if (this.pluginProbesInFlight.has(serverId)) return;
 
     const now = Date.now();

@@ -15,7 +15,6 @@ import {
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import {
-  SERVER_PROFILES,
   type OwnerLinkServer,
   type RequestService,
   type Server,
@@ -164,7 +163,7 @@ export function ServerRow({
             )}
             {ownerLink && <OwnerAccountLine server={server} link={ownerLink} />}
 
-            {SERVER_PROFILES[server.type].liveEvents === 'ssePlugin' && !historical && (
+            {isJellyfinEmby(server.type) && !historical && (
               <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
                 {!connectionStatus ? (
                   <span className="text-muted-foreground">{t('servers.checkingConnection')}</span>

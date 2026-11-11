@@ -8,7 +8,6 @@ import {
   type LoginAccess,
   type UserRole,
   type JellyfinEmbyServerType,
-  type ServerType,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { authAccounts, servers, serverUsers, users } from '../db/schema.js';
@@ -165,9 +164,10 @@ async function mediaAccountIsAWayIn(
   userId: string,
   identity: { role: UserRole; loginAccess: LoginAccess },
   memberSwitch: boolean,
-  type: ServerType,
   account: MediaAccount
 ): Promise<boolean> {
+  const type = account.providerId;
+  if (!isServerType(type)) return false;
   const live = and(eq(serverUsers.userId, userId), liveServerAccount);
   switch (type) {
     case 'plex': {
@@ -258,9 +258,7 @@ async function someMediaAccountIsAWayIn(
   accounts: MediaAccount[]
 ): Promise<boolean> {
   for (const account of accounts) {
-    const type = account.providerId;
-    if (!isServerType(type)) continue;
-    if (await mediaAccountIsAWayIn(userId, identity, memberSwitch, type, account)) return true;
+    if (await mediaAccountIsAWayIn(userId, identity, memberSwitch, account)) return true;
   }
   return false;
 }

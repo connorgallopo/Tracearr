@@ -205,6 +205,7 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
             url: session.server.url,
             token: session.server.token,
           });
+          // Jellyfin and Emby sessions store the server's Session.Id as sessionKey
           await client.sendMessage(session.sessionKey, message, 'Tracearr', 10000);
           automationsLogger.debug('Client message sent', { sessionId, message });
           return undefined;

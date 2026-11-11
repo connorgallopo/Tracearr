@@ -41,7 +41,7 @@ import { isLiveRow } from '../../services/liveServers.js';
 import type { CacheService, PubSubService, TerminationCooldown } from '../../services/cache.js';
 import { geoipService } from '../../services/geoip.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
-import { emailFromServer } from '../../services/mediaServer/byServerType.js';
+import { emailForSessionUser } from '../../services/mediaServer/byServerType.js';
 import { resolveSessionGeo, type SessionGeo } from '../../services/serverLocations.js';
 import {
   fetchRecentSessionsForIdentity,
@@ -297,19 +297,19 @@ async function readCompositeKillCooldowns(
  */
 function trackingKeysForCachedSessions(
   cachedSessions: ActiveSession[],
-  servers: { id: string; type: ServerType }[]
+  serverRows: { id: string; type: ServerType }[]
 ): Set<string> {
   // servers.type is varchar, so a row written by a newer release can hold a type this
   // one does not know. That server's own poll fails on it; keying its cached sessions
   // must not take every other server's poll down with it.
   const serverTypes = new Map(
-    servers.filter((s) => SERVER_TYPES.includes(s.type)).map((s) => [s.id, s.type])
+    serverRows.filter((s) => SERVER_TYPES.includes(s.type)).map((s) => [s.id, s.type])
   );
   return new Set(
     cachedSessions.map((s) =>
       buildCompositeKey({
         // Only the polled server's own keys are ever compared, so a session on a server
-        // outside `servers` keeps the session-key form.
+        // outside `serverRows` keeps the session-key form.
         serverType: serverTypes.get(s.serverId) ?? 'plex',
         serverId: s.serverId,
         externalUserId: s.serverUserId,
@@ -1065,7 +1065,7 @@ async function processServerSessions(
               serverId: server.id,
               externalId: u.externalId,
               username: u.username,
-              email: emailFromServer(server.type, { username: u.username, email: null }),
+              email: emailForSessionUser(server.type, u.username),
               thumbUrl: u.thumbUrl,
             }))
           )

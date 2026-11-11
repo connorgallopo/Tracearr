@@ -22,7 +22,7 @@ import { db } from '../db/client.js';
 import { servers, libraryItems } from '../db/schema.js';
 import { assertSafeProbeUrl, SsrfBlockedError } from '../utils/ssrf.js';
 import { cacheWriteAllowed, noteCacheWrite } from './imageCacheGuard.js';
-import { mediaBrowserTokenHeader } from './mediaServer/index.js';
+import { mediaBrowserTokenHeader } from './mediaServer/shared/baseMediaServerClient.js';
 
 // libvips defaults its thread pool to the core count, so one background
 // precache walk can own every core of a small box. Inputs are server-resized

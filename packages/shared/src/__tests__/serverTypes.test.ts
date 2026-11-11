@@ -10,11 +10,11 @@ describe('server types', () => {
 
   it('recognizes only the known server types', () => {
     expect(SERVER_TYPES.every(isServerType)).toBe(true);
-    expect(isServerType('silo')).toBe(false);
+    expect(isServerType('not-a-server')).toBe(false);
   });
 
   it('assertNever throws with the value', () => {
-    expect(() => assertNever('silo' as never)).toThrow('Unhandled value: silo');
+    expect(() => assertNever('not-a-server' as never)).toThrow('Unhandled value: not-a-server');
   });
 
   it.each([
