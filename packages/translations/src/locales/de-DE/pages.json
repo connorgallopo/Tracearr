@@ -127,7 +127,7 @@
       }
     },
     "habits": "",
-    "seeActivity": "",
+    "seeActivity": "Zeige Aktivität",
     "allTime": "",
     "watchTime": "",
     "span": {
@@ -423,7 +423,7 @@
       "serversNeedSync": "",
       "notWatchedByYou": "Von dir nicht angesehen",
       "memberEmpty": {
-        "title": "",
+        "title": "Hier steht noch nichts",
         "description": ""
       },
       "movieCount_one": "",
@@ -437,12 +437,12 @@
       "failedToLoad": "Fehler beim Laden der Qualitätsdaten",
       "failedToLoadDesc": "Qualitätsdaten konnten nicht abgerufen werden. Bitte versuchen Sie es erneut.",
       "codecBrowse": {
-        "movies": "",
+        "movies": "Filme durchsuchen",
         "shows": "",
-        "movieCount_one": "",
-        "movieCount_other": "",
-        "episodeCount_one": "",
-        "episodeCount_other": ""
+        "movieCount_one": "{{count}} Film",
+        "movieCount_other": "{{count}} Filme",
+        "episodeCount_one": "{{count}} Folge",
+        "episodeCount_other": "{{count}} Folgen"
       },
       "codec": {
         "title": "",
@@ -485,33 +485,33 @@
       "insufficientData": "Unzureichende Daten",
       "failedToLoad": "Fehler beim Laden der Speicherdaten",
       "failedToLoadDesc": "Speicherdaten konnten nicht abgerufen werden. Bitte versuchen Sie es erneut.",
-      "duplicatesTitle": "",
+      "duplicatesTitle": "Duplikate",
       "duplicatesSubtitle": "",
       "growthPreChangeover": "",
-      "loadingDuplicates": "",
-      "duplicatesFailed": "",
-      "noDuplicatesTitle": "",
+      "loadingDuplicates": "Lade Duplikate...",
+      "duplicatesFailed": "Fehlgeschlagen Duplikate zu laden",
+      "noDuplicatesTitle": "Keine Duplikate gefunden",
       "noDuplicatesDesc": "",
       "colTitle": "Titel",
       "colMatchType": "",
       "colCopies": "Kopien",
       "colRecoverable": "",
-      "sameServer": "",
+      "sameServer": "Gleicher Server",
       "mirror": "",
       "missingOnServer": "Fehlt auf dem Server",
-      "missingOnServerHint": "",
-      "copyPath": "",
+      "missingOnServerHint": "Der Server listet diese Datei zwar weiterhin auf, kann sie aber auf der Festplatte nicht finden. Leeren Sie in Plex den Papierkorb der Bibliothek, um sie zu entfernen.",
+      "copyPath": "Kopiere Dateipfad",
       "libraries": {
         "title": "Bibliotheken",
         "columns": {
           "library": "Bibliothek",
-          "share": ""
+          "share": "Teile"
         },
-        "serverFailed": ""
+        "serverFailed": "Bibliotheken von {{servers}} konnten nicht geladen werden"
       },
       "stale": {
         "tabs": {
-          "neverWatched": "",
+          "neverWatched": "Noch nie gesehen ({{count}})",
           "stale": ""
         },
         "empty": {
@@ -693,7 +693,7 @@
         "titles_other": ""
       },
       "monthly": {
-        "watchCount": "",
+        "watchCount": "Wiedergabe Zähler",
         "empty": {
           "title": "",
           "description": ""
@@ -706,7 +706,7 @@
         }
       },
       "hourly": {
-        "watches": "",
+        "watches": "Wiedergaben",
         "empty": {
           "title": "",
           "description": ""
@@ -714,7 +714,7 @@
       },
       "completion": {
         "inProgress": "",
-        "notStarted": "",
+        "notStarted": "Nicht gestartet",
         "empty": {
           "title": "",
           "description": ""
@@ -758,7 +758,7 @@
     "noViolationsRecorded": "Bisher wurden keine Verstöße registriert.",
     "allSeverities": "Alle Schweregrade",
     "allStatuses": "Alle Statusmeldungen",
-    "allRules": "",
+    "allRules": "Alle Regeln",
     "filterPeople": "",
     "allPeople": "",
     "personFilterPlaceholder": "",
@@ -843,31 +843,31 @@
       "server": "Server",
       "media": "Medien",
       "device": "Gerät",
-      "trust": "",
+      "trust": "Vertrauen",
       "newsletter": "Newsletter",
       "event": ""
     },
     "variables": {
       "user": {
-        "username": "",
+        "username": "Konto Nutzername",
         "identityName": ""
       },
       "session": {
         "mediaTitle": "",
-        "mediaType": "",
+        "mediaType": "Medientyp",
         "sourceDynamicRange": "",
         "sourceVideoCodec": "",
-        "seasonNumber": "",
-        "episodeNumber": "",
+        "seasonNumber": "Staffel Nummer",
+        "episodeNumber": "Folgen Nummer",
         "name": ""
       },
       "server": {
         "name": "Server Name",
-        "type": ""
+        "type": "Server Typ"
       },
       "device": {
         "name": "",
-        "platform": "",
+        "platform": "Plattform",
         "product": "",
         "location": "Standort"
       },
@@ -880,16 +880,16 @@
       "trust": {
         "previous": "",
         "new": "",
-        "reason": ""
+        "reason": "Grund"
       },
       "media": {
-        "title": "",
+        "title": "Item Titel",
         "name": "",
         "show": "",
-        "season": "",
+        "season": "Staffel",
         "episode": "Episode",
         "episodeCount": "Episode hinzugefügt",
-        "type": "",
+        "type": "Medientyp",
         "year": "Jahr",
         "library": "Bibliothek",
         "server": "Server",
@@ -902,7 +902,7 @@
           "fileSize": ""
         },
         "to": {
-          "resolution": "",
+          "resolution": "Neue Auflösung",
           "dynamicRange": "",
           "videoCodec": "",
           "audioCodec": "",
@@ -917,16 +917,16 @@
         "error": "Fehler"
       },
       "durationMinutes": "",
-      "minutes": "",
-      "days": "",
-      "installedVersion": "",
-      "latestVersion": "",
-      "downloadUrl": "",
+      "minutes": "Minuten",
+      "days": "Tage inaktiv",
+      "installedVersion": "Installierte Version",
+      "latestVersion": "Aktuellste Version",
+      "downloadUrl": "Download Link",
       "releaseUrl": ""
     },
     "actions": {
       "send": {
-        "label": "",
+        "label": "Sende Benachrichtigung",
         "description": "",
         "fields": {
           "cooldown_minutes": {
@@ -936,27 +936,27 @@
             "description": ""
           }
         },
-        "ran": ""
+        "ran": "Sende eine Benachrichtigung"
       },
       "trust": {
-        "label": "",
+        "label": "Vertrauenswert",
         "description": "",
         "fields": {
           "mode": {
-            "label": ""
+            "label": "Modus"
           },
           "amount": {
-            "label": "",
+            "label": "Anzahl",
             "description": ""
           },
           "value": {
-            "label": ""
+            "label": "Wert"
           }
         },
-        "ran": ""
+        "ran": "Vertrauenswert geändert"
       },
       "kill_stream": {
-        "label": "",
+        "label": "Beende Stream",
         "description": "",
         "fields": {
           "cooldown_minutes": {
@@ -991,7 +991,7 @@
       }
     },
     "activity": {
-      "title": "",
+      "title": "Aktivität",
       "description": "",
       "outcome": "",
       "who": "",
@@ -999,7 +999,7 @@
       "playing": "",
       "from": "Von",
       "summary": "",
-      "started": "",
+      "started": "Gestartet",
       "finished": "",
       "noSummary": "",
       "outcomes": {
@@ -1016,8 +1016,8 @@
       "tabs": {
         "all": "Alle",
         "completed": "",
-        "stopped_by_condition": "",
-        "error": ""
+        "stopped_by_condition": "Kein Treffer",
+        "error": "Fehlgeschlagen"
       },
       "group": "",
       "branch": {
@@ -1028,7 +1028,7 @@
       "openInEditor": "",
       "tabsLabel": "",
       "emptyRan": "",
-      "item": "",
+      "item": "Item",
       "recordedViolation": "",
       "emptyRanDescription_one": "",
       "emptyRanDescription_other": ""
@@ -1621,7 +1621,7 @@
         "placeholder": ""
       },
       "media_type": {
-        "label": "",
+        "label": "Medientyp",
         "description": ""
       },
       "season_number": {
@@ -2582,7 +2582,7 @@
         "librarySyncDesc": "",
         "versionCheck": "",
         "versionCheckDesc": "",
-        "inactivityCheck": "",
+        "inactivityCheck": "Inaktivitäts-Check",
         "inactivityCheckDesc": "",
         "backup": "",
         "backupDesc": ""
