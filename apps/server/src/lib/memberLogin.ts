@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { APIError } from 'better-auth/api';
 import { setSessionCookie } from 'better-auth/cookies';
-import { and, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, ne, sql, type SQL } from 'drizzle-orm';
 import {
   assertNever,
   isServerType,
@@ -9,7 +9,7 @@ import {
   type UserRole,
   type JellyfinEmbyServerType,
 } from '@tracearr/shared';
-import { db } from '../db/client.js';
+import { db, type Executor } from '../db/client.js';
 import { authAccounts, servers, serverUsers, users } from '../db/schema.js';
 import { EmbyClient, JellyfinClient, logoutUserToken } from '../services/mediaServer/index.js';
 import { getOwnerUser } from '../services/userService.js';
@@ -71,6 +71,29 @@ export async function writeWithoutParams<T>(
     log.error('could not store a sign-in account', ids);
     throw new APIError('INTERNAL_SERVER_ERROR', { message: 'Sign-in failed. Try again later.' });
   }
+}
+
+/**
+ * The tofa sign-in row for a cloud identity, moved onto userId when another person holds it. A
+ * moved row takes a new id: merge audits record the rows a merge brought by id, and a row that
+ * changed hands outside a merge is no longer one that merge brought.
+ */
+export function upsertTofaAccount(userId: string, identityId: string, executor: Executor = db) {
+  return writeWithoutParams(
+    () =>
+      executor
+        .insert(authAccounts)
+        .values({ id: randomUUID(), providerId: 'tofa', accountId: identityId, userId })
+        .onConflictDoUpdate({
+          target: [authAccounts.providerId, authAccounts.accountId],
+          set: {
+            id: sql`case when ${authAccounts.userId} = excluded.user_id then ${authAccounts.id} else excluded.id end`,
+            userId,
+            updatedAt: new Date(),
+          },
+        }),
+    { userId }
+  );
 }
 
 export async function finishMemberLogin(ctx: Ctx, input: MemberLoginInput) {
@@ -169,19 +192,27 @@ async function mediaAccountIsAWayIn(
   const type = account.providerId;
   if (!isServerType(type)) return false;
   const live = and(eq(serverUsers.userId, userId), liveServerAccount);
+  // plex.tv and tofa cloud vouch for the person; the sync's view of their server accounts is what
+  // keeps them signed in, so no server is asked.
+  const syncedAccountIsAWayIn = async (match: SQL | undefined) => {
+    const rows = await db
+      .select({ serverAllowsMembers: servers.allowMemberLogin })
+      .from(serverUsers)
+      .innerJoin(servers, eq(servers.id, serverUsers.serverId))
+      .where(and(live, match));
+    return rows.some((row) =>
+      nonOwnerMayLoginThrough(identity, memberSwitch, row.serverAllowsMembers)
+    );
+  };
   switch (type) {
-    case 'plex': {
-      const rows = await db
-        .select({ serverAllowsMembers: servers.allowMemberLogin })
-        .from(serverUsers)
-        .innerJoin(servers, eq(servers.id, serverUsers.serverId))
-        .where(
-          and(live, eq(servers.type, 'plex'), eq(serverUsers.plexAccountId, account.accountId))
-        );
-      return rows.some((row) =>
-        nonOwnerMayLoginThrough(identity, memberSwitch, row.serverAllowsMembers)
+    case 'plex':
+      return syncedAccountIsAWayIn(
+        and(eq(servers.type, 'plex'), eq(serverUsers.plexAccountId, account.accountId))
       );
-    }
+    case 'tofa':
+      return syncedAccountIsAWayIn(
+        and(eq(servers.type, 'tofa'), eq(serverUsers.cloudIdentityId, account.accountId))
+      );
     case 'jellyfin':
     case 'emby':
       break;

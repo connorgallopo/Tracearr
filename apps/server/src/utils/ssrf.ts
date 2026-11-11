@@ -102,3 +102,13 @@ export function assertSafeProbeUrl(rawUrl: string): void {
     }
   }
 }
+
+/** Why a probe of the URL is refused, or null when it may be probed. */
+export function probeRefusal(rawUrl: string): string | null {
+  try {
+    assertSafeProbeUrl(rawUrl);
+    return null;
+  } catch (err) {
+    return err instanceof SsrfBlockedError ? err.message : 'URL not permitted';
+  }
+}

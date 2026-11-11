@@ -26,6 +26,7 @@ import {
   maybeEnqueueImportedHistoryLink,
   SyncInterruptedError,
   type SyncResult,
+  SYNC_STATE_TTL,
 } from '../services/librarySync.js';
 import { syncServer } from '../services/sync.js';
 import { getPubSubService } from '../services/cache.js';
@@ -367,6 +368,13 @@ export function startLibrarySyncWorker(): void {
     }
 
     console.error(`[LibrarySync] Job ${job.id} failed:`, error);
+
+    // A failed attempt with retries left runs again later and reads the changes then
+    if (job.attemptsMade >= (job.opts.attempts ?? 1)) {
+      void syncChangesMissedByRun(serverId).catch((err: unknown) => {
+        console.warn(`[LibrarySync] Could not queue the sync owed to ${serverId}:`, err);
+      });
+    }
   });
 
   librarySyncWorker.on('error', (error) => {
@@ -379,6 +387,9 @@ export function startLibrarySyncWorker(): void {
     // Skipped duplicates did no work; a backlog drain completes hundreds in
     // seconds and the sentinel probe scans library_item_versions per call
     if ((job.returnvalue as { skipped?: boolean } | undefined)?.skipped) return;
+    void syncChangesMissedByRun(job.data.serverId).catch((err: unknown) => {
+      console.warn(`[LibrarySync] Could not queue the sync owed to ${job.data.serverId}:`, err);
+    });
     const now = Date.now();
     if (now - lastBackfillCheck > BACKFILL_CHECK_COOLDOWN_MS) {
       lastBackfillCheck = now;
@@ -667,25 +678,40 @@ export async function enqueueLibrarySync(
     }
   }
 
+  const { jobId, accepted } = await addSync(librarySyncQueue, serverId, triggeredBy, userId, delay);
+  if (!accepted && triggeredBy === 'manual') {
+    throw new Error('A sync is already in progress for this server');
+  }
+  return jobId;
+}
+
+/** Adds a sync under the server's dedup key; refused while one is queued or running for it. */
+async function addSync(
+  queue: Queue<LibrarySyncJobData>,
+  serverId: string,
+  triggeredBy: 'manual' | 'scheduled' | 'boot' | 'event',
+  userId?: string,
+  delay?: number
+): Promise<{ jobId: string; accepted: boolean }> {
   const name = `${triggeredBy === 'scheduled' ? 'auto' : triggeredBy}-sync-${serverId}`;
   const data: LibrarySyncJobData = {
     serverId,
     triggeredBy: triggeredBy === 'manual' ? 'manual' : 'scheduled',
     ...(userId ? { userId } : {}),
   };
-  const { jobId, accepted } = await addSingleton(
-    librarySyncQueue,
+  const added = await addSingleton(
+    queue,
     name,
     data,
     `sync-${serverId}`,
     delay ? { delay } : undefined
   );
-  if (!accepted) {
-    if (triggeredBy === 'manual') throw new Error('A sync is already in progress for this server');
-    return jobId;
+  if (added.accepted) {
+    console.log(
+      `[LibrarySync] Enqueued ${triggeredBy} sync for server ${serverId} (job ${added.jobId})`
+    );
   }
-  console.log(`[LibrarySync] Enqueued ${triggeredBy} sync for server ${serverId} (job ${jobId})`);
-  return jobId;
+  return added;
 }
 
 /**
@@ -716,6 +742,40 @@ export async function hasPendingLibrarySync(serverId: string): Promise<boolean> 
 export async function enqueueLibrarySyncFromEvent(serverId: string): Promise<void> {
   if (!librarySyncQueue) return;
   await enqueueLibrarySync(serverId, 'event');
+}
+
+// A holder in one of these has not started, so it reads a change made now when it runs
+const QUEUED_STATES = new Set<string | undefined>(['waiting', 'delayed', 'prioritized']);
+
+/**
+ * A sync for a library change tofa reported on its socket, after the delay, so the changes of
+ * one scan ride on one job. A refused add means another sync holds the server. One still
+ * waiting reads the change when it runs. One running may already have read past it, so the
+ * change is marked for that run's end, which queues one more; and when the holder is no longer
+ * running, by the time the mark is set, nothing is left to read it, so it is read at once.
+ */
+export async function enqueueLibrarySyncForChange(serverId: string, delay: number): Promise<void> {
+  const queue = librarySyncQueue;
+  if (!queue || !redisClient) return;
+  const { jobId, accepted } = await addSync(queue, serverId, 'event', undefined, delay);
+  if (accepted) return;
+
+  const holderState = async () => (await queue.getJob(jobId))?.getState();
+  if (QUEUED_STATES.has(await holderState())) return;
+  await redisClient.set(
+    REDIS_KEYS.LIBRARY_SYNC_CHANGED_DURING_RUN(serverId),
+    String(delay),
+    'EX',
+    SYNC_STATE_TTL
+  );
+  if ((await holderState()) !== 'active') await syncChangesMissedByRun(serverId);
+}
+
+/** Queues the one sync owed for changes that arrived while a sync of the server ran. */
+async function syncChangesMissedByRun(serverId: string): Promise<void> {
+  if (!redisClient) return;
+  const delay = await redisClient.getdel(REDIS_KEYS.LIBRARY_SYNC_CHANGED_DURING_RUN(serverId));
+  if (delay !== null) await enqueueLibrarySync(serverId, 'event', undefined, Number(delay));
 }
 
 /**

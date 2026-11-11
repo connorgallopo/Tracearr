@@ -145,6 +145,10 @@ export interface AvailabilityRow {
   /** Null when the owning server hasn't synced its library names yet (see librarySync.ts). */
   library_name: string | null;
   rating_key: string;
+  /** Episode and season rows only. */
+  show_rating_key: string | null;
+  season_number: number | null;
+  episode_number: number | null;
   added_at: Date;
   removed_at: Date | null;
   video_resolution: string | null;
@@ -259,6 +263,12 @@ export async function getAvailability(
       li.library_id,
       lib.name AS library_name,
       li.rating_key,
+      CASE li.media_type
+        WHEN 'episode' THEN li.grandparent_rating_key
+        WHEN 'season' THEN li.parent_rating_key
+      END AS show_rating_key,
+      CASE WHEN li.media_type IN ('episode', 'season') THEN li.parent_index END AS season_number,
+      CASE WHEN li.media_type = 'episode' THEN li.item_index END AS episode_number,
       li.created_at AS added_at,
       li.removed_at,
       li.video_resolution,

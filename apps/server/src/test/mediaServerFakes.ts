@@ -9,6 +9,9 @@ import type { JellyfinEmbyServerType } from '@tracearr/shared';
 import * as plexParser from '../services/mediaServer/plex/parser.js';
 import { parseSessionsResponse as parseJellyfinSessions } from '../services/mediaServer/jellyfin/parser.js';
 import { parseSessionsResponse as parseEmbySessions } from '../services/mediaServer/emby/parser.js';
+import * as tofaParser from '../services/mediaServer/tofa/parser.js';
+import type { TofaLibraryFiles, TofaMediaPage } from '../services/mediaServer/tofa/types.js';
+import type { TofaRequestSource } from '../services/requests/sync.js';
 import {
   parseLibrariesResponse,
   parseLibraryItemsResponse,
@@ -16,17 +19,21 @@ import {
 } from '../services/mediaServer/shared/jellyfinEmbyParser.js';
 import {
   NOT_NEEDED,
+  cursorDate,
   type IMediaServerClient,
   type MediaLibraryItem,
   type MediaSession,
   type NotNeeded,
+  type SyncCursor,
 } from '../services/mediaServer/types.js';
 import { normalizeClient } from '../utils/platformNormalizer.js';
 import plex from './mediaServerResponses/plex.json' with { type: 'json' };
 import jellyfin from './mediaServerResponses/jellyfin.json' with { type: 'json' };
 import emby from './mediaServerResponses/emby.json' with { type: 'json' };
+import tofa from './mediaServerResponses/tofa.json' with { type: 'json' };
 
 type Overrides = Partial<Omit<IMediaServerClient, 'serverType'>>;
+type ItemsSince = Awaited<ReturnType<IMediaServerClient['getLibraryItemsSince']>>;
 type Paging = { offset?: number; limit?: number };
 type PlexListing = { MediaContainer: { totalSize: number; Metadata: unknown[] } };
 type JellyfinEmbyListing = { Items: unknown[]; TotalRecordCount: number };
@@ -51,10 +58,10 @@ function plexPage(listing: PlexListing | undefined, paging?: Paging) {
 }
 
 // Plex answers these newest first, by updatedAt
-function plexSince(listing: PlexListing | undefined, since: Date) {
+function plexSince(listing: PlexListing | undefined, since: SyncCursor) {
   const updatedUnix = (item: MediaLibraryItem) =>
     item.updatedAt ? Math.floor(item.updatedAt.getTime() / 1000) : 0;
-  const sinceUnix = Math.floor(since.getTime() / 1000);
+  const sinceUnix = Math.floor(cursorDate(since).getTime() / 1000);
   const items = plexPage(listing, { limit: Infinity })
     .items.filter((item) => updatedUnix(item) >= sinceUnix)
     .sort((a, b) => updatedUnix(b) - updatedUnix(a));
@@ -107,22 +114,26 @@ export function fakePlexClient(overrides: Overrides = {}): IMediaServerClient {
     getLibraryLeaves: vi.fn(async (libraryId: string, paging?: Paging) =>
       plexPage(plexListings.leaves?.[libraryId], paging)
     ),
-    getLibraryItemsSince: vi.fn(async (libraryId: string, since: Date) =>
-      plexSince(plexListings.items?.[libraryId], since)
+    getLibraryItemsSince: vi.fn(
+      async (libraryId: string, since: SyncCursor): Promise<ItemsSince> => ({
+        ...plexSince(plexListings.items?.[libraryId], since),
+        feed: NOT_NEEDED,
+      })
     ),
-    getLibraryLeavesSince: vi.fn(async (libraryId: string, since: Date) =>
+    getLibraryRevision: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getLibraryLeavesSince: vi.fn(async (libraryId: string, since: SyncCursor) =>
       plexSince(plexListings.leaves?.[libraryId], since)
     ),
     getLibrarySeasons: vi.fn(async (libraryId: string, paging?: Paging) =>
       plexPage(plexListings.seasons?.[libraryId], paging)
     ),
-    getLibrarySeasonsSince: vi.fn(async (libraryId: string, since: Date) =>
+    getLibrarySeasonsSince: vi.fn(async (libraryId: string, since: SyncCursor) =>
       plexSince(plexListings.seasons?.[libraryId], since)
     ),
     getLibraryAlbums: vi.fn(async (libraryId: string, paging?: Paging) =>
       plexPage(plexListings.albums?.[libraryId], paging)
     ),
-    getLibraryAlbumsSince: vi.fn(async (libraryId: string, since: Date) =>
+    getLibraryAlbumsSince: vi.fn(async (libraryId: string, since: SyncCursor) =>
       plexSince(plexListings.albums?.[libraryId], since)
     ),
     checkFilesExist: vi.fn(
@@ -154,9 +165,9 @@ function jellyfinEmbyPage(listing: JellyfinEmbyListing | undefined, paging?: Pag
 }
 
 // Jellyfin and Emby answer these newest first, by DateCreated
-function addedSince(listing: JellyfinEmbyListing | undefined, since: Date) {
+function addedSince(listing: JellyfinEmbyListing | undefined, since: SyncCursor) {
   const items = parseLibraryItemsResponse(listing?.Items ?? [])
-    .filter((item) => item.addedAt >= since)
+    .filter((item) => item.addedAt >= cursorDate(since))
     .sort((a, b) => b.addedAt.getTime() - a.addedAt.getTime());
   return { items, totalCount: items.length };
 }
@@ -206,10 +217,14 @@ function fakeJellyfinEmbyClient(
     getLibraryLeaves: vi.fn(async (libraryId: string, paging?: Paging) =>
       jellyfinEmbyPage(responses.leaves[libraryId], paging)
     ),
-    getLibraryItemsSince: vi.fn(async (libraryId: string, since: Date) =>
-      addedSince(responses.items[libraryId], since)
+    getLibraryItemsSince: vi.fn(
+      async (libraryId: string, since: SyncCursor): Promise<ItemsSince> => ({
+        ...addedSince(responses.items[libraryId], since),
+        feed: NOT_NEEDED,
+      })
     ),
-    getLibraryLeavesSince: vi.fn(async (libraryId: string, since: Date) =>
+    getLibraryRevision: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getLibraryLeavesSince: vi.fn(async (libraryId: string, since: SyncCursor) =>
       addedSince(responses.leaves[libraryId], since)
     ),
     getLibrarySeasons: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
@@ -227,4 +242,122 @@ export function fakeJellyfinClient(overrides: Overrides = {}): IMediaServerClien
 
 export function fakeEmbyClient(overrides: Overrides = {}): IMediaServerClient {
   return fakeJellyfinEmbyClient('emby', emby, parseEmbySessions, overrides);
+}
+
+const tofaDetail = (id: string) => tofa.mediaBatch.find((detail) => detail.id === id);
+const tofaPages: Record<string, TofaMediaPage> = tofa.mediaPages;
+const tofaFiles: Record<string, TofaLibraryFiles> = tofa.libraryFiles;
+
+function tofaLeaves(libraryId: string) {
+  const files = tofaFiles[libraryId]?.items ?? [];
+  const shows = [...new Set(files.map((file) => file.media_id))].flatMap(
+    (id) => tofaDetail(id) ?? []
+  );
+  return shows.flatMap((show) => {
+    const { seasons, episodes } = tofaParser.parseTofaShowChildren(show);
+    return [...seasons, ...episodes];
+  });
+}
+
+function tofaSessions(): MediaSession[] {
+  const media = new Map(
+    tofa.mediaBatch.map((detail) => [detail.id, tofaParser.parseTofaMedia(detail)])
+  );
+  const nowPlaying = new Map(tofa.nowPlaying.sessions.map((row) => [row.session_id, row]));
+  return tofa.playbackSessions.map((row) =>
+    tofaParser.parseTofaSession(row, nowPlaying.get(row.session_id), media.get(row.media_id))
+  );
+}
+
+export function fakeTofaClient(overrides: Overrides = {}): IMediaServerClient {
+  return {
+    serverType: 'tofa',
+    getSessions: vi.fn(async () => tofaSessions()),
+    getUsers: vi.fn(async () => tofaParser.parseUsers(tofa.users, tofa.cloudUsers, tofa.profiles)),
+    getLibraries: vi.fn(async () => tofaParser.parseLibraries(tofa.libraries)),
+    testConnection: vi.fn(async () => true),
+    getServerIdentity: vi.fn(async () => tofa.systemInfo.server_id),
+    getSoftwareVersion: vi.fn(async () => tofa.systemInfo.version),
+    describeDownloadSource: vi.fn(async (request) => {
+      const download = tofa.downloads.items.find((d) => d.media_file_id === request.partId);
+      const file = download
+        ? tofaDetail(download.media_id)?.files.find((f) => f.id === download.media_file_id)
+        : undefined;
+      return tofaParser.parseTofaDownloadSource(request, download, file);
+    }),
+    terminateSession: vi.fn(async () => true),
+    getLibraryItems: vi.fn(async (libraryId: string, paging?: Paging) => {
+      const listing = tofaPages[libraryId];
+      const offset = paging?.offset ?? 0;
+      const ids = (listing?.items ?? [])
+        .slice(offset, offset + (paging?.limit ?? 200))
+        .map((item) => item.id);
+      return {
+        items: ids.flatMap((id) => tofaDetail(id) ?? []).map(tofaParser.parseTofaLibraryItem),
+        totalCount: listing?.total ?? 0,
+        rawCount: ids.length,
+      };
+    }),
+    findExistingRatingKeys: vi.fn(
+      async (ratingKeys: string[], library) =>
+        new Set(ratingKeys.filter((key) => tofaDetail(key)?.library_id === library.id))
+    ),
+    getLibraryLeaves: vi.fn(async (libraryId: string, paging?: Paging) => {
+      const leaves = tofaLeaves(libraryId);
+      const offset = paging?.offset ?? 0;
+      const page = leaves.slice(offset, offset + (paging?.limit ?? 200));
+      return { items: page, totalCount: leaves.length, rawCount: page.length };
+    }),
+    getLibraryItemsSince: vi.fn(async (libraryId: string) => {
+      const ours = tofa.mediaChanges.changes.filter((change) => change.library_id === libraryId);
+      const details = ours
+        .filter((change) => change.change_kind === 'upsert')
+        .flatMap((change) => tofaDetail(change.media_id) ?? []);
+      return {
+        items: details.flatMap((detail) => {
+          const { seasons, episodes } = tofaParser.parseTofaShowChildren(detail);
+          return [tofaParser.parseTofaLibraryItem(detail), ...seasons, ...episodes];
+        }),
+        totalCount: details.length,
+        feed: {
+          deletedIds: ours
+            .filter((change) => change.change_kind === 'delete')
+            .map((change) => change.media_id),
+          wholeIds: details.map((detail) => detail.id),
+          revision: tofa.mediaChanges.latest_revision,
+        },
+      };
+    }),
+    getLibraryRevision: vi.fn(async () => tofa.mediaChanges.latest_revision),
+    getLibraryLeavesSince: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getLibrarySeasons: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getLibrarySeasonsSince: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getLibraryAlbums: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getLibraryAlbumsSince: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    checkFilesExist: vi.fn(async (ratingKeys: string[]) => {
+      const existence = new Map<string, Map<string, boolean>>();
+      for (const file of Object.values(tofaFiles).flatMap((listing) => listing.items)) {
+        const key = file.episode_id ?? file.media_id;
+        if (ratingKeys.includes(key)) {
+          existence
+            .getOrInsertComputed(key, () => new Map())
+            .set(file.media_file_id, file.available);
+        }
+      }
+      return existence;
+    }),
+    ...overrides,
+  };
+}
+
+/** tofa's own requests, which only tofa has, so they sit outside IMediaServerClient */
+export function fakeTofaRequestSource(
+  overrides: Partial<TofaRequestSource> = {}
+): TofaRequestSource {
+  return {
+    systemInfo: vi.fn(async () => tofa.systemInfo),
+    getRequests: vi.fn(async () => tofa.requests),
+    getRequestPosterPath: vi.fn(async () => null),
+    ...overrides,
+  };
 }

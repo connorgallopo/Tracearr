@@ -12,6 +12,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { SIGN_IN_ERROR_CODES } from '@tracearr/shared';
 
 vi.mock('../../db/client.js', () => ({
   db: {
@@ -186,6 +187,7 @@ describe('plex better auth plugin', () => {
       local: true,
       plex: true,
       oidc: false,
+      tofa: false,
       member: false,
     });
     vi.mocked(canMemberLogin).mockResolvedValue({ ok: true });
@@ -287,6 +289,7 @@ describe('plex better auth plugin', () => {
       local: true,
       plex: false,
       oidc: false,
+      tofa: false,
       member: true,
     });
     vi.mocked(PlexClient.checkOAuthPin).mockResolvedValue(authResult);
@@ -355,6 +358,7 @@ describe('plex better auth plugin', () => {
     expect(result.response.authorized).toBe(true);
     expect(result.response.needsServerSelection).toBe(true);
     expect(result.response.tempToken).toBeTruthy();
+    expect(result.response.username).toBe(authResult.username);
     expect((result.response.servers as unknown[]).length).toBe(1);
     expect(mockRedis.setex).toHaveBeenCalledTimes(1);
     expect(mockSetSessionCookie).not.toHaveBeenCalled();
@@ -406,6 +410,7 @@ describe('plex better auth plugin', () => {
         local: true,
         plex: false,
         oidc: false,
+        tofa: false,
         member: true,
       });
       vi.mocked(PlexClient.checkOAuthPin).mockResolvedValue(authResult);
@@ -574,6 +579,16 @@ describe('plex better auth plugin', () => {
       serverUri: 'http://192.168.1.10:32400',
       serverName: 'My Plex',
     };
+
+    it('answers an expired temp token with the sign-in expired code', async () => {
+      mockRedis.get.mockResolvedValue(null);
+
+      await expect(callEndpoint('plexConnect', connectPayload)).rejects.toMatchObject({
+        statusCode: 401,
+        body: { code: SIGN_IN_ERROR_CODES.signInExpired },
+      });
+      expect(PlexClient.verifyServerAdmin).not.toHaveBeenCalled();
+    });
 
     it('rejects connect when an owner already exists (re-checked at connect time)', async () => {
       mockRedis.get.mockResolvedValue(JSON.stringify(storedTempData));

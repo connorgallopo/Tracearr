@@ -67,11 +67,14 @@ function selects(...results: unknown[][]) {
   for (const rows of results) vi.mocked(db.select).mockReturnValueOnce(makeChain(rows) as never);
 }
 
-function methods(overrides: Partial<Record<'local' | 'plex' | 'oidc' | 'member', boolean>>) {
+function methods(
+  overrides: Partial<Record<'local' | 'plex' | 'oidc' | 'tofa' | 'member', boolean>>
+) {
   vi.mocked(usableLoginMethods).mockResolvedValue({
     local: true,
     plex: true,
     oidc: true,
+    tofa: true,
     member: true,
     ...overrides,
   });

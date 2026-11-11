@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter, Route, Routes } from 'react-router';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { SetupStatus } from '@tracearr/shared';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
+  Trans: ({ i18nKey }: { i18nKey: string }) => i18nKey,
 }));
 
 const auth = vi.hoisted(() => ({ isAuthenticated: false, isLoading: false }));
@@ -20,11 +21,11 @@ vi.mock('@/hooks/queries/useSetup', () => ({
   },
 }));
 
-const signInEmail = vi.hoisted(() => vi.fn());
+const { signInEmail, signUp } = vi.hoisted(() => ({ signInEmail: vi.fn(), signUp: vi.fn() }));
 vi.mock('@/lib/authClient', () => ({
-  authClient: { signIn: { email: signInEmail, username: vi.fn() } },
+  authClient: { signIn: { email: signInEmail, username: vi.fn() }, $fetch: signUp },
 }));
-vi.mock('@/lib/api', () => ({ api: {}, BASE_URL: '/' }));
+vi.mock('@/lib/api', () => ({ api: {}, BASE_URL: '/', ApiError: class extends Error {} }));
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/components/brand/Logo', () => ({ LogoIcon: () => null }));
 vi.mock('@/components/auth/MemberLogin', () => ({
@@ -50,6 +51,7 @@ import { Login } from './Login';
 
 const jellyfin = { id: 'jf', name: 'Jelly', type: 'jellyfin' as const, quickConnect: true };
 const plexMember = { id: 'px', name: 'Plexy', type: 'plex' as const, quickConnect: false };
+const tofaMember = { id: 'tf', name: 'Foxy', type: 'tofa' as const, quickConnect: false };
 
 function status(
   methods: Partial<SetupStatus['authMethods']>,
@@ -66,6 +68,7 @@ function status(
       plex: false,
       oidc: false,
       oidcProviderName: null,
+      tofa: false,
       member: false,
       ssoOnly: false,
       ...methods,
@@ -74,8 +77,8 @@ function status(
   };
 }
 
-function renderLogin(url = '/login', client = new QueryClient()) {
-  return render(
+function loginTree(url: string, client: QueryClient) {
+  return (
     <QueryClientProvider client={client}>
       <MemoryRouter initialEntries={[url]}>
         <Login />
@@ -84,7 +87,12 @@ function renderLogin(url = '/login', client = new QueryClient()) {
   );
 }
 
+function renderLogin(url = '/login', client = new QueryClient()) {
+  return render(loginTree(url, client));
+}
+
 const plexButton = () => screen.queryByRole('button', { name: /settings:plex.signInWithPlex/ });
+const tofaButton = () => screen.queryByRole('button', { name: 'pages:tofa.signIn' });
 
 describe('Login blocks', () => {
   beforeEach(() => {
@@ -132,6 +140,97 @@ describe('Login blocks', () => {
     setup.data = status({ local: true, member: true }, [plexMember]);
     renderLogin();
     expect(plexButton()).toBeInTheDocument();
+  });
+
+  it('login offers tofa to the owner when it is on', async () => {
+    setup.data = status({ local: true });
+    const { unmount } = renderLogin();
+    expect(tofaButton()).toBeNull();
+    unmount();
+
+    setup.data = status({ local: true, tofa: true });
+    const client = new QueryClient();
+    client.setQueryData(['stats', 'me', 'UTC'], { daysWatched: 9 });
+    Object.assign(api, {
+      auth: {
+        initiateTofa: vi.fn().mockResolvedValue({
+          handle: 'h-1',
+          verificationUri: 'https://app.tofa.tv/link?code=ABCD',
+          userCode: 'ABCD',
+          expiresIn: 600,
+          interval: 0,
+        }),
+        checkTofa: vi.fn().mockResolvedValue({ status: 'signed-in', user: { id: 'u-1' } }),
+      },
+    });
+    vi.spyOn(window, 'open').mockReturnValue(null);
+    renderLogin('/login', client);
+    expect(screen.getByText('common:or')).toBeInTheDocument();
+
+    await userEvent.click(tofaButton()!);
+
+    await vi.waitFor(() => expect(client.getQueryData(['stats', 'me', 'UTC'])).toBeUndefined());
+    expect(api.auth.initiateTofa).toHaveBeenCalledWith('sign-in');
+  });
+
+  it('toasts a failed tofa sign-in on login', async () => {
+    setup.data = status({ local: true, tofa: true });
+    Object.assign(api, {
+      auth: { initiateTofa: vi.fn().mockRejectedValue(new Error('tofa cloud is down')) },
+    });
+    vi.spyOn(window, 'open').mockReturnValue(null);
+    const client = new QueryClient();
+    const { rerender } = renderLogin('/login', client);
+
+    await userEvent.click(tofaButton()!);
+
+    await vi.waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith('notifications:toast.error.authFailed', {
+        description: 'tofa cloud is down',
+      })
+    );
+    expect(tofaButton()).toBeInTheDocument();
+    // The mocked t is new on every render, as it is after a language change.
+    rerender(loginTree('/login', client));
+    expect(toast.error).toHaveBeenCalledOnce();
+  });
+
+  it('lets the fallback Plex picker cancel back to sign in', async () => {
+    Object.assign(api, {
+      auth: {
+        initiatePlex: vi.fn().mockResolvedValue({ handle: 'h-1', authUrl: 'https://app.plex.tv' }),
+        checkPlexPin: vi.fn().mockResolvedValue({
+          authorized: true,
+          needsServerSelection: true,
+          tempToken: 'temp-1',
+          servers: [
+            {
+              name: 'Attic',
+              platform: 'Linux',
+              version: '1.0',
+              clientIdentifier: 'machine-1',
+              recommendedUri: 'http://10.0.0.5:32400',
+              connections: [],
+            },
+          ],
+        }),
+      },
+    });
+    vi.spyOn(window, 'open').mockReturnValue(null);
+    renderLogin();
+
+    await userEvent.click(plexButton()!);
+    await userEvent.click(await screen.findByRole('button', { name: 'common:actions.cancel' }));
+
+    expect(plexButton()).toBeInTheDocument();
+  });
+
+  it('login offers tofa to members when a tofa server is open', () => {
+    setup.data = status({ member: true }, [tofaMember, jellyfin]);
+    renderLogin();
+
+    expect(tofaButton()).toBeInTheDocument();
+    expect(screen.getByText('member form: Jelly')).toBeInTheDocument();
   });
 
   it('draws the divider only when buttons sit above a form', () => {
@@ -189,11 +288,14 @@ describe('Login blocks', () => {
       },
     });
     vi.spyOn(window, 'open').mockReturnValue(null);
-    renderLogin();
+    const client = new QueryClient();
+    const { rerender } = renderLogin('/login', client);
 
     await userEvent.click(screen.getByRole('button', { name: /settings:plex.signInWithPlex/ }));
 
     await vi.waitFor(() => expect(toast.error).toHaveBeenCalledWith('pages:login.plexExpired'));
+    rerender(loginTree('/login', client));
+    expect(toast.error).toHaveBeenCalledOnce();
     expect(checkPlexPin).toHaveBeenCalledOnce();
     expect(checkPlexPin).toHaveBeenCalledWith({ handle: 'h-1' });
     expect(plexButton()).toBeInTheDocument();
@@ -240,6 +342,58 @@ describe('Login blocks', () => {
     signInEmail.mockResolvedValueOnce({ error: { code: 'INVALID', message: 'Wrong password' } });
     await userEvent.click(screen.getByRole('button', { name: /signIn/i }));
     expect(await screen.findByText('Wrong password')).toBeInTheDocument();
+  });
+
+  it('puts the claim code gate in front of the first run', () => {
+    setup.data = { ...status({ local: true }), needsSetup: true, requiresClaimCode: true };
+    renderLogin();
+
+    expect(screen.getByText('pages:login.enterClaimCode')).toBeInTheDocument();
+    expect(screen.queryByRole('radio')).toBeNull();
+  });
+
+  it('starts a first run by asking for the server, with no SSO button even when SSO is on', async () => {
+    setup.data = {
+      ...status({ local: true, plex: true, oidc: true, oidcProviderName: 'Authentik' }),
+      needsSetup: true,
+    };
+    renderLogin();
+
+    expect(screen.getByText('pages:setup.serverTitle')).toBeInTheDocument();
+    await userEvent.click(screen.getByRole('radio', { name: 'Emby' }));
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.continue' }));
+
+    expect(screen.queryByRole('button', { name: /continueWith/ })).toBeNull();
+    expect(screen.getByLabelText('settings:account.displayName')).toBeInTheDocument();
+  });
+
+  it('takes a new owner to the connect step for the server they picked', async () => {
+    setup.data = { ...status({ local: true }), needsSetup: true };
+    signUp.mockResolvedValue({ error: null });
+    function SetupProbe() {
+      const { search } = useLocation();
+      return <p>setup{search}</p>;
+    }
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter initialEntries={['/login']}>
+          <Routes>
+            <Route path="login" element={<Login />} />
+            <Route path="setup" element={<SetupProbe />} />
+          </Routes>
+        </MemoryRouter>
+      </QueryClientProvider>
+    );
+
+    await userEvent.click(screen.getByRole('radio', { name: 'Jellyfin' }));
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.continue' }));
+    await userEvent.type(screen.getByLabelText('settings:account.displayName'), 'Dana');
+    await userEvent.type(screen.getByLabelText('pages:login.username'), 'dana');
+    await userEvent.type(screen.getByLabelText('settings:account.email'), 'dana@example.com');
+    await userEvent.type(screen.getByLabelText('settings:account.password'), 'longenough');
+    await userEvent.click(screen.getByRole('button', { name: 'settings:account.createAccount' }));
+
+    expect(await screen.findByText('setup?type=jellyfin')).toBeInTheDocument();
   });
 
   it('returns a signed-in user to the page that sent them to login', () => {

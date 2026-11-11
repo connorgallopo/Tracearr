@@ -1,6 +1,6 @@
 /**
- * Live server stats (CPU/RAM and bandwidth). Plex is fetched behind a short
- * Redis cache; Jellyfin/Emby arrive as SSE plugin events into a rolling
+ * Live server stats (CPU/RAM and bandwidth). Plex and tofa are fetched behind a
+ * short Redis cache; Jellyfin/Emby arrive as SSE plugin events into a rolling
  * buffer, so their charts empty when a plugin goes quiet.
  */
 
@@ -18,6 +18,8 @@ import {
 import type { ServerResourceDataPoint } from '@tracearr/shared';
 import { PlexClient } from './mediaServer/plex/client.js';
 import type { PlexBandwidthStats, PlexStatisticsDataPoint } from './mediaServer/plex/parser.js';
+import { TofaClient } from './mediaServer/tofa/client.js';
+import { parseTofaMetrics } from './mediaServer/tofa/parser.js';
 
 interface ServerRow {
   id: string;
@@ -26,7 +28,7 @@ interface ServerRow {
   token: string;
 }
 
-type PlexServerRow = Omit<ServerRow, 'type'>;
+type ServerConnection = Omit<ServerRow, 'type'>;
 
 export interface PluginStatsSample {
   at: number;
@@ -82,7 +84,7 @@ async function cachedFetch<T>(
 
 export async function getServerResourceStats(
   redis: Redis,
-  server: PlexServerRow
+  server: ServerConnection
 ): Promise<PlexStatisticsDataPoint[]> {
   return cachedFetch(
     redis,
@@ -97,7 +99,7 @@ export async function getServerResourceStats(
 
 export async function getServerBandwidthStats(
   redis: Redis,
-  server: PlexServerRow
+  server: ServerConnection
 ): Promise<PlexBandwidthStats> {
   return cachedFetch(
     redis,
@@ -217,9 +219,9 @@ export async function getPluginServerStats(
 // Past this, the gap is a wrong clock rather than sampling lag
 const MAX_PLAUSIBLE_LAG_SECONDS = 15;
 
-/** Seconds to shift a Plex server's timestamps onto our clock. Zero when the
+/** Seconds to shift a server's timestamps onto our clock. Zero when the
  *  gap reads as sampling lag, so a synced server keeps its own timestamps. */
-export function plexClockShift(...series: { at: number }[][]): number {
+export function serverClockShift(...series: { at: number }[][]): number {
   const newest = newestAt(...series);
   if (newest === 0) return 0;
 
@@ -244,12 +246,14 @@ export async function getServerLiveStats(redis: Redis, server: ServerRow) {
         bandwidthAccounts: [],
         bandwidthDevices: [],
       };
+    case 'tofaMetrics':
+      return getTofaLiveStats(redis, server);
     default:
       return assertNever(hostStats);
   }
 }
 
-async function getPlexLiveStats(redis: Redis, server: PlexServerRow) {
+async function getPlexLiveStats(redis: Redis, server: ServerConnection) {
   const [statistics, bandwidthStats] = await Promise.all([
     getServerResourceStats(redis, server),
     getServerBandwidthStats(redis, server),
@@ -257,7 +261,7 @@ async function getPlexLiveStats(redis: Redis, server: PlexServerRow) {
 
   // One absolute axis for every server, so an unsynced Plex box would draw
   // off it entirely. After the cache, so the shift is fresh.
-  const shift = plexClockShift(statistics, bandwidthStats.points);
+  const shift = serverClockShift(statistics, bandwidthStats.points);
 
   return {
     statistics: shiftPoints(statistics, shift),
@@ -265,5 +269,28 @@ async function getPlexLiveStats(redis: Redis, server: PlexServerRow) {
     bandwidthSamples: shiftPoints(bandwidthStats.samples, shift),
     bandwidthAccounts: bandwidthStats.accounts,
     bandwidthDevices: bandwidthStats.devices,
+  };
+}
+
+// tofa keeps its own recent samples. Its network counters are host-wide, not stream traffic,
+// so the bandwidth chart stays empty as it does for Jellyfin and Emby.
+async function getTofaLiveStats(redis: Redis, server: ServerConnection) {
+  const statistics = await cachedFetch(
+    redis,
+    REDIS_KEYS.SERVER_STATS_RESOURCES(server.id),
+    CACHE_TTL.SERVER_STATS_RESOURCES,
+    async () =>
+      parseTofaMetrics(
+        await new TofaClient({ url: server.url, token: server.token }).getMetrics(),
+        liveStatsRetentionSeconds(SERVER_STATS_CONFIG.WINDOW_SECONDS)
+      )
+  );
+
+  return {
+    statistics: shiftPoints(statistics, serverClockShift(statistics)),
+    bandwidth: [],
+    bandwidthSamples: [],
+    bandwidthAccounts: [],
+    bandwidthDevices: [],
   };
 }

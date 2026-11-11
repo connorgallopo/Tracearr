@@ -48,6 +48,8 @@ export interface ServerWithToken {
   type: ServerType;
   url: string;
   token: string;
+  /** The server's own watched rule, for a server whose profile defers to it */
+  watchedRulePercent: number | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -101,11 +103,13 @@ export interface ProcessedSession extends StreamDetailFields {
   ratingKey: string;
   /** Identifier of the file/version being played, when the server reports one */
   serverVersionKey?: string | null;
+  /** The profile that played, where one account holds several (tofa) */
+  profileName?: string | null;
 
   // User identification from media server
   /** External user ID from Plex/Jellyfin for lookup */
   externalUserId: string;
-  /** Display name from media server */
+  /** Display name from media server; empty when the session carried none */
   username: string;
   /** Avatar URL from media server */
   userThumb: string;
@@ -150,8 +154,10 @@ export interface ProcessedSession extends StreamDetailFields {
   discNumber: number | null;
 
   // Connection info
-  /** Client IP address */
+  /** Client IP address; empty for a relayed client */
   ipAddress: string;
+  /** The client reached the server through its relay, which hides the client's address */
+  relayed?: boolean;
   /** Player/device name */
   playerName: string;
   /** Unique device identifier */

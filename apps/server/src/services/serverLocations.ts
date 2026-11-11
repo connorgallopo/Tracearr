@@ -2,6 +2,7 @@ import { eq, sql } from 'drizzle-orm';
 import type { ServerLocationEntry, ServerLocationsResponse } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { serverLocations, servers } from '../db/schema.js';
+import { RELAYED_COUNTRY } from '../db/sessions/rules.js';
 import { geoipService, type GeoLocation } from './geoip.js';
 import { lookupGeoIP } from './plexGeoip.js';
 import {
@@ -12,6 +13,21 @@ import {
 } from './serverLocationRanges.js';
 
 export type SessionGeo = GeoLocation & { isLocal: boolean };
+
+/** A client on tofa's relay has no address of its own to place, so it is labeled instead. */
+export const RELAYED_SESSION_GEO: SessionGeo = {
+  city: null,
+  region: null,
+  country: RELAYED_COUNTRY,
+  countryCode: null,
+  continent: null,
+  postal: null,
+  lat: null,
+  lon: null,
+  asnNumber: null,
+  asnOrganization: null,
+  isLocal: false,
+};
 
 export function loadServerLocations(serverId: string): Promise<ServerLocation[]> {
   return db

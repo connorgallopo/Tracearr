@@ -48,9 +48,19 @@ import { getCacheService, getPubSubService } from '../cache.js';
 import { createMediaServerClient } from '../mediaServer/index.js';
 import { dispatchSessionStopped } from '../automations/events/producers.js';
 import { terminateSession } from '../termination.js';
-import { fakeEmbyClient, fakeJellyfinClient, fakePlexClient } from '../../test/mediaServerFakes.js';
+import {
+  fakeEmbyClient,
+  fakeJellyfinClient,
+  fakePlexClient,
+  fakeTofaClient,
+} from '../../test/mediaServerFakes.js';
 
-const fakeClients = { plex: fakePlexClient, jellyfin: fakeJellyfinClient, emby: fakeEmbyClient };
+const fakeClients = {
+  plex: fakePlexClient,
+  jellyfin: fakeJellyfinClient,
+  emby: fakeEmbyClient,
+  tofa: fakeTofaClient,
+};
 
 // Type for the mock session findFirst function (returns partial session for tests)
 const mockSessionFindFirst = db.query.sessions.findFirst as ReturnType<typeof vi.fn>;
@@ -556,6 +566,17 @@ describe('terminateSession', () => {
       expect(mockMediaClient.terminateSession).toHaveBeenCalledWith('plex-specific-id', undefined);
     });
 
+    it('stops a Plex live TV session the way it stops any other', async () => {
+      const mockSession = createMockSession({ mediaType: 'live' });
+      mockSessionFindFirst.mockResolvedValue(mockSession);
+      mockMediaClient.terminateSession.mockResolvedValue(true);
+
+      const result = await terminateSession({ sessionId: mockSession.id, trigger: 'manual' });
+
+      expect(result.outcome).toBe('terminated');
+      expect(mockMediaClient.terminateSession).toHaveBeenCalledWith('plex-session-456', undefined);
+    });
+
     it('should use sessionKey for Jellyfin servers', async () => {
       const mockSession = createMockSession({
         server: {
@@ -707,6 +728,86 @@ describe('terminateSession', () => {
         expect.objectContaining({ success: false, errorMessage: 'Server is historical' })
       );
       expect(db.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('tofa key that cannot stop streams', () => {
+    it('reports the key scope as the reason and never asks the server', async () => {
+      const mockSession = createMockSession({
+        server: {
+          id: randomUUID(),
+          type: 'tofa',
+          url: 'http://tofa.local:33333',
+          token: 'test-token',
+          canStopStreams: false,
+        },
+      });
+      mockSessionFindFirst.mockResolvedValue(mockSession);
+      const insertChain = mockDbInsertChain('log-t');
+
+      const result = await terminateSession({ sessionId: mockSession.id, trigger: 'rule' });
+
+      expect(result).toEqual({
+        success: false,
+        terminationLogId: 'log-t',
+        error: 'this tofa API key cannot stop streams',
+        outcome: 'failed',
+      });
+      expect(createMediaServerClient).not.toHaveBeenCalled();
+      expect(insertChain.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          errorMessage: 'this tofa API key cannot stop streams',
+        })
+      );
+    });
+  });
+
+  describe('tofa live TV', () => {
+    const tofaServer = {
+      id: randomUUID(),
+      type: 'tofa',
+      url: 'http://tofa.local:33333',
+      token: 'test-token',
+      canStopStreams: true,
+    };
+
+    it('stops a live TV play on the session list by its session id', async () => {
+      const mockSession = createMockSession({ mediaType: 'live', server: tofaServer });
+      mockSessionFindFirst.mockResolvedValue(mockSession);
+      mockMediaClient.terminateSession.mockResolvedValue(true);
+
+      const result = await terminateSession({ sessionId: mockSession.id, trigger: 'manual' });
+
+      expect(result.outcome).toBe('terminated');
+      expect(mockMediaClient.terminateSession).toHaveBeenCalledWith('session-key-123', undefined);
+    });
+
+    it('refuses a live viewer with no playback session, with the reason, and never asks the server', async () => {
+      const mockSession = createMockSession({
+        mediaType: 'live',
+        sessionKey: 'viewer:viewer-1',
+        server: tofaServer,
+      });
+      mockSessionFindFirst.mockResolvedValue(mockSession);
+      const insertChain = mockDbInsertChain('log-l');
+
+      const result = await terminateSession({ sessionId: mockSession.id, trigger: 'manual' });
+
+      expect(result).toEqual({
+        success: false,
+        terminationLogId: 'log-l',
+        error: 'tofa has no way for Tracearr to stop a live TV viewer without a playback session',
+        outcome: 'failed',
+      });
+      expect(createMediaServerClient).not.toHaveBeenCalled();
+      expect(insertChain.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          errorMessage:
+            'tofa has no way for Tracearr to stop a live TV viewer without a playback session',
+        })
+      );
     });
   });
 

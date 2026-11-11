@@ -69,11 +69,21 @@ const statusSchema = z.object({ version: z.string(), commitTag: z.string().optio
 const mainSettingsSchema = z.object({
   applicationTitle: z.string(),
   mediaServerType: z.number().int(),
+  // Off by default in Seerr; with it off, /imageproxy answers 404
+  cacheImages: z.boolean().default(false),
 });
 const plexSettingsSchema = z.object({ name: z.string(), machineId: z.string() });
 const jellyfinSettingsSchema = z.object({ name: z.string(), serverId: z.string() });
-const movieLookupSchema = z.object({ title: z.string(), releaseDate: z.string().nullish() });
-const tvLookupSchema = z.object({ name: z.string(), firstAirDate: z.string().nullish() });
+const movieLookupSchema = z.object({
+  title: z.string(),
+  releaseDate: z.string().nullish(),
+  posterPath: z.string().nullish(),
+});
+const tvLookupSchema = z.object({
+  name: z.string(),
+  firstAirDate: z.string().nullish(),
+  posterPath: z.string().nullish(),
+});
 
 export type SeerrRequest = z.infer<typeof seerrRequestSchema>;
 export type SeerrRequestsPage = z.infer<typeof seerrRequestsPageSchema>;
@@ -81,6 +91,8 @@ export type SeerrCounts = z.infer<typeof seerrCountSchema>;
 export interface SeerrTitleLookup {
   title: string;
   year: number | null;
+  /** The TMDB poster file, as Seerr names it on its own pages */
+  posterPath: string | null;
 }
 
 export class SeerrApiError extends Error {
@@ -173,11 +185,11 @@ export class SeerrClient {
 
   async movie(tmdbId: number): Promise<SeerrTitleLookup> {
     const row = await this.get(`/movie/${tmdbId}`, movieLookupSchema);
-    return { title: row.title, year: yearOf(row.releaseDate) };
+    return { title: row.title, year: yearOf(row.releaseDate), posterPath: row.posterPath ?? null };
   }
 
   async tv(tmdbId: number): Promise<SeerrTitleLookup> {
     const row = await this.get(`/tv/${tmdbId}`, tvLookupSchema);
-    return { title: row.name, year: yearOf(row.firstAirDate) };
+    return { title: row.name, year: yearOf(row.firstAirDate), posterPath: row.posterPath ?? null };
   }
 }

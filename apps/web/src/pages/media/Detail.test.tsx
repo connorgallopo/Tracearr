@@ -106,6 +106,7 @@ function requestEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestE
   return {
     id: 'req-1',
     serverId: 'srv-1',
+    serviceType: 'seerr',
     status: 'completed',
     requestedAt: '2026-01-08T12:00:00.000Z',
     availableAt: '2026-01-08T12:02:00.000Z',

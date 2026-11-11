@@ -412,7 +412,7 @@ export async function syncUserFromMediaServer(
   serverUser: ServerUser;
   user: User;
   created: boolean;
-  newlyDisabled: boolean;
+  lostAccess: boolean;
 } | null> {
   const { isPlexServer = false } = options;
   const inTransaction = <T>(run: (tx: Tx) => Promise<T>): Promise<T> =>
@@ -504,7 +504,7 @@ export async function syncUserFromMediaServer(
       await clearScopeOnLibraryChange(existing);
 
       const user = await identityOf(existing.userId);
-      return { serverUser: updated, user, created: false, newlyDisabled: false };
+      return { serverUser: updated, user, created: false, lostAccess: false };
     }
 
     // Already folded into another account by a same-server merge. Creating it
@@ -583,7 +583,7 @@ export async function syncUserFromMediaServer(
       serverUser: result.serverUser,
       user: result.user,
       created: true,
-      newlyDisabled: false,
+      lostAccess: false,
     };
   }
 
@@ -594,15 +594,19 @@ export async function syncUserFromMediaServer(
   // Account level only: the identity lookup and users.email below keep the raw
   // value, so a username never becomes a login email or links two people.
   const accountEmail = mediaUser.email ?? usernameAsEmail(mediaUser.username);
+  // Only tofa reports a cloud identity; other servers' rows keep whatever they hold.
+  const cloudIdentity =
+    mediaUser.cloudIdentityId === undefined ? {} : { cloudIdentityId: mediaUser.cloudIdentityId };
 
   if (existing) {
     const changes: ServerUserChanges = {
       username: mediaUser.username,
       email: accountEmail,
-      thumbUrl: mediaUser.thumb ?? null,
+      ...(mediaUser.picturesUnread ? {} : { thumbUrl: mediaUser.thumb ?? null }),
       isServerAdmin: mediaUser.isAdmin,
       isDisabled: mediaUser.isDisabled ?? false,
       libraryIds,
+      ...cloudIdentity,
     };
 
     const advancedActivity = advancedActivityAt(mediaUser.lastActivityAt, existing.lastActivityAt);
@@ -622,7 +626,10 @@ export async function syncUserFromMediaServer(
       serverUser: updated,
       user,
       created: false,
-      newlyDisabled: !existing.isDisabled && updated.isDisabled,
+      // A cloud identity cleared or replaced is tofa revoking that person's access.
+      lostAccess:
+        (!existing.isDisabled && updated.isDisabled) ||
+        (existing.cloudIdentityId !== null && updated.cloudIdentityId !== existing.cloudIdentityId),
     };
   }
 
@@ -680,6 +687,7 @@ export async function syncUserFromMediaServer(
         libraryIds,
         joinedAt: mediaUser.joinedAt ?? null,
         lastActivityAt: mediaUser.lastActivityAt ?? null,
+        ...cloudIdentity,
       })
       .returning();
 
@@ -697,7 +705,7 @@ export async function syncUserFromMediaServer(
     known.usersById.set(result.user.id, result.user);
   }
 
-  return { serverUser: result.serverUser, user: result.user, created: true, newlyDisabled: false };
+  return { serverUser: result.serverUser, user: result.user, created: true, lostAccess: false };
 }
 
 /**

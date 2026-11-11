@@ -1,11 +1,15 @@
-import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, sql } from 'drizzle-orm';
 import {
   REDIS_KEYS,
+  REQUEST_SERVICE_BUILT_IN,
+  REQUEST_SERVICE_TYPES,
+  SERVER_PROFILES,
   WS_EVENTS,
   type RequestService,
   type RequestServiceType,
+  type ServerType,
 } from '@tracearr/shared';
-import { db } from '../../db/client.js';
+import { db, type Executor } from '../../db/client.js';
 import { mediaRequests, requestServices } from '../../db/schema.js';
 import { createLogger } from '../../utils/logger.js';
 import { getCacheService, getPubSubService } from '../cache.js';
@@ -15,6 +19,9 @@ const logger = createLogger('request-services');
 
 export type RequestServiceRow = typeof requestServices.$inferSelect;
 export type MediaRequestRow = typeof mediaRequests.$inferSelect;
+
+const LINKED_TYPES = REQUEST_SERVICE_TYPES.filter((type) => !REQUEST_SERVICE_BUILT_IN[type]);
+const BUILT_IN_TYPES = REQUEST_SERVICE_TYPES.filter((type) => REQUEST_SERVICE_BUILT_IN[type]);
 
 export async function publishRequestsChanged(serviceId: string): Promise<void> {
   await getCacheService()
@@ -33,8 +40,13 @@ export async function listRequestServices(): Promise<RequestServiceRow[]> {
   return db.select().from(requestServices).orderBy(requestServices.createdAt, requestServices.id);
 }
 
+/** Whether any service takes requests: a linked one, or a server's own with its requests on */
 export async function anyRequestServiceLinked(): Promise<boolean> {
-  const rows = await db.select({ id: requestServices.id }).from(requestServices).limit(1);
+  const rows = await db
+    .select({ id: requestServices.id })
+    .from(requestServices)
+    .where(eq(requestServices.takesRequests, true))
+    .limit(1);
   return rows.length > 0;
 }
 
@@ -88,6 +100,42 @@ export async function createRequestService(input: {
   return row;
 }
 
+/**
+ * Gives each server of these types that has requests built in its request service, named and
+ * addressed as the server, unless it has one. Returns the ids of the services created.
+ */
+export async function addBuiltInRequestServices(
+  executor: Executor,
+  serverTypes: readonly ServerType[]
+): Promise<string[]> {
+  const created: string[] = [];
+  for (const serverType of serverTypes) {
+    const type = SERVER_PROFILES[serverType].builtInRequests;
+    if (type === null) continue;
+    const result = await executor.execute(sql`
+      INSERT INTO request_services (server_id, type, name, url)
+      SELECT id, ${type}, name, url FROM servers WHERE type = ${serverType}
+      ON CONFLICT (server_id) DO NOTHING
+      RETURNING id
+    `);
+    created.push(...(result.rows as { id: string }[]).map((row) => row.id));
+  }
+  return created;
+}
+
+/** Copies the server's name and address onto its built-in request service, if it has one. */
+export async function followServerOnBuiltInRequestService(
+  executor: Executor,
+  serverId: string
+): Promise<void> {
+  await executor.execute(sql`
+    UPDATE request_services SET name = servers.name, url = servers.url, updated_at = now()
+    FROM servers
+    WHERE servers.id = ${serverId} AND request_services.server_id = servers.id
+      AND request_services.type = ANY(${sql.param(BUILT_IN_TYPES)}::text[])
+  `);
+}
+
 export async function updateRequestService(
   id: string,
   patch: {
@@ -119,10 +167,11 @@ export async function updateRequestService(
   return row;
 }
 
+/** A built-in service is left alone: it goes when its server does. */
 export async function deleteRequestService(id: string): Promise<boolean> {
   const deleted = await db
     .delete(requestServices)
-    .where(eq(requestServices.id, id))
+    .where(and(eq(requestServices.id, id), inArray(requestServices.type, LINKED_TYPES)))
     .returning({ id: requestServices.id });
   if (deleted.length === 0) return false;
   await publishRequestsChanged(id);
@@ -146,6 +195,7 @@ export async function recordSyncResult(
     lastSyncAt?: Date;
     lastFullSyncAt?: Date;
     lastSyncError: string | null;
+    takesRequests?: boolean;
   }
 ): Promise<void> {
   await db
@@ -154,13 +204,25 @@ export async function recordSyncResult(
     .where(eq(requestServices.id, id));
 }
 
-/** Rows that already carry a title need no Seerr lookup: the upsert keeps the stored one. */
-export async function remoteIdsWithStoredTitle(serviceId: string): Promise<Set<number>> {
+export interface MirroredRequest {
+  titled: boolean;
+  postered: boolean;
+}
+
+/**
+ * What the mirror holds for each of a service's requests, by remote id. A stored title or
+ * poster needs no lookup: the upsert keeps the stored one.
+ */
+export async function mirroredRequests(serviceId: string): Promise<Map<string, MirroredRequest>> {
   const rows = await db
-    .select({ remoteId: mediaRequests.remoteId })
+    .select({
+      remoteId: mediaRequests.remoteId,
+      titled: sql<boolean>`${mediaRequests.title} IS NOT NULL`,
+      postered: sql<boolean>`${mediaRequests.posterPath} IS NOT NULL`,
+    })
     .from(mediaRequests)
-    .where(and(eq(mediaRequests.serviceId, serviceId), isNotNull(mediaRequests.title)));
-  return new Set(rows.map((row) => row.remoteId));
+    .where(eq(mediaRequests.serviceId, serviceId));
+  return new Map(rows.map(({ remoteId, ...stored }) => [remoteId, stored]));
 }
 
 export async function requestCountsByService(): Promise<Map<string, RequestService['counts']>> {

@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import { getName as getCountryNameFromCode } from 'country-list';
-import { formatEpisodeLabel, type TranscodeInfo } from '@tracearr/shared';
+import { formatEpisodeLabel, namesShow, type TranscodeInfo } from '@tracearr/shared';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -46,6 +46,7 @@ interface MediaDisplayFields {
   year?: number | null;
   artistName?: string | null;
   albumName?: string | null;
+  channelTitle?: string | null;
 }
 
 /**
@@ -87,18 +88,22 @@ export function getMediaDisplay(media: MediaDisplayFields): {
   title: string;
   subtitle: string | null;
 } {
-  if (media.mediaType === 'episode' && media.grandparentTitle) {
-    // TV Show episode
-    const episodeInfo =
-      formatEpisodeLabel(media.seasonNumber, media.episodeNumber, {
-        spaced: true,
-      }) ?? '';
+  // Jellyfin and Emby name the channel as the title when no program is known
+  const channel =
+    media.mediaType === 'live' && media.channelTitle !== media.mediaTitle
+      ? media.channelTitle
+      : null;
+  if (namesShow(media)) {
+    const episodeInfo = formatEpisodeLabel(media.seasonNumber, media.episodeNumber, {
+      spaced: true,
+    });
     return {
       title: media.grandparentTitle,
-      subtitle: episodeInfo
-        ? `${episodeInfo} · ${media.mediaTitle ?? ''}`
-        : (media.mediaTitle ?? null),
+      subtitle: [episodeInfo, media.mediaTitle, channel].filter(Boolean).join(' · ') || null,
     };
+  }
+  if (media.mediaType === 'live') {
+    return { title: media.mediaTitle ?? '', subtitle: channel ?? null };
   }
   if (media.mediaType === 'track') {
     // Music track - show track name as title, artist/album as subtitle
@@ -122,10 +127,19 @@ export function getMediaLinks(
   media: MediaDisplayFields & { mediaId?: string | null; showMediaId?: string | null }
 ): { title: string | null; subtitle: string | null } {
   const path = (id: string | null | undefined) => (id ? `/media/${id}` : null);
-  if (media.mediaType === 'episode' && media.grandparentTitle) {
+  if (namesShow(media)) {
     return { title: path(media.showMediaId), subtitle: path(media.mediaId) };
   }
   return { title: path(media.mediaId), subtitle: null };
+}
+
+/** The profile that played, unless it only repeats the account's username in another case. */
+export function getDistinctProfileName(session: {
+  profileName?: string | null;
+  user: { username: string };
+}): string | null {
+  const name = session.profileName;
+  return name && name.toLowerCase() !== session.user.username.toLowerCase() ? name : null;
 }
 
 /**

@@ -1,7 +1,10 @@
 import { APIError } from 'better-auth/api';
-import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
+import { and, eq, isNotNull, isNull, sql, type SQL } from 'drizzle-orm';
 import {
+  SERVER_PROFILES,
+  SERVER_TYPES,
   SIGN_IN_ERROR_CODES,
+  assertNever,
   canLogin,
   isStaff,
   type LoginMethods,
@@ -181,9 +184,44 @@ interface OwnerCredentials {
   password: boolean;
   plex: boolean;
   oidc: boolean;
+  tofa: boolean;
 }
 
-const NO_CREDENTIALS: OwnerCredentials = { password: false, plex: false, oidc: false };
+const NO_CREDENTIALS: OwnerCredentials = { password: false, plex: false, oidc: false, tofa: false };
+
+/**
+ * The server accounts a change takes from whoever holds them (rows), and the ones it leaves in place
+ * but no longer able to sign anyone in (live). Written against the su and s aliases below.
+ */
+interface LeavingAccounts {
+  rows: SQL;
+  live: SQL;
+}
+
+const NOTHING_LEAVES: LeavingAccounts = { rows: sql`false`, live: sql`false` };
+
+/** A change that takes server accounts away: a server deleted or made historical, or one account split off. */
+export type ServerAccountChange =
+  | { kind: 'deleteServer'; serverId: string }
+  | { kind: 'retireServer'; serverId: string }
+  | { kind: 'unlinkAccount'; serverUserId: string };
+
+function leavingAccounts(change: ServerAccountChange): LeavingAccounts {
+  switch (change.kind) {
+    case 'deleteServer': {
+      const rows = sql`s.id = ${change.serverId}`;
+      return { rows, live: rows };
+    }
+    case 'retireServer':
+      return { rows: sql`false`, live: sql`s.id = ${change.serverId}` };
+    case 'unlinkAccount': {
+      const rows = sql`su.id = ${change.serverUserId}`;
+      return { rows, live: rows };
+    }
+    default:
+      return assertNever(change);
+  }
+}
 
 // Drizzle leaves columns unqualified in a select list, so these subqueries name their own.
 const hasPassword = sql<boolean>`exists (
@@ -196,15 +234,16 @@ const hasPassword = sql<boolean>`exists (
 // Plex server_users row whose external_id is a plex.tv id. A synced row carries plex_account_id,
 // and external_id equals it except on the server owner's own row, which is '1'. A row the poller
 // created and no sync has reached has no plex_account_id; its external_id is the session user id,
-// a plex.tv id for everyone but the server owner, who is again '1'.
-const hasPlexLogin = sql<boolean>`(
+// a plex.tv id for everyone but the server owner, who is again '1'. Those lookups ignore
+// historical servers, so only rows that leave stop counting.
+const hasPlexLogin = (leaving: LeavingAccounts) => sql<boolean>`(
   users.plex_account_id is not null
   or exists (
     select 1 from plex_accounts pa where pa.user_id = users.id and pa.allow_login
   )
   or exists (
     select 1 from server_users su join servers s on s.id = su.server_id
-    where su.user_id = users.id and s.type = 'plex'
+    where su.user_id = users.id and s.type = 'plex' and not (${leaving.rows})
       and (
         su.external_id = su.plex_account_id
         or (su.plex_account_id is null and su.external_id <> '1')
@@ -216,25 +255,61 @@ const hasOidcLogin = sql<boolean>`exists (
   select 1 from auth_accounts aa where aa.user_id = users.id and aa.provider_id = 'oidc'
 )`;
 
+// Mirrors the owner lookup in tofaPlugin's /tofa/check: the sign-in row and a live tofa account
+// carrying its cloud identity.
+const hasTofaLogin = (leaving: LeavingAccounts) => sql<boolean>`exists (
+  select 1 from auth_accounts aa
+  join server_users su on su.user_id = aa.user_id and su.cloud_identity_id = aa.account_id
+  join servers s on s.id = su.server_id
+  where aa.user_id = users.id and aa.provider_id = 'tofa'
+    and su.removed_at is null and not su.is_disabled and s.historical_at is null
+    and not (${leaving.live})
+)`;
+
+const SERVER_PASSWORD_TYPES = SERVER_TYPES.filter(
+  (type) => SERVER_PROFILES[type].memberSignIn === 'serverPassword'
+);
+
+// The owner signs in through their own Jellyfin or Emby account on a server the login page
+// offers member sign-in for.
+const hasServerPasswordLogin = (leaving: LeavingAccounts) => sql<boolean>`exists (
+  select 1 from server_users su join servers s on s.id = su.server_id
+  where su.user_id = users.id and s.type in (${sql.join(
+    SERVER_PASSWORD_TYPES.map((type) => sql`${type}`),
+    sql`, `
+  )})
+    and su.removed_at is null and not su.is_disabled and s.historical_at is null
+    and s.allow_member_login and not (${leaving.live})
+)`;
+
 // better-auth verifies passwords against the credential auth_accounts row; users.password_hash
 // is a legacy copy that owners created through better-auth sign-up never get.
 async function ownerCredentials(ownerId: string): Promise<OwnerCredentials> {
   const [row] = await db
-    .select({ password: hasPassword, plex: hasPlexLogin, oidc: hasOidcLogin })
+    .select({
+      password: hasPassword,
+      plex: hasPlexLogin(NOTHING_LEAVES),
+      oidc: hasOidcLogin,
+      tofa: hasTofaLogin(NOTHING_LEAVES),
+    })
     .from(users)
     .where(eq(users.id, ownerId))
     .limit(1);
   return row ?? NO_CREDENTIALS;
 }
 
+const OWNER_LOGIN_METHODS = ['local', 'plex', 'oidc', 'tofa'] as const;
+type OwnerLoginMethod = (typeof OWNER_LOGIN_METHODS)[number];
+
 function ownerCanSignIn(
-  methods: Pick<LoginMethods, 'local' | 'plex' | 'oidc'>,
+  methods: Pick<LoginMethods, OwnerLoginMethod>,
   credentials: OwnerCredentials
 ): boolean {
   return (
     (methods.local && credentials.password) ||
     (methods.plex && credentials.plex) ||
-    (methods.oidc && oidcConfigured && credentials.oidc)
+    (methods.oidc && oidcConfigured && credentials.oidc) ||
+    (methods.tofa && credentials.tofa)
   );
 }
 
@@ -289,12 +364,14 @@ export async function usableLoginMethods(): Promise<LoginMethods> {
   ]);
   const credentials = owner ? await ownerCredentials(owner.id) : NO_CREDENTIALS;
   // The save-time guard cannot see an OIDC env var removed or a Plex row lost later. When the
-  // switches leave the owner no way in, the owner's own password, Plex and OIDC logins still work.
+  // switches leave the owner no way in, the owner's own password, Plex, OIDC and tofa logins still
+  // work.
   const ownerLockedOut = !!owner && !ownerCanSignIn(methods, credentials);
   return {
     local: (methods.local && !!anyPassword) || (ownerLockedOut && credentials.password),
     plex: (methods.plex || ownerLockedOut) && credentials.plex,
     oidc: oidcConfigured && (methods.oidc || (ownerLockedOut && credentials.oidc)),
+    tofa: (methods.tofa || ownerLockedOut) && credentials.tofa,
     // The login page offers every switched-on server whatever the global switch says; the rule,
     // once the media server accepted the person, decides who gets in and who is told no.
     member: !!memberServer && !mediaClosed,
@@ -302,18 +379,53 @@ export async function usableLoginMethods(): Promise<LoginMethods> {
 }
 
 export async function assertOwnerKeepsALoginMethod(
-  next: Partial<Pick<LoginMethods, 'local' | 'plex' | 'oidc'>>
+  next: Partial<Pick<LoginMethods, OwnerLoginMethod>>
 ): Promise<void> {
   const owner = await getOwnerUser();
   if (!owner) return;
   const current = await getSetting('loginMethods');
-  const turnsSomethingOff = (['local', 'plex', 'oidc'] as const).some(
+  const turnsSomethingOff = OWNER_LOGIN_METHODS.some(
     (method) => next[method] === false && current[method]
   );
   if (!turnsSomethingOff) return;
   if (!ownerCanSignIn({ ...current, ...next }, await ownerCredentials(owner.id))) {
-    throw new APIError('BAD_REQUEST', {
-      message: 'That would leave the owner with no way to sign in.',
-    });
+    throw ownerLockoutRefusal();
   }
+}
+
+function ownerLockoutRefusal(): APIError {
+  return new APIError('BAD_REQUEST', {
+    message: 'That would leave the owner with no way to sign in.',
+  });
+}
+
+// Every login of the owner's own counts whatever the switches say: usableLoginMethods opens them
+// whenever the switches leave the owner no way in.
+function ownerHasAWayIn(leaving: LeavingAccounts, mediaOpen: boolean): SQL<boolean> {
+  return sql<boolean>`(${sql.join(
+    [
+      hasPassword,
+      hasPlexLogin(leaving),
+      ...(oidcConfigured ? [hasOidcLogin] : []),
+      hasTofaLogin(leaving),
+      ...(mediaOpen ? [hasServerPasswordLogin(leaving)] : []),
+    ],
+    sql` or `
+  )})`;
+}
+
+/** Refuses a change that would take away the owner's last way to sign in. */
+export async function assertOwnerKeepsALoginAfter(change: ServerAccountChange): Promise<void> {
+  const owner = await getOwnerUser();
+  if (!owner) return;
+  const mediaOpen = !(await mediaSignInClosed());
+  const [row] = await db
+    .select({
+      before: ownerHasAWayIn(NOTHING_LEAVES, mediaOpen),
+      after: ownerHasAWayIn(leavingAccounts(change), mediaOpen),
+    })
+    .from(users)
+    .where(eq(users.id, owner.id))
+    .limit(1);
+  if (row?.before && !row.after) throw ownerLockoutRefusal();
 }

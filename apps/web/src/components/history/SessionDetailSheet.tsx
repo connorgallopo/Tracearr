@@ -41,6 +41,7 @@ import {
 import {
   cn,
   getCountryName,
+  getDistinctProfileName,
   getMediaDisplay,
   getMediaLinks,
   getSessionProgress,
@@ -56,6 +57,7 @@ import { StreamDetailsPanel } from './StreamDetailsPanel';
 import {
   PLAYBACK_DECISION_LABEL_KEYS,
   POSTER_IMAGE_SIZE,
+  SERVER_PROFILES,
   isStaff,
   verbKeysFor,
 } from '@tracearr/shared';
@@ -77,11 +79,11 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-// Server type configuration
-const SERVER_CONFIG: Record<ServerType, { label: string; color: string }> = {
-  plex: { label: 'Plex', color: 'text-amber-500' },
-  jellyfin: { label: 'Jellyfin', color: 'text-purple-500' },
-  emby: { label: 'Emby', color: 'text-green-500' },
+const SERVER_LABEL_COLOR: Record<ServerType, string> = {
+  plex: 'text-amber-500',
+  jellyfin: 'text-purple-500',
+  emby: 'text-green-500',
+  tofa: 'text-teal-500',
 };
 
 const STATE_CONFIG = {
@@ -244,7 +246,7 @@ function SessionContent({
     setSegmentsOpen(false);
   }
 
-  const serverConfig = SERVER_CONFIG[session.server.type];
+  const profileName = getDistinctProfileName(session);
   const stateConfig = STATE_CONFIG[session.state];
   const mediaConfig = MEDIA_CONFIG[session.mediaType];
   const MediaIcon = mediaConfig.icon;
@@ -353,6 +355,9 @@ function SessionContent({
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">
                   {session.user.identityName ?? session.user.username}
+                  {profileName && (
+                    <span className="text-muted-foreground font-normal"> · {profileName}</span>
+                  )}
                 </p>
                 {session.user.identityName &&
                   session.user.identityName !== session.user.username && (
@@ -384,7 +389,9 @@ function SessionContent({
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">{t('labels.server')}</span>
             <span className="flex items-center gap-1.5">
-              <span className={serverConfig.color}>{serverConfig.label}</span>
+              <span className={SERVER_LABEL_COLOR[session.server.type]}>
+                {SERVER_PROFILES[session.server.type].displayName}
+              </span>
               <span className="text-muted-foreground">·</span>
               {session.server.name}
             </span>

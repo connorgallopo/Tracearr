@@ -89,7 +89,7 @@ import { settingsRoutes } from '../settings.js';
 import { permissionGuard } from '../../lib/scope.js';
 
 const mockAllSettings: Settings = {
-  loginMethods: { local: true, plex: true, oidc: true, member: false },
+  loginMethods: { local: true, plex: true, oidc: true, tofa: true, member: false },
   unitSystem: 'metric',
   pollerEnabled: true,
   pollerIntervalMs: 15000,
@@ -198,7 +198,13 @@ describe('Settings Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = response.json();
-      expect(body.loginMethods).toEqual({ local: true, plex: true, oidc: true, member: false });
+      expect(body.loginMethods).toEqual({
+        local: true,
+        plex: true,
+        oidc: true,
+        tofa: true,
+        member: false,
+      });
       expect(body.pollerEnabled).toBe(true);
       expect(body.pollerIntervalMs).toBe(15000);
       expect(body.externalUrl).toBe('https://tracearr.example.com');

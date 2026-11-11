@@ -497,10 +497,10 @@ export interface PlexServerInfo {
   connections: PlexServerConnection[];
 }
 
-// Minimal user echoed back by the Plex Better Auth plugin endpoints. The
+// Minimal user echoed back by the Plex and tofa Better Auth plugin endpoints. The
 // session cookie itself carries the full session; this is just enough for
 // the login UI to know who signed in.
-export interface PlexAuthUser {
+export interface SignedInUser {
   id: string;
   username: string;
   role: UserRole;
@@ -512,17 +512,54 @@ export interface PlexCheckPinResponse {
   /** The sign-in was started too long ago or in another browser; start it again. */
   expired?: boolean;
   // If returning user (or new user with no servers) - session cookie is already set
-  user?: PlexAuthUser;
+  user?: SignedInUser;
   // If new user (needs server selection)
   needsServerSelection?: boolean;
   servers?: PlexDiscoveredServer[]; // Now includes reachability info
   tempToken?: string;
+  /** The plex.tv username, with the servers, so the picker can say who signed in. */
+  username?: string;
 }
 
 export interface PlexConnectResponse {
   authorized: boolean;
-  user: PlexAuthUser;
+  user: SignedInUser;
 }
+
+/** A tofa server the signed-in tofa account owns, as tofa cloud lists it. */
+export interface TofaCloudServer {
+  id: string;
+  name: string;
+  online: boolean;
+  localAddress: string | null;
+}
+
+export interface TofaInitiateResponse {
+  handle: string;
+  verificationUri: string;
+  userCode: string;
+  expiresIn: number;
+  interval: number;
+}
+
+type TofaExpired = { status: 'expired' };
+type TofaUnreachable = { status: 'unreachable'; address: string };
+
+export type TofaCheckResponse =
+  | { status: 'pending' }
+  | { status: 'slow_down' }
+  | TofaExpired
+  | { status: 'signed-in'; user: SignedInUser }
+  | { status: 'no-servers'; username: string }
+  | { status: 'all-connected'; username: string }
+  | { status: 'select-server'; tempToken: string; username: string; servers: TofaCloudServer[] }
+  | { status: 'linked' };
+
+export type TofaConnectResponse =
+  TofaExpired | TofaUnreachable | { status: 'signed-in'; user: SignedInUser };
+
+export type TofaAddServerResponse =
+  TofaExpired | TofaUnreachable | { status: 'added'; server: Server; canStopStreams: boolean };
 
 // Token storage keys
 const ACCESS_TOKEN_KEY = 'tracearr_access_token';
@@ -610,6 +647,7 @@ class ApiClient {
       '/auth/logout',
       '/auth/me',
       '/auth/plex/check-pin',
+      '/auth/tofa/check',
       '/auth/callback',
     ];
     const shouldClearAuth = !noAuthClearPaths.some((p) => path.startsWith(p));
@@ -660,12 +698,14 @@ class ApiClient {
         username: string;
         email: string | null;
         thumbnail: string | null;
+        thumbnailServerId?: string | null;
         role: UserRole;
         aggregateTrustScore?: number;
         serverIds: string[];
         impersonatedBy?: string;
         hasPassword?: boolean;
         hasPlexLinked?: boolean;
+        hasTofaLinked?: boolean;
         // Fallback fields for backwards compatibility
         id?: string;
         serverId?: string;
@@ -767,6 +807,43 @@ class ApiClient {
       claimCode?: string;
     }) =>
       this.request<{ connection: PlexDiscoveredConnection }>('/auth/plex/test-connection', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
+    // tofa cloud device sign-in: the browser holds only the handle and the temp token
+    initiateTofa: (purpose: 'sign-in' | 'add-server') =>
+      this.request<TofaInitiateResponse>('/auth/tofa/initiate', {
+        method: 'POST',
+        body: JSON.stringify({ purpose }),
+      }),
+
+    initiateTofaLink: (serverId: string) =>
+      this.request<TofaInitiateResponse>('/auth/tofa/initiate', {
+        method: 'POST',
+        body: JSON.stringify({ purpose: 'link', serverId }),
+      }),
+
+    checkTofa: (data: { handle: string; claimCode?: string }) =>
+      this.request<TofaCheckResponse>('/auth/tofa/check', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
+    // First run: creates the key on the picked server, then the owner and the server
+    connectTofa: (data: {
+      tempToken: string;
+      serverId: string;
+      url?: string;
+      claimCode?: string;
+    }) =>
+      this.request<TofaConnectResponse>('/auth/tofa/connect', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+
+    addTofaServer: (data: { tempToken: string; serverId: string; url?: string }) =>
+      this.request<TofaAddServerResponse>('/auth/tofa/add-server', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
@@ -2198,6 +2275,21 @@ class ApiClient {
         this.request<{ status: string; jobId: string }>(`/import/playback-reporting/${jobId}`, {
           method: 'DELETE',
         }),
+    },
+    tofa: {
+      start: (serverId: string) =>
+        this.request<{ status: string; jobId?: string; message: string }>('/import/tofa', {
+          method: 'POST',
+          body: JSON.stringify({ serverId }),
+        }),
+      getActive: (serverId: string) =>
+        this.request<{
+          active: boolean;
+          jobId?: string;
+          state?: string;
+          progress?: number | object;
+          createdAt?: number;
+        }>(`/import/tofa/active/${serverId}`),
     },
   };
 

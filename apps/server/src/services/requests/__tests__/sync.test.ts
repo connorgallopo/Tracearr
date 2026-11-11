@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SeerrRequest, SeerrTitleLookup } from '../seerrClient.js';
 import type { SeerrClientLike } from '../sync.js';
 
@@ -10,7 +10,7 @@ const { mockDb, store, resolution } = vi.hoisted(() => ({
     recordSyncResult: vi.fn(),
     markRequestServiceReencrypt: vi.fn(),
     publishRequestsChanged: vi.fn(),
-    remoteIdsWithStoredTitle: vi.fn(),
+    mirroredRequests: vi.fn(),
   },
   resolution: { resolveRequests: vi.fn() },
 }));
@@ -20,8 +20,12 @@ vi.mock('../store.js', () => store);
 vi.mock('../resolution.js', () => resolution);
 vi.mock('../serverLookup.js', () => ({
   serverTypeById: vi.fn(async () => 'plex'),
+  liveServerConnection: vi.fn(async () => ({ url: 'http://tofa.local:33333', token: 'key' })),
 }));
 
+import { TofaClient } from '../../mediaServer/tofa/client.js';
+import { fakeTofaRequestSource } from '../../../test/mediaServerFakes.js';
+import tofa from '../../../test/mediaServerResponses/tofa.json' with { type: 'json' };
 import { PAGE_SIZE, runRequestSync } from '../sync.js';
 
 const counts = {
@@ -71,6 +75,7 @@ function serviceRow(overrides: Record<string, unknown> = {}) {
     config: 'enc',
     configStatus: 'ok',
     enabled: true,
+    takesRequests: true,
     remoteServerId: 'abc',
     version: null,
     syncCursor: null,
@@ -86,10 +91,11 @@ function serviceRow(overrides: Record<string, unknown> = {}) {
 
 function client(
   pages: SeerrRequest[][],
-  extra: Partial<Record<'movie' | 'tv', (tmdbId: number) => Promise<SeerrTitleLookup>>> = {}
+  extra: Partial<Pick<SeerrClientLike, 'movie' | 'tv' | 'mainSettings'>> = {}
 ): SeerrClientLike {
   return {
     status: vi.fn(async () => ({ version: '3.5.0' })),
+    mainSettings: extra.mainSettings ?? vi.fn(async () => ({ cacheImages: false })),
     requestCount: vi.fn(async () => counts),
     requestsPage: vi.fn(async (skip: number, take: number) => {
       const index = skip / take;
@@ -104,8 +110,20 @@ function client(
         results,
       };
     }),
-    movie: extra.movie ?? vi.fn(async () => ({ title: 'Looked Up', year: 2024 })),
-    tv: extra.tv ?? vi.fn(async () => ({ title: 'Looked Up TV', year: 2020 })),
+    movie:
+      extra.movie ??
+      vi.fn(async (): Promise<SeerrTitleLookup> => ({
+        title: 'Looked Up',
+        year: 2024,
+        posterPath: null,
+      })),
+    tv:
+      extra.tv ??
+      vi.fn(async (): Promise<SeerrTitleLookup> => ({
+        title: 'Looked Up TV',
+        year: 2020,
+        posterPath: null,
+      })),
   };
 }
 
@@ -115,7 +133,7 @@ describe('runRequestSync', () => {
     vi.clearAllMocks();
     upserts = [];
     store.readApiKey.mockReturnValue({ ok: true, apiKey: 'k' });
-    store.remoteIdsWithStoredTitle.mockResolvedValue(new Set());
+    store.mirroredRequests.mockResolvedValue(new Map());
     resolution.resolveRequests.mockResolvedValue(new Map());
     mockDb.execute.mockImplementation(async (query: { queryChunks?: unknown[] }) => {
       upserts.push(query);
@@ -217,9 +235,9 @@ describe('runRequestSync', () => {
   it('takes titles from matched media and looks up only unresolved rows', async () => {
     store.getRequestService.mockResolvedValue(serviceRow());
     resolution.resolveRequests.mockResolvedValue(
-      new Map([[1, { mediaId: 'm-1', serverUserId: null, title: 'Local Title', year: 2019 }]])
+      new Map([['1', { mediaId: 'm-1', serverUserId: null, title: 'Local Title', year: 2019 }]])
     );
-    const movie = vi.fn(async () => ({ title: 'Remote Title', year: 2024 }));
+    const movie = vi.fn(async () => ({ title: 'Remote Title', year: 2024, posterPath: null }));
     const c = client(
       [[request(1, '2026-09-03T00:00:00.000Z'), request(2, '2026-09-03T00:00:00.000Z')]],
       { movie }
@@ -231,15 +249,51 @@ describe('runRequestSync', () => {
 
   it('leaves the title lookups alone on a second run over rows that already stored one', async () => {
     store.getRequestService.mockResolvedValue(serviceRow());
-    const movie = vi.fn(async () => ({ title: 'Remote Title', year: 2024 }));
+    const movie = vi.fn(async () => ({ title: 'Remote Title', year: 2024, posterPath: null }));
     const c = client([[request(1, '2026-09-03T00:00:00.000Z')]], { movie });
 
     await runRequestSync('svc', 'full', { clientFor: () => c });
     expect(movie).toHaveBeenCalledTimes(1);
 
-    store.remoteIdsWithStoredTitle.mockResolvedValue(new Set([1]));
+    store.mirroredRequests.mockResolvedValue(new Map([['1', { titled: true, postered: false }]]));
     await runRequestSync('svc', 'full', { clientFor: () => c });
     expect(movie).toHaveBeenCalledTimes(1);
+  });
+
+  it("stores Seerr's image cache path for a request in no library while Seerr caches images", async () => {
+    store.getRequestService.mockResolvedValue(serviceRow());
+    const c = client([[request(1, '2026-09-03T00:00:00.000Z')]], {
+      mainSettings: vi.fn(async () => ({ cacheImages: true })),
+      movie: vi.fn(async () => ({ title: 'Remote Title', year: 2024, posterPath: '/abc.jpg' })),
+    });
+
+    await runRequestSync('svc', 'full', { clientFor: () => c });
+
+    const sqlText = upserts.map((q) => JSON.stringify(q)).join('\n');
+    expect(sqlText).toContain('"/imageproxy/tmdb/t/p/w600_and_h900_bestv2/abc.jpg"');
+  });
+
+  it('stores no poster while Seerr does not cache images', async () => {
+    store.getRequestService.mockResolvedValue(serviceRow());
+    const c = client([[request(1, '2026-09-03T00:00:00.000Z')]], {
+      movie: vi.fn(async () => ({ title: 'Remote Title', year: 2024, posterPath: '/abc.jpg' })),
+    });
+
+    await runRequestSync('svc', 'full', { clientFor: () => c });
+
+    const sqlText = upserts.map((q) => JSON.stringify(q)).join('\n');
+    expect(sqlText).not.toContain('abc.jpg');
+  });
+
+  it('drops the stored posters once Seerr stops caching images', async () => {
+    store.getRequestService.mockResolvedValue(serviceRow());
+    store.mirroredRequests.mockResolvedValue(new Map([['1', { titled: true, postered: true }]]));
+    const c = client([[request(1, '2026-09-03T00:00:00.000Z')]]);
+
+    await runRequestSync('svc', 'full', { clientFor: () => c });
+
+    const sqlText = upserts.map((q) => JSON.stringify(q)).join('\n');
+    expect(sqlText).toContain('UPDATE media_requests SET poster_path = NULL');
   });
 
   it('marks the service for re-entry when the key no longer decrypts', async () => {
@@ -271,5 +325,153 @@ describe('runRequestSync', () => {
     const result = await runRequestSync('svc', 'incremental', { clientFor: () => c });
     expect(result.skipped).toBe(true);
     expect(c.requestCount).not.toHaveBeenCalled();
+  });
+});
+
+describe('runRequestSync for tofa', () => {
+  let statements: string[];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    statements = [];
+    resolution.resolveRequests.mockResolvedValue(new Map());
+    store.mirroredRequests.mockResolvedValue(new Map());
+    mockDb.execute.mockImplementation(async (query: unknown) => {
+      statements.push(JSON.stringify(query));
+      return { rows: [], rowCount: 0 };
+    });
+    store.getRequestService.mockResolvedValue(
+      serviceRow({ type: 'tofa', url: 'http://tofa.local:33333', config: null })
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it('lists every request on each scheduled run, so a status change lands without a socket frame', async () => {
+    const [waiting] = tofa.requests;
+    if (!waiting) throw new Error('fixture has no requests');
+    const source = fakeTofaRequestSource({ getRequests: vi.fn(async () => [waiting]) });
+    await runRequestSync('svc', 'incremental', { tofaClientFor: () => source });
+
+    source.getRequests = vi.fn(async () => [{ ...waiting, status: 'available' }]);
+    statements = [];
+    const result = await runRequestSync('svc', 'incremental', { tofaClientFor: () => source });
+
+    expect(result).toEqual({ skipped: false, upserted: 1, markedDeleted: 0 });
+    const upsert = statements.find((q) => q.includes('INSERT INTO media_requests'));
+    expect(upsert).toContain('"completed"');
+    expect(statements.some((q) => q.includes('UPDATE media_requests SET deleted_at'))).toBe(true);
+  });
+
+  it('asks tofa for the poster of a request in no library and stores its image cache path', async () => {
+    const [show, inLibrary] = tofa.requests;
+    if (!show || !inLibrary) throw new Error('fixture has too few requests');
+    resolution.resolveRequests.mockResolvedValue(
+      new Map([[inLibrary.id, { mediaId: 'm-1', serverUserId: null, title: 'T', year: 2020 }]])
+    );
+    const source = fakeTofaRequestSource({
+      getRequests: vi.fn(async () => [show, inLibrary]),
+      getRequestPosterPath: vi.fn(async () => '/cache/images/posters/abc.jpg'),
+    });
+
+    await runRequestSync('svc', 'incremental', { tofaClientFor: () => source });
+
+    expect(source.getRequestPosterPath).toHaveBeenCalledTimes(1);
+    expect(source.getRequestPosterPath).toHaveBeenCalledWith('tv', show.tmdb_id);
+    const upsert = statements.find((q) => q.includes('INSERT INTO media_requests'));
+    expect(upsert).toContain('"/cache/images/posters/abc.jpg"');
+  });
+
+  it('asks again for a missing poster only on a full run', async () => {
+    const [waiting] = tofa.requests;
+    if (!waiting) throw new Error('fixture has no requests');
+    store.mirroredRequests.mockResolvedValue(
+      new Map([[waiting.id, { titled: true, postered: false }]])
+    );
+    const source = fakeTofaRequestSource({ getRequests: vi.fn(async () => [waiting]) });
+
+    await runRequestSync('svc', 'incremental', { tofaClientFor: () => source });
+    expect(source.getRequestPosterPath).not.toHaveBeenCalled();
+
+    await runRequestSync('svc', 'full', { tofaClientFor: () => source });
+    expect(source.getRequestPosterPath).toHaveBeenCalledTimes(1);
+  });
+
+  it('reports requests turned off and leaves the mirror alone', async () => {
+    const source = fakeTofaRequestSource({
+      systemInfo: vi.fn(async () => ({ ...tofa.systemInfo, requests_available: false })),
+    });
+
+    const result = await runRequestSync('svc', 'full', { tofaClientFor: () => source });
+
+    expect(result.skipped).toBe(true);
+    expect(source.getRequests).not.toHaveBeenCalled();
+    expect(statements).toEqual([]);
+    expect(store.recordSyncResult).toHaveBeenCalledWith(
+      'svc',
+      expect.objectContaining({ lastSyncError: 'Requests are turned off on this tofa server' })
+    );
+  });
+
+  it('records whether tofa takes requests, and tells the web when that changes', async () => {
+    const off = fakeTofaRequestSource({
+      systemInfo: vi.fn(async () => ({ ...tofa.systemInfo, requests_available: false })),
+    });
+    await runRequestSync('svc', 'full', { tofaClientFor: () => off });
+
+    expect(store.recordSyncResult).toHaveBeenLastCalledWith(
+      'svc',
+      expect.objectContaining({ takesRequests: false })
+    );
+    expect(store.publishRequestsChanged).toHaveBeenCalledTimes(1);
+
+    store.getRequestService.mockResolvedValue(
+      serviceRow({
+        type: 'tofa',
+        url: 'http://tofa.local:33333',
+        config: null,
+        takesRequests: false,
+      })
+    );
+    const on = fakeTofaRequestSource({ getRequests: vi.fn(async () => []) });
+    await runRequestSync('svc', 'full', { tofaClientFor: () => on });
+
+    expect(store.recordSyncResult).toHaveBeenLastCalledWith(
+      'svc',
+      expect.objectContaining({ takesRequests: true })
+    );
+    expect(store.publishRequestsChanged).toHaveBeenCalledTimes(2);
+  });
+
+  it.each([
+    ['an error status', async () => new Response('', { status: 502 })],
+    [
+      'a timeout',
+      async (): Promise<Response> => {
+        throw new DOMException('The operation timed out', 'TimeoutError');
+      },
+    ],
+    ['a body that is not JSON', async () => new Response('<html>', { status: 200 })],
+    ['a body without the list', async () => Response.json({})],
+  ])('leaves the mirror untouched when listing the requests fails with %s', async (_, listing) => {
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        url.endsWith('/system/info') ? Response.json(tofa.systemInfo) : listing()
+      )
+    );
+
+    await expect(
+      runRequestSync('svc', 'incremental', { tofaClientFor: (server) => new TofaClient(server) })
+    ).rejects.toThrow();
+
+    expect(statements).toEqual([]);
+    expect(store.recordSyncResult).toHaveBeenCalledWith('svc', {
+      lastSyncError: expect.any(String),
+    });
   });
 });

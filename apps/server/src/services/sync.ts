@@ -11,10 +11,16 @@ import type pg from 'pg';
 import { assertNever, type JellyfinEmbyServerType } from '@tracearr/shared';
 import { createRawPgClient, db, type Executor } from '../db/client.js';
 import * as schema from '../db/schema.js';
-import { servers, serverUsers } from '../db/schema.js';
+import { servers, serverUsers, serverUserLinks } from '../db/schema.js';
 import { revokeSessionsForServerUsers } from '../lib/revoke.js';
 import { clearScope } from '../lib/scope.js';
-import { createMediaServerClient, PlexClient, type MediaUser } from './mediaServer/index.js';
+import { publishServersChanged } from '../jobs/poller/database.js';
+import {
+  createMediaServerClient,
+  PlexClient,
+  TofaClient,
+  type MediaUser,
+} from './mediaServer/index.js';
 import {
   loadServerAccounts,
   recomputeIdentityAggregates,
@@ -22,6 +28,8 @@ import {
   type ServerSyncBatch,
   type SyncUserOptions,
 } from './userService.js';
+import { readServerFacts } from './mediaServer/byServerType.js';
+import type { TofaLinkedAccount } from './mediaServer/tofa/parser.js';
 import { ensureServerIdentifier } from './serverIdentity.js';
 import { ServerHistoricalError } from './liveServers.js';
 
@@ -137,7 +145,7 @@ export async function syncServerUsers(
     const accounts = await loadServerAccounts(serverId);
     const recompute = new Set<string>();
     const clearScopes = new Set<string>();
-    const disabledIds: string[] = [];
+    const lostAccessIds: string[] = [];
     const writer = batchWriter(client);
     const batch: ServerSyncBatch = { accounts, write: writer.write, recompute, clearScopes };
     // A batch's follow-ups run as soon as its writes commit: once committed, the next sync sees
@@ -151,12 +159,12 @@ export async function syncServerUsers(
         const message = err instanceof Error ? err.message : 'Unknown error';
         errors.push(`Failed to recount ${recompute.size} identities: ${message}`);
       }
-      if (disabledIds.length > 0) await revokeSessionsForServerUsers([...disabledIds]);
+      if (lostAccessIds.length > 0) await revokeSessionsForServerUsers([...lostAccessIds]);
       // After commit, so a scope rebuilt meanwhile reads the new library access.
       for (const userId of clearScopes) await clearScope(userId);
       recompute.clear();
       clearScopes.clear();
-      disabledIds.length = 0;
+      lostAccessIds.length = 0;
     };
     for (const [index, mediaUser] of mediaUsers.entries()) {
       syncedExternalIds.push(mediaUser.id);
@@ -169,7 +177,7 @@ export async function syncServerUsers(
           added++;
         } else {
           updated++;
-          if (result.newlyDisabled) disabledIds.push(result.serverUser.id);
+          if (result.lostAccess) lostAccessIds.push(result.serverUser.id);
         }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
@@ -259,6 +267,20 @@ async function fetchPlexUsers(token: string, serverUrl: string): Promise<MediaUs
   return PlexClient.getAllUsersWithLibraries(token, machineIdentifier);
 }
 
+type UserSyncResult = Awaited<ReturnType<typeof syncServerUsers>>;
+
+function failedUserSync(serverName: string, err: unknown): UserSyncResult {
+  const message = err instanceof Error ? err.message : 'Unknown error';
+  return {
+    added: 0,
+    updated: 0,
+    skipped: 0,
+    removed: 0,
+    restored: 0,
+    errors: [`${serverName} user sync failed: ${message}`],
+  };
+}
+
 /**
  * Sync users from Plex server to local database
  *
@@ -271,27 +293,12 @@ async function syncPlexUsers(
   serverId: string,
   token: string,
   serverUrl: string
-): Promise<{
-  added: number;
-  updated: number;
-  skipped: number;
-  removed: number;
-  restored: number;
-  errors: string[];
-}> {
+): Promise<UserSyncResult> {
   try {
     const plexUsers = await fetchPlexUsers(token, serverUrl);
     return await syncServerUsers(serverId, plexUsers, { isPlexServer: true });
   } catch (err) {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    return {
-      added: 0,
-      updated: 0,
-      skipped: 0,
-      removed: 0,
-      restored: 0,
-      errors: [`Plex user sync failed: ${message}`],
-    };
+    return failedUserSync('Plex', err);
   }
 }
 
@@ -304,14 +311,7 @@ async function syncMediaServerUsers(
   serverType: JellyfinEmbyServerType,
   serverUrl: string,
   token: string
-): Promise<{
-  added: number;
-  updated: number;
-  skipped: number;
-  removed: number;
-  restored: number;
-  errors: string[];
-}> {
+): Promise<UserSyncResult> {
   const serverName = serverType.charAt(0).toUpperCase() + serverType.slice(1);
   try {
     const client = createMediaServerClient({
@@ -337,15 +337,87 @@ async function syncMediaServerUsers(
     }));
     return await syncServerUsers(serverId, withLibraryIds); // isPlexServer defaults to false
   } catch (err) {
+    return failedUserSync(serverName, err);
+  }
+}
+
+async function syncTofaUsers(
+  serverId: string,
+  serverUrl: string,
+  token: string
+): Promise<UserSyncResult> {
+  try {
+    const client = new TofaClient({ url: serverUrl, token, id: serverId });
+    const result = await syncServerUsers(serverId, await client.getUsers());
+    try {
+      await saveAccountLinks(serverId, await client.getAccountLinks());
+    } catch (err) {
+      // The links only feed merge suggestions; the ones already saved stay until the next sync
+      console.warn('[Sync] tofa account links failed:', err);
+    }
+    return result;
+  } catch (err) {
+    return failedUserSync('tofa', err);
+  }
+}
+
+/** Replaces the saved links of a server's users with the ones it reports now. */
+async function saveAccountLinks(serverId: string, links: TofaLinkedAccount[]): Promise<void> {
+  const accounts = await db
+    .select({ id: serverUsers.id, externalId: serverUsers.externalId })
+    .from(serverUsers)
+    .where(eq(serverUsers.serverId, serverId));
+  const serverUserIdOf = new Map(accounts.map((account) => [account.externalId, account.id]));
+  const rows = links.flatMap((link) => {
+    const serverUserId = serverUserIdOf.get(link.userId);
+    return serverUserId
+      ? [
+          {
+            serverUserId,
+            provider: link.provider,
+            externalUserId: link.externalUserId,
+            externalServerId: link.externalServerId,
+          },
+        ]
+      : [];
+  });
+
+  await db.transaction(async (tx) => {
+    if (accounts.length > 0) {
+      await tx.delete(serverUserLinks).where(
+        inArray(
+          serverUserLinks.serverUserId,
+          accounts.map((account) => account.id)
+        )
+      );
+    }
+    if (rows.length > 0) await tx.insert(serverUserLinks).values(rows).onConflictDoNothing();
+  });
+}
+
+/**
+ * The key's scopes and the watched rule can change on the server, so each user sync rereads
+ * them. Apart from the user sync, so a failed read leaves the users syncing.
+ */
+async function refreshTofaServerFacts(
+  server: Pick<typeof servers.$inferSelect, 'id' | 'canStopStreams' | 'watchedRulePercent'>,
+  serverUrl: string,
+  token: string
+): Promise<string[]> {
+  try {
+    const facts = await readServerFacts('tofa', serverUrl, token);
+    if (
+      facts.canStopStreams === server.canStopStreams &&
+      facts.watchedRulePercent === server.watchedRulePercent
+    ) {
+      return [];
+    }
+    await db.update(servers).set(facts).where(eq(servers.id, server.id));
+    await publishServersChanged();
+    return [];
+  } catch (err) {
     const message = err instanceof Error ? err.message : 'Unknown error';
-    return {
-      added: 0,
-      updated: 0,
-      skipped: 0,
-      removed: 0,
-      restored: 0,
-      errors: [`${serverName} user sync failed: ${message}`],
-    };
+    return [`tofa key scope refresh failed: ${message}`];
   }
 }
 
@@ -388,7 +460,7 @@ export async function syncServer(
 
   // Sync users
   if (options.syncUsers) {
-    let userResult: Awaited<ReturnType<typeof syncPlexUsers>>;
+    let userResult: UserSyncResult;
     switch (server.type) {
       case 'plex':
         userResult = await syncPlexUsers(serverId, token, serverUrl);
@@ -397,6 +469,14 @@ export async function syncServer(
       case 'emby':
         userResult = await syncMediaServerUsers(serverId, server.type, serverUrl, token);
         break;
+      case 'tofa': {
+        const [users, factErrors] = await Promise.all([
+          syncTofaUsers(serverId, serverUrl, token),
+          refreshTofaServerFacts(server, serverUrl, token),
+        ]);
+        userResult = { ...users, errors: [...users.errors, ...factErrors] };
+        break;
+      }
       default:
         return assertNever(server.type);
     }

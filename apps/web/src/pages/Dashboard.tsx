@@ -20,7 +20,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useServer } from '@/hooks/useServer';
 import { useServerColorMap } from '@/hooks/useServerColorMap';
 import { useSocket } from '@/hooks/useSocket';
-import { SERVER_PROFILES, pickServerColor } from '@tracearr/shared';
+import { SERVER_PROFILES, liveStatsGapSeconds, pickServerColor } from '@tracearr/shared';
 import { formatWatchTime } from '@/lib/dateFormat';
 import { cn } from '@/lib/utils';
 
@@ -90,7 +90,9 @@ function ServerDashboard({ actions }: { actions?: ReactNode }) {
     !!singleProfile?.reportsBandwidth ||
     (isMultiServer && liveSelected.some((s) => SERVER_PROFILES[s.type].reportsBandwidth));
   const singleProcessLabel = singleServer
-    ? { plex: 'Plex Media Server', jellyfin: 'Jellyfin', emby: 'Emby' }[singleServer.type]
+    ? { plex: 'Plex Media Server', jellyfin: 'Jellyfin', emby: 'Emby', tofa: 'tofa' }[
+        singleServer.type
+      ]
     : undefined;
 
   const {
@@ -110,40 +112,51 @@ function ServerDashboard({ actions }: { actions?: ReactNode }) {
       liveSelected.some((s) => SERVER_PROFILES[s.type].hostStats === 'plexStatistics'));
 
   const seriesMeta = useCallback(
-    (serverId: string) => {
-      const server = selectedServers.find((p) => p.id === serverId);
-      return {
-        serverId,
-        serverName: server?.name ?? serverId,
-        color:
-          serverColorMap.get(serverId) ??
-          pickServerColor(
-            server?.type ?? 'plex',
-            selectedServers.map((p) => p.color)
-          ),
-      };
-    },
+    (server: (typeof selectedServers)[number]) => ({
+      serverId: server.id,
+      serverName: server.name,
+      color:
+        serverColorMap.get(server.id) ??
+        pickServerColor(
+          server.type,
+          selectedServers.map((p) => p.color)
+        ),
+    }),
     [selectedServers, serverColorMap]
   );
 
+  // A series whose server is no longer selected (its stats answered after the selection
+  // changed) draws no line
   const resourceMultiSeries = useMemo(
     () =>
       showMultiServerResources
-        ? multiLiveStats
-            .filter((s) => s.statistics.length > 0)
-            .map((s) => ({ ...seriesMeta(s.serverId), data: s.statistics }))
+        ? multiLiveStats.flatMap((s) => {
+            const server = selectedServers.find((p) => p.id === s.serverId);
+            return server && s.statistics.length > 0
+              ? [
+                  {
+                    ...seriesMeta(server),
+                    gapSeconds: liveStatsGapSeconds(server.type),
+                    data: s.statistics,
+                  },
+                ]
+              : [];
+          })
         : undefined,
-    [showMultiServerResources, multiLiveStats, seriesMeta]
+    [showMultiServerResources, multiLiveStats, seriesMeta, selectedServers]
   );
 
   const bandwidthMultiSeries = useMemo(
     () =>
       showMultiServerResources
-        ? multiLiveStats
-            .filter((s) => s.bandwidth.length > 0)
-            .map((s) => ({ ...seriesMeta(s.serverId), data: s.bandwidth }))
+        ? multiLiveStats.flatMap((s) => {
+            const server = selectedServers.find((p) => p.id === s.serverId);
+            return server && s.bandwidth.length > 0
+              ? [{ ...seriesMeta(server), data: s.bandwidth }]
+              : [];
+          })
         : undefined,
-    [showMultiServerResources, multiLiveStats, seriesMeta]
+    [showMultiServerResources, multiLiveStats, seriesMeta, selectedServers]
   );
 
   const hasActiveStreams = (sessions?.length ?? 0) > 0;
@@ -244,6 +257,7 @@ function ServerDashboard({ actions }: { actions?: ReactNode }) {
               averages={showServerResources ? averages : undefined}
               multiSeries={showMultiServerResources ? resourceMultiSeries : undefined}
               processLabel={singleProcessLabel}
+              gapSeconds={singleServer ? liveStatsGapSeconds(singleServer.type) : undefined}
               clockSkewMs={clockSkewMs}
             />
             {showBandwidthChart && (

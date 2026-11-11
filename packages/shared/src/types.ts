@@ -62,6 +62,8 @@ export interface Server {
   /** When Tracearr stopped contacting this server. Null, or absent on older payloads, while it is live. */
   historicalAt?: string | null;
   allowMemberLogin?: boolean;
+  /** False when the saved API key may not stop streams; null for servers whose key always may. */
+  canStopStreams?: boolean | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -274,10 +276,11 @@ export interface OwnerLinkCandidate {
   blockedReason: OwnerLinkBlockedReason | null;
 }
 
-/** The owner's own account on one Jellyfin or Emby server, or the accounts it could be. */
+/** The owner's own account on one Jellyfin, Emby or tofa server, or the accounts it could be. */
 export interface OwnerLinkServer {
   serverId: string;
-  linked: { serverUserId: string; username: string } | null;
+  /** canUnlink is false for the tofa account the owner's own tofa sign-in came with, which stays. */
+  linked: { serverUserId: string; username: string; canUnlink: boolean } | null;
   candidates: OwnerLinkCandidate[];
 }
 
@@ -303,7 +306,8 @@ export interface MergeSuggestionIdentity {
 }
 
 export interface MergeSuggestion {
-  matchType: 'email' | 'username';
+  /** linkedAccount: one server reports the other account as its user's own; matchValue is that account's username */
+  matchType: 'linkedAccount' | 'email' | 'username';
   matchValue: string;
   users: [MergeSuggestionIdentity, MergeSuggestionIdentity];
   requiredTargetUserId: string | null;
@@ -329,6 +333,7 @@ export interface SetupStatus {
     plex: boolean;
     oidc: boolean;
     oidcProviderName: string | null;
+    tofa: boolean;
     member: boolean;
     /** SSO-only is hiding the owner's and admins' other methods; /login?all shows them. */
     ssoOnly: boolean;
@@ -411,6 +416,10 @@ export interface TranscodeInfo {
   /** Seconds from the file start that the transcoder has ready (Plex only; Jellyfin sends none) */
   maxOffsetAvailable?: number;
   reasons?: string[];
+  /** Playback health the client reports (tofa only) */
+  rebufferCount?: number;
+  rebufferDurationMs?: number;
+  droppedFrames?: number;
 }
 
 /** Subtitle stream information */
@@ -520,6 +529,8 @@ export interface Session extends StreamDetailFields {
   geoAsnOrganization: string | null;
   // A local network session; its geo fields hold its server's location when one is set
   isLocal: boolean;
+  /** The profile that played, where one account holds several (tofa); null elsewhere */
+  profileName: string | null;
   playerName: string | null; // Friendly device name
   deviceId: string | null; // Unique device identifier (machineIdentifier)
   product: string | null; // Product/app name (e.g., "Plex for iOS")
@@ -1126,6 +1137,7 @@ export interface LoginMethods {
   local: boolean;
   plex: boolean;
   oidc: boolean;
+  tofa: boolean;
   member: boolean;
 }
 
@@ -1409,6 +1421,39 @@ export interface PlaybackReportingImportResult {
   }[];
 }
 
+// tofa watch history import types
+export interface TofaImportProgress {
+  status: 'idle' | 'waiting' | 'fetching' | 'processing' | 'complete' | 'error';
+  fetchedRecords: number;
+  processedRecords: number;
+  importedRecords: number;
+  skippedRecords: number;
+  /** Skipped: a play Tracearr captured itself, or one an earlier import brought in */
+  duplicateRecords: number;
+  /** Skipped: user not found in Tracearr (sync server first) */
+  unknownUserRecords: number;
+  /** Skipped: a play still running, which has no end yet */
+  activeRecords: number;
+  errorRecords: number;
+  message: string;
+  /** Present when status='waiting' - what this job is waiting for */
+  waitingFor?: HeavyOpsWaitingFor;
+}
+
+export interface TofaImportResult {
+  success: boolean;
+  imported: number;
+  skipped: number;
+  duplicates: number;
+  errors: number;
+  message: string;
+  skippedUsers?: {
+    userId: string;
+    username: string | null;
+    recordCount: number;
+  }[];
+}
+
 // Library sync progress types
 export interface LibrarySyncProgress {
   serverId: string;
@@ -1440,6 +1485,7 @@ export interface ServerToClientEvents {
   'import:progress': (progress: TautulliImportProgress) => void;
   'import:jellystat:progress': (progress: JellystatImportProgress) => void;
   'import:playbackreporting:progress': (progress: PlaybackReportingImportProgress) => void;
+  'import:tofa:progress': (progress: TofaImportProgress) => void;
   'maintenance:progress': (progress: MaintenanceJobProgress) => void;
   'library:sync:progress': (progress: LibrarySyncProgress) => void;
   'tasks:updated': (tasks: RunningTask[]) => void;
@@ -1498,7 +1544,8 @@ export interface UserDevice {
   locations: DeviceLocation[]; // Where this device has been used from
 }
 
-export type MediaDownloadSource = 'activity_log' | 'emby_sync' | 'plex' | 'jellyfin_transcode';
+export type MediaDownloadSource =
+  'activity_log' | 'emby_sync' | 'plex' | 'jellyfin_transcode' | 'tofa';
 
 export interface MediaDownloadRow {
   id: string;
@@ -3084,6 +3131,12 @@ export interface MediaAvailabilityEntry {
   /** Library display name, null until that server's library sync has recorded it. */
   libraryName: string | null;
   ratingKey: string;
+  /** Episode and season rows only: this server's key for the show. */
+  showRatingKey: string | null;
+  /** Episode and season rows only. */
+  seasonNumber: number | null;
+  /** Episode rows only. */
+  episodeNumber: number | null;
   addedAt: string;
   removedAt: string | null;
   videoResolution: string | null;

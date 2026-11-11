@@ -4,11 +4,11 @@
  */
 
 import { eq } from 'drizzle-orm';
-import type { ServerType } from '@tracearr/shared';
+import { assertNever, type ServerType } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
 import { dispatchServerUpdate } from '../services/automations/events/producers.js';
-import { createMediaServerClient } from '../services/mediaServer/index.js';
+import { createMediaServerClient, TofaClient } from '../services/mediaServer/index.js';
 import { liveServers } from '../services/liveServers.js';
 import { getSettings } from '../services/settings.js';
 import { createLogger } from '../utils/logger.js';
@@ -18,6 +18,7 @@ import {
   isNewerServerVersion,
   latestVersionFor,
   normalizeServerVersion,
+  type FeedServerType,
 } from '../utils/serverVersions.js';
 
 const logger = createLogger('ServerUpdate');
@@ -65,6 +66,34 @@ export async function installedVersionOf(server: CheckedServer): Promise<string 
   return normalized;
 }
 
+async function tofaUpdateVersion(server: CheckedServer): Promise<string | null> {
+  try {
+    const client = new TofaClient({ url: server.url, token: server.token, id: server.id });
+    const found = await client.getUpdateVersion();
+    return found ? normalizeServerVersion(server.type, found) : null;
+  } catch (error) {
+    logger.warn(`${server.name}: could not read its update state`, { error });
+    return null;
+  }
+}
+
+/** A vendor feed is read once per type however many servers share it; tofa asks each server. */
+function latestVersionOf(
+  server: CheckedServer,
+  feeds: Map<FeedServerType, Promise<string | null>>
+): Promise<string | null> {
+  switch (server.type) {
+    case 'plex':
+    case 'jellyfin':
+    case 'emby':
+      return feeds.getOrInsertComputed(server.type, latestVersionFor);
+    case 'tofa':
+      return tofaUpdateVersion(server);
+    default:
+      return assertNever(server.type);
+  }
+}
+
 async function checkServer(server: CheckedServer, latest: string | null): Promise<void> {
   const installed = await installedVersionOf(server);
 
@@ -107,13 +136,9 @@ export async function runServerUpdateCheck(): Promise<void> {
 
     const rows = await liveServers();
 
-    // The vendor feed is per type, not per server: read it once however many servers share it.
-    const latestByType = new Map<ServerType, Promise<string | null>>();
+    const feeds = new Map<FeedServerType, Promise<string | null>>();
     for (const server of rows) {
-      await checkServer(
-        server,
-        await latestByType.getOrInsertComputed(server.type, latestVersionFor)
-      );
+      await checkServer(server, await latestVersionOf(server, feeds));
     }
   } catch (error) {
     logger.error('Check failed', { error });

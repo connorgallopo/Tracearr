@@ -22,14 +22,14 @@ import { Input } from '@/components/ui/input';
 import { ColorSwatchPicker } from '@/components/settings/shared/ColorSwatchPicker';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import { api } from '@/lib/api';
-import { isJellyfinEmby } from '@/lib/serverType';
+import { holdsApiKey } from '@/lib/serverType';
 import { cn } from '@/lib/utils';
 import {
   usePlexServerConnections,
   useServerLocations,
   useUpdateServerLocations,
 } from '@/hooks/queries';
-import { API_KEY_HELP } from './AddServerDialog';
+import { API_KEY_HELP, PUBLIC_URL_PLACEHOLDER, SERVER_URL_PLACEHOLDER } from './AddServerFields';
 import { SERVER_DIALOG_CONTENT_CLASS } from './dialogClasses';
 import { ServerLocationEditor } from './ServerLocationEditor';
 import { draftsKey, toDrafts, toEntries, type LocationDraft } from './serverLocationDrafts';
@@ -129,12 +129,12 @@ export function EditServerDialog({
   const hasNameChange = server ? editName.trim() !== server.name : false;
   const hasUrlChange = server && !locked ? manualUrl.trim() !== server.url : false;
   const hasPublicUrlChange =
-    server && isJellyfinEmby(server.type)
+    server && holdsApiKey(server.type)
       ? manualPublicUrl.trim() !== (server.publicUrl ?? '')
       : false;
   const hasColorChange = server ? editColor !== (server.color ?? '') : false;
   const hasApiKeyChange =
-    server && isJellyfinEmby(server.type) && !locked ? editApiKey.trim().length > 0 : false;
+    server && holdsApiKey(server.type) && !locked ? editApiKey.trim().length > 0 : false;
   const hasServerChange =
     hasNameChange || hasUrlChange || hasPublicUrlChange || hasColorChange || hasApiKeyChange;
   const canSave =
@@ -228,7 +228,7 @@ export function EditServerDialog({
               )}
             </Field>
           )}
-          {isJellyfinEmby(server.type) && (
+          {holdsApiKey(server.type) && (
             <>
               <Field>
                 <FieldLabel htmlFor="edit-url">{t('servers.serverUrl')}</FieldLabel>
@@ -236,21 +236,23 @@ export function EditServerDialog({
                   id="edit-url"
                   value={manualUrl}
                   onChange={(e) => setManualUrl(e.target.value)}
-                  placeholder="http://192.168.1.100:8096"
+                  placeholder={t(SERVER_URL_PLACEHOLDER[server.type])}
                   disabled={locked}
                 />
                 {locked && <FieldDescription>{t('servers.resumeFirst')}</FieldDescription>}
               </Field>
-              <Field>
-                <FieldLabel htmlFor="edit-public-url">{t('servers.publicUrl')}</FieldLabel>
-                <Input
-                  id="edit-public-url"
-                  value={manualPublicUrl}
-                  onChange={(e) => setManualPublicUrl(e.target.value)}
-                  placeholder="https://jellyfin.example.com"
-                />
-                <FieldDescription>{t('servers.publicUrlHint')}</FieldDescription>
-              </Field>
+              {SERVER_PROFILES[server.type].itemLinks === 'serverAddress' && (
+                <Field>
+                  <FieldLabel htmlFor="edit-public-url">{t('servers.publicUrl')}</FieldLabel>
+                  <Input
+                    id="edit-public-url"
+                    value={manualPublicUrl}
+                    onChange={(e) => setManualPublicUrl(e.target.value)}
+                    placeholder={PUBLIC_URL_PLACEHOLDER[server.type]}
+                  />
+                  <FieldDescription>{t('servers.publicUrlHint')}</FieldDescription>
+                </Field>
+              )}
               <Field>
                 <FieldLabel htmlFor="edit-api-key">{t('common:labels.apiKey')}</FieldLabel>
                 <Input

@@ -21,7 +21,12 @@ export interface CreatedServer extends Required<ServerData> {
   updatedAt: Date;
 }
 
-const DEFAULT_PORTS: Record<ServerType, number> = { plex: 32400, jellyfin: 8096, emby: 8920 };
+const DEFAULT_PORTS: Record<ServerType, number> = {
+  plex: 32400,
+  jellyfin: 8096,
+  emby: 8920,
+  tofa: 33333,
+};
 
 let serverCounter = 0;
 

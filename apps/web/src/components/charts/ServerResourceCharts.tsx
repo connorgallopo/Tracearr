@@ -35,6 +35,8 @@ export interface ResourceMultiSeries {
   serverId: string;
   serverName: string;
   color: string;
+  /** How long this server's line may go without a sample before it breaks. */
+  gapSeconds: number;
   data: ServerResourceDataPoint[];
 }
 
@@ -51,6 +53,8 @@ interface ServerResourceChartsProps {
   multiSeries?: ResourceMultiSeries[];
   /** Single-view name for the process series (defaults to Plex's) */
   processLabel?: string;
+  /** Single-view counterpart of a series' gapSeconds */
+  gapSeconds?: number;
   clockSkewMs?: number;
 }
 
@@ -89,6 +93,7 @@ function ResourceChart({
   isLoading,
   multiSeries,
   processLabel,
+  gapSeconds: gap = SERVER_STATS_CONFIG.GAP_BREAK_SECONDS,
   clockSkewMs = 0,
 }: ResourceChartProps) {
   const { t } = useTranslation(['pages', 'common']);
@@ -101,15 +106,13 @@ function ResourceChart({
   const chartOptions = useMemo<Highcharts.Options>(() => {
     if (!hasData) return {};
 
-    const gap = SERVER_STATS_CONFIG.GAP_BREAK_SECONDS;
-
     // Host metrics belong to the box: N co-hosted servers, N identical lines
     const series: Highcharts.SeriesOptionsType[] = isMulti
       ? multiSeries.map((s) => ({
           type: 'line' as const,
           name: s.serverName,
           color: s.color,
-          data: withGaps(pointsFor(s.data, processKey), gap),
+          data: withGaps(pointsFor(s.data, processKey), s.gapSeconds),
         }))
       : [
           {
@@ -218,7 +221,7 @@ function ResourceChart({
         ],
       },
     };
-  }, [data, processKey, hostKey, multiSeries, isMulti, hasData, processLabel, clockSkewMs, t]);
+  }, [data, processKey, hostKey, multiSeries, isMulti, hasData, processLabel, gap, clockSkewMs, t]);
 
   const header = (
     <CardHeader>
@@ -298,9 +301,10 @@ export function ServerResourceCharts({
   averages,
   multiSeries,
   processLabel,
+  gapSeconds,
   clockSkewMs,
 }: ServerResourceChartsProps) {
-  const shared = { data, isLoading, multiSeries, processLabel, clockSkewMs };
+  const shared = { data, isLoading, multiSeries, processLabel, gapSeconds, clockSkewMs };
 
   return (
     <>

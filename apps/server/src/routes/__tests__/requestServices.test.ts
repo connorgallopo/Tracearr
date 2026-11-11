@@ -81,6 +81,7 @@ function makeRow(overrides: Partial<RequestServiceRow> = {}): RequestServiceRow 
     config: 'v1:ciphertext',
     configStatus: 'ok',
     enabled: true,
+    takesRequests: true,
     remoteServerId: 'machine-1',
     version: '1.33.2',
     syncCursor: null,
@@ -349,6 +350,23 @@ describe('Request Service Routes', () => {
       expect(updateRequestService).not.toHaveBeenCalled();
     });
 
+    it('refuses an address or key for built-in requests, which use the server address and key', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getRequestService).mockResolvedValue(
+        makeRow({ type: 'tofa', config: null, remoteServerId: null })
+      );
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `/request-services/${SERVICE_ID}`,
+        payload: { url: 'https://moved.example.com' },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(probeSeerr).not.toHaveBeenCalled();
+      expect(updateRequestService).not.toHaveBeenCalled();
+    });
+
     it('404s an unknown id', async () => {
       app = await buildTestApp(ownerUser);
       vi.mocked(getRequestService).mockResolvedValue(null);
@@ -388,6 +406,23 @@ describe('Request Service Routes', () => {
       });
 
       expect(response.statusCode).toBe(404);
+      expect(scheduleRequestSync).not.toHaveBeenCalled();
+    });
+
+    it('refuses built-in requests and says why', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(deleteRequestService).mockResolvedValue(false);
+      vi.mocked(getRequestService).mockResolvedValue(
+        makeRow({ type: 'tofa', config: null, remoteServerId: null })
+      );
+
+      const response = await app.inject({
+        method: 'DELETE',
+        url: `/request-services/${SERVICE_ID}`,
+      });
+
+      expect(response.statusCode).toBe(409);
+      expect(response.json().message).toContain('removed with their server');
       expect(scheduleRequestSync).not.toHaveBeenCalled();
     });
   });

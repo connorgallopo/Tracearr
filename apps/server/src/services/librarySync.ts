@@ -9,7 +9,7 @@
  * 5. Report progress via callback for real-time updates
  */
 
-import { eq, and, inArray, notInArray, sql, gte, lt, isNull } from 'drizzle-orm';
+import { eq, and, inArray, notInArray, or, sql, gte, lt, isNull } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { latestSnapshotFor } from '../db/librarySnapshots.js';
 import {
@@ -24,7 +24,14 @@ import {
   type MediaLibrary,
   type MediaLibraryItem,
 } from './mediaServer/index.js';
-import { NOT_NEEDED, type NotNeeded } from './mediaServer/types.js';
+import {
+  FullSyncRequiredError,
+  INCREMENTAL_CAP_RATIO,
+  NOT_NEEDED,
+  type LibraryChangeFeed,
+  type NotNeeded,
+  type SyncCursor,
+} from './mediaServer/types.js';
 import { resolveMediaBatch, reconcileMediaDuplicates } from './library/mediaResolutionService.js';
 import { parentArtFor, posterOf } from './library/posterArt.js';
 import {
@@ -56,7 +63,12 @@ import {
 } from '../jobs/importedHistoryLinking.js';
 import { getSessionsCompressionHorizon, refreshAggregates } from '../db/timescale.js';
 import type { LibrarySyncProgress, ServerType } from '@tracearr/shared';
-import { REDIS_KEYS, RESOLUTION_TIERS, LEGACY_VERSION_SENTINEL } from '@tracearr/shared';
+import {
+  REDIS_KEYS,
+  RESOLUTION_TIERS,
+  LEGACY_VERSION_SENTINEL,
+  assertNever,
+} from '@tracearr/shared';
 import {
   bucketMembershipColumns,
   perResolutionBucket,
@@ -83,7 +95,7 @@ const BATCH_SIZE = Math.min(1000, Math.max(50, Number(process.env.LIBRARY_SYNC_P
 const BATCH_DELAY_MS = 150;
 const BATCH_DELAY_MS_INCREMENTAL = 50;
 const SYNC_SAFETY_MARGIN_MS = 5 * 60 * 1000; // 5 minutes
-const SYNC_STATE_TTL = 30 * 24 * 60 * 60; // 30 days in seconds
+export const SYNC_STATE_TTL = 30 * 24 * 60 * 60; // 30 days in seconds
 
 /**
  * Force a full scan when the last one is older than this (safety net for all
@@ -120,9 +132,6 @@ const REPLACEMENT_LINK_WINDOW_MS = 10 * 60 * 1000;
 
 /** More links than this in one pass is a library rebuild, not upgrades - link nothing. */
 const REPLACEMENT_LINK_MAX_PER_PASS = 50;
-
-/** If incremental sync returns more than this fraction of total items, fall through to full scan */
-const INCREMENTAL_CAP_RATIO = 0.3;
 
 /**
  * Agregarr's "coming soon" stand-ins: a trailer saved as the movie, or as S00E00 of the
@@ -822,6 +831,12 @@ export class LibrarySyncService {
 
     // Load sync state from Redis
     const syncState = await this.getSyncState(serverId, libraryId);
+    const cursor = await this.storedSyncCursor(
+      serverType,
+      serverId,
+      libraryId,
+      syncState.lastSyncedAt
+    );
 
     // Decided once per library, before any page is upserted: a paged first sync
     // must not start announcing on page two.
@@ -862,7 +877,7 @@ export class LibrarySyncService {
       triggeredBy === 'manual' || fullScanDue || overcountMismatch || scanQueryChanged;
 
     const isIncremental =
-      syncState.lastSyncedAt !== null &&
+      cursor !== null &&
       syncState.lastItemCount !== null &&
       totalCount >= syncState.lastItemCount &&
       !forceFullScan;
@@ -876,7 +891,7 @@ export class LibrarySyncService {
       const fullScanAgeHours = syncState.lastFullScanAt
         ? Math.round((Date.now() - syncState.lastFullScanAt.getTime()) / (60 * 60 * 1000))
         : null;
-      const reason = !syncState.lastSyncedAt
+      const reason = !cursor
         ? 'first sync'
         : totalCount < (syncState.lastItemCount ?? 0)
           ? 'items removed'
@@ -912,22 +927,22 @@ export class LibrarySyncService {
     // =========================================================================
     // INCREMENTAL PATH
     // =========================================================================
-    const { lastSyncedAt } = syncState;
-    if (isIncremental && lastSyncedAt) {
+    if (isIncremental) {
       try {
-        const { items: newItems, totalCount: incrementalCount } = await client.getLibraryItemsSince(
-          libraryId,
-          lastSyncedAt,
-          { libraryType }
-        );
+        const {
+          items: newItems,
+          totalCount: incrementalCount,
+          feed,
+        } = await client.getLibraryItemsSince(libraryId, cursor, { libraryType });
+        const nextRevision = feed === NOT_NEEDED ? undefined : feed.revision;
 
         // Check for new episodes/tracks independently — new episodes can arrive
         // for shows that were added months ago (no new Series in the result).
         let newLeaves: MediaLibraryItem[] = [];
         if (!FLAT_LIBRARY_TYPES.has(libraryType.toLowerCase())) {
           try {
-            const { items: leaves } = await client.getLibraryLeavesSince(libraryId, lastSyncedAt);
-            newLeaves = leaves;
+            const leaves = await client.getLibraryLeavesSince(libraryId, cursor);
+            if (leaves !== NOT_NEEDED) newLeaves = leaves.items;
           } catch (leafErr) {
             console.warn(
               `[LibrarySync] Incremental leaf fetch failed for ${libraryName}, skipping leaves:`,
@@ -946,7 +961,7 @@ export class LibrarySyncService {
               : undefined;
         if (fetchContainersSince) {
           try {
-            const containers = await fetchContainersSince(libraryId, lastSyncedAt);
+            const containers = await fetchContainersSince(libraryId, cursor);
             if (containers !== NOT_NEEDED) newContainers = containers.items;
           } catch (containerErr) {
             console.warn(
@@ -960,6 +975,7 @@ export class LibrarySyncService {
           incrementalCount === 0 &&
           newLeaves.length === 0 &&
           newContainers.length === 0 &&
+          (feed === NOT_NEEDED || feed.deletedIds.length === 0) &&
           totalCount === syncState.lastItemCount
         ) {
           if (
@@ -980,9 +996,15 @@ export class LibrarySyncService {
           }
           console.log(`[LibrarySync] ${libraryName}: no changes since last sync, skipping`);
           const snapshot = await this.copyLastSnapshot(serverId, libraryId);
-          await this.saveSyncState(serverId, libraryId, serverType, totalCount, {
-            at: syncState.lastFullScanAt ?? new Date(),
-          });
+          await this.saveSyncState(
+            serverId,
+            libraryId,
+            serverType,
+            totalCount,
+            { at: syncState.lastFullScanAt ?? new Date() },
+            undefined,
+            nextRevision
+          );
           return {
             serverId,
             libraryId,
@@ -996,9 +1018,10 @@ export class LibrarySyncService {
         }
 
         // Cap check: if too many items were returned, fall through to full scan
-        // which also handles orphan detection
+        // which also handles orphan detection. Changed entries count as the server counts
+        // them, so a tofa show that comes with its episodes counts once.
         const incrementalCap = Math.floor(totalCount * INCREMENTAL_CAP_RATIO);
-        const totalIncrementalItems = newItems.length + newLeaves.length + newContainers.length;
+        const totalIncrementalItems = incrementalCount + newLeaves.length + newContainers.length;
 
         if (incrementalCap > 0 && totalIncrementalItems > incrementalCap) {
           console.log(
@@ -1007,29 +1030,9 @@ export class LibrarySyncService {
           throw new Error('CAP_EXCEEDED');
         }
 
-        const allItems: MediaLibraryItem[] = [];
-        const combinedItems = [...newItems, ...newContainers, ...newLeaves];
-        let totalSkippedEmpty = 0;
-        const placeholderParents = new Set<string>();
-
-        for (let i = 0; i < combinedItems.length; i += BATCH_SIZE) {
-          const pageStartedAt = Date.now();
-          const batch = combinedItems.slice(i, i + BATCH_SIZE);
-          allItems.push(...batch);
-          const batchRes = await this.upsertItems(
-            serverId,
-            libraryId,
-            batch,
-            touchedMediaIds,
-            announce
-          );
-          totalSkippedEmpty += batchRes.skippedEmpty;
-          for (const key of batchRes.placeholderParents) placeholderParents.add(key);
-
-          if (i + BATCH_SIZE < combinedItems.length) {
-            await paceAfter(pageStartedAt, BATCH_DELAY_MS_INCREMENTAL);
-          }
-        }
+        const allItems = [...newItems, ...newContainers, ...newLeaves];
+        const { skippedEmpty: totalSkippedEmpty, placeholderParents } =
+          await this.upsertIncremental(serverId, libraryId, allItems, touchedMediaIds, announce);
 
         await this.dropPlaceholderContainers(
           serverId,
@@ -1039,13 +1042,20 @@ export class LibrarySyncService {
           announce
         );
 
-        const itemsRemoved = await this.retireReplacedCopies(
-          client,
-          serverId,
-          { id: libraryId, name: libraryName, type: libraryType },
-          allItems.map((item) => item.ratingKey),
-          touchedMediaIds
-        );
+        const goneKeys =
+          feed === NOT_NEEDED ? [] : await this.keysGoneSince(serverId, libraryId, feed, allItems);
+        await this.markItemsRemoved(serverId, libraryId, goneKeys, touchedMediaIds);
+        const itemsRemoved =
+          goneKeys.length +
+          (feed === NOT_NEEDED
+            ? await this.retireReplacedCopies(
+                client,
+                serverId,
+                { id: libraryId, name: libraryName, type: libraryType },
+                allItems.map((item) => item.ratingKey),
+                touchedMediaIds
+              )
+            : 0);
 
         // Post-sync undercount check, so ordinary growth isn't mistaken for a wrong tombstone.
         if (
@@ -1078,9 +1088,15 @@ export class LibrarySyncService {
           );
         }
 
-        await this.saveSyncState(serverId, libraryId, serverType, totalCount, {
-          at: syncState.lastFullScanAt ?? new Date(),
-        });
+        await this.saveSyncState(
+          serverId,
+          libraryId,
+          serverType,
+          totalCount,
+          { at: syncState.lastFullScanAt ?? new Date() },
+          undefined,
+          nextRevision
+        );
 
         return {
           serverId,
@@ -1095,12 +1111,15 @@ export class LibrarySyncService {
       } catch (error) {
         const isCap = error instanceof Error && error.message === 'CAP_EXCEEDED';
         const isUndercount = error instanceof Error && error.message === 'UNDERCOUNT_MISMATCH';
+        const isFullSyncRequired = error instanceof FullSyncRequiredError;
         const msg = isCap
           ? `Incremental sync exceeded cap for ${libraryName}, using full scan`
           : isUndercount
             ? `Local active count for ${libraryName} still below server total, using full scan`
-            : `Incremental fetch failed for ${libraryName}, falling back to full scan`;
-        if (isCap || isUndercount) {
+            : isFullSyncRequired
+              ? `${error.message}, using full scan for ${libraryName}`
+              : `Incremental fetch failed for ${libraryName}, falling back to full scan`;
+        if (isCap || isUndercount || isFullSyncRequired) {
           console.warn(`[LibrarySync] ${msg}`);
         } else {
           console.warn(`[LibrarySync] ${msg}`, error);
@@ -1133,6 +1152,7 @@ export class LibrarySyncService {
     // The completed-scan marker carries this time: an item added while the scan runs may
     // be listed or not, so only a play older than the scan's start is known to be absent.
     const fullScanStartedAt = new Date();
+    const scanRevision = await client.getLibraryRevision();
 
     // Fetch items in batches with pagination
     let offset = 0;
@@ -1372,7 +1392,8 @@ export class LibrarySyncService {
         serverType,
         totalCount,
         { at: new Date(), startedAt: fullScanStartedAt },
-        acceptedShortfall
+        acceptedShortfall,
+        scanRevision === NOT_NEEDED ? undefined : scanRevision
       );
       return {
         serverId,
@@ -1412,7 +1433,8 @@ export class LibrarySyncService {
       serverType,
       totalCount,
       { at: new Date(), startedAt: fullScanStartedAt },
-      acceptedShortfall
+      acceptedShortfall,
+      scanRevision === NOT_NEEDED ? undefined : scanRevision
     );
 
     return {
@@ -1425,6 +1447,93 @@ export class LibrarySyncService {
       itemsSkipped: totalSkippedEmpty,
       snapshotId: snapshot?.id ?? null,
     };
+  }
+
+  /** Upserts an incremental sync's items a page at a time, paced for the media server. */
+  private async upsertIncremental(
+    serverId: string,
+    libraryId: string,
+    items: MediaLibraryItem[],
+    touchedMediaIds: Set<string>,
+    announce: MediaAnnounce | null
+  ): Promise<{ skippedEmpty: number; placeholderParents: Set<string> }> {
+    let skippedEmpty = 0;
+    const placeholderParents = new Set<string>();
+    for (let i = 0; i < items.length; i += BATCH_SIZE) {
+      const pageStartedAt = Date.now();
+      const batchRes = await this.upsertItems(
+        serverId,
+        libraryId,
+        items.slice(i, i + BATCH_SIZE),
+        touchedMediaIds,
+        announce
+      );
+      skippedEmpty += batchRes.skippedEmpty;
+      for (const key of batchRes.placeholderParents) placeholderParents.add(key);
+
+      if (i + BATCH_SIZE < items.length) {
+        await paceAfter(pageStartedAt, BATCH_DELAY_MS_INCREMENTAL);
+      }
+    }
+    return { skippedEmpty, placeholderParents };
+  }
+
+  /**
+   * The rows a change feed leaves behind: a deleted item with its seasons and episodes, and the
+   * children a wholly listed item no longer has.
+   */
+  private async keysGoneSince(
+    serverId: string,
+    libraryId: string,
+    feed: LibraryChangeFeed,
+    listed: MediaLibraryItem[]
+  ): Promise<string[]> {
+    const parents = [...feed.deletedIds, ...feed.wholeIds];
+    if (parents.length === 0) return [];
+    const rows = await db
+      .select({ ratingKey: libraryItems.ratingKey })
+      .from(libraryItems)
+      .where(
+        and(
+          eq(libraryItems.serverId, serverId),
+          eq(libraryItems.libraryId, libraryId),
+          isNull(libraryItems.removedAt),
+          or(
+            inArray(libraryItems.ratingKey, feed.deletedIds),
+            inArray(libraryItems.parentRatingKey, parents),
+            inArray(libraryItems.grandparentRatingKey, parents)
+          )
+        )
+      );
+    const kept = new Set(listed.map((item) => item.ratingKey));
+    return rows.map((row) => row.ratingKey).filter((key) => !kept.has(key));
+  }
+
+  /**
+   * Where an incremental sync of the library picks up. Plex, Jellyfin and Emby list what changed
+   * after the last sync's time; tofa lists its changes after the revision the last sync read.
+   */
+  private async storedSyncCursor(
+    serverType: ServerType,
+    serverId: string,
+    libraryId: string,
+    lastSyncedAt: Date | null
+  ): Promise<SyncCursor | null> {
+    if (lastSyncedAt === null) return null;
+    switch (serverType) {
+      case 'plex':
+      case 'jellyfin':
+      case 'emby':
+        return { kind: 'date', since: lastSyncedAt };
+      case 'tofa': {
+        const revision = await redisClient?.get(
+          REDIS_KEYS.LIBRARY_SYNC_REVISION(serverId, libraryId)
+        );
+        return revision ? { kind: 'revision', since: Number(revision) } : null;
+      }
+      default:
+        return assertNever(serverType);
+    }
   }
 
   /**
@@ -1476,6 +1585,7 @@ export class LibrarySyncService {
    * A completed full scan (startedAt set) also records the marker the identity backfill trusts,
    * stamped with the time the scan started listing.
    * acceptedShortfall is omitted unless a full scan just recomputed it, leaving the prior baseline in place.
+   * revision is tofa's, where its next incremental sync picks up.
    */
   private async saveSyncState(
     serverId: string,
@@ -1483,7 +1593,8 @@ export class LibrarySyncService {
     serverType: ServerType,
     itemCount: number,
     fullScan: { at: Date; startedAt?: Date },
-    acceptedShortfall?: number
+    acceptedShortfall?: number,
+    revision?: number
   ): Promise<void> {
     if (!redisClient) return;
 
@@ -1530,6 +1641,16 @@ export class LibrarySyncService {
         redisClient.set(
           REDIS_KEYS.LIBRARY_SYNC_SHORTFALL(serverId, libraryId),
           String(acceptedShortfall),
+          'EX',
+          SYNC_STATE_TTL
+        )
+      );
+    }
+    if (revision !== undefined) {
+      writes.push(
+        redisClient.set(
+          REDIS_KEYS.LIBRARY_SYNC_REVISION(serverId, libraryId),
+          String(revision),
           'EX',
           SYNC_STATE_TTL
         )
@@ -2491,8 +2612,10 @@ export class LibrarySyncService {
 
   /**
    * A server that re-creates an item gives it a new id and leaves the library count alone, so an
-   * incremental sync adds the new copy and the old one would stay live until the next full scan. Other live copies of the media just synced are checked by id, as a
-   * full scan confirms removals, and retired once the server no longer has them.
+   * incremental sync adds the new copy and the old one would stay live until the next full scan.
+   * Other live copies of the media just synced are checked by id, as a full scan confirms
+   * removals, and retired once the server no longer has them. A server with a change feed reports
+   * a re-created item as a delete and is not asked here.
    */
   private async retireReplacedCopies(
     client: ReturnType<typeof createMediaServerClient>,

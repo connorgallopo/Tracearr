@@ -46,6 +46,7 @@ function createMockSession(overrides: Partial<Session> = {}): Session {
     geoAsnNumber: null,
     geoAsnOrganization: null,
     isLocal: false,
+    profileName: null,
     playerName: 'Living Room TV',
     deviceId: 'device-123',
     product: 'Plex Web',

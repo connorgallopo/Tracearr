@@ -20,6 +20,7 @@ export const LOGIN_ACCESS = ['default', 'allow', 'block'] as const;
 export const SIGN_IN_ERROR_CODES = {
   refused: 'MEMBER_LOGIN_REFUSED',
   notPermitted: 'MEMBER_NOT_PERMITTED',
+  signInExpired: 'SIGN_IN_EXPIRED',
 } as const;
 
 export const SEVERITY_LEVELS = {
@@ -47,6 +48,7 @@ export const WS_EVENTS = {
   IMPORT_PROGRESS: 'import:progress',
   IMPORT_JELLYSTAT_PROGRESS: 'import:jellystat:progress',
   IMPORT_PLAYBACK_REPORTING_PROGRESS: 'import:playbackreporting:progress',
+  IMPORT_TOFA_PROGRESS: 'import:tofa:progress',
   MAINTENANCE_PROGRESS: 'maintenance:progress',
   /** Library sync progress updates */
   LIBRARY_SYNC_PROGRESS: 'library:sync:progress',
@@ -261,6 +263,12 @@ export const REDIS_KEYS = {
     `${_redisPrefix}tracearr:library:sync:last:${serverId}:${libraryId}`,
   LIBRARY_SYNC_COUNT: (serverId: string, libraryId: string) =>
     `${_redisPrefix}tracearr:library:sync:count:${serverId}:${libraryId}`,
+  // tofa's change revision the last sync read up to; its incremental sync lists changes after it
+  LIBRARY_SYNC_REVISION: (serverId: string, libraryId: string) =>
+    `${_redisPrefix}tracearr:library:sync:revision:${serverId}:${libraryId}`,
+  // A library change arrived while a sync of the server ran; holds the delay of the sync it earns
+  LIBRARY_SYNC_CHANGED_DURING_RUN: (serverId: string) =>
+    `${_redisPrefix}tracearr:library:sync:changed-during-run:${serverId}`,
   // Timestamp of the last completed full scan - the periodic full-scan safety
   // net is time-based so event-sync bursts can't drag it forward
   LIBRARY_SYNC_FULL_SCAN_AT: (serverId: string, libraryId: string) =>
@@ -302,6 +310,8 @@ export const REDIS_KEYS = {
   // Auth tokens
   PLEX_TEMP_TOKEN: (token: string) => `${_redisPrefix}tracearr:plex_temp:${token}`,
   PLEX_PIN: (handle: string) => `${_redisPrefix}tracearr:plex_pin:${handle}`,
+  TOFA_DEVICE: (handle: string) => `${_redisPrefix}tracearr:tofa_device:${handle}`,
+  TOFA_TEMP: (token: string) => `${_redisPrefix}tracearr:tofa_temp:${token}`,
   QUICK_CONNECT: (handle: string) => `${_redisPrefix}tracearr:quick_connect:${handle}`,
   LOGIN_FAILURES: (serverId: string, username: string) =>
     `${_redisPrefix}tracearr:login_failures:${serverId}:${username}`,
@@ -879,13 +889,14 @@ export const SERVER_COLOR_PALETTE = [
   { hex: '#39C668', label: 'Green' }, // Emby brand
   { hex: '#3B82F6', label: 'Blue' },
   { hex: '#EF4444', label: 'Red' },
-  { hex: '#14B8A6', label: 'Teal' },
+  { hex: '#14B8A6', label: 'Teal' }, // tofa brand
 ] as const;
 
 export const SERVER_TYPE_BRAND_COLORS: Record<string, string> = {
   plex: '#F4A825',
   jellyfin: '#895FDD',
   emby: '#39C668',
+  tofa: '#14B8A6',
 };
 
 /** Pick best color for a server given its type and colors already used by other servers */
@@ -922,8 +933,9 @@ export const SERVER_STATS_CONFIG = {
   // Charts hold their right edge this far behind real time so the newest
   // region is always populated. Sized to the slowest source, the 6s plugin.
   NOW_DELAY_SECONDS: 6,
-  // Memory cap, not a window - charts bound themselves by time
-  MAX_POINTS: 32,
+  // Memory cap, not a window - charts bound themselves by time. Holds the whole
+  // window at the fastest source, tofa's 2s samples.
+  MAX_POINTS: 80,
   // Break the line rather than bridge dead air: 3 Plex samples, 2 plugin ones
   GAP_BREAK_SECONDS: 15,
 } as const;

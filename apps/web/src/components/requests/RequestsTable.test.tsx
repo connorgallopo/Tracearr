@@ -20,6 +20,7 @@ function makeMediaEntry(overrides: Partial<MediaRequestEntry> = {}): MediaReques
   return {
     id: 'r1',
     serverId: 's1',
+    serviceType: 'seerr',
     status: 'completed',
     requestedAt: '2026-01-01T00:00:00.000Z',
     availableAt: '2026-01-02T00:00:00.000Z',

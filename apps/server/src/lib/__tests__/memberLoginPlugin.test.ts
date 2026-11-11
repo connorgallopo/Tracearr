@@ -118,6 +118,7 @@ describe('member login plugin', () => {
       local: true,
       plex: true,
       oidc: false,
+      tofa: false,
       member: true,
     });
     vi.mocked(canMemberLogin).mockResolvedValue({ ok: true });
@@ -431,6 +432,7 @@ describe('memberStillValid', () => {
       local: false,
       plex: false,
       oidc: false,
+      tofa: false,
       member: true,
       ...methods,
     });
@@ -459,6 +461,16 @@ describe('memberStillValid', () => {
 
   it('ends the session for a Plex member whose server account was removed', async () => {
     selects(defaultMember, [{ providerId: 'plex', accountId: 'plex-1', token: 't' }], []);
+    await expect(memberStillValid('member-1')).resolves.toBe(false);
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('drops a tofa member with no live account', async () => {
+    const tofa = { providerId: 'tofa', accountId: 'identity-1', token: null, password: null };
+    selects(defaultMember, [tofa], [{ serverAllowsMembers: true }]);
+    await expect(memberStillValid('member-1')).resolves.toBe(true);
+
+    selects(defaultMember, [tofa], []);
     await expect(memberStillValid('member-1')).resolves.toBe(false);
     expect(fetchMock).not.toHaveBeenCalled();
   });

@@ -2,8 +2,14 @@ import { z } from 'zod';
 import { serverIdsQuerySchema, uuidSchema } from './schemas.js';
 import type { ServerType, WatchedState } from './types.js';
 
-export const REQUEST_SERVICE_TYPES = ['seerr'] as const;
+export const REQUEST_SERVICE_TYPES = ['seerr', 'tofa'] as const;
 export type RequestServiceType = (typeof REQUEST_SERVICE_TYPES)[number];
+
+/** A built-in service is the server's own requests: it comes and goes with the server and reads the server's address and key. */
+export const REQUEST_SERVICE_BUILT_IN: Record<RequestServiceType, boolean> = {
+  seerr: false,
+  tofa: true,
+};
 
 export const MEDIA_REQUEST_STATUSES = [
   'pending',
@@ -42,7 +48,8 @@ export interface RequestService {
   url: string;
   enabled: boolean;
   configStatus: 'ok' | 'reencrypt';
-  remoteServerId: string;
+  /** The media server id the service reports; null for a built-in service, which is the server */
+  remoteServerId: string | null;
   version: string | null;
   lastSyncAt: string | null;
   lastFullSyncAt: string | null;
@@ -87,6 +94,8 @@ interface RequestEntryBase {
 }
 
 export interface MediaRequestEntry extends RequestEntryBase {
+  /** The service the request was made through */
+  serviceType: RequestServiceType;
   requester: RequestRequester;
 }
 

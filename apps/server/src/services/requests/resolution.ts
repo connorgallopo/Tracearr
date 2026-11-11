@@ -10,6 +10,7 @@ export type ResolutionInput = Pick<
   | 'tmdbId'
   | 'tvdbId'
   | 'ratingKey'
+  | 'remoteUserId'
   | 'remotePlexId'
   | 'remoteJellyfinUserId'
 >;
@@ -99,7 +100,10 @@ async function byRatingKey(serverId: string, keys: string[]): Promise<Map<string
   return out;
 }
 
-/** Seerr names a Plex requester by plex.tv account id, a Jellyfin or Emby requester by the server's own user id. */
+/**
+ * Seerr names a Plex requester by plex.tv account id, a Jellyfin or Emby requester by the
+ * server's own user id. A tofa request names the tofa user it is for.
+ */
 function requesterIdentity(serverType: ServerType) {
   switch (serverType) {
     case 'plex':
@@ -112,6 +116,11 @@ function requesterIdentity(serverType: ServerType) {
       return {
         column: sql`external_id`,
         key: (r: ResolutionInput) => r.remoteJellyfinUserId,
+      };
+    case 'tofa':
+      return {
+        column: sql`external_id`,
+        key: (r: ResolutionInput) => r.remoteUserId,
       };
     default:
       return assertNever(serverType);
@@ -137,7 +146,7 @@ export async function resolveRequests(
   serverId: string,
   serverType: ServerType,
   rows: ResolutionInput[]
-): Promise<Map<number, Resolved>> {
+): Promise<Map<string, Resolved>> {
   const movies = rows.filter((r) => r.mediaType === 'movie');
   const shows = rows.filter((r) => r.mediaType === 'show');
   const requester = requesterIdentity(serverType);
@@ -154,7 +163,7 @@ export async function resolveRequests(
     uniqueStrings(rows.map(requester.key))
   );
 
-  const out = new Map<number, Resolved>();
+  const out = new Map<string, Resolved>();
   for (const row of rows) {
     let hit: MediaHit | undefined;
     if (row.mediaType === 'movie') {

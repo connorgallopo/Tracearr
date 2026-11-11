@@ -1,7 +1,7 @@
 import { Queue, Worker, type ConnectionOptions, type Job } from 'bullmq';
 import { TIME_MS } from '@tracearr/shared';
 import { runRequestSync, type SyncMode } from '../services/requests/sync.js';
-import { listRequestServices } from '../services/requests/store.js';
+import { getRequestServiceByServer, listRequestServices } from '../services/requests/store.js';
 import { isMaintenance } from '../serverState.js';
 import { everyAligned, getBullPrefix, queueConnectionOptions } from './queueConnection.js';
 import { WORKER_DEFAULTS, addSingleton, registerQueue, registerWorker } from './jobSafety.js';
@@ -99,6 +99,23 @@ export async function enqueueRequestSync(serviceId: string, mode: SyncMode): Pro
   );
   if (!accepted) throw new Error('A sync is already in progress for this service');
   return jobId;
+}
+
+/**
+ * A sync of the server's built-in requests after the server said one changed. One already
+ * queued reads the change when it runs. One running may have listed the requests before the
+ * change, and the next scheduled run, which lists them all, reads it.
+ */
+export async function enqueueRequestSyncForServer(serverId: string): Promise<void> {
+  if (!queue) return;
+  const service = await getRequestServiceByServer(serverId);
+  if (!service?.enabled) return;
+  await addSingleton(
+    queue,
+    `event-${service.id}`,
+    { serviceId: service.id, mode: 'full' },
+    `request-sync-${service.id}`
+  );
 }
 
 export async function shutdownRequestSyncQueue(): Promise<void> {

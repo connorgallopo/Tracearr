@@ -65,6 +65,9 @@ function fullDetail(overrides: Partial<MediaDetailData> = {}): MediaDetailData {
         libraryId: 'lib-1',
         libraryName: 'Movies',
         ratingKey: 'rk-1',
+        showRatingKey: null,
+        seasonNumber: null,
+        episodeNumber: null,
         addedAt: '2025-03-12T00:00:00Z',
         removedAt: null,
         videoResolution: '4k',
@@ -90,6 +93,7 @@ function requestEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestE
   return {
     id: 'req-1',
     serverId: 'srv-plex',
+    serviceType: 'seerr',
     status: 'completed',
     requestedAt: '2026-01-08T12:00:00.000Z',
     availableAt: '2026-01-08T12:02:00.000Z',
@@ -199,6 +203,9 @@ describe('DetailHero', () => {
         libraryId: 'lib-1',
         libraryName: 'Movies',
         ratingKey: 'rk-1',
+        showRatingKey: null,
+        seasonNumber: null,
+        episodeNumber: null,
         addedAt: '2025-03-12T00:00:00Z',
         removedAt: null,
         videoResolution: '4k',
@@ -215,6 +222,9 @@ describe('DetailHero', () => {
         libraryId: 'lib-2',
         libraryName: 'Movies',
         ratingKey: 'rk-2',
+        showRatingKey: null,
+        seasonNumber: null,
+        episodeNumber: null,
         addedAt: '2025-01-01T00:00:00Z',
         removedAt: '2026-06-08T00:00:00Z',
         videoResolution: '1080p',
@@ -242,6 +252,9 @@ describe('DetailHero', () => {
         libraryId: 'lib-1',
         libraryName: 'Movies',
         ratingKey: 'rk-2',
+        showRatingKey: null,
+        seasonNumber: null,
+        episodeNumber: null,
         // The server's back-dated claim - the caption must never show this date
         addedAt: '2026-08-01T12:00:00Z',
         removedAt: null,
@@ -275,6 +288,9 @@ describe('DetailHero', () => {
         libraryId: 'lib-1',
         libraryName: 'Movies',
         ratingKey: 'rk-1',
+        showRatingKey: null,
+        seasonNumber: null,
+        episodeNumber: null,
         addedAt: '2025-03-12T00:00:00Z',
         removedAt: '2026-06-08T00:00:00Z',
         videoResolution: '4k',
@@ -317,6 +333,36 @@ describe('DetailHero', () => {
     );
   });
 
+  it('opens a tofa episode on its show page, at the season and episode', () => {
+    const tofa = new Map<string, HeroServerLookupEntry>([
+      ['srv-tofa', { name: 'Attic', type: 'tofa', url: 'http://10.0.0.5:33333', publicUrl: null }],
+    ]);
+    const [entry] = fullDetail().availability ?? [];
+    renderHero({
+      data: fullDetail({
+        mediaType: 'episode',
+        availability: entry
+          ? [
+              {
+                ...entry,
+                serverId: 'srv-tofa',
+                serverType: 'tofa',
+                showRatingKey: 'show-4',
+                seasonNumber: 29,
+                episodeNumber: 2,
+              },
+            ]
+          : [],
+      }),
+      serverById: tofa,
+    });
+
+    expect(screen.getByRole('link', { name: /Open on server/ })).toHaveAttribute(
+      'href',
+      'https://app.tofa.tv/media/show-4?season=29&episode=2'
+    );
+  });
+
   it('renders an inline error with retry when the detail fetch fails and there is no stub at all', () => {
     const onRetry = vi.fn();
     renderHero({ isError: true, onRetry });
@@ -348,6 +394,17 @@ describe('DetailHero', () => {
     });
 
     expect(screen.getByText(/Requested by agelwarg/)).toBeInTheDocument();
+  });
+
+  it('marks a request with the logo of the service it went through', () => {
+    renderHero({
+      data: fullDetail(),
+      stub,
+      request: requestEntry({ serviceType: 'tofa' }),
+    });
+
+    const logo = screen.getByText(/Requested by Alice/).parentElement?.querySelector('img');
+    expect(logo?.getAttribute('src')).toMatch(/images\/servers\/tofa\.png$/);
   });
 
   it('renders no request line without a request', () => {

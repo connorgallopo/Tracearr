@@ -89,6 +89,7 @@ function createMockSession(overrides: Partial<Session> = {}): Session {
     geoAsnNumber: 7922,
     geoAsnOrganization: 'Comcast',
     isLocal: false,
+    profileName: null,
     playerName: 'Player 1',
     deviceId: 'device-1',
     product: 'Plex Web',
@@ -616,6 +617,29 @@ describe('Session Behavior Evaluators', () => {
       );
       expect(result.matched).toBe(true);
       expect(result.actual).toBe(2);
+    });
+
+    it('never treats sessions without an address as one IP, relayed or not', async () => {
+      const addressless = (id: string, deviceId: string, geoCountry: string | null) =>
+        createMockSession({ id, serverUserId: 'user-1', deviceId, ipAddress: '', geoCountry });
+      const condition = createCondition({
+        field: 'concurrent_streams',
+        operator: 'eq',
+        value: 2,
+        params: { exclude_same_ip: true },
+      });
+      const countFor = async (geoCountry: string | null) => {
+        const session1 = addressless('s1', 'device-1', geoCountry);
+        const ctx = createTestContext({
+          session: session1,
+          serverUser: createMockServerUser({ id: 'user-1' }),
+          activeSessions: [session1, addressless('s2', 'device-2', geoCountry)],
+        });
+        return (await evaluatorRegistry.concurrent_streams(ctx, condition)).actual;
+      };
+
+      expect(await countFor('Tofa Relay')).toBe(2);
+      expect(await countFor(null)).toBe(2);
     });
 
     it('only counts sessions from listed device types when count_device_types is set', async () => {
@@ -1443,6 +1467,38 @@ describe('Session Behavior Evaluators', () => {
       expect(matched(result)).toBe(false);
       expect(result.actual).toBe(0);
       expect(result.details?.ips).toEqual([]);
+    });
+
+    it('does not count sessions without an address, relayed or not', () => {
+      const now = new Date();
+      const ipsFor = (geoCountry: string | null) => {
+        const mkSession = (id: string, ipAddress: string) =>
+          createMockSession({
+            id,
+            serverUserId: 'user-1',
+            startedAt: now,
+            ipAddress,
+            geoCountry: ipAddress ? 'US' : geoCountry,
+          });
+        const ctx = createTestContext({
+          session: mkSession('s1', ''),
+          serverUser: createMockServerUser({ id: 'user-1' }),
+          recentSessions: [mkSession('s1', ''), mkSession('s2', ''), mkSession('s3', '1.1.1.1')],
+        });
+        const result = evaluatorRegistry.unique_ips_in_window(
+          ctx,
+          createCondition({
+            field: 'unique_ips_in_window',
+            operator: 'gte',
+            value: 2,
+            params: { window_hours: 24 },
+          })
+        ) as EvaluatorResult;
+        return result.details?.ips;
+      };
+
+      expect(ipsFor('Tofa Relay')).toEqual(['1.1.1.1']);
+      expect(ipsFor(null)).toEqual(['1.1.1.1']);
     });
 
     it('unmaps hex-form v4-mapped addresses before the LAN check', () => {
@@ -2953,6 +3009,19 @@ describe('Network/Location Evaluators', () => {
           )
         )
       ).toBe(true);
+    });
+
+    it('calls a session without an address neither local nor remote, relayed or not', () => {
+      const remote = (geoCountry: string | null) =>
+        matched(
+          evaluatorRegistry.is_local_network(
+            createTestContext({ session: createMockSession({ ipAddress: '', geoCountry }) }),
+            createCondition({ field: 'is_local_network', operator: 'eq', value: false })
+          )
+        );
+
+      expect(remote('Tofa Relay')).toBe(false);
+      expect(remote(null)).toBe(false);
     });
   });
 

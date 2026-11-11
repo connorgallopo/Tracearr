@@ -125,7 +125,10 @@ describe('PlexClient genre fill', () => {
         ])
       );
 
-    const { items } = await makeClient().getLibraryItemsSince('3', new Date(0));
+    const { items } = await makeClient().getLibraryItemsSince('3', {
+      kind: 'date',
+      since: new Date(0),
+    });
 
     expect(items[0]?.genres).toEqual(['Drama', 'War', 'History']);
   });

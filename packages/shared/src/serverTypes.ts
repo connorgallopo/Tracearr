@@ -1,4 +1,4 @@
-export const SERVER_TYPES = ['plex', 'jellyfin', 'emby'] as const;
+export const SERVER_TYPES = ['plex', 'jellyfin', 'emby', 'tofa'] as const;
 
 export type ServerType = (typeof SERVER_TYPES)[number];
 

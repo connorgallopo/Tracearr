@@ -7,6 +7,7 @@
  */
 
 import { SERVER_PROFILES, assertNever, type ServerType } from '@tracearr/shared';
+import { LIVE_VIEWER_PREFIX } from '../../services/mediaServer/tofa/parser.js';
 import type { BuildCompositeKeyInput } from './types.js';
 
 /**
@@ -78,15 +79,23 @@ export function terminationSessionId(
   }
 }
 
-/** Some Plex clients (Plexamp) report no Session.id, and Plex cannot stop a playback without one. */
-export function canTerminate(type: ServerType, plexSessionId: string | null | undefined): boolean {
-  const terminatesBy = SERVER_PROFILES[type].terminatesBy;
-  switch (terminatesBy) {
-    case 'plexSessionId':
-      return !!plexSessionId;
-    case 'sessionKey':
+/**
+ * Some Plex clients (Plexamp) report no Session.id, and Plex cannot stop a playback without one.
+ * tofa stops playback sessions only, so a live viewer listed without one cannot be stopped.
+ */
+export function canTerminate(
+  type: ServerType,
+  session: { plexSessionId?: string | null; sessionKey: string }
+): boolean {
+  switch (type) {
+    case 'plex':
+      return !!session.plexSessionId;
+    case 'jellyfin':
+    case 'emby':
       return true;
+    case 'tofa':
+      return !session.sessionKey.startsWith(LIVE_VIEWER_PREFIX);
     default:
-      return assertNever(terminatesBy);
+      return assertNever(type);
   }
 }

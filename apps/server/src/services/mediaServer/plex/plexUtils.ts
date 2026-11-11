@@ -38,6 +38,18 @@ export function extractLiveUuid(key: string | undefined | null): string | undefi
 // Live TV Metadata Extraction
 // ============================================================================
 
+/** The channel's name as the session or its Media states it; undefined when neither does */
+export function plexChannelName(
+  item: Record<string, unknown>,
+  firstMedia: Record<string, unknown> | undefined
+): string | undefined {
+  return (
+    parseOptionalBoundedString(item.sourceTitle, 255) ||
+    parseOptionalBoundedString(firstMedia?.channelTitle, 255) ||
+    undefined
+  );
+}
+
 /**
  * Extract live TV metadata from Plex session data
  *
@@ -54,10 +66,11 @@ export function extractPlexLiveTvMetadata(
   item: Record<string, unknown>,
   firstMedia: Record<string, unknown> | undefined
 ): { channelTitle: string; channelIdentifier?: string; channelThumb?: string } | undefined {
-  // Channel title can come from sourceTitle (session level) or Media.channelTitle
+  // Channel title can come from sourceTitle (session level) or Media.channelTitle. Without
+  // either, the channel's number and call sign stand in.
   const channelTitle =
-    parseOptionalBoundedString(item.sourceTitle, 255) ||
-    parseOptionalBoundedString(firstMedia?.channelTitle, 255);
+    plexChannelName(item, firstMedia) ||
+    [firstMedia?.channelVcn, firstMedia?.channelCallSign].filter(Boolean).join(' ').slice(0, 255);
 
   if (!channelTitle) return undefined;
 

@@ -1,7 +1,7 @@
 /**
  * Media Server Client Module
  *
- * Provides a unified interface for Plex and Jellyfin media server integrations.
+ * Provides a unified interface for Plex, Jellyfin, Emby and tofa media server integrations.
  * Use the factory function to create clients based on server type.
  *
  * @example
@@ -21,6 +21,7 @@ import { assertNever, type JellyfinEmbyServerType, type ServerType } from '@trac
 import { PlexClient } from './plex/client.js';
 import { JellyfinClient } from './jellyfin/client.js';
 import { EmbyClient } from './emby/client.js';
+import { TofaClient } from './tofa/client.js';
 import type { IMediaServerClient, MediaServerConfig, CreateClientOptions } from './types.js';
 
 // ============================================================================
@@ -59,6 +60,8 @@ export function createMediaServerClient(options: CreateClientOptions): IMediaSer
       return new JellyfinClient(config);
     case 'emby':
       return new EmbyClient(config);
+    case 'tofa':
+      return new TofaClient(config);
     default:
       return assertNever(options.type);
   }
@@ -86,6 +89,8 @@ export function isJellyfinEmby(type: ServerType): type is JellyfinEmbyServerType
       return true;
     case 'emby':
       return true;
+    case 'tofa':
+      return false;
     default:
       return assertNever(type);
   }
@@ -99,6 +104,8 @@ export function verifyServerAdmin(type: ServerType, token: string, url: string) 
       return JellyfinClient.verifyServerAdmin(token, url);
     case 'emby':
       return EmbyClient.verifyServerAdmin(token, url);
+    case 'tofa':
+      return TofaClient.verifyServerAdmin(token, url);
     default:
       return assertNever(type);
   }
@@ -140,6 +147,7 @@ export type {
 export { PlexClient } from './plex/client.js';
 export { JellyfinClient } from './jellyfin/client.js';
 export { EmbyClient } from './emby/client.js';
+export { TofaClient } from './tofa/client.js';
 
 // Plex-specific types
 export type { PlexServerResource, PlexServerConnection } from './plex/parser.js';

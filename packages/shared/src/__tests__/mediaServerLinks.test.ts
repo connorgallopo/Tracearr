@@ -3,6 +3,7 @@ import {
   buildMediaServerItemUrl,
   isPubliclyRoutableUrl,
   memberFacingUrl,
+  type MediaServerItemLinkInput,
 } from '../mediaServerLinks.js';
 
 const PLEX_MACHINE = '02aede436384ae67d1d1dc879dcd69f8504c27ca';
@@ -43,6 +44,52 @@ describe('buildMediaServerItemUrl', () => {
     ).toBe(
       'http://media.example.com:8096/web/index.html#/details?id=bf01da2708ae716a7d2bd441376de12f'
     );
+  });
+
+  it('builds a tofa link through app.tofa.tv, whatever the server address', () => {
+    expect(
+      buildMediaServerItemUrl({
+        serverType: 'tofa',
+        baseUrl: 'http://media.example.com:33333/',
+        ratingKey: '4c2e8a1f-6b3d-4e97-a5c0-9d1f7b2e8a63',
+        mediaType: 'movie',
+      })
+    ).toBe('https://app.tofa.tv/media/4c2e8a1f-6b3d-4e97-a5c0-9d1f7b2e8a63');
+  });
+
+  it('opens a tofa episode or season on its show page by number', () => {
+    const episode: MediaServerItemLinkInput = {
+      serverType: 'tofa',
+      baseUrl: 'http://media.example.com:33333',
+      ratingKey: '9b7d3f1e-2c8a-4a65-b0e4-7f3c1d9a5e28',
+      mediaType: 'episode',
+      showRatingKey: '4c2e8a1f-6b3d-4e97-a5c0-9d1f7b2e8a63',
+      seasonNumber: 29,
+      episodeNumber: 2,
+    };
+    const show = 'https://app.tofa.tv/media/4c2e8a1f-6b3d-4e97-a5c0-9d1f7b2e8a63';
+    expect(buildMediaServerItemUrl(episode)).toBe(`${show}?season=29&episode=2`);
+    expect(buildMediaServerItemUrl({ ...episode, mediaType: 'season' })).toBe(`${show}?season=29`);
+    expect(buildMediaServerItemUrl({ ...episode, seasonNumber: 0 })).toBe(
+      `${show}?season=0&episode=2`
+    );
+    expect(buildMediaServerItemUrl({ ...episode, seasonNumber: null })).toBe(show);
+  });
+
+  it('links a tofa episode to its show, and not at all when the show is unknown', () => {
+    const episode: MediaServerItemLinkInput = {
+      serverType: 'tofa',
+      baseUrl: 'http://media.example.com:33333',
+      ratingKey: '9b7d3f1e-2c8a-4a65-b0e4-7f3c1d9a5e28',
+      mediaType: 'episode',
+    };
+    expect(
+      buildMediaServerItemUrl({
+        ...episode,
+        showRatingKey: '4c2e8a1f-6b3d-4e97-a5c0-9d1f7b2e8a63',
+      })
+    ).toBe('https://app.tofa.tv/media/4c2e8a1f-6b3d-4e97-a5c0-9d1f7b2e8a63');
+    expect(buildMediaServerItemUrl({ ...episode, showRatingKey: null })).toBeNull();
   });
 
   it('does not double the slash when the configured url has a trailing one', () => {
