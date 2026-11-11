@@ -1209,4 +1209,173 @@ describe('mediaResolutionService', () => {
     const merged = await reconcileMediaDuplicates();
     expect(merged).toBe(1);
   });
+
+  // Rows written by one statement share created_at. Unless noted, the expected loser holds the
+  // lower id and sits first on disk, so neither decides the survivor.
+  const lowId = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
+  const survivingKeys = async () =>
+    (await db.select().from(media))
+      .filter((r) => !r.mergedIntoId)
+      .map((r) => r.matchKey)
+      .sort();
+
+  it('a resolve hitting two rows created together merges into the lower match key', async () => {
+    const createdAt = new Date();
+    await db.insert(media).values([
+      {
+        id: lowId(1),
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:3249741',
+        imdbId: 'tt1861184',
+        tvdbId: 3249741,
+        title: 'Stonewalled',
+        normalizedTitle: 'stonewalled',
+        createdAt,
+      },
+      {
+        id: lowId(2),
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:3249731',
+        imdbId: 'tt1861183',
+        tvdbId: 3249731,
+        title: 'Vengeance',
+        normalizedTitle: 'vengeance',
+        createdAt,
+      },
+    ]);
+    // One server pairs this episode's tvdb id with the next episode's imdb id
+    const resolved = await resolveMediaForItem({
+      mediaType: 'episode',
+      imdbId: 'tt1861184',
+      tvdbId: 3249731,
+      title: 'Vengeance',
+      serverId: 's2',
+      ratingKey: '67108',
+    });
+    expect(resolved).toBe(lowId(2));
+    expect(await survivingKeys()).toEqual(['episode:tvdb:3249731']);
+  });
+
+  it('title lookups pick the lower match key among rows created together, batched or not', async () => {
+    const createdAt = new Date();
+    await db.insert(media).values([
+      {
+        id: lowId(1),
+        mediaType: 'movie',
+        matchKey: 'movie:title:heat:1996',
+        title: 'Heat',
+        normalizedTitle: 'heat',
+        year: 1996,
+        createdAt,
+      },
+      {
+        id: lowId(2),
+        mediaType: 'movie',
+        matchKey: 'movie:title:heat:1995',
+        title: 'Heat',
+        normalizedTitle: 'heat',
+        year: 1995,
+        createdAt,
+      },
+    ]);
+    const server = await createTestServer({ type: 'plex' });
+    const input = { mediaType: 'movie', title: 'Heat', year: 1995, serverId: server.id };
+    expect(await resolveMediaForItem({ ...input, ratingKey: 'rk-1' })).toBe(lowId(2));
+    const batch = await resolveMediaBatch([{ ...input, ratingKey: 'rk-2' }]);
+    expect(batch.get('rk-2')).toBe(lowId(2));
+  });
+
+  it('reconcile keeps the lower match key among rows created together, in every pass', async () => {
+    const createdAt = new Date();
+    const row = (
+      n: number,
+      matchKey: string,
+      fields: Omit<typeof media.$inferInsert, 'id' | 'mediaType' | 'matchKey'>
+    ) => ({ id: lowId(n), mediaType: 'movie', matchKey, createdAt, ...fields });
+    await db.insert(media).values([
+      // Shared tmdb id; the second pair puts the winner first on disk with the lower id
+      row(1, 'movie:imdb:ttB', { imdbId: 'ttB', tmdbId: 7, title: 'A', normalizedTitle: 'a' }),
+      row(5, 'movie:imdb:ttA', { imdbId: 'ttA', tmdbId: 7, title: 'A', normalizedTitle: 'a' }),
+      row(2, 'movie:imdb:ttC', { imdbId: 'ttC', tmdbId: 8, title: 'B', normalizedTitle: 'b' }),
+      row(6, 'movie:imdb:ttD', { imdbId: 'ttD', tmdbId: 8, title: 'B', normalizedTitle: 'b' }),
+      // Title-keyed race artifact
+      row(3, 'movie:title:heat:1996', { title: 'Heat', normalizedTitle: 'heat', year: 1996 }),
+      row(7, 'movie:title:heat:1995', { title: 'Heat', normalizedTitle: 'heat', year: 1995 }),
+      // Split provider ids for one title and year
+      row(4, 'movie:tmdb:18', { tmdbId: 18, title: 'Fifth', normalizedTitle: 'fifth', year: 1997 }),
+      row(8, 'movie:imdb:tt0119116', {
+        imdbId: 'tt0119116',
+        title: 'Fifth',
+        normalizedTitle: 'fifth',
+        year: 1997,
+      }),
+    ]);
+    expect(await reconcileMediaDuplicates()).toBe(4);
+    expect(await survivingKeys()).toEqual([
+      'movie:imdb:tt0119116',
+      'movie:imdb:ttA',
+      'movie:imdb:ttC',
+      'movie:title:heat:1995',
+    ]);
+  });
+
+  it('a row older by microseconds wins even when both share a millisecond', async () => {
+    const at = (micros: number) =>
+      sql`${`2026-01-01T00:00:00.000${String(micros).padStart(3, '0')}Z`}::timestamptz`;
+    // In each pair the older row carries the higher match key and the lower id
+    await db.insert(media).values([
+      {
+        id: lowId(1),
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:3249741',
+        imdbId: 'tt1861184',
+        tvdbId: 3249741,
+        title: 'Stonewalled',
+        normalizedTitle: 'stonewalled',
+        createdAt: at(100),
+      },
+      {
+        id: lowId(2),
+        mediaType: 'episode',
+        matchKey: 'episode:tvdb:3249731',
+        imdbId: 'tt1861183',
+        tvdbId: 3249731,
+        title: 'Vengeance',
+        normalizedTitle: 'vengeance',
+        createdAt: at(300),
+      },
+      {
+        id: lowId(3),
+        mediaType: 'movie',
+        matchKey: 'movie:title:heat:1996',
+        title: 'Heat',
+        normalizedTitle: 'heat',
+        year: 1996,
+        createdAt: at(100),
+      },
+      {
+        id: lowId(4),
+        mediaType: 'movie',
+        matchKey: 'movie:title:heat:1995',
+        title: 'Heat',
+        normalizedTitle: 'heat',
+        year: 1995,
+        createdAt: at(300),
+      },
+    ]);
+    const resolved = await resolveMediaForItem({
+      mediaType: 'episode',
+      imdbId: 'tt1861184',
+      tvdbId: 3249731,
+      title: 'Vengeance',
+      serverId: 's2',
+      ratingKey: '67108',
+    });
+    expect(resolved).toBe(lowId(1));
+    const server = await createTestServer({ type: 'plex' });
+    const batch = await resolveMediaBatch([
+      { mediaType: 'movie', title: 'Heat', year: 1995, serverId: server.id, ratingKey: 'rk-1' },
+    ]);
+    expect(batch.get('rk-1')).toBe(lowId(3));
+  });
 });

@@ -1,4 +1,4 @@
-import { and, asc, eq, inArray, isNotNull, isNull, or, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNotNull, isNull, or, sql } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { media, libraryItems } from '../../db/schema.js';
 import {
@@ -10,6 +10,12 @@ import {
 
 type MediaRow = typeof media.$inferSelect;
 type Executor = Pick<typeof db, 'select' | 'update' | 'insert' | 'execute'>;
+
+// Every choice between duplicate rows sorts here, in SQL: a JS Date drops created_at's
+// microseconds. Rows from one batch insert share created_at and went in sorted by match key;
+// ids are random, so a tie broken on id picks a different row for the same input in another
+// database. The C collation keeps the order independent of the database's collation.
+const OLDEST_FIRST_SQL = 'created_at, match_key COLLATE "C"';
 
 function lockKeyFor(input: MatchKeyInput): string {
   // Must mirror buildMediaMatchKey's per-type ID precedence, or two servers
@@ -35,7 +41,8 @@ async function findByAnyProviderId(dbc: Executor, input: MatchKeyInput): Promise
   return dbc
     .select()
     .from(media)
-    .where(and(eq(media.mediaType, input.mediaType), isNull(media.mergedIntoId), or(...conds)));
+    .where(and(eq(media.mediaType, input.mediaType), isNull(media.mergedIntoId), or(...conds)))
+    .orderBy(sql.raw(OLDEST_FIRST_SQL));
 }
 
 async function findByTitleTolerant(
@@ -62,7 +69,7 @@ async function findByTitleTolerant(
         sql`(${media.year} IS NULL OR ${media.year} BETWEEN ${year - 1} AND ${year + 1})`
       )
     )
-    .orderBy(sql`${media.year} IS NULL`, asc(media.createdAt), asc(media.id))
+    .orderBy(sql`${media.year} IS NULL`, sql.raw(OLDEST_FIRST_SQL))
     .limit(1);
   return rows[0];
 }
@@ -251,8 +258,7 @@ export async function resolveMediaForItem(input: MatchKeyInput): Promise<string>
 
     const hits = await findByAnyProviderId(tx, input);
     if (hits.length > 1) {
-      // Two rows describe the same item: merge into the first (stable order by createdAt)
-      hits.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+      // Two rows describe the same item: merge into the oldest
       for (const loser of hits.slice(1)) await mergeMediaRowsWithin(tx, hits[0]!.id, loser.id);
     }
     let hit: MediaRow | undefined = hits[0];
@@ -567,11 +573,8 @@ async function resolveMediaMisses(inputs: MatchKeyInput[]): Promise<Map<string, 
           isNull(media.mergedIntoId),
           inArray(media.normalizedTitle, titles)
         )
-      );
-    rows.sort(
-      (a, b) =>
-        a.createdAt.getTime() - b.createdAt.getTime() || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)
-    );
+      )
+      .orderBy(sql.raw(OLDEST_FIRST_SQL));
     for (const input of idlessGroup) {
       const normalized = normalizeTitle(input.title!);
       const year = input.year ?? 0;
@@ -788,13 +791,20 @@ export async function resolveMediaBatch(inputs: MatchKeyInput[]): Promise<Map<st
 export async function reconcileMediaDuplicates(): Promise<number> {
   let merges = 0;
   for (const col of ['imdb_id', 'tmdb_id', 'tvdb_id'] as const) {
+    // Duplicated values are found first so only their rows pay for the ordered aggregate
     const dupes = (await db.execute(
       sql.raw(`
-      SELECT array_agg(id ORDER BY created_at) AS ids
+      SELECT array_agg(id ORDER BY ${OLDEST_FIRST_SQL}) AS ids
       FROM media
-      WHERE ${col} IS NOT NULL AND merged_into_id IS NULL
+      WHERE merged_into_id IS NULL
+        AND (media_type, ${col}) IN (
+          SELECT media_type, ${col}
+          FROM media
+          WHERE ${col} IS NOT NULL AND merged_into_id IS NULL
+          GROUP BY media_type, ${col}
+          HAVING COUNT(*) > 1
+        )
       GROUP BY media_type, ${col}
-      HAVING COUNT(*) > 1
     `)
     )) as unknown as { rows: Array<{ ids: string[] }> };
     for (const row of dupes.rows) {
@@ -808,8 +818,8 @@ export async function reconcileMediaDuplicates(): Promise<number> {
   // Safety net for title-keyed race artifacts the advisory lock cannot cover
   const titleDupes = (await db.execute(
     sql.raw(`
-      SELECT array_agg(id ORDER BY created_at, id) AS ids,
-             array_agg(COALESCE(year, 0) ORDER BY created_at, id) AS years
+      SELECT array_agg(id ORDER BY ${OLDEST_FIRST_SQL}) AS ids,
+             array_agg(COALESCE(year, 0) ORDER BY ${OLDEST_FIRST_SQL}) AS years
       FROM media
       WHERE merged_into_id IS NULL
         AND media_type IN ('movie', 'show')
@@ -874,11 +884,11 @@ async function reconcileSplitProviderIdRows(): Promise<number> {
   let merges = 0;
   const groups = (await db.execute(
     sql.raw(`
-      SELECT array_agg(id ORDER BY created_at, id) AS ids,
-             array_agg(year ORDER BY created_at, id) AS years,
-             array_agg(imdb_id ORDER BY created_at, id) AS imdb_ids,
-             array_agg(tmdb_id ORDER BY created_at, id) AS tmdb_ids,
-             array_agg(tvdb_id ORDER BY created_at, id) AS tvdb_ids
+      SELECT array_agg(id ORDER BY ${OLDEST_FIRST_SQL}) AS ids,
+             array_agg(year ORDER BY ${OLDEST_FIRST_SQL}) AS years,
+             array_agg(imdb_id ORDER BY ${OLDEST_FIRST_SQL}) AS imdb_ids,
+             array_agg(tmdb_id ORDER BY ${OLDEST_FIRST_SQL}) AS tmdb_ids,
+             array_agg(tvdb_id ORDER BY ${OLDEST_FIRST_SQL}) AS tvdb_ids
       FROM media
       WHERE merged_into_id IS NULL
         AND media_type IN ('movie', 'show')

@@ -21,6 +21,18 @@ import { db } from '../../../db/client.js';
 import { resolveMediaBatch } from '../mediaResolutionService.js';
 import { buildMediaMatchKey, type MatchKeyInput } from '../mediaMatchKey.js';
 
+/** A select chain resolving to `rows`, whether or not the query ends in orderBy(). */
+function selectResolving(rows: unknown[]) {
+  const result = Object.assign(Promise.resolve(rows), {
+    orderBy: vi.fn().mockResolvedValue(rows),
+  });
+  return {
+    from: vi.fn().mockReturnThis(),
+    leftJoin: vi.fn().mockReturnThis(),
+    where: vi.fn().mockReturnValue(result),
+  };
+}
+
 /** loadStoredIdentities gets `rows`; the merged-away revalidation query that
  *  follows gets `mergedAwayIds` (defaults to none stale). */
 function mockStoredIdentitiesQuery(rows: unknown[], mergedAwayIds: string[] = []) {
@@ -28,11 +40,7 @@ function mockStoredIdentitiesQuery(rows: unknown[], mergedAwayIds: string[] = []
   vi.mocked(db.select).mockImplementation(() => {
     const response = call === 0 ? rows : mergedAwayIds.map((id) => ({ id }));
     call++;
-    return {
-      from: vi.fn().mockReturnThis(),
-      leftJoin: vi.fn().mockReturnThis(),
-      where: vi.fn().mockResolvedValue(response),
-    } as never;
+    return selectResolving(response) as never;
   });
 }
 
@@ -59,10 +67,7 @@ function mockFreshResolution(newId: string) {
     onConflictDoNothing: vi.fn().mockReturnThis(),
     returning: vi.fn().mockResolvedValue([{ id: newId }]),
   };
-  const selectChain = {
-    from: vi.fn().mockReturnThis(),
-    where: vi.fn().mockResolvedValue([]), // no hits by provider id
-  };
+  const selectChain = selectResolving([]); // no hits by provider id
   const tx = {
     execute: vi.fn().mockResolvedValue(undefined),
     select: vi.fn().mockReturnValue(selectChain),
@@ -208,12 +213,7 @@ describe('resolveMediaBatch', () => {
     let call = 0;
     vi.mocked(db.select).mockImplementation(() => {
       const idx = call++;
-      const rows = idx === 1 ? [mediaRow] : [];
-      return {
-        from: vi.fn().mockReturnThis(),
-        leftJoin: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(rows),
-      } as never;
+      return selectResolving(idx === 1 ? [mediaRow] : []) as never;
     });
     const updateChain = {
       set: vi.fn().mockReturnThis(),
@@ -401,12 +401,7 @@ describe('resolveMediaBatch', () => {
       let call = 0;
       vi.mocked(db.select).mockImplementation(() => {
         const idx = call++;
-        const rows = idx === 2 ? probeRows : [];
-        return {
-          from: vi.fn().mockReturnThis(),
-          leftJoin: vi.fn().mockReturnThis(),
-          where: vi.fn().mockResolvedValue(rows),
-        } as never;
+        return selectResolving(idx === 2 ? probeRows : []) as never;
       });
     }
 

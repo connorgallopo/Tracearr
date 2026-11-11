@@ -1942,7 +1942,8 @@ export class LibrarySyncService {
     if (genreMediaIds.size > 0) {
       // Rebuilt from every server's active copy so an edit on the server lands.
       // Servers that disagree settle on the longest list, then the lowest
-      // server id, so they never take turns overwriting the row.
+      // server id and rating key, so they never take turns overwriting the
+      // row; the random row id would pick differently in another database.
       const ids = `{${[...genreMediaIds].join(',')}}`;
       await db.execute(sql`
         UPDATE media m SET genres = best.genres, updated_at = now()
@@ -1950,7 +1951,7 @@ export class LibrarySyncService {
           SELECT DISTINCT ON (media_id) media_id, genres
           FROM library_items
           WHERE removed_at IS NULL AND cardinality(genres) > 0 AND media_id = ANY(${ids}::uuid[])
-          ORDER BY media_id, cardinality(genres) DESC, server_id, id
+          ORDER BY media_id, cardinality(genres) DESC, server_id, rating_key COLLATE "C"
         ) best
         WHERE m.id = best.media_id AND m.genres IS DISTINCT FROM best.genres
       `);
