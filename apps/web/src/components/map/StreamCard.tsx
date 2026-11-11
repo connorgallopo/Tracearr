@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Marker, type StyleSpecification } from 'maplibre-gl';
 import {
   formatEpisodeLabel,
+  namesShow,
   isStaff,
   type ActiveSession,
   type LocationStats,
@@ -27,12 +28,12 @@ import {
 } from './useMapLibre';
 
 function formatMediaTitle(session: ActiveSession): { primary: string; secondary: string | null } {
-  const { mediaType, mediaTitle, grandparentTitle, seasonNumber, episodeNumber, year } = session;
+  const { mediaType, mediaTitle, seasonNumber, episodeNumber, year } = session;
 
-  if (mediaType === 'episode' && grandparentTitle) {
+  if (namesShow(session)) {
     const seasonEp = formatEpisodeLabel(seasonNumber, episodeNumber, { spaced: true });
     return {
-      primary: grandparentTitle,
+      primary: session.grandparentTitle,
       secondary: seasonEp ? `${seasonEp} · ${mediaTitle}` : mediaTitle,
     };
   }

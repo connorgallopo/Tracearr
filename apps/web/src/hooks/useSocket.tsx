@@ -332,10 +332,12 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     });
 
     // A server added, renamed, reordered or removed anywhere; the builder's
-    // server list comes from the filter options, so refresh both.
+    // server list comes from the filter options, and a server with its own
+    // requests brings its request service with it, so refresh all three.
     newSocket.on(WS_EVENTS.SERVERS_CHANGED, () => {
       void queryClient.invalidateQueries({ queryKey: ['servers'] });
       void queryClient.invalidateQueries({ queryKey: ['sessions', 'filter-options'] });
+      void queryClient.invalidateQueries({ queryKey: [...REQUESTS_KEY, 'services'] });
     });
 
     newSocket.on(WS_EVENTS.SERVER_CONNECTION, (status: ServerConnectionStatus) => {

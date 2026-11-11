@@ -100,6 +100,8 @@ export function PlaybackReportingImportSection({
       }
     : null;
 
+  const pickServer = jellyfinServers.length > 1;
+
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -111,25 +113,27 @@ export function PlaybackReportingImportSection({
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm font-medium">
           <StepBadge n={1} />
-          {t('import.selectTargetServer')}
+          {t(pickServer ? 'import.selectTargetServer' : 'import.checkPlugin')}
         </div>
 
         <div className="ml-8 space-y-4">
-          <Select value={selectedServerId} onValueChange={onServerChange}>
-            <SelectTrigger>
-              <SelectValue placeholder={t('import.selectJellyfinServer')} />
-            </SelectTrigger>
-            <SelectContent>
-              {jellyfinServers.map((server) => (
-                <SelectItem key={server.id} value={server.id}>
-                  <div className="flex items-center gap-2">
-                    <MediaServerIcon type={server.type} className="h-4 w-4" />
-                    {server.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {pickServer && (
+            <Select value={selectedServerId} onValueChange={onServerChange}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('import.selectJellyfinServer')} />
+              </SelectTrigger>
+              <SelectContent>
+                {jellyfinServers.map((server) => (
+                  <SelectItem key={server.id} value={server.id}>
+                    <div className="flex items-center gap-2">
+                      <MediaServerIcon type={server.type} className="h-4 w-4" />
+                      {server.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
           <div className="flex flex-wrap items-center gap-3">
             <Button

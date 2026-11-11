@@ -14,11 +14,13 @@ import {
 } from 'lucide-react';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type {
-  OwnerLinkServer,
-  RequestService,
-  Server,
-  ServerConnectionStatus,
+import {
+  SERVER_PROFILES,
+  assertNever,
+  type OwnerLinkServer,
+  type RequestService,
+  type Server,
+  type ServerConnectionStatus,
 } from '@tracearr/shared';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -83,9 +85,8 @@ export function ServerRow({
     disabled: !isDraggable,
   });
 
-  const hasPluginIssue =
-    !!connectionStatus?.pluginIssue && PLUGIN_ISSUES.includes(connectionStatus.pluginIssue);
   const historical = !!server.historicalAt;
+  const profile = SERVER_PROFILES[server.type];
 
   return (
     <div
@@ -162,54 +163,25 @@ export function ServerRow({
               <RequestServiceLine server={server} service={requestService.service} />
             )}
             {ownerLink && <OwnerAccountLine server={server} link={ownerLink} />}
-
-            {isJellyfinEmby(server.type) && !historical && (
-              <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                {!connectionStatus ? (
-                  <span className="text-muted-foreground">{t('servers.checkingConnection')}</span>
-                ) : connectionStatus.mode === 'realtime' ? (
-                  <span className="text-muted-foreground flex items-center gap-1">
-                    <Zap className="text-success h-3 w-3" aria-hidden="true" />
-                    {t('servers.realtimeActive')}
-                  </span>
-                ) : hasPluginIssue ? (
-                  <button
-                    type="button"
-                    className="text-warning flex items-center gap-1 hover:underline"
-                    onClick={() => setRealtimeDialog('setup')}
-                  >
-                    <AlertTriangle className="h-3 w-3" aria-hidden="true" />
-                    {t('servers.realtimeError')}
-                  </button>
-                ) : (
-                  <span className="flex items-center gap-1">
-                    <Radio className="text-muted-foreground h-3 w-3" aria-hidden="true" />
-                    <span className="text-muted-foreground">{t('servers.pollingMode')}</span>
-                    <button
-                      type="button"
-                      className="text-primary hover:underline"
-                      onClick={() => setRealtimeDialog('setup')}
-                    >
-                      {t('servers.setupRealtime')}
-                    </button>
-                  </span>
-                )}
-                {connectionStatus?.pluginVersion && (
-                  <span className="text-muted-foreground">
-                    {t('servers.pluginVersion', { version: connectionStatus.pluginVersion })}
-                  </span>
-                )}
-                {connectionStatus?.pluginUpdateAvailable && (
-                  <button
-                    type="button"
-                    className="text-warning inline-flex items-center gap-1 hover:underline"
-                    onClick={() => setRealtimeDialog('update')}
-                  >
-                    <ArrowUpCircle className="h-3 w-3" aria-hidden="true" />
-                    {t('servers.pluginUpdateAvailable')}
-                  </button>
-                )}
+            {isOwner && profile.memberSignIn === 'unavailable' && (
+              <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+                <span>{t('servers.ownerAccount.label')}</span>
+                <span>{t('servers.noSignIn', { server: profile.displayName })}</span>
               </div>
+            )}
+            {server.canStopStreams === false && (
+              <p className="text-warning flex items-center gap-1 text-xs">
+                <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+                {t('servers.cannotStopStreams')}
+              </p>
+            )}
+
+            {!historical && (
+              <RealtimeLine
+                server={server}
+                connectionStatus={connectionStatus}
+                onOpenDialog={setRealtimeDialog}
+              />
             )}
           </ItemContent>
 
@@ -258,4 +230,94 @@ export function ServerRow({
       )}
     </div>
   );
+}
+
+function RealtimeLine({
+  server,
+  connectionStatus,
+  onOpenDialog,
+}: {
+  server: Server;
+  connectionStatus?: ServerConnectionStatus;
+  onOpenDialog: (mode: 'setup' | 'update') => void;
+}) {
+  const { t } = useTranslation(['settings', 'common']);
+  const profile = SERVER_PROFILES[server.type];
+  switch (profile.liveEvents) {
+    case 'plexWebsocket':
+      return null;
+    case 'tofaSocket':
+      return (
+        <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+          {!connectionStatus ? (
+            <span>{t('servers.checkingConnection')}</span>
+          ) : connectionStatus.mode === 'realtime' ? (
+            <span className="flex items-center gap-1">
+              <Zap className="text-success h-3 w-3" aria-hidden="true" />
+              {t('servers.realtimeActive')}
+            </span>
+          ) : (
+            <span className="flex items-center gap-1">
+              <Radio className="h-3 w-3" aria-hidden="true" />
+              {t('servers.tofaPolling', { server: profile.displayName })}
+            </span>
+          )}
+          <span>{t('servers.realtimeBuiltIn', { server: profile.displayName })}</span>
+        </div>
+      );
+    case 'ssePlugin': {
+      const hasPluginIssue =
+        !!connectionStatus?.pluginIssue && PLUGIN_ISSUES.includes(connectionStatus.pluginIssue);
+      return (
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+          {!connectionStatus ? (
+            <span className="text-muted-foreground">{t('servers.checkingConnection')}</span>
+          ) : connectionStatus.mode === 'realtime' ? (
+            <span className="text-muted-foreground flex items-center gap-1">
+              <Zap className="text-success h-3 w-3" aria-hidden="true" />
+              {t('servers.realtimeActive')}
+            </span>
+          ) : hasPluginIssue ? (
+            <button
+              type="button"
+              className="text-warning flex items-center gap-1 hover:underline"
+              onClick={() => onOpenDialog('setup')}
+            >
+              <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+              {t('servers.realtimeError')}
+            </button>
+          ) : (
+            <span className="flex items-center gap-1">
+              <Radio className="text-muted-foreground h-3 w-3" aria-hidden="true" />
+              <span className="text-muted-foreground">{t('servers.pollingMode')}</span>
+              <button
+                type="button"
+                className="text-primary hover:underline"
+                onClick={() => onOpenDialog('setup')}
+              >
+                {t('servers.setupRealtime')}
+              </button>
+            </span>
+          )}
+          {connectionStatus?.pluginVersion && (
+            <span className="text-muted-foreground">
+              {t('servers.pluginVersion', { version: connectionStatus.pluginVersion })}
+            </span>
+          )}
+          {connectionStatus?.pluginUpdateAvailable && (
+            <button
+              type="button"
+              className="text-warning inline-flex items-center gap-1 hover:underline"
+              onClick={() => onOpenDialog('update')}
+            >
+              <ArrowUpCircle className="h-3 w-3" aria-hidden="true" />
+              {t('servers.pluginUpdateAvailable')}
+            </button>
+          )}
+        </div>
+      );
+    }
+    default:
+      return assertNever(profile.liveEvents);
+  }
 }

@@ -10,6 +10,7 @@ import {
   formatLocationCompact,
   getBufferedPercent,
   getDeviceDisplayName,
+  getDistinctProfileName,
   getMediaDisplay,
   getMediaLinks,
 } from '@/lib/utils';
@@ -66,12 +67,12 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
   const { title, subtitle: mediaSubtitle } = getMediaDisplay(session);
   const mediaLinks = getMediaLinks(session);
   const { user } = useAuth();
-  const { t } = useTranslation(['common', 'pages']);
+  const { t } = useTranslation(['common', 'pages', 'settings']);
   const subtitle =
     session.mediaType === 'trailer'
       ? [t('pages:automations.options.trailer'), mediaSubtitle].filter(Boolean).join(' · ')
       : mediaSubtitle;
-  const { isMultiServer } = useServer();
+  const { isMultiServer, servers } = useServer();
   const [showTerminateDialog, setShowTerminateDialog] = useState(false);
   // Read when the tooltip opens: while playing, now plus what's left stays put.
   const [endsAt, setEndsAt] = useState<number | null>(null);
@@ -79,6 +80,8 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
   // Only admin/owner can terminate sessions, and session must support termination
   // (some Plex clients like Plexamp don't provide the required Session.id)
   const canTerminate = (user?.role === 'admin' || user?.role === 'owner') && session.canTerminate;
+  const stopRefused =
+    servers.find((server) => server.id === session.serverId)?.canStopStreams === false;
 
   // Use estimated progress for smooth updates between SSE/poll events
   const { estimatedProgressMs, progressPercent } = useEstimatedProgress(session);
@@ -103,8 +106,11 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
   const avatarUrl = getAvatarUrl(session.serverId, session.user.thumbUrl, 28) ?? undefined;
 
   const deviceName = getDeviceDisplayName(session);
+  const displayName = session.user.identityName ?? session.user.username;
+  const profileName = getDistinctProfileName(session);
   const isPaused = session.state === 'paused';
-  const isSquareArt = session.mediaType === 'track' || session.mediaType === 'live';
+  const isLive = session.mediaType === 'live';
+  const isSquareArt = session.mediaType === 'track' || isLive;
 
   return (
     <>
@@ -169,9 +175,12 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
                 </Avatar>
                 <span
                   className="truncate text-sm font-medium"
-                  title={session.user.identityName ?? session.user.username}
+                  title={profileName ? `${displayName} · ${profileName}` : displayName}
                 >
-                  {session.user.identityName ?? session.user.username}
+                  {displayName}
+                  {profileName && (
+                    <span className="text-muted-foreground font-normal"> · {profileName}</span>
+                  )}
                 </span>
               </div>
 
@@ -212,20 +221,33 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
                 </div>
 
                 {/* Terminate button - admin/owner only */}
-                {canTerminate && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowTerminateDialog(true);
-                    }}
-                    title={t('pages:terminateStream.title')}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                )}
+                {canTerminate &&
+                  (stopRefused ? (
+                    <span title={t('settings:servers.cannotStopStreams')}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-muted-foreground pointer-events-none h-6 w-6"
+                        aria-label={t('settings:servers.cannotStopStreams')}
+                        disabled
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </span>
+                  ) : (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive h-6 w-6"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowTerminateDialog(true);
+                      }}
+                      title={t('pages:terminateStream.title')}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  ))}
               </div>
             </div>
 
@@ -244,18 +266,18 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
             {/* Bottom: Progress */}
             <div className="mt-3 space-y-1">
               <Progress
-                value={progressPercent}
+                value={isLive ? 100 : progressPercent}
                 buffered={getBufferedPercent(session)}
                 className="h-1.5"
               />
               <div className="text-muted-foreground flex justify-between text-[10px]">
-                <span>{formatDuration(estimatedProgressMs)}</span>
+                <span>{isLive ? t('media.liveTV') : formatDuration(estimatedProgressMs)}</span>
                 <span>
                   {isPaused || session.buffering ? (
                     <span className="font-medium text-yellow-500">
                       {session.buffering ? t('playback.buffering') : t('playback.paused')}
                     </span>
-                  ) : remaining ? (
+                  ) : isLive ? null : remaining ? (
                     <TooltipProvider delayDuration={100}>
                       <Tooltip
                         onOpenChange={(open) => {

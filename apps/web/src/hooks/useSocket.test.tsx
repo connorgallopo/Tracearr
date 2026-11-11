@@ -280,12 +280,13 @@ describe('SocketProvider', () => {
     expect(invalidate).toHaveBeenCalledWith({ queryKey: REQUESTS_KEY });
   });
 
-  it('refetches servers and filter options when a server changes', () => {
+  it('refetches servers, filter options and request services when a server changes', () => {
     const { invalidate } = setup();
     fire(WS_EVENTS.SERVERS_CHANGED);
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['servers'] });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['sessions', 'filter-options'] });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['requests', 'services'] });
   });
 
   it('coalesces a burst of finished runs into one refetch', () => {

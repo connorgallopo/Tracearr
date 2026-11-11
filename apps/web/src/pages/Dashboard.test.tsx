@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router';
+import { liveStatsGapSeconds } from '@tracearr/shared';
 import { Dashboard } from './Dashboard';
 
 function Search() {
@@ -61,8 +62,13 @@ vi.mock('@/hooks/queries/useServers', () => ({
   useMultiServerLiveStats: (ids: string[], enabled: boolean) => multiLiveStats(ids, enabled),
 }));
 
+const { resourceCharts } = vi.hoisted(() => ({
+  resourceCharts: vi.fn(
+    (_props: { multiSeries?: { serverId: string; gapSeconds: number }[] }) => null
+  ),
+}));
 vi.mock('@/components/charts/ServerResourceCharts', () => ({
-  ServerResourceCharts: () => null,
+  ServerResourceCharts: resourceCharts,
 }));
 
 vi.mock('@/components/charts/BandwidthChart', () => ({
@@ -112,6 +118,7 @@ function serverReturn() {
 describe('Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    multiLiveStats.mockReset();
     auth.user.role = 'owner';
     auth.user.impersonatedBy = undefined;
     localStorage.clear();
@@ -214,6 +221,49 @@ describe('Dashboard', () => {
     renderDashboard();
 
     expect(multiLiveStats).toHaveBeenCalledWith(['a'], true);
+  });
+
+  it('draws resource lines for the selected servers only, each with its own sampling gap', () => {
+    mockUseDashboardStats.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useDashboardStats>);
+    mockUseActiveSessions.mockReturnValue({
+      data: [],
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useActiveSessions>);
+    mockUseServer.mockReturnValue({
+      selectedServerIds: ['a', 'b'],
+      selectedServers: [
+        { id: 'a', name: 'Attic', type: 'plex', historicalAt: null },
+        { id: 'b', name: 'Den', type: 'tofa', historicalAt: null },
+      ],
+      isMultiServer: true,
+      selectedServerId: null,
+    } as unknown as ReturnType<typeof useServer>);
+    const sample = [{ at: '2026-11-14T00:00:00.000Z', hostCpu: 1 }];
+    multiLiveStats.mockReturnValue({
+      series: [
+        { serverId: 'a', statistics: sample, bandwidth: [] },
+        { serverId: 'b', statistics: sample, bandwidth: [] },
+        { serverId: 'gone', statistics: sample, bandwidth: [] },
+      ],
+      clockSkewMs: 0,
+      isLoading: false,
+    } as never);
+
+    renderDashboard();
+
+    const series = resourceCharts.mock.lastCall?.[0].multiSeries;
+    expect(series?.map((line) => [line.serverId, line.gapSeconds])).toEqual([
+      ['a', liveStatsGapSeconds('plex')],
+      ['b', liveStatsGapSeconds('tofa')],
+    ]);
   });
 
   it('shows no server resources section when the only Plex server is historical', () => {

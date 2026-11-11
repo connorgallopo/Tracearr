@@ -146,4 +146,22 @@ describe('ServerRow', () => {
 
     expect(screen.queryByText('servers.checkingConnection')).not.toBeInTheDocument();
   });
+
+  it('shows tofa live over its own connection, with no plugin to set up', () => {
+    renderRow({
+      server: server({ type: 'tofa' }),
+      connectionStatus: { mode: 'realtime' } as ServerConnectionStatus,
+    });
+
+    expect(screen.getByText('servers.realtimeActive')).toBeInTheDocument();
+    expect(screen.getByText('servers.realtimeBuiltIn:{"server":"tofa"}')).toBeInTheDocument();
+    expect(screen.queryByText('servers.setupRealtime')).not.toBeInTheDocument();
+  });
+
+  it('marks a tofa key that cannot stop streams, without a no-sign-in line', () => {
+    renderRow({ server: server({ type: 'tofa', canStopStreams: false }), isOwner: true });
+
+    expect(screen.queryByText('servers.noSignIn:{"server":"tofa"}')).not.toBeInTheDocument();
+    expect(screen.getByText('servers.cannotStopStreams')).toBeInTheDocument();
+  });
 });

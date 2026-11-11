@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { formatDuration } from '@/lib/dateFormat';
 import { cn } from '@/lib/utils';
 import {
   PLAYBACK_DECISION_LABEL_KEYS,
@@ -50,8 +51,8 @@ interface StreamDetailsPanelProps {
   serverType: ServerType;
 }
 
-// Component for showing "N/A" with tooltip when stream bitrate is unavailable (Jellyfin/Emby only)
-function UnavailableBitrate() {
+/** "N/A" with the reason on hover, for a value the server does not report. */
+function NotReported({ reason }: { reason: string }) {
   const { t } = useTranslation('pages');
   return (
     <Tooltip>
@@ -62,7 +63,7 @@ function UnavailableBitrate() {
         </span>
       </TooltipTrigger>
       <TooltipContent side="top" className="max-w-[250px]">
-        <p className="text-xs">{t('history.stream.bitrateUnavailable')}</p>
+        <p className="text-xs">{reason}</p>
       </TooltipContent>
     </Tooltip>
   );
@@ -258,6 +259,9 @@ export function StreamDetailsPanel({
   // Atmos is metadata inside the core codec, so a direct play or copy keeps it
   const atmosSuffix = sourceAudioDetails?.atmos ? ' Atmos' : '';
   const hasSubtitleDetails = subtitleInfo?.codec || subtitleInfo?.language;
+  const rebufferCount = transcodeInfo?.rebufferCount;
+  const droppedFrames = transcodeInfo?.droppedFrames;
+  const hasPlaybackHealth = rebufferCount !== undefined || droppedFrames !== undefined;
   const hasTranscodeDetails =
     transcodeInfo && (transcodeInfo.hwDecoding || transcodeInfo.hwEncoding || transcodeInfo.speed);
 
@@ -278,7 +282,7 @@ export function StreamDetailsPanel({
 
   return (
     <div className="space-y-3">
-      {(transcodeInfo?.sourceContainer || bitrate) && (
+      {(transcodeInfo?.sourceContainer || bitrate || hasPlaybackHealth) && (
         <>
           {transcodeInfo?.sourceContainer && (
             <ComparisonRow
@@ -289,10 +293,34 @@ export function StreamDetailsPanel({
               )}
             />
           )}
-          {!!bitrate && (
-            <div className="flex justify-between py-1 text-sm">
-              <span className="text-muted-foreground">{t('pages:history.stream.bitrate')}</span>
-              <span className="font-medium">{formatBitrate(bitrate)}</span>
+          {(!!bitrate || hasPlaybackHealth) && (
+            <div>
+              {!!bitrate && (
+                <div className="flex justify-between py-1 text-sm">
+                  <span className="text-muted-foreground">{t('pages:history.stream.bitrate')}</span>
+                  <span className="font-medium">{formatBitrate(bitrate)}</span>
+                </div>
+              )}
+              {rebufferCount !== undefined && (
+                <div className="flex justify-between py-1 text-sm">
+                  <span className="text-muted-foreground">
+                    {t('pages:history.stream.rebuffers')}
+                  </span>
+                  <span className="font-medium">
+                    {rebufferCount}
+                    {!!transcodeInfo?.rebufferDurationMs &&
+                      ` · ${formatDuration(transcodeInfo.rebufferDurationMs, { style: 'compact' })}`}
+                  </span>
+                </div>
+              )}
+              {droppedFrames !== undefined && (
+                <div className="flex justify-between py-1 text-sm">
+                  <span className="text-muted-foreground">
+                    {t('pages:history.stream.droppedFrames')}
+                  </span>
+                  <span className="font-medium">{droppedFrames.toLocaleString()}</span>
+                </div>
+              )}
             </div>
           )}
           <Separator />
@@ -337,7 +365,7 @@ export function StreamDetailsPanel({
                   videoDecision === 'transcode' &&
                   !streamVideoDetails?.bitrate &&
                   !SERVER_PROFILES[serverType].reportsTranscodeTrackBitrates ? (
-                    <UnavailableBitrate />
+                    <NotReported reason={t('pages:history.stream.bitrateUnavailable')} />
                   ) : (
                     formatBitrate(streamVideoDetails?.bitrate ?? sourceVideoDetails?.bitrate)
                   )
@@ -425,7 +453,7 @@ export function StreamDetailsPanel({
                 audioDecision === 'transcode' &&
                 !streamAudioDetails?.bitrate &&
                 !SERVER_PROFILES[serverType].reportsTranscodeTrackBitrates ? (
-                  <UnavailableBitrate />
+                  <NotReported reason={t('pages:history.stream.bitrateUnavailable')} />
                 ) : (
                   formatBitrate(streamAudioDetails?.bitrate ?? sourceAudioDetails?.bitrate)
                 )
