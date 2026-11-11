@@ -1407,7 +1407,7 @@
         "sessionPaused": "strumień zostaje wstrzymany",
         "sessionHeldFor": "strumień pozostaje wstrzymany przez {{duration}}",
         "sessionHeldForTotal": "strumień był wstrzymany łącznie przez {{duration}}",
-        "sessionWatched": "",
+        "sessionWatched": "strumień liczy się jako obejrzany",
         "accountInactiveFor": "konto pozostaje nieaktywne przez {{duration}}",
         "accountNewDevice": "konto odtwarza z nowego urządzenia",
         "accountTrustChanged": "zmienia się wynik zaufania konta",
@@ -2182,8 +2182,8 @@
           "synonyms": "pauza, bezczynny, porzucony, zawieszony, afk"
         },
         "sessionWatched": {
-          "description": "",
-          "synonyms": ""
+          "description": "Strumień osiąga próg obejrzenia zdefiniowany w Ustawieniach dla typu multimediów.",
+          "synonyms": "obejrzany, zakończony, zakończony, procent, postęp, próg"
         },
         "accountInactiveFor": {
           "label": "Konto przestaje być aktywne",
@@ -3050,7 +3050,7 @@
         "libraryAll": "Dowolna biblioteka",
         "yearFromLabel": "Od roku",
         "yearToLabel": "Do roku",
-        "addedLabel": "",
+        "addedLabel": "Dodano",
         "sizeGbMinLabel": "Min. rozmiar (GB)",
         "sizeGbMaxLabel": "Maks. rozmiar (GB)",
         "sizeChipAtLeast": "≥ {{min}} GB",
