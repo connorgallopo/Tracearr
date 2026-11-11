@@ -403,6 +403,8 @@
       "media": "Let admins and members sign in",
       "mediaDesc": "With the account they have on a server below. Off, only people set to Allow get in, and everyone else is signed out.",
       "servers": "Through these servers",
+      "ssoOnly": "Single sign-on only",
+      "ssoOnlyDesc": "Admins and members sign in through your identity provider, never with a Plex, Jellyfin or Emby account, and the login page shows only single sign-on. The servers above still decide who may sign in. Your own password and Plex sign-in stay on at /login?all.",
       "overrides": "Set individually",
       "overridesDesc": "People whose user page says Allow or Block instead of following the switch above.",
       "overridesEmpty": "Nobody is set individually.",
