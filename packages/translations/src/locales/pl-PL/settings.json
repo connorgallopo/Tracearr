@@ -407,6 +407,8 @@
       "media": "Pozwól administratorom i członkom na zalogowanie",
       "mediaDesc": "Z kontem posiadanym przez nich na serwerze poniżej. Jeśli wyłączone, tylko osoby z flagą Zezwól mogą się zalogować, a wszyscy inni są wylogowani.",
       "servers": "Za pośrednictwem tych serwerów",
+      "ssoOnly": "",
+      "ssoOnlyDesc": "",
       "overrides": "Ustaw indywidualnie",
       "overridesDesc": "Osoby, które mają nadpisane ustawienia bezpośrednio na stronie użytkownika, więc ignorują powyższy przełącznik.",
       "overridesEmpty": "Nikt nie jest ustawiony indywidualnie.",

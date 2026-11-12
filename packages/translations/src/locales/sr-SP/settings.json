@@ -405,6 +405,8 @@
       "media": "",
       "mediaDesc": "",
       "servers": "",
+      "ssoOnly": "",
+      "ssoOnlyDesc": "",
       "overrides": "",
       "overridesDesc": "",
       "overridesEmpty": "",

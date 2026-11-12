@@ -401,6 +401,8 @@
       "media": "允许管理员和成员登录",
       "mediaDesc": "使用他们在下面某台服务器上的账户。关闭后，只有设置为“允许”的人可以登录，其他所有人都会被注销。",
       "servers": "通过以下服务器",
+      "ssoOnly": "",
+      "ssoOnlyDesc": "",
       "overrides": "单独设置",
       "overridesDesc": "其用户页显示“允许”或“阻止”而非遵循上方开关的人员。",
       "overridesEmpty": "无人被单独设置。",
