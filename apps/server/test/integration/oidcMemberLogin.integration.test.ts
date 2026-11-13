@@ -48,6 +48,7 @@ function fakeIdp(input: string | URL | Request, init?: RequestInit): Promise<Res
         authorization_endpoint: `${IDP}/authorize`,
         token_endpoint: `${IDP}/token`,
         userinfo_endpoint: `${IDP}/userinfo`,
+        end_session_endpoint: `${IDP}/logout`,
         id_token_signing_alg_values_supported: ['RS256'],
       })
     );
@@ -269,5 +270,29 @@ describe('oidc member sign-in (integration)', () => {
     expect(setCookies(res).some((c) => /session_token=[^;]/.test(c) && !/Max-Age=0/i.test(c))).toBe(
       false
     );
+  });
+
+  it('signs out without sending the browser to the identity provider', async () => {
+    const {
+      alice,
+      servers: [allowing],
+    } = await memberAlice();
+    if (!allowing) throw new Error('server missing');
+    await db
+      .insert(serverUsers)
+      .values({ userId: alice.id, serverId: allowing.id, externalId: 'ext-a', username: 'alice' });
+    const signedIn = await signIn({ sub: 'sub-f', email: 'alice@example.com' });
+    expect(signedIn.headers.location).toBe('/');
+
+    const res = await app.inject({
+      method: 'POST',
+      url: `${API_BASE_PATH}/auth/sign-out`,
+      headers: { origin, 'content-type': 'application/json', cookie: cookieHeader(signedIn) },
+      payload: {},
+    });
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual({ success: true });
+    expect(res.headers.location).toBeUndefined();
   });
 });

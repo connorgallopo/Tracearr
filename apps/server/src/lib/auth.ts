@@ -529,6 +529,9 @@ function buildAuth(redis: Redis, withOidc: boolean) {
                     discoveryUrl: oidcDiscoveryUrl,
                     scopes: ['openid', 'email', 'profile'],
                     pkce: true,
+                    // Without a post-logout redirect URI registered at the IdP, its logout
+                    // endpoint strands the browser on the IdP's own page.
+                    disableProviderLogout: true,
                     mapProfileToUser: async (profile) => {
                       const outcome = await linkOidcMember(profile);
                       // Either address matches no user, so better-auth goes on to user creation,

@@ -358,6 +358,7 @@ describe('getAuth construction', () => {
           discoveryUrl: 'https://auth.example.com/.well-known/openid-configuration',
           scopes: ['openid', 'email', 'profile'],
           pkce: true,
+          disableProviderLogout: true,
           mapProfileToUser: expect.any(Function),
         },
       ]);
