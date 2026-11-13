@@ -312,8 +312,11 @@ export function PlexServerSelector({
             {/* Recommended Connection Preview (for discovered servers) */}
             {recommendedConn && isDiscoveredConnection(recommendedConn) && (
               <div className="mt-3 flex items-center gap-2 text-sm">
-                <Check className="h-4 w-4 flex-shrink-0 text-green-500" />
-                <span className="text-muted-foreground min-w-0 break-all">
+                <Check className="text-success h-4 w-4 flex-shrink-0" />
+                <span
+                  className="text-muted-foreground min-w-0 truncate"
+                  title={recommendedConn.uri}
+                >
                   {recommendedConn.custom
                     ? t('pages:settings.plex.custom')
                     : recommendedConn.local
@@ -475,12 +478,12 @@ export function PlexServerSelector({
                           {/* Reachability indicator */}
                           {isDiscoveredConn ? (
                             conn.reachable ? (
-                              <Check className="h-3.5 w-3.5 flex-shrink-0 text-green-500" />
+                              <Check className="text-success h-3.5 w-3.5 flex-shrink-0" />
                             ) : (
                               <X className="h-3.5 w-3.5 flex-shrink-0 text-red-500" />
                             )
                           ) : conn.local ? (
-                            <Wifi className="h-3.5 w-3.5 flex-shrink-0 text-green-500" />
+                            <Wifi className="text-success h-3.5 w-3.5 flex-shrink-0" />
                           ) : (
                             <Globe className="h-3.5 w-3.5 flex-shrink-0 text-blue-500" />
                           )}
@@ -497,7 +500,7 @@ export function PlexServerSelector({
 
                             {/* Secure badge for HTTPS */}
                             {conn.uri.startsWith('https://') && (
-                              <span className="inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium text-green-600 dark:text-green-500">
+                              <span className="text-success inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium">
                                 <Lock className="h-3 w-3" />
                                 {t('pages:settings.plex.secure')}
                               </span>
@@ -552,7 +555,7 @@ export function PlexServerSelector({
                   >
                     <div className="flex items-center gap-2">
                       {conn.local ? (
-                        <Wifi className="h-3 w-3 text-green-500" />
+                        <Wifi className="text-success h-3 w-3" />
                       ) : (
                         <Globe className="h-3 w-3 text-blue-500" />
                       )}
@@ -563,7 +566,7 @@ export function PlexServerSelector({
                         : {conn.uri}
                       </span>
                       {conn.uri.startsWith('https://') && (
-                        <span className="inline-flex items-center gap-0.5 text-xs font-medium text-green-600 dark:text-green-500">
+                        <span className="text-success inline-flex items-center gap-0.5 text-xs font-medium">
                           <Lock className="h-3 w-3" />
                           {t('pages:settings.plex.secure')}
                         </span>

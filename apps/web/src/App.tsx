@@ -77,7 +77,16 @@ export const appRoutes = (
     {/* Public routes */}
     <Route path="/login" element={<Login />} />
     <Route path="/auth/plex-callback" element={<PlexCallback />} />
-    <Route path="/setup" element={<Setup />} />
+
+    {/* First run, after the owner account exists */}
+    <Route
+      path="/setup"
+      element={
+        <ProtectedRoute>
+          <Setup />
+        </ProtectedRoute>
+      }
+    />
 
     {/* Scalar lays itself out against the viewport, so the docs skip the app shell */}
     <Route

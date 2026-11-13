@@ -1,40 +1,110 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Navigate, useNavigate, useSearchParams } from 'react-router';
+import { SERVER_PROFILES, isServerType, type ServerType } from '@tracearr/shared';
+import { Button } from '@/components/ui/button';
+import { ConnectServerStep } from '@/components/setup/ConnectServerStep';
+import { ServerTypeStep } from '@/components/setup/ServerTypePicker';
+import { SetupLayout, setupPath } from '@/components/setup/SetupLayout';
+import { setupSteps } from '@/components/setup/SetupSteps';
+import { ImportSources } from '@/components/settings/data/Import';
 import { useAuth } from '@/hooks/useAuth';
-import { LogoIcon } from '@/components/brand/Logo';
+import { useServers } from '@/hooks/queries';
 
-/**
- * Setup page - redirects based on auth state
- *
- * With the simplified auth flow, server connection is handled
- * directly in the Login page. This page now just ensures
- * proper routing based on authentication state.
- */
-export function Setup() {
+interface StepContext {
+  serverType: ServerType;
+  /** The owner's account line on the step list; the account step is done and locked from here on. */
+  account: { detail?: string };
+  connectedName: string | undefined;
+}
+
+function ImportHistoryStep({
+  serverType,
+  account,
+  connectedName,
+  onBack,
+}: StepContext & { onBack: () => void }) {
+  const { t } = useTranslation(['pages', 'common']);
   const navigate = useNavigate();
-  const { isAuthenticated, isLoading } = useAuth();
+  const [started, setStarted] = useState(false);
 
-  useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        // Already authenticated, go to dashboard
-        void navigate('/', { replace: true });
-      } else {
-        // Not authenticated, go to login
-        void navigate('/login', { replace: true });
-      }
-    }
-  }, [isAuthenticated, isLoading, navigate]);
-
-  // Show loading while checking auth
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center">
-      <div className="flex flex-col items-center gap-4">
-        <LogoIcon className="h-16 w-16 animate-pulse" />
-        <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
-        <p className="text-muted-foreground text-sm">Loading...</p>
-      </div>
-    </div>
+    <SetupLayout
+      steps={setupSteps('import', {
+        server: { detail: SERVER_PROFILES[serverType].displayName },
+        account,
+        connect: { ...(connectedName && { detail: connectedName }), onSelect: onBack },
+      })}
+      title={t('pages:setup.importTitle')}
+      description={t('pages:setup.importDescription')}
+      serverType={serverType}
+      back={{ onClick: onBack }}
+      actions={
+        <Button variant={started ? 'default' : 'ghost'} onClick={() => void navigate('/')}>
+          {started ? t('pages:setup.goToDashboard') : t('common:actions.skip')}
+        </Button>
+      }
+    >
+      <ImportSources serverType={serverType} onStarted={() => setStarted(true)} />
+    </SetupLayout>
+  );
+}
+
+/** The owner's first-run steps after the account exists: connect the server, then bring in history. */
+export function Setup() {
+  const { t } = useTranslation('pages');
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { data: servers } = useServers();
+  const [searchParams] = useSearchParams();
+  const [changingType, setChangingType] = useState(false);
+  const [chosenType, setChosenType] = useState<ServerType | null>(null);
+  const type = searchParams.get('type') ?? '';
+
+  if (user?.role !== 'owner' || !isServerType(type)) {
+    return <Navigate to="/" replace />;
+  }
+
+  const context: StepContext = {
+    serverType: type,
+    account: user.username ? { detail: t('setup.signedInAs', { username: user.username }) } : {},
+    connectedName: servers?.find((server) => server.type === type)?.name,
+  };
+
+  if (changingType) {
+    return (
+      <ServerTypeStep
+        steps={setupSteps('server').map((step) =>
+          step.id === 'account' ? { ...step, status: 'done', ...context.account } : step
+        )}
+        value={chosenType ?? type}
+        onChange={setChosenType}
+        onContinue={() => {
+          setChangingType(false);
+          void navigate(setupPath(chosenType ?? type), { replace: true });
+        }}
+      />
+    );
+  }
+
+  if (searchParams.get('step') === 'import') {
+    return (
+      <ImportHistoryStep
+        {...context}
+        onBack={() => void navigate(setupPath(type), { replace: true })}
+      />
+    );
+  }
+
+  return (
+    <ConnectServerStep
+      {...context}
+      onConnected={() => void navigate(setupPath(type, 'import'), { replace: true })}
+      onSkip={() => void navigate('/')}
+      onChangeType={() => {
+        setChosenType(null);
+        setChangingType(true);
+      }}
+    />
   );
 }

@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import type { DragEndEvent } from '@dnd-kit/core';
 import type { Server } from '@tracearr/shared';
 import { Connections } from './Connections';
+import type { AddServerForm } from './useAddServer';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -67,29 +68,21 @@ vi.mock('@/lib/api', () => ({
 }));
 
 vi.mock('@/components/settings/servers/AddServerDialog', () => ({
-  AddServerDialog: (props: {
-    open: boolean;
-    onServerTypeChange: (type: 'jellyfin') => void;
-    onServerUrlChange: (value: string) => void;
-    onServerNameChange: (value: string) => void;
-    onApiKeyChange: (value: string) => void;
-    onPublicUrlChange: (value: string) => void;
-    onConnect: () => void;
-  }) =>
-    props.open ? (
+  AddServerDialog: ({ open, form }: { open: boolean; form: AddServerForm }) =>
+    open ? (
       <div>
         <button
           onClick={() => {
-            props.onServerTypeChange('jellyfin');
-            props.onServerUrlChange('http://192.168.1.20:8096');
-            props.onServerNameChange('Attic');
-            props.onApiKeyChange('key-1');
-            props.onPublicUrlChange(' jellyfin.example.com ');
+            form.changeServerType('jellyfin');
+            form.setServerUrl('http://192.168.1.20:8096');
+            form.setServerName('Attic');
+            form.setApiKey('key-1');
+            form.setPublicUrl(' jellyfin.example.com ');
           }}
         >
           fill jellyfin
         </button>
-        <button onClick={props.onConnect}>connect</button>
+        <button onClick={() => void form.connect()}>connect</button>
       </div>
     ) : null,
 }));
