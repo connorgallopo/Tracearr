@@ -118,6 +118,27 @@ describe('buildMediaLinks', () => {
     });
   });
 
+  it('opens a tofa episode on its show page, at the season and episode', async () => {
+    mockLimit.mockResolvedValue([{ url: 'http://192.168.1.122:33333', machineIdentifier: null }]);
+    const links = await buildMediaLinks(
+      payload({
+        serverType: 'tofa',
+        serverName: 'Attic',
+        mediaType: 'episode',
+        ratingKey: 'episode-9',
+        grandparentRatingKey: 'show-4',
+        parentRatingKey: 'season-2',
+        parentIndex: 29,
+        itemIndex: 2,
+      })
+    );
+
+    expect(links[1]).toEqual({
+      label: 'Attic',
+      url: 'https://app.tofa.tv/media/show-4?season=29&episode=2',
+    });
+  });
+
   it.each([
     ['the public address when set', 'https://emby.example.org', 'https://emby.example.org'],
     ['the configured URL when none is set', null, 'http://192.168.1.122:8096'],

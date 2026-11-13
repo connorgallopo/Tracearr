@@ -69,6 +69,10 @@ export async function buildMediaLinks(ctx: MediaEventPayload): Promise<MediaLink
         serverType: ctx.serverType,
         baseUrl: serverLinkBase(server),
         ratingKey: ctx.ratingKey,
+        mediaType: ctx.mediaType,
+        showRatingKey: ctx.mediaType === 'season' ? ctx.parentRatingKey : ctx.grandparentRatingKey,
+        seasonNumber: ctx.parentIndex,
+        episodeNumber: ctx.itemIndex,
         machineIdentifier: server.machineIdentifier,
       });
     if (url) links.push({ label: ctx.serverName, url });
