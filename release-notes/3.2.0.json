@@ -23,6 +23,11 @@
     {
       "type": "fix",
       "text": "episodes whose TVDB ids differ are no longer merged into one, even with the same IMDb id; earlier merges stay merged"
+    },
+    {
+      "type": "fix",
+      "text": "signing out of a single sign-on account returns to the login page instead of the identity provider's logout page",
+      "refs": ["#1445"]
     }
   ]
 }
