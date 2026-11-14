@@ -14,8 +14,12 @@ import { randomUUID } from 'node:crypto';
 // requests are a "matching" v vs a mismatch without depending on the real hash.
 vi.mock('../../services/imageProxy.js', () => ({
   proxyImage: vi.fn(),
+  proxyAccountPicture: vi.fn(),
   posterVersionFor: vi.fn(() => 'abcd1234'),
+  IMAGE_SIZES: { apiAvatar: { width: 100, height: 100 } },
 }));
+
+vi.mock('../../services/userService.js', () => ({ getUserById: vi.fn() }));
 
 const mockReadLogoPng = vi.fn();
 vi.mock('../../services/notifications/emailLogo.js', () => ({
@@ -23,7 +27,8 @@ vi.mock('../../services/notifications/emailLogo.js', () => ({
 }));
 
 // Import mocked service and routes
-import { proxyImage } from '../../services/imageProxy.js';
+import { proxyAccountPicture, proxyImage } from '../../services/imageProxy.js';
+import { getUserById } from '../../services/userService.js';
 import { imageRoutes } from '../images.js';
 
 /**
@@ -35,6 +40,9 @@ async function buildTestApp(): Promise<FastifyInstance> {
 
   // Register sensible for HTTP error helpers
   await app.register(sensible);
+  app.decorate('authenticate', async (request: { user: unknown }) => {
+    request.user = { userId: 'user-1' };
+  });
 
   // Register routes
   await app.register(imageRoutes, { prefix: '/images' });
@@ -493,6 +501,43 @@ describe('Image Routes', () => {
       const svg = await app.inject({ method: 'GET', url: '/images/logo' });
       expect(svg.headers['content-type']).toBe('image/svg+xml');
       expect(svg.payload).toContain('<svg');
+    });
+  });
+
+  describe('GET /images/account', () => {
+    it("serves the signed-in person's own picture from its address, privately", async () => {
+      app = await buildTestApp();
+      vi.mocked(getUserById).mockResolvedValue({
+        thumbnail: 'https://idp.example.com/avatars/alice.png',
+      } as never);
+      vi.mocked(proxyAccountPicture).mockResolvedValue({
+        data: Buffer.from('webp-bytes'),
+        contentType: 'image/webp',
+        cached: false,
+      });
+
+      const res = await app.inject({ method: 'GET', url: '/images/account' });
+
+      expect(proxyAccountPicture).toHaveBeenCalledWith(
+        'https://idp.example.com/avatars/alice.png',
+        100
+      );
+      expect(res.statusCode).toBe(200);
+      expect(res.headers['cache-control']).toBe('private, no-store');
+      expect(res.rawPayload).toEqual(Buffer.from('webp-bytes'));
+    });
+
+    it.each([
+      ['no picture', null],
+      ['a server path', '/api/v1/profiles/avatars/astronaut.png'],
+    ])('answers 404 for %s', async (_kind, thumbnail) => {
+      app = await buildTestApp();
+      vi.mocked(getUserById).mockResolvedValue({ thumbnail } as never);
+
+      const res = await app.inject({ method: 'GET', url: '/images/account' });
+
+      expect(res.statusCode).toBe(404);
+      expect(proxyAccountPicture).not.toHaveBeenCalled();
     });
   });
 });

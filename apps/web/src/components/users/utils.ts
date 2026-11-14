@@ -1,7 +1,7 @@
 /**
  * Shared utilities for user components
  */
-import { isDirectAvatarUrl } from '@tracearr/shared';
+import { isDirectAvatarUrl, isProxiableAvatarUrl } from '@tracearr/shared';
 import { imageProxyUrl } from '@/lib/api';
 
 /**
@@ -13,7 +13,9 @@ export function getAvatarUrl(
   size = 100
 ): string | null {
   if (!thumbUrl) return null;
-  if (thumbUrl.startsWith('http')) return isDirectAvatarUrl(thumbUrl) ? thumbUrl : null;
+  if (thumbUrl.startsWith('http') && !isProxiableAvatarUrl(thumbUrl)) {
+    return isDirectAvatarUrl(thumbUrl) ? thumbUrl : null;
+  }
   // Otherwise, proxy through our server
   if (!serverId) return null;
   return imageProxyUrl(serverId, thumbUrl, size, size, 'avatar');
