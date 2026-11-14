@@ -432,12 +432,19 @@ describe('admin cli commands', () => {
 
   describe('enableLocalLoginCommand', () => {
     it('turns local login back on and keeps the other methods', async () => {
-      await setSetting('loginMethods', { local: false, plex: false, oidc: true, member: true });
+      await setSetting('loginMethods', {
+        local: false,
+        plex: false,
+        oidc: true,
+        tofa: false,
+        member: true,
+      });
       await enableLocalLoginCommand();
       expect(await getSetting('loginMethods')).toEqual({
         local: true,
         plex: false,
         oidc: true,
+        tofa: false,
         member: true,
       });
     });

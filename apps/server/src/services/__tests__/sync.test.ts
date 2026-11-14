@@ -43,8 +43,8 @@ const SERVER = {
   historicalAt: null,
 };
 
-function synced(id: string, newlyDisabled: boolean) {
-  return { serverUser: { id }, user: {}, created: false, newlyDisabled } as never;
+function synced(id: string, lostAccess: boolean) {
+  return { serverUser: { id }, user: {}, created: false, lostAccess } as never;
 }
 
 describe('syncServer revocation', () => {

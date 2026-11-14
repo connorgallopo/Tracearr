@@ -6,7 +6,7 @@
  */
 
 import { fetchJson, HttpClientError, isHttpStatus } from '../../../utils/http.js';
-import { assertSafeProbeUrl } from '../../../utils/ssrf.js';
+import { assertSafeProbeUrl, probeRefusal } from '../../../utils/ssrf.js';
 import type { MediaServerAuth } from '../types.js';
 import {
   BaseMediaServerClient,
@@ -235,6 +235,15 @@ export class JellyfinClient extends BaseMediaServerClient {
     serverUrl: string
   ): Promise<{ success: true } | { success: false; code: string; message: string }> {
     const url = serverUrl.replace(/\/$/, '');
+
+    const refusal = probeRefusal(url);
+    if (refusal) {
+      return {
+        success: false,
+        code: JellyfinClient.AdminVerifyError.CONNECTION_FAILED,
+        message: refusal,
+      };
+    }
 
     const headers = {
       Authorization: BaseMediaServerClient.buildStaticAuthHeader(apiKey),

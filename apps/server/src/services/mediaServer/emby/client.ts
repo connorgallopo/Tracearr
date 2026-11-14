@@ -10,6 +10,7 @@
 import { REDIS_KEYS } from '@tracearr/shared';
 import { getRedis } from '../../../lib/redisShared.js';
 import { fetchJson, HttpClientError } from '../../../utils/http.js';
+import { probeRefusal } from '../../../utils/ssrf.js';
 import type { MediaServerAuth, MediaServerConfig } from '../types.js';
 import {
   BaseMediaServerClient,
@@ -194,6 +195,15 @@ export class EmbyClient extends BaseMediaServerClient {
     serverUrl: string
   ): Promise<{ success: true } | { success: false; code: string; message: string }> {
     const url = serverUrl.replace(/\/$/, '');
+
+    const refusal = probeRefusal(url);
+    if (refusal) {
+      return {
+        success: false,
+        code: EmbyClient.AdminVerifyError.CONNECTION_FAILED,
+        message: refusal,
+      };
+    }
 
     const headers = {
       'X-Emby-Authorization': BaseMediaServerClient.buildStaticAuthHeader(apiKey),

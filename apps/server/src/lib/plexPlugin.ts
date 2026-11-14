@@ -25,7 +25,7 @@ import { createAuthEndpoint, APIError } from 'better-auth/api';
 import { expireCookie, type setSessionCookie } from 'better-auth/cookies';
 import { z } from 'zod';
 import { eq, and, asc, desc, ne, or, sql } from 'drizzle-orm';
-import { REDIS_KEYS, type PlexDiscoveredServer } from '@tracearr/shared';
+import { REDIS_KEYS, SIGN_IN_ERROR_CODES, type PlexDiscoveredServer } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { users, servers, serverUsers, plexAccounts, authAccounts } from '../db/schema.js';
 import { PlexClient } from '../services/mediaServer/index.js';
@@ -438,6 +438,7 @@ export const plexPlugin = () =>
                 needsServerSelection: true,
                 servers: testedServers,
                 tempToken,
+                username: authResult.username,
               });
             }
 
@@ -508,6 +509,7 @@ export const plexPlugin = () =>
           const stored = await getRedis().get(REDIS_KEYS.PLEX_TEMP_TOKEN(tempToken));
           if (!stored) {
             throw new APIError('UNAUTHORIZED', {
+              code: SIGN_IN_ERROR_CODES.signInExpired,
               message: 'Invalid or expired temp token. Please restart login.',
             });
           }

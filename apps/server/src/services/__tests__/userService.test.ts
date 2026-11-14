@@ -278,6 +278,102 @@ describe('syncUserFromMediaServer', () => {
     expect(result!.created).toBe(false);
     expect(result!.serverUser.username).toBe(mediaUser.username);
   });
+
+  it('keeps the stored picture only when the server says it could not read pictures', async () => {
+    const existing = createMockServerUser({ serverId, externalId: mediaUser.id });
+    vi.mocked(db.select).mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([{ ...existing, user: createMockUser() }]),
+    } as never);
+    const set = vi.fn().mockReturnThis();
+    vi.mocked(db.update).mockReturnValue({
+      set,
+      where: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockResolvedValue([existing]),
+    } as never);
+
+    await syncUserFromMediaServer(serverId, {
+      ...mediaUser,
+      thumb: undefined,
+      picturesUnread: true,
+    });
+    await syncUserFromMediaServer(serverId, {
+      ...mediaUser,
+      cloudIdentityId: 'identity-1',
+      thumb: undefined,
+    });
+
+    expect(set.mock.calls[0]?.[0]).not.toHaveProperty('thumbUrl');
+    expect(set.mock.calls[1]?.[0]).toHaveProperty('thumbUrl', null);
+  });
+
+  it('writes the cloud identity only for accounts that report one', async () => {
+    const existing = createMockServerUser({ serverId, externalId: mediaUser.id });
+    vi.mocked(db.select).mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([{ ...existing, user: createMockUser() }]),
+    } as never);
+    const set = vi.fn().mockReturnThis();
+    vi.mocked(db.update).mockReturnValue({
+      set,
+      where: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockResolvedValue([existing]),
+    } as never);
+
+    await syncUserFromMediaServer(serverId, { ...mediaUser, cloudIdentityId: null });
+    await syncUserFromMediaServer(serverId, mediaUser);
+
+    expect(set.mock.calls[0]?.[0]).toMatchObject({ cloudIdentityId: null });
+    expect(set.mock.calls[1]?.[0]).not.toHaveProperty('cloudIdentityId');
+
+    vi.mocked(db.select).mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([]),
+    } as never);
+    const values = vi.fn().mockReturnThis();
+    vi.mocked(db.transaction).mockImplementation(async (callback) =>
+      callback({
+        select: vi.fn().mockReturnValue({
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockResolvedValue([]),
+        }),
+        insert: vi.fn(() => ({
+          values,
+          returning: vi.fn().mockResolvedValue([createMockUser()]),
+        })),
+      } as never)
+    );
+
+    await syncUserFromMediaServer(serverId, { ...mediaUser, cloudIdentityId: 'identity-1' });
+
+    expect(values.mock.calls[1]?.[0]).toMatchObject({ cloudIdentityId: 'identity-1' });
+  });
+
+  it('reports lost access when tofa clears the cloud identity of an account', async () => {
+    const existing = createMockServerUser({
+      serverId,
+      externalId: mediaUser.id,
+      cloudIdentityId: 'identity-1',
+    });
+    vi.mocked(db.select).mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([{ ...existing, user: createMockUser() }]),
+    } as never);
+    vi.mocked(db.update).mockReturnValue({
+      set: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockResolvedValue([{ ...existing, cloudIdentityId: null }]),
+    } as never);
+
+    const result = await syncUserFromMediaServer(serverId, { ...mediaUser, cloudIdentityId: null });
+
+    expect(result?.lostAccess).toBe(true);
+  });
 });
 
 describe('updateUser', () => {

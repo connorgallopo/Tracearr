@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { KeyRound, Users, X } from 'lucide-react';
 import {
   LOGIN_ACCESS,
+  SERVER_PROFILES,
   type LoginAccess,
   type LoginMethods,
   type Server,
@@ -103,9 +104,10 @@ function OwnerMethods({ methods }: { methods: LoginMethods }) {
   const held = {
     local: user?.hasPassword === true,
     plex: user?.hasPlexLinked === true,
+    tofa: user?.hasTofaLinked === true,
     oidc: settings?.oidcConfigured === true,
   } as const;
-  const shown = (['local', 'plex', 'oidc'] as const).filter((method) => held[method]);
+  const shown = (['local', 'plex', 'tofa', 'oidc'] as const).filter((method) => held[method]);
   const waysIn = shown.filter((method) => methods[method]).length;
 
   return (
@@ -125,11 +127,14 @@ function OwnerMethods({ methods }: { methods: LoginMethods }) {
 }
 
 function ServerLoginSwitch({ server }: { server: Server }) {
+  const { t } = useTranslation('settings');
   const update = useUpdateServer({ silent: true });
   const status = useMutationSaveStatus(update);
   const checked = update.isPending
     ? (update.variables?.allowMemberLogin ?? false)
     : (server.allowMemberLogin ?? false);
+  const profile = SERVER_PROFILES[server.type];
+  const unavailable = profile.memberSignIn === 'unavailable';
 
   return (
     <AutosaveSwitchField
@@ -140,7 +145,9 @@ function ServerLoginSwitch({ server }: { server: Server }) {
           <ServerBadge server={server} />
         </span>
       }
+      description={unavailable ? t('servers.noSignIn', { server: profile.displayName }) : undefined}
       checked={checked}
+      disabled={unavailable}
       onChange={(next) => update.mutate({ id: server.id, allowMemberLogin: next })}
       status={status}
       errorMessage={update.error?.message}
