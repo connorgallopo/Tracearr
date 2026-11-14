@@ -6,6 +6,7 @@
  */
 
 import type { FastifyPluginAsync } from 'fastify';
+import { APIError } from 'better-auth/api';
 import { splitServerUserParamSchema } from '@tracearr/shared';
 import { splitServerUser, MergeValidationError } from '../services/mergeService.js';
 import { ServerUserNotFoundError } from '../services/userService.js';
@@ -23,7 +24,10 @@ export const serverUserRoutes: FastifyPluginAsync = async (app) => {
       if (error instanceof ServerUserNotFoundError) {
         return reply.notFound(error.message);
       }
-      if (error instanceof MergeValidationError) {
+      if (
+        error instanceof MergeValidationError ||
+        (error instanceof APIError && error.status === 'BAD_REQUEST')
+      ) {
         return reply.badRequest(error.message);
       }
       throw error;

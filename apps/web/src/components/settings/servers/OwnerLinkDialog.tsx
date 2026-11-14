@@ -21,8 +21,11 @@ import {
 } from '@/components/ui/dialog';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { SignInFailedAlert } from '@/components/auth/AuthFormError';
+import { TofaSignInButton, TofaWaiting } from '@/components/auth/TofaSignIn';
+import { useTofaSignIn } from '@/components/auth/useTofaSignIn';
 import { UserCell } from '@/components/users/UserCell';
-import { useLinkOwnerAccount } from '@/hooks/queries';
+import { useLinkOwnerAccount, useOwnerAccountLinked } from '@/hooks/queries';
 import { safeFormatDistanceToNow } from '@/lib/dateFormat';
 
 interface OwnerLinkDialogProps {
@@ -149,6 +152,53 @@ export function OwnerLinkDialog({ open, onOpenChange, server, link }: OwnerLinkD
             {t('servers.ownerAccount.dialog.submit')}
           </Button>
         </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/**
+ * tofa proves the account by signing in to tofa as it, since the link also makes it the owner's
+ * tofa login.
+ */
+export function TofaOwnerLinkDialog({
+  open,
+  onOpenChange,
+  server,
+}: Omit<OwnerLinkDialogProps, 'link'>) {
+  const { t } = useTranslation(['settings', 'pages']);
+  const linked = useOwnerAccountLinked();
+  const tofa = useTofaSignIn({
+    purpose: { link: server.id },
+    onLinked: () => {
+      linked();
+      onOpenChange(false);
+    },
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {t('servers.ownerAccount.dialog.title', { server: server.name })}
+          </DialogTitle>
+          <DialogDescription>{t('servers.ownerAccount.tofaDialog.description')}</DialogDescription>
+        </DialogHeader>
+
+        {tofa.step === 'waiting' ? (
+          <TofaWaiting
+            verificationUri={tofa.verificationUri}
+            userCode={tofa.userCode}
+            expiresAt={tofa.expiresAt}
+            onCancel={tofa.cancel}
+          />
+        ) : (
+          <div className="flex flex-col gap-4">
+            <SignInFailedAlert error={tofa.error} onSignInAgain={() => void tofa.start()} />
+            <TofaSignInButton label={t('pages:tofa.signIn')} onClick={() => void tofa.start()} />
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

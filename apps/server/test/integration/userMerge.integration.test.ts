@@ -301,11 +301,11 @@ describe('mergeUsers', () => {
       .insert(mediaRequests)
       .values({
         serviceId: requestService!.id,
-        remoteId: 1,
+        remoteId: '1',
         remoteMediaId: 1,
         mediaType: 'movie',
         serverUserId: sourceSu.id,
-        remoteUserId: 1,
+        remoteUserId: '1',
         remoteUsername: 'dupe',
         status: 'completed',
         requestedAt: new Date('2026-08-01T00:00:00Z'),
@@ -906,6 +906,104 @@ describe('splitServerUser', () => {
 
     const [restored] = await db.select().from(users).where(eq(users.id, result.newUserId));
     expect(restored?.email).toBeNull();
+  });
+
+  async function mergeTofaMemberIntoOwner() {
+    const owner = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const tofa = await createTestServer({ type: 'tofa' });
+    const member = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: owner.id, serverId: plex.id });
+    const memberSu = await createTestServerUser({ userId: member.id, serverId: tofa.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-member' })
+      .where(eq(serverUsers.id, memberSu.id));
+    await db.insert(authAccounts).values({
+      id: randomUUID(),
+      providerId: 'tofa',
+      accountId: 'cloud-member',
+      userId: member.id,
+    });
+    await mergeUsers(member.id, owner.id, owner.id);
+    return { owner, memberSu };
+  }
+
+  async function tofaSignInOwner(): Promise<string | undefined> {
+    const [row] = await db
+      .select({ userId: authAccounts.userId })
+      .from(authAccounts)
+      .where(eq(authAccounts.accountId, 'cloud-member'));
+    return row?.userId;
+  }
+
+  it('moves the tofa sign-in back with the account it names', async () => {
+    const { owner, memberSu } = await mergeTofaMemberIntoOwner();
+    expect(await tofaSignInOwner()).toBe(owner.id);
+
+    const { newUserId } = await splitServerUser(memberSu.id, owner.id);
+
+    expect(await tofaSignInOwner()).toBe(newUserId);
+  });
+
+  it('keeps the tofa sign-in where another account still carries that cloud identity', async () => {
+    const { owner, memberSu } = await mergeTofaMemberIntoOwner();
+    const otherTofa = await createTestServer({ type: 'tofa' });
+    const kept = await createTestServerUser({ userId: owner.id, serverId: otherTofa.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-member' })
+      .where(eq(serverUsers.id, kept.id));
+
+    await splitServerUser(memberSu.id, owner.id);
+
+    expect(await tofaSignInOwner()).toBe(owner.id);
+  });
+
+  it("refuses to split off the owner's own tofa account, which their tofa sign-in names", async () => {
+    const owner = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const tofa = await createTestServer({ type: 'tofa' });
+    await createTestServerUser({ userId: owner.id, serverId: plex.id });
+    const ownTofa = await createTestServerUser({ userId: owner.id, serverId: tofa.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-owner' })
+      .where(eq(serverUsers.id, ownTofa.id));
+    await db
+      .insert(authAccounts)
+      .values({ id: randomUUID(), providerId: 'tofa', accountId: 'cloud-owner', userId: owner.id });
+
+    await expect(splitServerUser(ownTofa.id, owner.id)).rejects.toBeInstanceOf(
+      MergeValidationError
+    );
+    const [kept] = await db
+      .select({ userId: serverUsers.userId })
+      .from(serverUsers)
+      .where(eq(serverUsers.id, ownTofa.id));
+    expect(kept?.userId).toBe(owner.id);
+  });
+
+  it("refuses to split off the owner's tofa account even when a merge brought it, if the sign-in was the owner's", async () => {
+    const owner = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const tofa = await createTestServer({ type: 'tofa' });
+    await createTestServerUser({ userId: owner.id, serverId: plex.id });
+    await db
+      .insert(authAccounts)
+      .values({ id: randomUUID(), providerId: 'tofa', accountId: 'cloud-owner', userId: owner.id });
+    // The sync made the owner's tofa account its own person, which the owner then merged in.
+    const synced = await createTestUser({ role: 'member' });
+    const ownTofa = await createTestServerUser({ userId: synced.id, serverId: tofa.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-owner' })
+      .where(eq(serverUsers.id, ownTofa.id));
+    await mergeUsers(synced.id, owner.id, owner.id);
+
+    await expect(splitServerUser(ownTofa.id, owner.id)).rejects.toBeInstanceOf(
+      MergeValidationError
+    );
   });
 });
 

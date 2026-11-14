@@ -21,6 +21,12 @@ import { cn } from '@/lib/utils';
 import { ServerPillList } from './ServerPillList';
 import type { MergeCandidate, MergeRequest } from './mergeSelection';
 
+const MERGE_REASON_KEYS = {
+  linkedAccount: 'pages:users.mergeReasonLinked',
+  email: 'pages:users.mergeReasonEmail',
+  username: 'pages:users.mergeReasonUsername',
+} as const satisfies Record<NonNullable<MergeRequest['match']>['type'], string>;
+
 export interface MergeConfirmInput {
   sourceUserId: string;
   targetUserId: string;
@@ -87,11 +93,12 @@ function MergeReview({
         </AlertDialogTitle>
         {match && (
           <AlertDialogDescription>
-            {match.type === 'username'
-              ? t('pages:users.mergeReasonUsername', { value: match.value })
-              : match.onUsername
-                ? t('pages:users.mergeReasonEmailUsername', { value: match.value })
-                : t('pages:users.mergeReasonEmail', { value: match.value })}
+            {t(
+              match.onUsername
+                ? 'pages:users.mergeReasonEmailUsername'
+                : MERGE_REASON_KEYS[match.type],
+              { value: match.value }
+            )}
           </AlertDialogDescription>
         )}
       </AlertDialogHeader>

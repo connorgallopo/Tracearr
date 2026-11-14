@@ -1,12 +1,13 @@
 /**
  * Owner Account Link Routes
  *
- * GET    /owner-links               - The owner's account on each Jellyfin and Emby server, or the accounts that could be linked
- * POST   /owner-links               - Fold body.serverUserId into the owner
+ * GET    /owner-links               - The owner's account on each Jellyfin, Emby and tofa server, or the accounts that could be linked
+ * POST   /owner-links               - Fold body.serverUserId into the owner (tofa links through /auth/tofa)
  * DELETE /owner-links/:serverUserId - Split the owner's account back out to a person of its own
  */
 
 import type { FastifyPluginAsync } from 'fastify';
+import { APIError } from 'better-auth/api';
 import { fromNodeHeaders } from 'better-auth/node';
 import { ownerLinkBodySchema, ownerLinkParamSchema } from '@tracearr/shared';
 import { resolveBetterAuthSession } from '../../lib/sessionResolver.js';
@@ -63,7 +64,10 @@ export const ownerLinkRoutes: FastifyPluginAsync = async (app) => {
         if (error instanceof ServerUserNotFoundError) {
           return reply.notFound(error.message);
         }
-        if (error instanceof MergeValidationError) {
+        if (
+          error instanceof MergeValidationError ||
+          (error instanceof APIError && error.status === 'BAD_REQUEST')
+        ) {
           return reply.badRequest(error.message);
         }
         throw error;

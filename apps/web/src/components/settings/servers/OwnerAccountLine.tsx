@@ -1,11 +1,40 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { OwnerLinkServer, Server } from '@tracearr/shared';
+import {
+  SERVER_PROFILES,
+  assertNever,
+  ownerLinkProof,
+  type OwnerLinkServer,
+  type Server,
+} from '@tracearr/shared';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { useUnlinkOwnerAccount } from '@/hooks/queries';
-import { OwnerLinkDialog } from './OwnerLinkDialog';
+import { OwnerLinkDialog, TofaOwnerLinkDialog } from './OwnerLinkDialog';
 
-/** The owner's own account on a Jellyfin or Emby server, which their plays and sign-in follow. */
+function LinkDialog({
+  server,
+  link,
+  onOpenChange,
+}: {
+  server: Server;
+  link: OwnerLinkServer;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const proof = ownerLinkProof(server.type);
+  switch (proof) {
+    case 'typedUsername':
+      return <OwnerLinkDialog open onOpenChange={onOpenChange} server={server} link={link} />;
+    case 'tofaSignIn':
+      return <TofaOwnerLinkDialog open onOpenChange={onOpenChange} server={server} />;
+    case 'plexAccount':
+      // Plex servers have no owner link line; the owner links plex.tv accounts instead.
+      return null;
+    default:
+      return assertNever(proof);
+  }
+}
+
+/** The owner's own account on a Jellyfin, Emby or tofa server, which their plays and sign-in follow. */
 export function OwnerAccountLine({ server, link }: { server: Server; link: OwnerLinkServer }) {
   const { t } = useTranslation(['settings', 'common']);
   const [linkOpen, setLinkOpen] = useState(false);
@@ -27,17 +56,25 @@ export function OwnerAccountLine({ server, link }: { server: Server; link: Owner
       ) : (
         <>
           <span>{linked.username}</span>
-          <button
-            type="button"
-            className="text-primary hover:underline"
-            onClick={() => setUnlinkOpen(true)}
-          >
-            {t('servers.ownerAccount.unlink')}
-          </button>
+          {linked.canUnlink ? (
+            <button
+              type="button"
+              className="text-primary hover:underline"
+              onClick={() => setUnlinkOpen(true)}
+            >
+              {t('servers.ownerAccount.unlink')}
+            </button>
+          ) : (
+            <span className="text-muted-foreground">
+              {t('servers.ownerAccount.keepsSignIn', {
+                server: SERVER_PROFILES[server.type].displayName,
+              })}
+            </span>
+          )}
         </>
       )}
 
-      {linkOpen && <OwnerLinkDialog open onOpenChange={setLinkOpen} server={server} link={link} />}
+      {linkOpen && <LinkDialog server={server} link={link} onOpenChange={setLinkOpen} />}
 
       {linked !== null && (
         <ConfirmDialog
