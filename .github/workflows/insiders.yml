@@ -111,9 +111,25 @@ jobs:
         run: pnpm --filter @tracearr/server test:${{ matrix.group }}
 
   test-integration:
-    name: Test (integration)
+    name: Test (integration, ${{ matrix.db.label }}, ${{ matrix.part.name }})
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # Same databases and split as ci.yml
+        db:
+          - label: floor-pg15-ts2.28
+            image: timescale/timescaledb:2.28.3-pg15@sha256:6343bdc87ca132c6b53acb26113a6bad1821d188fa39975a745f32ddd9757634
+          - label: tip-pg18-ts2.29
+            image: timescale/timescaledb:2.29.1-pg18@sha256:373eb0fee9c0f8e0b4b0d4e74c7d0dd463dce05de6b49982701c4b540e94cba0
+        part:
+          - name: suite 1/2
+            args: --exclude '**/catalogExplain.integration.test.ts' --shard=1/2
+          - name: suite 2/2
+            args: --exclude '**/catalogExplain.integration.test.ts' --shard=2/2
+          - name: explain gate
+            args: catalogExplain
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}
@@ -122,7 +138,7 @@ jobs:
 
     services:
       timescale:
-        image: timescale/timescaledb:2.25.0-pg16@sha256:9e9f50161784dc57d3f547b89ded4af73553f9acb4677345ed05f45af7c7f664
+        image: ${{ matrix.db.image }}
         ports:
           - 5433:5432
         env:
@@ -177,7 +193,7 @@ jobs:
         run: pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/emails --filter=@tracearr/test-utils
 
       - name: Run integration tests
-        run: pnpm --filter @tracearr/server test:integration
+        run: pnpm --filter @tracearr/server test:integration ${{ matrix.part.args }}
 
   build-docker:
     name: Build Docker (${{ matrix.platform }})
@@ -202,6 +218,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           ref: ${{ inputs.branch }}
+
+      # A dispatched run has no head commit, and github.sha is the ref it was started from
+      - name: Read the built commit
+        id: commit
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "date=$(git log -1 --format=%cI)" >> "$GITHUB_OUTPUT"
 
       - name: Update GeoIP database
         uses: ./.github/actions/fetch-geoip
@@ -243,9 +266,9 @@ jobs:
           build-args: |
             APP_VERSION=${{ inputs.version }}
             APP_TAG=insiders
-            APP_COMMIT=${{ github.sha }}
-            APP_BUILD_DATE=${{ github.event.head_commit.timestamp }}
-            CACHE_BUST=${{ github.sha }}
+            APP_COMMIT=${{ steps.commit.outputs.sha }}
+            APP_BUILD_DATE=${{ steps.commit.outputs.date }}
+            CACHE_BUST=${{ steps.commit.outputs.sha }}
 
       - name: Export digest
         run: |
@@ -326,6 +349,13 @@ jobs:
         with:
           ref: ${{ inputs.branch }}
 
+      # A dispatched run has no head commit, and github.sha is the ref it was started from
+      - name: Read the built commit
+        id: commit
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          echo "date=$(git log -1 --format=%cI)" >> "$GITHUB_OUTPUT"
+
       - name: Update GeoIP database
         uses: ./.github/actions/fetch-geoip
         # The committed databases stay in place when MaxMind is unreachable
@@ -366,9 +396,9 @@ jobs:
           build-args: |
             APP_VERSION=${{ inputs.version }}
             APP_TAG=supervised-insiders
-            APP_COMMIT=${{ github.sha }}
-            APP_BUILD_DATE=${{ github.event.head_commit.timestamp }}
-            CACHE_BUST=${{ github.sha }}
+            APP_COMMIT=${{ steps.commit.outputs.sha }}
+            APP_BUILD_DATE=${{ steps.commit.outputs.date }}
+            CACHE_BUST=${{ steps.commit.outputs.sha }}
 
       - name: Export digest
         run: |
