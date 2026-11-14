@@ -41,6 +41,7 @@ import {
   yieldJob,
 } from './jobSafety.js';
 import { enqueueImagePrecache } from './imagePrecacheQueue.js';
+import { releaseHeldImport } from './importQueue.js';
 import { resolvePrecachePass } from './precachePassPolicy.js';
 import { VALID_LIBRARY_ITEM_CONDITION } from '../utils/snapshotValidation.js';
 import { scheduleImageCacheSweep } from '../services/imageCacheSweep.js';
@@ -389,6 +390,12 @@ export function startLibrarySyncWorker(): void {
     if ((job.returnvalue as { skipped?: boolean } | undefined)?.skipped) return;
     void syncChangesMissedByRun(job.data.serverId).catch((err: unknown) => {
       console.warn(`[LibrarySync] Could not queue the sync owed to ${job.data.serverId}:`, err);
+    });
+    void releaseHeldImport(job.data.serverId).catch((err: unknown) => {
+      console.warn(
+        `[LibrarySync] Could not release the import held for ${job.data.serverId}:`,
+        err
+      );
     });
     const now = Date.now();
     if (now - lastBackfillCheck > BACKFILL_CHECK_COOLDOWN_MS) {

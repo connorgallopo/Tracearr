@@ -7,7 +7,8 @@ function Card({ className, ...props }: React.ComponentProps<'div'>) {
     <div
       data-slot="card"
       className={cn(
-        'bg-card text-card-foreground flex flex-col gap-4 rounded-xl border py-6 shadow-sm',
+        // A card inside a card steps up the surface ladder instead of relying on its border.
+        'bg-card text-card-foreground [[data-slot=card]_&]:bg-card-raised flex flex-col gap-4 rounded-xl border py-6 shadow-sm [[data-slot=card]_&]:shadow-none',
         className
       )}
       {...props}
@@ -34,7 +35,11 @@ function CardHeader({ className, ...props }: React.ComponentProps<'div'>) {
 function CardTitle({ className, ...props }: React.ComponentProps<'h3'>) {
   return (
     // oxlint-disable-next-line jsx-a11y/heading-has-content -- children arrive through props
-    <h3 data-slot="card-title" className={cn('leading-none font-semibold', className)} {...props} />
+    <h3
+      data-slot="card-title"
+      className={cn('text-base leading-none font-semibold', className)}
+      {...props}
+    />
   );
 }
 

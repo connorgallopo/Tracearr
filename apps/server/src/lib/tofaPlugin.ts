@@ -41,7 +41,7 @@ import {
 } from '../services/mediaServer/tofa/cloud.js';
 import { TofaClient } from '../services/mediaServer/tofa/client.js';
 import { isTofaPicture } from '../services/mediaServer/tofa/parser.js';
-import { createServer } from '../services/serverCreate.js';
+import { createServer, startAddedServer } from '../services/serverCreate.js';
 import { deleteServer } from '../services/serverDelete.js';
 import { getOwnerUser } from '../services/userService.js';
 import { createLogger } from '../utils/logger.js';
@@ -241,7 +241,11 @@ async function readSignIn(tempToken: string, purpose: Purpose): Promise<CloudSig
 
 type Connected =
   | { status: 'unreachable'; address: string }
-  | { status: 'connected'; server: Awaited<ReturnType<typeof createServer>>; ownerId: string };
+  | {
+      status: 'connected';
+      server: Awaited<ReturnType<typeof createServer>>['server'];
+      ownerId: string;
+    };
 
 /**
  * The key is made at the server's local address or the address the owner typed, never at
@@ -311,7 +315,7 @@ async function connectServer(
               ownerAccount?.thumb ?? null
             ));
 
-      const created = await createServer({
+      const { server: created, requestServiceIds } = await createServer({
         name: server.name,
         type: 'tofa',
         url: address,
@@ -330,6 +334,7 @@ async function connectServer(
       createdServerId = created.id;
       await upsertTofaAccount(ownerId, signIn.identityId);
       if ('existingId' in owner) await refreshOwnerPicture(ownerId);
+      await startAddedServer(created, requestServiceIds);
       return { status: 'connected', server: created, ownerId };
     } catch (error) {
       // The server and owner made here go with the key; createServer saves nothing when it throws.

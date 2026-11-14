@@ -75,6 +75,12 @@ vi.mock('../../jobs/importQueue.js', () => ({
   getImportQueueStats: vi.fn().mockResolvedValue(null),
   getActiveImportForServer: vi.fn().mockResolvedValue(null),
   getActivePlaybackReportingImportForServer: vi.fn().mockResolvedValue(null),
+  getActiveTofaImportForServer: vi.fn().mockResolvedValue(null),
+  getLatestTofaImport: vi.fn().mockResolvedValue(null),
+}));
+
+vi.mock('../../jobs/librarySyncQueue.js', () => ({
+  getLibrarySyncStatus: vi.fn().mockResolvedValue({ isActive: false }),
 }));
 
 // Import mocked services and routes
@@ -90,7 +96,10 @@ import {
   getImportQueueStats,
   getActiveImportForServer,
   getActivePlaybackReportingImportForServer,
+  getActiveTofaImportForServer,
+  getLatestTofaImport,
 } from '../../jobs/importQueue.js';
+import { getLibrarySyncStatus } from '../../jobs/librarySyncQueue.js';
 import { importRoutes } from '../import.js';
 import { permissionGuard } from '../../lib/scope.js';
 
@@ -1038,6 +1047,82 @@ describe('Import Routes', () => {
 
       expect(response.statusCode).toBe(409);
       expect(enqueueJellystatImport).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /import/tofa/active/:serverId', () => {
+    const serverId = randomUUID();
+    const result = {
+      success: true,
+      imported: 9,
+      skipped: 3,
+      duplicates: 3,
+      errors: 0,
+      message: 'Import complete: 9 imported, 3 already in Tracearr',
+    };
+
+    it('says the held backfill waits for the library sync running for the server', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getActiveTofaImportForServer).mockResolvedValueOnce('held-import-1');
+      vi.mocked(getImportStatus).mockResolvedValueOnce({
+        jobId: 'held-import-1',
+        state: 'delayed',
+        progress: 0,
+      });
+      vi.mocked(getLatestTofaImport).mockResolvedValueOnce({
+        held: true,
+        state: 'delayed',
+        progress: null,
+        result: null,
+        failedReason: null,
+        finishedAt: null,
+      });
+      vi.mocked(getLibrarySyncStatus).mockResolvedValueOnce({
+        isActive: true,
+        progress: 40,
+        jobId: 'sync-1',
+      });
+
+      const response = await app.inject({ url: `/import/tofa/active/${serverId}` });
+
+      expect(response.json()).toMatchObject({
+        active: true,
+        jobId: 'held-import-1',
+        backfill: {
+          state: 'waitingForLibrarySync',
+          librarySync: { state: 'running', progress: 40 },
+        },
+      });
+    });
+
+    it('reports a finished import as complete by its result, whatever progress it last wrote', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getLatestTofaImport).mockResolvedValueOnce({
+        held: false,
+        state: 'completed',
+        progress: {
+          status: 'processing',
+          fetchedRecords: 12,
+          processedRecords: 10,
+          importedRecords: 7,
+          skippedRecords: 3,
+          duplicateRecords: 3,
+          unknownUserRecords: 0,
+          activeRecords: 0,
+          errorRecords: 0,
+          message: 'Processing: 10 plays',
+        },
+        result,
+        failedReason: null,
+        finishedAt: 1_763_100_000_000,
+      });
+
+      const response = await app.inject({ url: `/import/tofa/active/${serverId}` });
+
+      expect(response.json()).toEqual({
+        active: false,
+        backfill: { state: 'complete', result, finishedAt: 1_763_100_000_000 },
+      });
     });
   });
 });

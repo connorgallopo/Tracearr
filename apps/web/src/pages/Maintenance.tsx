@@ -7,7 +7,7 @@ import { RESTORE_PHASES } from '@tracearr/shared';
 function StatusDot({ ok }: { ok: boolean }) {
   return (
     <span
-      className={`inline-block h-2.5 w-2.5 rounded-full ${ok ? 'bg-green-500' : 'bg-red-500'}`}
+      className={`inline-block h-2.5 w-2.5 rounded-full ${ok ? 'bg-success' : 'bg-destructive'}`}
     />
   );
 }
@@ -27,7 +27,7 @@ function RestoreProgress() {
 
   return (
     <div className="w-full max-w-md space-y-4">
-      <h1 className="text-foreground text-center text-2xl font-bold">
+      <h1 className="text-foreground text-center text-xl font-semibold">
         {t('maintenance.restoreTitle')}
       </h1>
       <div className="space-y-2">
@@ -38,11 +38,11 @@ function RestoreProgress() {
           return (
             <div key={phase} className="flex items-center gap-3 text-sm">
               {isDone ? (
-                <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
+                <CheckCircle2 className="text-success h-4 w-4 shrink-0" />
               ) : isFailedPhase ? (
                 <XCircle className="text-destructive h-4 w-4 shrink-0" />
               ) : isActive ? (
-                <Loader2 className="h-4 w-4 shrink-0 animate-spin text-blue-500" />
+                <Loader2 className="text-info h-4 w-4 shrink-0 animate-spin" />
               ) : (
                 <span className="bg-muted h-4 w-4 shrink-0 rounded-full" />
               )}
@@ -91,7 +91,7 @@ export function Maintenance() {
         <RestoreProgress />
       ) : (
         <>
-          <h1 className="text-foreground text-2xl font-bold">
+          <h1 className="text-foreground text-xl font-semibold">
             {wasReady ? t('maintenance.interruptionTitle') : t('maintenance.startingTitle')}
           </h1>
           <p className="text-muted-foreground max-w-md text-center">
@@ -118,7 +118,7 @@ export function Maintenance() {
                 {t(`maintenance.initStep.${initStep}`)}
               </p>
               {(initStep === 'migrations' || initStep === 'timescale') && (
-                <p className="rounded-md border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-500">
+                <p className="border-warning/40 bg-warning/10 text-warning rounded-md border px-3 py-2 text-sm">
                   {t('maintenance.doNotRestart')}
                 </p>
               )}

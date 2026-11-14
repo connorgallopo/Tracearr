@@ -116,9 +116,19 @@ vi.mock('../../jobs/requestSyncQueue.js', () => ({
   enqueueRequestSync: vi.fn().mockResolvedValue('job-1'),
 }));
 
+vi.mock('../../jobs/importQueue.js', () => ({
+  holdTofaImport: vi.fn().mockResolvedValue(undefined),
+  dropHeldImport: vi.fn().mockResolvedValue(undefined),
+}));
+
 import type { SQL } from 'drizzle-orm';
 import { db } from '../../db/client.js';
-import { rebuildAutoSyncSchedules, scheduleAutoSync } from '../../jobs/librarySyncQueue.js';
+import { dropHeldImport, holdTofaImport } from '../../jobs/importQueue.js';
+import {
+  enqueueLibrarySync,
+  rebuildAutoSyncSchedules,
+  scheduleAutoSync,
+} from '../../jobs/librarySyncQueue.js';
 import { enqueueRequestSync, scheduleRequestSync } from '../../jobs/requestSyncQueue.js';
 import { getCacheService } from '../../services/cache.js';
 import { markServerHistorical, resumeServer } from '../../services/historicalServers.js';
@@ -133,7 +143,7 @@ import { sseManager } from '../../services/sseManager.js';
 import { revokeUnlessStillIn } from '../../lib/revoke.js';
 import { assertOwnerKeepsALoginAfter } from '../../lib/authGuards.js';
 import { serverRoutes } from '../servers.js';
-import { createServer } from '../../services/serverCreate.js';
+import { createServer, startAddedServer } from '../../services/serverCreate.js';
 import { permissionGuard } from '../../lib/scope.js';
 
 // Mock global fetch for image proxy tests
@@ -389,6 +399,7 @@ describe('Server Routes', () => {
         usersRemoved: 0,
         usersRestored: 0,
         librariesSynced: 3,
+        usersRead: true,
         errors: [],
       });
     });
@@ -639,7 +650,10 @@ describe('Server Routes', () => {
         )
       );
       mockTofaIdentity.mockResolvedValueOnce('tofa-server-1');
-      const byUrl = vi.fn().mockResolvedValueOnce([]).mockResolvedValueOnce([{ id: mockServer.id }]);
+      const byUrl = vi
+        .fn()
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{ id: mockServer.id }]);
       vi.mocked(db.select).mockReturnValue({
         from: vi.fn().mockReturnThis(),
         where: vi.fn().mockReturnThis(),
@@ -712,6 +726,10 @@ describe('Server Routes', () => {
       expect(renderSql(insert).sql).toContain('INSERT INTO request_services');
       await vi.waitFor(() => expect(enqueueRequestSync).toHaveBeenCalledWith(serviceId, 'full'));
       expect(scheduleRequestSync).toHaveBeenCalled();
+      const { id } = response.json<{ id: string }>();
+      expect(holdTofaImport).toHaveBeenCalledExactlyOnceWith(id);
+      expect(enqueueLibrarySync).toHaveBeenCalledExactlyOnceWith(id, 'event');
+      expect(dropHeldImport).not.toHaveBeenCalled();
     });
 
     it('creates a new Emby server for owner', async () => {
@@ -1468,6 +1486,7 @@ describe('Server Routes', () => {
 
       expect(response.statusCode).toBe(200);
       expect(response.json().success).toBe(true);
+      expect(dropHeldImport).toHaveBeenCalledExactlyOnceWith(mockServer.id);
     });
 
     it("refuses to delete the server holding the owner's last way to sign in", async () => {
@@ -1543,6 +1562,7 @@ describe('Server Routes', () => {
         usersRemoved: 0,
         usersRestored: 0,
         librariesSynced: 0,
+        usersRead: true,
         errors: [],
       });
 
@@ -1644,6 +1664,7 @@ describe('Server Routes', () => {
         usersRemoved: 0,
         usersRestored: 0,
         librariesSynced: 5,
+        usersRead: true,
         errors: [],
       });
     });
@@ -1698,6 +1719,7 @@ describe('Server Routes', () => {
         usersRemoved: 0,
         usersRestored: 0,
         librariesSynced: 0,
+        usersRead: true,
         errors: ['Failed to fetch library 1', 'User sync timeout'],
       });
 
@@ -2171,10 +2193,11 @@ describe('Server Routes', () => {
         usersRemoved: 0,
         usersRestored: 0,
         librariesSynced: 0,
+        usersRead: true,
         errors: [],
       });
 
-      const server = await createServer({
+      const { server } = await createServer({
         name: 'tofa',
         type: 'tofa',
         url: 'http://192.168.1.122:33333',
@@ -2189,6 +2212,7 @@ describe('Server Routes', () => {
           cloudIdentityId: 'identity-1',
         },
       });
+      await startAddedServer(server, []);
 
       expect(server.id).toBe(serverId);
       expect(insert.values).toHaveBeenCalledWith(
@@ -2218,6 +2242,7 @@ describe('Server Routes', () => {
         usersRemoved: 0,
         usersRestored: 0,
         librariesSynced: 0,
+        usersRead: true,
         errors: [],
       });
       mockPublish.mockImplementationOnce(() => {
@@ -2225,16 +2250,17 @@ describe('Server Routes', () => {
       });
       vi.mocked(rearmImportedHistoryLink).mockRejectedValueOnce(new Error('db down'));
 
-      const server = await createServer({
+      const { server } = await createServer({
         name: 'Plex',
         type: 'plex',
         url: 'http://plex.local:32400',
         token: 'plex-token',
         facts: {},
       });
+      await startAddedServer(server, []);
 
       expect(server.id).toBe(serverId);
-      expect(syncServer).toHaveBeenCalledWith(serverId, { syncUsers: true, syncLibraries: true });
+      expect(syncServer).toHaveBeenCalledWith(serverId, { syncUsers: true, syncLibraries: false });
       expect(sseManager.refresh).toHaveBeenCalled();
     });
   });

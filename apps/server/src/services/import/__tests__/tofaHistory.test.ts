@@ -41,9 +41,11 @@ vi.mock('../userMapping.js', async (importActual) => ({
   createUserMapping: vi.fn(),
 }));
 vi.mock('../batchProcessor.js', () => ({ flushInsertBatch: vi.fn() }));
+vi.mock('../../sync.js', () => ({ syncServer: vi.fn() }));
 
 import { db } from '../../../db/client.js';
 import { flushInsertBatch } from '../batchProcessor.js';
+import { syncServer } from '../../sync.js';
 import { createUserMapping } from '../userMapping.js';
 import { importTofaHistory } from '../tofaHistory.js';
 
@@ -67,6 +69,16 @@ function rows(...known: { sessionKey: string; externalSessionId: string | null }
 beforeEach(() => {
   vi.clearAllMocks();
   vi.mocked(createUserMapping).mockResolvedValue(new Map([[tofa.users[0]?.id ?? '', SERVER_USER]]));
+  vi.mocked(syncServer).mockResolvedValue({
+    usersAdded: 0,
+    usersUpdated: 1,
+    usersSkipped: 0,
+    usersRemoved: 0,
+    usersRestored: 0,
+    librariesSynced: 0,
+    usersRead: true,
+    errors: [],
+  });
   getWatchHistoryPage.mockResolvedValueOnce(newer).mockResolvedValueOnce(older);
 });
 
@@ -75,6 +87,40 @@ afterEach(() => {
 });
 
 describe('importTofaHistory', () => {
+  it("syncs the server's users before mapping plays to them", async () => {
+    rows([], []);
+
+    await importTofaHistory(SERVER.id);
+
+    expect(syncServer).toHaveBeenCalledWith(SERVER.id, { syncUsers: true, syncLibraries: false });
+    expect(vi.mocked(syncServer).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(createUserMapping).mock.invocationCallOrder[0] ?? 0
+    );
+  });
+
+  it('imports nothing when the user list cannot be read', async () => {
+    rows([], []);
+    vi.mocked(syncServer).mockResolvedValueOnce({
+      usersAdded: 0,
+      usersUpdated: 0,
+      usersSkipped: 0,
+      usersRemoved: 0,
+      usersRestored: 0,
+      librariesSynced: 0,
+      usersRead: false,
+      errors: ['tofa user sync failed: unreachable'],
+    });
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+    const result = await importTofaHistory(SERVER.id);
+
+    expect(result).toMatchObject({
+      success: false,
+      message: 'Import failed: tofa user sync failed: unreachable',
+    });
+    expect(getWatchHistoryPage).not.toHaveBeenCalled();
+  });
+
   it('pages back from the newest play and stops at the oldest', async () => {
     rows([], []);
 

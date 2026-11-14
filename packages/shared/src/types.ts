@@ -129,6 +129,9 @@ export interface ServerUser {
 export interface ServerUserWithIdentity extends ServerUser {
   serverName: string;
   identityName: string | null;
+  // The person's name, the same under every server filter: identityName, else their own
+  // username, which can differ from this account's `username`. Only populated by the list endpoint.
+  personName?: string;
   role: UserRole; // From linked User identity
   loginAccess: LoginAccess; // From linked User identity
   lastLoginAt: Date | string | null; // Tracearr sign-ins of the linked identity
@@ -1454,6 +1457,21 @@ export interface TofaImportResult {
   }[];
 }
 
+/**
+ * A tofa server's latest history import: the one queued when the server was added, which waits
+ * for a library sync of the server to complete (or a day at most), or a later one the owner ran.
+ */
+export type TofaBackfillStatus =
+  | {
+      state: 'waitingForLibrarySync';
+      /** The library sync it waits for; null when none is queued or running for the server */
+      librarySync: { state: 'queued' | 'running'; progress: number | null } | null;
+    }
+  | { state: 'queued' }
+  | { state: 'running'; progress: TofaImportProgress | null }
+  | { state: 'complete'; result: TofaImportResult; finishedAt: number | null }
+  | { state: 'failed'; message: string | null };
+
 // Library sync progress types
 export interface LibrarySyncProgress {
   serverId: string;
@@ -2255,6 +2273,7 @@ export type RunningTaskType =
   | 'tautulli_import'
   | 'jellystat_import'
   | 'playback_reporting_import'
+  | 'tofa_import'
   | 'image_precache'
   | 'maintenance';
 

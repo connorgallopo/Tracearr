@@ -19,16 +19,21 @@ interface MediaTypeBadgeConfig {
   className: string;
 }
 
-const MOVIE_BADGE: MediaTypeBadgeConfig = { icon: Film, labelKey: 'media.movie', className: '' };
+// The media color marks the icon only: the series palette is tuned for 3:1 graphics, not text.
+const MOVIE_BADGE: MediaTypeBadgeConfig = {
+  icon: Film,
+  labelKey: 'media.movie',
+  className: 'text-media-movie',
+};
 const TV_BADGE: MediaTypeBadgeConfig = {
   icon: Tv,
   labelKey: 'media.tv',
-  className: 'bg-blue-500/10 text-blue-500',
+  className: 'text-media-show',
 };
 const MUSIC_BADGE: MediaTypeBadgeConfig = {
   icon: Music,
   labelKey: 'media.music',
-  className: 'bg-purple-500/10 text-purple-500',
+  className: 'text-media-music',
 };
 
 /** Leaves carry their parent's badge: an episode reads TV, a track reads Music. */
@@ -49,8 +54,8 @@ export function MediaTypeBadge({ mediaType }: { mediaType: string }) {
   if (!badge) return null;
   const Icon = badge.icon;
   return (
-    <Badge variant="secondary" className={cn('gap-1', badge.className)}>
-      <Icon className="h-3 w-3" />
+    <Badge variant="secondary" className="gap-1">
+      <Icon className={cn('h-3 w-3', badge.className)} />
       {t(badge.labelKey)}
     </Badge>
   );

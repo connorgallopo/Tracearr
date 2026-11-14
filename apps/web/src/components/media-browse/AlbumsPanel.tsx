@@ -36,9 +36,9 @@ export function AlbumsPanel({ albums, isLoading, isError, onRetry, onSelect }: A
   return (
     <section
       aria-labelledby="albums-panel-heading"
-      className="bg-card rounded-[calc(var(--radius)+2px)] border p-[16px_18px]"
+      className="bg-card rounded-xl border p-6 shadow-sm"
     >
-      <h2 id="albums-panel-heading" className="mb-3 text-[15px] font-semibold">
+      <h2 id="albums-panel-heading" className="mb-3 text-base font-semibold">
         {t('media.detail.albums.title')}
       </h2>
 
@@ -57,7 +57,7 @@ export function AlbumsPanel({ albums, isLoading, isError, onRetry, onSelect }: A
                 onClick={() => onSelect(album.id)}
                 className="group focus-visible:ring-ring w-full min-w-0 cursor-pointer space-y-1.5 rounded-md text-left focus-visible:ring-2 focus-visible:outline-none"
               >
-                <span className="bg-muted block aspect-square overflow-hidden rounded-[calc(var(--radius)+2px)] transition-transform duration-200 group-hover:-translate-y-[3px] group-hover:shadow-[0_12px_32px_hsl(240_10%_2%/0.7)]">
+                <span className="bg-muted block aspect-square overflow-hidden rounded-xl transition-transform duration-200 group-hover:-translate-y-[3px] group-hover:shadow-(--poster-lift)">
                   <PosterArt
                     src={
                       album.thumbPath && album.serverId

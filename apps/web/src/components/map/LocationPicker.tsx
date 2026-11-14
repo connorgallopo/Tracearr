@@ -2,9 +2,15 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { MapMouseEvent, StyleSpecification } from 'maplibre-gl';
 import { useTheme } from '@/components/theme-provider';
-import { buildBaseStyle, hsl, isWebglSupported } from './maplibre';
+import { addDataLayers, buildBaseStyle, hsl, isWebglSupported } from './maplibre';
 import { MapUnavailable } from './MapUnavailable';
-import { useBasemapAvailable, useMapLang, useMapLibre, useResolvedDark } from './useMapLibre';
+import {
+  useAccentH,
+  useBasemapAvailable,
+  useMapLang,
+  useMapLibre,
+  useResolvedDark,
+} from './useMapLibre';
 
 export function LocationPicker({
   lat,
@@ -18,6 +24,7 @@ export function LocationPicker({
   const { t } = useTranslation('pages');
   const { accentHue } = useTheme();
   const dark = useResolvedDark();
+  const accentH = useAccentH();
   const lang = useMapLang();
   const basemapOk = useBasemapAvailable();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -27,7 +34,7 @@ export function LocationPicker({
 
   const style = useMemo<StyleSpecification | null>(() => {
     if (!basemapOk) return null;
-    const s = buildBaseStyle({ dark, basemapOk, lang });
+    const s = buildBaseStyle({ dark, basemapOk, lang, accentH });
     if (lat !== null && lon !== null) {
       s.sources.pin = {
         type: 'geojson',
@@ -37,7 +44,7 @@ export function LocationPicker({
           properties: {},
         },
       };
-      s.layers.push({
+      addDataLayers(s, {
         id: 'pin',
         type: 'circle',
         source: 'pin',
@@ -50,7 +57,7 @@ export function LocationPicker({
       });
     }
     return s;
-  }, [basemapOk, dark, lang, lat, lon, accentHue]);
+  }, [basemapOk, dark, lang, lat, lon, accentHue, accentH]);
 
   const map = useMapLibre(containerRef, style, {
     center: pinned ? [lon, lat] : [0, 20],

@@ -3,7 +3,7 @@ import { Monitor, Moon, RotateCcw, Sun } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Field, FieldDescription, FieldGroup, FieldTitle } from '@/components/ui/field';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
-import { ACCENT_PRESETS, useTheme, type Theme } from '@/components/theme-provider';
+import { ACCENT_PRESETS, accentVars, useTheme, type Theme } from '@/components/theme-provider';
 import { ColorSwatchPicker } from '@/components/settings/shared/ColorSwatchPicker';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 
@@ -19,7 +19,8 @@ const THEME_MODES = [
 const ACCENT_OPTIONS = ACCENT_PRESETS.map((preset) => ({
   id: String(preset.hue),
   name: preset.name,
-  hex: preset.hex,
+  className: 'accent-swatch',
+  style: accentVars(preset),
 }));
 
 export function Appearance() {
@@ -51,7 +52,7 @@ export function Appearance() {
                   <Icon className="h-4 w-4" />
                   {t(labelKey)}
                   {isDefaultMode && (
-                    <span className="text-[10px] opacity-60">{t('general.default')}</span>
+                    <span className="text-muted-foreground text-xs">{t('general.default')}</span>
                   )}
                 </ToggleGroupItem>
               ))}

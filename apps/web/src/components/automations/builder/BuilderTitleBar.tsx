@@ -28,7 +28,7 @@ export function BuilderTitleBar({ title, active, onActiveChange, onBack }: Build
       >
         <ChevronLeft />
       </Button>
-      <h1 className="min-w-0 text-2xl font-semibold tracking-tight">{title}</h1>
+      <h1 className="min-w-0 text-xl font-semibold">{title}</h1>
       <div className="ml-auto flex shrink-0 items-center gap-2">
         <FieldLabel htmlFor={activeId} className="text-muted-foreground text-sm">
           {t('pages:automations.builder.activeLabel')}

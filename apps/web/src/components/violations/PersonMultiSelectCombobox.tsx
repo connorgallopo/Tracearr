@@ -21,7 +21,7 @@ import { MultiSelectList } from '@/components/ui/multi-select';
 import { selectTriggerClasses } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { getAvatarUrl } from '@/components/users/utils';
+import { getAvatarUrl, rosterPersonName } from '@/components/users/utils';
 import { summarizePersonSelection } from './personFilterSummary';
 
 const SEARCH_DEBOUNCE_MS = 300;
@@ -77,7 +77,7 @@ export function PersonMultiSelectCombobox({
   const nameById = useMemo(() => {
     const map = new Map<string, string>();
     for (const option of options) {
-      map.set(option.userId, option.identityName ?? option.username);
+      map.set(option.userId, rosterPersonName(option));
     }
     return map;
   }, [options]);
@@ -128,14 +128,14 @@ export function PersonMultiSelectCombobox({
         <MultiSelectList
           options={options.map((option) => ({
             value: option.userId,
-            label: option.identityName ?? option.username,
+            label: rosterPersonName(option),
             icon: (
               <Avatar className="h-5 w-5">
                 <AvatarImage
                   src={getAvatarUrl(option.serverId, option.thumbUrl, 40) ?? undefined}
                 />
-                <AvatarFallback className="text-[8px]">
-                  {(option.identityName ?? option.username)[0]?.toUpperCase() ?? '?'}
+                <AvatarFallback className="text-xs">
+                  {rosterPersonName(option)[0]?.toUpperCase() ?? '?'}
                 </AvatarFallback>
               </Avatar>
             ),

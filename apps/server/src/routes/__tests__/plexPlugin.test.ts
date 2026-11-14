@@ -71,6 +71,7 @@ vi.mock('../../utils/claimCode.js', () => ({
 }));
 
 vi.mock('../../services/sync.js', () => ({ syncServer: vi.fn(() => Promise.resolve()) }));
+vi.mock('../../services/serverCreate.js', () => ({ startAddedServer: vi.fn() }));
 
 const mockSetSessionCookie = vi.fn(
   async (
@@ -89,6 +90,7 @@ vi.mock('better-auth/cookies', () => ({
 
 import { db } from '../../db/client.js';
 import { PlexClient } from '../../services/mediaServer/index.js';
+import { startAddedServer } from '../../services/serverCreate.js';
 import { getUserById, getOwnerUser } from '../../services/userService.js';
 import {
   canMemberLogin,
@@ -687,6 +689,10 @@ describe('plex better auth plugin', () => {
       expect(ctx.createSession).toHaveBeenCalledWith('user-1');
       expect(mockSetSessionCookie).toHaveBeenCalledTimes(1);
       expect(mockRedis.del).toHaveBeenCalledWith(expect.stringContaining('temp-abc'));
+      expect(startAddedServer).toHaveBeenCalledExactlyOnceWith(
+        { id: 'server-1', type: 'plex' },
+        []
+      );
     });
   });
 });

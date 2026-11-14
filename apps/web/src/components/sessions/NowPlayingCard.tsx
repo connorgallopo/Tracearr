@@ -150,15 +150,11 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
             {/* Play/Pause indicator overlay */}
             <div
               className={cn(
-                'absolute inset-0 flex items-center justify-center bg-black/50 transition-opacity',
+                'bg-overlay/50 text-overlay-foreground absolute inset-0 flex items-center justify-center transition-opacity',
                 isPaused ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
               )}
             >
-              {isPaused ? (
-                <Pause className="h-8 w-8 text-white" />
-              ) : (
-                <Play className="h-8 w-8 text-white" />
-              )}
+              {isPaused ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8" />}
             </div>
           </div>
 
@@ -270,11 +266,11 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
                 buffered={getBufferedPercent(session)}
                 className="h-1.5"
               />
-              <div className="text-muted-foreground flex justify-between text-[10px]">
+              <div className="text-muted-foreground flex justify-between text-xs tabular-nums">
                 <span>{isLive ? t('media.liveTV') : formatDuration(estimatedProgressMs)}</span>
                 <span>
                   {isPaused || session.buffering ? (
-                    <span className="font-medium text-yellow-500">
+                    <span className="text-warning font-medium">
                       {session.buffering ? t('playback.buffering') : t('playback.paused')}
                     </span>
                   ) : isLive ? null : remaining ? (

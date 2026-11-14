@@ -237,7 +237,7 @@ function TailscaleCard() {
                 disabled={refreshed}
                 size="icon-xs"
                 iconClassName={cn(
-                  'size-3.5 transition-opacity duration-300',
+                  'size-3.5 transition-opacity duration-200',
                   refreshed && 'opacity-30'
                 )}
               />

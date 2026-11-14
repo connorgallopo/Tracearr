@@ -106,6 +106,7 @@ vi.mock('./useMapLibre', async (importOriginal) => {
     },
     useBasemapAvailable: () => true,
     useResolvedDark: () => false,
+    useAccentH: () => 212,
     useMapLang: () => 'en',
   };
 });
@@ -207,7 +208,7 @@ describe('StreamMap', () => {
     render(<StreamMap locations={[trenton]} />);
     const circles = fake.style?.layers.find((l) => l.id === 'circles');
     const opacity = circles && 'paint' in circles ? circles.paint : undefined;
-    const base = ['+', 0.4, ['*', 0.4, ['get', 'w']]];
+    const base = ['+', 0.3, ['*', 0.3, ['get', 'w']]];
     expect(opacity).toMatchObject({
       'circle-opacity': ['case', HIGHLIGHTED, ['max', 0.75, base], base],
     });

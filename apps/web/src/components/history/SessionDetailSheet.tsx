@@ -58,6 +58,7 @@ import {
   PLAYBACK_DECISION_LABEL_KEYS,
   POSTER_IMAGE_SIZE,
   SERVER_PROFILES,
+  SERVER_TYPE_BRAND_COLORS,
   isStaff,
   verbKeysFor,
 } from '@tracearr/shared';
@@ -67,7 +68,6 @@ import type {
   SessionSegment,
   SessionState,
   MediaType,
-  ServerType,
 } from '@tracearr/shared';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -79,16 +79,9 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-const SERVER_LABEL_COLOR: Record<ServerType, string> = {
-  plex: 'text-amber-500',
-  jellyfin: 'text-purple-500',
-  emby: 'text-green-500',
-  tofa: 'text-teal-500',
-};
-
 const STATE_CONFIG = {
-  playing: { icon: Play, color: 'text-green-500', labelKey: 'common:playback.playing' },
-  paused: { icon: Pause, color: 'text-yellow-500', labelKey: 'common:playback.paused' },
+  playing: { icon: Play, color: 'text-success', labelKey: 'common:playback.playing' },
+  paused: { icon: Pause, color: 'text-warning', labelKey: 'common:playback.paused' },
   stopped: { icon: Square, color: 'text-muted-foreground', labelKey: 'common:playback.stopped' },
 } as const satisfies Record<SessionState, { icon: typeof Play; color: string; labelKey: string }>;
 
@@ -322,7 +315,7 @@ function SessionContent({
                   {primary}
                 </MediaPageLink>
               </span>
-              {session.watched && <Eye className="h-3.5 w-3.5 flex-shrink-0 text-green-500" />}
+              {session.watched && <Eye className="text-success h-3.5 w-3.5 flex-shrink-0" />}
             </div>
             {secondary && (
               <div className="text-muted-foreground mt-0.5 truncate text-sm">
@@ -389,9 +382,11 @@ function SessionContent({
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">{t('labels.server')}</span>
             <span className="flex items-center gap-1.5">
-              <span className={SERVER_LABEL_COLOR[session.server.type]}>
-                {SERVER_PROFILES[session.server.type].displayName}
-              </span>
+              <span
+                className="size-2 shrink-0 rounded-full"
+                style={{ backgroundColor: SERVER_TYPE_BRAND_COLORS[session.server.type] }}
+              />
+              <span>{SERVER_PROFILES[session.server.type].displayName}</span>
               <span className="text-muted-foreground">·</span>
               {session.server.name}
             </span>
@@ -612,7 +607,7 @@ function SessionContent({
                         <span className="flex items-center gap-1">{content}</span>
                       </TooltipTrigger>
                       <TooltipContent side="top" className="max-w-xs text-left">
-                        <span className="text-[11px]">{transcodeReasonText}</span>
+                        <span className="text-xs">{transcodeReasonText}</span>
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>

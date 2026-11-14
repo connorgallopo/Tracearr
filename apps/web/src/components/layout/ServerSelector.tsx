@@ -94,8 +94,11 @@ export function ServerSelector() {
           <Popover>
             <PopoverTrigger asChild>
               <SidebarMenuButton
-                className="border-l-2 group-data-[collapsible=icon]:border-l-0"
-                style={{ borderLeftColor: singleSelected?.color ?? 'transparent' }}
+                variant="outline"
+                className="border-l-2 group-data-[collapsible=icon]:border-l"
+                style={
+                  singleSelected?.color ? { borderLeftColor: singleSelected.color } : undefined
+                }
                 tooltip={triggerLabel}
               >
                 {/* MediaServerIcon renders an <img>, which SidebarMenuButton's

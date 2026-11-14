@@ -125,7 +125,7 @@ function HeroPoster({
     <div className="w-[150px] min-[761px]:w-[218px]">
       <div
         className={cn(
-          'border-border/50 relative overflow-hidden rounded-[calc(var(--radius)+4px)] border shadow-[0_24px_60px_hsl(240_10%_2%/0.6)]',
+          'border-border/50 relative overflow-hidden rounded-xl border shadow-(--poster-hero)',
           POSTER_ASPECT_CLASS[aspect]
         )}
         style={dominantColor ? { backgroundColor: dominantColor } : undefined}
@@ -135,13 +135,18 @@ function HeroPoster({
             className="flex h-full w-full items-center justify-center p-3 text-center"
             style={{
               background: dominantColor
-                ? `linear-gradient(160deg, ${dominantColor} 0%, hsl(var(--card-raised)) 100%)`
-                : 'linear-gradient(160deg, hsl(var(--muted)) 0%, hsl(var(--card-raised)) 100%)',
+                ? `linear-gradient(160deg, ${dominantColor} 0%, oklch(var(--card-raised)) 100%)`
+                : 'linear-gradient(160deg, oklch(var(--muted)) 0%, oklch(var(--card-raised)) 100%)',
             }}
           >
             <span
               aria-hidden="true"
-              className="text-[30px] leading-none font-bold text-white/90 [text-shadow:0_2px_12px_hsl(240_10%_2%/0.4)]"
+              className={cn(
+                'text-3xl leading-none font-bold',
+                dominantColor
+                  ? 'text-overlay-foreground/90 [text-shadow:0_2px_12px_hsl(var(--overlay)/0.4)]'
+                  : 'text-foreground/85 dark:[text-shadow:0_2px_12px_hsl(var(--overlay)/0.4)]'
+              )}
             >
               {heroInitials(title)}
             </span>
@@ -314,7 +319,7 @@ export function DetailHero({
       <div className="-mx-6 -mt-6 mb-0 border-b px-6 pt-7 pb-6">
         <div className="grid grid-cols-1 items-end gap-[26px] min-[761px]:grid-cols-[218px_1fr]">
           <div className="w-[150px] min-[761px]:w-[218px]">
-            <Skeleton className="aspect-[2/3] w-full rounded-[calc(var(--radius)+4px)]" />
+            <Skeleton className="aspect-[2/3] w-full rounded-xl" />
           </div>
           <div className="space-y-3">
             <Skeleton className="h-8 w-72" />
@@ -330,9 +335,9 @@ export function DetailHero({
       className="-mx-6 -mt-6 mb-0 border-b px-6 pt-7 pb-6"
       style={
         {
-          '--cover': coverHsl ?? 'var(--muted)',
+          '--cover': coverHsl ? `hsl(${coverHsl})` : 'oklch(var(--muted))',
           background:
-            'radial-gradient(900px 420px at 22% 0%, hsl(var(--cover) / 0.35), transparent 65%), linear-gradient(180deg, hsl(var(--cover) / 0.16), hsl(var(--background)) 88%)',
+            'radial-gradient(900px 420px at 22% 0%, color-mix(in oklab, var(--cover) 35%, transparent), transparent 65%), linear-gradient(180deg, color-mix(in oklab, var(--cover) 16%, transparent), oklch(var(--background)) 88%)',
         } as CSSProperties
       }
     >
@@ -369,7 +374,7 @@ export function DetailHero({
           aspect={mediaType === 'artist' ? 'square' : 'poster'}
         />
         <div>
-          <h1 className="text-[34px] leading-tight font-bold tracking-[-0.025em] text-balance">
+          <h1 className="text-3xl leading-tight font-bold tracking-[-0.025em] text-balance">
             {title}
           </h1>
 
@@ -379,7 +384,7 @@ export function DetailHero({
             <HeroBodySkeleton />
           ) : (
             <>
-              {metaLine && <p className="text-muted-foreground mt-1 text-[13px]">{metaLine}</p>}
+              {metaLine && <p className="text-muted-foreground text-dense mt-1">{metaLine}</p>}
 
               {availability && (availability.length > 0 || removedEverywhere) && (
                 <div className="mt-3.5 flex flex-col gap-1.5">
@@ -433,7 +438,7 @@ export function DetailHero({
                       <div
                         key={`${entry.serverId}-${entry.ratingKey}`}
                         className={cn(
-                          'flex flex-wrap items-center gap-2.5 text-[12.5px]',
+                          'text-dense flex flex-wrap items-center gap-2.5',
                           removed && 'opacity-55'
                         )}
                       >
@@ -455,7 +460,7 @@ export function DetailHero({
                     );
                   })}
                   {removedEverywhere && (
-                    <p className="text-muted-foreground mt-1 text-[12.5px] italic">
+                    <p className="text-muted-foreground text-dense mt-1 italic">
                       {t('media.detail.hero.removedEverywhere.caption')}
                     </p>
                   )}
@@ -463,7 +468,7 @@ export function DetailHero({
               )}
 
               {request && (
-                <p className="text-muted-foreground mt-2 flex items-center gap-2 text-[12.5px]">
+                <p className="text-muted-foreground text-dense mt-2 flex items-center gap-2">
                   <RequestServiceIcon type={request.serviceType} className="h-3.5 w-3.5" />
                   <span>{heroRequestText(request, t as Translate)}</span>
                 </p>

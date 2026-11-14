@@ -47,7 +47,10 @@ vi.mock('../../services/mediaServer/tofa/client.js', () => {
 });
 
 vi.mock('../../services/mediaServer/byServerType.js', () => ({ readServerFacts: vi.fn() }));
-vi.mock('../../services/serverCreate.js', () => ({ createServer: vi.fn() }));
+vi.mock('../../services/serverCreate.js', () => ({
+  createServer: vi.fn(),
+  startAddedServer: vi.fn(),
+}));
 vi.mock('../../jobs/poller/database.js', () => ({ publishServersChanged: vi.fn() }));
 vi.mock('../../services/sseManager.js', () => ({
   sseManager: { refresh: vi.fn(async () => undefined) },
@@ -137,7 +140,7 @@ import {
 } from '../../services/mediaServer/tofa/cloud.js';
 import { TofaClient } from '../../services/mediaServer/tofa/client.js';
 import { readServerFacts } from '../../services/mediaServer/byServerType.js';
-import { createServer } from '../../services/serverCreate.js';
+import { createServer, startAddedServer } from '../../services/serverCreate.js';
 import { mergeUsers } from '../../services/mergeService.js';
 import { getOwnerUser } from '../../services/userService.js';
 import {
@@ -592,10 +595,8 @@ describe('tofa better auth plugin', () => {
       ]);
       vi.mocked(readServerFacts).mockResolvedValue(facts);
       vi.mocked(createServer).mockResolvedValue({
-        id: 'server-new',
-        name: CLOUD_SERVER.name,
-        type: 'tofa',
-        canStopStreams: true,
+        server: { id: 'server-new', name: CLOUD_SERVER.name, type: 'tofa', canStopStreams: true },
+        requestServiceIds: ['service-new'],
       } as never);
     });
 
@@ -711,6 +712,13 @@ describe('tofa better auth plugin', () => {
           cloudIdentityId: IDENTITY,
         },
       });
+      expect(startAddedServer).toHaveBeenCalledExactlyOnceWith(
+        expect.objectContaining({ id: 'server-new', type: 'tofa' }),
+        ['service-new']
+      );
+      expect(vi.mocked(db.insert).mock.invocationCallOrder.at(-1)).toBeLessThan(
+        vi.mocked(startAddedServer).mock.invocationCallOrder[0] ?? 0
+      );
       expect(TofaClient.deleteApiKey).not.toHaveBeenCalled();
       expect(TofaClient.logoutSession).toHaveBeenCalledWith(
         CLOUD_SERVER.localAddress,
@@ -762,6 +770,7 @@ describe('tofa better auth plugin', () => {
         'server-new',
       ]);
       expect(TofaClient.deleteApiKey).toHaveBeenCalled();
+      expect(startAddedServer).not.toHaveBeenCalled();
     });
 
     it('a failed first-run connect leaves no owner behind', async () => {

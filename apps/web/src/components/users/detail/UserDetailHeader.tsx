@@ -119,7 +119,7 @@ export function UserDetailHeader({
             />
             {user.role === 'owner' && (
               <span title={t('common:labels.serverOwner')}>
-                <Crown className="h-5 w-5 text-yellow-500" />
+                <Crown className="text-foreground h-5 w-5" />
               </span>
             )}
             {removed.removed && <RemovedBadge removedAt={removed.removedAt} />}

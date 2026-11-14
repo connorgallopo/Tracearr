@@ -21,7 +21,11 @@ import { serverUsers, servers } from '../../db/schema.js';
 import { countedSessionSql, countedViewersSql, localSessionSql } from '../../db/sessions/rules.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { likePattern } from '../../utils/listQuery.js';
-import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
+import {
+  personNameSql,
+  personUsernameSql,
+  representativeAccountOrderSql,
+} from '../../utils/representativeAccount.js';
 import {
   identityAccountsWhere,
   serverUserIdAnyFragment,
@@ -506,7 +510,7 @@ function peopleRowsCte(input: PeopleRowsInput): SQL {
   );
   const pattern = search ? likePattern(search) : null;
   const matched = pattern
-    ? sql`(u.name ILIKE ${pattern} OR EXISTS (
+    ? sql`(${personNameSql()} ILIKE ${pattern} OR EXISTS (
         SELECT 1 FROM server_users msu
         WHERE msu.user_id = u.id ${buildMultiServerFragment(resolvedServerIds, 'msu.server_id')}
           AND msu.username ILIKE ${pattern}))`
@@ -560,7 +564,7 @@ function peopleRowsCte(input: PeopleRowsInput): SQL {
         u.name AS identity_name,
         u.aggregate_trust_score AS trust_score,
         rep.id AS server_user_id,
-        rep.username,
+        ${personUsernameSql()} AS username,
         rep.thumb_url,
         rep.server_id::text AS server_id,
         COALESCE(t.plays, 0) AS plays,
@@ -576,7 +580,7 @@ function peopleRowsCte(input: PeopleRowsInput): SQL {
       FROM people pp
       JOIN users u ON u.id = pp.user_id
       INNER JOIN LATERAL (
-        SELECT su.id, su.username, su.thumb_url, su.server_id
+        SELECT su.id, su.thumb_url, su.server_id
         FROM server_users su
         WHERE su.user_id = u.id ${accountServers}
         ORDER BY ${representativeAccountOrderSql('su')}

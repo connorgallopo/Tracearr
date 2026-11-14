@@ -1,8 +1,9 @@
-import { pickServerColor, SERVER_PROFILES, type ServerType } from '@tracearr/shared';
+import { assertNever, pickServerColor, SERVER_PROFILES, type ServerType } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, serverUsers } from '../db/schema.js';
+import { holdTofaImport } from '../jobs/importQueue.js';
 import { publishServersChanged } from '../jobs/poller/database.js';
-import { rebuildAutoSyncSchedules } from '../jobs/librarySyncQueue.js';
+import { enqueueLibrarySync, rebuildAutoSyncSchedules } from '../jobs/librarySyncQueue.js';
 import { enqueueRequestSync, scheduleRequestSync } from '../jobs/requestSyncQueue.js';
 import { createLogger } from '../utils/logger.js';
 import type { readServerFacts } from './mediaServer/byServerType.js';
@@ -34,8 +35,9 @@ export interface CreateServerInput {
 }
 
 /**
- * The caller has already checked the address and key; the returned row leaves out the token. A
- * throw means nothing was saved.
+ * The caller has already checked the address and key, and starts the server with
+ * startAddedServer once nothing else it does can undo the add. The returned row leaves out the
+ * token. A throw means nothing was saved.
  */
 export async function createServer(input: CreateServerInput) {
   const { type, ownerServerUser } = input;
@@ -45,7 +47,7 @@ export async function createServer(input: CreateServerInput) {
     existingColors.map((s) => s.color)
   );
 
-  const created = await db.transaction(async (tx) => {
+  return db.transaction(async (tx) => {
     const [row] = await tx
       .insert(servers)
       .values({
@@ -79,41 +81,80 @@ export async function createServer(input: CreateServerInput) {
     }
     return { server: row, requestServiceIds: await addBuiltInRequestServices(tx, [row.type]) };
   });
-  const { server, requestServiceIds } = created;
+}
 
-  // The row is saved, so a step after it is logged and never undoes it.
+/** The history the server keeps itself, held behind its first library sync. */
+async function holdServerHistoryImport(server: { id: string; type: ServerType }): Promise<void> {
+  const importer = SERVER_PROFILES[server.type].serverHistoryImport;
+  switch (importer) {
+    case 'tofa':
+      return holdTofaImport(server.id);
+    case null:
+      return;
+    default:
+      return assertNever(importer);
+  }
+}
+
+/**
+ * Everything a server needs once its row is saved, for every way a server is added. A step that
+ * fails is logged and never undoes the add; the steps that need it do not run.
+ */
+export async function startAddedServer(
+  server: { id: string; type: ServerType },
+  requestServiceIds: readonly string[]
+): Promise<void> {
   const failedFor = (step: string) => (error: unknown) => {
     log.error(`${step} failed for new server`, { err: error, serverId: server.id });
   };
 
   await publishServersChanged().catch(failedFor('Announcing the change'));
   rebuildAutoSyncSchedules().catch(failedFor('Auto-sync schedule'));
-
   if (SERVER_PROFILES[server.type].linksImportedHistory) {
     await rearmImportedHistoryLink({ keepProviderPass: false }).catch(
       failedFor('Re-arming imported history linking')
     );
   }
-
-  const initialSync = syncServer(server.id, { syncUsers: true, syncLibraries: true })
-    .then((result) => {
-      log.info('Auto-sync completed for new server', {
-        serverId: server.id,
-        usersAdded: result.usersAdded,
-        librariesSynced: result.librariesSynced,
-      });
-    })
-    .catch(failedFor('Auto-sync'));
-
-  // A built-in request's requester resolves to one of the users the first sync brings in
-  if (requestServiceIds.length > 0) {
-    void initialSync
-      .then(scheduleRequestSync)
-      .then(() => Promise.all(requestServiceIds.map((id) => enqueueRequestSync(id, 'full'))))
-      .catch(failedFor('Request sync'));
-  }
-
+  // Held before the add answers, so an import the owner starts meanwhile finds it and is refused
+  await holdServerHistoryImport(server).catch(failedFor('Holding the history import'));
   sseManager.refresh().catch(failedFor('SSE refresh'));
 
-  return server;
+  void syncAddedServer(server.id, requestServiceIds, failedFor);
+}
+
+/**
+ * Users first: built-in requests are attributed to them. The library sync needs no users, and is
+ * queued after them only so the two do not read the server at once. The held history import
+ * needs neither: it syncs users itself and runs when a library sync completes or its delay ends.
+ */
+async function syncAddedServer(
+  serverId: string,
+  requestServiceIds: readonly string[],
+  failedFor: (step: string) => (error: unknown) => void
+): Promise<void> {
+  const usersRead = await syncServer(serverId, { syncUsers: true, syncLibraries: false }).then(
+    (result) => {
+      if (result.errors.length > 0) {
+        failedFor('User sync')(result.errors);
+      } else {
+        log.info('User sync completed for new server', { serverId, usersAdded: result.usersAdded });
+      }
+      return result.usersRead;
+    },
+    (error: unknown) => {
+      failedFor('User sync')(error);
+      return false;
+    }
+  );
+
+  await enqueueLibrarySync(serverId, 'event').catch(failedFor('Queuing the library sync'));
+
+  if (requestServiceIds.length > 0) {
+    await scheduleRequestSync().catch(failedFor('Request sync schedule'));
+    if (usersRead) {
+      await Promise.all(requestServiceIds.map((id) => enqueueRequestSync(id, 'full'))).catch(
+        failedFor('Request sync')
+      );
+    }
+  }
 }

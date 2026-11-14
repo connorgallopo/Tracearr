@@ -1,20 +1,27 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { StyleSpecification } from 'maplibre-gl';
 import { useTheme } from '@/components/theme-provider';
-import { buildBaseStyle, hsl, isWebglSupported } from './maplibre';
+import { addDataLayers, buildBaseStyle, hsl, isWebglSupported } from './maplibre';
 import { MapUnavailable } from './MapUnavailable';
-import { useBasemapAvailable, useMapLang, useMapLibre, useResolvedDark } from './useMapLibre';
+import {
+  useAccentH,
+  useBasemapAvailable,
+  useMapLang,
+  useMapLibre,
+  useResolvedDark,
+} from './useMapLibre';
 
 export function MiniMap({ lat, lon }: { lat: number; lon: number }) {
   const { accentHue } = useTheme();
   const dark = useResolvedDark();
+  const accentH = useAccentH();
   const lang = useMapLang();
   const basemapOk = useBasemapAvailable();
   const containerRef = useRef<HTMLDivElement>(null);
 
   const style = useMemo<StyleSpecification | null>(() => {
     if (basemapOk === null) return null;
-    const s = buildBaseStyle({ dark, basemapOk, lang });
+    const s = buildBaseStyle({ dark, basemapOk, lang, accentH });
     s.sources.point = {
       type: 'geojson',
       data: {
@@ -23,7 +30,7 @@ export function MiniMap({ lat, lon }: { lat: number; lon: number }) {
         properties: {},
       },
     };
-    s.layers.push({
+    addDataLayers(s, {
       id: 'point',
       type: 'circle',
       source: 'point',
@@ -36,7 +43,7 @@ export function MiniMap({ lat, lon }: { lat: number; lon: number }) {
       },
     });
     return s;
-  }, [basemapOk, dark, lang, lat, lon, accentHue]);
+  }, [basemapOk, dark, lang, lat, lon, accentHue, accentH]);
 
   const map = useMapLibre(containerRef, style, {
     interactive: false,

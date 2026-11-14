@@ -23,9 +23,9 @@ export function MediaDownloadsPanel({ rows }: MediaDownloadsPanelProps) {
   return (
     <section
       aria-labelledby="media-downloads-heading"
-      className="bg-card rounded-[calc(var(--radius)+2px)] border p-[16px_18px]"
+      className="bg-card rounded-xl border p-6 shadow-sm"
     >
-      <h2 id="media-downloads-heading" className="mb-3 text-[15px] font-semibold">
+      <h2 id="media-downloads-heading" className="mb-3 text-base font-semibold">
         {t('pages:downloads.panelTitle')}
       </h2>
       <Table>

@@ -56,9 +56,9 @@ export function SeasonHeatPanel({ seasons, isLoading, isError, onRetry }: Season
   return (
     <section
       aria-labelledby="season-heat-heading"
-      className="bg-card rounded-[calc(var(--radius)+2px)] border p-[16px_18px]"
+      className="bg-card rounded-xl border p-6 shadow-sm"
     >
-      <h2 id="season-heat-heading" className="mb-3 text-[15px] font-semibold">
+      <h2 id="season-heat-heading" className="mb-3 text-base font-semibold">
         {t('media.detail.seasons.title')}
       </h2>
 
@@ -78,8 +78,8 @@ export function SeasonHeatPanel({ seasons, isLoading, isError, onRetry }: Season
                 className="border-border/50 grid grid-cols-[100px_1fr_100px] items-center gap-3.5 border-b py-2.5 last:border-b-0 min-[600px]:grid-cols-[120px_1fr_120px]"
               >
                 <div>
-                  <div className="text-[13px] font-semibold">{season.title}</div>
-                  <small className="text-muted-foreground block text-[11px] font-normal">
+                  <div className="text-dense font-semibold">{season.title}</div>
+                  <small className="text-muted-foreground block text-xs font-normal">
                     {t('media.detail.seasons.episodeCount', { count: season.episodeCount })}
                     {season.year != null ? ` · ${season.year}` : ''}
                   </small>
@@ -101,7 +101,7 @@ export function SeasonHeatPanel({ seasons, isLoading, isError, onRetry }: Season
                             to={`/media/${episode.mediaId}`}
                             aria-label={label}
                             className={cn(
-                              'bg-muted focus-visible:ring-ring h-[18px] rounded-[3px] hover:opacity-75 focus-visible:ring-2 focus-visible:outline-none',
+                              'bg-muted focus-visible:ring-ring h-[18px] rounded-sm hover:opacity-75 focus-visible:ring-2 focus-visible:outline-none',
                               episode.watchedState === 'watched' && 'bg-primary/85',
                               episode.watchedState === 'partial' && 'bg-primary/35'
                             )}

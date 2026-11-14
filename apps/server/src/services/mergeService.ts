@@ -70,7 +70,7 @@ import { getAuth } from '../lib/auth.js';
 import { assertOwnerKeepsALoginAfter } from '../lib/authGuards.js';
 import { upsertTofaAccount } from '../lib/memberLogin.js';
 import { refreshUserSessionSnapshots, revokeSessionsForUsers } from '../lib/revoke.js';
-import { representativeAccountOrderSql } from '../utils/representativeAccount.js';
+import { personNameSql } from '../utils/representativeAccount.js';
 import {
   recomputeIdentityAggregates,
   ServerUserNotFoundError,
@@ -218,15 +218,8 @@ async function loadIdentitySnapshot(tx: Tx, userId: string): Promise<MergeIdenti
 
 async function shownName(tx: Tx, userId: string): Promise<string | null> {
   const result = await tx.execute(sql`
-    SELECT coalesce(u.name, rep.username) AS name
+    SELECT ${personNameSql()} AS name
     FROM users u
-    LEFT JOIN LATERAL (
-      SELECT su.username
-      FROM server_users su
-      WHERE su.user_id = u.id
-      ORDER BY ${representativeAccountOrderSql('su')}
-      LIMIT 1
-    ) rep ON true
     WHERE u.id = ${userId}
   `);
   return (result.rows[0] as { name: string | null } | undefined)?.name ?? null;

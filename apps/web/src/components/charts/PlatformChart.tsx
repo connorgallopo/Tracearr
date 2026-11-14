@@ -4,6 +4,7 @@ import Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
 import { ChartSkeleton } from '@/components/ui/skeleton';
 import { ChartEmpty } from './ChartEmpty';
+import { CATEGORICAL_COLORS, PIE_SEGMENT_BORDER } from './chartUtils';
 
 interface PlatformData {
   name: string;
@@ -15,15 +16,6 @@ interface PlatformChartProps {
   isLoading?: boolean;
   height?: number;
 }
-
-const COLORS = [
-  'hsl(var(--primary))',
-  'hsl(221, 83%, 53%)', // Blue
-  'hsl(142, 76%, 36%)', // Green
-  'hsl(38, 92%, 50%)', // Yellow/Orange
-  'hsl(262, 83%, 58%)', // Purple
-  'hsl(340, 82%, 52%)', // Pink
-];
 
 export function PlatformChart({ data, isLoading, height = 200 }: PlatformChartProps) {
   const { t } = useTranslation(['common', 'pages']);
@@ -49,10 +41,10 @@ export function PlatformChart({ data, isLoading, height = 200 }: PlatformChartPr
         enabled: false,
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         pointFormatter: function () {
           return t('pages:activity.playsShare', {
@@ -64,12 +56,11 @@ export function PlatformChart({ data, isLoading, height = 200 }: PlatformChartPr
       plotOptions: {
         pie: {
           innerSize: '60%',
-          borderWidth: 0,
+          ...PIE_SEGMENT_BORDER,
           dataLabels: {
             enabled: false,
           },
           showInLegend: true,
-          colors: COLORS,
         },
       },
       legend: {
@@ -77,10 +68,10 @@ export function PlatformChart({ data, isLoading, height = 200 }: PlatformChartPr
         verticalAlign: 'middle',
         layout: 'vertical',
         itemStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--primary))',
+          color: 'oklch(var(--primary))',
         },
       },
       series: [
@@ -90,7 +81,7 @@ export function PlatformChart({ data, isLoading, height = 200 }: PlatformChartPr
           data: data.map((d, i) => ({
             name: d.name,
             y: d.count,
-            color: COLORS[i % COLORS.length],
+            color: CATEGORICAL_COLORS[i % CATEGORICAL_COLORS.length],
           })),
         },
       ],
@@ -105,9 +96,6 @@ export function PlatformChart({ data, isLoading, height = 200 }: PlatformChartPr
                 align: 'center',
                 verticalAlign: 'bottom',
                 layout: 'horizontal',
-                itemStyle: {
-                  fontSize: '10px',
-                },
               },
             },
           },

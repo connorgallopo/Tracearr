@@ -50,7 +50,7 @@ export function Sentence({ fragments, onFocusNode, className }: SentenceProps) {
               <button
                 type="button"
                 onClick={() => onFocusNode(nodeId)}
-                className="border-primary/65 bg-primary/10 text-primary focus-visible:ring-ring/50 inline-flex items-center gap-1 rounded-sm border border-dashed px-1.5 py-0.5 text-[0.9375em] focus-visible:ring-[3px] focus-visible:outline-none"
+                className="border-primary/65 bg-primary/10 text-primary focus-visible:ring-ring/(--ring-alpha) inline-flex items-center gap-1 rounded-sm border border-dashed px-1.5 py-0.5 text-[0.9375em] focus-visible:ring-[3px] focus-visible:outline-none"
               >
                 {body}
                 <ChevronDown className="size-3" />
@@ -65,7 +65,7 @@ export function Sentence({ fragments, onFocusNode, className }: SentenceProps) {
             <button
               type="button"
               onClick={() => onFocusNode(nodeId)}
-              className="text-foreground focus-visible:ring-ring/50 hover:decoration-foreground rounded-sm underline decoration-dotted underline-offset-4 focus-visible:ring-[3px] focus-visible:outline-none"
+              className="text-foreground focus-visible:ring-ring/(--ring-alpha) hover:decoration-foreground rounded-sm underline decoration-dotted underline-offset-4 focus-visible:ring-[3px] focus-visible:outline-none"
             >
               {fragment.text}
             </button>{' '}

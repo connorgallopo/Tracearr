@@ -774,7 +774,11 @@ async function processPlaybackReportingImportJob(
 
 async function processTofaImportJob(job: Job<TofaImportJobData>): Promise<TofaImportResult> {
   const pubSubService = getPubSubService();
-  const result = await importTofaHistory(job.data.serverId, pubSubService ?? undefined);
+  const result = await importTofaHistory(
+    job.data.serverId,
+    pubSubService ?? undefined,
+    (progress) => job.updateProgress(progress)
+  );
   await pubSubService?.publish('import:tofa:progress', {
     ...tofaProgress(result.success ? 'complete' : 'error', result.message),
     importedRecords: result.imported,
@@ -1082,6 +1086,89 @@ export async function enqueueTofaImport(serverId: string, userId: string): Promi
   const jobId = job.id ?? `unknown-${Date.now()}`;
   console.log(`[Import] Enqueued tofa history job ${jobId} for server ${serverId}`);
   return jobId;
+}
+
+// A sync still running after this long is not waited for: the import then reads the library as it stands
+const HELD_IMPORT_MAX_WAIT_MS = 24 * 60 * 60 * 1000;
+
+const heldImportId = (serverId: string) => `held-import-${serverId}`;
+
+/**
+ * Queues the history import of a server just added, held until a library sync of the server
+ * ends, so its plays resolve against the library. Queued at once, an import asked for meanwhile
+ * finds it and is refused.
+ */
+export async function holdTofaImport(serverId: string): Promise<void> {
+  if (!importQueue) throw new Error('Import queue not initialized');
+  await importQueue.add(
+    'tofa-import',
+    { type: 'tofa', serverId, userId: 'system' },
+    { jobId: heldImportId(serverId), delay: HELD_IMPORT_MAX_WAIT_MS }
+  );
+  console.log(`[Import] Held tofa history import for server ${serverId}`);
+}
+
+/** Runs the server's held import now: a library sync of it completed. */
+export async function releaseHeldImport(serverId: string): Promise<void> {
+  const job = await importQueue?.getJob(heldImportId(serverId));
+  if (job && (await job.isDelayed())) await job.promote();
+}
+
+function isTofaImportProgress(value: unknown): value is TofaImportProgress {
+  return (
+    typeof value === 'object' && value !== null && 'status' in value && 'importedRecords' in value
+  );
+}
+
+function isTofaImportResult(value: unknown): value is TofaImportResult {
+  return typeof value === 'object' && value !== null && 'success' in value && 'duplicates' in value;
+}
+
+/**
+ * The server's latest tofa history import, held or started by the owner, or null when it has
+ * none still kept. A finished one is told by its result, which the job stores as it completes.
+ */
+export async function getLatestTofaImport(serverId: string): Promise<{
+  held: boolean;
+  state: string;
+  progress: TofaImportProgress | null;
+  result: TofaImportResult | null;
+  failedReason: string | null;
+  finishedAt: number | null;
+} | null> {
+  if (!importQueue) return null;
+  const jobs = await importQueue.getJobs([
+    'active',
+    'waiting',
+    'delayed',
+    'prioritized',
+    'completed',
+    'failed',
+  ]);
+  const latest = jobs
+    .filter((job) => job.data.type === 'tofa' && job.data.serverId === serverId)
+    .reduce<Job<ImportJobData> | undefined>(
+      (newest, job) => (newest && newest.timestamp >= job.timestamp ? newest : job),
+      undefined
+    );
+  if (!latest) return null;
+  return {
+    held: latest.id === heldImportId(serverId),
+    state: await latest.getState(),
+    progress: isTofaImportProgress(latest.progress) ? latest.progress : null,
+    result: isTofaImportResult(latest.returnvalue) ? latest.returnvalue : null,
+    failedReason: latest.failedReason ?? null,
+    finishedAt: latest.finishedOn ?? null,
+  };
+}
+
+/** Removes the server's held import: the server is gone or no longer live. */
+export async function dropHeldImport(serverId: string): Promise<void> {
+  const job = await importQueue?.getJob(heldImportId(serverId));
+  if (job && (await job.isDelayed())) {
+    await job.remove();
+    console.log(`[Import] Dropped the held history import for server ${serverId}`);
+  }
 }
 
 /**

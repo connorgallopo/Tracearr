@@ -147,11 +147,11 @@ export function StoragePredictionChart({
         fillColor: {
           linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
           stops: [
-            [0, 'hsl(var(--primary) / 0.3)'],
-            [1, 'hsl(var(--primary) / 0.05)'],
+            [0, 'oklch(var(--primary) / 0.3)'],
+            [1, 'oklch(var(--primary) / 0.05)'],
           ],
         },
-        lineColor: 'hsl(var(--primary))',
+        lineColor: 'oklch(var(--primary))',
         lineWidth: 2,
         marker: {
           enabled: false,
@@ -171,7 +171,7 @@ export function StoragePredictionChart({
         type: 'line',
         name: t('library.charts.storage.prediction'),
         data: predictionLineData,
-        color: 'hsl(var(--chart-2))',
+        color: 'oklch(var(--chart-2))',
         dashStyle: 'ShortDash',
         lineWidth: 2,
         marker: {
@@ -184,7 +184,7 @@ export function StoragePredictionChart({
         type: 'arearange',
         name: t('library.storage.confidence'),
         data: confidenceBandData,
-        color: 'hsl(var(--chart-2))',
+        color: 'oklch(var(--chart-2))',
         fillOpacity: 0.15,
         lineWidth: 0,
         linkedTo: ':previous',
@@ -217,19 +217,19 @@ export function StoragePredictionChart({
         verticalAlign: 'top',
         floating: false,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
           fontWeight: 'normal',
-          fontSize: '11px',
+          fontSize: '12px',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
       },
       xAxis: {
         type: 'datetime',
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
           formatter: function () {
             // Include year for longer time periods (year/all) to differentiate labels
@@ -241,21 +241,21 @@ export function StoragePredictionChart({
             );
           },
         },
-        lineColor: 'hsl(var(--border))',
-        tickColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
+        tickColor: 'oklch(var(--border))',
         plotLines:
           predictionPoints.length > 0
             ? [
                 {
-                  color: 'hsl(var(--border))',
+                  color: 'oklch(var(--border))',
                   width: 1,
                   value: lastHistoricalDate,
                   dashStyle: 'Dash',
                   label: {
                     text: t('library.charts.storage.now'),
                     style: {
-                      color: 'hsl(var(--muted-foreground))',
-                      fontSize: '10px',
+                      color: 'oklch(var(--muted-foreground))',
+                      fontSize: '12px',
                     },
                     verticalAlign: 'top',
                     y: 12,
@@ -268,25 +268,25 @@ export function StoragePredictionChart({
         title: {
           text: t('library.charts.storage.axis', { unit: unitLabel }),
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
           formatter: function () {
             return `${this.value?.toLocaleString()} ${unitLabel}`;
           },
         },
-        gridLineColor: 'hsl(var(--border))',
+        gridLineColor: 'oklch(var(--border))',
         min: 0,
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         shared: true,
         formatter: function () {
@@ -329,25 +329,10 @@ export function StoragePredictionChart({
                 floating: false,
                 align: 'center',
                 verticalAlign: 'bottom',
-                itemStyle: {
-                  fontSize: '10px',
-                },
-              },
-              xAxis: {
-                labels: {
-                  style: {
-                    fontSize: '9px',
-                  },
-                },
               },
               yAxis: {
                 title: {
                   text: undefined,
-                },
-                labels: {
-                  style: {
-                    fontSize: '9px',
-                  },
                 },
               },
             },

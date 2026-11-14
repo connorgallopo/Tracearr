@@ -26,16 +26,17 @@ vi.mock('../../../services/mediaServer/index.js', () => ({
     },
   },
 }));
-vi.mock('../../../jobs/librarySyncQueue.js', () => ({
-  rebuildAutoSyncSchedules: vi.fn().mockResolvedValue(undefined),
+vi.mock('../../../services/serverCreate.js', () => ({
+  startAddedServer: vi.fn().mockResolvedValue(undefined),
 }));
 vi.mock('../../../services/sync.js', () => ({
   syncServer: vi.fn().mockResolvedValue({ usersAdded: 0, librariesSynced: 0 }),
 }));
 
 import { db } from '../../../db/client.js';
-import { rebuildAutoSyncSchedules } from '../../../jobs/librarySyncQueue.js';
 import { EmbyClient, JellyfinClient } from '../../../services/mediaServer/index.js';
+import { startAddedServer } from '../../../services/serverCreate.js';
+import { syncServer } from '../../../services/sync.js';
 import { embyRoutes } from '../emby.js';
 import { jellyfinRoutes } from '../jellyfin.js';
 
@@ -167,13 +168,26 @@ describe.each([
     expect(db.update).not.toHaveBeenCalled();
   });
 
-  it('rebuilds the sync schedules when a new server is added', async () => {
+  it('starts a new server the way every added server starts', async () => {
     const app = await build();
     mockExisting([]);
     mockInsert();
-    vi.mocked(rebuildAutoSyncSchedules).mockClear();
+    vi.mocked(startAddedServer).mockClear();
+    vi.mocked(syncServer).mockClear();
     const res = await app.inject({ method: 'POST', url, payload });
     expect(res.statusCode).toBe(200);
-    expect(rebuildAutoSyncSchedules).toHaveBeenCalledTimes(1);
+    expect(startAddedServer).toHaveBeenCalledExactlyOnceWith({ id: 'srv-1', type }, []);
+    expect(syncServer).not.toHaveBeenCalled();
+  });
+
+  it('syncs a reconnected server without starting it again', async () => {
+    const app = await build();
+    mockExisting([{ id: 'srv-1' }]);
+    mockUpdate();
+    vi.mocked(startAddedServer).mockClear();
+    const res = await app.inject({ method: 'POST', url, payload });
+    expect(res.statusCode).toBe(200);
+    expect(startAddedServer).not.toHaveBeenCalled();
+    expect(syncServer).toHaveBeenCalledWith('srv-1', { syncUsers: true, syncLibraries: true });
   });
 });

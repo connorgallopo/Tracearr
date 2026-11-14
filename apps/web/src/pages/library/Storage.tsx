@@ -287,7 +287,7 @@ export function LibraryStorage() {
   return (
     <div className="space-y-6">
       {versionsPendingIds.length > 0 && (
-        <Card className="border-amber-500/40 bg-amber-500/5">
+        <Card className="border-warning/40 bg-warning/5">
           <CardContent className="flex flex-wrap items-center justify-between gap-3 py-3">
             <p className="text-sm">{t('library.versionsBackfill.banner')}</p>
             <Button
@@ -491,7 +491,9 @@ export function LibraryStorage() {
           </p>
           {roi.data?.summary && (
             <CardAction className="text-right">
-              <p className="text-2xl font-bold">{roi.data.summary.avgWatchHoursPerGb.toFixed(2)}</p>
+              <p className="text-2xl font-semibold tabular-nums">
+                {roi.data.summary.avgWatchHoursPerGb.toFixed(2)}
+              </p>
               <p className="text-muted-foreground text-sm">{t('library.storage.avgHoursPerGB')}</p>
             </CardAction>
           )}

@@ -11,6 +11,7 @@ import {
   buildPerServerSeries,
   chartLang,
   sharedTooltipRows,
+  STACKED_AREA_FILL_OPACITY,
   stackedTooltipRows,
 } from './chartUtils';
 
@@ -38,7 +39,7 @@ export function priorRangeComparison(
       const slot = current[index];
       return slot ? [{ date: slot.date, count: point.count }] : [];
     }),
-    color: 'hsl(var(--muted-foreground))',
+    color: 'oklch(var(--muted-foreground))',
     dashStyle: 'ShortDash',
   };
 }
@@ -83,11 +84,11 @@ export function PlaysChart({
       dateTimeLabelFormats: axisDateTimeLabelFormats(true),
       labels: {
         style: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
         },
       },
-      lineColor: 'hsl(var(--border))',
-      tickColor: 'hsl(var(--border))',
+      lineColor: 'oklch(var(--border))',
+      tickColor: 'oklch(var(--border))',
       startOnTick: false,
       endOnTick: false,
     };
@@ -98,44 +99,20 @@ export function PlaysChart({
       },
       labels: {
         style: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
         },
       },
-      gridLineColor: 'hsl(var(--border))',
+      gridLineColor: 'oklch(var(--border))',
       min: 0,
     };
 
     const tooltipBase: Highcharts.TooltipOptions = {
-      backgroundColor: 'hsl(var(--popover))',
-      borderColor: 'hsl(var(--border))',
+      backgroundColor: 'oklch(var(--popover))',
+      borderColor: 'oklch(var(--border))',
       style: {
-        color: 'hsl(var(--popover-foreground))',
+        color: 'oklch(var(--popover-foreground))',
       },
     };
-
-    const responsiveRules: Highcharts.ResponsiveRulesOptions[] = [
-      {
-        condition: {
-          maxWidth: 400,
-        },
-        chartOptions: {
-          xAxis: {
-            labels: {
-              style: {
-                fontSize: '9px',
-              },
-            },
-          },
-          yAxis: {
-            labels: {
-              style: {
-                fontSize: '9px',
-              },
-            },
-          },
-        },
-      },
-    ];
 
     const comparisonSeries = comparisons.map((comparison): Highcharts.SeriesLineOptions => ({
       type: 'line',
@@ -160,6 +137,7 @@ export function PlaysChart({
       stacking: 'normal',
       marker: hoverMarker,
       lineWidth: 2,
+      fillOpacity: STACKED_AREA_FILL_OPACITY,
     };
 
     let series: Highcharts.SeriesOptionsType[];
@@ -217,13 +195,13 @@ export function PlaysChart({
         fillColor: {
           linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
           stops: [
-            [0, 'hsl(var(--primary) / 0.3)'],
-            [1, 'hsl(var(--primary) / 0.05)'],
+            [0, 'oklch(var(--primary) / 0.3)'],
+            [1, 'oklch(var(--primary) / 0.05)'],
           ],
         },
         marker: hoverMarker,
         lineWidth: 2,
-        lineColor: 'hsl(var(--primary))',
+        lineColor: 'oklch(var(--primary))',
         states: {
           hover: {
             lineWidth: 2,
@@ -261,10 +239,10 @@ export function PlaysChart({
       legend: {
         enabled: legendEnabled,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
       },
       xAxis: xAxisBase,
@@ -272,9 +250,6 @@ export function PlaysChart({
       plotOptions: { area },
       tooltip: { ...tooltipBase, ...tooltip },
       series,
-      responsive: {
-        rules: responsiveRules,
-      },
     };
   }, [data, height, period, stackBy, isMultiServer, servers, comparisons, t]);
 

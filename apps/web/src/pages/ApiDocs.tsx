@@ -103,7 +103,7 @@ export function ApiDocs() {
         {token && (
           <span className="text-muted-foreground text-sm">{t('apiDocs.apiKeyAutoLoaded')}</span>
         )}
-        {!token && <span className="text-sm text-yellow-500">{t('apiDocs.noApiKey')}</span>}
+        {!token && <span className="text-warning text-sm">{t('apiDocs.noApiKey')}</span>}
       </div>
       {specError && (
         <div className="text-destructive flex h-48 items-center justify-center text-sm">

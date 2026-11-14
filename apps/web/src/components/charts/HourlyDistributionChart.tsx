@@ -49,46 +49,46 @@ export function HourlyDistributionChart({
         labels: {
           rotation: -45,
           style: {
-            color: 'hsl(var(--muted-foreground))',
-            fontSize: '10px',
+            color: 'oklch(var(--muted-foreground))',
+            fontSize: '12px',
           },
         },
-        lineColor: 'hsl(var(--border))',
-        tickColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
+        tickColor: 'oklch(var(--border))',
       },
       yAxis: {
         title: {
           text: t('library.charts.hourly.watches'),
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
-        gridLineColor: 'hsl(var(--border))',
+        gridLineColor: 'oklch(var(--border))',
         min: 0,
       },
       plotOptions: {
         column: {
           borderRadius: 2,
-          color: 'hsl(var(--chart-2))',
+          color: 'oklch(var(--primary))',
           pointPadding: 0.1,
           groupPadding: 0.1,
           states: {
             hover: {
-              color: 'hsl(var(--chart-2) / 0.8)',
+              color: 'oklch(var(--primary) / 0.8)',
             },
           },
         },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         formatter: function () {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -112,9 +112,6 @@ export function HourlyDistributionChart({
             chartOptions: {
               xAxis: {
                 labels: {
-                  style: {
-                    fontSize: '8px',
-                  },
                   rotation: -60,
                 },
               },

@@ -14,7 +14,7 @@ export function ErrorState({ title, message, onRetry }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center justify-center px-4 py-12 text-center">
       <AlertCircle className="text-destructive mb-4 h-12 w-12" />
-      <h3 className="mb-2 text-lg font-medium">{title ?? t('errors.somethingWentWrong')}</h3>
+      <h3 className="mb-2 text-base font-medium">{title ?? t('errors.somethingWentWrong')}</h3>
       <p className="text-muted-foreground mb-4 max-w-md">{message}</p>
       <Button variant="outline" onClick={onRetry}>
         <RefreshCw />

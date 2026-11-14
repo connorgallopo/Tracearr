@@ -1,7 +1,12 @@
 import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { extendTailwindMerge } from 'tailwind-merge';
 import { getName as getCountryNameFromCode } from 'country-list';
 import { formatEpisodeLabel, namesShow, type TranscodeInfo } from '@tracearr/shared';
+
+// text-dense is a size step from globals.css; unregistered it would merge away as a text color.
+const twMerge = extendTailwindMerge({
+  extend: { classGroups: { 'font-size': [{ text: ['dense'] }] } },
+});
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

@@ -65,21 +65,21 @@ export function HoverOverlay({
     <div
       aria-hidden="true"
       className={cn(
-        'pointer-events-none absolute inset-0 flex flex-col overflow-hidden rounded-[calc(var(--radius)+2px)] bg-[hsl(240_10%_5%/0.55)] p-2.5 opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-focus-within:backdrop-blur-md group-hover:opacity-100 group-hover:backdrop-blur-md',
+        'bg-overlay/55 text-overlay-foreground pointer-events-none absolute inset-0 flex flex-col overflow-hidden rounded-xl p-2.5 opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-focus-within:backdrop-blur-md group-hover:opacity-100 group-hover:backdrop-blur-md',
         className
       )}
     >
-      <h3 className="line-clamp-3 text-[13px] leading-snug font-semibold">{title}</h3>
-      {metaLine && <p className="text-foreground/70 mt-1 truncate text-[11px]">{metaLine}</p>}
+      <h3 className="text-dense line-clamp-3 leading-snug font-semibold">{title}</h3>
+      {metaLine && <p className="text-overlay-foreground/70 mt-1 truncate text-xs">{metaLine}</p>}
       <div className="mt-auto flex flex-col gap-1">
         {dedupedServers.slice(0, MAX_SERVER_ROWS).map((server) => (
-          <span key={server.serverId} className="flex items-center gap-1.5 truncate text-[11px]">
+          <span key={server.serverId} className="flex items-center gap-1.5 truncate text-xs">
             <span
               aria-hidden="true"
               className="bg-muted-foreground h-1.5 w-1.5 shrink-0 rounded-full"
               style={server.color ? { backgroundColor: server.color } : undefined}
             />
-            <span className="text-foreground/80 truncate">
+            <span className="text-overlay-foreground/80 truncate">
               {t('media.posterCard.addedLabel', {
                 date: safeFormatDate(server.addedAt, { month: 'short', year: 'numeric' }),
               })}
@@ -87,12 +87,12 @@ export function HoverOverlay({
           </span>
         ))}
         {dedupedServers.length > MAX_SERVER_ROWS && (
-          <span className="text-foreground/60 truncate text-[11px]">
+          <span className="text-overlay-foreground/60 truncate text-xs">
             {t('media.posterCard.moreServers', { count: dedupedServers.length - MAX_SERVER_ROWS })}
           </span>
         )}
         {statsLine && (
-          <p className="text-foreground/90 truncate text-[11px] font-medium">{statsLine}</p>
+          <p className="text-overlay-foreground/90 truncate text-xs font-medium">{statsLine}</p>
         )}
       </div>
     </div>

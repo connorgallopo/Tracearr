@@ -69,7 +69,7 @@ export const FLUSH_FOOTER_OFFSET: Record<DataTableDensity, string> = {
 
 const HEADER_TEXT: Record<DataTableHeaderVariant, string | undefined> = {
   default: undefined,
-  micro: 'text-[10.5px] font-semibold tracking-[0.07em]',
+  micro: 'font-semibold tracking-wider',
 };
 
 function metaAlignClasses(meta: DataTableColumnMeta | undefined): string | undefined {
@@ -167,7 +167,7 @@ export function DataTableHeader<TData extends object>({
       // A collapsed border belongs to the table box and does not travel with a
       // sticky thead, so the rule under the header has to be a shadow.
       className={cn(
-        'bg-card sticky top-0 z-10 shadow-[inset_0_-1px_0_0_hsl(var(--border))]',
+        'bg-card sticky top-0 z-10 shadow-[inset_0_-1px_0_0_oklch(var(--border))]',
         className
       )}
     >

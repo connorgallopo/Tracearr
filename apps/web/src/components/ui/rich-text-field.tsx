@@ -147,7 +147,7 @@ export function RichTextField({
   );
 
   return (
-    <div className="border-input focus-within:ring-ring/50 rounded-md border shadow-xs focus-within:ring-[3px]">
+    <div className="border-input focus-within:ring-ring/(--ring-alpha) rounded-md border shadow-xs focus-within:ring-[3px]">
       <div className="flex items-center justify-between gap-2 border-b px-2 py-1">
         <ButtonGroup>
           {toggle(t('newsletters.richText.bold'), state.bold, BoldIcon, () =>

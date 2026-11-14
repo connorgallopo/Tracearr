@@ -5,19 +5,13 @@ import { HighchartsReact } from 'highcharts-react-official';
 import { PLAYBACK_DECISION_LABEL_KEYS, type QualityStats } from '@tracearr/shared';
 import { ChartSkeleton } from '@/components/ui/skeleton';
 import { ChartEmpty } from './ChartEmpty';
+import { PIE_SEGMENT_BORDER, PLAYBACK_COLORS } from './chartUtils';
 
 interface QualityChartProps {
   data: QualityStats | undefined;
   isLoading?: boolean;
   height?: number;
 }
-
-const COLORS = {
-  directPlay: 'hsl(142, 76%, 36%)', // Green
-  directStream: 'hsl(210, 76%, 50%)', // Blue
-  audioTranscode: 'hsl(262, 60%, 58%)', // Violet
-  transcode: 'hsl(38, 92%, 50%)', // Orange
-};
 
 export function QualityChart({ data, isLoading, height = 250 }: QualityChartProps) {
   const { t } = useTranslation(['common', 'pages']);
@@ -43,10 +37,10 @@ export function QualityChart({ data, isLoading, height = 250 }: QualityChartProp
         enabled: false,
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         pointFormatter: function () {
           return t('pages:activity.playsShare', {
@@ -58,7 +52,7 @@ export function QualityChart({ data, isLoading, height = 250 }: QualityChartProp
       plotOptions: {
         pie: {
           innerSize: '60%',
-          borderWidth: 0,
+          ...PIE_SEGMENT_BORDER,
           dataLabels: {
             enabled: false,
           },
@@ -70,10 +64,10 @@ export function QualityChart({ data, isLoading, height = 250 }: QualityChartProp
         verticalAlign: 'middle',
         layout: 'vertical',
         itemStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--primary))',
+          color: 'oklch(var(--primary))',
         },
       },
       series: [
@@ -84,22 +78,22 @@ export function QualityChart({ data, isLoading, height = 250 }: QualityChartProp
             {
               name: t(PLAYBACK_DECISION_LABEL_KEYS.directplay),
               y: data.directPlay,
-              color: COLORS.directPlay,
+              color: PLAYBACK_COLORS.directPlay,
             },
             {
               name: t(PLAYBACK_DECISION_LABEL_KEYS.copy),
               y: data.directStream,
-              color: COLORS.directStream,
+              color: PLAYBACK_COLORS.directStream,
             },
             {
               name: t(PLAYBACK_DECISION_LABEL_KEYS.audio_transcode),
               y: data.audioTranscode,
-              color: COLORS.audioTranscode,
+              color: PLAYBACK_COLORS.audioTranscode,
             },
             {
               name: t(PLAYBACK_DECISION_LABEL_KEYS.transcode),
               y: data.transcode - data.audioTranscode,
-              color: COLORS.transcode,
+              color: PLAYBACK_COLORS.transcode,
             },
           ],
         },
@@ -115,9 +109,6 @@ export function QualityChart({ data, isLoading, height = 250 }: QualityChartProp
                 align: 'center',
                 verticalAlign: 'bottom',
                 layout: 'horizontal',
-                itemStyle: {
-                  fontSize: '10px',
-                },
               },
             },
           },

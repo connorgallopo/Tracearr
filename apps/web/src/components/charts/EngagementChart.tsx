@@ -4,6 +4,7 @@ import Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
 import { ChartSkeleton } from '@/components/ui/skeleton';
 import { ChartEmpty } from './ChartEmpty';
+import { CATEGORICAL_COLORS, PIE_SEGMENT_BORDER } from './chartUtils';
 import type { EngagementTier, EngagementTierBreakdown } from '@tracearr/shared';
 
 interface EngagementBreakdownChartProps {
@@ -12,14 +13,14 @@ interface EngagementBreakdownChartProps {
   height?: number;
 }
 
-// Colors for engagement tiers (from abandoned to rewatched)
+// Engagement is ordered, so it reads on the sequential ramp: rewatched brightest.
 export const TIER_COLORS: Record<string, string> = {
-  abandoned: 'hsl(0, 70%, 50%)', // Red
-  sampled: 'hsl(38, 92%, 50%)', // Orange
-  engaged: 'hsl(48, 96%, 53%)', // Yellow
-  watched: 'hsl(142, 76%, 36%)', // Green
-  rewatched: 'hsl(217, 91%, 60%)', // Blue
-  unknown: 'hsl(220, 9%, 46%)', // Gray
+  abandoned: 'oklch(var(--seq-7))',
+  sampled: 'oklch(var(--seq-6))',
+  engaged: 'oklch(var(--seq-4))',
+  watched: 'oklch(var(--seq-3))',
+  rewatched: 'oklch(var(--seq-1))',
+  unknown: 'oklch(var(--muted-foreground))',
 };
 
 const TIER_LABELS = {
@@ -76,10 +77,10 @@ export function EngagementBreakdownChart({
         enabled: false,
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         pointFormatter: function () {
           return `<b>${t('pages:activity.tierItems', { count: this.y ?? 0 })}</b> (${(this.percentage ?? 0).toFixed(1)}%)`;
@@ -88,7 +89,7 @@ export function EngagementBreakdownChart({
       plotOptions: {
         pie: {
           innerSize: '60%',
-          borderWidth: 0,
+          ...PIE_SEGMENT_BORDER,
           dataLabels: {
             enabled: false,
           },
@@ -100,11 +101,11 @@ export function EngagementBreakdownChart({
         verticalAlign: 'middle',
         layout: 'vertical',
         itemStyle: {
-          color: 'hsl(var(--foreground))',
-          fontSize: '11px',
+          color: 'oklch(var(--foreground))',
+          fontSize: '12px',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--primary))',
+          color: 'oklch(var(--primary))',
         },
       },
       series: [
@@ -129,9 +130,6 @@ export function EngagementBreakdownChart({
                 align: 'center',
                 verticalAlign: 'bottom',
                 layout: 'horizontal',
-                itemStyle: {
-                  fontSize: '9px',
-                },
               },
             },
           },
@@ -199,10 +197,10 @@ export function PlaysVsSessionsChart({
         categories: ['Validated Plays', 'Raw Sessions'],
         labels: {
           style: {
-            color: 'hsl(var(--foreground))',
+            color: 'oklch(var(--foreground))',
           },
         },
-        lineColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
       },
       yAxis: {
         title: {
@@ -210,16 +208,16 @@ export function PlaysVsSessionsChart({
         },
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
-        gridLineColor: 'hsl(var(--border))',
+        gridLineColor: 'oklch(var(--border))',
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         formatter: function () {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -234,7 +232,7 @@ export function PlaysVsSessionsChart({
           dataLabels: {
             enabled: true,
             style: {
-              color: 'hsl(var(--foreground))',
+              color: 'oklch(var(--foreground))',
               textOutline: 'none',
             },
           },
@@ -250,11 +248,11 @@ export function PlaysVsSessionsChart({
           data: [
             {
               y: plays,
-              color: 'hsl(142, 76%, 36%)', // Green - the "real" metric
+              color: CATEGORICAL_COLORS[0],
             },
             {
               y: sessions,
-              color: 'hsl(220, 9%, 46%)', // Gray - the inflated metric
+              color: 'oklch(var(--muted-foreground))',
             },
           ],
         },
@@ -279,11 +277,9 @@ export function PlaysVsSessionsChart({
       />
       {inflationPct > 0 && (
         <p className="text-muted-foreground mt-2 text-center text-xs">
-          Session inflation: <span className="font-medium text-orange-500">+{inflationPct}%</span>
+          Session inflation: <span className="text-warning font-medium">+{inflationPct}%</span>
           <br />
-          <span className="text-muted-foreground/70">
-            Raw sessions overcount by {sessions - plays} due to pauses, resumes, and short sessions
-          </span>
+          Raw sessions overcount by {sessions - plays} due to pauses, resumes, and short sessions
         </p>
       )}
     </div>

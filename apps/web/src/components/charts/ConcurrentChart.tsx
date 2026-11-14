@@ -6,7 +6,7 @@ import { PLAYBACK_DECISION_LABEL_KEYS } from '@tracearr/shared';
 import { ChartSkeleton } from '@/components/ui/skeleton';
 import { axisDateTimeLabelFormats, formatBucketDate, parseChartDate } from '@/lib/dateFormat';
 import { ChartEmpty } from './ChartEmpty';
-import { chartLang } from './chartUtils';
+import { chartLang, PLAYBACK_COLORS, STACKED_AREA_FILL_OPACITY } from './chartUtils';
 
 interface ConcurrentData {
   hour: string;
@@ -62,12 +62,12 @@ export function ConcurrentChart({
         verticalAlign: 'top',
         floating: false,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
           fontWeight: 'normal',
-          fontSize: '11px',
+          fontSize: '12px',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
       },
       xAxis: {
@@ -76,11 +76,11 @@ export function ConcurrentChart({
         dateTimeLabelFormats: axisDateTimeLabelFormats(true),
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
-        lineColor: 'hsl(var(--border))',
-        tickColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
+        tickColor: 'oklch(var(--border))',
         startOnTick: false,
         endOnTick: false,
       },
@@ -90,10 +90,10 @@ export function ConcurrentChart({
         },
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
-        gridLineColor: 'hsl(var(--border))',
+        gridLineColor: 'oklch(var(--border))',
         min: 0,
         allowDecimals: false,
       },
@@ -110,6 +110,7 @@ export function ConcurrentChart({
             },
           },
           lineWidth: 2,
+          fillOpacity: STACKED_AREA_FILL_OPACITY,
           states: {
             hover: {
               lineWidth: 2,
@@ -119,10 +120,10 @@ export function ConcurrentChart({
         },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         shared: true,
         formatter: function () {
@@ -145,53 +146,25 @@ export function ConcurrentChart({
           type: 'area',
           name: t(PLAYBACK_DECISION_LABEL_KEYS.directplay),
           data: points((d) => d.direct),
-          color: 'hsl(var(--chart-2))',
-          fillColor: {
-            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-            stops: [
-              [0, 'hsl(var(--chart-2) / 0.4)'],
-              [1, 'hsl(var(--chart-2) / 0.1)'],
-            ],
-          },
+          color: PLAYBACK_COLORS.directPlay,
         },
         {
           type: 'area',
           name: t(PLAYBACK_DECISION_LABEL_KEYS.copy),
           data: points((d) => d.directStream),
-          color: 'hsl(210, 76%, 50%)',
-          fillColor: {
-            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-            stops: [
-              [0, 'hsl(210 76% 50% / 0.4)'],
-              [1, 'hsl(210 76% 50% / 0.1)'],
-            ],
-          },
+          color: PLAYBACK_COLORS.directStream,
         },
         {
           type: 'area',
           name: t(PLAYBACK_DECISION_LABEL_KEYS.audio_transcode),
           data: points((d) => d.audioTranscode),
-          color: 'hsl(262, 60%, 58%)',
-          fillColor: {
-            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-            stops: [
-              [0, 'hsl(262 60% 58% / 0.4)'],
-              [1, 'hsl(262 60% 58% / 0.1)'],
-            ],
-          },
+          color: PLAYBACK_COLORS.audioTranscode,
         },
         {
           type: 'area',
           name: t(PLAYBACK_DECISION_LABEL_KEYS.transcode),
           data: points((d) => d.transcode - d.audioTranscode),
-          color: 'hsl(var(--chart-4))',
-          fillColor: {
-            linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-            stops: [
-              [0, 'hsl(var(--chart-4) / 0.4)'],
-              [1, 'hsl(var(--chart-4) / 0.1)'],
-            ],
-          },
+          color: PLAYBACK_COLORS.transcode,
         },
       ],
       responsive: {
@@ -204,23 +177,6 @@ export function ConcurrentChart({
               legend: {
                 align: 'center',
                 verticalAlign: 'bottom',
-                itemStyle: {
-                  fontSize: '10px',
-                },
-              },
-              xAxis: {
-                labels: {
-                  style: {
-                    fontSize: '9px',
-                  },
-                },
-              },
-              yAxis: {
-                labels: {
-                  style: {
-                    fontSize: '9px',
-                  },
-                },
               },
             },
           },

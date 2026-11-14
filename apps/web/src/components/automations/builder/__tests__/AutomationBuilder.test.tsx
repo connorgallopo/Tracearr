@@ -261,10 +261,10 @@ describe('AutomationBuilder', () => {
     ).toBeInTheDocument();
   });
 
-  it('puts the name and the description on the one raised card, with the sentence', () => {
+  it('puts the name and the description on the one summary card, with the sentence', () => {
     renderBuilder();
 
-    const card = screen.getByLabelText('Name').closest('.bg-card-raised');
+    const card = screen.getByLabelText('Name').closest('[data-slot="field-group"]');
     expect(card).not.toBeNull();
     expect(
       within(card as HTMLElement).getByPlaceholderText('What this is for')

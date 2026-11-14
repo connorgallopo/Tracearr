@@ -11,13 +11,10 @@ const alertVariants = cva(
     variants: {
       variant: {
         default: 'bg-card text-card-foreground',
-        // Tinted backgrounds rather than tinted borders: globals.css applies
-        // `* { @apply border-border }` unlayered, which outranks every layered
-        // border-colour utility, so a border tint here would never render.
         destructive:
           'bg-destructive/10 text-destructive *:data-[slot=alert-description]:text-destructive',
-        // Amber carries the icon and chrome, but not the prose: --warning is
-        // 2.3:1 on the light surface, so body copy stays on the text token.
+        // Amber carries the icon and title; body copy stays on the text token so long
+        // descriptions read at full contrast.
         warning: 'bg-warning/10 text-warning *:data-[slot=alert-description]:text-foreground',
       },
     },

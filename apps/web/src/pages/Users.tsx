@@ -281,6 +281,7 @@ export function Users() {
                   serverUserId={user.id}
                   username={user.username}
                   identityName={user.identityName}
+                  personName={user.personName}
                   thumbUrl={user.thumbUrl}
                   serverId={user.serverId}
                   size="md"

@@ -141,9 +141,9 @@ function HistoryPanel({
       id="full-history"
       ref={historyRef}
       aria-labelledby="history-heading"
-      className="bg-card scroll-mt-6 rounded-[calc(var(--radius)+2px)] border p-[16px_18px]"
+      className="bg-card scroll-mt-6 rounded-xl border p-6 shadow-sm"
     >
-      <h2 id="history-heading" className="mb-3 text-[15px] font-semibold">
+      <h2 id="history-heading" className="mb-3 text-base font-semibold">
         {t('media.detail.history.title')}
       </h2>
 

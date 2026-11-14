@@ -50,6 +50,10 @@ vi.mock('../imagePrecacheQueue.js', () => ({
   enqueueImagePrecache: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('../importQueue.js', () => ({
+  releaseHeldImport: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock('../precachePassPolicy.js', () => ({
   resolvePrecachePass: vi.fn().mockResolvedValue(null),
 }));
@@ -98,6 +102,7 @@ import {
 } from '../../services/librarySync.js';
 import { syncServer } from '../../services/sync.js';
 import { enqueueImagePrecache } from '../imagePrecacheQueue.js';
+import { releaseHeldImport } from '../importQueue.js';
 import { resolvePrecachePass } from '../precachePassPolicy.js';
 import {
   initLibrarySyncQueue,
@@ -763,6 +768,7 @@ describe('library sync worker - user sync', () => {
       usersRemoved: 0,
       usersRestored: 0,
       librariesSynced: 0,
+      usersRead: true,
       errors: [],
     });
   });
@@ -841,5 +847,61 @@ describe('library sync worker - imported history link hand-off', () => {
     initLibrarySyncQueue('redis://localhost:6379');
     await complete('plex', { skipped: true, reason: 'sync already in progress' });
     expect(maybeEnqueueImportedHistoryLink).not.toHaveBeenCalled();
+  });
+});
+
+describe('library sync worker - held history import', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    mockDbServers.mockImplementation((() => ({
+      where: () => Object.assign(Promise.resolve([{ type: 'tofa' }]), { limit: async () => [] }),
+    })) as never);
+    await shutdownLibrarySyncQueue();
+    initLibrarySyncQueue('redis://localhost:6379');
+    startLibrarySyncWorker();
+  });
+
+  function handler(event: 'completed' | 'failed') {
+    const worker = vi.mocked(Worker).mock.results.at(-1)?.value as
+      { on: ReturnType<typeof vi.fn> } | undefined;
+    const registered = worker?.on.mock.calls.find((c) => c[0] === event);
+    if (!registered) throw new Error(`no ${event} handler`);
+    return registered[1] as (...args: unknown[]) => void;
+  }
+
+  it('releases the import once a sync of the server completes', async () => {
+    handler('completed')({
+      id: 'job-1',
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      returnvalue: { success: true, results: [] },
+    });
+    handler('completed')({
+      id: 'job-2',
+      data: { serverId: 'srv-2', triggeredBy: 'scheduled' },
+      returnvalue: { skipped: true, reason: 'server historical' },
+    });
+
+    expect(releaseHeldImport).toHaveBeenCalledExactlyOnceWith('srv-1');
+  });
+
+  it('keeps the import held through a failed sync, for the next completed sync to release', async () => {
+    handler('failed')(
+      {
+        id: 'job-1',
+        data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+        attemptsMade: 3,
+        opts: { attempts: 3 },
+      },
+      new Error('Library sync failed for Movies')
+    );
+    expect(releaseHeldImport).not.toHaveBeenCalled();
+
+    handler('completed')({
+      id: 'job-2',
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      returnvalue: { success: true, results: [] },
+    });
+    expect(releaseHeldImport).toHaveBeenCalledExactlyOnceWith('srv-1');
   });
 });

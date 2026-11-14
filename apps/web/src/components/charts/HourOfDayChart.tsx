@@ -50,23 +50,23 @@ export function HourOfDayChart({ data, isLoading, height = 250 }: HourOfDayChart
       legend: {
         enabled: groups.length >= 2,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
       },
       xAxis: {
         categories: hours.map(formatHourOfDay),
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
-            fontSize: '10px',
+            color: 'oklch(var(--muted-foreground))',
+            fontSize: '12px',
           },
           rotation: -45,
         },
-        lineColor: 'hsl(var(--border))',
-        tickColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
+        tickColor: 'oklch(var(--border))',
       },
       yAxis: {
         title: {
@@ -74,10 +74,10 @@ export function HourOfDayChart({ data, isLoading, height = 250 }: HourOfDayChart
         },
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
-        gridLineColor: 'hsl(var(--border))',
+        gridLineColor: 'oklch(var(--border))',
         min: 0,
       },
       plotOptions: {
@@ -85,21 +85,21 @@ export function HourOfDayChart({ data, isLoading, height = 250 }: HourOfDayChart
           ? { borderRadius: 2, pointPadding: 0.1, groupPadding: 0.1, stacking: 'normal' }
           : {
               borderRadius: 2,
-              color: 'hsl(var(--chart-2))',
+              color: 'oklch(var(--primary))',
               pointPadding: 0.1,
               groupPadding: 0.1,
               states: {
                 hover: {
-                  color: 'hsl(var(--chart-2) / 0.8)',
+                  color: 'oklch(var(--primary) / 0.8)',
                 },
               },
             },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         shared: stacked,
         formatter: function () {
@@ -134,9 +134,6 @@ export function HourOfDayChart({ data, isLoading, height = 250 }: HourOfDayChart
             chartOptions: {
               xAxis: {
                 labels: {
-                  style: {
-                    fontSize: '8px',
-                  },
                   rotation: -60,
                 },
               },

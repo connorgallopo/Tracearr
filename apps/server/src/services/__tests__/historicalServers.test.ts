@@ -58,6 +58,11 @@ vi.mock('../../jobs/librarySyncQueue.js', () => ({
     calls.push('rebuildAutoSyncSchedules');
   }),
 }));
+vi.mock('../../jobs/importQueue.js', () => ({
+  dropHeldImport: vi.fn(async (serverId: string) => {
+    calls.push(`dropHeldImport:${serverId}`);
+  }),
+}));
 vi.mock('../../jobs/poller/database.js', () => ({
   publishServersChanged: vi.fn(async () => {
     calls.push('publishServersChanged');
@@ -119,6 +124,7 @@ describe('markServerHistorical', () => {
       'forceStop',
       'refresh',
       'rebuildAutoSyncSchedules',
+      'dropHeldImport:srv-1',
       `invalidate:${REDIS_KEYS.SERVER_HEALTH('srv-1')}`,
       'resetServerFailCount',
       `invalidate:${REDIS_KEYS.SERVER_CONNECTION('srv-1')}`,

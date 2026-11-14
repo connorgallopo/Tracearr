@@ -217,7 +217,7 @@ export function UserDevicesCard({ devices, isLoading, totalSessions = 0 }: UserD
                           {hasMultipleLocations ? (
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <span className="flex cursor-help items-center gap-1 text-yellow-500">
+                                <span className="text-warning flex cursor-help items-center gap-1">
                                   <MapPin className="h-3 w-3 shrink-0" />
                                   {t('common:count.location', { count: locations.length })}
                                 </span>

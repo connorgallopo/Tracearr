@@ -415,7 +415,7 @@ describe('Dashboard', () => {
 
     mockUseDashboardStats.mockReturnValue(stats(3_600_000));
     renderDashboard();
-    expect(screen.getByText('(common:labels.listenTime 1h 0m)')).toBeInTheDocument();
+    expect(screen.getByText('common:labels.listenTime 1h 0m')).toBeInTheDocument();
   });
 
   it('leaves the server view with the active users tile and no member extras', () => {

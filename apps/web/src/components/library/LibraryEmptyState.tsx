@@ -157,7 +157,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
     return (
       <div className="rounded-xl border border-dashed p-8 text-center">
         <Loader2 className="text-muted-foreground/50 mx-auto h-12 w-12 animate-spin" />
-        <h3 className="mt-4 text-lg font-medium">
+        <h3 className="mt-4 text-base font-medium">
           {t('library.emptyState.backfillRunning.title')}
         </h3>
         <p className="text-muted-foreground mx-auto mt-2 max-w-md">
@@ -196,7 +196,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
         return (
           <div className="rounded-xl border border-dashed p-8 text-center">
             <Loader2 className="text-muted-foreground/50 mx-auto h-12 w-12 animate-spin" />
-            <h3 className="mt-4 text-lg font-medium">
+            <h3 className="mt-4 text-base font-medium">
               {t('library.emptyState.backfillAvailable.syncRunningTitle')}
             </h3>
             <p className="text-muted-foreground mx-auto mt-2 max-w-md">
@@ -209,7 +209,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
       return (
         <div className="rounded-xl border border-dashed p-8 text-center">
           <Clock className="text-muted-foreground/50 mx-auto h-12 w-12" />
-          <h3 className="mt-4 text-lg font-medium">
+          <h3 className="mt-4 text-base font-medium">
             {t('library.emptyState.backfillAvailable.title')}
           </h3>
           <p className="text-muted-foreground mx-auto mt-2 max-w-md">
@@ -245,7 +245,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
       return (
         <div className="rounded-xl border border-dashed p-8 text-center">
           <Loader2 className="text-muted-foreground/50 mx-auto h-12 w-12 animate-spin" />
-          <h3 className="mt-4 text-lg font-medium">
+          <h3 className="mt-4 text-base font-medium">
             {t('library.emptyState.syncInProgress.title')}
           </h3>
           <p className="text-muted-foreground mx-auto mt-2 max-w-md">
@@ -261,7 +261,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
       return (
         <div className="rounded-xl border border-dashed p-8 text-center">
           <Database className="text-muted-foreground/50 mx-auto h-12 w-12" />
-          <h3 className="mt-4 text-lg font-medium">{t('library.emptyState.noMedia.title')}</h3>
+          <h3 className="mt-4 text-base font-medium">{t('library.emptyState.noMedia.title')}</h3>
           <p className="text-muted-foreground mx-auto mt-2 max-w-md">
             {t('library.emptyState.noMedia.body')}
           </p>
@@ -283,7 +283,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
     return (
       <div className="rounded-xl border border-dashed p-8 text-center">
         <Database className="text-muted-foreground/50 mx-auto h-12 w-12" />
-        <h3 className="mt-4 text-lg font-medium">{t('library.emptyState.notSynced.title')}</h3>
+        <h3 className="mt-4 text-base font-medium">{t('library.emptyState.notSynced.title')}</h3>
         <p className="text-muted-foreground mx-auto mt-2 max-w-md">
           {t('library.emptyState.notSynced.body')}
         </p>
@@ -313,7 +313,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
   return (
     <div className="rounded-xl border border-dashed p-8 text-center">
       <Database className="text-muted-foreground/50 mx-auto h-12 w-12" />
-      <h3 className="mt-4 text-lg font-medium">{t('library.emptyState.multiServer.title')}</h3>
+      <h3 className="mt-4 text-base font-medium">{t('library.emptyState.multiServer.title')}</h3>
       <p className="text-muted-foreground mx-auto mt-2 max-w-md">
         {t('library.emptyState.multiServer.body')}
       </p>

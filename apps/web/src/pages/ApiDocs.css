@@ -7,7 +7,7 @@
   /* Scalar offsets its sticky sidebar and sizes it to the viewport minus this */
   --scalar-custom-header-height: 3.5rem;
   min-height: 100svh;
-  background: hsl(var(--background));
+  background: oklch(var(--background));
 }
 
 .api-docs-header {
@@ -16,6 +16,6 @@
   z-index: 20;
   height: var(--scalar-custom-header-height);
   padding: 0 1.5rem;
-  border-bottom: 1px solid hsl(var(--border));
-  background: hsl(var(--background));
+  border-bottom: 1px solid oklch(var(--border));
+  background: oklch(var(--background));
 }

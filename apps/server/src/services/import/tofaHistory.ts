@@ -26,6 +26,7 @@ import { TofaClient } from '../mediaServer/tofa/client.js';
 import { playMethodDecisions, tofaPosterPath } from '../mediaServer/tofa/parser.js';
 import type { TofaWatchHistoryRow } from '../mediaServer/tofa/types.js';
 import { markImportedServerLocations } from '../serverLocations.js';
+import { syncServer } from '../sync.js';
 import { refreshImportAggregates } from './aggregates.js';
 import { flushInsertBatch } from './batchProcessor.js';
 import { importIdentityByKey } from './libraryKeyMatch.js';
@@ -179,9 +180,11 @@ async function knownPlays(serverId: string, rows: TofaWatchHistoryRow[]): Promis
   );
 }
 
+/** Syncs the server's users first, so the import never relies on a sync that ran before it. */
 export async function importTofaHistory(
   serverId: string,
-  pubSubService?: PubSubService
+  pubSubService?: PubSubService,
+  onProgress?: (progress: TofaImportProgress) => Promise<void>
 ): Promise<TofaImportResult> {
   const progress: TofaImportProgress = {
     status: 'idle',
@@ -197,7 +200,8 @@ export async function importTofaHistory(
   };
   const publishProgress = createSimpleProgressPublisher<TofaImportProgress>(
     pubSubService,
-    'import:tofa:progress'
+    'import:tofa:progress',
+    onProgress
   );
   publishProgress(progress);
   const skippedUserTracker = createSkippedUserTracker();
@@ -209,6 +213,9 @@ export async function importTofaHistory(
     if (SERVER_PROFILES[server.type].serverHistoryImport !== 'tofa') {
       throw new Error(`${server.type} servers keep no watch history of their own to import`);
     }
+
+    const users = await syncServer(serverId, { syncUsers: true, syncLibraries: false });
+    if (!users.usersRead) throw new Error(users.errors.join('; '));
 
     const client = new TofaClient({ url: server.url, token: server.token, id: server.id });
     const userMap = await createUserMapping(serverId);

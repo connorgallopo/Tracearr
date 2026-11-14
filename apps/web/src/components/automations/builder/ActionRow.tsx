@@ -58,7 +58,7 @@ export function ActionRow({
       {...rowProps}
       data-pulse={pulsing}
       className={cn(
-        'bg-card-raised @container items-start',
+        'bg-card dark:bg-card-raised @container items-start',
         'data-[pulse=true]:ring-primary/60 data-[pulse=true]:ring-2',
         !enabled && 'opacity-60'
       )}

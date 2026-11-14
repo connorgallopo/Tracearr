@@ -17,9 +17,9 @@ export function MediaRequestsPanel({ rows, isLoading, isError, onRetry }: MediaR
   return (
     <section
       aria-labelledby="media-requests-heading"
-      className="bg-card rounded-[calc(var(--radius)+2px)] border p-[16px_18px]"
+      className="bg-card rounded-xl border p-6 shadow-sm"
     >
-      <h2 id="media-requests-heading" className="mb-3 text-[15px] font-semibold">
+      <h2 id="media-requests-heading" className="mb-3 text-base font-semibold">
         {t('requests.mediaPanel.title')}
       </h2>
 

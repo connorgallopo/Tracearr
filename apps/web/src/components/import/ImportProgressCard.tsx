@@ -60,7 +60,7 @@ export function ImportProgressCard({
       {/* Header with status */}
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">{statusLabel}</span>
-        {isComplete && <CheckCircle2 className="h-5 w-5 text-green-600" />}
+        {isComplete && <CheckCircle2 className="text-success h-5 w-5" />}
         {isError && <XCircle className="text-destructive h-5 w-5" />}
         {isWaiting && <Clock className="text-muted-foreground h-5 w-5 animate-pulse" />}
         {isActive && <Loader2 className="text-muted-foreground h-5 w-5 animate-spin" />}
@@ -100,14 +100,14 @@ export function ImportProgressCard({
 
             <div>
               <span className="text-muted-foreground">Imported:</span>{' '}
-              <span className="font-medium text-green-600">
+              <span className="text-success font-medium">
                 {progress.importedRecords.toLocaleString()}
               </span>
             </div>
 
             <div>
               <span className="text-muted-foreground">Skipped:</span>{' '}
-              <span className="font-medium text-yellow-600">
+              <span className="text-warning font-medium">
                 {progress.skippedRecords.toLocaleString()}
               </span>
             </div>
@@ -115,7 +115,7 @@ export function ImportProgressCard({
             {progress.enrichedRecords !== undefined && progress.enrichedRecords > 0 && (
               <div>
                 <span className="text-muted-foreground">Enriched:</span>{' '}
-                <span className="font-medium text-blue-600">
+                <span className="text-info font-medium">
                   {progress.enrichedRecords.toLocaleString()}
                 </span>
               </div>
@@ -124,7 +124,7 @@ export function ImportProgressCard({
             {progress.filteredRecords !== undefined && progress.filteredRecords > 0 && (
               <div>
                 <span className="text-muted-foreground">Filtered:</span>{' '}
-                <span className="font-medium text-yellow-600">
+                <span className="text-warning font-medium">
                   {progress.filteredRecords.toLocaleString()}
                 </span>
               </div>

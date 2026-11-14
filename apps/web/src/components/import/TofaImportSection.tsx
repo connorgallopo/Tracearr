@@ -164,8 +164,8 @@ export function TofaImportSection({
           </div>
         </div>
 
-        <div className="flex gap-3 rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-4">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-600" />
+        <div className="border-warning/20 bg-warning/5 flex gap-3 rounded-lg border p-4">
+          <AlertTriangle className="text-warning mt-0.5 h-4 w-4 shrink-0" />
           <div className="space-y-2 text-sm">
             <p className="font-medium">{t('import.recordsMayBeSkipped')}</p>
             <ul className="text-muted-foreground list-inside list-disc space-y-1">

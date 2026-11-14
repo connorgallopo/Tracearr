@@ -5,10 +5,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 type WhatStats = Pick<UserRangeStats, 'mediaTypeSplit' | 'topGenres'>;
 
 const MEDIA_TYPES = [
-  { key: 'movie', labelKey: 'common:media.movie_plural', className: 'bg-chart-1' },
-  { key: 'episode', labelKey: 'common:media.episode_plural', className: 'bg-chart-2' },
-  { key: 'track', labelKey: 'common:media.track_plural', className: 'bg-chart-3' },
-  { key: 'other', labelKey: 'pages:userDetail.overview.otherMedia', className: 'bg-chart-4' },
+  { key: 'movie', labelKey: 'common:media.movie_plural', className: 'bg-media-movie' },
+  { key: 'episode', labelKey: 'common:media.episode_plural', className: 'bg-media-show' },
+  { key: 'track', labelKey: 'common:media.track_plural', className: 'bg-media-music' },
+  { key: 'other', labelKey: 'pages:userDetail.overview.otherMedia', className: 'bg-media-other' },
 ] as const;
 
 export function WhatCard({ stats }: { stats: WhatStats | undefined }) {

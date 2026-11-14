@@ -256,7 +256,7 @@ describe('UserDetail', () => {
     const cards = screen.getByTestId('range-stat-cards');
     expect(cards.children).toHaveLength(6);
     expect(within(cards).getByText('+12%')).toBeInTheDocument();
-    expect(within(cards).getByText('(pages:userDetail.cards.vsPrior)')).toBeInTheDocument();
+    expect(within(cards).getByText('pages:userDetail.cards.vsPrior')).toBeInTheDocument();
   });
 
   it('defaults to the overview tab and syncs ?tab=sessions on click with replace', async () => {

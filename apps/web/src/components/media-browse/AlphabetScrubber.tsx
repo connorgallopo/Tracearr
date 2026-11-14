@@ -150,7 +150,7 @@ export function AlphabetScrubber({
       onFocus={() => setContainerFocused(true)}
       onBlur={() => setContainerFocused(false)}
       className={cn(
-        'text-muted-foreground/70 sticky top-[120px] flex h-fit flex-col items-center gap-px text-[9.5px] font-semibold focus-visible:outline-none',
+        'text-muted-foreground sticky top-[120px] flex h-fit flex-col items-center gap-px text-xs leading-tight font-semibold focus-visible:outline-none',
         className
       )}
     >
@@ -176,7 +176,7 @@ export function AlphabetScrubber({
             }}
             className={cn(
               'cursor-pointer rounded px-1',
-              isActive && 'bg-primary/12 text-primary',
+              isActive && 'bg-primary/10 text-primary dark:bg-primary/12',
               isFocused && !isActive && 'ring-ring ring-1',
               isEmpty && 'text-muted-foreground/30 cursor-default'
             )}

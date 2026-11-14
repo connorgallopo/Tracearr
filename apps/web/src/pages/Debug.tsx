@@ -366,9 +366,7 @@ export function Debug() {
           header: t('common:labels.status'),
           cell: ({ row }) =>
             row.original.is_suspicious ? (
-              <Badge variant="outline" className="border-amber-500/30 text-xs text-amber-600">
-                {t('debug.suspicious')}
-              </Badge>
+              <Badge variant="warning">{t('debug.suspicious')}</Badge>
             ) : (
               <span className="text-muted-foreground text-xs">{t('debug.ok')}</span>
             ),
@@ -435,7 +433,7 @@ export function Debug() {
           <AlertTriangle className="text-destructive h-5 w-5" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold">{t('debug.title')}</h1>
+          <h1 className="text-xl font-semibold">{t('debug.title')}</h1>
           <p className="text-muted-foreground text-sm">{t('debug.description')}</p>
         </div>
       </div>
@@ -455,7 +453,9 @@ export function Debug() {
               <CardContent className="flex items-center gap-3 p-4">
                 <Film className="text-muted-foreground h-8 w-8" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.data?.counts.sessions ?? '-'}</p>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {stats.data?.counts.sessions ?? '-'}
+                  </p>
                   <p className="text-muted-foreground text-xs">{t('common:labels.sessions')}</p>
                 </div>
               </CardContent>
@@ -464,7 +464,9 @@ export function Debug() {
               <CardContent className="flex items-center gap-3 p-4">
                 <Shield className="text-muted-foreground h-8 w-8" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.data?.counts.violations ?? '-'}</p>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {stats.data?.counts.violations ?? '-'}
+                  </p>
                   <p className="text-muted-foreground text-xs">{t('violations.title')}</p>
                 </div>
               </CardContent>
@@ -473,7 +475,9 @@ export function Debug() {
               <CardContent className="flex items-center gap-3 p-4">
                 <Scale className="text-muted-foreground h-8 w-8" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.data?.counts.rules ?? '-'}</p>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {stats.data?.counts.rules ?? '-'}
+                  </p>
                   <p className="text-muted-foreground text-xs">{t('automations.title')}</p>
                 </div>
               </CardContent>
@@ -482,7 +486,9 @@ export function Debug() {
               <CardContent className="flex items-center gap-3 p-4">
                 <Users className="text-muted-foreground h-8 w-8" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.data?.counts.users ?? '-'}</p>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {stats.data?.counts.users ?? '-'}
+                  </p>
                   <p className="text-muted-foreground text-xs">{t('users.title')}</p>
                 </div>
               </CardContent>
@@ -491,7 +497,9 @@ export function Debug() {
               <CardContent className="flex items-center gap-3 p-4">
                 <Server className="text-muted-foreground h-8 w-8" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.data?.counts.servers ?? '-'}</p>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {stats.data?.counts.servers ?? '-'}
+                  </p>
                   <p className="text-muted-foreground text-xs">Servers</p>
                 </div>
               </CardContent>
@@ -500,7 +508,9 @@ export function Debug() {
               <CardContent className="flex items-center gap-3 p-4">
                 <Link2 className="text-muted-foreground h-8 w-8" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.data?.counts.plexAccounts ?? '-'}</p>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {stats.data?.counts.plexAccounts ?? '-'}
+                  </p>
                   <p className="text-muted-foreground text-xs">{t('debug.plexAccounts')}</p>
                 </div>
               </CardContent>
@@ -509,7 +519,9 @@ export function Debug() {
               <CardContent className="flex items-center gap-3 p-4">
                 <XSquare className="text-muted-foreground h-8 w-8" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.data?.counts.terminationLogs ?? '-'}</p>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {stats.data?.counts.terminationLogs ?? '-'}
+                  </p>
                   <p className="text-muted-foreground text-xs">{t('debug.terminations')}</p>
                 </div>
               </CardContent>
@@ -518,7 +530,9 @@ export function Debug() {
               <CardContent className="flex items-center gap-3 p-4">
                 <Library className="text-muted-foreground h-8 w-8" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.data?.counts.libraryItems ?? '-'}</p>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {stats.data?.counts.libraryItems ?? '-'}
+                  </p>
                   <p className="text-muted-foreground text-xs">{t('debug.libraryItems')}</p>
                 </div>
               </CardContent>
@@ -527,7 +541,9 @@ export function Debug() {
               <CardContent className="flex items-center gap-3 p-4">
                 <Database className="text-muted-foreground h-8 w-8" />
                 <div>
-                  <p className="text-2xl font-bold">{stats.data?.database.size ?? '-'}</p>
+                  <p className="text-2xl font-semibold tabular-nums">
+                    {stats.data?.database.size ?? '-'}
+                  </p>
                   <p className="text-muted-foreground text-xs">DB Size</p>
                 </div>
               </CardContent>
@@ -1120,10 +1136,10 @@ export function Debug() {
                 : 'This will delete all suspicious snapshots (those with 0 bytes for video libraries).'}
             </DialogDescription>
           </DialogHeader>
-          <div className="flex items-start gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 p-3">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+          <div className="border-warning/20 bg-warning/5 flex items-start gap-3 rounded-lg border p-3">
+            <AlertTriangle className="text-warning mt-0.5 h-4 w-4 shrink-0" />
             <div className="text-sm">
-              <p className="font-medium text-amber-600">This cannot be undone</p>
+              <p className="text-warning font-medium">This cannot be undone</p>
               <p className="text-muted-foreground mt-1 text-xs">
                 Deleted snapshots will need to be recreated via the Backfill Library Snapshots job.
                 The continuous aggregate will be refreshed automatically.

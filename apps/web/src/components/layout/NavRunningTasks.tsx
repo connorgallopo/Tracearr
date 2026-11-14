@@ -30,7 +30,7 @@ function TaskIcon({ status }: { status: RunningTask['status'] }) {
     case 'pending':
       return <Clock className="text-muted-foreground h-4 w-4" />;
     case 'complete':
-      return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      return <CheckCircle2 className="text-success h-4 w-4" />;
     case 'error':
       return <AlertCircle className="text-destructive h-4 w-4" />;
     default:
@@ -70,7 +70,7 @@ function TaskItem({ task }: { task: RunningTask }) {
           {task.progress !== null && task.status === 'running' && (
             <Progress value={task.progress} className="h-1.5" />
           )}
-          <p className="text-muted-foreground/70 text-xs">
+          <p className="text-muted-foreground text-xs">
             {t('tasks.startedAgo', { time: timeAgo })}
           </p>
         </div>

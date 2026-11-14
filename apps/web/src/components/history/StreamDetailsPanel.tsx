@@ -161,7 +161,7 @@ function ComparisonRow({
   const sourceClasses = cn(sourceClassName ?? 'truncate font-medium');
   const streamClasses = cn(
     streamClassName ?? 'truncate',
-    isDifferent && 'font-medium text-amber-500'
+    isDifferent && 'text-warning font-medium'
   );
   const labelClasses = cn(
     'text-muted-foreground',
@@ -177,7 +177,7 @@ function ComparisonRow({
         <ArrowRight
           className={cn(
             'mx-auto h-3.5 w-3.5',
-            isDifferent ? 'text-amber-500' : 'text-muted-foreground/50'
+            isDifferent ? 'text-warning' : 'text-muted-foreground/50'
           )}
         />
       ) : (
@@ -214,7 +214,7 @@ function SectionColumnLabels({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'text-muted-foreground grid grid-cols-[100px_1fr_24px_1fr] items-center gap-2 text-[10px] tracking-[0.3em] uppercase',
+        'text-muted-foreground grid grid-cols-[100px_1fr_24px_1fr] items-center gap-2 text-xs uppercase',
         className
       )}
     >
@@ -553,7 +553,7 @@ export function StreamDetailsPanel({
               {transcodeInfo?.speed !== undefined && (
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">{t('pages:history.stream.speed')}</span>
-                  <span className={cn(transcodeInfo.speed < 1 && 'text-amber-500')}>
+                  <span className={cn(transcodeInfo.speed < 1 && 'text-warning')}>
                     {transcodeInfo.speed.toFixed(1)}x
                     {transcodeInfo.throttled && ` ${t('pages:history.stream.throttled')}`}
                   </span>

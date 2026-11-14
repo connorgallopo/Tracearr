@@ -11,6 +11,8 @@ interface UserCellProps {
   username: string | null;
   /** The display name the identity carries, when it has one. */
   identityName?: string | null;
+  /** The person's name when `username` is an account's and may not be it. */
+  personName?: string;
   thumbUrl?: string | null;
   serverId?: string | null;
   /** `sm` for table rows, `md` for the pages that lead with a person. */
@@ -30,6 +32,7 @@ export function UserCell({
   serverUserId,
   username,
   identityName,
+  personName,
   thumbUrl,
   serverId,
   size = 'sm',
@@ -39,7 +42,7 @@ export function UserCell({
   trailing,
   muted,
 }: UserCellProps) {
-  const name = identityName ?? username;
+  const name = personName ?? identityName ?? username;
   if (name === null) return <span className="text-muted-foreground">—</span>;
 
   const small = size === 'sm';

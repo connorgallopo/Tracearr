@@ -7,6 +7,7 @@ import {
 } from '@tracearr/shared';
 import { getIdentityServers } from './identityServerPills';
 import { getPersonRemovedState } from './removedStatus';
+import { rosterPersonName } from './utils';
 
 /**
  * Pure helpers for the Users page merge flows: the bulk action and suggestion review.
@@ -139,7 +140,7 @@ export function rowToMergeCandidate(row: ServerUserWithIdentity): MergeCandidate
   const ownRemovedAt = toIsoString(row.removedAt);
   return {
     userId: row.userId,
-    displayName: row.identityName ?? row.username,
+    displayName: rosterPersonName(row),
     username: row.username,
     emails: uniqueEmails([row.email]),
     // Server-computed: role alone misses a linked Plex or auth account, and the

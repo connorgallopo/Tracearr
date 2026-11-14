@@ -480,12 +480,12 @@ export function PlexServerSelector({
                             conn.reachable ? (
                               <Check className="text-success h-3.5 w-3.5 flex-shrink-0" />
                             ) : (
-                              <X className="h-3.5 w-3.5 flex-shrink-0 text-red-500" />
+                              <X className="text-destructive h-3.5 w-3.5 flex-shrink-0" />
                             )
                           ) : conn.local ? (
                             <Wifi className="text-success h-3.5 w-3.5 flex-shrink-0" />
                           ) : (
-                            <Globe className="h-3.5 w-3.5 flex-shrink-0 text-blue-500" />
+                            <Globe className="text-info h-3.5 w-3.5 flex-shrink-0" />
                           )}
 
                           <div className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
@@ -508,7 +508,7 @@ export function PlexServerSelector({
 
                             {/* Unreachable warning when shown via "Show all" */}
                             {!isReachable && showingAll && !errorLabel && (
-                              <span className="inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium text-amber-600 dark:text-amber-500">
+                              <span className="text-warning inline-flex flex-shrink-0 items-center gap-0.5 text-xs font-medium">
                                 <AlertTriangle className="h-3 w-3" />
                                 {t('pages:settings.plex.mayNotConnect')}
                               </span>
@@ -557,7 +557,7 @@ export function PlexServerSelector({
                       {conn.local ? (
                         <Wifi className="text-success h-3 w-3" />
                       ) : (
-                        <Globe className="h-3 w-3 text-blue-500" />
+                        <Globe className="text-info h-3 w-3" />
                       )}
                       <span className="text-xs whitespace-nowrap">
                         {conn.local

@@ -22,3 +22,23 @@ export function representativeAccountOrderSql(alias: string): SQL {
      ${alias}.id`
   );
 }
+
+/**
+ * The person `u`'s own username: their representative account's, picked across every server
+ * they are on. A page's server filter narrows which account a row describes, never this, so a
+ * merged person keeps one name whichever servers are selected. users.username is not used
+ * because sync never rewrites it, so it keeps the old name after a rename on the server.
+ */
+export function personUsernameSql(): SQL {
+  return sql`(
+    SELECT person_su.username FROM server_users person_su
+    WHERE person_su.user_id = u.id
+    ORDER BY ${representativeAccountOrderSql('person_su')}
+    LIMIT 1
+  )`;
+}
+
+/** The name a person row shows and sorts by: the display name, else personUsernameSql. */
+export function personNameSql(): SQL {
+  return sql`coalesce(u.name, ${personUsernameSql()})`;
+}

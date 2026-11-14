@@ -30,6 +30,7 @@ import { db } from '../db/client.js';
 import { users, servers, serverUsers, plexAccounts, authAccounts } from '../db/schema.js';
 import { PlexClient } from '../services/mediaServer/index.js';
 import { testServerConnections } from '../services/mediaServer/plex/connectionTest.js';
+import { startAddedServer } from '../services/serverCreate.js';
 import { syncServer } from '../services/sync.js';
 import { getOwnerUser, getUserById } from '../services/userService.js';
 import { getRedis } from './redisShared.js';
@@ -560,7 +561,8 @@ export const plexPlugin = () =>
               .where(and(eq(servers.url, serverUri), eq(servers.type, 'plex')))
               .limit(1);
 
-            if (server.length === 0) {
+            const added = server.length === 0;
+            if (added) {
               server = await writeWithoutParams(
                 () =>
                   db
@@ -671,20 +673,24 @@ export const plexPlugin = () =>
               role: 'owner',
             });
 
-            syncServer(serverId, { syncUsers: true, syncLibraries: true })
-              .then((result) => {
-                ctx.context.logger.info('Auto-sync completed for Plex server', {
-                  serverId,
-                  usersAdded: result.usersAdded,
-                  librariesSynced: result.librariesSynced,
+            if (added) {
+              await startAddedServer({ id: serverId, type: 'plex' }, []);
+            } else {
+              syncServer(serverId, { syncUsers: true, syncLibraries: true })
+                .then((result) => {
+                  ctx.context.logger.info('Auto-sync completed for Plex server', {
+                    serverId,
+                    usersAdded: result.usersAdded,
+                    librariesSynced: result.librariesSynced,
+                  });
+                })
+                .catch((error: unknown) => {
+                  ctx.context.logger.error('Auto-sync failed for Plex server', {
+                    err: error,
+                    serverId,
+                  });
                 });
-              })
-              .catch((error: unknown) => {
-                ctx.context.logger.error('Auto-sync failed for Plex server', {
-                  err: error,
-                  serverId,
-                });
-              });
+            }
 
             const sessionUser = await createSignedInSession(ctx, newUser.id);
             return await ctx.json({

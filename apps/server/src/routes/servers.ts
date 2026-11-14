@@ -34,7 +34,7 @@ import {
 } from '../services/mediaServer/index.js';
 import { readServerFacts } from '../services/mediaServer/byServerType.js';
 import { getServerLiveStats, getServerResourceStats } from '../services/serverLiveStats.js';
-import { createServer } from '../services/serverCreate.js';
+import { createServer, startAddedServer } from '../services/serverCreate.js';
 import { deleteServer } from '../services/serverDelete.js';
 import { syncServer } from '../services/sync.js';
 import { sseManager } from '../services/sseManager.js';
@@ -232,7 +232,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         assertNever(type);
     }
 
-    const server = await createServer({
+    const { server, requestServiceIds } = await createServer({
       name,
       type,
       url,
@@ -242,6 +242,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       machineIdentifier,
       facts: serverFacts,
     });
+    await startAddedServer(server, requestServiceIds);
 
     return reply.status(201).send(server);
   });

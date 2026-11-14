@@ -36,7 +36,7 @@ function breakAfterSlashes(text: string): ReactNode {
 
 function PathCode({ children }: { children?: ReactNode }) {
   return (
-    <code className="bg-muted rounded px-1 py-0.5 font-mono text-[0.85em] select-all">
+    <code className="bg-muted rounded px-1 py-0.5 font-mono text-xs select-all">
       {Children.map(children, (child) =>
         typeof child === 'string' ? breakAfterSlashes(child) : child
       )}

@@ -35,24 +35,12 @@ type MediaTypeFilter = 'all' | 'movie' | 'show' | 'artist';
 type SortBy = 'size' | 'title' | 'days_stale' | 'added_at';
 type SortOrder = 'asc' | 'desc';
 
-/**
- * Badge component for staleness with color coding
- * Yellow: < 1 year, Orange: 1-2 years, Red: > 2 years
- */
+/** Neutral under a year, warning to two years, danger past that. */
 function StaleBadge({ daysStale }: { daysStale: number }) {
   const { t } = useTranslation('pages');
-  const colorClass =
-    daysStale > 730
-      ? 'bg-red-500/10 text-red-500'
-      : daysStale > 365
-        ? 'bg-orange-500/10 text-orange-500'
-        : 'bg-yellow-500/10 text-yellow-500';
+  const variant = daysStale > 730 ? 'danger' : daysStale > 365 ? 'warning' : 'secondary';
 
-  return (
-    <Badge variant="secondary" className={colorClass}>
-      {formatStaleTime(daysStale, t)}
-    </Badge>
-  );
+  return <Badge variant={variant}>{formatStaleTime(daysStale, t)}</Badge>;
 }
 
 interface SortButtonProps {

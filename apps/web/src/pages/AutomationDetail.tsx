@@ -78,7 +78,7 @@ export function AutomationDetail() {
           </ItemMedia>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <h1 className="text-2xl font-bold">{automation.name}</h1>
+              <h1 className="text-xl font-semibold">{automation.name}</h1>
               <AutomationKindBadge kind={automation.kind} />
               <ScopeChip automation={automation} servers={servers} />
               {template && <TemplateBadge template={template} />}

@@ -10,7 +10,10 @@ import { db } from '../../db/client.js';
 import { servers } from '../../db/schema.js';
 import { startedAtRange } from '../../db/sessions/conditions.js';
 import { buildMultiServerFragment, serverIdCondition } from '../../utils/serverFiltering.js';
-import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
+import {
+  personUsernameSql,
+  representativeAccountOrderSql,
+} from '../../utils/representativeAccount.js';
 import { compareNames } from '../../utils/collation.js';
 import { serverOrderBy } from '../../utils/serverOrder.js';
 import { scopeSessionsRaw, type Scope } from '../../lib/scope.js';
@@ -133,7 +136,7 @@ export async function queryFilterOptions(params: {
       )
       SELECT
         su.id,
-        su.username,
+        ${personUsernameSql()} AS username,
         su.thumb_url,
         su.server_id,
         u.name as identity_name,
@@ -148,7 +151,6 @@ export async function queryFilterOptions(params: {
       FROM representative rep
       JOIN server_users su ON su.id = rep.id
       LEFT JOIN users u ON u.id = su.user_id
-      ORDER BY LOWER(COALESCE(u.name, su.username))
     `),
     // Servers (for rules builder)
     db

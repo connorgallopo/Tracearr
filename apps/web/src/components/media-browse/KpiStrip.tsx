@@ -64,9 +64,9 @@ export function KpiStrip({
         </div>
       ) : statsLoading || !stats ? (
         <>
-          <StatCard label="" value="" isLoading variant="kpi" />
-          <StatCard label="" value="" isLoading variant="kpi" />
-          <StatCard label="" value="" isLoading variant="kpi" />
+          <StatCard label="" value="" isLoading />
+          <StatCard label="" value="" isLoading />
+          <StatCard label="" value="" isLoading />
         </>
       ) : (
         <>
@@ -75,7 +75,6 @@ export function KpiStrip({
             label={t('media.detail.kpis.plays.label')}
             value={formatNumber(stats.windows.all_time.combined.plays)}
             subValue={t('media.detail.kpis.plays.caption')}
-            variant="kpi"
           />
           <StatCard
             icon={Clock}
@@ -84,7 +83,6 @@ export function KpiStrip({
             subValue={t('media.detail.kpis.watchTime.detail', {
               hours: Math.round(stats.windows.last_30.combined.watchTimeMs / 3_600_000),
             })}
-            variant="kpi"
           />
           <StatCard
             icon={Users}
@@ -95,7 +93,6 @@ export function KpiStrip({
             )}
             value={formatNumber(stats.windows.all_time.combined.uniqueUsers)}
             subValue={t('media.detail.kpis.viewers.detail')}
-            variant="kpi"
           />
         </>
       )}
@@ -108,14 +105,13 @@ export function KpiStrip({
           />
         </div>
       ) : watchersLoading || watchers === undefined ? (
-        <StatCard label="" value="" isLoading variant="kpi" />
+        <StatCard label="" value="" isLoading />
       ) : (
         <StatCard
           icon={CheckCircle2}
           label={t('media.detail.kpis.completion.label')}
           value={avgCompletion != null ? `${avgCompletion}%` : '—'}
           subValue={t(completionDetailKey, { finished: finishedCount, total: totalWatchers })}
-          variant="kpi"
         />
       )}
     </div>
@@ -169,10 +165,10 @@ export function MemberKpiStrip({
         </div>
       ) : watchersLoading || watchers === undefined ? (
         <>
-          <StatCard label="" value="" isLoading variant="kpi" />
-          <StatCard label="" value="" isLoading variant="kpi" />
-          <StatCard label="" value="" isLoading variant="kpi" />
-          <StatCard label="" value="" isLoading variant="kpi" />
+          <StatCard label="" value="" isLoading />
+          <StatCard label="" value="" isLoading />
+          <StatCard label="" value="" isLoading />
+          <StatCard label="" value="" isLoading />
         </>
       ) : (
         <>
@@ -180,7 +176,6 @@ export function MemberKpiStrip({
             icon={Play}
             label={t('media.detail.kpis.yourPlays')}
             value={formatNumber(plays)}
-            variant="kpi"
           />
           <StatCard
             icon={Clock}
@@ -188,7 +183,6 @@ export function MemberKpiStrip({
               isArtist ? 'media.detail.kpis.yourListenTime' : 'media.detail.kpis.yourWatchTime'
             )}
             value={formatKpiHours(watchTimeMs)}
-            variant="kpi"
           />
           <StatCard
             icon={CheckCircle2}
@@ -202,13 +196,11 @@ export function MemberKpiStrip({
                   })
                 : undefined
             }
-            variant="kpi"
           />
           <StatCard
             icon={Calendar}
             label={t(isArtist ? 'media.detail.kpis.lastPlayed' : 'media.detail.kpis.lastWatched')}
             value={lastWatchedDay ? formatIsoDay(lastWatchedDay) : '-'}
-            variant="kpi"
           />
         </>
       )}

@@ -40,6 +40,8 @@ export interface SyncResult {
   usersRemoved: number;
   usersRestored: number;
   librariesSynced: number;
+  /** The server's user list was read; false when it could not be, or users were not synced */
+  usersRead: boolean;
   errors: string[];
 }
 
@@ -131,6 +133,7 @@ export async function syncServerUsers(
   skipped: number;
   removed: number;
   restored: number;
+  usersRead: boolean;
   errors: string[];
 }> {
   return withServerSyncLock(serverId, async (client) => {
@@ -234,7 +237,7 @@ export async function syncServerUsers(
       }
     }
 
-    return { added, updated, skipped, removed, restored, errors };
+    return { added, updated, skipped, removed, restored, usersRead: true, errors };
   });
 }
 
@@ -277,6 +280,7 @@ function failedUserSync(serverName: string, err: unknown): UserSyncResult {
     skipped: 0,
     removed: 0,
     restored: 0,
+    usersRead: false,
     errors: [`${serverName} user sync failed: ${message}`],
   };
 }
@@ -435,6 +439,7 @@ export async function syncServer(
     usersRemoved: 0,
     usersRestored: 0,
     librariesSynced: 0,
+    usersRead: false,
     errors: [],
   };
 
@@ -485,6 +490,7 @@ export async function syncServer(
     result.usersSkipped = userResult.skipped;
     result.usersRemoved = userResult.removed;
     result.usersRestored = userResult.restored;
+    result.usersRead = userResult.usersRead;
     result.errors.push(...userResult.errors);
   }
 

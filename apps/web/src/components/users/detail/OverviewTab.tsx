@@ -51,7 +51,7 @@ export function OverviewTab({
             {
               name: t('pages:userDetail.overview.serverAverage'),
               data: stats.serverAvgPlaysByDay,
-              color: 'hsl(var(--chart-2))',
+              color: 'oklch(var(--primary))',
             },
           ]
         : []),

@@ -124,7 +124,7 @@ export function FileDropzone({
           onDrop={handleDrop}
           disabled={disabled}
           className={cn(
-            'focus-visible:border-ring focus-visible:ring-ring/50 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-8 transition-colors outline-none focus-visible:ring-[3px]',
+            'focus-visible:border-ring focus-visible:ring-ring/(--ring-alpha) flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-8 transition-colors outline-none focus-visible:ring-[3px]',
             isDragging && 'border-primary bg-primary/5',
             !isDragging &&
               'border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-muted/50',

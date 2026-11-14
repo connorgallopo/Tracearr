@@ -113,6 +113,7 @@ export function NavUser() {
         <DropdownMenuTrigger asChild>
           <SidebarMenuButton
             size="lg"
+            variant="outline"
             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             {identity(false)}

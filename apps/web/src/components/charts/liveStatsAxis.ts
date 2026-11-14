@@ -38,14 +38,14 @@ export function liveStatsTimeAxis(now: number, narrow = false): Highcharts.XAxis
       return positions;
     },
     labels: {
-      style: { color: 'hsl(var(--muted-foreground))', fontSize: '10px' },
+      style: { color: 'oklch(var(--muted-foreground))', fontSize: '12px' },
       formatter() {
         const seconds = Math.max(Math.round(((this.axis.max ?? 0) - Number(this.value)) / 1000), 0);
         return formatDuration(seconds * 1000, { style: 'compact', emptyValue: 'NOW' });
       },
     },
-    lineColor: 'hsl(var(--border))',
-    tickColor: 'hsl(var(--border))',
+    lineColor: 'oklch(var(--border))',
+    tickColor: 'oklch(var(--border))',
   };
 }
 

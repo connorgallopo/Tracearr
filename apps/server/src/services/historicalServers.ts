@@ -7,6 +7,7 @@ import { and, eq, isNull } from 'drizzle-orm';
 import { REDIS_KEYS, WS_EVENTS } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, sessions } from '../db/schema.js';
+import { dropHeldImport } from '../jobs/importQueue.js';
 import { rebuildAutoSyncSchedules } from '../jobs/librarySyncQueue.js';
 import { publishServersChanged } from '../jobs/poller/database.js';
 import { forceStopSessions } from '../jobs/poller/index.js';
@@ -69,6 +70,10 @@ export async function markServerHistorical(server: ServerRow): Promise<ServerRow
 
   await sseManager.refresh();
   await rescheduleSyncs();
+  // A held import would run against a server that no longer answers
+  await dropHeldImport(server.id).catch((error: unknown) => {
+    logger.warn('Dropping the held history import failed', { error });
+  });
 
   const cache = getCacheService();
   if (cache) {

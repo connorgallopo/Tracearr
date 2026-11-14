@@ -14,14 +14,13 @@ import { ChartEmpty } from './ChartEmpty';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Cpu, MemoryStick } from 'lucide-react';
 
-// Colors matching Plex's style
 const COLORS = {
-  process: '#00b4e4', // Plex-style cyan for "Plex Media Server"
-  system: '#cc7b9f', // Pink/purple for "System"
-  processGradientStart: 'rgba(0, 180, 228, 0.3)',
-  processGradientEnd: 'rgba(0, 180, 228, 0.05)',
-  systemGradientStart: 'rgba(204, 123, 159, 0.3)',
-  systemGradientEnd: 'rgba(204, 123, 159, 0.05)',
+  process: 'oklch(var(--chart-1))',
+  system: 'oklch(var(--chart-2))',
+  processGradientStart: 'oklch(var(--chart-1) / 0.3)',
+  processGradientEnd: 'oklch(var(--chart-1) / 0.05)',
+  systemGradientStart: 'oklch(var(--chart-2) / 0.3)',
+  systemGradientEnd: 'oklch(var(--chart-2) / 0.05)',
 };
 
 // In highcharts-react's effect deps - inline literals would update per render
@@ -171,20 +170,20 @@ function ResourceChart({
         verticalAlign: 'top',
         floating: false,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
           fontWeight: 'normal',
-          fontSize: '11px',
+          fontSize: '12px',
         },
-        itemHoverStyle: { color: 'hsl(var(--foreground))' },
+        itemHoverStyle: { color: 'oklch(var(--foreground))' },
       },
       xAxis: liveStatsTimeAxis(Date.now() + clockSkewMs),
       yAxis: {
         title: { text: undefined },
         labels: {
-          style: { color: 'hsl(var(--muted-foreground))', fontSize: '10px' },
+          style: { color: 'oklch(var(--muted-foreground))', fontSize: '12px' },
           format: '{value}%',
         },
-        gridLineColor: 'hsl(var(--border) / 0.5)',
+        gridLineColor: 'oklch(var(--border) / 0.5)',
         min: 0,
         max: yMax,
         tickInterval: yMax <= 10 ? 1 : yMax <= 20 ? 5 : 10,
@@ -199,9 +198,9 @@ function ResourceChart({
         area: { threshold: null },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
-        style: { color: 'hsl(var(--popover-foreground))', fontSize: '11px' },
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
+        style: { color: 'oklch(var(--popover-foreground))', fontSize: '12px' },
         formatter: nearestPointTooltip((y) => `${Math.round(y)}%`),
       },
       series,
@@ -213,7 +212,6 @@ function ResourceChart({
               legend: {
                 align: 'center',
                 layout: 'horizontal',
-                itemStyle: { fontSize: '10px' },
               },
               xAxis: liveStatsTimeAxis(Date.now() + clockSkewMs, true),
             },

@@ -16,14 +16,17 @@ vi.mock('pmtiles', () => ({
 vi.mock('@protomaps/basemaps', () => ({ layers: () => [], namedFlavor: () => ({}) }));
 
 import type { Point } from 'geojson';
+import type { LayerSpecification, StyleSpecification } from 'maplibre-gl';
 import type { LocationStats } from '@tracearr/shared';
 import { type Area, circleRadius } from './areas';
 import {
+  addDataLayers,
   checkBasemap,
   HEAT_FADE,
   hasMapPosition,
   locationsGeojson,
   mapMaxZoom,
+  oklchRgb,
   worldFillZoom,
 } from './maplibre';
 import { locationKey } from './locationKey';
@@ -224,5 +227,37 @@ describe('worldFillZoom', () => {
   it('never goes below zero for a narrow or unmeasured container', () => {
     expect(worldFillZoom(0)).toBe(0);
     expect(worldFillZoom(300)).toBe(0);
+  });
+});
+
+describe('oklchRgb', () => {
+  it('converts OKLCH to the sRGB the gray tokens render as', () => {
+    expect(oklchRgb(1, 0, 0)).toBe('rgb(255, 255, 255)');
+    expect(oklchRgb(0.142, 0.012, 212)).toBe('rgb(5, 11, 12)');
+    expect(oklchRgb(0.884, 0.006, 293, 0.85)).toBe('rgba(217, 216, 220, 0.85)');
+  });
+});
+
+describe('addDataLayers', () => {
+  it('draws data below the place names and its own labels above them', () => {
+    const layer = (id: string, type: 'circle' | 'line' | 'symbol'): LayerSpecification =>
+      ({ id, type, source: 'basemap' }) as LayerSpecification;
+    const style: StyleSpecification = {
+      version: 8,
+      sources: {},
+      layers: [
+        layer('roads', 'line'),
+        layer('roads_shields', 'symbol'),
+        layer('places_locality', 'symbol'),
+      ],
+    };
+    addDataLayers(style, layer('circles', 'circle'), layer('pts-count', 'symbol'));
+    expect(style.layers.map((l) => l.id)).toEqual([
+      'roads',
+      'roads_shields',
+      'circles',
+      'places_locality',
+      'pts-count',
+    ]);
   });
 });

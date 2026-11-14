@@ -37,14 +37,14 @@ describe('WatchedBadge', () => {
     const { container } = render(
       <WatchedBadge watchedState="partial" watchedStateSelf="unwatched" />
     );
-    expect(container.querySelector('path')).toHaveAttribute('fill', 'hsl(var(--warning))');
+    expect(container.querySelector('path')).toHaveAttribute('fill', 'oklch(var(--warning))');
   });
 
   it('renders the partial pie in the success tone when the requester is mid-watch themselves', () => {
     const { container } = render(
       <WatchedBadge watchedState="partial" watchedStateSelf="partial" />
     );
-    expect(container.querySelector('path')).toHaveAttribute('fill', 'hsl(var(--success))');
+    expect(container.querySelector('path')).toHaveAttribute('fill', 'oklch(var(--success))');
   });
 
   it('renders the success/green tone with a "watched by you" label when the requester watched it', () => {
