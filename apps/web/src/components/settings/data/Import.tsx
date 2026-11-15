@@ -58,6 +58,7 @@ import {
   serverWithImport,
   useActiveImports,
   useImportStatus,
+  type CardProgress,
   type ImportPhase,
 } from '@/hooks/queries/useImports';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
@@ -69,7 +70,7 @@ const TAB_COLUMNS: Record<number, string> = { 2: 'grid-cols-2', 3: 'grid-cols-3'
 const blankTautulliProgress = (
   status: TautulliImportProgress['status'],
   message: string
-): TautulliImportProgress => ({
+): CardProgress<TautulliImportProgress> => ({
   status,
   totalRecords: 0,
   fetchedRecords: 0,
@@ -89,7 +90,7 @@ const blankTautulliProgress = (
 const blankJellystatProgress = (
   status: JellystatImportProgress['status'],
   message: string
-): JellystatImportProgress => ({
+): CardProgress<JellystatImportProgress> => ({
   status,
   totalRecords: 0,
   processedRecords: 0,
@@ -104,7 +105,7 @@ const blankJellystatProgress = (
 const blankPlaybackReportingProgress = (
   status: PlaybackReportingImportProgress['status'],
   message: string
-): PlaybackReportingImportProgress => ({
+): CardProgress<PlaybackReportingImportProgress> => ({
   status,
   totalRecords: 0,
   fetchedRecords: 0,
@@ -121,7 +122,9 @@ const blankPlaybackReportingProgress = (
   message,
 });
 
-const tautulliResultProgress = (result: TautulliImportResult): TautulliImportProgress => {
+const tautulliResultProgress = (
+  result: TautulliImportResult
+): CardProgress<TautulliImportProgress> => {
   const processed = result.imported + result.skipped + result.errors;
   return {
     ...blankTautulliProgress('complete', result.message),
@@ -135,7 +138,9 @@ const tautulliResultProgress = (result: TautulliImportResult): TautulliImportPro
   };
 };
 
-const jellystatResultProgress = (result: JellystatImportResult): JellystatImportProgress => {
+const jellystatResultProgress = (
+  result: JellystatImportResult
+): CardProgress<JellystatImportProgress> => {
   const processed = result.imported + result.skipped + result.errors;
   return {
     ...blankJellystatProgress('complete', result.message),
@@ -151,7 +156,7 @@ const jellystatResultProgress = (result: JellystatImportResult): JellystatImport
 
 const playbackReportingResultProgress = (
   result: PlaybackReportingImportResult
-): PlaybackReportingImportProgress => {
+): CardProgress<PlaybackReportingImportProgress> => {
   const processed = result.imported + result.skipped + result.errors;
   return {
     ...blankPlaybackReportingProgress('complete', result.message),
@@ -670,12 +675,14 @@ export function ImportSources({
 
   const tautulli = useImportStatus(
     'tautulli',
+    selectedPlexServerId,
     latestImport(tautulliImports, selectedPlexServerId),
     { blank: blankTautulliProgress, fromResult: tautulliResultProgress },
     { onStarted }
   );
   const jellystat = useImportStatus(
     'jellystat',
+    selectedJellyfinServerId,
     latestImport(jellystatImports, selectedJellyfinServerId),
     { blank: blankJellystatProgress, fromResult: jellystatResultProgress },
     // The server drops the uploaded backup once the import ends, so another one needs it again
@@ -683,6 +690,7 @@ export function ImportSources({
   );
   const playbackReporting = useImportStatus(
     'playbackReporting',
+    selectedJellyfinServerId,
     latestImport(playbackReportingImports, selectedJellyfinServerId),
     { blank: blankPlaybackReportingProgress, fromResult: playbackReportingResultProgress },
     { onStarted }

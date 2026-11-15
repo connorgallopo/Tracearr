@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "建立你的帳號即可開始使用",
-    "createAccountDescription": "建立一個帳號來管理你的媒體伺服器",
-    "setupNote": "建立帳號後，你會從設定中新增你的 Plex 或 Jellyfin 伺服器。"
+    }
   },
   "setup": {
     "serverTitle": "",

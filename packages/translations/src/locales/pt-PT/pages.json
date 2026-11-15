@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "Crie sua conta para começar",
-    "createAccountDescription": "Crie uma conta para gerenciar seus servidores de mídia",
-    "setupNote": "Depois de criar a sua conta, você adicionará seus servidores Plex ou Jellyfin a partir de Configurações."
+    }
   },
   "setup": {
     "serverTitle": "",

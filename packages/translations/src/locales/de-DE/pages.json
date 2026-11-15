@@ -49,10 +49,7 @@
       "newCode": "Neuer Code",
       "refused": "",
       "notPermitted": "Sie sind nicht berechtigt, sich anzumelden. Bitte wenden Sie sich an den Serverbetreiber."
-    },
-    "createAccountHeading": "Erstellen Sie Ihr Konto, um starten",
-    "createAccountDescription": "Erstellen Sie ein Konto, um Ihre Medienserver zu verwalten",
-    "setupNote": "Nachdem Sie Ihr Konto erstellt haben, fügen Sie Ihre Plex- oder Jellyfin-Server unter „Einstellungen“ hinzu"
+    }
   },
   "setup": {
     "serverTitle": "",

@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "",
-    "createAccountDescription": "",
-    "setupNote": ""
+    }
   },
   "setup": {
     "serverTitle": "",

@@ -77,6 +77,7 @@ export function Connections() {
   const servers = Array.isArray(serversData)
     ? serversData
     : ((serversData as unknown as { data?: Server[] })?.data ?? []);
+  const nameOf = (id: string | null) => servers.find((s) => s.id === id)?.name ?? '';
 
   const openAddDialog = () => {
     setAddedServer(null);
@@ -147,7 +148,7 @@ export function Connections() {
                   }
                   isSwitching={setHistorical.isPending && setHistorical.variables?.id === server.id}
                   isSyncing={syncServer.isPending && syncServer.variables === server.id}
-                  isDraggable={isOwner}
+                  isDraggable={isOwner && servers.length > 1}
                   isOwner={isOwner}
                   requestService={
                     isOwner && !requestServicesLoading
@@ -174,8 +175,9 @@ export function Connections() {
 
       <ConfirmDialog
         open={!!deleteId}
+        restoreFocus
         onOpenChange={() => setDeleteId(null)}
-        title={t('servers.removeServer')}
+        title={t('servers.removeServerTitle', { name: nameOf(deleteId) })}
         description={t('servers.removeServerConfirm')}
         confirmLabel={t('common:actions.remove')}
         isLoading={deleteServer.isPending}
@@ -192,10 +194,9 @@ export function Connections() {
 
       <ConfirmDialog
         open={!!historicalId}
+        restoreFocus
         onOpenChange={() => setHistoricalId(null)}
-        title={t('servers.markHistoricalTitle', {
-          name: servers.find((s) => s.id === historicalId)?.name ?? '',
-        })}
+        title={t('servers.markHistoricalTitle', { name: nameOf(historicalId) })}
         description={t('servers.markHistoricalConfirm')}
         confirmLabel={t('servers.markHistorical')}
         variant="default"

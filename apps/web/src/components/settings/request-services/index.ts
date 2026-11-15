@@ -1,2 +1,2 @@
-export { RequestServiceLine } from './RequestServiceLine';
+export { useRequestServiceActions } from './useRequestServiceActions';
 export { LinkDialog } from './LinkDialog';

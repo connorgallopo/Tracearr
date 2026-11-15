@@ -29,6 +29,7 @@ import {
   useServerLocations,
   useUpdateServerLocations,
 } from '@/hooks/queries';
+import { useRestoreFocus } from '@/hooks/useRestoreFocus';
 import { API_KEY_HELP, PUBLIC_URL_PLACEHOLDER, SERVER_URL_PLACEHOLDER } from './AddServerFields';
 import { SERVER_DIALOG_CONTENT_CLASS } from './dialogClasses';
 import { ServerLocationEditor } from './ServerLocationEditor';
@@ -64,6 +65,7 @@ export function EditServerDialog({
   isUpdating: boolean;
 }) {
   const { t } = useTranslation(['settings', 'common', 'pages']);
+  const focusHandlers = useRestoreFocus();
   const [editName, setEditName] = useState('');
   const [manualUrl, setManualUrl] = useState('');
   const [manualPublicUrl, setManualPublicUrl] = useState('');
@@ -162,6 +164,7 @@ export function EditServerDialog({
     <Dialog open onOpenChange={(open) => !open && !isSaving && onClose()}>
       <DialogContent
         className={cn(SERVER_DIALOG_CONTENT_CLASS, 'max-h-[calc(100dvh-2rem)] overflow-y-auto')}
+        {...focusHandlers}
       >
         <DialogHeader>
           <DialogTitle>{t('servers.editServer')}</DialogTitle>

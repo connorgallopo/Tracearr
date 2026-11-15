@@ -49,10 +49,7 @@
       "newCode": "Nowy kod",
       "refused": "Logowanie nie jest dostępne dla tego konta.",
       "notPermitted": "Nie masz uprawnień do logowania. Skontaktuj się z właścicielem serwera."
-    },
-    "createAccountHeading": "Utwórz konto, aby rozpocząć",
-    "createAccountDescription": "Utwórz konto do zarządzania serwerami multimediów",
-    "setupNote": "Po utworzeniu konta dodasz serwery Plex lub Jellyfin w Ustawieniach."
+    }
   },
   "setup": {
     "serverTitle": "",

@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "Maak je account aan om te beginnen",
-    "createAccountDescription": "Maak een account aan om je mediaservers te beheren",
-    "setupNote": "Na het aanmaken van je account kun je je Plex- of Jellyfin-servers toevoegen vanuit de instellingen."
+    }
   },
   "setup": {
     "serverTitle": "",

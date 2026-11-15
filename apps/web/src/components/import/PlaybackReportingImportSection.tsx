@@ -25,7 +25,7 @@ import { TimezoneSelect } from '@/components/settings/shared/TimezoneSelect';
 import { browserTimeZone } from '@/lib/dateFormat';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
-import type { ImportPhase } from '@/hooks/queries/useImports';
+import type { CardProgress, ImportPhase } from '@/hooks/queries/useImports';
 import { ImportProgressCard, type ImportProgressData } from './ImportProgressCard';
 import { StartImportButton } from './StartImportButton';
 import type { Server, PlaybackReportingImportProgress } from '@tracearr/shared';
@@ -34,7 +34,7 @@ interface PlaybackReportingImportSectionProps {
   jellyfinServers: Server[];
   selectedServerId: string;
   onServerChange: (id: string) => void;
-  progress: PlaybackReportingImportProgress | null;
+  progress: CardProgress<PlaybackReportingImportProgress> | null;
   phase: ImportPhase;
   onStartImport: (opts: {
     serverId: string;

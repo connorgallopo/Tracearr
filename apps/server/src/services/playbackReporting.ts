@@ -328,6 +328,7 @@ export async function importPlaybackReporting(
   onProgress?: (progress: PlaybackReportingImportProgress) => Promise<void>
 ): Promise<PlaybackReportingImportResult> {
   const progress: PlaybackReportingImportProgress = {
+    serverId,
     status: 'idle',
     totalRecords: 0,
     fetchedRecords: 0,

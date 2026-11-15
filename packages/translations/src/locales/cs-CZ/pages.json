@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "Vytvořte si účet, abyste mohli začít",
-    "createAccountDescription": "Vytvořte si účet pro správu vašich mediálních serverů",
-    "setupNote": "Po vytvoření účtu přidáte z Nastavení své Plex nebo Jellyfin."
+    }
   },
   "setup": {
     "serverTitle": "",

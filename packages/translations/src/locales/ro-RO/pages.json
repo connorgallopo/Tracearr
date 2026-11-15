@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "Creează-ți un cont pentru a începe",
-    "createAccountDescription": "Creaţi un cont pentru a gestiona serverele media",
-    "setupNote": "Dupa crearea contului, vei adauga serverele tale Plex sau Jellyfin din Setari."
+    }
   },
   "setup": {
     "serverTitle": "",

@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "アカウントを作成して開始する",
-    "createAccountDescription": "メディアサーバーを管理するためのアカウントを作成する",
-    "setupNote": "アカウントを作成したら、設定から Plex または Jellyfin サーバーを追加します。"
+    }
   },
   "setup": {
     "serverTitle": "",

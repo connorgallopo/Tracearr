@@ -49,10 +49,7 @@
       "newCode": "Nou codi",
       "refused": "L'inici de sessió no està disponible per a aquest compte.",
       "notPermitted": "No teniu permís per iniciar sessió. Si us plau, poseu-vos en contacte amb el propietari del servidor."
-    },
-    "createAccountHeading": "Creeu el vostre compte per a començar",
-    "createAccountDescription": "Creeu un compte per gestionar els vostres servidors multimèdia",
-    "setupNote": "Després de crear el vostre compte, podreu afegir els vostres servidors Plex o Jellyfin des de la configuració."
+    }
   },
   "setup": {
     "serverTitle": "",

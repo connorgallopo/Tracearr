@@ -21,14 +21,17 @@ import { api } from '@/lib/api';
 import { useMultiServerQuery, type MultiServerQueryResult } from '@/hooks/useMultiServerQuery';
 import { useSocket } from '@/hooks/useSocket';
 
+/** A card shows one server, so its progress needs no server of its own. */
+export type CardProgress<P> = Omit<P, 'serverId'>;
+
 interface ImportShapes {
-  tautulli: { progress: TautulliImportProgress; result: TautulliImportResult };
-  jellystat: { progress: JellystatImportProgress; result: JellystatImportResult };
+  tautulli: { progress: CardProgress<TautulliImportProgress>; result: TautulliImportResult };
+  jellystat: { progress: CardProgress<JellystatImportProgress>; result: JellystatImportResult };
   playbackReporting: {
-    progress: PlaybackReportingImportProgress;
+    progress: CardProgress<PlaybackReportingImportProgress>;
     result: PlaybackReportingImportResult;
   };
-  tofa: { progress: TofaImportProgress; result: TofaImportResult };
+  tofa: { progress: CardProgress<TofaImportProgress>; result: TofaImportResult };
 }
 
 export type ImportSource = keyof ImportShapes;
@@ -162,11 +165,12 @@ export function importPhase(progress: { status: string } | null): ImportPhase {
 
 /**
  * One import source's card for the server shown: its latest import from the status read, and the
- * progress its socket channel brings while this page is open. `start` runs a start request and
- * shows it starting, or failing to.
+ * progress its socket channel brings for that server while this page is open. `start` runs a start
+ * request and shows it starting, or failing to.
  */
 export function useImportStatus<S extends ImportSource>(
   source: S,
+  serverId: string,
   latest: LatestOf<S> | null,
   shape: ImportProgressShape<ProgressOf<S>, ImportShapes[S]['result']>,
   events: { onStarted?: () => void; onSettled?: () => void } = {}
@@ -174,7 +178,11 @@ export function useImportStatus<S extends ImportSource>(
   const { t } = useTranslation('settings');
   const { socket } = useSocket();
   const queryClient = useQueryClient();
-  const [live, setLive] = useState<ProgressOf<S> | null>(null);
+  const [liveByServer, setLiveByServer] = useState<Record<string, ProgressOf<S> | null>>({});
+  const live = liveByServer[serverId] ?? null;
+  type LiveProgress = ProgressOf<S> & { serverId: string };
+  const setLive = (id: string, next: ProgressOf<S> | null) =>
+    setLiveByServer((current) => ({ ...current, [id]: next }));
 
   // A held or queued import is never announced on the socket, so only the status read knows it
   const waitsInQueue = latest?.state === 'waitingForLibrarySync' || latest?.state === 'queued';
@@ -185,8 +193,9 @@ export function useImportStatus<S extends ImportSource>(
         ? { ...live, message: retryingMessage(live.retry, t) }
         : live;
 
-  const onProgress = useEffectEvent((next: ProgressOf<S>) => {
-    setLive(next);
+  const onProgress = useEffectEvent((next: LiveProgress) => {
+    setLive(next.serverId, next);
+    if (next.serverId !== serverId) return;
     // Progress means the import left the queue; ask now rather than wait for useSocket's refresh
     if (waitsInQueue) void queryClient.invalidateQueries({ queryKey: ['import', source] });
     if (next.status === 'complete' || next.status === 'error') events.onSettled?.();
@@ -194,7 +203,7 @@ export function useImportStatus<S extends ImportSource>(
 
   useEffect(() => {
     if (!socket) return;
-    type Listener = (next: ProgressOf<S>) => void;
+    type Listener = (next: LiveProgress) => void;
     // socket.io's event typing cannot follow an event and payload that are both chosen by S
     const channel = socket as unknown as {
       on: (event: string, listener: Listener) => void;
@@ -216,14 +225,22 @@ export function useImportStatus<S extends ImportSource>(
 
   const start = async (starting: ProgressOf<S>, request: () => Promise<unknown>) => {
     events.onStarted?.();
-    setLive(starting);
+    setLive(serverId, starting);
     try {
       await request();
       void queryClient.invalidateQueries({ queryKey: ['import', source] });
     } catch (err) {
-      setLive(shape.blank('error', failedMessage(err instanceof Error ? err.message : null, t)));
+      setLive(
+        serverId,
+        shape.blank('error', failedMessage(err instanceof Error ? err.message : null, t))
+      );
     }
   };
 
-  return { progress, phase: importPhase(progress), start, show: setLive };
+  return {
+    progress,
+    phase: importPhase(progress),
+    start,
+    show: (next: ProgressOf<S> | null) => setLive(serverId, next),
+  };
 }

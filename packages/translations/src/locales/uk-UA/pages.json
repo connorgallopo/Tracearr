@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "Створіть обліковий запис, щоб розпочати",
-    "createAccountDescription": "Створіть обліковий запис для керування вашими медіа-серверами",
-    "setupNote": "Після створення облікового запису, ви додасте свої Plex або Jellyfin сервери у налаштуваннях."
+    }
   },
   "setup": {
     "serverTitle": "",

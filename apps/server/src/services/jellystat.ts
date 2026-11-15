@@ -648,6 +648,7 @@ export async function importJellystatBackup(
   }
 ): Promise<JellystatImportResult> {
   const progress: JellystatImportProgress = {
+    serverId,
     status: 'idle',
     totalRecords: 0,
     processedRecords: 0,

@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "Luo tilisi päästäksesi alkuun",
-    "createAccountDescription": "Luo tili hallitaksesi mediapalvelimia",
-    "setupNote": "Kun olet luonut tilin, voit lisätä Plex tai Jellyfin palvelimet Asetuksista."
+    }
   },
   "setup": {
     "serverTitle": "",

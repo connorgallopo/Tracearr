@@ -49,10 +49,7 @@
       "newCode": "获取新代码",
       "refused": "此账户无法登录。",
       "notPermitted": "你无权登录。请联系服务器所有者。"
-    },
-    "createAccountHeading": "开始创建你的账户",
-    "createAccountDescription": "创建一个帐户来管理您的媒体服务器",
-    "setupNote": "在创建您的帐户后，您会从设置中添加您的 Plex或 Jellyfin 服务器。"
+    }
   },
   "setup": {
     "serverTitle": "",

@@ -41,7 +41,6 @@ import {
 import {
   cn,
   getCountryName,
-  getDistinctProfileName,
   getMediaDisplay,
   getMediaLinks,
   getSessionProgress,
@@ -239,7 +238,6 @@ function SessionContent({
     setSegmentsOpen(false);
   }
 
-  const profileName = getDistinctProfileName(session);
   const stateConfig = STATE_CONFIG[session.state];
   const mediaConfig = MEDIA_CONFIG[session.mediaType];
   const MediaIcon = mediaConfig.icon;
@@ -348,9 +346,6 @@ function SessionContent({
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">
                   {session.user.identityName ?? session.user.username}
-                  {profileName && (
-                    <span className="text-muted-foreground font-normal"> · {profileName}</span>
-                  )}
                 </p>
                 {session.user.identityName &&
                   session.user.identityName !== session.user.username && (

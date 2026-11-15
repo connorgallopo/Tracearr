@@ -2267,9 +2267,10 @@ describe('importJellystatBackup', () => {
 
       await importJellystatBackup(serverId, backup, false, mockPubSub as any);
 
-      expect(mockPubSub.publish).toHaveBeenCalled();
-      const calls = mockPubSub.publish.mock.calls;
-      expect(calls.some((c: unknown[]) => c[0] === 'import:jellystat:progress')).toBe(true);
+      expect(mockPubSub.publish).toHaveBeenCalledWith(
+        'import:jellystat:progress',
+        expect.objectContaining({ serverId })
+      );
     });
 
     it('should handle pubSubService publish errors gracefully', async () => {

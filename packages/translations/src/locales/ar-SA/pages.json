@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "أنشئ حسابك للبدء",
-    "createAccountDescription": "إنشاء حساب لإدارة خوادم الوسائط الخاصة بك",
-    "setupNote": "بعد إنشاء حسابك، ستضيف خوادم Plex أو Jellyfin من الإعدادات."
+    }
   },
   "setup": {
     "serverTitle": "",

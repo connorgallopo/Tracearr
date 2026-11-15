@@ -828,6 +828,7 @@ export class TautulliService {
 
     // Initialize progress with detailed tracking
     const progress: TautulliImportProgress = {
+      serverId,
       status: 'fetching',
       totalRecords: 0,
       fetchedRecords: 0,
@@ -1688,6 +1689,7 @@ export class TautulliService {
 
     // Initialize progress
     const progress: TautulliImportProgress = {
+      serverId,
       status: 'processing',
       totalRecords: 0,
       fetchedRecords: 0,

@@ -311,7 +311,13 @@ describe('Import', () => {
         waiting: null,
         latest: running,
       });
-      act(() => handlers.get(event)?.({ status: 'processing', message: 'Importing 10 plays' }));
+      act(() =>
+        handlers.get(event)?.({
+          serverId: 'jf-1',
+          status: 'processing',
+          message: 'Importing 10 plays',
+        })
+      );
 
       expect(await screen.findByText('Importing 10 plays')).toBeInTheDocument();
       expect(screen.queryByText(/import\.waitingForLibrarySync/)).not.toBeInTheDocument();
@@ -322,6 +328,7 @@ describe('Import', () => {
     withTofaImport({
       state: 'running',
       progress: {
+        serverId: 'tofa-1',
         status: 'processing',
         fetchedRecords: 200,
         processedRecords: 50,
@@ -484,7 +491,8 @@ describe('Import', () => {
     const region = screen.getByRole('status');
     expect(region).toHaveTextContent('import.importing');
 
-    const emit = (progress: object) => act(() => handlers.get('import:tofa:progress')?.(progress));
+    const emit = (progress: object) =>
+      act(() => handlers.get('import:tofa:progress')?.({ serverId: 'tofa-1', ...progress }));
     const page = (processed: number) => ({
       status: 'processing',
       message: `Processing: ${processed} plays`,
@@ -510,6 +518,48 @@ describe('Import', () => {
     emit({ status: 'error', message: 'Import failed: tofa answered 503' });
     expect(region).toHaveTextContent('Import failed: tofa answered 503');
     expect(screen.getByRole('button', { name: 'import.startAgain' })).toBeEnabled();
+  });
+
+  it('shows a tofa server its own live progress, never that of another server', async () => {
+    const handlers = new Map<string, (progress: unknown) => void>();
+    socketState.socket = {
+      on: (name: string, handler: (progress: unknown) => void) => handlers.set(name, handler),
+      off: vi.fn(),
+    };
+    vi.mocked(useServers).mockReturnValue({
+      data: [
+        { id: 'tofa-1', name: 'Den', type: 'tofa' },
+        { id: 'tofa-2', name: 'Attic', type: 'tofa' },
+      ],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useServers>);
+    vi.mocked(api.import.tofa.getActive).mockResolvedValue({ active: false, latest: null });
+    const onStarted = vi.fn();
+
+    render(<ImportSources serverType="tofa" onStarted={onStarted} />, { wrapper: Providers });
+    expect(screen.getByRole('combobox', { name: 'import.targetServer' })).toHaveTextContent('Den');
+
+    act(() =>
+      handlers.get('import:tofa:progress')?.({
+        serverId: 'tofa-2',
+        status: 'processing',
+        message: 'Processing: 50 plays',
+        fetchedRecords: 200,
+        processedRecords: 50,
+        importedRecords: 50,
+        skippedRecords: 0,
+        errorRecords: 0,
+      })
+    );
+    expect(screen.queryByText('Processing: 50 plays')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'import.importTofaHistory' })).toBeEnabled();
+    expect(onStarted).not.toHaveBeenCalled();
+
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('combobox', { name: 'import.targetServer' }));
+    await user.click(await screen.findByRole('option', { name: /Attic/ }));
+
+    expect(screen.getByText('Processing: 50 plays')).toBeInTheDocument();
   });
 
   it('says a picked file is not a Jellystat backup at the dropzone, and leaves the import unstarted', async () => {

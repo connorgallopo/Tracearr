@@ -575,9 +575,11 @@ describe('importPlaybackReporting', () => {
       publish.mock.calls.every(([channel]) => channel === 'import:playbackreporting:progress')
     ).toBe(true);
     const lastProgress = publish.mock.calls.at(-1)?.[1] as {
+      serverId: string;
       status: string;
       importedRecords: number;
     };
+    expect(lastProgress.serverId).toBe(SERVER_ID);
     expect(lastProgress.status).toBe('complete');
     expect(lastProgress.importedRecords).toBe(2);
 

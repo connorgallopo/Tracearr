@@ -133,7 +133,7 @@ describe('SessionDetailSheet', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('names tofa and the profile, and labels a relayed play', () => {
+  it('names tofa and the user alone, and labels a relayed play', () => {
     renderSheet({
       server: { id: 'server-1', name: 'Den', type: 'tofa' },
       profileName: 'Robin',
@@ -143,7 +143,7 @@ describe('SessionDetailSheet', () => {
     });
 
     expect(screen.getByText('tofa')).toBeInTheDocument();
-    expect(screen.getByText('· Robin')).toBeInTheDocument();
+    expect(screen.queryByText('· Robin')).toBeNull();
     expect(screen.getByText('Tofa Relay')).toBeInTheDocument();
     expect(screen.getByText('pages:history.stream.rebuffers')).toBeInTheDocument();
     expect(screen.getByText('14')).toBeInTheDocument();

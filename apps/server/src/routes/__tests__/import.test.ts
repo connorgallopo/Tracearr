@@ -750,7 +750,11 @@ describe('Import Routes', () => {
 
       expect(response.json().status).toBe('started');
       await vi.waitFor(() =>
-        expect(publishImportFailed).toHaveBeenCalledWith('playback-reporting', failure)
+        expect(publishImportFailed).toHaveBeenCalledWith(
+          'playback-reporting',
+          validServerId,
+          failure
+        )
       );
     });
 
@@ -1182,6 +1186,7 @@ describe('Import Routes', () => {
         held: false,
         state: 'completed',
         progress: {
+          serverId,
           status: 'processing',
           fetchedRecords: 12,
           processedRecords: 10,
@@ -1222,6 +1227,7 @@ describe('Import Routes', () => {
       attempts: 3,
     };
     const progress = {
+      serverId,
       status: 'processing' as const,
       fetchedRecords: 12,
       processedRecords: 10,

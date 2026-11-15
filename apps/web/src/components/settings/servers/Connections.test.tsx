@@ -7,7 +7,10 @@ import { Connections } from './Connections';
 import type { AddServerForm } from './useAddServer';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string, options?: Record<string, unknown>) =>
+      options ? `${key}:${JSON.stringify(options)}` : key,
+  }),
 }));
 
 let capturedOnDragEnd: ((event: DragEndEvent) => void) | undefined;
@@ -30,7 +33,7 @@ vi.mock('@dnd-kit/core', async () => {
 });
 
 const { serverRowProps } = vi.hoisted(() => ({
-  serverRowProps: [] as { server: Server; requestService?: unknown }[],
+  serverRowProps: [] as { server: Server; requestService?: unknown; isDraggable?: boolean }[],
 }));
 
 vi.mock('@/components/settings/servers/ServerRow', () => ({
@@ -274,6 +277,29 @@ describe('Connections', () => {
 
     expect(deleteMutate).toHaveBeenCalledWith('server-1', expect.any(Object));
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['plex-accounts'] });
+  });
+
+  it('names the server in the remove confirm', async () => {
+    render(<Connections />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'remove-server-2' }));
+
+    expect(screen.getByText('servers.removeServerTitle:{"name":"Server 2"}')).toBeInTheDocument();
+  });
+
+  it('offers reordering only when there is more than one server', () => {
+    const { unmount } = render(<Connections />);
+    expect(serverRowProps.every((props) => props.isDraggable)).toBe(true);
+    unmount();
+
+    vi.mocked(useServers).mockReturnValue({
+      data: [server()],
+      isLoading: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useServers>);
+    serverRowProps.length = 0;
+    render(<Connections />);
+    expect(serverRowProps.map((props) => props.isDraggable)).toEqual([false]);
   });
 
   it('sends the trimmed public address with the Jellyfin connect call', async () => {

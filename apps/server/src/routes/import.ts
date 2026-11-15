@@ -200,7 +200,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         })
         .catch((err: unknown) => {
           console.error(`[Import] Tautulli import failed:`, err);
-          publishImportFailed('tautulli', err);
+          publishImportFailed('tautulli', serverId, err);
         });
 
       return {
@@ -458,7 +458,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         })
         .catch((err: unknown) => {
           console.error(`[Import] Jellystat import failed:`, err);
-          publishImportFailed('jellystat', err);
+          publishImportFailed('jellystat', parsed.data.serverId, err);
         })
         .finally(() => {
           void removeJellystatUpload(backupPath);
@@ -606,7 +606,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         })
         .catch((err: unknown) => {
           console.error(`[Import] Playback Reporting import failed:`, err);
-          publishImportFailed('playback-reporting', err);
+          publishImportFailed('playback-reporting', serverId, err);
         });
 
       return {
@@ -805,7 +805,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         })
         .catch((err: unknown) => {
           console.error(`[Import] tofa history import failed:`, err);
-          publishImportFailed('tofa', err);
+          publishImportFailed('tofa', serverId, err);
         });
 
       return {

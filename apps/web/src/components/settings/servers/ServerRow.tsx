@@ -1,12 +1,12 @@
-import { useState } from 'react';
+import { Fragment, useRef, useState, type ComponentProps, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   AlertTriangle,
+  ArrowUp,
   ArrowUpCircle,
   ExternalLink,
   GripVertical,
   MoreHorizontal,
-  Pencil,
   Radio,
   RefreshCw,
   Trash2,
@@ -28,6 +28,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import {
@@ -38,13 +39,12 @@ import {
   ItemMedia,
   ItemTitle,
 } from '@/components/ui/item';
-import { TooltipProvider } from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
-import { ServerVersionLine } from '@/components/settings/servers/ServerVersionLine';
-import { OwnerAccountLine } from '@/components/settings/servers/OwnerAccountLine';
+import { availableUpdate } from '@/components/settings/servers/serverVersion';
+import { useOwnerAccountActions } from '@/components/settings/servers/useOwnerAccountActions';
 import { RealtimeSetupDialog } from '@/components/settings/servers/RealtimeSetupDialog';
-import { RequestServiceLine } from '@/components/settings/request-services';
-import { TooltipIconButton } from '@/components/settings/shared/TooltipIconButton';
+import { useRequestServiceActions } from '@/components/settings/request-services';
 import { cn } from '@/lib/utils';
 import { formatDate } from '@/lib/dateFormat';
 import { isJellyfinEmby } from '@/lib/serverType';
@@ -84,15 +84,64 @@ export function ServerRow({
     id: server.id,
     disabled: !isDraggable,
   });
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const afterMenuClose = useRef<(() => void) | null>(null);
+  // A dialog opened while the menu is still closing records the unmounting item as the place
+  // to return focus to, so it would land on the body. The action waits until the menu has
+  // handed focus back to its trigger.
+  const fromMenu = (action: () => void) => () => {
+    afterMenuClose.current = action;
+  };
+  const requests = useRequestServiceActions(server, requestService, fromMenu);
+  const account = useOwnerAccountActions(server, ownerLink, fromMenu);
 
   const historical = !!server.historicalAt;
-  const profile = SERVER_PROFILES[server.type];
+  const update = availableUpdate(server);
+  const meta = [
+    server.url,
+    server.version && t('servers.version.installed', { version: server.version }),
+    server.historicalAt
+      ? t('servers.historicalSince', {
+          date: formatDate(new Date(server.historicalAt), { dateStyle: 'medium' }),
+        })
+      : t('servers.added', {
+          date: formatDate(new Date(server.createdAt), { dateStyle: 'medium' }),
+        }),
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
+  const menuGroups = [
+    <Fragment key="server">
+      <DropdownMenuItem onSelect={fromMenu(onEdit)}>{t('common:actions.edit')}</DropdownMenuItem>
+      <DropdownMenuItem asChild>
+        <a href={server.url} target="_blank" rel="noopener noreferrer">
+          {t('servers.openServer')}
+          <ExternalLink className="ml-auto" aria-hidden="true" />
+        </a>
+      </DropdownMenuItem>
+    </Fragment>,
+    requests.menuItems,
+    account.menuItem,
+    isOwner && (
+      <DropdownMenuItem
+        key="historical"
+        onSelect={fromMenu(() => onSetHistorical(!historical))}
+        disabled={isSwitching}
+      >
+        {historical ? t('servers.resume') : t('servers.markHistorical')}
+      </DropdownMenuItem>
+    ),
+    <DropdownMenuItem key="remove" variant="destructive" onSelect={fromMenu(onDelete)}>
+      <Trash2 />
+      {t('common:actions.remove')}
+    </DropdownMenuItem>,
+  ].filter(Boolean);
 
   return (
     <div
       ref={setNodeRef}
       role="listitem"
-      className="touch-none"
       style={{
         transform: CSS.Transform.toString(transform),
         transition,
@@ -102,121 +151,132 @@ export function ServerRow({
       <TooltipProvider delayDuration={100}>
         <Item
           variant="outline"
-          className={cn(
-            server.color && 'border-l-4',
-            isDragging && 'ring-primary ring-2',
-            historical && 'opacity-60'
-          )}
+          className={cn(server.color && 'border-l-4', isDragging && 'ring-primary ring-2')}
           style={server.color ? { borderLeftColor: server.color } : undefined}
         >
-          <ItemMedia className="gap-2 self-center">
+          <ItemMedia className="gap-2">
             {isDraggable && (
               <Button
                 variant="ghost"
                 size="icon-sm"
                 aria-label={t('servers.reorder')}
-                className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing"
+                className="text-muted-foreground hover:text-foreground cursor-grab touch-none active:cursor-grabbing"
                 {...attributes}
                 {...listeners}
               >
                 <GripVertical className="h-5 w-5" />
               </Button>
             )}
-            <span className="bg-muted flex size-10 items-center justify-center rounded-lg">
+            <span
+              className={cn(
+                'bg-muted flex size-10 items-center justify-center rounded-lg',
+                historical && 'opacity-60'
+              )}
+            >
               <MediaServerIcon type={server.type} className="h-6 w-6" />
             </span>
           </ItemMedia>
 
-          <ItemContent>
-            <ItemTitle>
-              {server.name}
+          <ItemContent className="min-w-0 flex-[1_1_16rem]">
+            <ItemTitle className="flex-wrap">
+              <span className={cn(historical && 'text-muted-foreground')}>{server.name}</span>
+              {!historical && (
+                <RealtimeStatus
+                  server={server}
+                  connectionStatus={connectionStatus}
+                  onOpenDialog={setRealtimeDialog}
+                />
+              )}
+              {update && (
+                <Badge variant="warning">
+                  <ArrowUp aria-hidden="true" />
+                  {t('servers.version.updateBadge', { version: update })}
+                </Badge>
+              )}
+              {server.canStopStreams === false && (
+                <StatusBadge
+                  variant="warning"
+                  hint={t('servers.cannotStopStreams')}
+                  onClick={onEdit}
+                >
+                  <AlertTriangle aria-hidden="true" />
+                  {t('servers.cannotStopStreamsBadge')}
+                </StatusBadge>
+              )}
               {historical && <Badge variant="outline">{t('servers.historical')}</Badge>}
-              <TooltipIconButton
-                label={t('servers.editServer')}
-                icon={Pencil}
-                onClick={onEdit}
-                size="icon-xs"
-              />
             </ItemTitle>
 
-            <ItemDescription className="flex items-center gap-2">
-              <a href={server.url} target="_blank" rel="noopener noreferrer">
-                {server.url}
-              </a>
-              <ExternalLink className="h-3 w-3" aria-hidden="true" />
-            </ItemDescription>
+            <ItemDescription className="text-xs wrap-anywhere">{meta}</ItemDescription>
 
-            <p className="text-muted-foreground text-xs">
-              {t('servers.added', {
-                date: formatDate(new Date(server.createdAt), { dateStyle: 'medium' }),
-              })}
-            </p>
-            {server.historicalAt && (
-              <p className="text-muted-foreground text-xs">
-                {t('servers.historicalSince', {
-                  date: formatDate(new Date(server.historicalAt), { dateStyle: 'medium' }),
-                })}
-              </p>
-            )}
-            <ServerVersionLine server={server} />
-            {requestService && (
-              <RequestServiceLine server={server} service={requestService.service} />
-            )}
-            {ownerLink && <OwnerAccountLine server={server} link={ownerLink} />}
-            {isOwner && profile.memberSignIn === 'unavailable' && (
-              <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-                <span>{t('servers.ownerAccount.label')}</span>
-                <span>{t('servers.noSignIn', { server: profile.displayName })}</span>
-              </div>
-            )}
-            {server.canStopStreams === false && (
-              <p className="text-warning flex items-center gap-1 text-xs">
-                <AlertTriangle className="h-3 w-3" aria-hidden="true" />
-                {t('servers.cannotStopStreams')}
-              </p>
-            )}
-
-            {!historical && (
-              <RealtimeLine
-                server={server}
-                connectionStatus={connectionStatus}
-                onOpenDialog={setRealtimeDialog}
-              />
+            {(requests.fact || account.fact) && (
+              <dl className="mt-2 grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-4 gap-y-1 text-xs">
+                {requests.fact && (
+                  <>
+                    <dt className="text-muted-foreground">{t('requests.label')}</dt>
+                    <dd>{requests.fact}</dd>
+                  </>
+                )}
+                {account.fact && (
+                  <>
+                    <dt className="text-muted-foreground">{t('servers.ownerAccount.label')}</dt>
+                    <dd>{account.fact}</dd>
+                  </>
+                )}
+              </dl>
             )}
           </ItemContent>
 
-          <ItemActions>
-            <Button variant="ghost" size="sm" onClick={onSync} disabled={isSyncing || historical}>
-              <RefreshCw className={cn(isSyncing && 'animate-spin')} />
-              {t('common:actions.sync')}
-            </Button>
-            {isOwner && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={t('servers.moreActions')}
-                    disabled={isSwitching}
-                  >
-                    <MoreHorizontal />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onSelect={() => onSetHistorical(!historical)}>
-                    {historical ? t('servers.resume') : t('servers.markHistorical')}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            <TooltipIconButton
-              label={t('common:actions.remove')}
-              icon={Trash2}
-              onClick={onDelete}
-              iconClassName="text-destructive"
-            />
+          <ItemActions className="ml-auto self-start">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onSync}
+                  disabled={isSyncing || historical}
+                  aria-label={isSyncing ? undefined : t('servers.syncNamed', { name: server.name })}
+                >
+                  <RefreshCw className={cn(isSyncing && 'animate-spin')} />
+                  {isSyncing ? t('servers.syncing') : t('common:actions.sync')}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{t('servers.syncHint')}</TooltipContent>
+            </Tooltip>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  ref={triggerRef}
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={t('servers.actionsFor', { name: server.name })}
+                >
+                  <MoreHorizontal />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                onCloseAutoFocus={(event) => {
+                  const action = afterMenuClose.current;
+                  if (!action) return;
+                  afterMenuClose.current = null;
+                  event.preventDefault();
+                  triggerRef.current?.focus();
+                  action();
+                }}
+              >
+                {menuGroups.map((group, i) => (
+                  <Fragment key={i}>
+                    {i > 0 && <DropdownMenuSeparator />}
+                    {group}
+                  </Fragment>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </ItemActions>
         </Item>
+
+        {requests.dialogs}
+        {account.dialogs}
       </TooltipProvider>
 
       {isJellyfinEmby(server.type) && realtimeDialog && (
@@ -232,7 +292,42 @@ export function ServerRow({
   );
 }
 
-function RealtimeLine({
+/** A badge that explains itself in a tooltip, and does something when it has an onClick. */
+function StatusBadge({
+  variant,
+  hint,
+  onClick,
+  label,
+  children,
+}: {
+  variant: ComponentProps<typeof Badge>['variant'];
+  hint?: string;
+  onClick?: () => void;
+  label?: string;
+  children: ReactNode;
+}) {
+  const badge = onClick ? (
+    <Badge variant={variant} asChild>
+      <button type="button" className="cursor-pointer" onClick={onClick} aria-label={label}>
+        {children}
+      </button>
+    </Badge>
+  ) : (
+    <Badge variant={variant} tabIndex={hint ? 0 : undefined}>
+      {children}
+    </Badge>
+  );
+  if (!hint) return badge;
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{badge}</TooltipTrigger>
+      <TooltipContent>{hint}</TooltipContent>
+    </Tooltip>
+  );
+}
+
+function RealtimeStatus({
   server,
   connectionStatus,
   onOpenDialog,
@@ -243,78 +338,75 @@ function RealtimeLine({
 }) {
   const { t } = useTranslation(['settings', 'common']);
   const profile = SERVER_PROFILES[server.type];
+
+  const checking = (
+    <Badge variant="outline" className="text-muted-foreground">
+      {t('servers.checkingConnection')}
+    </Badge>
+  );
+  const realtime = (hint?: string) => (
+    <StatusBadge variant="success" hint={hint}>
+      <Zap aria-hidden="true" />
+      {t('servers.realtime')}
+    </StatusBadge>
+  );
+  const polling = (hint: string) => (
+    <StatusBadge variant="outline" hint={hint}>
+      <Radio aria-hidden="true" />
+      {t('servers.pollingMode')}
+    </StatusBadge>
+  );
+
   switch (profile.liveEvents) {
     case 'plexWebsocket':
       return null;
     case 'tofaSocket':
-      return (
-        <div className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
-          {!connectionStatus ? (
-            <span>{t('servers.checkingConnection')}</span>
-          ) : connectionStatus.mode === 'realtime' ? (
-            <span className="flex items-center gap-1">
-              <Zap className="text-success h-3 w-3" aria-hidden="true" />
-              {t('servers.realtimeActive')}
-            </span>
-          ) : (
-            <span className="flex items-center gap-1">
-              <Radio className="h-3 w-3" aria-hidden="true" />
-              {t('servers.tofaPolling', { server: profile.displayName })}
-            </span>
-          )}
-          <span>{t('servers.realtimeBuiltIn', { server: profile.displayName })}</span>
-        </div>
-      );
+      if (!connectionStatus) return checking;
+      return connectionStatus.mode === 'realtime'
+        ? realtime()
+        : polling(t('servers.tofaPolling', { server: profile.displayName }));
     case 'ssePlugin': {
       const hasPluginIssue =
         !!connectionStatus?.pluginIssue && PLUGIN_ISSUES.includes(connectionStatus.pluginIssue);
+      const pluginHint = connectionStatus?.pluginVersion
+        ? t('servers.realtimePlugin', { version: connectionStatus.pluginVersion })
+        : undefined;
       return (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs">
+        <>
           {!connectionStatus ? (
-            <span className="text-muted-foreground">{t('servers.checkingConnection')}</span>
+            checking
           ) : connectionStatus.mode === 'realtime' ? (
-            <span className="text-muted-foreground flex items-center gap-1">
-              <Zap className="text-success h-3 w-3" aria-hidden="true" />
-              {t('servers.realtimeActive')}
-            </span>
+            realtime(pluginHint)
           ) : hasPluginIssue ? (
-            <button
-              type="button"
-              className="text-warning flex items-center gap-1 hover:underline"
-              onClick={() => onOpenDialog('setup')}
-            >
-              <AlertTriangle className="h-3 w-3" aria-hidden="true" />
+            <StatusBadge variant="danger" hint={pluginHint} onClick={() => onOpenDialog('setup')}>
+              <AlertTriangle aria-hidden="true" />
               {t('servers.realtimeError')}
-            </button>
+            </StatusBadge>
           ) : (
-            <span className="flex items-center gap-1">
-              <Radio className="text-muted-foreground h-3 w-3" aria-hidden="true" />
-              <span className="text-muted-foreground">{t('servers.pollingMode')}</span>
-              <button
-                type="button"
-                className="text-primary hover:underline"
+            <>
+              {polling(t('servers.pollingHint'))}
+              <Button
+                variant="link"
+                size="sm"
+                className="h-auto p-0 text-xs"
                 onClick={() => onOpenDialog('setup')}
               >
-                {t('servers.setupRealtime')}
-              </button>
-            </span>
-          )}
-          {connectionStatus?.pluginVersion && (
-            <span className="text-muted-foreground">
-              {t('servers.pluginVersion', { version: connectionStatus.pluginVersion })}
-            </span>
+                {t('servers.setupRealtimeShort')}
+              </Button>
+            </>
           )}
           {connectionStatus?.pluginUpdateAvailable && (
-            <button
-              type="button"
-              className="text-warning inline-flex items-center gap-1 hover:underline"
+            <StatusBadge
+              variant="warning"
+              hint={pluginHint}
+              label={t('servers.pluginUpdateAvailable')}
               onClick={() => onOpenDialog('update')}
             >
-              <ArrowUpCircle className="h-3 w-3" aria-hidden="true" />
-              {t('servers.pluginUpdateAvailable')}
-            </button>
+              <ArrowUpCircle aria-hidden="true" />
+              {t('servers.pluginUpdate')}
+            </StatusBadge>
           )}
-        </div>
+        </>
       );
     }
     default:

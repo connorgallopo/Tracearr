@@ -49,10 +49,7 @@
       "newCode": "",
       "refused": "",
       "notPermitted": ""
-    },
-    "createAccountHeading": "Skapa ditt konto för att komma igång",
-    "createAccountDescription": "Skapa ett konto för att hantera dina mediaservrar",
-    "setupNote": "Efter att du skapat ditt konto lägger du till dina Plex eller Jellyfin-servrar från Inställningar."
+    }
   },
   "setup": {
     "serverTitle": "",

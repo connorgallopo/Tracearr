@@ -187,6 +187,7 @@ export async function importTofaHistory(
   onProgress?: (progress: TofaImportProgress) => Promise<void>
 ): Promise<TofaImportResult> {
   const progress: TofaImportProgress = {
+    serverId,
     status: 'idle',
     fetchedRecords: 0,
     processedRecords: 0,

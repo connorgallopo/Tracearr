@@ -224,10 +224,12 @@ function importProgressChannel(
 /** An import's progress outside its run, every count at zero, in its own channel's shape */
 function blankProgress(
   type: ImportJobData['type'],
+  serverId: string,
   status: 'waiting' | 'retrying' | 'complete' | 'error',
   message: string
 ): ImportProgressPayload {
   const base = {
+    serverId,
     status,
     processedRecords: 0,
     importedRecords: 0,
@@ -283,10 +285,16 @@ function blankProgress(
 // Payload shape must match the importing job's channel, or its UI card never updates.
 function buildWaitingProgress(
   type: ImportJobData['type'],
+  serverId: string,
   waitingFor: HeavyOpsLockHolder
 ): ImportProgressPayload {
   return {
-    ...blankProgress(type, 'waiting', `Waiting for ${waitingFor.description} to complete...`),
+    ...blankProgress(
+      type,
+      serverId,
+      'waiting',
+      `Waiting for ${waitingFor.description} to complete...`
+    ),
     waitingFor: {
       jobType: waitingFor.jobType,
       description: waitingFor.description,
@@ -301,11 +309,12 @@ const errorMessage = (error: unknown) =>
 /** Tells the owner's import panel that an import of this type failed */
 export function publishImportFailed(
   type: ImportJobData['type'],
+  serverId: string,
   error: unknown,
   jobId?: string
 ): void {
   void getPubSubService()?.publish(importProgressChannel(type), {
-    ...blankProgress(type, 'error', `Import failed: ${errorMessage(error)}`),
+    ...blankProgress(type, serverId, 'error', `Import failed: ${errorMessage(error)}`),
     jobId,
   });
 }
@@ -322,6 +331,7 @@ function publishImportRetrying(job: Job<ImportJobData>, error: unknown): void {
   void getPubSubService()?.publish(importProgressChannel(job.data.type), {
     ...blankProgress(
       job.data.type,
+      job.data.serverId,
       'retrying',
       `Attempt ${retry.attempt} of ${retry.attempts} failed, retrying: ${retry.reason}`
     ),
@@ -429,7 +439,7 @@ export function startImportWorker(): void {
         // Broadcast waiting status to frontend
         if (pubSubService) {
           void pubSubService.publish(importProgressChannel(job.data.type), {
-            ...buildWaitingProgress(job.data.type, lockHolder),
+            ...buildWaitingProgress(job.data.type, job.data.serverId, lockHolder),
             jobId: job.id,
           });
         }
@@ -528,7 +538,7 @@ export function startImportWorker(): void {
     }
 
     if (job.data.type === 'jellystat') void removeJellystatUpload(job.data.backupPath);
-    publishImportFailed(job.data.type, error, job.id);
+    publishImportFailed(job.data.type, job.data.serverId, error, job.id);
 
     if (exhausted) {
       console.error(`[Import] Job ${job.id} exhausted retries, moving to DLQ:`, error);
@@ -623,10 +633,23 @@ async function processTautulliImportJob(
     console.log(`[Import] Starting stream details enrichment for server ${serverId}`);
     if (pubSubService) {
       await pubSubService.publish('import:progress', {
+        serverId,
         status: 'enriching',
+        totalRecords: 0,
+        fetchedRecords: 0,
+        processedRecords: 0,
+        importedRecords: 0,
+        updatedRecords: 0,
+        skippedRecords: 0,
+        duplicateRecords: 0,
+        unknownUserRecords: 0,
+        activeSessionRecords: 0,
+        errorRecords: 0,
+        currentPage: 0,
+        totalPages: 0,
         message: '(BETA) Fetching detailed stream data...',
         jobId: job.id,
-      });
+      } satisfies TautulliImportProgress & { jobId?: string });
     }
 
     try {
@@ -649,6 +672,7 @@ async function processTautulliImportJob(
   if (pubSubService) {
     const total = result.imported + result.updated + result.skipped + result.errors;
     await pubSubService.publish('import:progress', {
+      serverId,
       status: 'complete',
       totalRecords: total,
       fetchedRecords: total,
@@ -664,7 +688,7 @@ async function processTautulliImportJob(
       totalPages: 0,
       message: result.message,
       jobId: job.id,
-    });
+    } satisfies TautulliImportProgress & { jobId?: string });
   }
 
   return result;
@@ -693,12 +717,13 @@ async function processJellystatImportJob(
   // Publish final result
   if (pubSubService) {
     await pubSubService.publish('import:jellystat:progress', {
+      serverId,
       status: 'complete',
       totalRecords: result.imported + result.updated + result.skipped + result.errors,
       processedRecords: result.imported + result.updated + result.skipped + result.errors,
       importedRecords: result.imported,
-      updatedRecords: result.updated,
       skippedRecords: result.skipped,
+      filteredRecords: result.filtered,
       errorRecords: result.errors,
       enrichedRecords: result.enriched,
       uncheckedRecords: result.unchecked,
@@ -708,7 +733,7 @@ async function processJellystatImportJob(
       overlongRecords: result.overlong,
       message: result.message,
       jobId: job.id,
-    });
+    } satisfies JellystatImportProgress & { jobId?: string });
   }
 
   return result;
@@ -734,6 +759,7 @@ async function processPlaybackReportingImportJob(
     const total = result.imported + result.skipped + result.errors;
     const unknownUserRecords = result.skippedUsers?.reduce((sum, u) => sum + u.recordCount, 0) ?? 0;
     await pubSubService.publish('import:playbackreporting:progress', {
+      serverId,
       status: 'complete',
       totalRecords: total,
       fetchedRecords: total,
@@ -749,7 +775,7 @@ async function processPlaybackReportingImportJob(
       enrichedRecords: result.enriched,
       message: result.message,
       jobId: job.id,
-    });
+    } satisfies PlaybackReportingImportProgress & { jobId?: string });
   }
 
   return result;
@@ -763,7 +789,7 @@ async function processTofaImportJob(job: Job<TofaImportJobData>): Promise<TofaIm
     (progress) => job.updateProgress(progress)
   );
   await pubSubService?.publish('import:tofa:progress', {
-    ...blankProgress('tofa', 'complete', result.message),
+    ...blankProgress('tofa', job.data.serverId, 'complete', result.message),
     importedRecords: result.imported,
     skippedRecords: result.skipped,
     duplicateRecords: result.duplicates,

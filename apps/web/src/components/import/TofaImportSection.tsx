@@ -16,6 +16,7 @@ import {
   serverWithImport,
   useActiveImports,
   useImportStatus,
+  type CardProgress,
 } from '@/hooks/queries/useImports';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -25,7 +26,7 @@ import { StartImportButton } from './StartImportButton';
 const blankProgress = (
   status: TofaImportProgress['status'],
   message: string
-): TofaImportProgress => ({
+): CardProgress<TofaImportProgress> => ({
   status,
   fetchedRecords: 0,
   processedRecords: 0,
@@ -38,7 +39,7 @@ const blankProgress = (
   message,
 });
 
-function resultProgress(result: TofaImportResult): TofaImportProgress {
+function resultProgress(result: TofaImportResult): CardProgress<TofaImportProgress> {
   const processed = result.imported + result.skipped + result.errors;
   return {
     ...blankProgress('complete', result.message),
@@ -74,6 +75,7 @@ export function TofaImportSection({
     start,
   } = useImportStatus(
     'tofa',
+    serverId,
     latestImport(imports, serverId),
     { blank: blankProgress, fromResult: resultProgress },
     { onStarted }

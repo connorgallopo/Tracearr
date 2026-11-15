@@ -419,7 +419,12 @@ describe('import worker', () => {
     expect(await worker.processor?.(job)).toBe(result);
     expect(mockPublish).toHaveBeenCalledWith(
       'import:tofa:progress',
-      expect.objectContaining({ status: 'complete', importedRecords: 3, jobId: 'job-2' })
+      expect.objectContaining({
+        serverId: 'srv-1',
+        status: 'complete',
+        importedRecords: 3,
+        jobId: 'job-2',
+      })
     );
   });
 
@@ -439,6 +444,24 @@ describe('import worker', () => {
     expect(job.updateProgress).toHaveBeenCalledWith(progress);
   });
 
+  it('names the server in the progress a Playback Reporting import closes with', async () => {
+    startImportWorker();
+    vi.mocked(importPlaybackReporting).mockResolvedValueOnce({
+      success: true,
+      imported: 4,
+      skipped: 0,
+      errors: 0,
+      message: 'ok',
+    } as never);
+
+    await worker.processor?.({ ...playbackJob, updateProgress: vi.fn() });
+
+    expect(mockPublish).toHaveBeenCalledWith(
+      'import:playbackreporting:progress',
+      expect.objectContaining({ serverId: 'srv-1', status: 'complete', jobId: 'job-1' })
+    );
+  });
+
   it('tells the panel an import is retrying, not failed, while attempts remain', () => {
     startImportWorker();
 
@@ -456,6 +479,7 @@ describe('import worker', () => {
     expect(mockPublish).toHaveBeenCalledWith(
       'import:jellystat:progress',
       expect.objectContaining({
+        serverId: 'srv-1',
         status: 'retrying',
         retry: { attempt: 1, attempts: 3, reason: 'connect ECONNREFUSED' },
         jobId: 'job-1',
@@ -480,7 +504,11 @@ describe('import worker', () => {
     expect(mockPublish).toHaveBeenCalledOnce();
     expect(mockPublish).toHaveBeenCalledWith(
       'import:progress',
-      expect.objectContaining({ status: 'error', message: 'Import failed: connect ECONNREFUSED' })
+      expect.objectContaining({
+        serverId: 'srv-1',
+        status: 'error',
+        message: 'Import failed: connect ECONNREFUSED',
+      })
     );
     expect(mockAdd).toHaveBeenCalledWith(
       'dlq-tautulli',

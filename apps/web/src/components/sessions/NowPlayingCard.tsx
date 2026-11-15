@@ -10,7 +10,6 @@ import {
   formatLocationCompact,
   getBufferedPercent,
   getDeviceDisplayName,
-  getDistinctProfileName,
   getMediaDisplay,
   getMediaLinks,
 } from '@/lib/utils';
@@ -42,12 +41,6 @@ function DeviceIcon({ session, className }: { session: ActiveSession; className?
   const device = session.device?.toLowerCase() ?? '';
   const product = session.product?.toLowerCase() ?? '';
 
-  if (platform.includes('ios') || device.includes('iphone') || platform.includes('android')) {
-    return <Smartphone className={className} />;
-  }
-  if (device.includes('ipad') || platform.includes('tablet')) {
-    return <Tablet className={className} />;
-  }
   if (
     platform.includes('tv') ||
     device.includes('tv') ||
@@ -55,10 +48,15 @@ function DeviceIcon({ session, className }: { session: ActiveSession; className?
     device.includes('roku') ||
     device.includes('firestick') ||
     device.includes('chromecast') ||
-    device.includes('apple tv') ||
     device.includes('shield')
   ) {
     return <Tv className={className} />;
+  }
+  if (device.includes('ipad') || platform.includes('tablet')) {
+    return <Tablet className={className} />;
+  }
+  if (platform.includes('ios') || device.includes('iphone') || platform.includes('android')) {
+    return <Smartphone className={className} />;
   }
   return <Monitor className={className} />;
 }
@@ -107,7 +105,6 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
 
   const deviceName = getDeviceDisplayName(session);
   const displayName = session.user.identityName ?? session.user.username;
-  const profileName = getDistinctProfileName(session);
   const isPaused = session.state === 'paused';
   const isLive = session.mediaType === 'live';
   const isSquareArt = session.mediaType === 'track' || isLive;
@@ -169,14 +166,8 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
                     {session.user.username.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <span
-                  className="truncate text-sm font-medium"
-                  title={profileName ? `${displayName} · ${profileName}` : displayName}
-                >
+                <span className="truncate text-sm font-medium" title={displayName}>
                   {displayName}
-                  {profileName && (
-                    <span className="text-muted-foreground font-normal"> · {profileName}</span>
-                  )}
                 </span>
               </div>
 

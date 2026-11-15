@@ -49,10 +49,7 @@
       "newCode": "Nouveau code",
       "refused": "Connexion non disponible pour ce compte.",
       "notPermitted": "Vous n'êtes pas autorisé à vous connecter. S'il vous plaît, contacter le propriétaire du serveur."
-    },
-    "createAccountHeading": "Créez votre compte pour démarrer",
-    "createAccountDescription": "Créez un compte pour gérer vos serveurs multimédias",
-    "setupNote": "Après avoir créé votre compte, vous pourrez ajouter vos serveurs Plex ou Jellyfin depuis les réglages."
+    }
   },
   "setup": {
     "serverTitle": "",

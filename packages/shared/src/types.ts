@@ -1284,7 +1284,16 @@ export interface HeavyOpsWaitingFor {
 
 // Tautulli import types
 export interface TautulliImportProgress {
-  status: 'idle' | 'waiting' | 'fetching' | 'processing' | 'retrying' | 'complete' | 'error';
+  serverId: string;
+  status:
+    | 'idle'
+    | 'waiting'
+    | 'fetching'
+    | 'processing'
+    | 'enriching'
+    | 'retrying'
+    | 'complete'
+    | 'error';
   /** Expected total from API (may differ from actual if API count is stale) */
   totalRecords: number;
   /** Actual records fetched from API so far */
@@ -1334,6 +1343,7 @@ export interface TautulliImportResult {
 
 // Jellystat import types
 export interface JellystatImportProgress {
+  serverId: string;
   status:
     'idle' | 'waiting' | 'parsing' | 'enriching' | 'processing' | 'retrying' | 'complete' | 'error';
   totalRecords: number;
@@ -1384,6 +1394,7 @@ export interface JellystatImportResult {
 
 // Playback Reporting plugin import types
 export interface PlaybackReportingImportProgress {
+  serverId: string;
   status:
     | 'idle'
     | 'waiting'
@@ -1439,6 +1450,7 @@ export interface PlaybackReportingImportResult {
 
 // tofa watch history import types
 export interface TofaImportProgress {
+  serverId: string;
   status: 'idle' | 'waiting' | 'fetching' | 'processing' | 'retrying' | 'complete' | 'error';
   fetchedRecords: number;
   processedRecords: number;

@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  getDeviceDisplayName,
-  getDistinctProfileName,
-  getMediaDisplay,
-  getMediaLinks,
-} from './utils';
+import { getDeviceDisplayName, getMediaDisplay, getMediaLinks } from './utils';
 
 describe('getDeviceDisplayName', () => {
   it('prefers the name the client gave itself', () => {
@@ -33,15 +28,6 @@ describe('getDeviceDisplayName', () => {
   it('falls back to the platform, then to nothing at all', () => {
     expect(getDeviceDisplayName({ platform: 'Roku' })).toBe('Roku');
     expect(getDeviceDisplayName({})).toBeNull();
-  });
-});
-
-describe('getDistinctProfileName', () => {
-  it('names a profile only when it says more than the username', () => {
-    const user = { username: 'morgan' };
-    expect(getDistinctProfileName({ profileName: 'Robin', user })).toBe('Robin');
-    expect(getDistinctProfileName({ profileName: 'Morgan', user })).toBeNull();
-    expect(getDistinctProfileName({ profileName: null, user })).toBeNull();
   });
 });
 

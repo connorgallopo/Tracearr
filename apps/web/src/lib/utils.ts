@@ -138,15 +138,6 @@ export function getMediaLinks(
   return { title: path(media.mediaId), subtitle: null };
 }
 
-/** The profile that played, unless it only repeats the account's username in another case. */
-export function getDistinctProfileName(session: {
-  profileName?: string | null;
-  user: { username: string };
-}): string | null {
-  const name = session.profileName;
-  return name && name.toLowerCase() !== session.user.username.toLowerCase() ? name : null;
-}
-
 /**
  * What a client calls itself, else the app and hardware it reports. Null when
  * the server sent nothing identifying, so callers pick their own fallback.

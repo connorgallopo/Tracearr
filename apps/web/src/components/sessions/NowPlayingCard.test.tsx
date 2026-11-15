@@ -70,6 +70,18 @@ describe('NowPlayingCard device icon', () => {
   it('carries no hover text when the session reports no device at all', () => {
     expect(renderCard({})).not.toHaveAttribute('title');
   });
+
+  it.each([
+    ['an iPad', { platform: 'iOS', device: 'iPad Pro' }, 'lucide-tablet'],
+    ['an Android TV', { platform: 'Android TV', device: 'BRAVIA 4K' }, 'lucide-tv'],
+    ['an NVIDIA Shield', { platform: 'Android TV', device: 'SHIELD Android TV' }, 'lucide-tv'],
+    ['an iPhone', { platform: 'iOS', device: 'iPhone 15' }, 'lucide-smartphone'],
+    ['an Android phone', { platform: 'Android', device: 'Pixel 8' }, 'lucide-smartphone'],
+    ['a browser', { platform: 'Chrome', device: 'Chrome' }, 'lucide-monitor'],
+  ])('draws %s with the matching icon', (_name, session, icon) => {
+    const svg = renderCard(session).querySelector('svg');
+    expect(svg).toHaveClass(icon);
+  });
 });
 
 describe('NowPlayingCard transcoder bar and buffering', () => {
