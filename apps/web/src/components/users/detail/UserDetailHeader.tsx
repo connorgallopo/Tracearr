@@ -59,7 +59,7 @@ export function UserDetailHeader({
   const { t } = useTranslation(['pages', 'common', 'nav']);
   const viewAs = useViewAs();
   const { user, identity } = detail;
-  const name = user.identityName ?? user.username;
+  const name = user.identityName ?? identity.username;
   const isMerged = identity.serverUsers.length > 1;
   const showsPerson = isMerged && !isSpecificServerScope;
   const avatarUrl = getAvatarUrl(user.serverId, user.thumbUrl, 64);

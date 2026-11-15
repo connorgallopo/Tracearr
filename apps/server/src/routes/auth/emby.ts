@@ -11,8 +11,7 @@ import { db } from '../../db/client.js';
 import { servers } from '../../db/schema.js';
 import { invalidateServersCache } from '../../jobs/poller/database.js';
 import { EmbyClient } from '../../services/mediaServer/index.js';
-import { startAddedServer } from '../../services/serverCreate.js';
-import { syncServer } from '../../services/sync.js';
+import { startAddedServer, syncReconnectedServer } from '../../services/serverCreate.js';
 import { HISTORICAL_EDIT_MESSAGE } from '../../services/liveServers.js';
 
 export const embyRoutes: FastifyPluginAsync = async (app) => {
@@ -86,16 +85,7 @@ export const embyRoutes: FastifyPluginAsync = async (app) => {
       if (added) {
         await startAddedServer({ id: serverId, type: 'emby' }, []);
       } else {
-        syncServer(serverId, { syncUsers: true, syncLibraries: true })
-          .then((result) => {
-            app.log.info(
-              { serverId, usersAdded: result.usersAdded, librariesSynced: result.librariesSynced },
-              'Auto-sync completed for Emby server'
-            );
-          })
-          .catch((error: unknown) => {
-            app.log.error({ err: error, serverId }, 'Auto-sync failed for Emby server');
-          });
+        syncReconnectedServer(serverId);
       }
 
       return { serverId };

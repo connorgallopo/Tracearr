@@ -1244,6 +1244,7 @@ export const userMergeAudits = pgTable(
       // Absent on audits written before merges carried the contact email
       contactEmail?: string | null;
       contactEmailCarried?: boolean;
+      // Only on audits from merges that pinned the target's name; split still clears it
       nameSetOnTarget?: string | null;
     }>(),
     // Which plex_accounts / mobile_sessions / mobile_tokens rows repointIdentityRows

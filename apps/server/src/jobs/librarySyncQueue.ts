@@ -53,6 +53,13 @@ export interface LibrarySyncJobData {
   userId?: string; // For audit trail on manual syncs
   kind?: 'tick'; // Scheduler slot: queues the real sync through the dedup key and returns
   completedLibraryIds?: string[]; // Checkpoint: libraries this job already finished
+  firstSync?: true; // Queued by adding the server
+}
+
+interface EnqueueOptions {
+  userId?: string;
+  delay?: number;
+  firstSync?: boolean;
 }
 
 // Queue configuration
@@ -351,27 +358,16 @@ export function startLibrarySyncWorker(): void {
   librarySyncWorker.on('failed', (job, error) => {
     if (!job) return;
     const { serverId } = job.data;
+    const lastAttempt = job.attemptsMade >= (job.opts.attempts ?? 1);
 
-    // Publish error to WebSocket
-    const pubSubService = getPubSubService();
-    if (pubSubService) {
-      void pubSubService.publish(WS_EVENTS.LIBRARY_SYNC_PROGRESS, {
-        serverId,
-        serverName: 'Unknown',
-        status: 'error',
-        totalLibraries: 0,
-        processedLibraries: 0,
-        totalItems: 0,
-        processedItems: 0,
-        message: `Sync failed: ${error?.message || 'Unknown error'}`,
-        startedAt: new Date().toISOString(),
-      } satisfies LibrarySyncProgress);
-    }
+    void publishSyncFailure(job, error, lastAttempt).catch((err: unknown) => {
+      console.warn(`[LibrarySync] Could not publish the failure of job ${job.id}:`, err);
+    });
 
     console.error(`[LibrarySync] Job ${job.id} failed:`, error);
 
     // A failed attempt with retries left runs again later and reads the changes then
-    if (job.attemptsMade >= (job.opts.attempts ?? 1)) {
+    if (lastAttempt) {
       void syncChangesMissedByRun(serverId).catch((err: unknown) => {
         console.warn(`[LibrarySync] Could not queue the sync owed to ${serverId}:`, err);
       });
@@ -432,6 +428,32 @@ export function startLibrarySyncWorker(): void {
  * chase the snapshot normalization until its marker lands.
  */
 let normalizationConfirmed = false;
+
+async function publishSyncFailure(
+  job: Job<LibrarySyncJobData>,
+  error: Error,
+  lastAttempt: boolean
+): Promise<void> {
+  const pubSubService = getPubSubService();
+  if (!pubSubService) return;
+  const { serverId, firstSync } = job.data;
+  const [server] = await db
+    .select({ name: servers.name })
+    .from(servers)
+    .where(eq(servers.id, serverId));
+  await pubSubService.publish(WS_EVENTS.LIBRARY_SYNC_PROGRESS, {
+    serverId,
+    serverName: server?.name ?? 'Unknown',
+    status: 'error',
+    totalLibraries: 0,
+    processedLibraries: 0,
+    totalItems: 0,
+    processedItems: 0,
+    message: `Sync failed: ${error?.message || 'Unknown error'}`,
+    startedAt: new Date().toISOString(),
+    ...(firstSync && lastAttempt ? { firstSyncFailed: true as const } : {}),
+  } satisfies LibrarySyncProgress);
+}
 
 /**
  * BullMQ emits `completed` only after moving the job out of `active`, so the
@@ -652,7 +674,7 @@ export async function scheduleAutoSync(): Promise<void> {
   if (allServers.length === 0) return;
 
   for (const [i, server] of allServers.entries()) {
-    await enqueueLibrarySync(server.id, 'boot', undefined, (i + 1) * 10_000);
+    await enqueueLibrarySync(server.id, 'boot', { delay: (i + 1) * 10_000 });
   }
 
   console.log(`[LibrarySync] Queued boot sync for ${allServers.length} server(s)`);
@@ -665,8 +687,7 @@ export async function scheduleAutoSync(): Promise<void> {
 export async function enqueueLibrarySync(
   serverId: string,
   triggeredBy: 'manual' | 'scheduled' | 'boot' | 'event',
-  userId?: string,
-  delay?: number
+  options: EnqueueOptions = {}
 ): Promise<string> {
   if (!librarySyncQueue) throw new Error('Library sync queue not initialized');
 
@@ -685,7 +706,7 @@ export async function enqueueLibrarySync(
     }
   }
 
-  const { jobId, accepted } = await addSync(librarySyncQueue, serverId, triggeredBy, userId, delay);
+  const { jobId, accepted } = await addSync(librarySyncQueue, serverId, triggeredBy, options);
   if (!accepted && triggeredBy === 'manual') {
     throw new Error('A sync is already in progress for this server');
   }
@@ -697,14 +718,14 @@ async function addSync(
   queue: Queue<LibrarySyncJobData>,
   serverId: string,
   triggeredBy: 'manual' | 'scheduled' | 'boot' | 'event',
-  userId?: string,
-  delay?: number
+  { userId, delay, firstSync }: EnqueueOptions = {}
 ): Promise<{ jobId: string; accepted: boolean }> {
   const name = `${triggeredBy === 'scheduled' ? 'auto' : triggeredBy}-sync-${serverId}`;
   const data: LibrarySyncJobData = {
     serverId,
     triggeredBy: triggeredBy === 'manual' ? 'manual' : 'scheduled',
     ...(userId ? { userId } : {}),
+    ...(firstSync ? { firstSync: true as const } : {}),
   };
   const added = await addSingleton(
     queue,
@@ -764,7 +785,7 @@ const QUEUED_STATES = new Set<string | undefined>(['waiting', 'delayed', 'priori
 export async function enqueueLibrarySyncForChange(serverId: string, delay: number): Promise<void> {
   const queue = librarySyncQueue;
   if (!queue || !redisClient) return;
-  const { jobId, accepted } = await addSync(queue, serverId, 'event', undefined, delay);
+  const { jobId, accepted } = await addSync(queue, serverId, 'event', { delay });
   if (accepted) return;
 
   const holderState = async () => (await queue.getJob(jobId))?.getState();
@@ -782,7 +803,7 @@ export async function enqueueLibrarySyncForChange(serverId: string, delay: numbe
 async function syncChangesMissedByRun(serverId: string): Promise<void> {
   if (!redisClient) return;
   const delay = await redisClient.getdel(REDIS_KEYS.LIBRARY_SYNC_CHANGED_DURING_RUN(serverId));
-  if (delay !== null) await enqueueLibrarySync(serverId, 'event', undefined, Number(delay));
+  if (delay !== null) await enqueueLibrarySync(serverId, 'event', { delay: Number(delay) });
 }
 
 /**
@@ -824,6 +845,8 @@ export async function getAllActiveLibrarySyncs(): Promise<
     state: string;
     progress: number | null;
     createdAt: number;
+    firstSync: boolean;
+    attemptsMade: number;
   }>
 > {
   if (!librarySyncQueue) {
@@ -853,6 +876,8 @@ export async function getAllActiveLibrarySyncs(): Promise<
         state,
         progress: typeof progress === 'number' ? progress : null,
         createdAt: job.timestamp ?? Date.now(),
+        firstSync: job.data.firstSync === true,
+        attemptsMade: job.attemptsMade,
       };
     })
   );

@@ -17,10 +17,7 @@ import '../../db/schema.js';
 import { resolveDateRange } from './utils.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { scopedServerFragment } from '../../lib/scope.js';
-import {
-  personUsernameSql,
-  representativeAccountOrderSql,
-} from '../../utils/representativeAccount.js';
+import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 
 // Extended schema with optional serverUserId filter
 const bandwidthQuerySchema = statsQuerySchema.safeExtend({
@@ -188,7 +185,7 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
 
       result = await db.execute(sql`
         SELECT
-          ${personUsernameSql()} AS username,
+          u.username AS username,
           u.name AS identity_name,
           rep.thumb_url AS thumb_url,
           rep.id AS server_user_id,
@@ -229,7 +226,7 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
 
       result = await db.execute(sql`
         SELECT
-          ${personUsernameSql()} AS username,
+          u.username AS username,
           u.name AS identity_name,
           rep.thumb_url AS thumb_url,
           rep.id AS server_user_id,

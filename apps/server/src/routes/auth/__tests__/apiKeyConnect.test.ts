@@ -28,15 +28,12 @@ vi.mock('../../../services/mediaServer/index.js', () => ({
 }));
 vi.mock('../../../services/serverCreate.js', () => ({
   startAddedServer: vi.fn().mockResolvedValue(undefined),
-}));
-vi.mock('../../../services/sync.js', () => ({
-  syncServer: vi.fn().mockResolvedValue({ usersAdded: 0, librariesSynced: 0 }),
+  syncReconnectedServer: vi.fn(),
 }));
 
 import { db } from '../../../db/client.js';
 import { EmbyClient, JellyfinClient } from '../../../services/mediaServer/index.js';
-import { startAddedServer } from '../../../services/serverCreate.js';
-import { syncServer } from '../../../services/sync.js';
+import { startAddedServer, syncReconnectedServer } from '../../../services/serverCreate.js';
 import { embyRoutes } from '../emby.js';
 import { jellyfinRoutes } from '../jellyfin.js';
 
@@ -173,11 +170,11 @@ describe.each([
     mockExisting([]);
     mockInsert();
     vi.mocked(startAddedServer).mockClear();
-    vi.mocked(syncServer).mockClear();
+    vi.mocked(syncReconnectedServer).mockClear();
     const res = await app.inject({ method: 'POST', url, payload });
     expect(res.statusCode).toBe(200);
     expect(startAddedServer).toHaveBeenCalledExactlyOnceWith({ id: 'srv-1', type }, []);
-    expect(syncServer).not.toHaveBeenCalled();
+    expect(syncReconnectedServer).not.toHaveBeenCalled();
   });
 
   it('syncs a reconnected server without starting it again', async () => {
@@ -185,9 +182,10 @@ describe.each([
     mockExisting([{ id: 'srv-1' }]);
     mockUpdate();
     vi.mocked(startAddedServer).mockClear();
+    vi.mocked(syncReconnectedServer).mockClear();
     const res = await app.inject({ method: 'POST', url, payload });
     expect(res.statusCode).toBe(200);
     expect(startAddedServer).not.toHaveBeenCalled();
-    expect(syncServer).toHaveBeenCalledWith('srv-1', { syncUsers: true, syncLibraries: true });
+    expect(syncReconnectedServer).toHaveBeenCalledExactlyOnceWith('srv-1');
   });
 });

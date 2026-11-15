@@ -23,10 +23,7 @@ import {
 import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { scopeSessionsRaw } from '../../lib/scope.js';
-import {
-  personUsernameSql,
-  representativeAccountOrderSql,
-} from '../../utils/representativeAccount.js';
+import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 import { localSessionSql } from '../../db/sessions/rules.js';
 import { resolveDateRange } from './utils.js';
 
@@ -189,8 +186,7 @@ async function queryLocations(
     ),
     people AS (
       SELECT DISTINCT ON (pa.loc_id, su.user_id)
-        pa.loc_id, su.user_id, su.id, su.server_id, ${personUsernameSql()} AS username, su.thumb_url,
-        u.name AS identity_name
+        pa.loc_id, su.user_id, su.id, su.server_id, u.username, su.thumb_url, u.name AS identity_name
       FROM (SELECT DISTINCT loc_id, server_user_id FROM base ${onlySelected('loc_id')}) pa
       JOIN server_users su ON su.id = pa.server_user_id
       JOIN users u ON u.id = su.user_id
@@ -354,8 +350,7 @@ export const locationsRoutes: FastifyPluginAsync = async (app) => {
               ARRAY[rep.id::text]
             ) AS server_user_ids
           FROM (
-            SELECT DISTINCT ON (su.user_id) su.id, su.user_id, ${personUsernameSql()} AS username,
-              u.name as identity_name
+            SELECT DISTINCT ON (su.user_id) su.id, su.user_id, u.username, u.name as identity_name
             FROM sessions s
             JOIN server_users su ON su.id = s.server_user_id
             JOIN users u ON su.user_id = u.id

@@ -129,8 +129,8 @@ export interface ServerUser {
 export interface ServerUserWithIdentity extends ServerUser {
   serverName: string;
   identityName: string | null;
-  // The person's name, the same under every server filter: identityName, else their own
-  // username, which can differ from this account's `username`. Only populated by the list endpoint.
+  // The Tracearr user's name, the same under every server filter: identityName, else the
+  // user's username, not this account's `username`. Only populated by the list endpoint.
   personName?: string;
   role: UserRole; // From linked User identity
   loginAccess: LoginAccess; // From linked User identity
@@ -200,6 +200,8 @@ export interface ServerUserFullDetail {
   user: ServerUserDetail;
   identity: {
     userId: string;
+    /** The Tracearr user's username, which names the person when identityName is unset. */
+    username: string;
     aggregateTrustScore: number;
     totalViolations: number;
     contactEmail: string | null;
@@ -1487,6 +1489,8 @@ export interface LibrarySyncProgress {
   startedAt: string;
   completedAt?: string;
   error?: string;
+  /** Set on the error event of a server's first library sync once its last attempt failed */
+  firstSyncFailed?: true;
 }
 
 /** Why the poller marked a server down, when it knows; absent for unreachable. */

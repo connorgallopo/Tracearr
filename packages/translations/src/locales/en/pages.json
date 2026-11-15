@@ -689,7 +689,7 @@
       },
       "notSynced": {
         "title": "Library not synced yet",
-        "body": "Library statistics will appear here once the library has been synced. This typically happens automatically every hour."
+        "body": "Library statistics will appear here once the library has been synced. A sync starts when a server is added and repeats every 12 hours."
       },
       "noMedia": {
         "title": "No movies or shows yet",

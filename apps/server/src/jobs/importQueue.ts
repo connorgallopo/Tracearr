@@ -1093,6 +1093,8 @@ const HELD_IMPORT_MAX_WAIT_MS = 24 * 60 * 60 * 1000;
 
 const heldImportId = (serverId: string) => `held-import-${serverId}`;
 
+const isHeldImport = (job: Job<ImportJobData>) => job.id === heldImportId(job.data.serverId);
+
 /**
  * Queues the history import of a server just added, held until a library sync of the server
  * ends, so its plays resolve against the library. Queued at once, an import asked for meanwhile
@@ -1153,7 +1155,7 @@ export async function getLatestTofaImport(serverId: string): Promise<{
     );
   if (!latest) return null;
   return {
-    held: latest.id === heldImportId(serverId),
+    held: isHeldImport(latest),
     state: await latest.getState(),
     progress: isTofaImportProgress(latest.progress) ? latest.progress : null,
     result: isTofaImportResult(latest.returnvalue) ? latest.returnvalue : null,
@@ -1189,6 +1191,7 @@ export async function getAllActiveImports(): Promise<
     state: string;
     progress: number | object | null;
     createdAt: number;
+    held: boolean;
   }>
 > {
   if (!importQueue) {
@@ -1208,6 +1211,7 @@ export async function getAllActiveImports(): Promise<
         state,
         progress: typeof progress === 'number' || typeof progress === 'object' ? progress : null,
         createdAt: job.timestamp ?? Date.now(),
+        held: isHeldImport(job),
       };
     })
   );

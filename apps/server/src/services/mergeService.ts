@@ -70,7 +70,6 @@ import { getAuth } from '../lib/auth.js';
 import { assertOwnerKeepsALoginAfter } from '../lib/authGuards.js';
 import { upsertTofaAccount } from '../lib/memberLogin.js';
 import { refreshUserSessionSnapshots, revokeSessionsForUsers } from '../lib/revoke.js';
-import { personNameSql } from '../utils/representativeAccount.js';
 import {
   recomputeIdentityAggregates,
   ServerUserNotFoundError,
@@ -214,15 +213,6 @@ async function loadIdentitySnapshot(tx: Tx, userId: string): Promise<MergeIdenti
     linkedPlexAccountCount: plexCount?.count ?? 0,
     authAccountCount: authAccountCountRow?.count ?? 0,
   };
-}
-
-async function shownName(tx: Tx, userId: string): Promise<string | null> {
-  const result = await tx.execute(sql`
-    SELECT ${personNameSql()} AS name
-    FROM users u
-    WHERE u.id = ${userId}
-  `);
-  return (result.rows[0] as { name: string | null } | undefined)?.name ?? null;
 }
 
 export interface MergedIdentityRowIds {
@@ -520,8 +510,6 @@ export async function mergeUsers(
     // above so a rejected merge leaves the source's sessions untouched.
     await (await getAuth().$context).internalAdapter.deleteUserSessions(sourceUserId);
 
-    const keptName = await shownName(tx, targetUserId);
-
     const combinedSourceIds = plan.combines.map((c) => c.sourceServerUserId);
     if (combinedSourceIds.length > 0) {
       [combinedHistory] = await tx
@@ -555,15 +543,6 @@ export async function mergeUsers(
     }
     const movedIdentityRowIds = await repointIdentityRows(tx, sourceUserId, targetUserId);
     await recomputeIdentityAggregates(targetUserId, tx);
-
-    const nameSetOnTarget =
-      keptName !== null && (await shownName(tx, targetUserId)) !== keptName
-        ? await tx
-            .update(users)
-            .set({ name: keptName, updatedAt: new Date() })
-            .where(and(eq(users.id, targetUserId), isNull(users.name)))
-            .returning({ id: users.id })
-        : [];
 
     // If this source was itself the target of an earlier merge, that earlier
     // audit's targetUserId still points at it. user_merge_audits.targetUserId
@@ -659,7 +638,6 @@ export async function mergeUsers(
           role: sourceUser.role,
           contactEmail: sourceUser.contactEmail,
           contactEmailCarried: carriedContactEmail.length > 0,
-          nameSetOnTarget: nameSetOnTarget.length > 0 ? keptName : null,
         },
         movedIdentityRowIds,
       })

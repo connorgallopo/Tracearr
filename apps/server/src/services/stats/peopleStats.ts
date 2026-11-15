@@ -21,11 +21,7 @@ import { serverUsers, servers } from '../../db/schema.js';
 import { countedSessionSql, countedViewersSql, localSessionSql } from '../../db/sessions/rules.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { likePattern } from '../../utils/listQuery.js';
-import {
-  personNameSql,
-  personUsernameSql,
-  representativeAccountOrderSql,
-} from '../../utils/representativeAccount.js';
+import { personNameSql, representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 import {
   identityAccountsWhere,
   serverUserIdAnyFragment,
@@ -564,7 +560,7 @@ function peopleRowsCte(input: PeopleRowsInput): SQL {
         u.name AS identity_name,
         u.aggregate_trust_score AS trust_score,
         rep.id AS server_user_id,
-        ${personUsernameSql()} AS username,
+        u.username,
         rep.thumb_url,
         rep.server_id::text AS server_id,
         COALESCE(t.plays, 0) AS plays,

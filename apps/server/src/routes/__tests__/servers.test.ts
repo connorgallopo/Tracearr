@@ -728,7 +728,7 @@ describe('Server Routes', () => {
       expect(scheduleRequestSync).toHaveBeenCalled();
       const { id } = response.json<{ id: string }>();
       expect(holdTofaImport).toHaveBeenCalledExactlyOnceWith(id);
-      expect(enqueueLibrarySync).toHaveBeenCalledExactlyOnceWith(id, 'event');
+      expect(enqueueLibrarySync).toHaveBeenCalledExactlyOnceWith(id, 'event', { firstSync: true });
       expect(dropHeldImport).not.toHaveBeenCalled();
     });
 

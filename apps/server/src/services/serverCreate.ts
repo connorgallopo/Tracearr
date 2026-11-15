@@ -119,7 +119,14 @@ export async function startAddedServer(
   await holdServerHistoryImport(server).catch(failedFor('Holding the history import'));
   sseManager.refresh().catch(failedFor('SSE refresh'));
 
-  void syncAddedServer(server.id, requestServiceIds, failedFor);
+  void syncAddedServer(server.id, true, requestServiceIds, failedFor);
+}
+
+/** A server re-added at its saved address keeps its start; only its users and libraries sync. */
+export function syncReconnectedServer(serverId: string): void {
+  void syncAddedServer(serverId, false, [], (step) => (error) => {
+    log.error(`${step} failed for reconnected server`, { err: error, serverId });
+  });
 }
 
 /**
@@ -129,6 +136,7 @@ export async function startAddedServer(
  */
 async function syncAddedServer(
   serverId: string,
+  firstSync: boolean,
   requestServiceIds: readonly string[],
   failedFor: (step: string) => (error: unknown) => void
 ): Promise<void> {
@@ -137,7 +145,7 @@ async function syncAddedServer(
       if (result.errors.length > 0) {
         failedFor('User sync')(result.errors);
       } else {
-        log.info('User sync completed for new server', { serverId, usersAdded: result.usersAdded });
+        log.info('User sync completed', { serverId, usersAdded: result.usersAdded });
       }
       return result.usersRead;
     },
@@ -147,7 +155,9 @@ async function syncAddedServer(
     }
   );
 
-  await enqueueLibrarySync(serverId, 'event').catch(failedFor('Queuing the library sync'));
+  await enqueueLibrarySync(serverId, 'event', { firstSync }).catch(
+    failedFor('Queuing the library sync')
+  );
 
   if (requestServiceIds.length > 0) {
     await scheduleRequestSync().catch(failedFor('Request sync schedule'));

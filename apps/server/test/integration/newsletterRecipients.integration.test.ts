@@ -75,7 +75,7 @@ describe('recipient candidates', () => {
     expect(seeded).toBeDefined();
   });
 
-  it('carries the username and server name onto a missing-address person, for a Jellyfin account with no identity name', async () => {
+  it('names a missing-address person by their Tracearr username and keeps the Jellyfin account and server on the row', async () => {
     const [jellyfin] = await db
       .insert(servers)
       .values({
@@ -104,7 +104,7 @@ describe('recipient candidates', () => {
     const { missing } = mergeRecipients(candidates, [], new Set());
     const person = missing.find((p) => p.userId === identity!.id);
     expect(person).toMatchObject({
-      name: null,
+      name: 'garry-login',
       username: 'garry',
       serverId: jellyfin!.id,
       serverName: 'Basement Jellyfin',

@@ -11,7 +11,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import Fastify from 'fastify';
 import sensible from '@fastify/sensible';
 import { DEFAULT_NEWSLETTER_SECTIONS } from '@tracearr/shared';
@@ -121,13 +121,13 @@ async function authSessionExists(id: string): Promise<boolean> {
   return rows.length > 0;
 }
 
-async function mergeSignInPlexAccountIntoJellyfinUser(targetName: string | null = null) {
+async function mergeSignInPlexAccountIntoJellyfinUser() {
   const admin = await createTestUser({ role: 'owner' });
   const plexServer = await createTestServer({ type: 'plex' });
   const jellyfinServer = await createTestServer({ type: 'jellyfin' });
   const target = await createTestUser({
     role: 'member',
-    name: targetName,
+    name: null,
     plexAccountId: 'plex-1263',
   });
   const source = await createTestUser({ role: 'member' });
@@ -149,6 +149,17 @@ async function mergeSignInPlexAccountIntoJellyfinUser(targetName: string | null 
 
   const result = await mergeUsers(source.id, target.id, admin.id);
   return { admin, target, targetSu, sourceSu, result };
+}
+
+/** What a merge wrote while merges could pin the target's name: the name, and the audit's record of it. */
+async function pinNameLikeAnOlderMerge(auditId: string, targetUserId: string, name: string) {
+  await db.update(users).set({ name }).where(eq(users.id, targetUserId));
+  await db
+    .update(userMergeAudits)
+    .set({
+      sourceUserSnapshot: sql`${userMergeAudits.sourceUserSnapshot} || ${JSON.stringify({ nameSetOnTarget: name })}::jsonb`,
+    })
+    .where(eq(userMergeAudits.id, auditId));
 }
 
 describe('mergeUsers', () => {
@@ -608,47 +619,16 @@ describe('mergeUsers', () => {
     expect(survivor?.contactEmail).toBe('target-contact@example.com');
   });
 
-  it('keeps the kept person name when a folded-in account becomes the representative', async () => {
+  it("leaves the kept user's name alone and records no pinned name when a folded-in account becomes the representative", async () => {
     const { target, result } = await mergeSignInPlexAccountIntoJellyfinUser();
 
-    expect(await shownNameOf(target.id)).toBe('abc');
+    const [survivor] = await db.select().from(users).where(eq(users.id, target.id));
+    expect(survivor).toMatchObject({ name: null, username: target.username });
     const [audit] = await db
       .select()
       .from(userMergeAudits)
       .where(eq(userMergeAudits.id, result.auditId));
-    expect(audit?.sourceUserSnapshot.nameSetOnTarget).toBe('abc');
-  });
-
-  it('leaves the name unset when the merge does not change who represents the person', async () => {
-    const admin = await createTestUser({ role: 'owner' });
-    const target = await createTestUser({ role: 'member', name: null });
-    const source = await createTestUser({ role: 'member' });
-    await createTestServerUser({
-      userId: target.id,
-      serverId: (await createTestServer({ type: 'jellyfin' })).id,
-      username: 'abc',
-      lastActivityAt: new Date(),
-    });
-    await createTestServerUser({
-      userId: source.id,
-      serverId: (await createTestServer({ type: 'plex' })).id,
-      username: 'xyz',
-    });
-
-    const result = await mergeUsers(source.id, target.id, admin.id);
-
-    expect(await shownNameOf(target.id)).toBeNull();
-    const [audit] = await db
-      .select()
-      .from(userMergeAudits)
-      .where(eq(userMergeAudits.id, result.auditId));
-    expect(audit?.sourceUserSnapshot.nameSetOnTarget).toBeNull();
-  });
-
-  it('never overwrites a name the owner set', async () => {
-    const { target } = await mergeSignInPlexAccountIntoJellyfinUser('Grandma');
-
-    expect(await shownNameOf(target.id)).toBe('Grandma');
+    expect(audit?.sourceUserSnapshot).not.toHaveProperty('nameSetOnTarget');
   });
 
   it("signs the target out, since the person's data boundary changed, and leaves the owner signed in", async () => {
@@ -823,16 +803,18 @@ describe('splitServerUser', () => {
     expect(survivor?.contactEmail).toBeNull();
   });
 
-  it('clears the name the merge pinned once the folded account is split back out', async () => {
-    const { admin, target, sourceSu } = await mergeSignInPlexAccountIntoJellyfinUser();
+  it('clears the name an older merge pinned once the folded account is split back out', async () => {
+    const { admin, target, sourceSu, result } = await mergeSignInPlexAccountIntoJellyfinUser();
+    await pinNameLikeAnOlderMerge(result.auditId, target.id, 'abc');
 
     await splitServerUser(sourceSu.id, admin.id);
 
     expect(await shownNameOf(target.id)).toBeNull();
   });
 
-  it('keeps a pinned name the owner has since retyped when splitting', async () => {
-    const { admin, target, sourceSu } = await mergeSignInPlexAccountIntoJellyfinUser();
+  it('keeps a name an older merge pinned once the owner has retyped it, when splitting', async () => {
+    const { admin, target, sourceSu, result } = await mergeSignInPlexAccountIntoJellyfinUser();
+    await pinNameLikeAnOlderMerge(result.auditId, target.id, 'abc');
     await db.update(users).set({ name: 'Mireille' }).where(eq(users.id, target.id));
 
     await splitServerUser(sourceSu.id, admin.id);

@@ -579,7 +579,7 @@ export function Users() {
         userId={identityTarget?.id ?? ''}
         currentName={identityTarget?.identityName ?? null}
         currentContactEmail={identityDetail.data?.identity.contactEmail ?? null}
-        username={identityTarget?.username ?? ''}
+        username={identityDetail.data?.identity.username ?? ''}
       />
 
       <EditTrustScoreDialog

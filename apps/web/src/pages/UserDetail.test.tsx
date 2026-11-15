@@ -96,6 +96,7 @@ const fullData = {
   },
   identity: {
     userId: 'u-1',
+    username: 'alice',
     aggregateTrustScore: 80,
     totalViolations: 1,
     contactEmail: null,
@@ -248,6 +249,24 @@ describe('UserDetail', () => {
     expect(facts).toHaveTextContent('pages:userDetail.access.roleMember');
     expect(facts).toHaveTextContent('common:labels.joined');
     expect(screen.getByRole('link', { name: 'nav:users' })).toHaveAttribute('href', '/users');
+  });
+
+  it('names a person without a display name by their Tracearr username, keeping the account handle', async () => {
+    mockUseUserFull.mockReturnValue({
+      data: {
+        ...fullData,
+        user: { ...fullData.user, identityName: null, username: 'aaron_tofa' },
+        identity: { ...fullData.identity, username: 'zoe' },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useUserFull>);
+    renderDetail();
+
+    expect(screen.getByRole('heading', { level: 1, name: 'zoe' })).toBeInTheDocument();
+    expect(screen.getByTestId('user-facts')).toHaveTextContent('@aaron_tofa');
+
+    await userEvent.click(screen.getByRole('button', { name: 'pages:userDetail.editIdentity' }));
+    expect(await screen.findByPlaceholderText('zoe')).toBeInTheDocument();
   });
 
   it('renders six stat cards with deltas from the range stats', () => {

@@ -77,10 +77,10 @@ const RESET_TRUST_REASON = 'reset by an owner';
  * buildOrderBy. `pendingViolations` is the exception: it names the page query's
  * select-list count, which no index covers, so that sort counts every identity.
  *
- * `username` is another: it orders on the shown name, which no index can hold.
- * lower() because the database collation is byte order on every install family
- * but the glibc dev image, so capitals would otherwise sort before every
- * lowercase name.
+ * `username` orders on personNameSql, the name the row shows, which
+ * users_display_name_idx holds. lower() because the database collation is byte
+ * order on every install family but the glibc dev image, so capitals would
+ * otherwise sort before every lowercase name.
  */
 const USER_SORT_KEYS: Record<UserSortField, SortKey> = {
   username: { key: sql`lower(${personNameSql()})`, defaultDir: 'asc', nulls: 'last' },
@@ -137,7 +137,7 @@ export function buildUserRosterSql(
 
   if (filters.search) {
     const pattern = likePattern(filters.search);
-    // The shown name matches, and so does any account's username in scope: someone
+    // The person's name matches, and so does any account's username in scope: someone
     // who is bob_plex on Plex and robert on Jellyfin is findable as either.
     identityConditions.push(sql`(
       ${personNameSql()} ILIKE ${pattern}

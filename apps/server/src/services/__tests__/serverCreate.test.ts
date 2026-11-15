@@ -30,7 +30,7 @@ vi.mock('../sseManager.js', () => ({ sseManager: { refresh: vi.fn(step('sseRefre
 vi.mock('../sync.js', () => ({ syncServer: vi.fn() }));
 
 import { enqueueLibrarySync } from '../../jobs/librarySyncQueue.js';
-import { startAddedServer } from '../serverCreate.js';
+import { startAddedServer, syncReconnectedServer } from '../serverCreate.js';
 import { syncServer } from '../sync.js';
 
 const usersSynced = { usersAdded: 2, usersRead: true, errors: [] as string[] };
@@ -40,15 +40,15 @@ async function settled(last: string): Promise<void> {
   await vi.waitFor(() => expect(calls).toContain(last));
 }
 
-describe('startAddedServer', () => {
-  beforeEach(() => {
-    calls.length = 0;
-    vi.mocked(syncServer).mockImplementation(async () => {
-      calls.push('userSync');
-      return usersSynced as never;
-    });
+beforeEach(() => {
+  calls.length = 0;
+  vi.mocked(syncServer).mockImplementation(async () => {
+    calls.push('userSync');
+    return usersSynced as never;
   });
+});
 
+describe('startAddedServer', () => {
   it('holds the history import, then syncs users, queues the library sync and syncs requests', async () => {
     await startAddedServer(tofa, ['service-1']);
     await settled('requestSync');
@@ -64,7 +64,7 @@ describe('startAddedServer', () => {
       'requestSync',
     ]);
     expect(syncServer).toHaveBeenCalledWith('srv-1', { syncUsers: true, syncLibraries: false });
-    expect(enqueueLibrarySync).toHaveBeenCalledWith('srv-1', 'event');
+    expect(enqueueLibrarySync).toHaveBeenCalledWith('srv-1', 'event', { firstSync: true });
   });
 
   it('re-arms imported history linking for Plex and holds no import', async () => {
@@ -107,5 +107,15 @@ describe('startAddedServer', () => {
 
     expect(calls.slice(-3)).toEqual(['userSync', 'librarySync', 'scheduleRequestSync']);
     expect(calls).not.toContain('requestSync');
+  });
+});
+
+describe('syncReconnectedServer', () => {
+  it('syncs users, then queues a library sync that is not a first sync, and restarts nothing', async () => {
+    syncReconnectedServer('srv-3');
+    await settled('librarySync');
+
+    expect(calls).toEqual(['userSync', 'librarySync']);
+    expect(enqueueLibrarySync).toHaveBeenCalledWith('srv-3', 'event', { firstSync: false });
   });
 });

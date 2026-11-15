@@ -405,6 +405,7 @@ export interface MediaHistoryPageResponse {
 export interface LibraryStatusResponse {
   isSynced: boolean;
   isSyncRunning: boolean;
+  isSyncQueued: boolean;
   needsBackfill: boolean;
   isBackfillRunning: boolean;
   backfillState: 'active' | 'waiting' | 'delayed' | null;

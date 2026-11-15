@@ -55,6 +55,7 @@ import {
   buildUserRosterAccountIdQuery,
 } from '../list.js';
 import { permissionGuard } from '../../../lib/scope.js';
+import { personNameSql } from '../../../utils/representativeAccount.js';
 
 const mockExecute = vi.mocked(db.execute);
 const mockSelect = vi.mocked(db.select);
@@ -66,6 +67,8 @@ const mockRecompute = vi.mocked(recomputeIdentityAggregates);
 function normalize(text: string): string {
   return text.replace(/\s+/g, ' ').trim();
 }
+
+const PERSON_NAME = normalize(renderSql(personNameSql()).sql);
 
 function owner(): AuthUser {
   return { userId: randomUUID(), username: 'tester', role: 'owner', serverIds: [] };
@@ -108,7 +111,7 @@ describe('roster search', () => {
 
     expect(text).toContain('EXISTS ( SELECT 1 FROM server_users rsu WHERE rsu.user_id = u.id');
     expect(text).toContain('rsu.username ILIKE');
-    expect(text).toContain('u.name ILIKE');
+    expect(text).toContain(`${PERSON_NAME} ILIKE`);
     expect(params).toContain('%robert%');
   });
 
@@ -140,10 +143,8 @@ describe('roster search', () => {
 // ============================================================================
 
 describe('roster ORDER BY', () => {
-  it('sorts by the identity display name by default, ascending, tiebroken on the identity id', () => {
-    expect(orderClause('username')).toBe(
-      'lower(coalesce(u.name, u.username)) ASC NULLS LAST, u.id ASC'
-    );
+  it('sorts by the shown person name by default, ascending, tiebroken on the identity id', () => {
+    expect(orderClause('username')).toBe(`lower(${PERSON_NAME}) ASC NULLS LAST, u.id ASC`);
   });
 
   it('sorts trust by the identity aggregate, worst-first default', () => {
@@ -160,9 +161,7 @@ describe('roster ORDER BY', () => {
 
   it('honours an explicit direction and keeps NULLS LAST in both', () => {
     expect(orderClause('joinedAt', 'asc')).toBe('u.first_joined_at ASC NULLS LAST, u.id ASC');
-    expect(orderClause('username', 'desc')).toBe(
-      'lower(coalesce(u.name, u.username)) DESC NULLS LAST, u.id ASC'
-    );
+    expect(orderClause('username', 'desc')).toBe(`lower(${PERSON_NAME}) DESC NULLS LAST, u.id ASC`);
   });
 });
 
@@ -551,7 +550,7 @@ describe('POST /users/bulk/reset-trust', () => {
     // Without it, "select all 3 users" resets every account on the server.
     const seedQuery = renderSql(mockExecute.mock.calls[0]![0] as any);
     expect(normalize(seedQuery.sql)).toContain('rsu.username ILIKE');
-    expect(normalize(seedQuery.sql)).toContain('u.name ILIKE');
+    expect(normalize(seedQuery.sql)).toContain(`${PERSON_NAME} ILIKE`);
     expect(seedQuery.params).toContain('%robert%');
     expect(mockRecompute).toHaveBeenCalledWith([userId], expect.anything());
   });

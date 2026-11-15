@@ -51,6 +51,11 @@ function importTaskKind(type: ImportJobData['type']): { type: RunningTaskType; l
   }
 }
 
+function librarySyncMessage(isRunning: boolean, attemptsMade: number, serverName: string) {
+  if (isRunning) return `Syncing ${serverName}...`;
+  return attemptsMade > 0 ? 'Retrying after an error' : 'Waiting to start';
+}
+
 export const tasksRoutes: FastifyPluginAsync = async (app) => {
   const readTasks = { preHandler: [app.requirePermission('tasks', 'read')] };
   /**
@@ -64,15 +69,12 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
   app.get('/running', readTasks, async () => {
     const tasks: RunningTask[] = [];
 
-    // Get library sync tasks
-    // Only show scheduled syncs if actively running (hide queued cron jobs)
     const librarySyncs = await getAllActiveLibrarySyncs();
     for (const sync of librarySyncs) {
       const isRunning = sync.state === 'active';
-      const isScheduled = sync.triggeredBy === 'scheduled';
 
-      // Skip scheduled jobs that are just queued - only show when running
-      if (isScheduled && !isRunning) {
+      // Queued cron and change-event syncs stay hidden until they run; a first sync shows
+      if (sync.triggeredBy === 'scheduled' && !sync.firstSync && !isRunning) {
         continue;
       }
 
@@ -83,7 +85,7 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
         name: 'Library Sync',
         status: isRunning ? 'running' : 'pending',
         progress: sync.progress,
-        message: isRunning ? `Syncing ${serverName}...` : 'Waiting to start',
+        message: librarySyncMessage(isRunning, sync.attemptsMade, serverName),
         startedAt: new Date(sync.createdAt).toISOString(),
         context: serverName,
       });
@@ -106,6 +108,11 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
       let importStatus: RunningTask['status'] = imp.state === 'active' ? 'running' : 'pending';
       let waitingFor: RunningTask['waitingFor'] = undefined;
 
+      if (imp.held && imp.state === 'delayed') {
+        importStatus = 'waiting';
+        message = 'Waiting for the first library sync';
+      }
+
       if (isCachedJob) {
         // Use cached progress which has waiting status
         importStatus = cachedImportProgress.status === 'waiting' ? 'waiting' : importStatus;
@@ -124,7 +131,7 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
       }
 
       // Get progress percentage from BullMQ job progress
-      if (typeof imp.progress === 'number') {
+      if (typeof imp.progress === 'number' && imp.progress > 0) {
         progressPct = imp.progress;
         if (!isCachedJob || cachedImportProgress?.status !== 'waiting') {
           message = `Importing... ${imp.progress}%`;

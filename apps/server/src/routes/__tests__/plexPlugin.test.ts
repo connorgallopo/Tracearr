@@ -19,6 +19,7 @@ vi.mock('../../db/client.js', () => ({
     select: vi.fn(),
     insert: vi.fn(),
     update: vi.fn(),
+    transaction: vi.fn(),
   },
 }));
 
@@ -70,7 +71,6 @@ vi.mock('../../utils/claimCode.js', () => ({
   validateClaimCode: vi.fn(() => true),
 }));
 
-vi.mock('../../services/sync.js', () => ({ syncServer: vi.fn(() => Promise.resolve()) }));
 vi.mock('../../services/serverCreate.js', () => ({ startAddedServer: vi.fn() }));
 
 const mockSetSessionCookie = vi.fn(
@@ -89,6 +89,7 @@ vi.mock('better-auth/cookies', () => ({
 }));
 
 import { db } from '../../db/client.js';
+import { servers, serverUsers, users } from '../../db/schema.js';
 import { PlexClient } from '../../services/mediaServer/index.js';
 import { startAddedServer } from '../../services/serverCreate.js';
 import { getUserById, getOwnerUser } from '../../services/userService.js';
@@ -184,6 +185,7 @@ describe('plex better auth plugin', () => {
     vi.mocked(isClaimCodeEnabled).mockReturnValue(false);
     vi.mocked(db.update).mockReturnValue(makeChain([]) as never);
     vi.mocked(db.insert).mockReturnValue(makeChain([]) as never);
+    vi.mocked(db.transaction).mockImplementation(async (write) => write(db as never));
     mockFetch.mockResolvedValue({ ok: true, status: 200, statusText: 'OK' });
     vi.mocked(usableLoginMethods).mockResolvedValue({
       local: true,
@@ -582,6 +584,14 @@ describe('plex better auth plugin', () => {
       serverName: 'My Plex',
     };
 
+    function readyToConnect() {
+      mockRedis.get.mockResolvedValue(JSON.stringify(storedTempData));
+      mockRedis.del.mockResolvedValue(1);
+      vi.mocked(getOwnerUser).mockResolvedValue(null);
+      vi.mocked(PlexClient.verifyServerAdmin).mockResolvedValue({ success: true } as never);
+      mockGetUsers.mockResolvedValue([{ id: 'plex-local-1', isAdmin: true }]);
+    }
+
     it('answers an expired temp token with the sign-in expired code', async () => {
       mockRedis.get.mockResolvedValue(null);
 
@@ -668,12 +678,7 @@ describe('plex better auth plugin', () => {
     });
 
     it('creates the user and server, deletes the temp token, and returns a session on success', async () => {
-      mockRedis.get.mockResolvedValue(JSON.stringify(storedTempData));
-      mockRedis.del.mockResolvedValue(1);
-      vi.mocked(getOwnerUser).mockResolvedValue(null);
-      vi.mocked(PlexClient.verifyServerAdmin).mockResolvedValue({ success: true } as never);
-      mockGetUsers.mockResolvedValue([{ id: 'plex-local-1', isAdmin: true }]);
-
+      readyToConnect();
       vi.mocked(db.select).mockReturnValueOnce(makeChain([]) as never); // no existing server
       vi.mocked(db.insert)
         .mockReturnValueOnce(makeChain([{ id: 'server-1' }]) as never)
@@ -693,6 +698,74 @@ describe('plex better auth plugin', () => {
         { id: 'server-1', type: 'plex' },
         []
       );
+    });
+
+    it('starts a server row left by an earlier attempt the way every added server starts', async () => {
+      readyToConnect();
+      vi.mocked(db.select).mockReturnValueOnce(makeChain([{ id: 'server-1' }]) as never);
+      vi.mocked(db.insert)
+        .mockReturnValueOnce(
+          makeChain([{ id: 'user-1', username: 'newowner', role: 'owner' }]) as never
+        )
+        .mockReturnValueOnce(makeChain([{ id: 'plexacct-1' }]) as never);
+
+      await callEndpoint('plexConnect', connectPayload);
+
+      expect(startAddedServer).toHaveBeenCalledExactlyOnceWith(
+        { id: 'server-1', type: 'plex' },
+        []
+      );
+    });
+
+    it('keeps nothing from an attempt whose last write fails, so the retry signs in', async () => {
+      readyToConnect();
+      type Rows = Map<unknown, Record<string, unknown>[]>;
+      let serverUserWriteFails = true;
+      const writer = (rows: Rows) => ({
+        select: () => makeChain(rows.get(servers) ?? []),
+        update: () => makeChain([]),
+        insert: (table: unknown) => {
+          const chain = makeChain();
+          chain.then = (resolve: (v: unknown) => unknown, reject: (e: unknown) => unknown) => {
+            if (table === serverUsers && serverUserWriteFails) {
+              serverUserWriteFails = false;
+              return reject(new Error('insert failed'));
+            }
+            const values = vi.mocked(chain.values as () => unknown).mock.calls[0] as unknown[];
+            const row = { id: `row-${rows.size}`, ...(values[0] as Record<string, unknown>) };
+            rows.set(table, [...(rows.get(table) ?? []), row]);
+            return resolve([row]);
+          };
+          return chain;
+        },
+      });
+      const committed: Rows = new Map();
+      const autocommit = writer(committed);
+      vi.mocked(db.select).mockImplementation(autocommit.select as never);
+      vi.mocked(db.insert).mockImplementation(autocommit.insert as never);
+      vi.mocked(db.transaction).mockImplementation(async (write) => {
+        const staged: Rows = new Map([...committed].map(([table, rows]) => [table, [...rows]]));
+        const written = await write(writer(staged) as never);
+        for (const [table, rows] of staged) committed.set(table, rows);
+        return written;
+      });
+      vi.mocked(getOwnerUser).mockImplementation(
+        async () => (committed.get(users)?.[0] ?? null) as never
+      );
+
+      await expect(callEndpoint('plexConnect', connectPayload)).rejects.toMatchObject({
+        statusCode: 500,
+      });
+      expect(committed.get(servers)).toBeUndefined();
+      expect(committed.get(users)).toBeUndefined();
+
+      const { result } = await callEndpoint('plexConnect', connectPayload);
+
+      expect(result.response.authorized).toBe(true);
+      expect(committed.get(users)).toHaveLength(1);
+      expect(committed.get(servers)).toHaveLength(1);
+      expect(committed.get(serverUsers)).toHaveLength(1);
+      expect(startAddedServer).toHaveBeenCalledOnce();
     });
   });
 });

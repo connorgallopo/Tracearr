@@ -171,6 +171,7 @@ import {
   startMaintenanceWorker,
   shutdownMaintenanceQueue,
   enqueueServerLocationSyncIfBehind,
+  seedSnapshotsNormalizedAt,
 } from './jobs/maintenanceQueue.js';
 import {
   initLibrarySyncQueue,
@@ -948,6 +949,13 @@ async function initializeServices(app: FastifyInstance) {
     await seedWhatsNewLastSeen();
   } catch (err) {
     app.log.warn({ err }, "Failed to seed what's-new last-seen version");
+  }
+
+  // Wrapped the same way: a failed seed leaves the setting null and the first sync normalizes.
+  try {
+    await seedSnapshotsNormalizedAt();
+  } catch (err) {
+    app.log.warn({ err }, 'Failed to seed snapshot normalization marker');
   }
 
   try {

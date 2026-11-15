@@ -2093,11 +2093,6 @@ export async function getAllActiveMaintenanceJobs(): Promise<
 }
 
 /**
- * Enqueue unless a maintenance job is already pending - the queue is
- * deliberately single-flight. Returns null when busy (or when the queue isn't
- * up), for automated callers that treat "already covered" as success.
- */
-/**
  * One-time snapshot normalization: everything older than raw retention is
  * already version-aware reconstruction (the 2.0 aggregate rebuild), so
  * regenerating the surviving pre-stamp band the same way leaves the whole
@@ -2184,6 +2179,30 @@ export async function processNormalizeLibrarySnapshotsJob(
   };
 }
 
+/**
+ * Boot decides once whether there is anything to normalize. Old-semantics history lives in
+ * snapshot or aggregate rows, or arrives later through items that still carry the 'legacy:1'
+ * sentinel; a database with no items, snapshots or aggregate rows has neither and never will,
+ * so it is stamped and the first library sync queues the plain backfill instead.
+ */
+export async function seedSnapshotsNormalizedAt(): Promise<void> {
+  if ((await getSetting('snapshotsNormalizedAt')) !== null) return;
+  const { extensionInstalled } = await getTimescaleStatus();
+  const result = await db.execute(sql`
+    SELECT EXISTS (SELECT 1 FROM library_items)
+      OR EXISTS (SELECT 1 FROM library_snapshots)
+      ${extensionInstalled ? sql`OR EXISTS (SELECT 1 FROM library_stats_daily)` : sql``}
+      AS has_history
+  `);
+  if ((result.rows[0] as { has_history: boolean } | undefined)?.has_history !== false) return;
+  await setSetting('snapshotsNormalizedAt', new Date().toISOString());
+}
+
+/**
+ * Enqueue unless a maintenance job is already pending - the queue is
+ * deliberately single-flight. Returns null when busy (or when the queue isn't
+ * up), for automated callers that treat "already covered" as success.
+ */
 export async function maybeEnqueueMaintenanceJob(
   type: MaintenanceJobType,
   userId: string,

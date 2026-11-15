@@ -667,7 +667,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       // Also trigger full library sync (items/episodes) in background
       let librarySyncJobId: string | null = null;
       try {
-        librarySyncJobId = await enqueueLibrarySync(id, 'manual', authUser.userId);
+        librarySyncJobId = await enqueueLibrarySync(id, 'manual', { userId: authUser.userId });
         app.log.info({ serverId: id, jobId: librarySyncJobId }, 'Library sync job enqueued');
       } catch (err) {
         // Don't fail the whole sync if library sync can't be queued

@@ -3,8 +3,8 @@
  *
  * When stats are rolled up by identity (users.id) instead of by server account
  * (server_users.id), one account has to be picked to represent the person for
- * navigation, avatar, and username fallback. This is the same preference order
- * as routes/users/list.ts's DISTINCT ON: an active, Plex-linked, most-active
+ * navigation and avatar. This is the same preference order as
+ * routes/users/list.ts's DISTINCT ON: an active, Plex-linked, most-active
  * account wins over a removed or less-active one.
  *
  * `alias` is the server_users table alias in the query (e.g. 'su2'), correlated
@@ -24,21 +24,9 @@ export function representativeAccountOrderSql(alias: string): SQL {
 }
 
 /**
- * The person `u`'s own username: their representative account's, picked across every server
- * they are on. A page's server filter narrows which account a row describes, never this, so a
- * merged person keeps one name whichever servers are selected. users.username is not used
- * because sync never rewrites it, so it keeps the old name after a rename on the server.
+ * The name a person row shows, sorts and searches by: the Tracearr user's, never a media server
+ * account's, so a server filter cannot change it. users_display_name_idx holds lower() of it.
  */
-export function personUsernameSql(): SQL {
-  return sql`(
-    SELECT person_su.username FROM server_users person_su
-    WHERE person_su.user_id = u.id
-    ORDER BY ${representativeAccountOrderSql('person_su')}
-    LIMIT 1
-  )`;
-}
-
-/** The name a person row shows and sorts by: the display name, else personUsernameSql. */
 export function personNameSql(): SQL {
-  return sql`coalesce(u.name, ${personUsernameSql()})`;
+  return sql`coalesce(u.name, u.username)`;
 }

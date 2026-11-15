@@ -9,7 +9,7 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { compareNames } from '../../utils/collation.js';
-import { personUsernameSql } from '../../utils/representativeAccount.js';
+import { personNameSql } from '../../utils/representativeAccount.js';
 import { lastDeliveredUserIds } from './store.js';
 import { normalizeAddress, suppressedAmong } from './suppressions.js';
 
@@ -170,7 +170,7 @@ interface CandidateRow {
   identity_email: string | null;
   account_emails: string[] | null;
   account_emails_from_usernames: boolean;
-  username: string | null;
+  usernames: string[] | null;
   server_ids: string[] | null;
   server_names: string[] | null;
   thumb_urls: (string | null)[] | null;
@@ -187,12 +187,12 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
   const result = await db.execute(sql`
     SELECT u.id AS user_id,
            (array_agg(su.id ORDER BY su.created_at, su.id))[1] AS server_user_id,
-           u.name,
+           ${personNameSql()} AS name,
            u.contact_email,
            u.email AS identity_email,
            array_remove(array_agg(su.email ORDER BY s.type IN ${USERNAME_EMAIL_TYPES}, su.created_at, su.id), NULL) AS account_emails,
            bool_and(su.email IS NULL OR s.type IN ${USERNAME_EMAIL_TYPES}) AS account_emails_from_usernames,
-           ${personUsernameSql()} AS username,
+           array_agg(su.username ORDER BY su.created_at, su.id) AS usernames,
            array_agg(su.server_id ORDER BY su.created_at, su.id) AS server_ids,
            array_agg(s.name ORDER BY su.created_at, su.id) AS server_names,
            array_agg(su.thumb_url ORDER BY su.created_at, su.id) AS thumb_urls,
@@ -208,7 +208,7 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
     userId: row.user_id,
     serverUserId: row.server_user_id,
     name: row.name,
-    username: row.username,
+    username: row.usernames?.[0] ?? null,
     serverId: row.server_ids?.[0] ?? '',
     serverName: row.server_names?.[0] ?? '',
     thumbUrl: row.thumb_urls?.[0] ?? null,
