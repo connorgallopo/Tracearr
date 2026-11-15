@@ -11,6 +11,7 @@ import {
   type TofaImportProgress,
   type TofaImportResult,
 } from '@tracearr/shared';
+import { UnrecoverableError } from 'bullmq';
 import { and, eq, gte, inArray, lte, or } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { servers, sessions } from '../../db/schema.js';
@@ -26,12 +27,11 @@ import { TofaClient } from '../mediaServer/tofa/client.js';
 import { playMethodDecisions, tofaPosterPath } from '../mediaServer/tofa/parser.js';
 import type { TofaWatchHistoryRow } from '../mediaServer/tofa/types.js';
 import { markImportedServerLocations } from '../serverLocations.js';
-import { syncServer } from '../sync.js';
 import { refreshImportAggregates } from './aggregates.js';
 import { flushInsertBatch } from './batchProcessor.js';
 import { importIdentityByKey } from './libraryKeyMatch.js';
 import { createSimpleProgressPublisher } from './progressTracker.js';
-import { createSkippedUserTracker, createUserMapping } from './userMapping.js';
+import { createSkippedUserTracker, createUserMapping, syncImportUsers } from './userMapping.js';
 
 const PAGE_SIZE = 200;
 // A play Tracearr captured starts within moments of tofa's record of it
@@ -206,171 +206,156 @@ export async function importTofaHistory(
   publishProgress(progress);
   const skippedUserTracker = createSkippedUserTracker();
 
-  try {
-    const [server] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
-    if (!server) throw new Error(`Server not found: ${serverId}`);
-    if (server.historicalAt) throw new ServerHistoricalError(serverId);
-    if (SERVER_PROFILES[server.type].serverHistoryImport !== 'tofa') {
-      throw new Error(`${server.type} servers keep no watch history of their own to import`);
-    }
-
-    const users = await syncServer(serverId, { syncUsers: true, syncLibraries: false });
-    if (!users.usersRead) throw new Error(users.errors.join('; '));
-
-    const client = new TofaClient({ url: server.url, token: server.token, id: server.id });
-    const userMap = await createUserMapping(serverId);
-    const thresholds = new Map<string, Promise<number>>();
-    const geoCache = new Map<string, ImportGeo>();
-    let minImportDate: Date | null = null;
-    let maxImportDate: Date | null = null;
-    let before: string | null = null;
-    let lastPage = new Set<string>();
-
-    for (;;) {
-      progress.status = 'fetching';
-      progress.message = `Fetching plays: ${progress.fetchedRecords} so far`;
-      publishProgress(progress);
-
-      const page = await client.getWatchHistoryPage(before, PAGE_SIZE);
-      const oldest = page.items.at(-1);
-      const items = page.items.filter((row) => !lastPage.has(row.id));
-      if (!oldest) break;
-      if (items.length === 0) {
-        // tofa pages history by start time alone, so a page of plays that all started in one
-        // millisecond cannot be paged past
-        console.warn(
-          '[TofaHistory] Stopped before the oldest plays: a full page started at',
-          oldest.started_at
-        );
-        break;
-      }
-      progress.fetchedRecords += items.length;
-
-      progress.status = 'processing';
-      const known = await knownPlays(serverId, items);
-      const identityByKey = await batchGetLibraryItemIdentity(
-        serverId,
-        items.flatMap((row) => historyItem(row).ratingKey ?? [])
-      );
-      const insertBatch: (typeof sessions.$inferInsert)[] = [];
-
-      for (const row of items) {
-        progress.processedRecords++;
-        try {
-          const serverUserId = userMap.get(row.user_id);
-          if (!serverUserId) {
-            skippedUserTracker.track(row.user_id, row.username);
-            progress.unknownUserRecords++;
-            progress.skippedRecords++;
-            continue;
-          }
-          if (known.has(row.id) || (row.session_id && known.has(row.session_id))) {
-            progress.duplicateRecords++;
-            progress.skippedRecords++;
-            continue;
-          }
-          if (!row.ended_at) {
-            progress.activeRecords++;
-            progress.skippedRecords++;
-            continue;
-          }
-
-          const { ratingKey, mediaType } = historyItem(row);
-          const ip = row.client_ip ?? '';
-          const geo = geoCache.getOrInsertComputed(ip, () => {
-            const asn = geoasnService.lookup(ip);
-            return {
-              ...geoipService.lookup(ip),
-              asnNumber: asn.number,
-              asnOrganization: asn.organization,
-            };
-          });
-          const endedAt = new Date(row.ended_at);
-          insertBatch.push(
-            transformTofaHistoryRow(row, endedAt, {
-              serverId,
-              serverUserId,
-              threshold: await thresholds.getOrInsertComputed(mediaType, (type) =>
-                serverWatchedThreshold(server, type)
-              ),
-              geo,
-              identity: ratingKey ? identityByKey.get(ratingKey) : undefined,
-              profileName: row.profile_name ?? null,
-            })
-          );
-
-          const startedAt = new Date(row.started_at);
-          if (!minImportDate || startedAt < minImportDate) minImportDate = startedAt;
-          if (!maxImportDate || startedAt > maxImportDate) maxImportDate = startedAt;
-          progress.importedRecords++;
-        } catch (error) {
-          console.error('[TofaHistory] Error processing play', row.id, error);
-          progress.errorRecords++;
-        }
-      }
-
-      await flushInsertBatch(insertBatch);
-      progress.message = `Processing: ${progress.processedRecords} plays`;
-      publishProgress(progress);
-
-      if (!page.has_more) break;
-      // Plays can share a start time, and tofa takes no tie-breaker, so the next page starts just
-      // after the oldest play and the plays this page already held are left out of it
-      lastPage = new Set(page.items.map((row) => row.id));
-      before = new Date(Date.parse(oldest.started_at) + 1).toISOString();
-    }
-
-    progress.message = 'Refreshing aggregates...';
-    publishProgress(progress);
-    await refreshImportAggregates('TofaHistory', minImportDate, maxImportDate);
-    try {
-      await markImportedServerLocations(serverId);
-      await enqueueServerLocationSyncIfBehind();
-    } catch (err) {
-      console.error('[TofaHistory] Could not queue the server location sync:', err);
-    }
-
-    let message =
-      `Import complete: ${progress.importedRecords} imported, ` +
-      `${progress.duplicateRecords} already in Tracearr, ` +
-      `${progress.unknownUserRecords} unknown user, ` +
-      `${progress.activeRecords} still playing, ${progress.errorRecords} errors`;
-    const skippedUsersWarning = skippedUserTracker.formatWarning();
-    if (skippedUsersWarning) message += `. Warning: ${skippedUsersWarning}`;
-
-    progress.status = 'complete';
-    progress.message = message;
-    publishProgress(progress);
-
-    return {
-      success: true,
-      imported: progress.importedRecords,
-      skipped: progress.skippedRecords,
-      duplicates: progress.duplicateRecords,
-      errors: progress.errorRecords,
-      message,
-      skippedUsers:
-        skippedUserTracker.size > 0
-          ? skippedUserTracker.getAll().map((u) => ({
-              userId: u.externalId,
-              username: u.username,
-              recordCount: u.count,
-            }))
-          : undefined,
-    };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[TofaHistory] Import failed:', error);
-    progress.status = 'error';
-    progress.message = `Import failed: ${errorMessage}`;
-    publishProgress(progress);
-    return {
-      success: false,
-      imported: progress.importedRecords,
-      skipped: progress.skippedRecords,
-      duplicates: progress.duplicateRecords,
-      errors: progress.errorRecords,
-      message: `Import failed: ${errorMessage}`,
-    };
+  const [server] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
+  if (!server) throw new UnrecoverableError(`Server not found: ${serverId}`);
+  if (server.historicalAt) throw new ServerHistoricalError(serverId);
+  if (SERVER_PROFILES[server.type].serverHistoryImport !== 'tofa') {
+    throw new UnrecoverableError(
+      `${server.type} servers keep no watch history of their own to import`
+    );
   }
+
+  await syncImportUsers(serverId);
+
+  const client = new TofaClient({ url: server.url, token: server.token, id: server.id });
+  const userMap = await createUserMapping(serverId);
+  const thresholds = new Map<string, Promise<number>>();
+  const geoCache = new Map<string, ImportGeo>();
+  let minImportDate: Date | null = null;
+  let maxImportDate: Date | null = null;
+  let before: string | null = null;
+  let lastPage = new Set<string>();
+
+  for (;;) {
+    progress.status = 'fetching';
+    progress.message = `Fetching plays: ${progress.fetchedRecords} so far`;
+    publishProgress(progress);
+
+    const page = await client.getWatchHistoryPage(before, PAGE_SIZE);
+    const oldest = page.items.at(-1);
+    const items = page.items.filter((row) => !lastPage.has(row.id));
+    if (!oldest) break;
+    if (items.length === 0) {
+      // tofa pages history by start time alone, so a page of plays that all started in one
+      // millisecond cannot be paged past
+      console.warn(
+        '[TofaHistory] Stopped before the oldest plays: a full page started at',
+        oldest.started_at
+      );
+      break;
+    }
+    progress.fetchedRecords += items.length;
+
+    progress.status = 'processing';
+    const known = await knownPlays(serverId, items);
+    const identityByKey = await batchGetLibraryItemIdentity(
+      serverId,
+      items.flatMap((row) => historyItem(row).ratingKey ?? [])
+    );
+    const insertBatch: (typeof sessions.$inferInsert)[] = [];
+
+    for (const row of items) {
+      progress.processedRecords++;
+      try {
+        const serverUserId = userMap.get(row.user_id);
+        if (!serverUserId) {
+          skippedUserTracker.track(row.user_id, row.username);
+          progress.unknownUserRecords++;
+          progress.skippedRecords++;
+          continue;
+        }
+        if (known.has(row.id) || (row.session_id && known.has(row.session_id))) {
+          progress.duplicateRecords++;
+          progress.skippedRecords++;
+          continue;
+        }
+        if (!row.ended_at) {
+          progress.activeRecords++;
+          progress.skippedRecords++;
+          continue;
+        }
+
+        const { ratingKey, mediaType } = historyItem(row);
+        const ip = row.client_ip ?? '';
+        const geo = geoCache.getOrInsertComputed(ip, () => {
+          const asn = geoasnService.lookup(ip);
+          return {
+            ...geoipService.lookup(ip),
+            asnNumber: asn.number,
+            asnOrganization: asn.organization,
+          };
+        });
+        const endedAt = new Date(row.ended_at);
+        insertBatch.push(
+          transformTofaHistoryRow(row, endedAt, {
+            serverId,
+            serverUserId,
+            threshold: await thresholds.getOrInsertComputed(mediaType, (type) =>
+              serverWatchedThreshold(server, type)
+            ),
+            geo,
+            identity: ratingKey ? identityByKey.get(ratingKey) : undefined,
+            profileName: row.profile_name ?? null,
+          })
+        );
+
+        const startedAt = new Date(row.started_at);
+        if (!minImportDate || startedAt < minImportDate) minImportDate = startedAt;
+        if (!maxImportDate || startedAt > maxImportDate) maxImportDate = startedAt;
+        progress.importedRecords++;
+      } catch (error) {
+        console.error('[TofaHistory] Error processing play', row.id, error);
+        progress.errorRecords++;
+      }
+    }
+
+    await flushInsertBatch(insertBatch);
+    progress.message = `Processing: ${progress.processedRecords} plays`;
+    publishProgress(progress);
+
+    if (!page.has_more) break;
+    // Plays can share a start time, and tofa takes no tie-breaker, so the next page starts just
+    // after the oldest play and the plays this page already held are left out of it
+    lastPage = new Set(page.items.map((row) => row.id));
+    before = new Date(Date.parse(oldest.started_at) + 1).toISOString();
+  }
+
+  progress.message = 'Refreshing aggregates...';
+  publishProgress(progress);
+  await refreshImportAggregates('TofaHistory', minImportDate, maxImportDate);
+  try {
+    await markImportedServerLocations(serverId);
+    await enqueueServerLocationSyncIfBehind();
+  } catch (err) {
+    console.error('[TofaHistory] Could not queue the server location sync:', err);
+  }
+
+  let message =
+    `Import complete: ${progress.importedRecords} imported, ` +
+    `${progress.duplicateRecords} already in Tracearr, ` +
+    `${progress.unknownUserRecords} unknown user, ` +
+    `${progress.activeRecords} still playing, ${progress.errorRecords} errors`;
+  const skippedUsersWarning = skippedUserTracker.formatWarning();
+  if (skippedUsersWarning) message += `. Warning: ${skippedUsersWarning}`;
+
+  progress.status = 'complete';
+  progress.message = message;
+  publishProgress(progress);
+
+  return {
+    success: true,
+    imported: progress.importedRecords,
+    skipped: progress.skippedRecords,
+    duplicates: progress.duplicateRecords,
+    errors: progress.errorRecords,
+    message,
+    skippedUsers:
+      skippedUserTracker.size > 0
+        ? skippedUserTracker.getAll().map((u) => ({
+            userId: u.externalId,
+            username: u.username,
+            recordCount: u.count,
+          }))
+        : undefined,
+  };
 }

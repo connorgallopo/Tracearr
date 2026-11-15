@@ -454,6 +454,7 @@
     "includeStreamDetailsHelp": "Importurile de informaţii suplimentare. Poate creşte semnificativ timpul de import.",
     "importing": "Importare...",
     "startImport": "Începe importul",
+    "startAgain": "",
     "howItWorks": "Cum funcţionează importul",
     "howItWorksDesc": "Tracearr va importa toate datele istorice de vizionare de la sursa dvs. Acest lucru poate dura un timp, în funcție de mărimea bibliotecii dvs.",
     "recordsMayBeSkipped": "Înregistrările pot fi omise dacă:",
@@ -507,6 +508,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

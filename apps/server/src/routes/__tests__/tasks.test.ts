@@ -65,8 +65,17 @@ function librarySync(state: string, firstSync: boolean, attemptsMade = 0) {
   };
 }
 
-function tofaImport(jobId: string, state: string, held: boolean) {
-  return { jobId, type: 'tofa' as const, serverId: 'srv-1', state, progress: 0, createdAt, held };
+function tofaImport(jobId: string, state: string, held: boolean, attemptsMade = 0) {
+  return {
+    jobId,
+    type: 'tofa' as const,
+    serverId: 'srv-1',
+    state,
+    progress: 0,
+    createdAt,
+    held,
+    attemptsMade,
+  };
 }
 
 describe('GET /tasks/running', () => {
@@ -108,6 +117,20 @@ describe('GET /tasks/running', () => {
     ]);
   });
 
+  it('reads an import waiting out a retry as retrying without its old progress', async () => {
+    vi.mocked(getAllActiveImports).mockResolvedValue([
+      { ...tofaImport('import-srv-1', 'delayed', false, 1), progress: 42 },
+    ]);
+
+    expect(await runningTasks()).toEqual([
+      expect.objectContaining({
+        status: 'pending',
+        progress: null,
+        message: 'Retrying after an error',
+      }),
+    ]);
+  });
+
   it('reads a held import as waiting for the first library sync', async () => {
     vi.mocked(getAllActiveImports).mockResolvedValue([
       tofaImport('held-import-srv-1', 'delayed', true),
@@ -122,14 +145,17 @@ describe('GET /tasks/running', () => {
     ]);
   });
 
-  it('reads a Playback Reporting import held for the first sync as waiting for it', async () => {
+  it.each([
+    ['playback-reporting', 'playback_reporting_import'],
+    ['tautulli', 'tautulli_import'],
+  ] as const)('reads a %s import held for the first sync as waiting for it', async (type, task) => {
     vi.mocked(getAllActiveImports).mockResolvedValue([
-      { ...tofaImport('pr-1', 'delayed', true), type: 'playback-reporting' },
+      { ...tofaImport('held-1', 'delayed', true), type },
     ]);
 
     expect(await runningTasks()).toEqual([
       expect.objectContaining({
-        type: 'playback_reporting_import',
+        type: task,
         status: 'waiting',
         message: 'Waiting for the first library sync',
       }),

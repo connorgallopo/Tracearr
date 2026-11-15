@@ -25,7 +25,9 @@ import { TimezoneSelect } from '@/components/settings/shared/TimezoneSelect';
 import { browserTimeZone } from '@/lib/dateFormat';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
+import type { ImportPhase } from '@/hooks/queries/useImports';
 import { ImportProgressCard, type ImportProgressData } from './ImportProgressCard';
+import { StartImportButton } from './StartImportButton';
 import type { Server, PlaybackReportingImportProgress } from '@tracearr/shared';
 
 interface PlaybackReportingImportSectionProps {
@@ -33,9 +35,7 @@ interface PlaybackReportingImportSectionProps {
   selectedServerId: string;
   onServerChange: (id: string) => void;
   progress: PlaybackReportingImportProgress | null;
-  isImporting: boolean;
-  /** Queued and held for the server's first library sync, so there is nothing to start */
-  held: boolean;
+  phase: ImportPhase;
   onStartImport: (opts: {
     serverId: string;
     timezone: string;
@@ -51,11 +51,11 @@ export function PlaybackReportingImportSection({
   selectedServerId,
   onServerChange,
   progress,
-  isImporting,
-  held,
+  phase,
   onStartImport,
 }: PlaybackReportingImportSectionProps) {
   const { t } = useTranslation(['settings', 'common']);
+  const busy = phase === 'pending' || phase === 'importing';
 
   const [checkState, setCheckState] = useState<PluginCheckState>('idle');
   const [checkMessage, setCheckMessage] = useState('');
@@ -205,7 +205,7 @@ export function PlaybackReportingImportSection({
               onCheckedChange={(checked: boolean | 'indeterminate') =>
                 setEnrichMedia(checked === true)
               }
-              disabled={isImporting}
+              disabled={busy}
             />
             <div className="space-y-1">
               <Label htmlFor="prEnrichMedia" className="cursor-pointer text-sm font-normal">
@@ -222,7 +222,7 @@ export function PlaybackReportingImportSection({
               onCheckedChange={(checked: boolean | 'indeterminate') =>
                 setImportFullRange(checked === true)
               }
-              disabled={isImporting}
+              disabled={busy}
             />
             <div className="space-y-1">
               <Label htmlFor="prImportFullRange" className="cursor-pointer text-sm font-normal">
@@ -236,37 +236,27 @@ export function PlaybackReportingImportSection({
 
       {/* Import Button */}
       <div className="border-t pt-6">
-        {!held && (
-          <Button onClick={handleStart} disabled={!selectedServerId || isImporting} size="lg">
-            {isImporting ? (
-              <>
-                <Loader2 className="animate-spin" />
-                {t('import.importing')}
-              </>
-            ) : (
-              <>
-                <Download className="mr-2 h-4 w-4" />
-                {t('import.startImport')}
-              </>
-            )}
-          </Button>
-        )}
+        <StartImportButton
+          phase={phase}
+          onClick={handleStart}
+          disabled={!selectedServerId}
+          icon={Download}
+          label={t('import.startImport')}
+        />
 
-        {progressData && (
-          <div className={cn('space-y-2', !held && 'mt-4')}>
-            <ImportProgressCard progress={progressData} />
-            {(progress?.overlapRecords ?? 0) > 0 || (progress?.duplicateRecords ?? 0) > 0 ? (
-              <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                {(progress?.overlapRecords ?? 0) > 0 && (
-                  <span>{t('import.overlapSkipped', { count: progress?.overlapRecords })}</span>
-                )}
-                {(progress?.duplicateRecords ?? 0) > 0 && (
-                  <span>{t('import.duplicates', { count: progress?.duplicateRecords })}</span>
-                )}
-              </div>
-            ) : null}
-          </div>
-        )}
+        <div className={cn('space-y-2', progressData && phase !== 'pending' && 'mt-4')}>
+          <ImportProgressCard progress={progressData} />
+          {(progress?.overlapRecords ?? 0) > 0 || (progress?.duplicateRecords ?? 0) > 0 ? (
+            <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
+              {(progress?.overlapRecords ?? 0) > 0 && (
+                <span>{t('import.overlapSkipped', { count: progress?.overlapRecords })}</span>
+              )}
+              {(progress?.duplicateRecords ?? 0) > 0 && (
+                <span>{t('import.duplicates', { count: progress?.duplicateRecords })}</span>
+              )}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* Info cards */}

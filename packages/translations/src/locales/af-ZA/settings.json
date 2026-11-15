@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "",
     "importing": "",
     "startImport": "",
+    "startAgain": "",
     "howItWorks": "",
     "howItWorksDesc": "",
     "recordsMayBeSkipped": "",
@@ -505,6 +506,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

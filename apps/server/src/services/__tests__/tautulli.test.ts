@@ -15,6 +15,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { UnrecoverableError } from 'bullmq';
+import { HttpClientError } from '../../utils/http.js';
 
 import {
   ImportInterruptedError,
@@ -2378,18 +2380,32 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
     );
   });
 
-  it('goes on when the user sync could not read the user list', async () => {
+  it.each([
+    ['for a retry when Plex could not be reached', new Error('connect ECONNREFUSED'), false],
+    [
+      'at once when Plex refused the token',
+      new HttpClientError({
+        service: 'plex',
+        statusCode: 401,
+        statusText: 'Unauthorized',
+        url: '',
+      }),
+      true,
+    ],
+  ])('stops %s while syncing users', async (_why, cause, permanent) => {
     vi.mocked(syncServer).mockResolvedValueOnce({
       usersRead: false,
-      errors: ['plex unreachable'],
+      usersError: cause,
+      errors: [`Plex user sync failed: ${cause.message}`],
     } as never);
     mockFetch = mockTautulliFetch([makeRecord()], 1);
     global.fetch = mockFetch as typeof global.fetch;
 
-    const result = await TautulliService.importHistory(SERVER_ID);
+    const error = await TautulliService.importHistory(SERVER_ID).catch((e: unknown) => e);
 
-    expect(result.success).toBe(true);
-    expect(createUserMapping).toHaveBeenCalled();
+    expect(error).toBeInstanceOf(Error);
+    expect(error instanceof UnrecoverableError).toBe(permanent);
+    expect(createUserMapping).not.toHaveBeenCalled();
   });
 
   it('stops, throwing, when the user sync throws', async () => {
@@ -2442,15 +2458,50 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
     expect(result.message).toContain('1 without metadata in Tautulli');
   });
 
-  it('aborts with an error result when the server has no tracking cutoff', async () => {
+  it('fails at once when the server has no tracking cutoff', async () => {
     vi.mocked(getServerTrackingStart).mockResolvedValue(null);
     mockFetch = mockTautulliFetch([], 0);
     global.fetch = mockFetch as typeof global.fetch;
 
-    const result = await TautulliService.importHistory(SERVER_ID);
+    const run = TautulliService.importHistory(SERVER_ID);
 
-    expect(result.success).toBe(false);
-    expect(result.message).toContain('cutoff');
+    await expect(run).rejects.toBeInstanceOf(UnrecoverableError);
+    await expect(run).rejects.toThrow('cutoff');
+  });
+
+  it('fails at once when Tautulli is not configured', async () => {
+    vi.mocked(getSettings).mockResolvedValue({
+      tautulliUrl: null,
+      tautulliApiKey: null,
+    } as Awaited<ReturnType<typeof getSettings>>);
+
+    const run = TautulliService.importHistory(SERVER_ID);
+
+    await expect(run).rejects.toBeInstanceOf(UnrecoverableError);
+    await expect(run).rejects.toThrow('Tautulli is not configured');
+  });
+
+  it('fails at once when the connection check answers without a response', async () => {
+    mockFetch = vi.fn(async () => jsonResponse({}));
+    global.fetch = mockFetch as typeof global.fetch;
+
+    const run = TautulliService.importHistory(SERVER_ID);
+
+    await expect(run).rejects.toBeInstanceOf(UnrecoverableError);
+    await expect(run).rejects.toThrow('Invalid Tautulli API response');
+  });
+
+  it('throws for a retry when Tautulli cannot be reached', async () => {
+    vi.useFakeTimers();
+    global.fetch = vi.fn().mockRejectedValue(new TypeError('fetch failed')) as typeof global.fetch;
+
+    const run = TautulliService.importHistory(SERVER_ID);
+    const settled = expect(run).rejects.toThrow('fetch failed');
+    await vi.runAllTimersAsync();
+
+    await settled;
+    await expect(run).rejects.not.toBeInstanceOf(UnrecoverableError);
+    vi.useRealTimers();
   });
 
   it('skips records at or after the cutoff before they reach dedup, and imports the one before it', async () => {

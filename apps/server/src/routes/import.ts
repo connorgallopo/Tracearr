@@ -13,7 +13,7 @@ import {
   playbackReportingTestSchema,
   tofaImportSchema,
   type ImportWaitingForLibrarySync,
-  type TofaBackfillStatus,
+  type LatestImportStatus,
 } from '@tracearr/shared';
 import { TautulliService } from '../services/tautulli.js';
 import { importJellystatBackup } from '../services/jellystat.js';
@@ -43,8 +43,11 @@ import {
   getActiveJellystatImportForServer,
   getActivePlaybackReportingImportForServer,
   getActiveTofaImportForServer,
-  getLatestTofaImport,
+  getLatestImport,
   publishImportFailed,
+  type ImportJobData,
+  type ImportJobResult,
+  type ImportProgressPayload,
 } from '../jobs/importQueue.js';
 import { getLibrarySyncStatus } from '../jobs/librarySyncQueue.js';
 
@@ -67,13 +70,25 @@ async function heldForLibrarySync(
 }
 
 /**
- * Where the server's latest tofa history import stands: the one held for it when it was added,
- * or a later one the owner started. Null when it has none.
+ * Where the server's latest import of this type stands: one held for its first library sync, or
+ * one the owner started. Null when it has none still kept.
  */
-async function readTofaBackfill(serverId: string): Promise<TofaBackfillStatus | null> {
-  const latest = await getLatestTofaImport(serverId);
+async function readLatestImport(
+  type: ImportJobData['type'],
+  serverId: string
+): Promise<LatestImportStatus<ImportProgressPayload, ImportJobResult> | null> {
+  const latest = await getLatestImport(type, serverId);
   switch (latest?.state) {
     case 'delayed':
+      // A delayed import that has failed an attempt is waiting out the backoff before its retry
+      if (latest.attemptsMade > 0) {
+        return {
+          state: 'retrying',
+          attempt: latest.attemptsMade,
+          attempts: latest.attempts,
+          reason: latest.failedReason,
+        };
+      }
       return (await heldForLibrarySync(serverId, latest)) ?? { state: 'queued' };
     case 'waiting':
     case 'prioritized':
@@ -81,12 +96,11 @@ async function readTofaBackfill(serverId: string): Promise<TofaBackfillStatus | 
     case 'active':
       return { state: 'running', progress: latest.progress };
     case 'completed':
-      // A failed import still completes the job; its result says it failed
-      return latest.result?.success
+      return latest.result
         ? { state: 'complete', result: latest.result, finishedAt: latest.finishedAt }
-        : { state: 'failed', message: latest.result?.message ?? latest.failedReason };
+        : { state: 'failed', reason: latest.failedReason };
     case 'failed':
-      return { state: 'failed', message: latest.failedReason };
+      return { state: 'failed', reason: latest.failedReason };
     default:
       return null;
   }
@@ -169,7 +183,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
           console.log(`[Import] Tautulli import completed:`, result);
 
           // (BETA) Enrich with stream details
-          if (includeStreamDetails && result.success) {
+          if (includeStreamDetails) {
             console.log(`[Import] Starting stream details enrichment for server ${serverId}`);
             try {
               const enrichResult = await TautulliService.enrichStreamDetails(
@@ -206,17 +220,21 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
     async (request, _reply) => {
       const { serverId } = request.params;
 
-      const jobId = await getActiveImportForServer(serverId);
-      if (!jobId) {
-        return { active: false };
-      }
-
-      const status = await getImportStatus(jobId);
+      const [jobId, latest] = await Promise.all([
+        getActiveImportForServer(serverId),
+        readLatestImport('tautulli', serverId),
+      ]);
+      const status = jobId ? await getImportStatus(jobId) : null;
       if (!status) {
-        return { active: false };
+        return { active: false, latest };
       }
 
-      return { active: true, ...status };
+      return {
+        active: true,
+        ...status,
+        waiting: await heldForLibrarySync(serverId, status),
+        latest,
+      };
     }
   );
 
@@ -462,13 +480,21 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
     async (request, _reply) => {
       const { serverId } = request.params;
 
-      const jobId = await getActiveJellystatImportForServer(serverId);
+      const [jobId, latest] = await Promise.all([
+        getActiveJellystatImportForServer(serverId),
+        readLatestImport('jellystat', serverId),
+      ]);
       const status = jobId ? await getJellystatImportStatus(jobId) : null;
       if (!status) {
-        return { active: false };
+        return { active: false, latest };
       }
 
-      return { active: true, ...status, waiting: await heldForLibrarySync(serverId, status) };
+      return {
+        active: true,
+        ...status,
+        waiting: await heldForLibrarySync(serverId, status),
+        latest,
+      };
     }
   );
 
@@ -668,13 +694,21 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
     async (request, _reply) => {
       const { serverId } = request.params;
 
-      const jobId = await getActivePlaybackReportingImportForServer(serverId);
+      const [jobId, latest] = await Promise.all([
+        getActivePlaybackReportingImportForServer(serverId),
+        readLatestImport('playback-reporting', serverId),
+      ]);
       const status = jobId ? await getImportStatus(jobId) : null;
       if (!status) {
-        return { active: false };
+        return { active: false, latest };
       }
 
-      return { active: true, ...status, waiting: await heldForLibrarySync(serverId, status) };
+      return {
+        active: true,
+        ...status,
+        waiting: await heldForLibrarySync(serverId, status),
+        latest,
+      };
     }
   );
 
@@ -771,6 +805,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         })
         .catch((err: unknown) => {
           console.error(`[Import] tofa history import failed:`, err);
+          publishImportFailed('tofa', err);
         });
 
       return {
@@ -788,12 +823,12 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
     readImport,
     async (request) => {
       const { serverId } = request.params;
-      const [jobId, backfill] = await Promise.all([
+      const [jobId, latest] = await Promise.all([
         getActiveTofaImportForServer(serverId),
-        readTofaBackfill(serverId),
+        readLatestImport('tofa', serverId),
       ]);
       const status = jobId ? await getImportStatus(jobId) : null;
-      return status ? { active: true, ...status, backfill } : { active: false, backfill };
+      return status ? { active: true, ...status, latest } : { active: false, latest };
     }
   );
 

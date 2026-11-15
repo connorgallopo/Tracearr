@@ -122,7 +122,8 @@ export type {
   PlaybackReportingImportResult,
   TofaImportProgress,
   TofaImportResult,
-  TofaBackfillStatus,
+  ImportRetry,
+  LatestImportStatus,
   ImportWaitingForLibrarySync,
   // Library sync
   LibrarySyncProgress,

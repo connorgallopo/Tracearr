@@ -1,6 +1,5 @@
-import { useState, useEffect, useEffectEvent, type ReactNode } from 'react';
+import { useState, useEffect, type ReactNode } from 'react';
 import { Link } from 'react-router';
-import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { ParseKeys } from 'i18next';
 import { Input } from '@/components/ui/input';
@@ -29,18 +28,16 @@ import {
   AlertTriangle,
   Upload,
   Info,
-  type LucideIcon,
 } from 'lucide-react';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
 import { api } from '@/lib/api';
 import { isJellyfinEmby } from '@/lib/serverType';
 import { cn } from '@/lib/utils';
-import { useActiveImport } from '@/hooks/useActiveImport';
-import { useSocket } from '@/hooks/useSocket';
 import {
   ImportProgressCard,
   FileDropzone,
   PlaybackReportingImportSection,
+  StartImportButton,
   TofaImportSection,
   type ImportProgressData,
 } from '@/components/import';
@@ -49,11 +46,20 @@ import {
   type Server,
   type ServerType,
   type TautulliImportProgress,
+  type TautulliImportResult,
   type JellystatImportProgress,
+  type JellystatImportResult,
   type PlaybackReportingImportProgress,
+  type PlaybackReportingImportResult,
 } from '@tracearr/shared';
 import { useSettings, useUpdateSettings, useServers } from '@/hooks/queries';
-import { useActiveImports, waitingForLibrarySyncMessage } from '@/hooks/queries/useImports';
+import {
+  latestImport,
+  serverWithImport,
+  useActiveImports,
+  useImportStatus,
+  type ImportPhase,
+} from '@/hooks/queries/useImports';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { StepBadge } from '@/components/settings/shared/StepBadge';
 import { BetaBadge } from '@/components/settings/shared/BetaBadge';
@@ -115,6 +121,54 @@ const blankPlaybackReportingProgress = (
   message,
 });
 
+const tautulliResultProgress = (result: TautulliImportResult): TautulliImportProgress => {
+  const processed = result.imported + result.skipped + result.errors;
+  return {
+    ...blankTautulliProgress('complete', result.message),
+    totalRecords: processed,
+    fetchedRecords: processed,
+    processedRecords: processed,
+    importedRecords: result.imported,
+    updatedRecords: result.updated,
+    skippedRecords: result.skipped,
+    errorRecords: result.errors,
+  };
+};
+
+const jellystatResultProgress = (result: JellystatImportResult): JellystatImportProgress => {
+  const processed = result.imported + result.skipped + result.errors;
+  return {
+    ...blankJellystatProgress('complete', result.message),
+    totalRecords: processed,
+    processedRecords: processed,
+    importedRecords: result.imported,
+    skippedRecords: result.skipped,
+    filteredRecords: result.filtered,
+    errorRecords: result.errors,
+    enrichedRecords: result.enriched,
+  };
+};
+
+const playbackReportingResultProgress = (
+  result: PlaybackReportingImportResult
+): PlaybackReportingImportProgress => {
+  const processed = result.imported + result.skipped + result.errors;
+  return {
+    ...blankPlaybackReportingProgress('complete', result.message),
+    totalRecords: processed,
+    fetchedRecords: processed,
+    processedRecords: processed,
+    importedRecords: result.imported,
+    skippedRecords: result.skipped,
+    duplicateRecords: result.duplicates,
+    overlapRecords: result.overlap,
+    filteredRecords: result.filtered,
+    overlongRecords: result.overlong,
+    errorRecords: result.errors,
+    enrichedRecords: result.enriched,
+  };
+};
+
 /** With one server to import into there is nothing to pick, so it is the target. */
 function onlyServerId(servers: Server[]): string {
   return servers.length === 1 ? (servers[0]?.id ?? '') : '';
@@ -159,37 +213,6 @@ function HowItWorksNotice() {
   );
 }
 
-/** Tautulli and Jellystat both start their import with the same button; only the icon and target state differ. */
-function StartImportButton({
-  onClick,
-  disabled,
-  importing,
-  icon: Icon,
-}: {
-  onClick: () => void;
-  disabled: boolean;
-  importing: boolean;
-  icon: LucideIcon;
-}) {
-  const { t } = useTranslation('settings');
-
-  return (
-    <Button onClick={onClick} disabled={disabled} size="lg">
-      {importing ? (
-        <>
-          <Loader2 className="animate-spin" />
-          {t('import.importing')}
-        </>
-      ) : (
-        <>
-          <Icon className="mr-2 h-4 w-4" />
-          {t('import.startImport')}
-        </>
-      )}
-    </Button>
-  );
-}
-
 // Tautulli Import Section Component
 interface TautulliImportSectionProps {
   tautulliUrl: string;
@@ -202,7 +225,7 @@ interface TautulliImportSectionProps {
   plexServers: Server[];
   selectedPlexServerId: string;
   setSelectedPlexServerId: (id: string) => void;
-  isTautulliImporting: boolean;
+  tautulliPhase: ImportPhase;
   overwriteFriendlyNames: boolean;
   setOverwriteFriendlyNames: (overwrite: boolean) => void;
   includeStreamDetails: boolean;
@@ -222,7 +245,7 @@ function TautulliImportSection({
   plexServers,
   selectedPlexServerId,
   setSelectedPlexServerId,
-  isTautulliImporting,
+  tautulliPhase,
   overwriteFriendlyNames,
   setOverwriteFriendlyNames,
   includeStreamDetails,
@@ -231,6 +254,7 @@ function TautulliImportSection({
   tautulliProgressData,
 }: TautulliImportSectionProps) {
   const { t } = useTranslation(['settings', 'common']);
+  const busy = tautulliPhase === 'pending' || tautulliPhase === 'importing';
 
   return (
     <div className="space-y-6">
@@ -299,8 +323,8 @@ function TautulliImportSection({
         </div>
       </div>
 
-      {/* Import Section - Only shown when connected */}
-      {connectionStatus === 'success' && (
+      {/* Import Section - Only shown when connected, or while an import goes ahead */}
+      {(connectionStatus === 'success' || busy) && (
         <>
           <div className="space-y-4 border-t pt-6">
             <div className="flex items-center gap-2 text-sm font-medium">
@@ -337,7 +361,7 @@ function TautulliImportSection({
                   onCheckedChange={(checked: boolean | 'indeterminate') =>
                     setOverwriteFriendlyNames(checked === true)
                   }
-                  disabled={isTautulliImporting}
+                  disabled={busy}
                 />
                 <div className="space-y-1">
                   <Label
@@ -359,7 +383,7 @@ function TautulliImportSection({
                   onCheckedChange={(checked: boolean | 'indeterminate') =>
                     setIncludeStreamDetails(checked === true)
                   }
-                  disabled={isTautulliImporting}
+                  disabled={busy}
                 />
                 <div className="space-y-1">
                   <Label
@@ -375,16 +399,20 @@ function TautulliImportSection({
                 </div>
               </div>
 
-              <StartImportButton
-                onClick={handleStartTautulliImport}
-                disabled={!selectedPlexServerId || isTautulliImporting}
-                importing={isTautulliImporting}
-                icon={Download}
-              />
-
-              {tautulliProgressData && (
-                <ImportProgressCard progress={tautulliProgressData} showPageProgress />
-              )}
+              <div>
+                <StartImportButton
+                  phase={tautulliPhase}
+                  onClick={() => void handleStartTautulliImport()}
+                  disabled={!selectedPlexServerId}
+                  icon={Download}
+                  label={t('import.startImport')}
+                />
+                <ImportProgressCard
+                  progress={tautulliProgressData}
+                  showPageProgress
+                  className={cn(tautulliPhase !== 'pending' && 'mt-4')}
+                />
+              </div>
             </div>
           </div>
 
@@ -412,13 +440,14 @@ interface JellystatImportSectionProps {
   selectedJellyfinServerId: string;
   setSelectedJellyfinServerId: (id: string) => void;
   selectedFile: File | null;
+  fileError: string | null;
   handleFileSelect: (file: File | null) => void;
+  handleWrongFileType: () => void;
   enrichMedia: boolean;
   setEnrichMedia: (enrich: boolean) => void;
   updateStreamDetails: boolean;
   setUpdateStreamDetails: (update: boolean) => void;
-  isJellystatImporting: boolean;
-  jellystatHeld: boolean;
+  jellystatPhase: ImportPhase;
   handleStartJellystatImport: () => Promise<void>;
   jellystatProgressData: ImportProgressData | null;
 }
@@ -428,17 +457,19 @@ function JellystatImportSection({
   selectedJellyfinServerId,
   setSelectedJellyfinServerId,
   selectedFile,
+  fileError,
   handleFileSelect,
+  handleWrongFileType,
   enrichMedia,
   setEnrichMedia,
   updateStreamDetails,
   setUpdateStreamDetails,
-  isJellystatImporting,
-  jellystatHeld,
+  jellystatPhase,
   handleStartJellystatImport,
   jellystatProgressData,
 }: JellystatImportSectionProps) {
   const { t } = useTranslation(['settings', 'common']);
+  const busy = jellystatPhase === 'pending' || jellystatPhase === 'importing';
 
   const pickServer = jellyfinEmbyServers.length > 1;
 
@@ -483,8 +514,10 @@ function JellystatImportSection({
             accept=".json,.jsonl"
             maxSize={500 * 1024 * 1024}
             onFileSelect={handleFileSelect}
+            onWrongType={handleWrongFileType}
             selectedFile={selectedFile}
-            disabled={isJellystatImporting}
+            disabled={busy}
+            error={fileError}
           />
           <Alert>
             <Info />
@@ -509,7 +542,7 @@ function JellystatImportSection({
               onCheckedChange={(checked: boolean | 'indeterminate') =>
                 setEnrichMedia(checked === true)
               }
-              disabled={isJellystatImporting}
+              disabled={busy}
             />
             <div className="space-y-1">
               <Label htmlFor="enrichMedia" className="cursor-pointer text-sm font-normal">
@@ -525,7 +558,7 @@ function JellystatImportSection({
               onCheckedChange={(checked: boolean | 'indeterminate') =>
                 setUpdateStreamDetails(checked === true)
               }
-              disabled={isJellystatImporting}
+              disabled={busy}
             />
             <div className="space-y-1">
               <Label htmlFor="updateStreamDetails" className="cursor-pointer text-sm font-normal">
@@ -541,20 +574,18 @@ function JellystatImportSection({
 
       {/* Import Button */}
       <div className="border-t pt-6">
-        {!jellystatHeld && (
-          <StartImportButton
-            onClick={handleStartJellystatImport}
-            disabled={!selectedJellyfinServerId || !selectedFile || isJellystatImporting}
-            importing={isJellystatImporting}
-            icon={Upload}
-          />
-        )}
+        <StartImportButton
+          phase={jellystatPhase}
+          onClick={() => void handleStartJellystatImport()}
+          disabled={!selectedJellyfinServerId || !selectedFile}
+          icon={Upload}
+          label={t('import.startImport')}
+        />
 
-        {jellystatProgressData && (
-          <div className={cn(!jellystatHeld && 'mt-4')}>
-            <ImportProgressCard progress={jellystatProgressData} />
-          </div>
-        )}
+        <ImportProgressCard
+          progress={jellystatProgressData}
+          className={cn(jellystatPhase !== 'pending' && 'mt-4')}
+        />
       </div>
 
       {/* Info cards */}
@@ -584,7 +615,6 @@ export function ImportSources({
   const { data: settings, isLoading: settingsLoading } = useSettings();
   const { data: serversData, isLoading: serversLoading } = useServers();
   const updateSettings = useUpdateSettings();
-  const { socket } = useSocket();
 
   // Tautulli state
   const [tautulliUrl, setTautulliUrl] = useState('');
@@ -594,23 +624,15 @@ export function ImportSources({
     'idle' | 'testing' | 'success' | 'error'
   >('idle');
   const [connectionMessage, setConnectionMessage] = useState('');
-  const [tautulliProgress, setTautulliProgress] = useState<TautulliImportProgress | null>(null);
-  const [isTautulliImporting, setIsTautulliImporting] = useState(false);
   const [overwriteFriendlyNames, setOverwriteFriendlyNames] = useState(false);
   const [includeStreamDetails, setIncludeStreamDetails] = useState(false);
 
   // Jellystat state
   const [pickedJellyfinServerId, setSelectedJellyfinServerId] = useState<string>('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState<string | null>(null);
   const [enrichMedia, setEnrichMedia] = useState(true);
   const [updateStreamDetails, setUpdateStreamDetails] = useState(false);
-  const [jellystatProgress, setJellystatProgress] = useState<JellystatImportProgress | null>(null);
-  const [isJellystatImporting, setIsJellystatImporting] = useState(false);
-
-  // Playback Reporting state
-  const [playbackReportingProgress, setPlaybackReportingProgress] =
-    useState<PlaybackReportingImportProgress | null>(null);
-  const [isPlaybackReportingImporting, setIsPlaybackReportingImporting] = useState(false);
 
   // Handle both array and wrapped response formats
   const servers = (
@@ -624,8 +646,6 @@ export function ImportSources({
   // Split servers by type
   const plexServers = servers.filter((s) => SERVER_PROFILES[s.type].importsTautulliHistory);
   const jellyfinEmbyServers = servers.filter((s) => isJellyfinEmby(s.type));
-  const selectedPlexServerId = pickedPlexServerId || onlyServerId(plexServers);
-  const selectedJellyfinServerId = pickedJellyfinServerId || onlyServerId(jellyfinEmbyServers);
   const tofaServers = servers.filter((s) => SERVER_PROFILES[s.type].serverHistoryImport === 'tofa');
 
   const plexIds = plexServers.map((server) => server.id);
@@ -633,17 +653,40 @@ export function ImportSources({
   const tautulliImports = useActiveImports('tautulli', plexIds);
   const jellystatImports = useActiveImports('jellystat', jellyfinEmbyIds);
   const playbackReportingImports = useActiveImports('playbackReporting', jellyfinEmbyIds);
-  const jellystatWaiting =
-    jellystatImports.byServer.get(selectedJellyfinServerId)?.data?.waiting ?? null;
-  const playbackReportingWaiting =
-    playbackReportingImports.byServer.get(selectedJellyfinServerId)?.data?.waiting ?? null;
 
-  // Progress means the hold was released; the waiting answer would otherwise cover it until the next refresh
-  const queryClient = useQueryClient();
-  const refreshIfWaiting = useEffectEvent((source: 'jellystat' | 'playbackReporting') => {
-    const waiting = source === 'jellystat' ? jellystatWaiting : playbackReportingWaiting;
-    if (waiting) void queryClient.invalidateQueries({ queryKey: ['import', source] });
-  });
+  // Until the owner picks one, show the server whose import is under way, else one with a result
+  const selectedPlexServerId =
+    pickedPlexServerId ||
+    onlyServerId(plexServers) ||
+    serverWithImport(plexIds, (id) => latestImport(tautulliImports, id));
+  const selectedJellyfinServerId =
+    pickedJellyfinServerId ||
+    onlyServerId(jellyfinEmbyServers) ||
+    serverWithImport(
+      jellyfinEmbyIds,
+      (id) => latestImport(jellystatImports, id),
+      (id) => latestImport(playbackReportingImports, id)
+    );
+
+  const tautulli = useImportStatus(
+    'tautulli',
+    latestImport(tautulliImports, selectedPlexServerId),
+    { blank: blankTautulliProgress, fromResult: tautulliResultProgress },
+    { onStarted }
+  );
+  const jellystat = useImportStatus(
+    'jellystat',
+    latestImport(jellystatImports, selectedJellyfinServerId),
+    { blank: blankJellystatProgress, fromResult: jellystatResultProgress },
+    // The server drops the uploaded backup once the import ends, so another one needs it again
+    { onStarted, onSettled: () => setSelectedFile(null) }
+  );
+  const playbackReporting = useImportStatus(
+    'playbackReporting',
+    latestImport(playbackReportingImports, selectedJellyfinServerId),
+    { blank: blankPlaybackReportingProgress, fromResult: playbackReportingResultProgress },
+    { onStarted }
+  );
 
   // Initialize form with saved settings
   useEffect(() => {
@@ -656,82 +699,6 @@ export function ImportSources({
       }
     }
   }, [settings]);
-
-  useActiveImport(plexIds, tautulliImports, (serverId, message) => {
-    setSelectedPlexServerId(serverId);
-    setIsTautulliImporting(true);
-    setTautulliProgress(blankTautulliProgress('processing', message));
-    setConnectionStatus('success');
-    onStarted?.();
-  });
-
-  useActiveImport(jellyfinEmbyIds, jellystatImports, (serverId, message) => {
-    setSelectedJellyfinServerId(serverId);
-    setIsJellystatImporting(true);
-    setJellystatProgress(blankJellystatProgress('processing', message));
-    onStarted?.();
-  });
-
-  useActiveImport(jellyfinEmbyIds, playbackReportingImports, (serverId, message) => {
-    setSelectedJellyfinServerId(serverId);
-    setIsPlaybackReportingImporting(true);
-    setPlaybackReportingProgress(blankPlaybackReportingProgress('processing', message));
-    onStarted?.();
-  });
-
-  // Listen for Tautulli import progress via WebSocket
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleTautulliProgress = (progress: TautulliImportProgress) => {
-      setTautulliProgress(progress);
-      if (progress.status === 'complete' || progress.status === 'error') {
-        setIsTautulliImporting(false);
-      }
-    };
-
-    socket.on('import:progress', handleTautulliProgress);
-    return () => {
-      socket.off('import:progress', handleTautulliProgress);
-    };
-  }, [socket]);
-
-  // Listen for Jellystat import progress via WebSocket
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleJellystatProgress = (progress: JellystatImportProgress) => {
-      refreshIfWaiting('jellystat');
-      setJellystatProgress(progress);
-      if (progress.status === 'complete' || progress.status === 'error') {
-        setIsJellystatImporting(false);
-        setSelectedFile(null);
-      }
-    };
-
-    socket.on('import:jellystat:progress', handleJellystatProgress);
-    return () => {
-      socket.off('import:jellystat:progress', handleJellystatProgress);
-    };
-  }, [socket]);
-
-  // Listen for Playback Reporting import progress via WebSocket
-  useEffect(() => {
-    if (!socket) return;
-
-    const handlePlaybackReportingProgress = (progress: PlaybackReportingImportProgress) => {
-      refreshIfWaiting('playbackReporting');
-      setPlaybackReportingProgress(progress);
-      if (progress.status === 'complete' || progress.status === 'error') {
-        setIsPlaybackReportingImporting(false);
-      }
-    };
-
-    socket.on('import:playbackreporting:progress', handlePlaybackReportingProgress);
-    return () => {
-      socket.off('import:playbackreporting:progress', handlePlaybackReportingProgress);
-    };
-  }, [socket]);
 
   const handleSaveSettings = () => {
     updateSettings.mutate({
@@ -775,64 +742,29 @@ export function ImportSources({
 
   const handleStartTautulliImport = async () => {
     if (!selectedPlexServerId) return;
-
-    onStarted?.();
-    setIsTautulliImporting(true);
-    setTautulliProgress(blankTautulliProgress('fetching', t('import.startingImport')));
-
-    try {
-      await api.import.tautulli.start(
-        selectedPlexServerId,
-        overwriteFriendlyNames,
-        includeStreamDetails
-      );
-    } catch (err) {
-      setIsTautulliImporting(false);
-      setTautulliProgress(
-        blankTautulliProgress(
-          'error',
-          err instanceof Error ? err.message : t('import.importFailed')
-        )
-      );
-    }
+    await tautulli.start(blankTautulliProgress('fetching', t('import.startingImport')), () =>
+      api.import.tautulli.start(selectedPlexServerId, overwriteFriendlyNames, includeStreamDetails)
+    );
   };
 
   const handleFileSelect = (file: File | null) => {
-    const name = file?.name.toLowerCase() ?? '';
-    if (file && !name.endsWith('.json') && !name.endsWith('.jsonl')) {
-      setJellystatProgress(blankJellystatProgress('error', t('import.pleaseSelectBackupFile')));
-      return;
-    }
     setSelectedFile(file);
+    setFileError(null);
     if (file) {
-      setJellystatProgress(null);
+      jellystat.show(null);
     }
   };
 
   const handleStartJellystatImport = async () => {
     if (!selectedJellyfinServerId || !selectedFile) return;
-
-    onStarted?.();
-    setIsJellystatImporting(true);
-    setJellystatProgress(blankJellystatProgress('processing', t('import.uploadingBackup')));
-
-    try {
-      await api.import.jellystat.start(
+    await jellystat.start(blankJellystatProgress('processing', t('import.uploadingBackup')), () =>
+      api.import.jellystat.start(
         selectedJellyfinServerId,
         selectedFile,
         enrichMedia,
         updateStreamDetails
-      );
-      void jellystatImports.byServer.get(selectedJellyfinServerId)?.refetch();
-    } catch (err) {
-      setIsJellystatImporting(false);
-      setJellystatProgress(
-        blankJellystatProgress(
-          'error',
-          err instanceof Error ? err.message : t('import.importFailed')
-        )
-      );
-    }
+      )
+    );
   };
 
   const handleStartPlaybackReportingImport = async (opts: {
@@ -841,35 +773,23 @@ export function ImportSources({
     enrichMedia: boolean;
     importFullRange: boolean;
   }) => {
-    onStarted?.();
-    setIsPlaybackReportingImporting(true);
-    setPlaybackReportingProgress(
-      blankPlaybackReportingProgress('fetching', t('import.startingImport'))
-    );
-
-    try {
-      await api.import.playbackReporting.start(
-        opts.serverId,
-        opts.timezone,
-        opts.enrichMedia,
-        opts.importFullRange
-      );
-      void playbackReportingImports.byServer.get(opts.serverId)?.refetch();
-    } catch (err) {
-      setIsPlaybackReportingImporting(false);
-      setPlaybackReportingProgress(
-        blankPlaybackReportingProgress(
-          'error',
-          err instanceof Error ? err.message : t('import.importFailed')
+    await playbackReporting.start(
+      blankPlaybackReportingProgress('fetching', t('import.startingImport')),
+      () =>
+        api.import.playbackReporting.start(
+          opts.serverId,
+          opts.timezone,
+          opts.enrichMedia,
+          opts.importFullRange
         )
-      );
-    }
+    );
   };
 
   // Convert progress types for the reusable component
+  const tautulliProgress = tautulli.progress;
   const tautulliProgressData: ImportProgressData | null = tautulliProgress
     ? {
-        status: tautulliProgress.status === 'fetching' ? 'fetching' : tautulliProgress.status,
+        status: tautulliProgress.status,
         message: tautulliProgress.message,
         totalRecords: tautulliProgress.totalRecords,
         processedRecords: tautulliProgress.processedRecords,
@@ -881,17 +801,7 @@ export function ImportSources({
       }
     : null;
 
-  // A held import is shown from the server's own answer, which useSocket refreshes as the sync moves
-  const jellystatShown = jellystatWaiting
-    ? blankJellystatProgress('waiting', waitingForLibrarySyncMessage(jellystatWaiting, t))
-    : jellystatProgress;
-  const playbackReportingShown = playbackReportingWaiting
-    ? blankPlaybackReportingProgress(
-        'waiting',
-        waitingForLibrarySyncMessage(playbackReportingWaiting, t)
-      )
-    : playbackReportingProgress;
-
+  const jellystatShown = jellystat.progress;
   const jellystatProgressData: ImportProgressData | null = jellystatShown
     ? {
         status:
@@ -921,7 +831,7 @@ export function ImportSources({
       plexServers={plexServers}
       selectedPlexServerId={selectedPlexServerId}
       setSelectedPlexServerId={setSelectedPlexServerId}
-      isTautulliImporting={isTautulliImporting}
+      tautulliPhase={tautulli.phase}
       overwriteFriendlyNames={overwriteFriendlyNames}
       setOverwriteFriendlyNames={setOverwriteFriendlyNames}
       includeStreamDetails={includeStreamDetails}
@@ -937,9 +847,8 @@ export function ImportSources({
         jellyfinServers={jellyfinEmbyServers}
         selectedServerId={selectedJellyfinServerId}
         onServerChange={setSelectedJellyfinServerId}
-        progress={playbackReportingShown}
-        isImporting={isPlaybackReportingImporting}
-        held={playbackReportingWaiting !== null}
+        progress={playbackReporting.progress}
+        phase={playbackReporting.phase}
         onStartImport={handleStartPlaybackReportingImport}
       />
 
@@ -949,13 +858,14 @@ export function ImportSources({
           selectedJellyfinServerId={selectedJellyfinServerId}
           setSelectedJellyfinServerId={setSelectedJellyfinServerId}
           selectedFile={selectedFile}
+          fileError={fileError}
           handleFileSelect={handleFileSelect}
+          handleWrongFileType={() => setFileError(t('import.pleaseSelectBackupFile'))}
           enrichMedia={enrichMedia}
           setEnrichMedia={setEnrichMedia}
           updateStreamDetails={updateStreamDetails}
           setUpdateStreamDetails={setUpdateStreamDetails}
-          isJellystatImporting={isJellystatImporting}
-          jellystatHeld={jellystatWaiting !== null}
+          jellystatPhase={jellystat.phase}
           handleStartJellystatImport={handleStartJellystatImport}
           jellystatProgressData={jellystatProgressData}
         />

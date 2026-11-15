@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "Importerar ytterligare ström information. Kan öka importtiden avsevärt.",
     "importing": "Importerar...",
     "startImport": "Starta import",
+    "startAgain": "",
     "howItWorks": "Hur importen fungerar",
     "howItWorksDesc": "Tracearr importerar alla historiska visningsdata från din källa. Det kan ta en stund beroende på hur stort ditt bibliotek är.",
     "recordsMayBeSkipped": "Poster kan hoppas över om:",
@@ -505,6 +506,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

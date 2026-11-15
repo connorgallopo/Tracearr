@@ -450,6 +450,7 @@
     "includeStreamDetailsHelp": "导入额外的流信息。可能会大大增加导入时间。",
     "importing": "导入中...",
     "startImport": "开始导入",
+    "startAgain": "",
     "howItWorks": "导入的工作方式",
     "howItWorksDesc": "Tracearr 将从您的数据源导入所有历史观看数据。根据媒体库大小，这可能需要一段时间。",
     "recordsMayBeSkipped": "记录可以在下列情况下跳过：",
@@ -503,6 +504,8 @@
     "skipOverlap": "重叠记录 - 时间戳位于 Tracearr 已为此服务器跟踪的时间段内。启用全范围导入以包含它。",
     "skipDuplicatePlugin": "重复记录 - 已经直接导入或通过Jellstat导入相同的插件数据早期到达。",
     "importFailed": "导入失败",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "将文件拖放到此处",
       "dragOrClick": "拖放或点击选择",

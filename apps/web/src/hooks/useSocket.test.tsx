@@ -216,6 +216,7 @@ describe('SocketProvider', () => {
     fire('disconnect');
     fire('connect');
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['sessions', 'active'] });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['import'] });
 
     invalidate.mockClear();
     fake.socket.recovered = true;

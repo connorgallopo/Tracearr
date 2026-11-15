@@ -1,10 +1,19 @@
+import { useTranslation } from 'react-i18next';
 import { CheckCircle2, Clock, Loader2, XCircle } from 'lucide-react';
 import { Progress } from '../ui/progress';
 import { cn } from '@/lib/utils';
 import type { HeavyOpsWaitingFor } from '@tracearr/shared';
 
 export type ImportStatus =
-  'idle' | 'waiting' | 'detecting' | 'fetching' | 'enriching' | 'processing' | 'complete' | 'error';
+  | 'idle'
+  | 'waiting'
+  | 'detecting'
+  | 'fetching'
+  | 'enriching'
+  | 'processing'
+  | 'retrying'
+  | 'complete'
+  | 'error';
 
 export interface ImportProgressData {
   status: ImportStatus;
@@ -25,20 +34,49 @@ export interface ImportProgressData {
 }
 
 interface ImportProgressCardProps {
-  progress: ImportProgressData;
+  progress: ImportProgressData | null;
   showPageProgress?: boolean;
+  /** Applied while there is an import to show */
+  className?: string;
 }
+
+const isActiveStatus = (status: ImportStatus) =>
+  status === 'detecting' ||
+  status === 'fetching' ||
+  status === 'enriching' ||
+  status === 'processing';
 
 export function ImportProgressCard({
   progress,
   showPageProgress = false,
+  className,
 }: ImportProgressCardProps) {
-  const isWaiting = progress.status === 'waiting';
-  const isActive =
-    progress.status === 'detecting' ||
-    progress.status === 'fetching' ||
-    progress.status === 'enriching' ||
-    progress.status === 'processing';
+  const { t } = useTranslation('settings');
+  // A run changes its message and counts every page, so the region holds one fixed line for it
+  const announced =
+    progress && isActiveStatus(progress.status) ? t('import.importing') : (progress?.message ?? '');
+
+  return (
+    <div className={cn(progress && ['space-y-3 rounded-lg border p-4', className])}>
+      {/* Rendered with no import too, so the region is in place before the first state */}
+      <p role="status" className="sr-only">
+        {announced}
+      </p>
+      {progress && <CardContent progress={progress} showPageProgress={showPageProgress} />}
+    </div>
+  );
+}
+
+function CardContent({
+  progress,
+  showPageProgress,
+}: {
+  progress: ImportProgressData;
+  showPageProgress: boolean;
+}) {
+  // A retry waits out its backoff, so it reads as waiting
+  const isWaiting = progress.status === 'waiting' || progress.status === 'retrying';
+  const isActive = isActiveStatus(progress.status);
   const isComplete = progress.status === 'complete';
   const isError = progress.status === 'error';
 
@@ -56,7 +94,7 @@ export function ImportProgressCard({
         : 'Importing...';
 
   return (
-    <div className="space-y-3 rounded-lg border p-4">
+    <>
       {/* Header with status */}
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium">{statusLabel}</span>
@@ -141,6 +179,6 @@ export function ImportProgressCard({
           </div>
         </>
       )}
-    </div>
+    </>
   );
 }

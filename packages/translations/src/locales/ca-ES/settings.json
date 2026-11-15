@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "Importa informació addicional de la transmissió. Pot augmentar molt el temps d'importació.",
     "importing": "S'està important...",
     "startImport": "Inicia la importació",
+    "startAgain": "",
     "howItWorks": "Com funciona la importació",
     "howItWorksDesc": "Tracearr importarà tot l'històric de reproduccions de la font. Això pot trigar una estona segons la mida de la biblioteca.",
     "recordsMayBeSkipped": "Els registres es poden ometre si:",
@@ -505,6 +506,8 @@
     "skipOverlap": "Registre solapat: la marca de temps cau dins del període que Tracearr ja registra per a aquest servidor. Activeu la importació de tot l'històric per incloure'l.",
     "skipDuplicatePlugin": "Registre duplicat: ja s'havia importat directament o havia arribat abans amb una importació de Jellystat de les mateixes dades del connector.",
     "importFailed": "La importació ha fallat",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "Deixeu anar el fitxer aquí",
       "dragOrClick": "Arrossegueu i deixeu anar o feu clic per seleccionar",

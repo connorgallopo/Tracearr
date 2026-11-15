@@ -2,7 +2,15 @@ import type {
   ImportWaitingForLibrarySync,
   Server,
   ServerDownReason,
-  TofaBackfillStatus,
+  JellystatImportProgress,
+  JellystatImportResult,
+  LatestImportStatus,
+  PlaybackReportingImportProgress,
+  PlaybackReportingImportResult,
+  TautulliImportProgress,
+  TautulliImportResult,
+  TofaImportProgress,
+  TofaImportResult,
   UpdateUserAccessInput,
   UserRole,
   ServerUserWithIdentity,
@@ -2145,6 +2153,7 @@ class ApiClient {
           state?: string;
           progress?: number | object;
           createdAt?: number;
+          latest: LatestImportStatus<TautulliImportProgress, TautulliImportResult> | null;
         }>(`/import/tautulli/active/${serverId}`),
       getStatus: (jobId: string) =>
         this.request<{
@@ -2201,6 +2210,7 @@ class ApiClient {
           progress?: number | object;
           createdAt?: number;
           waiting?: ImportWaitingForLibrarySync | null;
+          latest: LatestImportStatus<JellystatImportProgress, JellystatImportResult> | null;
         }>(`/import/jellystat/active/${serverId}`),
       getStatus: (jobId: string) =>
         this.request<{
@@ -2259,6 +2269,10 @@ class ApiClient {
           progress?: number | object;
           createdAt?: number;
           waiting?: ImportWaitingForLibrarySync | null;
+          latest: LatestImportStatus<
+            PlaybackReportingImportProgress,
+            PlaybackReportingImportResult
+          > | null;
         }>(`/import/playback-reporting/active/${serverId}`),
       getStatus: (jobId: string) =>
         this.request<{
@@ -2294,7 +2308,7 @@ class ApiClient {
           state?: string;
           progress?: number | object;
           createdAt?: number;
-          backfill: TofaBackfillStatus | null;
+          latest: LatestImportStatus<TofaImportProgress, TofaImportResult> | null;
         }>(`/import/tofa/active/${serverId}`),
     },
   };

@@ -456,6 +456,7 @@
     "includeStreamDetailsHelp": "Importuje dodatkowe informacje o strumieniu. Może znacznie wydłużyć czas importu.",
     "importing": "Importowanie...",
     "startImport": "Rozpocznij import",
+    "startAgain": "",
     "howItWorks": "Jak działa import",
     "howItWorksDesc": "Tracearr zaimportuje całą historię oglądania z Twojego źródła. Może to chwilę potrwać w zależności od wielkości Twojej biblioteki.",
     "recordsMayBeSkipped": "Rekordy mogą zostać pominięte, jeżeli:",
@@ -509,6 +510,8 @@
     "skipOverlap": "Nakładający się rekord – znacznik czasu przypada w okresie, który Tracearr już śledzi dla tego serwera. Włącz import pełnej historii, aby go uwzględnić.",
     "skipDuplicatePlugin": "Zduplikowany rekord – został już zaimportowany bezpośrednio lub dotarł wcześniej poprzez import Jellystat tych samych danych wtyczki.",
     "importFailed": "Import nie powiódł się",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "Upuść plik tutaj",
       "dragOrClick": "Przeciągnij i upuść lub kliknij, aby wybrać",

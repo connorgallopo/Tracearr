@@ -7,9 +7,26 @@
  * Used by both Tautulli and Jellystat importers.
  */
 
+import { UnrecoverableError } from 'bullmq';
 import { eq } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { serverUsers } from '../../db/schema.js';
+import { NotFoundError } from '../../utils/errors.js';
+import { isHttpStatus } from '../../utils/http.js';
+import { syncServer } from '../sync.js';
+
+/**
+ * Syncs the server's users before an import maps plays to them. A user list that could not be
+ * read stops the import: at once when the server is gone or refused the key, otherwise for a retry.
+ */
+export async function syncImportUsers(serverId: string): Promise<void> {
+  const users = await syncServer(serverId, { syncUsers: true, syncLibraries: false });
+  if (users.usersRead) return;
+  const message = users.errors.join('; ') || 'The server user list could not be read';
+  const permanent =
+    users.usersError instanceof NotFoundError || isHttpStatus(users.usersError, 401, 403);
+  throw permanent ? new UnrecoverableError(message) : new Error(message);
+}
 
 /**
  * Create a mapping from external user IDs to Tracearr server user IDs

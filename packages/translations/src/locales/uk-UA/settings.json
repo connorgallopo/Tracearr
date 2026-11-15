@@ -456,6 +456,7 @@
     "includeStreamDetailsHelp": "Імпортує додаткову інформацію про потік. Може значно збільшити час імпорту.",
     "importing": "Імпорт...",
     "startImport": "Почати Імпорт",
+    "startAgain": "",
     "howItWorks": "Як працює імпорт",
     "howItWorksDesc": "Tracearr імпортує всю історію переглядів з вашого джерела. Це може зайняти деякий час залежно від розміру вашої бібліотеки.",
     "recordsMayBeSkipped": "Записи можуть бути пропущені, якщо:",
@@ -509,6 +510,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

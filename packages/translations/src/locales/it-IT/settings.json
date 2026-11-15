@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "Importa ulteriori informazioni sullo stream. Può aumentare notevolmente il tempo di importazione.",
     "importing": "Importazione...",
     "startImport": "Avvia Importazione",
+    "startAgain": "",
     "howItWorks": "Come funziona l'importazione",
     "howItWorksDesc": "Tracearr importerà tutti i dati storici di visione dalla tua sorgente. Ciò potrebbe richiedere un po' di tempo a seconda delle dimensioni della tua libreria.",
     "recordsMayBeSkipped": "I record possono essere ignorati se:",
@@ -505,6 +506,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

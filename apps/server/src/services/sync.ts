@@ -32,6 +32,8 @@ import { readServerFacts } from './mediaServer/byServerType.js';
 import type { TofaLinkedAccount } from './mediaServer/tofa/parser.js';
 import { ensureServerIdentifier } from './serverIdentity.js';
 import { ServerHistoricalError } from './liveServers.js';
+import { NotFoundError } from '../utils/errors.js';
+import { fetchJson } from '../utils/http.js';
 
 export interface SyncResult {
   usersAdded: number;
@@ -42,6 +44,8 @@ export interface SyncResult {
   librariesSynced: number;
   /** The server's user list was read; false when it could not be, or users were not synced */
   usersRead: boolean;
+  /** What kept the user list from being read, when an error did */
+  usersError?: unknown;
   errors: string[];
 }
 
@@ -246,21 +250,14 @@ export async function syncServerUsers(
  */
 async function fetchPlexUsers(token: string, serverUrl: string): Promise<MediaUser[]> {
   // Get server machine identifier for shared_servers API
-  const response = await fetch(serverUrl, {
-    headers: {
-      'X-Plex-Token': token,
-      Accept: 'application/json',
-    },
-    signal: AbortSignal.timeout(10_000),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to connect to Plex server: ${response.status}`);
-  }
-
-  const serverInfo = (await response.json()) as {
-    MediaContainer?: { machineIdentifier?: string };
-  };
+  const serverInfo = await fetchJson<{ MediaContainer?: { machineIdentifier?: string } }>(
+    serverUrl,
+    {
+      headers: { 'X-Plex-Token': token, Accept: 'application/json' },
+      service: 'Plex server',
+      timeout: 10_000,
+    }
+  );
   const machineIdentifier = serverInfo.MediaContainer?.machineIdentifier;
 
   if (!machineIdentifier) {
@@ -270,7 +267,7 @@ async function fetchPlexUsers(token: string, serverUrl: string): Promise<MediaUs
   return PlexClient.getAllUsersWithLibraries(token, machineIdentifier);
 }
 
-type UserSyncResult = Awaited<ReturnType<typeof syncServerUsers>>;
+type UserSyncResult = Awaited<ReturnType<typeof syncServerUsers>> & { cause?: unknown };
 
 function failedUserSync(serverName: string, err: unknown): UserSyncResult {
   const message = err instanceof Error ? err.message : 'Unknown error';
@@ -282,6 +279,7 @@ function failedUserSync(serverName: string, err: unknown): UserSyncResult {
     restored: 0,
     usersRead: false,
     errors: [`${serverName} user sync failed: ${message}`],
+    cause: err,
   };
 }
 
@@ -449,6 +447,7 @@ export async function syncServer(
 
   if (!server) {
     result.errors.push(`Server not found: ${serverId}`);
+    result.usersError = new NotFoundError('Server', serverId);
     return result;
   }
 
@@ -491,6 +490,7 @@ export async function syncServer(
     result.usersRemoved = userResult.removed;
     result.usersRestored = userResult.restored;
     result.usersRead = userResult.usersRead;
+    result.usersError = userResult.cause;
     result.errors.push(...userResult.errors);
   }
 

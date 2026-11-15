@@ -12,6 +12,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { UnrecoverableError } from 'bullmq';
+import { HttpClientError } from '../../utils/http.js';
 
 // Import production functions for testing
 import {
@@ -21,6 +23,7 @@ import {
   importJellystatBackup,
 } from '../jellystat.js';
 import { syncServer } from '../sync.js';
+import { ServerHistoricalError } from '../liveServers.js';
 
 // Import schemas for validation tests
 import {
@@ -1821,16 +1824,34 @@ describe('importJellystatBackup', () => {
       );
     });
 
-    it('goes on when the user sync could not read the user list', async () => {
-      vi.mocked(syncServer).mockResolvedValue({
+    it.each([
+      [
+        'for a retry when the server could not be reached',
+        new Error('connect ECONNREFUSED'),
+        false,
+      ],
+      [
+        'at once when the server refused the key',
+        new HttpClientError({
+          service: 'jellyfin',
+          statusCode: 403,
+          statusText: 'Forbidden',
+          url: '',
+        }),
+        true,
+      ],
+    ])('stops %s while syncing users', async (_why, cause, permanent) => {
+      vi.mocked(syncServer).mockResolvedValueOnce({
         usersRead: false,
-        errors: ['jellyfin unreachable'],
+        usersError: cause,
+        errors: [`Jellyfin user sync failed: ${cause.message}`],
       } as never);
 
-      const result = await importJellystatBackup(serverId, backup, false);
+      const error = await importJellystatBackup(serverId, backup, false).catch((e: unknown) => e);
 
-      expect(result.success).toBe(true);
-      expect(result.skipped).toBe(1);
+      expect(error).toBeInstanceOf(Error);
+      expect(error instanceof UnrecoverableError).toBe(permanent);
+      expect(mockDbSelect).not.toHaveBeenCalled();
     });
 
     it('stops, throwing, when the user sync throws', async () => {
@@ -1853,10 +1874,10 @@ describe('importJellystatBackup', () => {
 
       const backup = JSON.stringify([{ jf_playback_activity: [REAL_BACKUP_ACTIVITY_1] }]);
 
-      const result = await importJellystatBackup('nonexistent-server', backup, false);
+      const run = importJellystatBackup('nonexistent-server', backup, false);
 
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('Server not found');
+      await expect(run).rejects.toBeInstanceOf(UnrecoverableError);
+      await expect(run).rejects.toThrow('Server not found');
     });
 
     it('should refuse to import into a historical server', async () => {
@@ -1868,10 +1889,9 @@ describe('importJellystatBackup', () => {
 
       const backup = JSON.stringify([{ jf_playback_activity: [REAL_BACKUP_ACTIVITY_1] }]);
 
-      const result = await importJellystatBackup(serverId, backup, false);
-
-      expect(result.success).toBe(false);
-      expect(result.message).toContain(`Server ${serverId} is historical`);
+      await expect(importJellystatBackup(serverId, backup, false)).rejects.toBeInstanceOf(
+        ServerHistoricalError
+      );
     });
 
     it('should throw error for Plex server type', async () => {
@@ -1883,10 +1903,10 @@ describe('importJellystatBackup', () => {
 
       const backup = JSON.stringify([{ jf_playback_activity: [REAL_BACKUP_ACTIVITY_1] }]);
 
-      const result = await importJellystatBackup(serverId, backup, false);
+      const run = importJellystatBackup(serverId, backup, false);
 
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('only supports Jellyfin/Emby');
+      await expect(run).rejects.toBeInstanceOf(UnrecoverableError);
+      await expect(run).rejects.toThrow('only supports Jellyfin/Emby');
     });
   });
 
@@ -1925,17 +1945,16 @@ describe('importJellystatBackup', () => {
 
   describe('invalid backup handling', () => {
     it('should fail on invalid JSON', async () => {
-      const result = await importJellystatBackup(serverId, 'not valid json', false);
-
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('Import failed');
+      await expect(importJellystatBackup(serverId, 'not valid json', false)).rejects.toBeInstanceOf(
+        UnrecoverableError
+      );
     });
 
     it('should fail on invalid backup structure', async () => {
-      const result = await importJellystatBackup(serverId, JSON.stringify({ not: 'array' }), false);
+      const run = importJellystatBackup(serverId, JSON.stringify({ not: 'array' }), false);
 
-      expect(result.success).toBe(false);
-      expect(result.message).toContain('Invalid Jellystat backup');
+      await expect(run).rejects.toBeInstanceOf(UnrecoverableError);
+      await expect(run).rejects.toThrow('Invalid Jellystat backup');
     });
   });
 

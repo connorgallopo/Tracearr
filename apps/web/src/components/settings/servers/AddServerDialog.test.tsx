@@ -4,7 +4,12 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import type { ServerType, TofaBackfillStatus } from '@tracearr/shared';
+import type {
+  LatestImportStatus,
+  ServerType,
+  TofaImportProgress,
+  TofaImportResult,
+} from '@tracearr/shared';
 import { api } from '@/lib/api';
 import { AddServerDialog } from './AddServerDialog';
 import type { AddServerForm } from './useAddServer';
@@ -33,7 +38,7 @@ vi.mock('@/lib/api', () => {
   const importer = () => ({
     test: vi.fn(),
     start: vi.fn(),
-    getActive: vi.fn().mockResolvedValue({ active: false, backfill: null }),
+    getActive: vi.fn().mockResolvedValue({ active: false, latest: null }),
   });
   return {
     api: {
@@ -265,18 +270,20 @@ describe('AddServerDialog', () => {
   });
 
   it('shows a tofa server its held import waiting on the library sync, and no second import', async () => {
-    const waiting: TofaBackfillStatus = {
+    const waiting: LatestImportStatus<TofaImportProgress, TofaImportResult> = {
       state: 'waitingForLibrarySync',
       librarySync: { state: 'running', progress: 42 },
     };
     vi.mocked(api.import.tofa.getActive).mockResolvedValueOnce({
       active: true,
       jobId: 'held-import-tofa-1',
-      backfill: waiting,
+      latest: waiting,
     });
     renderImportStep('tofa-1', 'tofa');
 
-    expect(await screen.findByText('import.waitingForLibrarySyncPercent')).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent('import.waitingForLibrarySyncPercent')
+    );
     expect(api.import.tofa.getActive).toHaveBeenCalledWith('tofa-1');
     expect(screen.queryByRole('button', { name: 'import.importing' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'import.importTofaHistory' })).toBeNull();

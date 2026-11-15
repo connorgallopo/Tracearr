@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "Importerer ekstra strøminformasjon kan øke importtiden betydelig.",
     "importing": "Importerer...",
     "startImport": "Start import",
+    "startAgain": "",
     "howItWorks": "Hvordan importen virker",
     "howItWorksDesc": "Tracearr importerer alle historiske visningsdata fra kilden din. Dette kan ta en stund, avhengig av størrelsen på biblioteket ditt.",
     "recordsMayBeSkipped": "Registreringer kan hoppes over hvis:",
@@ -505,6 +506,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

@@ -1284,7 +1284,7 @@ export interface HeavyOpsWaitingFor {
 
 // Tautulli import types
 export interface TautulliImportProgress {
-  status: 'idle' | 'waiting' | 'fetching' | 'processing' | 'complete' | 'error';
+  status: 'idle' | 'waiting' | 'fetching' | 'processing' | 'retrying' | 'complete' | 'error';
   /** Expected total from API (may differ from actual if API count is stale) */
   totalRecords: number;
   /** Actual records fetched from API so far */
@@ -1310,10 +1310,13 @@ export interface TautulliImportProgress {
   message: string;
   /** Present when status='waiting' - what this job is waiting for */
   waitingFor?: HeavyOpsWaitingFor;
+  /** Present when status='retrying' */
+  retry?: ImportRetry;
 }
 
 export interface TautulliImportResult {
-  success: boolean;
+  /** Always true: a failed import throws */
+  success: true;
   imported: number;
   updated: number;
   /** No longer set; kept for clients built against older versions */
@@ -1331,7 +1334,8 @@ export interface TautulliImportResult {
 
 // Jellystat import types
 export interface JellystatImportProgress {
-  status: 'idle' | 'waiting' | 'parsing' | 'enriching' | 'processing' | 'complete' | 'error';
+  status:
+    'idle' | 'waiting' | 'parsing' | 'enriching' | 'processing' | 'retrying' | 'complete' | 'error';
   totalRecords: number;
   processedRecords: number;
   importedRecords: number;
@@ -1350,10 +1354,13 @@ export interface JellystatImportProgress {
   message: string;
   /** Present when status='waiting' - what this job is waiting for */
   waitingFor?: HeavyOpsWaitingFor;
+  /** Present when status='retrying' */
+  retry?: ImportRetry;
 }
 
 export interface JellystatImportResult {
-  success: boolean;
+  /** Always true: a failed import throws */
+  success: true;
   imported: number;
   updated: number;
   skipped: number;
@@ -1384,6 +1391,7 @@ export interface PlaybackReportingImportProgress {
     | 'fetching'
     | 'enriching'
     | 'processing'
+    | 'retrying'
     | 'complete'
     | 'error';
   totalRecords: number;
@@ -1406,10 +1414,13 @@ export interface PlaybackReportingImportProgress {
   message: string;
   /** Present when status='waiting' - what this job is waiting for */
   waitingFor?: HeavyOpsWaitingFor;
+  /** Present when status='retrying' */
+  retry?: ImportRetry;
 }
 
 export interface PlaybackReportingImportResult {
-  success: boolean;
+  /** Always true: a failed import throws */
+  success: true;
   imported: number;
   skipped: number;
   duplicates: number;
@@ -1428,7 +1439,7 @@ export interface PlaybackReportingImportResult {
 
 // tofa watch history import types
 export interface TofaImportProgress {
-  status: 'idle' | 'waiting' | 'fetching' | 'processing' | 'complete' | 'error';
+  status: 'idle' | 'waiting' | 'fetching' | 'processing' | 'retrying' | 'complete' | 'error';
   fetchedRecords: number;
   processedRecords: number;
   importedRecords: number;
@@ -1443,10 +1454,13 @@ export interface TofaImportProgress {
   message: string;
   /** Present when status='waiting' - what this job is waiting for */
   waitingFor?: HeavyOpsWaitingFor;
+  /** Present when status='retrying' */
+  retry?: ImportRetry;
 }
 
 export interface TofaImportResult {
-  success: boolean;
+  /** Always true: a failed import throws */
+  success: true;
   imported: number;
   skipped: number;
   duplicates: number;
@@ -1469,16 +1483,26 @@ export interface ImportWaitingForLibrarySync {
   librarySync: { state: 'queued' | 'running'; progress: number | null } | null;
 }
 
+/** An import attempt that failed with a retry still to come */
+export interface ImportRetry {
+  /** The attempt that failed, counted from 1 */
+  attempt: number;
+  /** Attempts allowed in all */
+  attempts: number;
+  reason: string | null;
+}
+
 /**
- * A tofa server's latest history import: the one queued when the server was added, held for its
- * library sync, or a later one the owner ran.
+ * Where a server's latest import from one source stands: the one held for the server's first
+ * library sync, or one the owner started.
  */
-export type TofaBackfillStatus =
+export type LatestImportStatus<Progress, Result> =
   | ImportWaitingForLibrarySync
   | { state: 'queued' }
-  | { state: 'running'; progress: TofaImportProgress | null }
-  | { state: 'complete'; result: TofaImportResult; finishedAt: number | null }
-  | { state: 'failed'; message: string | null };
+  | { state: 'running'; progress: Progress | null }
+  | ({ state: 'retrying' } & ImportRetry)
+  | { state: 'failed'; reason: string | null }
+  | { state: 'complete'; result: Result; finishedAt: number | null };
 
 // Library sync progress types
 export interface LibrarySyncProgress {

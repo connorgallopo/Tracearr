@@ -8,6 +8,8 @@ interface FileDropzoneProps {
   accept?: string;
   maxSize?: number; // in bytes
   onFileSelect: (file: File | null) => void;
+  /** A file of a type `accept` leaves out was picked; it was not selected */
+  onWrongType?: () => void;
   selectedFile: File | null;
   disabled?: boolean;
   error?: string | null;
@@ -23,6 +25,7 @@ export function FileDropzone({
   accept = '.json',
   maxSize = 100 * 1024 * 1024, // 100MB default
   onFileSelect,
+  onWrongType,
   selectedFile,
   disabled = false,
   error,
@@ -54,6 +57,7 @@ export function FileDropzone({
 
       if (!extensions.includes(fileExt) && !extensions.includes('*')) {
         onFileSelect(null);
+        onWrongType?.();
         return;
       }
 
@@ -65,7 +69,7 @@ export function FileDropzone({
 
       onFileSelect(file);
     },
-    [accept, maxSize, onFileSelect]
+    [accept, maxSize, onFileSelect, onWrongType]
   );
 
   const handleDrop = useCallback(

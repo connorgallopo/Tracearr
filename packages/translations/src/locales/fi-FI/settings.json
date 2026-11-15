@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "Tuo lisätietoja striimeistä. Voi pidentää tuontiaikaa merkittävästi.",
     "importing": "Tuoda...",
     "startImport": "Aloita Tuonti",
+    "startAgain": "",
     "howItWorks": "Miten tuonti toimii",
     "howItWorksDesc": "Tracearr tuo kaikki aiemmat katselutiedot lähteestäsi. Tämä voi kestää jonkin aikaa kirjaston koosta riippuen.",
     "recordsMayBeSkipped": "Tietueet voidaan ohittaa, jos:",
@@ -505,6 +506,8 @@
     "skipOverlap": "Päällekkäinen tieto - aikaleima osuu ajanjaksolle, jota Tracearr jo seuraa tällä palvelimella. Ota koko historian tuonti käyttöön sisällyttääksesi sen.",
     "skipDuplicatePlugin": "Kaksoiskappale - tuotu jo suoraan tai saapunut aiemmin saman liitännäisdatan Jellystat-tuonnin kautta.",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

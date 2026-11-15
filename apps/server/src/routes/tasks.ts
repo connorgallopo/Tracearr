@@ -113,7 +113,10 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
         message = 'Waiting for the first library sync';
       }
 
-      if (isCachedJob) {
+      const retrying = imp.state === 'delayed' && !imp.held && imp.attemptsMade > 0;
+      if (retrying) message = 'Retrying after an error';
+
+      if (isCachedJob && !retrying) {
         // Use cached progress which has waiting status
         importStatus = cachedImportProgress.status === 'waiting' ? 'waiting' : importStatus;
         if (cachedImportProgress.status === 'waiting' && cachedImportProgress.waitingFor) {
@@ -131,13 +134,15 @@ export const tasksRoutes: FastifyPluginAsync = async (app) => {
       }
 
       // Get progress percentage from BullMQ job progress
-      if (typeof imp.progress === 'number' && imp.progress > 0) {
-        progressPct = imp.progress;
+      // A retry backoff keeps the failed attempt's progress, which no longer applies
+      const jobProgress = retrying ? null : imp.progress;
+      if (typeof jobProgress === 'number' && jobProgress > 0) {
+        progressPct = jobProgress;
         if (!isCachedJob || cachedImportProgress?.status !== 'waiting') {
-          message = `Importing... ${imp.progress}%`;
+          message = `Importing... ${jobProgress}%`;
         }
-      } else if (imp.progress && typeof imp.progress === 'object') {
-        const p = imp.progress as {
+      } else if (jobProgress && typeof jobProgress === 'object') {
+        const p = jobProgress as {
           processedRecords?: number;
           totalRecords?: number;
           message?: string;

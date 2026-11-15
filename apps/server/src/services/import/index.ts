@@ -17,6 +17,7 @@ export {
 // User Mapping
 export {
   createUserMapping,
+  syncImportUsers,
   lookupUser,
   type SkippedUser,
   createSkippedUserTracker,

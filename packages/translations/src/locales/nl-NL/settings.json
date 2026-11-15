@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "Invoer van aanvullende stream informatie. Kan de importtijd aanzienlijk verhogen.",
     "importing": "Importeren...",
     "startImport": "Importeren starten",
+    "startAgain": "",
     "howItWorks": "Hoe de import werkt",
     "howItWorksDesc": "Tracearr importeert alle historische kijkgegevens uit je bron. Dit kan even duren, afhankelijk van de grootte van je bibliotheek.",
     "recordsMayBeSkipped": "Records kunnen worden overgeslagen als:",
@@ -505,6 +506,8 @@
     "skipOverlap": "Overlappende record - de tijdstempel valt binnen de periode die Tracearr al bijhoudt voor deze server. Schakel 'volledige bereikimport' in om deze mee te nemen.",
     "skipDuplicatePlugin": "Dubbele record - reeds rechtstreeks geïmporteerd of eerder binnengekomen via een Jellystat import van dezelfde plugingegevens.",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

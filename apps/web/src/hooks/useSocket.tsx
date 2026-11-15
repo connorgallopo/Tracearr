@@ -181,6 +181,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       if (hasConnectedRef.current && !newSocket.recovered) {
         void queryClient.invalidateQueries({ queryKey: ['sessions', 'active'] });
         void queryClient.invalidateQueries({ queryKey: ['tasks', 'running'] });
+        void queryClient.invalidateQueries({ queryKey: ['import'] });
         void queryClient.invalidateQueries({ queryKey: ['stats', 'dashboard'] });
         refreshUnhealthyServers();
       }

@@ -1,15 +1,23 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { REDIS_KEYS } from '@tracearr/shared';
 
-const { mockGetJobs, mockGetJob, mockAdd, mockInvalidatePattern, workerHandlers, worker } =
-  vi.hoisted(() => ({
-    mockGetJobs: vi.fn(),
-    mockGetJob: vi.fn(),
-    mockAdd: vi.fn(),
-    mockInvalidatePattern: vi.fn(),
-    workerHandlers: new Map<string, (...args: unknown[]) => void>(),
-    worker: { processor: undefined as undefined | ((job: unknown) => Promise<unknown>) },
-  }));
+const {
+  mockGetJobs,
+  mockGetJob,
+  mockAdd,
+  mockInvalidatePattern,
+  mockPublish,
+  workerHandlers,
+  worker,
+} = vi.hoisted(() => ({
+  mockGetJobs: vi.fn(),
+  mockGetJob: vi.fn(),
+  mockAdd: vi.fn(),
+  mockInvalidatePattern: vi.fn(),
+  mockPublish: vi.fn(),
+  workerHandlers: new Map<string, (...args: unknown[]) => void>(),
+  worker: { processor: undefined as undefined | ((job: unknown) => Promise<unknown>) },
+}));
 
 vi.mock('../../db/client.js', () => ({ db: {} }));
 vi.mock('bullmq', () => ({
@@ -32,9 +40,12 @@ vi.mock('bullmq', () => ({
 }));
 vi.mock('../../services/cache.js', () => ({
   getCacheService: () => ({ invalidatePattern: mockInvalidatePattern }),
-  getPubSubService: () => null,
+  getPubSubService: () => ({ publish: mockPublish }),
 }));
-vi.mock('../../services/import/jellystatUpload.js', () => ({
+vi.mock('../../services/import/jellystatUpload.js', async (importActual) => ({
+  JellystatUploadMissingError: (
+    await importActual<typeof import('../../services/import/jellystatUpload.js')>()
+  ).JellystatUploadMissingError,
   sweepJellystatUploads: vi.fn(),
   removeJellystatUpload: vi.fn(),
 }));
@@ -50,9 +61,12 @@ vi.mock('../../db/timescale.js', () => ({
   withSessionsCompressionPaused: (run: () => Promise<unknown>) => run(),
 }));
 vi.mock('../../services/playbackReporting.js', () => ({ importPlaybackReporting: vi.fn() }));
+vi.mock('../../services/import/tofaHistory.js', () => ({ importTofaHistory: vi.fn() }));
 
 import { UnrecoverableError } from 'bullmq';
 import { importPlaybackReporting } from '../../services/playbackReporting.js';
+import { importTofaHistory } from '../../services/import/tofaHistory.js';
+import { HttpClientError } from '../../utils/http.js';
 import { removeJellystatUpload } from '../../services/import/jellystatUpload.js';
 import { hasPendingFirstSync } from '../librarySyncQueue.js';
 import { ServerHistoricalError } from '../../services/liveServers.js';
@@ -63,7 +77,7 @@ import {
   enqueuePlaybackReportingImport,
   enqueueTofaImport,
   getAllActiveImports,
-  getLatestTofaImport,
+  getLatestImport,
   initImportQueue,
   releaseHeldImport,
   startImportWorker,
@@ -75,6 +89,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockGetJobs.mockResolvedValue([]);
   mockInvalidatePattern.mockResolvedValue(undefined);
+  mockPublish.mockResolvedValue(undefined);
   vi.mocked(hasPendingFirstSync).mockResolvedValue(false);
 });
 
@@ -83,41 +98,75 @@ function tofaJob(id: string, timestamp: number, state: string, returnvalue: unkn
     id,
     timestamp,
     data: { type: 'tofa', serverId: 'srv-1', userId: 'system' },
+    opts: { attempts: 3 },
+    attemptsMade: 0,
     progress: 0,
     returnvalue,
-    failedReason: undefined,
+    failedReason: undefined as string | undefined,
     finishedOn: timestamp + 1000,
     getState: async () => state,
   };
 }
 
-describe('getLatestTofaImport', () => {
+describe('getLatestImport', () => {
+  const rerun = { success: true, imported: 9, skipped: 0, duplicates: 0, errors: 0, message: 'ok' };
+
   it('describes the run the owner started after the held import failed', async () => {
-    const rerun = {
-      success: true,
-      imported: 9,
-      skipped: 0,
-      duplicates: 0,
-      errors: 0,
-      message: 'ok',
-    };
     mockGetJobs.mockResolvedValue([
-      tofaJob('held-import-srv-1', 1_000, 'completed', {
+      {
+        ...tofaJob('held-import-srv-1', 1_000, 'failed', undefined),
+        failedReason: 'tofa user sync failed: unreachable',
+      },
+      tofaJob('42', 5_000, 'completed', rerun),
+      { ...tofaJob('43', 9_000, 'completed', rerun), data: { type: 'tofa', serverId: 'srv-2' } },
+      {
+        ...tofaJob('44', 9_000, 'completed', rerun),
+        data: { type: 'tautulli', serverId: 'srv-1' },
+      },
+    ]);
+
+    expect(await getLatestImport('tofa', 'srv-1')).toMatchObject({
+      held: false,
+      state: 'completed',
+      result: rerun,
+    });
+  });
+
+  it('reads a result stored as success: false as the failure it reported', async () => {
+    mockGetJobs.mockResolvedValue([
+      tofaJob('42', 5_000, 'completed', {
         success: false,
         imported: 0,
         skipped: 0,
         duplicates: 0,
         errors: 0,
-        message: 'Import failed: tofa user sync failed: unreachable',
+        message: 'Import failed: tofa answered 502',
       }),
-      tofaJob('42', 5_000, 'completed', rerun),
-      { ...tofaJob('43', 9_000, 'completed', rerun), data: { type: 'tofa', serverId: 'srv-2' } },
     ]);
 
-    expect(await getLatestTofaImport('srv-1')).toMatchObject({
-      held: false,
+    expect(await getLatestImport('tofa', 'srv-1')).toMatchObject({
       state: 'completed',
-      result: rerun,
+      result: null,
+      failedReason: 'Import failed: tofa answered 502',
+    });
+  });
+
+  it('counts the attempts of an import waiting out a retry', async () => {
+    mockGetJobs.mockResolvedValue([
+      {
+        ...tofaJob('42', 5_000, 'delayed', undefined),
+        processedOn: 5_500,
+        attemptsMade: 1,
+        failedReason: 'tofa answered 502',
+      },
+    ]);
+
+    expect(await getLatestImport('tofa', 'srv-1')).toMatchObject({
+      held: false,
+      state: 'delayed',
+      attemptsMade: 1,
+      attempts: 3,
+      failedReason: 'tofa answered 502',
     });
   });
 });
@@ -160,6 +209,7 @@ describe('import enqueues', () => {
 
 describe('imports that wait for a first library sync', () => {
   const libraryKeyedStarts = [
+    ['tautulli', () => enqueueImport('srv-1', 'owner', false)],
     ['jellystat', () => enqueueJellystatImport('srv-1', 'owner', '/tmp/backup.json')],
     [
       'playback-reporting',
@@ -231,19 +281,23 @@ describe('imports that wait for a first library sync', () => {
       heldForFirstSync: true,
     });
     const heldTofa = delayedJob('held-import-srv-1', { type: 'tofa', serverId: 'srv-1' });
+    const heldTautulli = delayedJob('tt', {
+      type: 'tautulli',
+      serverId: 'srv-1',
+      heldForFirstSync: true,
+    });
     const backoff = delayedJob('js', { type: 'jellystat', serverId: 'srv-1' });
     const otherServer = delayedJob('pr-2', {
       type: 'playback-reporting',
       serverId: 'srv-2',
       heldForFirstSync: true,
     });
-    mockGetJobs.mockResolvedValue([heldPlays, heldTofa, backoff, otherServer]);
+    const jobs = [heldPlays, heldTofa, heldTautulli, backoff, otherServer];
+    mockGetJobs.mockResolvedValue(jobs);
 
     await releaseHeldImport('srv-1');
 
-    expect(
-      [heldPlays, heldTofa, backoff, otherServer].map((job) => job.promote.mock.calls.length)
-    ).toEqual([1, 1, 0, 0]);
+    expect(jobs.map((job) => job.promote.mock.calls.length)).toEqual([1, 1, 1, 0, 0]);
   });
 
   it('lists an import held for the first sync as held', async () => {
@@ -314,6 +368,127 @@ describe('import worker', () => {
     await expect(worker.processor?.(job)).rejects.toBeInstanceOf(UnrecoverableError);
   });
 
+  const playbackJob = {
+    id: 'job-1',
+    data: { type: 'playback-reporting', serverId: 'srv-1', userId: 'owner' },
+  };
+
+  it.each([
+    [
+      'a rejected key',
+      new HttpClientError({
+        service: 'jellyfin',
+        statusCode: 401,
+        statusText: 'Unauthorized',
+        url: '',
+      }),
+    ],
+    ['an unreadable Tautulli answer', new Error('Invalid Tautulli API response: bad shape')],
+  ])('fails an import at once for %s', async (_cause, error) => {
+    startImportWorker();
+    vi.mocked(importPlaybackReporting).mockRejectedValueOnce(error);
+
+    await expect(worker.processor?.(playbackJob)).rejects.toBeInstanceOf(UnrecoverableError);
+  });
+
+  it('leaves an unreachable server to the retries', async () => {
+    startImportWorker();
+    const unreachable = new Error('connect ECONNREFUSED');
+    vi.mocked(importPlaybackReporting).mockRejectedValueOnce(unreachable);
+
+    await expect(worker.processor?.(playbackJob)).rejects.toBe(unreachable);
+  });
+
+  it('completes a tofa import with the result it returned', async () => {
+    startImportWorker();
+    const result = {
+      success: true,
+      imported: 3,
+      skipped: 1,
+      duplicates: 1,
+      errors: 0,
+      message: 'ok',
+    };
+    vi.mocked(importTofaHistory).mockResolvedValueOnce(result as never);
+    const job = {
+      id: 'job-2',
+      data: { type: 'tofa', serverId: 'srv-1', userId: 'owner' },
+      updateProgress: vi.fn(),
+    };
+
+    expect(await worker.processor?.(job)).toBe(result);
+    expect(mockPublish).toHaveBeenCalledWith(
+      'import:tofa:progress',
+      expect.objectContaining({ status: 'complete', importedRecords: 3, jobId: 'job-2' })
+    );
+  });
+
+  it('keeps the progress of a Playback Reporting import on its job for the status read', async () => {
+    startImportWorker();
+    const progress = { status: 'processing', importedRecords: 4 };
+    vi.mocked(importPlaybackReporting).mockImplementationOnce(
+      async (_serverId, _options, _pubSub, onProgress) => {
+        await onProgress?.(progress as never);
+        return { success: true, imported: 4, skipped: 0, errors: 0, message: 'ok' } as never;
+      }
+    );
+    const job = { ...playbackJob, data: { ...playbackJob.data }, updateProgress: vi.fn() };
+
+    await worker.processor?.(job);
+
+    expect(job.updateProgress).toHaveBeenCalledWith(progress);
+  });
+
+  it('tells the panel an import is retrying, not failed, while attempts remain', () => {
+    startImportWorker();
+
+    workerHandlers.get('failed')?.(
+      {
+        id: 'job-1',
+        attemptsMade: 1,
+        opts: { attempts: 3 },
+        data: { type: 'jellystat', serverId: 'srv-1', backupPath: '/tmp/backup.json' },
+      },
+      new Error('connect ECONNREFUSED')
+    );
+
+    expect(mockPublish).toHaveBeenCalledOnce();
+    expect(mockPublish).toHaveBeenCalledWith(
+      'import:jellystat:progress',
+      expect.objectContaining({
+        status: 'retrying',
+        retry: { attempt: 1, attempts: 3, reason: 'connect ECONNREFUSED' },
+        jobId: 'job-1',
+      })
+    );
+    expect(removeJellystatUpload).not.toHaveBeenCalled();
+  });
+
+  it('tells the panel an import failed once its last attempt fails, and moves it to the DLQ', () => {
+    startImportWorker();
+
+    workerHandlers.get('failed')?.(
+      {
+        id: 'job-1',
+        attemptsMade: 3,
+        opts: { attempts: 3 },
+        data: { type: 'tautulli', serverId: 'srv-1' },
+      },
+      new Error('connect ECONNREFUSED')
+    );
+
+    expect(mockPublish).toHaveBeenCalledOnce();
+    expect(mockPublish).toHaveBeenCalledWith(
+      'import:progress',
+      expect.objectContaining({ status: 'error', message: 'Import failed: connect ECONNREFUSED' })
+    );
+    expect(mockAdd).toHaveBeenCalledWith(
+      'dlq-tautulli',
+      expect.anything(),
+      expect.objectContaining({ jobId: 'dlq-job-1' })
+    );
+  });
+
   it('removes the upload and skips the dead letter queue for an unrecoverable failure', () => {
     startImportWorker();
 
@@ -329,5 +504,9 @@ describe('import worker', () => {
 
     expect(removeJellystatUpload).toHaveBeenCalledWith('/tmp/backup.json');
     expect(mockAdd).not.toHaveBeenCalled();
+    expect(mockPublish).toHaveBeenCalledWith(
+      'import:jellystat:progress',
+      expect.objectContaining({ status: 'error' })
+    );
   });
 });

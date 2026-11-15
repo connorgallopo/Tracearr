@@ -24,6 +24,7 @@ import { getBullPrefix, queueConnectionOptions } from './queueConnection.js';
 import { isMaintenance } from '../serverState.js';
 import {
   REDIS_KEYS,
+  assertNever,
   type TautulliImportProgress,
   type TautulliImportResult,
   type JellystatImportProgress,
@@ -36,6 +37,7 @@ import {
 import {
   ImportInterruptedError,
   TautulliService,
+  isFatalImportError,
   type ImportResumeState,
 } from '../services/tautulli.js';
 import { importJellystatBackup } from '../services/jellystat.js';
@@ -50,6 +52,7 @@ import { importPlaybackReporting } from '../services/playbackReporting.js';
 import { importTofaHistory } from '../services/import/tofaHistory.js';
 import { getCacheService, getPubSubService } from '../services/cache.js';
 import { ServerHistoricalError } from '../services/liveServers.js';
+import { isHttpStatus } from '../utils/http.js';
 import { extendJobLock } from './lockUtils.js';
 import {
   WORKER_DEFAULTS,
@@ -79,6 +82,7 @@ export interface TautulliImportJobData {
   resumeState?: ImportResumeState; // written with checkpoint; the finished pages' date range and failed pages
   overwriteFriendlyNames?: boolean; // Whether to overwrite existing friendly names
   includeStreamDetails?: boolean; // (BETA) Fetch detailed codec/bitrate info via additional API calls
+  heldForFirstSync?: true; // See addImportAfterFirstSync
 }
 
 export interface JellystatImportJobData {
@@ -198,7 +202,7 @@ export function initImportQueue(redisUrl: string): void {
   console.log('Import queue initialized');
 }
 
-type ImportProgressPayload =
+export type ImportProgressPayload =
   | TautulliImportProgress
   | JellystatImportProgress
   | PlaybackReportingImportProgress
@@ -217,20 +221,63 @@ function importProgressChannel(
   return 'import:progress';
 }
 
-/** A tofa import's progress outside its run, every count at zero */
-function tofaProgress(status: TofaImportProgress['status'], message: string): TofaImportProgress {
-  return {
+/** An import's progress outside its run, every count at zero, in its own channel's shape */
+function blankProgress(
+  type: ImportJobData['type'],
+  status: 'waiting' | 'retrying' | 'complete' | 'error',
+  message: string
+): ImportProgressPayload {
+  const base = {
     status,
-    fetchedRecords: 0,
     processedRecords: 0,
     importedRecords: 0,
     skippedRecords: 0,
-    duplicateRecords: 0,
-    unknownUserRecords: 0,
-    activeRecords: 0,
     errorRecords: 0,
     message,
   };
+  switch (type) {
+    case 'jellystat':
+      return {
+        ...base,
+        totalRecords: 0,
+        filteredRecords: 0,
+        enrichedRecords: 0,
+      } satisfies JellystatImportProgress;
+    case 'tofa':
+      return {
+        ...base,
+        fetchedRecords: 0,
+        duplicateRecords: 0,
+        unknownUserRecords: 0,
+        activeRecords: 0,
+      } satisfies TofaImportProgress;
+    case 'playback-reporting':
+      return {
+        ...base,
+        totalRecords: 0,
+        fetchedRecords: 0,
+        duplicateRecords: 0,
+        unknownUserRecords: 0,
+        overlapRecords: 0,
+        filteredRecords: 0,
+        overlongRecords: 0,
+        enrichedRecords: 0,
+      } satisfies PlaybackReportingImportProgress;
+    case 'tautulli':
+      return {
+        ...base,
+        totalRecords: 0,
+        fetchedRecords: 0,
+        updatedRecords: 0,
+        duplicateRecords: 0,
+        unknownUserRecords: 0,
+        activeSessionRecords: 0,
+        currentPage: 0,
+        totalPages: 0,
+      } satisfies TautulliImportProgress;
+    default:
+      return assertNever(type);
+  }
 }
 
 // Payload shape must match the importing job's channel, or its UI card never updates.
@@ -238,69 +285,18 @@ function buildWaitingProgress(
   type: ImportJobData['type'],
   waitingFor: HeavyOpsLockHolder
 ): ImportProgressPayload {
-  const message = `Waiting for ${waitingFor.description} to complete...`;
-  const waitingForSummary = {
-    jobType: waitingFor.jobType,
-    description: waitingFor.description,
-    startedAt: waitingFor.startedAt,
-  };
-
-  if (type === 'jellystat') {
-    return {
-      status: 'waiting',
-      totalRecords: 0,
-      processedRecords: 0,
-      importedRecords: 0,
-      skippedRecords: 0,
-      filteredRecords: 0,
-      errorRecords: 0,
-      enrichedRecords: 0,
-      message,
-      waitingFor: waitingForSummary,
-    };
-  }
-
-  if (type === 'tofa') {
-    return { ...tofaProgress('waiting', message), waitingFor: waitingForSummary };
-  }
-
-  if (type === 'playback-reporting') {
-    return {
-      status: 'waiting',
-      totalRecords: 0,
-      fetchedRecords: 0,
-      processedRecords: 0,
-      importedRecords: 0,
-      skippedRecords: 0,
-      duplicateRecords: 0,
-      unknownUserRecords: 0,
-      overlapRecords: 0,
-      filteredRecords: 0,
-      errorRecords: 0,
-      enrichedRecords: 0,
-      message,
-      waitingFor: waitingForSummary,
-    };
-  }
-
   return {
-    status: 'waiting',
-    totalRecords: 0,
-    fetchedRecords: 0,
-    processedRecords: 0,
-    importedRecords: 0,
-    updatedRecords: 0,
-    skippedRecords: 0,
-    duplicateRecords: 0,
-    unknownUserRecords: 0,
-    activeSessionRecords: 0,
-    errorRecords: 0,
-    currentPage: 0,
-    totalPages: 0,
-    message,
-    waitingFor: waitingForSummary,
+    ...blankProgress(type, 'waiting', `Waiting for ${waitingFor.description} to complete...`),
+    waitingFor: {
+      jobType: waitingFor.jobType,
+      description: waitingFor.description,
+      startedAt: waitingFor.startedAt,
+    },
   };
 }
+
+const errorMessage = (error: unknown) =>
+  error instanceof Error && error.message ? error.message : 'Unknown error';
 
 /** Tells the owner's import panel that an import of this type failed */
 export function publishImportFailed(
@@ -308,69 +304,40 @@ export function publishImportFailed(
   error: unknown,
   jobId?: string
 ): void {
-  const message = error instanceof Error && error.message ? error.message : 'Unknown error';
   void getPubSubService()?.publish(importProgressChannel(type), {
-    ...buildFailedProgress(type, message),
+    ...blankProgress(type, 'error', `Import failed: ${errorMessage(error)}`),
     jobId,
   });
 }
 
-function buildFailedProgress(
-  type: ImportJobData['type'],
-  errorMessage: string
-): ImportProgressPayload {
-  const message = `Import failed: ${errorMessage}`;
+const importAttempts = (job: Job<ImportJobData>) => job.opts.attempts || 3;
 
-  if (type === 'jellystat') {
-    return {
-      status: 'error',
-      totalRecords: 0,
-      processedRecords: 0,
-      importedRecords: 0,
-      skippedRecords: 0,
-      filteredRecords: 0,
-      errorRecords: 0,
-      enrichedRecords: 0,
-      message,
-    };
-  }
-
-  if (type === 'tofa') return tofaProgress('error', message);
-
-  if (type === 'playback-reporting') {
-    return {
-      status: 'error',
-      totalRecords: 0,
-      fetchedRecords: 0,
-      processedRecords: 0,
-      importedRecords: 0,
-      skippedRecords: 0,
-      duplicateRecords: 0,
-      unknownUserRecords: 0,
-      overlapRecords: 0,
-      filteredRecords: 0,
-      errorRecords: 0,
-      enrichedRecords: 0,
-      message,
-    };
-  }
-
-  return {
-    status: 'error',
-    totalRecords: 0,
-    fetchedRecords: 0,
-    processedRecords: 0,
-    importedRecords: 0,
-    updatedRecords: 0,
-    skippedRecords: 0,
-    duplicateRecords: 0,
-    unknownUserRecords: 0,
-    activeSessionRecords: 0,
-    errorRecords: 0,
-    currentPage: 0,
-    totalPages: 0,
-    message,
+/** Tells the owner's import panel that an attempt failed and the import runs again later */
+function publishImportRetrying(job: Job<ImportJobData>, error: unknown): void {
+  const retry = {
+    attempt: job.attemptsMade,
+    attempts: importAttempts(job),
+    reason: errorMessage(error),
   };
+  void getPubSubService()?.publish(importProgressChannel(job.data.type), {
+    ...blankProgress(
+      job.data.type,
+      'retrying',
+      `Attempt ${retry.attempt} of ${retry.attempts} failed, retrying: ${retry.reason}`
+    ),
+    retry,
+    jobId: job.id,
+  });
+}
+
+/** No retry can fix these: a rejected key, an unreadable answer, a server that takes no import */
+function failsAtOnce(error: unknown): error is Error {
+  return (
+    error instanceof ServerHistoricalError ||
+    error instanceof JellystatUploadMissingError ||
+    isHttpStatus(error, 401, 403) ||
+    (error instanceof Error && isFatalImportError(error))
+  );
 }
 
 // Longer than the default lock: the synchronous JSON.parse of a large Jellystat upload blocks the lock renewer.
@@ -508,8 +475,7 @@ export function startImportWorker(): void {
         } else {
           console.error(`[Import] Job ${job.id} failed after ${duration}s:`, error);
         }
-        // No retry can import into a server that is no longer live
-        if (error instanceof ServerHistoricalError) throw new UnrecoverableError(error.message);
+        if (failsAtOnce(error)) throw new UnrecoverableError(error.message);
         throw error;
       } finally {
         stopHeartbeat();
@@ -552,12 +518,16 @@ export function startImportWorker(): void {
     if (!job) return;
     activeImportProgress = null;
 
-    const exhausted = job.attemptsMade >= (job.opts.attempts || 3);
-    if (job.data.type === 'jellystat' && (exhausted || error instanceof UnrecoverableError)) {
-      void removeJellystatUpload(job.data.backupPath);
+    const exhausted = job.attemptsMade >= importAttempts(job);
+    // BullMQ tells an unrecoverable error by its name too
+    const unrecoverable =
+      error instanceof UnrecoverableError || error.name === 'UnrecoverableError';
+    if (!exhausted && !unrecoverable) {
+      publishImportRetrying(job, error);
+      return;
     }
 
-    // Always notify frontend of failure
+    if (job.data.type === 'jellystat') void removeJellystatUpload(job.data.backupPath);
     publishImportFailed(job.data.type, error, job.id);
 
     if (exhausted) {
@@ -649,7 +619,7 @@ async function processTautulliImportJob(
   }
 
   // (BETA) Enrich sessions with detailed stream data
-  if (includeStreamDetails && result.success) {
+  if (includeStreamDetails) {
     console.log(`[Import] Starting stream details enrichment for server ${serverId}`);
     if (pubSubService) {
       await pubSubService.publish('import:progress', {
@@ -679,7 +649,7 @@ async function processTautulliImportJob(
   if (pubSubService) {
     const total = result.imported + result.updated + result.skipped + result.errors;
     await pubSubService.publish('import:progress', {
-      status: result.success ? 'complete' : 'error',
+      status: 'complete',
       totalRecords: total,
       fetchedRecords: total,
       processedRecords: total,
@@ -709,13 +679,7 @@ async function processJellystatImportJob(
   const { serverId, enrichMedia, updateStreamDetails } = job.data;
   const pubSubService = getPubSubService();
 
-  let backupJson: string;
-  try {
-    backupJson = job.data.backupJson ?? (await readJellystatUpload(job.data.backupPath ?? ''));
-  } catch (error) {
-    if (error instanceof JellystatUploadMissingError) throw new UnrecoverableError(error.message);
-    throw error;
-  }
+  const backupJson = job.data.backupJson ?? (await readJellystatUpload(job.data.backupPath ?? ''));
 
   // Run the actual import
   const result = await importJellystatBackup(
@@ -723,13 +687,13 @@ async function processJellystatImportJob(
     backupJson,
     enrichMedia,
     pubSubService ?? undefined,
-    { updateStreamDetails }
+    { updateStreamDetails, onProgress: (progress) => job.updateProgress(progress) }
   );
 
   // Publish final result
   if (pubSubService) {
     await pubSubService.publish('import:jellystat:progress', {
-      status: result.success ? 'complete' : 'error',
+      status: 'complete',
       totalRecords: result.imported + result.updated + result.skipped + result.errors,
       processedRecords: result.imported + result.updated + result.skipped + result.errors,
       importedRecords: result.imported,
@@ -762,14 +726,15 @@ async function processPlaybackReportingImportJob(
   const result = await importPlaybackReporting(
     serverId,
     { timezone, enrichMedia, importFullRange },
-    pubSubService ?? undefined
+    pubSubService ?? undefined,
+    (progress) => job.updateProgress(progress)
   );
 
   if (pubSubService) {
     const total = result.imported + result.skipped + result.errors;
     const unknownUserRecords = result.skippedUsers?.reduce((sum, u) => sum + u.recordCount, 0) ?? 0;
     await pubSubService.publish('import:playbackreporting:progress', {
-      status: result.success ? 'complete' : 'error',
+      status: 'complete',
       totalRecords: total,
       fetchedRecords: total,
       processedRecords: total,
@@ -798,7 +763,7 @@ async function processTofaImportJob(job: Job<TofaImportJobData>): Promise<TofaIm
     (progress) => job.updateProgress(progress)
   );
   await pubSubService?.publish('import:tofa:progress', {
-    ...tofaProgress(result.success ? 'complete' : 'error', result.message),
+    ...blankProgress('tofa', 'complete', result.message),
     importedRecords: result.imported,
     skippedRecords: result.skipped,
     duplicateRecords: result.duplicates,
@@ -837,14 +802,14 @@ async function addImport(
 const HELD_IMPORT_MAX_WAIT_MS = 24 * 60 * 60 * 1000;
 
 /**
- * Adds an import whose plays take their season and show keys from the library as they are
+ * Adds an import whose plays take their media, season and show keys from the library as they are
  * written, held like the tofa import while the server's first library sync is queued or running.
  * Plays written before it keep those keys empty.
  */
 async function addImportAfterFirstSync(
   queue: Queue<ImportJobData>,
   name: string,
-  data: JellystatImportJobData | PlaybackReportingImportJobData
+  data: TautulliImportJobData | JellystatImportJobData | PlaybackReportingImportJobData
 ): Promise<string> {
   if (!(await hasPendingFirstSync(data.serverId))) return addImport(queue, name, data);
   const jobId = await addImport(
@@ -893,7 +858,7 @@ export async function enqueueImport(
   const existingJobId = await getActiveImportForServer(serverId);
   if (existingJobId) throw importInProgress(serverId, existingJobId);
 
-  const jobId = await addImport(importQueue, 'tautulli-import', {
+  const jobId = await addImportAfterFirstSync(importQueue, 'tautulli-import', {
     type: 'tautulli',
     serverId,
     userId,
@@ -1171,27 +1136,50 @@ export async function releaseHeldImport(serverId: string): Promise<void> {
   await Promise.all((await heldImportsOf(serverId)).map(promoteIfDelayed));
 }
 
-function isTofaImportProgress(value: unknown): value is TofaImportProgress {
+function isImportProgress(value: unknown): value is ImportProgressPayload {
   return (
     typeof value === 'object' && value !== null && 'status' in value && 'importedRecords' in value
   );
 }
 
-function isTofaImportResult(value: unknown): value is TofaImportResult {
-  return typeof value === 'object' && value !== null && 'success' in value && 'duplicates' in value;
+function isImportResult(value: unknown): value is ImportJobResult {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    'success' in value &&
+    value.success === true &&
+    'imported' in value
+  );
+}
+
+/** Jobs kept from older versions record a failed import as a completed job with success: false */
+function storedFailure(value: unknown): string | null {
+  return typeof value === 'object' &&
+    value !== null &&
+    'success' in value &&
+    value.success === false &&
+    'message' in value &&
+    typeof value.message === 'string'
+    ? value.message
+    : null;
 }
 
 /**
- * The server's latest tofa history import, held or started by the owner, or null when it has
+ * The server's latest import of this type, held or started by the owner, or null when it has
  * none still kept. A finished one is told by its result, which the job stores as it completes.
  */
-export async function getLatestTofaImport(serverId: string): Promise<{
+export async function getLatestImport(
+  type: ImportJobData['type'],
+  serverId: string
+): Promise<{
   held: boolean;
   state: string;
-  progress: TofaImportProgress | null;
-  result: TofaImportResult | null;
+  progress: ImportProgressPayload | null;
+  result: ImportJobResult | null;
   failedReason: string | null;
   finishedAt: number | null;
+  attemptsMade: number;
+  attempts: number;
 } | null> {
   if (!importQueue) return null;
   const jobs = await importQueue.getJobs([
@@ -1203,19 +1191,24 @@ export async function getLatestTofaImport(serverId: string): Promise<{
     'failed',
   ]);
   const latest = jobs
-    .filter((job) => job.data.type === 'tofa' && job.data.serverId === serverId)
+    .filter((job) => job.data.type === type && job.data.serverId === serverId)
     .reduce<Job<ImportJobData> | undefined>(
       (newest, job) => (newest && newest.timestamp >= job.timestamp ? newest : job),
       undefined
     );
   if (!latest) return null;
+  // Tautulli keeps a percentage on the job; its counts live in this process while it runs
+  const running = activeImportProgress;
+  const cached = running && running.jobId === latest.id ? running.progress : null;
   return {
     held: isHeldImport(latest),
     state: await latest.getState(),
-    progress: isTofaImportProgress(latest.progress) ? latest.progress : null,
-    result: isTofaImportResult(latest.returnvalue) ? latest.returnvalue : null,
-    failedReason: latest.failedReason ?? null,
+    progress: isImportProgress(latest.progress) ? latest.progress : cached,
+    result: isImportResult(latest.returnvalue) ? latest.returnvalue : null,
+    failedReason: latest.failedReason ?? storedFailure(latest.returnvalue),
     finishedAt: latest.finishedOn ?? null,
+    attemptsMade: latest.attemptsMade,
+    attempts: importAttempts(latest),
   };
 }
 
@@ -1247,6 +1240,7 @@ export async function getAllActiveImports(): Promise<
     progress: number | object | null;
     createdAt: number;
     held: boolean;
+    attemptsMade: number;
   }>
 > {
   if (!importQueue) {
@@ -1267,6 +1261,7 @@ export async function getAllActiveImports(): Promise<
         progress: typeof progress === 'number' || typeof progress === 'object' ? progress : null,
         createdAt: job.timestamp ?? Date.now(),
         held: isHeldImport(job),
+        attemptsMade: job.attemptsMade,
       };
     })
   );

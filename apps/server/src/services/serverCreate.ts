@@ -121,7 +121,8 @@ export async function startAddedServer(
   }
   // Held before the add answers, so an import the owner starts meanwhile finds it and is refused
   await holdServerHistoryImport(server).catch(failedFor('Holding the history import'));
-  // Before the add answers too: a Jellystat or Playback Reporting import started meanwhile waits
+  // Before the add answers too: a Tautulli, Jellystat or Playback Reporting import started
+  // meanwhile waits
   await markFirstSyncOwed(server.id).catch(failedFor('Marking the first sync owed'));
   sseManager.refresh().catch(failedFor('SSE refresh'));
 

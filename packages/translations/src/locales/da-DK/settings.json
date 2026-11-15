@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "Importerer flere oplysninger om streams. Kan øge importtiden betydeligt.",
     "importing": "Importerer...",
     "startImport": "",
+    "startAgain": "",
     "howItWorks": "Sådan fungerer importen",
     "howItWorksDesc": "Tracearr importerer alle historiske visningsdata fra din kilde. Det kan tage et stykke tid afhængigt af størrelsen på dit bibliotek.",
     "recordsMayBeSkipped": "Registreringer kan springes over, hvis:",
@@ -505,6 +506,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

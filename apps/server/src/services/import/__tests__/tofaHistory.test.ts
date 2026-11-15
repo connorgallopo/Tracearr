@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { UnrecoverableError } from 'bullmq';
 import tofa from '../../../test/mediaServerResponses/tofa.json' with { type: 'json' };
 import { queryChain } from '../../../test/helpers.js';
 
@@ -47,6 +48,7 @@ import { db } from '../../../db/client.js';
 import { flushInsertBatch } from '../batchProcessor.js';
 import { syncServer } from '../../sync.js';
 import { createUserMapping } from '../userMapping.js';
+import { HttpClientError } from '../../../utils/http.js';
 import { importTofaHistory } from '../tofaHistory.js';
 
 const SERVER = {
@@ -98,7 +100,7 @@ describe('importTofaHistory', () => {
     );
   });
 
-  it('imports nothing when the user list cannot be read', async () => {
+  it('throws for a retry and imports nothing when the user list cannot be read', async () => {
     rows([], []);
     vi.mocked(syncServer).mockResolvedValueOnce({
       usersAdded: 0,
@@ -110,15 +112,42 @@ describe('importTofaHistory', () => {
       usersRead: false,
       errors: ['tofa user sync failed: unreachable'],
     });
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-    const result = await importTofaHistory(SERVER.id);
+    const run = importTofaHistory(SERVER.id);
 
-    expect(result).toMatchObject({
-      success: false,
-      message: 'Import failed: tofa user sync failed: unreachable',
-    });
+    await expect(run).rejects.toThrow('tofa user sync failed: unreachable');
+    await expect(run).rejects.not.toBeInstanceOf(UnrecoverableError);
     expect(getWatchHistoryPage).not.toHaveBeenCalled();
+  });
+
+  it('fails at once when tofa refuses the key while syncing users', async () => {
+    rows([], []);
+    vi.mocked(syncServer).mockResolvedValueOnce({
+      usersAdded: 0,
+      usersUpdated: 0,
+      usersSkipped: 0,
+      usersRemoved: 0,
+      usersRestored: 0,
+      librariesSynced: 0,
+      usersRead: false,
+      usersError: new HttpClientError({
+        service: 'tofa',
+        statusCode: 401,
+        statusText: 'Unauthorized',
+        url: '',
+      }),
+      errors: ['tofa user sync failed: tofa request failed: 401 Unauthorized'],
+    });
+
+    await expect(importTofaHistory(SERVER.id)).rejects.toBeInstanceOf(UnrecoverableError);
+    expect(getWatchHistoryPage).not.toHaveBeenCalled();
+  });
+
+  it('fails at once for a server that keeps no watch history of its own', async () => {
+    vi.mocked(db.select).mockImplementation(() => queryChain(vi.fn, [{ ...SERVER, type: 'plex' }]));
+
+    await expect(importTofaHistory(SERVER.id)).rejects.toBeInstanceOf(UnrecoverableError);
+    expect(syncServer).not.toHaveBeenCalled();
   });
 
   it('pages back from the newest play and stops at the oldest', async () => {

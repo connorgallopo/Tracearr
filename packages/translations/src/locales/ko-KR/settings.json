@@ -450,6 +450,7 @@
     "includeStreamDetailsHelp": "추가 스트림 정보를 가져옵니다. 가져오기 시간이 크게 늘어날 수 있습니다.",
     "importing": "가져오는 중...",
     "startImport": "가져오기 시작",
+    "startAgain": "",
     "howItWorks": "가져오기 방식",
     "howItWorksDesc": "Tracearr가 소스의 모든 과거 시청 데이터를 가져옵니다. 라이브러리 크기에 따라 시간이 걸릴 수 있습니다.",
     "recordsMayBeSkipped": "다음 경우 기록을 건너뛸 수 있습니다:",
@@ -503,6 +504,8 @@
     "skipOverlap": "기간이 겹치는 기록 - 타임스탬프가 Tracearr에서 이미 추적 중인 기간에 포함됩니다. 포함하려면 전체 기록 가져오기를 켜세요.",
     "skipDuplicatePlugin": "중복 기록 - 이미 직접 가져왔거나 같은 플러그인 데이터를 Jellystat에서 먼저 가져온 항목입니다.",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

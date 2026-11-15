@@ -11,6 +11,7 @@ import type {
   PlaybackReportingImportResult,
   JellyfinEmbyServerType,
 } from '@tracearr/shared';
+import { UnrecoverableError } from 'bullmq';
 import { and, eq, sql } from 'drizzle-orm';
 import { db } from '../db/client.js';
 import { batchGetLibraryItemIdentity, type SessionIdentity } from '../jobs/poller/database.js';
@@ -36,6 +37,7 @@ import {
   type MediaEnrichment,
   queryExistingByExternalIds,
   type TimeBounds,
+  syncImportUsers,
 } from './import/index.js';
 import {
   createJellyfinEmbyClient,
@@ -46,7 +48,6 @@ import {
 import { parseMediaType } from './mediaServer/shared/jellyfinEmbyUtils.js';
 import { markImportedServerLocations } from './serverLocations.js';
 import { getWatchedThresholds, watchedThresholdFor, type WatchedThresholds } from './settings.js';
-import { syncServer } from './sync.js';
 
 const PAGE_SIZE = 5000;
 const BATCH_SIZE = 500;
@@ -88,7 +89,9 @@ export function buildSelectColumns(availableColumns: string[]): string[] {
 
   const missing = BASE_COLUMNS.filter((col) => !availableLower.has(col.toLowerCase()));
   if (missing.length > 0) {
-    throw new Error(`Playback Reporting table is missing required columns: ${missing.join(', ')}`);
+    throw new UnrecoverableError(
+      `Playback Reporting table is missing required columns: ${missing.join(', ')}`
+    );
   }
 
   const optional = OPTIONAL_COLUMNS.filter((col) => availableLower.has(col.toLowerCase()));
@@ -321,7 +324,8 @@ async function enrichPage(
 export async function importPlaybackReporting(
   serverId: string,
   options: { timezone: string; enrichMedia: boolean; importFullRange: boolean },
-  pubSubService?: PubSubService
+  pubSubService?: PubSubService,
+  onProgress?: (progress: PlaybackReportingImportProgress) => Promise<void>
 ): Promise<PlaybackReportingImportResult> {
   const progress: PlaybackReportingImportProgress = {
     status: 'idle',
@@ -342,7 +346,8 @@ export async function importPlaybackReporting(
 
   const publishProgress = createSimpleProgressPublisher<PlaybackReportingImportProgress>(
     pubSubService,
-    'import:playbackreporting:progress'
+    'import:playbackreporting:progress',
+    onProgress
   );
   publishProgress(progress);
 
@@ -350,293 +355,255 @@ export async function importPlaybackReporting(
 
   progress.message = 'Syncing server users...';
   publishProgress(progress);
-  await syncServer(serverId, { syncUsers: true, syncLibraries: false });
+  await syncImportUsers(serverId);
 
-  try {
-    const [server] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
+  const [server] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
 
-    if (!server) {
-      throw new Error(`Server not found: ${serverId}`);
-    }
-
-    if (server.historicalAt) {
-      throw new ServerHistoricalError(serverId);
-    }
-
-    if (!isJellyfinEmby(server.type)) {
-      throw new Error(
-        `Playback Reporting import only supports Jellyfin/Emby servers, got: ${server.type}`
-      );
-    }
-
-    const cutoff = server.createdAt;
-
-    const clientConfig = {
-      url: server.url,
-      token: server.token,
-      id: server.id,
-      name: server.name,
-    };
-    const client = createJellyfinEmbyClient(server.type, clientConfig);
-
-    progress.status = 'detecting';
-    progress.message = 'Checking for the Playback Reporting plugin...';
-    publishProgress(progress);
-
-    const info = await client.getPlaybackReportingInfo();
-    if (!info.installed) {
-      const message = 'Playback Reporting plugin is not installed on this server';
-      progress.status = 'error';
-      progress.message = message;
-      publishProgress(progress);
-
-      return {
-        success: false,
-        imported: 0,
-        skipped: 0,
-        duplicates: 0,
-        overlap: 0,
-        filtered: 0,
-        overlong: 0,
-        errors: 0,
-        enriched: 0,
-        message,
-      };
-    }
-
-    const selectColumns = buildSelectColumns(info.columns);
-    progress.totalRecords = info.totalRecords;
-    progress.message = `Found ${info.totalRecords} records in the plugin database`;
-    publishProgress(progress);
-
-    const userMap = await createUserMapping(serverId);
-    const thresholds = await getWatchedThresholds();
-    // importFullRange only disables the tracked-history watermark; tracking starts
-    // at the server's created_at, so the cutoff still applies.
-    const trackedWatermark = options.importFullRange
-      ? null
-      : await loadTrackedHistoryWatermark(serverId);
-    const watermark =
-      trackedWatermark && trackedWatermark.getTime() < cutoff.getTime() ? trackedWatermark : cutoff;
-
-    let minImportDate: Date | null = null;
-    let maxImportDate: Date | null = null;
-    let lastProgressTime = Date.now();
-    let lastRowid = 0;
-
-    for (;;) {
-      progress.status = 'fetching';
-      progress.message = `Fetching records: ${progress.fetchedRecords}/${progress.totalRecords}`;
-      publishProgress(progress);
-
-      const results = await client.queryPlaybackReporting(buildPageQuery(selectColumns, lastRowid));
-      if (results.length === 0) break;
-
-      const rows = parsePlaybackReportingRows(selectColumns, results);
-      const lastRow = rows.at(-1);
-      if (!lastRow) break;
-      lastRowid = lastRow.rowid;
-      progress.fetchedRecords += rows.length;
-
-      const pageRows: { row: PlaybackReportingRow; startedAt: Date }[] = [];
-      for (const row of rows) {
-        const startedAt = wallTimeToUtc(row.dateCreated, options.timezone);
-        if (Number.isNaN(startedAt.getTime())) {
-          console.warn(
-            `[PlaybackReporting] Unparseable DateCreated on rowid ${row.rowid}: ${row.dateCreated}`
-          );
-          progress.processedRecords++;
-          progress.errorRecords++;
-          continue;
-        }
-        pageRows.push({ row, startedAt });
-      }
-
-      if (pageRows.length > 0) {
-        const itemIds = [...new Set(pageRows.map(({ row }) => row.itemId))];
-
-        let enrichmentMap = new Map<string, MediaEnrichment>();
-        if (options.enrichMedia) {
-          progress.status = 'enriching';
-          progress.message = `Enriching ${itemIds.length} media items...`;
-          publishProgress(progress);
-
-          enrichmentMap = await enrichPage(client, itemIds);
-          progress.enrichedRecords += enrichmentMap.size;
-        }
-
-        const identityByItemId = await batchGetLibraryItemIdentity(serverId, itemIds);
-
-        const dedupIds = pageRows.flatMap(({ row }) => [`pr-${row.rowid}`, String(row.rowid)]);
-        const startTimes = pageRows.map(({ startedAt }) => startedAt.getTime());
-        const maxDurationMs = Math.max(...pageRows.map(({ row }) => row.playDurationSec)) * 1000;
-        // Rows that reached us through Jellystat are stamped at playback start minus their
-        // duration, so the lower bound has to clear the page's longest play.
-        const timeBounds: TimeBounds = {
-          minTime: new Date(Math.min(...startTimes) - maxDurationMs),
-          maxTime: new Date(Math.max(...startTimes)),
-        };
-        const existing = await queryExistingByExternalIds(serverId, dedupIds, timeBounds);
-
-        progress.status = 'processing';
-        const insertBatch: (typeof sessions.$inferInsert)[] = [];
-        const geoCache = new Map<string, ImportGeo>();
-
-        for (const { row, startedAt } of pageRows) {
-          progress.processedRecords++;
-
-          try {
-            const serverUserId = userMap.get(row.userId);
-            if (!serverUserId) {
-              skippedUserTracker.track(row.userId, null);
-              progress.unknownUserRecords++;
-              progress.skippedRecords++;
-              continue;
-            }
-
-            if (existing.has(`pr-${row.rowid}`) || existing.has(String(row.rowid))) {
-              progress.duplicateRecords++;
-              progress.skippedRecords++;
-              continue;
-            }
-
-            if (startedAt >= watermark) {
-              progress.overlapRecords++;
-              progress.skippedRecords++;
-              continue;
-            }
-
-            const enrichment = enrichmentMap.get(row.itemId);
-            if (enrichment?.filtered) {
-              progress.filteredRecords++;
-              progress.skippedRecords++;
-              continue;
-            }
-
-            if (exceedsRuntime(row.playDurationSec * 1000, enrichment?.runtimeMs)) {
-              progress.overlongRecords++;
-              progress.skippedRecords++;
-              continue;
-            }
-
-            const ipAddress = extractIpFromEndpoint(row.remoteAddress);
-            const geo = geoCache.getOrInsertComputed(ipAddress, (ip) => {
-              const baseGeo = geoipService.lookup(ip);
-              const asn = geoasnService.lookup(ip);
-              return { ...baseGeo, asnNumber: asn.number, asnOrganization: asn.organization };
-            });
-
-            insertBatch.push(
-              transformPlaybackReportingRow(row, {
-                serverId,
-                serverType: server.type,
-                serverUserId,
-                timezone: options.timezone,
-                geo,
-                thresholds,
-                enrichment,
-                identity: identityByItemId.get(row.itemId),
-              })
-            );
-
-            if (!minImportDate || startedAt < minImportDate) minImportDate = startedAt;
-            if (!maxImportDate || startedAt > maxImportDate) maxImportDate = startedAt;
-
-            progress.importedRecords++;
-          } catch (error) {
-            console.error('[PlaybackReporting] Error processing rowid', row.rowid, error);
-            progress.errorRecords++;
-          }
-
-          const now = Date.now();
-          if (now - lastProgressTime > PROGRESS_THROTTLE_MS) {
-            progress.message = `Processing: ${progress.processedRecords}/${progress.totalRecords}`;
-            publishProgress(progress);
-            lastProgressTime = now;
-          }
-        }
-
-        if (insertBatch.length > 0) {
-          await flushInsertBatch(insertBatch, { chunkSize: BATCH_SIZE });
-        }
-      }
-
-      if (results.length < PAGE_SIZE) break;
-    }
-
-    progress.status = 'processing';
-    progress.message = 'Refreshing aggregates...';
-    publishProgress(progress);
-    await refreshImportAggregates('PlaybackReporting', minImportDate, maxImportDate);
-    try {
-      await markImportedServerLocations(serverId);
-      await enqueueServerLocationSyncIfBehind();
-    } catch (err) {
-      console.error('[PlaybackReporting] Could not queue the server location sync:', err);
-    }
-
-    let message =
-      `Import complete: ${progress.importedRecords} imported, ` +
-      `${progress.duplicateRecords} duplicates skipped, ` +
-      `${progress.overlapRecords} overlapping tracked history, ` +
-      `${progress.unknownUserRecords} unknown user, ` +
-      `${progress.filteredRecords} filtered, ` +
-      `${progress.overlongRecords} longer than the media runtime, ${progress.errorRecords} errors`;
-
-    const skippedUsersWarning = skippedUserTracker.formatWarning();
-    if (skippedUsersWarning) {
-      message += `. Warning: ${skippedUsersWarning}`;
-      console.warn(
-        `[PlaybackReporting] Import skipped users: ${skippedUserTracker
-          .getAll()
-          .map((u) => `${u.username ?? 'Unknown'}(${u.externalId})`)
-          .join(', ')}`
-      );
-    }
-
-    progress.status = 'complete';
-    progress.message = message;
-    publishProgress(progress);
-
-    return {
-      success: true,
-      imported: progress.importedRecords,
-      skipped: progress.skippedRecords,
-      duplicates: progress.duplicateRecords,
-      overlap: progress.overlapRecords,
-      filtered: progress.filteredRecords,
-      overlong: progress.overlongRecords,
-      errors: progress.errorRecords,
-      enriched: progress.enrichedRecords,
-      message,
-      skippedUsers:
-        skippedUserTracker.size > 0
-          ? skippedUserTracker.getAll().map((u) => ({
-              userId: u.externalId,
-              username: u.username,
-              recordCount: u.count,
-            }))
-          : undefined,
-    };
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('[PlaybackReporting] Import failed:', error);
-
-    progress.status = 'error';
-    progress.message = `Import failed: ${errorMessage}`;
-    publishProgress(progress);
-
-    return {
-      success: false,
-      imported: progress.importedRecords,
-      skipped: progress.skippedRecords,
-      duplicates: progress.duplicateRecords,
-      overlap: progress.overlapRecords,
-      filtered: progress.filteredRecords,
-      overlong: progress.overlongRecords,
-      errors: progress.errorRecords,
-      enriched: progress.enrichedRecords,
-      message: `Import failed: ${errorMessage}`,
-    };
+  if (!server) {
+    throw new UnrecoverableError(`Server not found: ${serverId}`);
   }
+
+  if (server.historicalAt) {
+    throw new ServerHistoricalError(serverId);
+  }
+
+  if (!isJellyfinEmby(server.type)) {
+    throw new UnrecoverableError(
+      `Playback Reporting import only supports Jellyfin/Emby servers, got: ${server.type}`
+    );
+  }
+
+  const cutoff = server.createdAt;
+
+  const clientConfig = {
+    url: server.url,
+    token: server.token,
+    id: server.id,
+    name: server.name,
+  };
+  const client = createJellyfinEmbyClient(server.type, clientConfig);
+
+  progress.status = 'detecting';
+  progress.message = 'Checking for the Playback Reporting plugin...';
+  publishProgress(progress);
+
+  const info = await client.getPlaybackReportingInfo();
+  if (!info.installed) {
+    throw new UnrecoverableError('Playback Reporting plugin is not installed on this server');
+  }
+
+  const selectColumns = buildSelectColumns(info.columns);
+  progress.totalRecords = info.totalRecords;
+  progress.message = `Found ${info.totalRecords} records in the plugin database`;
+  publishProgress(progress);
+
+  const userMap = await createUserMapping(serverId);
+  const thresholds = await getWatchedThresholds();
+  // importFullRange only disables the tracked-history watermark; tracking starts
+  // at the server's created_at, so the cutoff still applies.
+  const trackedWatermark = options.importFullRange
+    ? null
+    : await loadTrackedHistoryWatermark(serverId);
+  const watermark =
+    trackedWatermark && trackedWatermark.getTime() < cutoff.getTime() ? trackedWatermark : cutoff;
+
+  let minImportDate: Date | null = null;
+  let maxImportDate: Date | null = null;
+  let lastProgressTime = Date.now();
+  let lastRowid = 0;
+
+  for (;;) {
+    progress.status = 'fetching';
+    progress.message = `Fetching records: ${progress.fetchedRecords}/${progress.totalRecords}`;
+    publishProgress(progress);
+
+    const results = await client.queryPlaybackReporting(buildPageQuery(selectColumns, lastRowid));
+    if (results.length === 0) break;
+
+    const rows = parsePlaybackReportingRows(selectColumns, results);
+    const lastRow = rows.at(-1);
+    if (!lastRow) break;
+    lastRowid = lastRow.rowid;
+    progress.fetchedRecords += rows.length;
+
+    const pageRows: { row: PlaybackReportingRow; startedAt: Date }[] = [];
+    for (const row of rows) {
+      const startedAt = wallTimeToUtc(row.dateCreated, options.timezone);
+      if (Number.isNaN(startedAt.getTime())) {
+        console.warn(
+          `[PlaybackReporting] Unparseable DateCreated on rowid ${row.rowid}: ${row.dateCreated}`
+        );
+        progress.processedRecords++;
+        progress.errorRecords++;
+        continue;
+      }
+      pageRows.push({ row, startedAt });
+    }
+
+    if (pageRows.length > 0) {
+      const itemIds = [...new Set(pageRows.map(({ row }) => row.itemId))];
+
+      let enrichmentMap = new Map<string, MediaEnrichment>();
+      if (options.enrichMedia) {
+        progress.status = 'enriching';
+        progress.message = `Enriching ${itemIds.length} media items...`;
+        publishProgress(progress);
+
+        enrichmentMap = await enrichPage(client, itemIds);
+        progress.enrichedRecords += enrichmentMap.size;
+      }
+
+      const identityByItemId = await batchGetLibraryItemIdentity(serverId, itemIds);
+
+      const dedupIds = pageRows.flatMap(({ row }) => [`pr-${row.rowid}`, String(row.rowid)]);
+      const startTimes = pageRows.map(({ startedAt }) => startedAt.getTime());
+      const maxDurationMs = Math.max(...pageRows.map(({ row }) => row.playDurationSec)) * 1000;
+      // Rows that reached us through Jellystat are stamped at playback start minus their
+      // duration, so the lower bound has to clear the page's longest play.
+      const timeBounds: TimeBounds = {
+        minTime: new Date(Math.min(...startTimes) - maxDurationMs),
+        maxTime: new Date(Math.max(...startTimes)),
+      };
+      const existing = await queryExistingByExternalIds(serverId, dedupIds, timeBounds);
+
+      progress.status = 'processing';
+      const insertBatch: (typeof sessions.$inferInsert)[] = [];
+      const geoCache = new Map<string, ImportGeo>();
+
+      for (const { row, startedAt } of pageRows) {
+        progress.processedRecords++;
+
+        try {
+          const serverUserId = userMap.get(row.userId);
+          if (!serverUserId) {
+            skippedUserTracker.track(row.userId, null);
+            progress.unknownUserRecords++;
+            progress.skippedRecords++;
+            continue;
+          }
+
+          if (existing.has(`pr-${row.rowid}`) || existing.has(String(row.rowid))) {
+            progress.duplicateRecords++;
+            progress.skippedRecords++;
+            continue;
+          }
+
+          if (startedAt >= watermark) {
+            progress.overlapRecords++;
+            progress.skippedRecords++;
+            continue;
+          }
+
+          const enrichment = enrichmentMap.get(row.itemId);
+          if (enrichment?.filtered) {
+            progress.filteredRecords++;
+            progress.skippedRecords++;
+            continue;
+          }
+
+          if (exceedsRuntime(row.playDurationSec * 1000, enrichment?.runtimeMs)) {
+            progress.overlongRecords++;
+            progress.skippedRecords++;
+            continue;
+          }
+
+          const ipAddress = extractIpFromEndpoint(row.remoteAddress);
+          const geo = geoCache.getOrInsertComputed(ipAddress, (ip) => {
+            const baseGeo = geoipService.lookup(ip);
+            const asn = geoasnService.lookup(ip);
+            return { ...baseGeo, asnNumber: asn.number, asnOrganization: asn.organization };
+          });
+
+          insertBatch.push(
+            transformPlaybackReportingRow(row, {
+              serverId,
+              serverType: server.type,
+              serverUserId,
+              timezone: options.timezone,
+              geo,
+              thresholds,
+              enrichment,
+              identity: identityByItemId.get(row.itemId),
+            })
+          );
+
+          if (!minImportDate || startedAt < minImportDate) minImportDate = startedAt;
+          if (!maxImportDate || startedAt > maxImportDate) maxImportDate = startedAt;
+
+          progress.importedRecords++;
+        } catch (error) {
+          console.error('[PlaybackReporting] Error processing rowid', row.rowid, error);
+          progress.errorRecords++;
+        }
+
+        const now = Date.now();
+        if (now - lastProgressTime > PROGRESS_THROTTLE_MS) {
+          progress.message = `Processing: ${progress.processedRecords}/${progress.totalRecords}`;
+          publishProgress(progress);
+          lastProgressTime = now;
+        }
+      }
+
+      if (insertBatch.length > 0) {
+        await flushInsertBatch(insertBatch, { chunkSize: BATCH_SIZE });
+      }
+    }
+
+    if (results.length < PAGE_SIZE) break;
+  }
+
+  progress.status = 'processing';
+  progress.message = 'Refreshing aggregates...';
+  publishProgress(progress);
+  await refreshImportAggregates('PlaybackReporting', minImportDate, maxImportDate);
+  try {
+    await markImportedServerLocations(serverId);
+    await enqueueServerLocationSyncIfBehind();
+  } catch (err) {
+    console.error('[PlaybackReporting] Could not queue the server location sync:', err);
+  }
+
+  let message =
+    `Import complete: ${progress.importedRecords} imported, ` +
+    `${progress.duplicateRecords} duplicates skipped, ` +
+    `${progress.overlapRecords} overlapping tracked history, ` +
+    `${progress.unknownUserRecords} unknown user, ` +
+    `${progress.filteredRecords} filtered, ` +
+    `${progress.overlongRecords} longer than the media runtime, ${progress.errorRecords} errors`;
+
+  const skippedUsersWarning = skippedUserTracker.formatWarning();
+  if (skippedUsersWarning) {
+    message += `. Warning: ${skippedUsersWarning}`;
+    console.warn(
+      `[PlaybackReporting] Import skipped users: ${skippedUserTracker
+        .getAll()
+        .map((u) => `${u.username ?? 'Unknown'}(${u.externalId})`)
+        .join(', ')}`
+    );
+  }
+
+  progress.status = 'complete';
+  progress.message = message;
+  publishProgress(progress);
+
+  return {
+    success: true,
+    imported: progress.importedRecords,
+    skipped: progress.skippedRecords,
+    duplicates: progress.duplicateRecords,
+    overlap: progress.overlapRecords,
+    filtered: progress.filteredRecords,
+    overlong: progress.overlongRecords,
+    errors: progress.errorRecords,
+    enriched: progress.enrichedRecords,
+    message,
+    skippedUsers:
+      skippedUserTracker.size > 0
+        ? skippedUserTracker.getAll().map((u) => ({
+            userId: u.externalId,
+            username: u.username,
+            recordCount: u.count,
+          }))
+        : undefined,
+  };
 }

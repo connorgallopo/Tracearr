@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "Εισαγωγές πρόσθετες πληροφορίες για τη ροή του προϊόντος.",
     "importing": "Εισαγωγή...",
     "startImport": "Έναρξη Εισαγωγής",
+    "startAgain": "",
     "howItWorks": "Πώς λειτουργεί η εισαγωγή",
     "howItWorksDesc": "Το Tracearr θα εισάγει όλα τα ιστορικά δεδομένα παρακολούθησης από την πηγή σας. Αυτό μπορεί να διαρκέσει λίγο ανάλογα με το μέγεθος της βιβλιοθήκης σας.",
     "recordsMayBeSkipped": "Οι εγγραφές μπορούν να παραλειφθούν εάν:",
@@ -505,6 +506,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

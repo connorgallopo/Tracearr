@@ -1,15 +1,7 @@
-import { useEffect, useEffectEvent, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
-import { AlertTriangle, Download, Info, Loader2 } from 'lucide-react';
-import {
-  WS_EVENTS,
-  assertNever,
-  type Server,
-  type TofaBackfillStatus,
-  type TofaImportProgress,
-} from '@tracearr/shared';
-import { Button } from '@/components/ui/button';
+import { AlertTriangle, Download, Info } from 'lucide-react';
+import type { Server, TofaImportProgress, TofaImportResult } from '@tracearr/shared';
 import { Field, FieldLabel } from '@/components/ui/field';
 import {
   Select,
@@ -19,11 +11,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
-import { useTofaImports, waitingForLibrarySyncMessage } from '@/hooks/queries/useImports';
-import { useSocket } from '@/hooks/useSocket';
+import {
+  latestImport,
+  serverWithImport,
+  useActiveImports,
+  useImportStatus,
+} from '@/hooks/queries/useImports';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 import { ImportProgressCard, type ImportProgressData } from './ImportProgressCard';
+import { StartImportButton } from './StartImportButton';
 
 const blankProgress = (
   status: TofaImportProgress['status'],
@@ -41,43 +38,17 @@ const blankProgress = (
   message,
 });
 
-const isPending = (backfill: TofaBackfillStatus | null) =>
-  backfill?.state === 'waitingForLibrarySync' ||
-  backfill?.state === 'queued' ||
-  backfill?.state === 'running';
-
-/** The server's latest import as the progress card shows it, or null when it has none. */
-function backfillProgress(
-  backfill: TofaBackfillStatus | null,
-  t: TFunction<['settings', 'common']>
-): TofaImportProgress | null {
-  switch (backfill?.state) {
-    case undefined:
-      return null;
-    case 'waitingForLibrarySync':
-      return blankProgress('waiting', waitingForLibrarySyncMessage(backfill, t));
-    case 'queued':
-      return blankProgress('waiting', t('import.importQueued'));
-    case 'running':
-      return backfill.progress ?? blankProgress('processing', t('import.importInProgressGeneric'));
-    case 'complete': {
-      const { result } = backfill;
-      const processed = result.imported + result.skipped + result.errors;
-      return {
-        ...blankProgress('complete', result.message),
-        fetchedRecords: processed,
-        processedRecords: processed,
-        importedRecords: result.imported,
-        skippedRecords: result.skipped,
-        duplicateRecords: result.duplicates,
-        errorRecords: result.errors,
-      };
-    }
-    case 'failed':
-      return blankProgress('error', backfill.message ?? t('import.importFailed'));
-    default:
-      return assertNever(backfill);
-  }
+function resultProgress(result: TofaImportResult): TofaImportProgress {
+  const processed = result.imported + result.skipped + result.errors;
+  return {
+    ...blankProgress('complete', result.message),
+    fetchedRecords: processed,
+    processedRecords: processed,
+    importedRecords: result.imported,
+    skippedRecords: result.skipped,
+    duplicateRecords: result.duplicates,
+    errorRecords: result.errors,
+  };
 }
 
 export function TofaImportSection({
@@ -88,63 +59,30 @@ export function TofaImportSection({
   onStarted?: () => void;
 }) {
   const { t } = useTranslation(['settings', 'common']);
-  const { socket } = useSocket();
   const [pickedServerId, setServerId] = useState('');
-  const [progress, setProgress] = useState<TofaImportProgress | null>(null);
-  const [isImporting, setIsImporting] = useState(false);
-  const imports = useTofaImports(servers.map((server) => server.id));
-  const backfillOf = (id: string) => imports.byServer.get(id)?.data?.backfill ?? null;
+  const serverIds = servers.map((server) => server.id);
+  const imports = useActiveImports('tofa', serverIds);
 
   // Until the owner picks one, show the server whose import is under way, else one with a result
   const serverId =
     pickedServerId ||
-    servers.find((server) => isPending(backfillOf(server.id)))?.id ||
-    servers.find((server) => backfillOf(server.id) !== null)?.id ||
+    serverWithImport(serverIds, (id) => latestImport(imports, id)) ||
     (servers[0]?.id ?? '');
-  const backfill = backfillOf(serverId);
-  const shown = progress ?? backfillProgress(backfill, t);
-  const importing = isImporting || backfill?.state === 'running';
-  // While waiting, queued or done, the card says where the import stands and there is no button
-  const offerImport =
-    shown?.status !== 'complete' &&
-    backfill?.state !== 'waitingForLibrarySync' &&
-    backfill?.state !== 'queued';
+  const {
+    progress: shown,
+    phase,
+    start,
+  } = useImportStatus(
+    'tofa',
+    latestImport(imports, serverId),
+    { blank: blankProgress, fromResult: resultProgress },
+    { onStarted }
+  );
 
-  const underway = backfill !== null && backfill.state !== 'failed';
-  const announce = useEffectEvent(() => onStarted?.());
-  useEffect(() => {
-    if (underway) announce();
-  }, [underway]);
-
-  useEffect(() => {
-    if (!socket) return;
-
-    const handleProgress = (next: TofaImportProgress) => {
-      setProgress(next);
-      if (next.status === 'complete' || next.status === 'error') {
-        setIsImporting(false);
-      }
-    };
-
-    socket.on(WS_EVENTS.IMPORT_TOFA_PROGRESS, handleProgress);
-    return () => {
-      socket.off(WS_EVENTS.IMPORT_TOFA_PROGRESS, handleProgress);
-    };
-  }, [socket]);
-
-  const handleStart = async () => {
-    onStarted?.();
-    setIsImporting(true);
-    setProgress(blankProgress('fetching', t('import.startingImport')));
-    try {
-      await api.import.tofa.start(serverId);
-    } catch (err) {
-      setIsImporting(false);
-      setProgress(
-        blankProgress('error', err instanceof Error ? err.message : t('import.importFailed'))
-      );
-    }
-  };
+  const handleStart = () =>
+    start(blankProgress('fetching', t('import.startingImport')), () =>
+      api.import.tofa.start(serverId)
+    );
 
   const progressData: ImportProgressData | null = shown
     ? {
@@ -172,7 +110,7 @@ export function TofaImportSection({
           <Select
             value={serverId}
             onValueChange={setServerId}
-            disabled={isImporting || isPending(backfill)}
+            disabled={phase === 'pending' || phase === 'importing'}
           >
             <SelectTrigger id="tofaServer">
               <SelectValue placeholder={t('import.selectTofaServer')} />
@@ -191,33 +129,23 @@ export function TofaImportSection({
         </Field>
       )}
 
-      <div className={cn('space-y-4', servers.length > 1 && 'border-t pt-6')}>
-        {offerImport && (
-          <Button onClick={() => void handleStart()} disabled={!serverId || importing} size="lg">
-            {importing ? (
-              <>
-                <Loader2 className="animate-spin" />
-                {t('import.importing')}
-              </>
-            ) : (
-              <>
-                <Download className="mr-2 h-4 w-4" />
-                {t('import.importTofaHistory')}
-              </>
-            )}
-          </Button>
-        )}
+      <div className={cn(servers.length > 1 && 'border-t pt-6')}>
+        <StartImportButton
+          phase={phase}
+          onClick={() => void handleStart()}
+          disabled={!serverId}
+          icon={Download}
+          label={t('import.importTofaHistory')}
+        />
 
-        {progressData && (
-          <div className="space-y-2">
-            <ImportProgressCard progress={progressData} />
-            {(shown?.duplicateRecords ?? 0) > 0 && (
-              <p className="text-muted-foreground text-xs">
-                {t('import.duplicates', { count: shown?.duplicateRecords })}
-              </p>
-            )}
-          </div>
-        )}
+        <div className={cn('space-y-2', progressData && phase !== 'pending' && 'mt-4')}>
+          <ImportProgressCard progress={progressData} />
+          {(shown?.duplicateRecords ?? 0) > 0 && (
+            <p className="text-muted-foreground text-xs">
+              {t('import.duplicates', { count: shown?.duplicateRecords })}
+            </p>
+          )}
+        </div>
       </div>
 
       <div className="space-y-3">

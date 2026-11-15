@@ -452,6 +452,7 @@
     "includeStreamDetailsHelp": "Importe des informations de flux supplémentaires. Peut augmenter considérablement le temps d'importation.",
     "importing": "Importation en cours...",
     "startImport": "Commencer l'importation",
+    "startAgain": "",
     "howItWorks": "Comment fonctionne l'import",
     "howItWorksDesc": "Tracearr importera toutes les données historiques de surveillance de votre source. Cela peut prendre un certain temps en fonction de la taille de votre bibliothèque.",
     "recordsMayBeSkipped": "Les enregistrements peuvent être ignorés si :",
@@ -505,6 +506,8 @@
     "skipOverlap": "Recouvrement de l'enregistrement - l'horodatage tombe dans la période que Tracearr suit déjà pour ce serveur. Activez l'importation complète pour l'inclure.",
     "skipDuplicatePlugin": "Enregistrement en double - déjà importé directement ou arrivé plus tôt via une importation Jellystat des mêmes données de plugin.",
     "importFailed": "Importation échouée",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "Glisser le fichier ici",
       "dragOrClick": "",

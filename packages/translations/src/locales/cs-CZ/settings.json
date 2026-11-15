@@ -456,6 +456,7 @@
     "includeStreamDetailsHelp": "Importuje další informace o streamu. Může výrazně prodloužit dobu importu.",
     "importing": "Importování...",
     "startImport": "Spustit import",
+    "startAgain": "",
     "howItWorks": "Jak funguje import",
     "howItWorksDesc": "Tracearr importuje všechna historická data z vašeho zdroje. To může chvíli trvat v závislosti na velikosti vaší knihovny.",
     "recordsMayBeSkipped": "Záznamy mohou být přeskočeny, pokud:",
@@ -509,6 +510,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",

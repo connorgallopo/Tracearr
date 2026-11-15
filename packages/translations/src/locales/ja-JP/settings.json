@@ -450,6 +450,7 @@
     "includeStreamDetailsHelp": "追加のストリーム情報をインポートします。インポート時間が大幅に増加する可能性があります。",
     "importing": "インポート中...",
     "startImport": "インポートを開始",
+    "startAgain": "",
     "howItWorks": "インポートの仕組み",
     "howItWorksDesc": "Tracearrはソースから過去の視聴データをすべてインポートします。ライブラリのサイズによっては時間がかかる場合があります。",
     "recordsMayBeSkipped": "レコードがスキップされる可能性があります:",
@@ -503,6 +504,8 @@
     "skipOverlap": "",
     "skipDuplicatePlugin": "",
     "importFailed": "",
+    "importFailedReason": "",
+    "importRetrying": "",
     "dropzone": {
       "dropHere": "",
       "dragOrClick": "",
