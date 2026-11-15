@@ -46,6 +46,7 @@ import {
 import { parseMediaType } from './mediaServer/shared/jellyfinEmbyUtils.js';
 import { markImportedServerLocations } from './serverLocations.js';
 import { getWatchedThresholds, watchedThresholdFor, type WatchedThresholds } from './settings.js';
+import { syncServer } from './sync.js';
 
 const PAGE_SIZE = 5000;
 const BATCH_SIZE = 500;
@@ -346,6 +347,10 @@ export async function importPlaybackReporting(
   publishProgress(progress);
 
   const skippedUserTracker = createSkippedUserTracker();
+
+  progress.message = 'Syncing server users...';
+  publishProgress(progress);
+  await syncServer(serverId, { syncUsers: true, syncLibraries: false });
 
   try {
     const [server] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);

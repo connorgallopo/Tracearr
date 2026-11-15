@@ -27,7 +27,7 @@ import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { AddServerDialog } from '@/components/settings/servers/AddServerDialog';
 import { EditServerDialog } from '@/components/settings/servers/EditServerDialog';
 import { ServerRow } from '@/components/settings/servers/ServerRow';
-import { useAddServer } from '@/components/settings/servers/useAddServer';
+import { useAddServer, type AddedServer } from '@/components/settings/servers/useAddServer';
 import { useAuth } from '@/hooks/useAuth';
 import { useSocket } from '@/hooks/useSocket';
 import {
@@ -61,8 +61,12 @@ export function Connections() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [historicalId, setHistoricalId] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [addedServer, setAddedServer] = useState<AddedServer | null>(null);
   const [editServer, setEditServer] = useState<Server | null>(null);
-  const form = useAddServer({ onAdded: () => setShowAddDialog(false) });
+  // Only the owner can import history, so only the owner gets the dialog's import step
+  const form = useAddServer({
+    onAdded: (server) => (isOwner ? setAddedServer(server) : setShowAddDialog(false)),
+  });
   const plexOAuth = SERVER_PROFILES[form.serverType].addServerAuth === 'plexOAuth';
 
   const sensors = useSensors(
@@ -75,6 +79,7 @@ export function Connections() {
     : ((serversData as unknown as { data?: Server[] })?.data ?? []);
 
   const openAddDialog = () => {
+    setAddedServer(null);
     setShowAddDialog(true);
     if (plexOAuth && isOwner) {
       void form.loadPlexAccounts();
@@ -164,6 +169,7 @@ export function Connections() {
           setShowAddDialog(open);
         }}
         form={form}
+        added={addedServer}
       />
 
       <ConfirmDialog

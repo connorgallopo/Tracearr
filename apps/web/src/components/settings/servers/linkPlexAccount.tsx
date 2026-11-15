@@ -3,7 +3,18 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Loader2, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import type { ServerType } from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from '@/components/ui/empty';
+import { AuthFormError } from '@/components/auth/AuthFormError';
+import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
 import { usePlexAccounts } from '@/hooks/queries';
 import { api } from '@/lib/api';
 
@@ -134,5 +145,42 @@ export function LinkAccountButton({
         </>
       )}
     </Button>
+  );
+}
+
+/** Shown when the owner has no Plex account linked, so no Plex server can be listed. */
+export function LinkPlexAccountPrompt({
+  serverType,
+  error,
+  onLinked,
+}: {
+  serverType: ServerType;
+  error: string | null;
+  onLinked: () => Promise<void>;
+}) {
+  const { t } = useTranslation('pages');
+  const { link, isLinking, linkError } = useLinkPlexAccount();
+
+  return (
+    <Empty className="border">
+      <EmptyHeader>
+        <EmptyMedia>
+          <MediaServerIcon type={serverType} alt="" className="size-10" />
+        </EmptyMedia>
+        <EmptyTitle>{t('setup.linkPlexTitle')}</EmptyTitle>
+        <EmptyDescription>{t('setup.linkPlexDescription')}</EmptyDescription>
+      </EmptyHeader>
+      <EmptyContent>
+        <LinkAccountButton
+          labelKey="settings.plex.linkPlexAccount"
+          onClick={async () => {
+            if (await link()) await onLinked();
+          }}
+          disabled={isLinking}
+          isLinking={isLinking}
+        />
+        <AuthFormError message={linkError ?? error} />
+      </EmptyContent>
+    </Empty>
   );
 }

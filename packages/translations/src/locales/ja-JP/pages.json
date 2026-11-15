@@ -120,6 +120,7 @@
     "noActiveStreams": "アクティブなストリームはありません",
     "streamsAppearHere": "ユーザーが視聴を開始すると、アクティブなストリームがここに表示されます",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -657,6 +658,10 @@
         "body": ""
       },
       "notSynced": {
+        "title": "",
+        "body": ""
+      },
+      "syncQueued": {
         "title": "",
         "body": ""
       },

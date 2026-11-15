@@ -120,6 +120,7 @@
     "noActiveStreams": "Niciun stream activ",
     "streamsAppearHere": "Stream-urile active vor apărea aici atunci când utilizatorii încep să vizioneze",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -723,6 +724,10 @@
         "body": ""
       },
       "notSynced": {
+        "title": "",
+        "body": ""
+      },
+      "syncQueued": {
         "title": "",
         "body": ""
       },

@@ -269,6 +269,9 @@ export const REDIS_KEYS = {
   // A library change arrived while a sync of the server ran; holds the delay of the sync it earns
   LIBRARY_SYNC_CHANGED_DURING_RUN: (serverId: string) =>
     `${_redisPrefix}tracearr:library:sync:changed-during-run:${serverId}`,
+  // A server was just added and its first sync is not queued yet
+  LIBRARY_FIRST_SYNC_OWED: (serverId: string) =>
+    `${_redisPrefix}tracearr:library:sync:first-sync-owed:${serverId}`,
   // Timestamp of the last completed full scan - the periodic full-scan safety
   // net is time-based so event-sync bursts can't drag it forward
   LIBRARY_SYNC_FULL_SCAN_AT: (serverId: string, libraryId: string) =>
@@ -325,6 +328,9 @@ export const REDIS_KEYS = {
   // Distributed locks
   get HEAVY_OPS_LOCK() {
     return `${_redisPrefix}tracearr:heavy-ops:lock`;
+  },
+  get HEAVY_OPS_IMPORT_WAITING() {
+    return `${_redisPrefix}tracearr:heavy-ops:import-waiting`;
   },
   SESSION_LOCK: (serverId: string, sessionKey: string) =>
     `${_redisPrefix}session:lock:${serverId}:${sessionKey}`,

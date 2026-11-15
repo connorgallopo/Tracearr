@@ -267,6 +267,25 @@ describe('safeFullRefreshAggregate / safeFullRefreshAllAggregates', () => {
     expect(failed[0]?.aggregate).toBe('daily_content_engagement');
   });
 
+  it('asks to pause only after a batch that leaves more, and stops there when told', async () => {
+    executeMock().mockImplementation(() => Promise.resolve({ rows: [] }) as never);
+    const askedAfterBatches: number[] = [];
+    const pauseWhen = async () => {
+      askedAfterBatches.push(executeMock().mock.calls.length);
+      return askedAfterBatches.length === 2;
+    };
+
+    await safeFullRefreshAggregate(
+      'library_stats_daily',
+      new Date('2026-01-01T00:00:00Z'),
+      new Date('2026-05-01T00:00:00Z'),
+      { batchDays: 30, delayBetweenBatches: 0, pauseWhen }
+    );
+
+    expect(askedAfterBatches).toEqual([1, 2]);
+    expect(executeMock()).toHaveBeenCalledTimes(2);
+  });
+
   it('returns no failures when every batch succeeds', async () => {
     executeMock().mockImplementation(() => Promise.resolve({ rows: [] }) as never);
 

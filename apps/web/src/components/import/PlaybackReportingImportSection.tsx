@@ -24,6 +24,7 @@ import { StepBadge } from '@/components/settings/shared/StepBadge';
 import { TimezoneSelect } from '@/components/settings/shared/TimezoneSelect';
 import { browserTimeZone } from '@/lib/dateFormat';
 import { api } from '@/lib/api';
+import { cn } from '@/lib/utils';
 import { ImportProgressCard, type ImportProgressData } from './ImportProgressCard';
 import type { Server, PlaybackReportingImportProgress } from '@tracearr/shared';
 
@@ -33,6 +34,8 @@ interface PlaybackReportingImportSectionProps {
   onServerChange: (id: string) => void;
   progress: PlaybackReportingImportProgress | null;
   isImporting: boolean;
+  /** Queued and held for the server's first library sync, so there is nothing to start */
+  held: boolean;
   onStartImport: (opts: {
     serverId: string;
     timezone: string;
@@ -49,6 +52,7 @@ export function PlaybackReportingImportSection({
   onServerChange,
   progress,
   isImporting,
+  held,
   onStartImport,
 }: PlaybackReportingImportSectionProps) {
   const { t } = useTranslation(['settings', 'common']);
@@ -232,22 +236,24 @@ export function PlaybackReportingImportSection({
 
       {/* Import Button */}
       <div className="border-t pt-6">
-        <Button onClick={handleStart} disabled={!selectedServerId || isImporting} size="lg">
-          {isImporting ? (
-            <>
-              <Loader2 className="animate-spin" />
-              {t('import.importing')}
-            </>
-          ) : (
-            <>
-              <Download className="mr-2 h-4 w-4" />
-              {t('import.startImport')}
-            </>
-          )}
-        </Button>
+        {!held && (
+          <Button onClick={handleStart} disabled={!selectedServerId || isImporting} size="lg">
+            {isImporting ? (
+              <>
+                <Loader2 className="animate-spin" />
+                {t('import.importing')}
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                {t('import.startImport')}
+              </>
+            )}
+          </Button>
+        )}
 
         {progressData && (
-          <div className="mt-4 space-y-2">
+          <div className={cn('space-y-2', !held && 'mt-4')}>
             <ImportProgressCard progress={progressData} />
             {(progress?.overlapRecords ?? 0) > 0 || (progress?.duplicateRecords ?? 0) > 0 ? (
               <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">

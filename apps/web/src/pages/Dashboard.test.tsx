@@ -41,6 +41,11 @@ const auth = vi.hoisted(() => ({
 }));
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => auth }));
 
+const serverList = vi.hoisted(() => ({
+  data: [{ id: 's1' }] as { id: string }[] | undefined,
+  isSuccess: true,
+}));
+
 const { multiLiveStats } = vi.hoisted(() => ({
   multiLiveStats: vi.fn((_ids: string[], _enabled: boolean) => ({
     series: [],
@@ -51,6 +56,7 @@ const { multiLiveStats } = vi.hoisted(() => ({
 
 // Not typechecked against the real module - keep in sync by hand
 vi.mock('@/hooks/queries/useServers', () => ({
+  useServers: () => serverList,
   useServerLiveStats: () => ({
     statistics: undefined,
     statisticsAverages: null,
@@ -121,6 +127,8 @@ describe('Dashboard', () => {
     multiLiveStats.mockReset();
     auth.user.role = 'owner';
     auth.user.impersonatedBy = undefined;
+    serverList.data = [{ id: 's1' }];
+    serverList.isSuccess = true;
     localStorage.clear();
     mockUseServer.mockReturnValue(serverReturn());
   });
@@ -375,6 +383,38 @@ describe('Dashboard', () => {
       expect(screen.getByTestId('personal')).toBeInTheDocument();
       expect(screen.queryByRole('radio')).not.toBeInTheDocument();
       expect(localStorage.getItem('tracearr_dashboard_view')).toBe('admin');
+    });
+
+    it('sends an owner with no servers to Connections instead of an empty dashboard', () => {
+      serverList.data = [];
+
+      renderDashboard();
+
+      expect(screen.getByText('settings:servers.noServersConnected')).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'settings:nav.sections.connections' })
+      ).toHaveAttribute('href', '/settings/servers/connections');
+      expect(screen.queryByText('dashboard.activeUsers')).not.toBeInTheDocument();
+    });
+
+    it('keeps the dashboard while the server list is still loading', () => {
+      serverList.data = undefined;
+      serverList.isSuccess = false;
+
+      renderDashboard();
+
+      expect(screen.queryByText('settings:servers.noServersConnected')).not.toBeInTheDocument();
+      expect(screen.getByText('dashboard.activeUsers')).toBeInTheDocument();
+    });
+
+    it('gives a member with no servers the personal view, not the Connections link', () => {
+      auth.user.role = 'member';
+      serverList.data = [];
+
+      renderDashboard();
+
+      expect(screen.getByTestId('personal')).toBeInTheDocument();
+      expect(screen.queryByText('settings:servers.noServersConnected')).not.toBeInTheDocument();
     });
 
     it('gives an owner viewing as an admin the server view and no toggle, whatever the URL and storage say', () => {

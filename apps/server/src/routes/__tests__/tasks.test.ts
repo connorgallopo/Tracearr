@@ -122,6 +122,20 @@ describe('GET /tasks/running', () => {
     ]);
   });
 
+  it('reads a Playback Reporting import held for the first sync as waiting for it', async () => {
+    vi.mocked(getAllActiveImports).mockResolvedValue([
+      { ...tofaImport('pr-1', 'delayed', true), type: 'playback-reporting' },
+    ]);
+
+    expect(await runningTasks()).toEqual([
+      expect.objectContaining({
+        type: 'playback_reporting_import',
+        status: 'waiting',
+        message: 'Waiting for the first library sync',
+      }),
+    ]);
+  });
+
   it('reads a queued import at 0% as starting', async () => {
     vi.mocked(getAllActiveImports).mockResolvedValue([tofaImport('7', 'waiting', false)]);
 

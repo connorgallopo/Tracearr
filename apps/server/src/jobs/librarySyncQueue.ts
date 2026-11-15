@@ -286,7 +286,10 @@ export function startLibrarySyncWorker(): void {
           completedLibraryIds: completed,
           onLibraryComplete: async (libraryId) => {
             completed.add(libraryId);
-            await checkpoint(job, { completedLibraryIds: [...completed] });
+            await checkpoint(job, {
+              completedLibraryIds: [...completed],
+              ...((await isFirstSync(job)) ? { firstSync: true as const } : {}),
+            });
           },
           signal,
         });
@@ -429,6 +432,13 @@ export function startLibrarySyncWorker(): void {
  */
 let normalizationConfirmed = false;
 
+/** A first sync refused while this job ran stamps the job in Redis, past this run's copy of its data. */
+async function isFirstSync(job: Job<LibrarySyncJobData>): Promise<boolean> {
+  if (job.data.firstSync) return true;
+  if (!job.id || !librarySyncQueue) return false;
+  return (await librarySyncQueue.getJob(job.id))?.data.firstSync === true;
+}
+
 async function publishSyncFailure(
   job: Job<LibrarySyncJobData>,
   error: Error,
@@ -436,7 +446,8 @@ async function publishSyncFailure(
 ): Promise<void> {
   const pubSubService = getPubSubService();
   if (!pubSubService) return;
-  const { serverId, firstSync } = job.data;
+  const { serverId } = job.data;
+  const firstSync = await isFirstSync(job);
   const [server] = await db
     .select({ name: servers.name })
     .from(servers)
@@ -691,6 +702,7 @@ export async function enqueueLibrarySync(
 ): Promise<string> {
   if (!librarySyncQueue) throw new Error('Library sync queue not initialized');
 
+  let firstSync = options.firstSync === true;
   if (triggeredBy === 'manual') {
     // A manual sync supersedes a queued automatic one; a job that already reached active refuses removal and the add below is then dropped.
     const queued = await librarySyncQueue.getJobs(['waiting', 'delayed']);
@@ -701,16 +713,48 @@ export async function enqueueLibrarySync(
         !isSchedulerJob(job) &&
         job.data.triggeredBy !== 'manual'
       ) {
+        if (job.data.firstSync) firstSync = true;
         await job.remove().catch(() => undefined);
       }
     }
   }
 
-  const { jobId, accepted } = await addSync(librarySyncQueue, serverId, triggeredBy, options);
+  let added: { jobId: string; accepted: boolean };
+  try {
+    added = await addSync(librarySyncQueue, serverId, triggeredBy, { ...options, firstSync });
+    if (firstSync && !added.accepted) {
+      const holder = await librarySyncQueue.getJob(added.jobId);
+      // A holder gone by now has finished a sync of the server
+      await holder?.updateData({ ...holder.data, firstSync: true }).catch(() => undefined);
+    }
+  } finally {
+    if (options.firstSync) await redisClient?.del(REDIS_KEYS.LIBRARY_FIRST_SYNC_OWED(serverId));
+  }
+  const { jobId, accepted } = added;
   if (!accepted && triggeredBy === 'manual') {
     throw new Error('A sync is already in progress for this server');
   }
   return jobId;
+}
+
+// Covers an added server's user sync, which runs before its first sync is queued
+const FIRST_SYNC_OWED_TTL_SECONDS = 15 * 60;
+
+/** Set before an added server's first sync is queued; queuing it clears the mark. */
+export async function markFirstSyncOwed(serverId: string): Promise<void> {
+  await redisClient?.set(
+    REDIS_KEYS.LIBRARY_FIRST_SYNC_OWED(serverId),
+    '1',
+    'EX',
+    FIRST_SYNC_OWED_TTL_SECONDS
+  );
+}
+
+/** True while the server's first sync is owed, queued, running or waiting to retry. */
+export async function hasPendingFirstSync(serverId: string): Promise<boolean> {
+  if (await redisClient?.exists(REDIS_KEYS.LIBRARY_FIRST_SYNC_OWED(serverId))) return true;
+  const syncs = await getAllActiveLibrarySyncs();
+  return syncs.some((sync) => sync.serverId === serverId && sync.firstSync);
 }
 
 /** Adds a sync under the server's dedup key; refused while one is queued or running for it. */

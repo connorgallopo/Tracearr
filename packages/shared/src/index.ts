@@ -123,6 +123,7 @@ export type {
   TofaImportProgress,
   TofaImportResult,
   TofaBackfillStatus,
+  ImportWaitingForLibrarySync,
   // Library sync
   LibrarySyncProgress,
   // Heavy ops coordination

@@ -120,6 +120,7 @@
     "noActiveStreams": "Немає активних потоків",
     "streamsAppearHere": "Активні потоки з'являться тут, коли користувачі почнуть перегляд",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -756,6 +757,10 @@
         "body": ""
       },
       "notSynced": {
+        "title": "",
+        "body": ""
+      },
+      "syncQueued": {
         "title": "",
         "body": ""
       },

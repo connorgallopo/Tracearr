@@ -169,6 +169,7 @@
       "serverAddFailed": "Palvelimen lisääminen epäonnistui",
       "serverRemoveFailed": "Palvelimen poistaminen epäonnistui",
       "serverSyncFailed": "Palvelimen synkronointi epäonnistui",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "Palvelimen tilan muuttaminen epäonnistui",
       "settingsUpdateFailed": "Asetusten päivitys epäonnistui",
       "copyManual": "",

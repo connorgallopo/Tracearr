@@ -18,6 +18,7 @@ import { SignInAgainAlert, SignInFailedAlert } from '@/components/auth/AuthFormE
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import { TofaServerPicker, TofaSignInButton, TofaWaiting } from '@/components/auth/TofaSignIn';
 import { holdsApiKey, type ApiKeyServerType } from '@/lib/serverType';
+import { LinkPlexAccountPrompt } from './linkPlexAccount';
 import type { AddServerForm, PlexAccountOption } from './useAddServer';
 
 const SERVER_URL_HELP = {
@@ -183,20 +184,18 @@ function TofaSignInFields({ form, inlineCancel }: { form: AddServerForm; inlineC
 
 /**
  * The fields of the add-server form for whichever server type the form holds. The empty
- * Plex states can be replaced where the surrounding page offers its own way forward, and a
+ * Plex server list can be replaced where the surrounding page offers its own way forward, and a
  * page with a Back of its own can drop the Cancel under tofa's waiting state.
  */
 export function AddServerFields({
   form,
   typeSelect,
-  noPlexAccounts,
   noPlexServers,
   inlineCancel = true,
   className,
 }: {
   form: AddServerForm;
   typeSelect?: ReactNode;
-  noPlexAccounts?: ReactNode;
   noPlexServers?: ReactNode;
   inlineCancel?: boolean;
   className?: string;
@@ -248,17 +247,13 @@ export function AddServerFields({
               </div>
             )}
 
-            {plexStep === 'no-accounts' &&
-              (noPlexAccounts ?? (
-                <Alert variant="warning">
-                  <AlertTriangle />
-                  <AlertDescription>
-                    <span className="font-medium">{t('servers.noPlexAccountsLinked')}</span>
-                    <span>{t('servers.noPlexAccountsLinkedHint')}</span>
-                    {connectError && <span className="text-destructive">{connectError}</span>}
-                  </AlertDescription>
-                </Alert>
-              ))}
+            {plexStep === 'no-accounts' && (
+              <LinkPlexAccountPrompt
+                serverType={serverType}
+                error={connectError}
+                onLinked={form.loadPlexAccounts}
+              />
+            )}
 
             {plexStep === 'select-account' && (
               <PlexAccountSelect

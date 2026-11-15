@@ -3,7 +3,11 @@ import { db } from '../db/client.js';
 import { servers, serverUsers } from '../db/schema.js';
 import { holdTofaImport } from '../jobs/importQueue.js';
 import { publishServersChanged } from '../jobs/poller/database.js';
-import { enqueueLibrarySync, rebuildAutoSyncSchedules } from '../jobs/librarySyncQueue.js';
+import {
+  enqueueLibrarySync,
+  markFirstSyncOwed,
+  rebuildAutoSyncSchedules,
+} from '../jobs/librarySyncQueue.js';
 import { enqueueRequestSync, scheduleRequestSync } from '../jobs/requestSyncQueue.js';
 import { createLogger } from '../utils/logger.js';
 import type { readServerFacts } from './mediaServer/byServerType.js';
@@ -117,6 +121,8 @@ export async function startAddedServer(
   }
   // Held before the add answers, so an import the owner starts meanwhile finds it and is refused
   await holdServerHistoryImport(server).catch(failedFor('Holding the history import'));
+  // Before the add answers too: a Jellystat or Playback Reporting import started meanwhile waits
+  await markFirstSyncOwed(server.id).catch(failedFor('Marking the first sync owed'));
   sseManager.refresh().catch(failedFor('SSE refresh'));
 
   void syncAddedServer(server.id, true, requestServiceIds, failedFor);

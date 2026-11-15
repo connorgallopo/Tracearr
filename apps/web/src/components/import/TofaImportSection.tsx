@@ -1,7 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { AlertTriangle, Download, Info, Loader2 } from 'lucide-react';
-import { WS_EVENTS, type Server, type TofaImportProgress } from '@tracearr/shared';
+import {
+  WS_EVENTS,
+  assertNever,
+  type Server,
+  type TofaBackfillStatus,
+  type TofaImportProgress,
+} from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
 import { Field, FieldLabel } from '@/components/ui/field';
 import {
@@ -12,7 +19,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
-import { useActiveImport } from '@/hooks/useActiveImport';
+import { useTofaImports, waitingForLibrarySyncMessage } from '@/hooks/queries/useImports';
 import { useSocket } from '@/hooks/useSocket';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
@@ -34,6 +41,45 @@ const blankProgress = (
   message,
 });
 
+const isPending = (backfill: TofaBackfillStatus | null) =>
+  backfill?.state === 'waitingForLibrarySync' ||
+  backfill?.state === 'queued' ||
+  backfill?.state === 'running';
+
+/** The server's latest import as the progress card shows it, or null when it has none. */
+function backfillProgress(
+  backfill: TofaBackfillStatus | null,
+  t: TFunction<['settings', 'common']>
+): TofaImportProgress | null {
+  switch (backfill?.state) {
+    case undefined:
+      return null;
+    case 'waitingForLibrarySync':
+      return blankProgress('waiting', waitingForLibrarySyncMessage(backfill, t));
+    case 'queued':
+      return blankProgress('waiting', t('import.importQueued'));
+    case 'running':
+      return backfill.progress ?? blankProgress('processing', t('import.importInProgressGeneric'));
+    case 'complete': {
+      const { result } = backfill;
+      const processed = result.imported + result.skipped + result.errors;
+      return {
+        ...blankProgress('complete', result.message),
+        fetchedRecords: processed,
+        processedRecords: processed,
+        importedRecords: result.imported,
+        skippedRecords: result.skipped,
+        duplicateRecords: result.duplicates,
+        errorRecords: result.errors,
+      };
+    }
+    case 'failed':
+      return blankProgress('error', backfill.message ?? t('import.importFailed'));
+    default:
+      return assertNever(backfill);
+  }
+}
+
 export function TofaImportSection({
   servers,
   onStarted,
@@ -43,19 +89,32 @@ export function TofaImportSection({
 }) {
   const { t } = useTranslation(['settings', 'common']);
   const { socket } = useSocket();
-  const [serverId, setServerId] = useState(servers[0]?.id ?? '');
+  const [pickedServerId, setServerId] = useState('');
   const [progress, setProgress] = useState<TofaImportProgress | null>(null);
   const [isImporting, setIsImporting] = useState(false);
+  const imports = useTofaImports(servers.map((server) => server.id));
+  const backfillOf = (id: string) => imports.byServer.get(id)?.data?.backfill ?? null;
 
-  useActiveImport(
-    servers.map((server) => server.id),
-    api.import.tofa.getActive,
-    (activeServerId, _jobId, message) => {
-      setServerId(activeServerId);
-      setIsImporting(true);
-      setProgress(blankProgress('processing', message));
-    }
-  );
+  // Until the owner picks one, show the server whose import is under way, else one with a result
+  const serverId =
+    pickedServerId ||
+    servers.find((server) => isPending(backfillOf(server.id)))?.id ||
+    servers.find((server) => backfillOf(server.id) !== null)?.id ||
+    (servers[0]?.id ?? '');
+  const backfill = backfillOf(serverId);
+  const shown = progress ?? backfillProgress(backfill, t);
+  const importing = isImporting || backfill?.state === 'running';
+  // While waiting, queued or done, the card says where the import stands and there is no button
+  const offerImport =
+    shown?.status !== 'complete' &&
+    backfill?.state !== 'waitingForLibrarySync' &&
+    backfill?.state !== 'queued';
+
+  const underway = backfill !== null && backfill.state !== 'failed';
+  const announce = useEffectEvent(() => onStarted?.());
+  useEffect(() => {
+    if (underway) announce();
+  }, [underway]);
 
   useEffect(() => {
     if (!socket) return;
@@ -87,16 +146,16 @@ export function TofaImportSection({
     }
   };
 
-  const progressData: ImportProgressData | null = progress
+  const progressData: ImportProgressData | null = shown
     ? {
-        status: progress.status,
-        message: progress.message,
-        totalRecords: progress.fetchedRecords,
-        processedRecords: progress.processedRecords,
-        importedRecords: progress.importedRecords,
-        skippedRecords: progress.skippedRecords,
-        errorRecords: progress.errorRecords,
-        waitingFor: progress.waitingFor,
+        status: shown.status,
+        message: shown.message,
+        totalRecords: shown.fetchedRecords,
+        processedRecords: shown.processedRecords,
+        importedRecords: shown.importedRecords,
+        skippedRecords: shown.skippedRecords,
+        errorRecords: shown.errorRecords,
+        waitingFor: shown.waitingFor,
       }
     : null;
 
@@ -110,7 +169,11 @@ export function TofaImportSection({
       {servers.length > 1 && (
         <Field>
           <FieldLabel htmlFor="tofaServer">{t('import.targetServer')}</FieldLabel>
-          <Select value={serverId} onValueChange={setServerId} disabled={isImporting}>
+          <Select
+            value={serverId}
+            onValueChange={setServerId}
+            disabled={isImporting || isPending(backfill)}
+          >
             <SelectTrigger id="tofaServer">
               <SelectValue placeholder={t('import.selectTofaServer')} />
             </SelectTrigger>
@@ -128,27 +191,29 @@ export function TofaImportSection({
         </Field>
       )}
 
-      <div className={cn(servers.length > 1 && 'border-t pt-6')}>
-        <Button onClick={() => void handleStart()} disabled={!serverId || isImporting} size="lg">
-          {isImporting ? (
-            <>
-              <Loader2 className="animate-spin" />
-              {t('import.importing')}
-            </>
-          ) : (
-            <>
-              <Download className="mr-2 h-4 w-4" />
-              {t('import.importTofaHistory')}
-            </>
-          )}
-        </Button>
+      <div className={cn('space-y-4', servers.length > 1 && 'border-t pt-6')}>
+        {offerImport && (
+          <Button onClick={() => void handleStart()} disabled={!serverId || importing} size="lg">
+            {importing ? (
+              <>
+                <Loader2 className="animate-spin" />
+                {t('import.importing')}
+              </>
+            ) : (
+              <>
+                <Download className="mr-2 h-4 w-4" />
+                {t('import.importTofaHistory')}
+              </>
+            )}
+          </Button>
+        )}
 
         {progressData && (
-          <div className="mt-4 space-y-2">
+          <div className="space-y-2">
             <ImportProgressCard progress={progressData} />
-            {(progress?.duplicateRecords ?? 0) > 0 && (
+            {(shown?.duplicateRecords ?? 0) > 0 && (
               <p className="text-muted-foreground text-xs">
-                {t('import.duplicates', { count: progress?.duplicateRecords })}
+                {t('import.duplicates', { count: shown?.duplicateRecords })}
               </p>
             )}
           </div>

@@ -169,6 +169,7 @@
       "serverAddFailed": "Αποτυχία προσθήκης διακομιστή",
       "serverRemoveFailed": "Αποτυχία κατάργησης διακομιστή",
       "serverSyncFailed": "Αποτυχία συγχρονισμού διακομιστή",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Αποτυχία ενημέρωσης των ρυθμίσεων",
       "copyManual": "",

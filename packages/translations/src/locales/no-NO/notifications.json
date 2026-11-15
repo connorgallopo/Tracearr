@@ -169,6 +169,7 @@
       "serverAddFailed": "Klarte ikke å legge til server",
       "serverRemoveFailed": "Kan ikke fjerne serveren",
       "serverSyncFailed": "Kan ikke synkronisere serveren",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Kunne ikke oppdatere innstillingene",
       "copyManual": "",

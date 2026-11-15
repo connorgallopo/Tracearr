@@ -20,6 +20,7 @@ import {
   transformActivityToSession,
   importJellystatBackup,
 } from '../jellystat.js';
+import { syncServer } from '../sync.js';
 
 // Import schemas for validation tests
 import {
@@ -1647,6 +1648,10 @@ vi.mock('../serverLocations.js', () => ({
   markImportedServerLocations: vi.fn(),
 }));
 
+vi.mock('../sync.js', () => ({
+  syncServer: vi.fn(),
+}));
+
 // Shared mock for JellyfinClient.getItems - can be configured per test
 let mockJellyfinGetItems = vi.fn();
 
@@ -1731,6 +1736,7 @@ describe('importJellystatBackup', () => {
 
   beforeEach(async () => {
     vi.clearAllMocks();
+    vi.mocked(syncServer).mockResolvedValue({ usersRead: true, errors: [] } as never);
 
     // Configure default JellyfinClient mock for enrichment
     configureMockJellyfinClient();
@@ -1787,6 +1793,54 @@ describe('importJellystatBackup', () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+  });
+
+  describe('user sync', () => {
+    const backup = JSON.stringify([{ jf_playback_activity: [REAL_BACKUP_ACTIVITY_UNKNOWN_USER] }]);
+
+    it('syncs the server users before it reads them', async () => {
+      const published: string[] = [];
+      const pubSub = {
+        publish: vi.fn(async (_channel: string, progress: { message: string }) => {
+          published.push(progress.message);
+        }),
+      };
+      let shownDuringSync: string | undefined;
+      vi.mocked(syncServer).mockImplementationOnce(async () => {
+        shownDuringSync = published.at(-1);
+        return { usersRead: true, errors: [] } as never;
+      });
+
+      const result = await importJellystatBackup(serverId, backup, false, pubSub as never);
+
+      expect(result.success).toBe(true);
+      expect(shownDuringSync).toBe('Syncing server users...');
+      expect(syncServer).toHaveBeenCalledWith(serverId, { syncUsers: true, syncLibraries: false });
+      expect(vi.mocked(syncServer).mock.invocationCallOrder[0]).toBeLessThan(
+        mockDbSelect.mock.invocationCallOrder[0] ?? 0
+      );
+    });
+
+    it('goes on when the user sync could not read the user list', async () => {
+      vi.mocked(syncServer).mockResolvedValue({
+        usersRead: false,
+        errors: ['jellyfin unreachable'],
+      } as never);
+
+      const result = await importJellystatBackup(serverId, backup, false);
+
+      expect(result.success).toBe(true);
+      expect(result.skipped).toBe(1);
+    });
+
+    it('stops, throwing, when the user sync throws', async () => {
+      vi.mocked(syncServer).mockRejectedValue(new Error('sync lock timed out'));
+
+      await expect(importJellystatBackup(serverId, backup, false)).rejects.toThrow(
+        'sync lock timed out'
+      );
+      expect(mockDbSelect).not.toHaveBeenCalled();
+    });
   });
 
   describe('server validation', () => {

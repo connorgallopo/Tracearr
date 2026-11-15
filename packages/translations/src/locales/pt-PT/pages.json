@@ -120,6 +120,7 @@
     "noActiveStreams": "Não há transmissões ativas",
     "streamsAppearHere": "As transmissões ativas aparecem aqui quando os utilizadores começarem a ver",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -690,6 +691,10 @@
         "body": ""
       },
       "notSynced": {
+        "title": "",
+        "body": ""
+      },
+      "syncQueued": {
         "title": "",
         "body": ""
       },

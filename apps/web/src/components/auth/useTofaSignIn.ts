@@ -25,7 +25,7 @@ export function useTofaSignIn({
   claimCode?: string;
   /** Gets the connected server's name when the sign-in also connected one. */
   onSignedIn?: (connectedServer?: string) => Promise<void>;
-  onAdded?: (result: { server: Server; canStopStreams: boolean }) => void;
+  onAdded?: (result: { server: Server; canStopStreams: boolean }) => void | Promise<void>;
   onLinked?: () => void;
 }) {
   const { t } = useTranslation('pages');
@@ -226,7 +226,7 @@ export function useTofaSignIn({
           await onSignedIn?.(servers.find((server) => server.id === serverId)?.name);
           return;
         case 'added':
-          onAdded?.({ server: result.server, canStopStreams: result.canStopStreams });
+          await onAdded?.({ server: result.server, canStopStreams: result.canStopStreams });
           cancel();
           return;
       }

@@ -20,18 +20,20 @@ export interface PlexAccountOption {
 
 export type AddServerForm = ReturnType<typeof useAddServer>;
 
+export type AddedServer = Pick<Server, 'id' | 'type'>;
+
 /**
  * The add-server form: a Plex server picked from a linked account, a tofa server picked after
  * signing in to tofa, or a Jellyfin, Emby or tofa server by URL and API key. onAdded runs once a
- * server is in, before the form resets, unless the caller has to say first that its key cannot
- * stop streams.
+ * server is in, before the form resets; when the caller has to say first that its key cannot stop
+ * streams, it runs on continueAdded instead.
  */
 export function useAddServer({
   initialType,
   onAdded,
 }: {
   initialType?: ServerType;
-  onAdded: () => void;
+  onAdded: (server: AddedServer) => void;
 }) {
   const { t } = useTranslation(['settings', 'notifications']);
   const { refetch } = useServers();
@@ -47,7 +49,7 @@ export function useAddServer({
   const [apiKey, setApiKey] = useState('');
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectError, setConnectError] = useState<string | null>(null);
-  const [addedWithoutStop, setAddedWithoutStop] = useState(false);
+  const [addedWithoutStop, setAddedWithoutStop] = useState<AddedServer | null>(null);
   const [plexStep, setPlexStep] = useState<PlexDialogStep>('loading');
   const [plexServers, setPlexServers] = useState<PlexDiscoveredServer[]>([]);
   const [connectingPlexServer, setConnectingPlexServer] = useState<string | null>(null);
@@ -67,8 +69,9 @@ export function useAddServer({
 
   const tofa = useTofaSignIn({
     purpose: 'add-server',
-    onAdded: ({ server }) => {
-      void Promise.all([refetchUser(), refetch()]).then(() => added(server));
+    onAdded: async ({ server }) => {
+      await Promise.all([refetchUser(), refetch()]);
+      added(server);
     },
   });
 
@@ -125,7 +128,7 @@ export function useAddServer({
     setServerName('');
     setApiKey('');
     setConnectError(null);
-    setAddedWithoutStop(false);
+    setAddedWithoutStop(null);
     setServerType(defaultType);
     setPlexStep('loading');
     setPlexServers([]);
@@ -136,13 +139,19 @@ export function useAddServer({
     tofa.cancel();
   };
 
-  const added = (server: Server | null) => {
-    if (server?.canStopStreams === false) {
-      setServerName(server.name);
-      setAddedWithoutStop(true);
+  const added = (server: AddedServer & Partial<Pick<Server, 'name' | 'canStopStreams'>>) => {
+    if (server.canStopStreams === false) {
+      setServerName(server.name ?? '');
+      setAddedWithoutStop(server);
       return;
     }
-    onAdded();
+    onAdded(server);
+    reset();
+  };
+
+  const continueAdded = () => {
+    if (!addedWithoutStop) return;
+    onAdded(addedWithoutStop);
     reset();
   };
 
@@ -166,7 +175,7 @@ export function useAddServer({
     setConnectError(null);
 
     try {
-      await api.auth.addPlexServer({
+      const { server } = await api.auth.addPlexServer({
         serverUri: uri,
         serverName: name,
         clientIdentifier,
@@ -178,7 +187,7 @@ export function useAddServer({
       await refetch();
       await refetchUser();
       void queryClient.invalidateQueries({ queryKey: ['plex-accounts'] });
-      onAdded();
+      onAdded(server);
       reset();
     } catch (error) {
       setConnectError(error instanceof Error ? error.message : 'Failed to connect Plex server');
@@ -207,14 +216,20 @@ export function useAddServer({
 
     try {
       const address = publicUrl.trim() ? { publicUrl: publicUrl.trim() } : {};
-      let server: Server | null = null;
+      let server: AddedServer & Partial<Pick<Server, 'name' | 'canStopStreams'>>;
       switch (serverType) {
-        case 'jellyfin':
-          await api.auth.connectJellyfinWithApiKey({ serverUrl, serverName, apiKey, ...address });
+        case 'jellyfin': {
+          const fields = { serverUrl, serverName, apiKey, ...address };
+          const { serverId } = await api.auth.connectJellyfinWithApiKey(fields);
+          server = { id: serverId, type: serverType };
           break;
-        case 'emby':
-          await api.auth.connectEmbyWithApiKey({ serverUrl, serverName, apiKey, ...address });
+        }
+        case 'emby': {
+          const fields = { serverUrl, serverName, apiKey, ...address };
+          const { serverId } = await api.auth.connectEmbyWithApiKey(fields);
+          server = { id: serverId, type: serverType };
           break;
+        }
         case 'tofa':
           server = await api.servers.create({
             name: serverName,
@@ -250,9 +265,11 @@ export function useAddServer({
     apiKey,
     setApiKey,
     isConnecting,
+    busy: isConnecting || connectingPlexServer !== null || tofa.connectingTo !== null,
     connectError,
     connect,
-    addedWithoutStop,
+    addedWithoutStop: addedWithoutStop !== null,
+    continueAdded,
     keyFields,
     enterKeyFields: () => setEnterKey(true),
     tofa,

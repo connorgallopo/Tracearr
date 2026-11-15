@@ -22,15 +22,16 @@ import {
 } from 'bullmq';
 import { getBullPrefix, queueConnectionOptions } from './queueConnection.js';
 import { isMaintenance } from '../serverState.js';
-import type {
-  TautulliImportProgress,
-  TautulliImportResult,
-  JellystatImportProgress,
-  JellystatImportResult,
-  PlaybackReportingImportProgress,
-  PlaybackReportingImportResult,
-  TofaImportProgress,
-  TofaImportResult,
+import {
+  REDIS_KEYS,
+  type TautulliImportProgress,
+  type TautulliImportResult,
+  type JellystatImportProgress,
+  type JellystatImportResult,
+  type PlaybackReportingImportProgress,
+  type PlaybackReportingImportResult,
+  type TofaImportProgress,
+  type TofaImportResult,
 } from '@tracearr/shared';
 import {
   ImportInterruptedError,
@@ -47,10 +48,12 @@ import {
 } from '../services/import/jellystatUpload.js';
 import { importPlaybackReporting } from '../services/playbackReporting.js';
 import { importTofaHistory } from '../services/import/tofaHistory.js';
-import { getPubSubService } from '../services/cache.js';
+import { getCacheService, getPubSubService } from '../services/cache.js';
+import { ServerHistoricalError } from '../services/liveServers.js';
 import { extendJobLock } from './lockUtils.js';
 import {
   WORKER_DEFAULTS,
+  addSingleton,
   checkpoint,
   registerQueue,
   registerWorker,
@@ -62,8 +65,10 @@ import {
   releaseHeavyOpsLock,
   extendHeavyOpsLock,
   startHeavyOpsLockHeartbeat,
+  HEAVY_OPS_WAIT_INTERVAL_MS,
   type HeavyOpsLockHolder,
 } from './heavyOpsLock.js';
+import { hasPendingFirstSync } from './librarySyncQueue.js';
 
 // Job data types
 export interface TautulliImportJobData {
@@ -84,6 +89,7 @@ export interface JellystatImportJobData {
   backupJson?: string; // Jobs queued before 2.4.0 carry the file contents instead of a path
   enrichMedia: boolean; // Whether to enrich with metadata from Jellyfin/Emby
   updateStreamDetails?: boolean; // Whether to update existing records with stream/transcode data
+  heldForFirstSync?: true; // See addImportAfterFirstSync
 }
 
 export interface PlaybackReportingImportJobData {
@@ -93,6 +99,7 @@ export interface PlaybackReportingImportJobData {
   timezone: string;
   enrichMedia: boolean;
   importFullRange: boolean;
+  heldForFirstSync?: true; // See addImportAfterFirstSync
 }
 
 export interface TofaImportJobData {
@@ -295,6 +302,19 @@ function buildWaitingProgress(
   };
 }
 
+/** Tells the owner's import panel that an import of this type failed */
+export function publishImportFailed(
+  type: ImportJobData['type'],
+  error: unknown,
+  jobId?: string
+): void {
+  const message = error instanceof Error && error.message ? error.message : 'Unknown error';
+  void getPubSubService()?.publish(importProgressChannel(type), {
+    ...buildFailedProgress(type, message),
+    jobId,
+  });
+}
+
 function buildFailedProgress(
   type: ImportJobData['type'],
   errorMessage: string
@@ -419,7 +439,6 @@ export function startImportWorker(): void {
       const runToken = randomUUID();
       let lockHolder: HeavyOpsLockHolder | null;
       const pubSubService = getPubSubService();
-      const WAIT_INTERVAL_MS = 5000; // Check every 5 seconds
       const MAX_WAIT_MS = 4 * 60 * 60 * 1000; // Max 4 hours wait
       let waitedMs = 0;
 
@@ -456,8 +475,8 @@ export function startImportWorker(): void {
         await extendJobLock(job, IMPORT_LOCK_DURATION_MS);
 
         // Wait before retry
-        await new Promise((resolve) => setTimeout(resolve, WAIT_INTERVAL_MS));
-        waitedMs += WAIT_INTERVAL_MS;
+        await new Promise((resolve) => setTimeout(resolve, HEAVY_OPS_WAIT_INTERVAL_MS));
+        waitedMs += HEAVY_OPS_WAIT_INTERVAL_MS;
 
         if (waitedMs >= MAX_WAIT_MS) {
           activeImportProgress = null;
@@ -489,6 +508,8 @@ export function startImportWorker(): void {
         } else {
           console.error(`[Import] Job ${job.id} failed after ${duration}s:`, error);
         }
+        // No retry can import into a server that is no longer live
+        if (error instanceof ServerHistoricalError) throw new UnrecoverableError(error.message);
         throw error;
       } finally {
         stopHeartbeat();
@@ -521,6 +542,9 @@ export function startImportWorker(): void {
 
   importWorker.on('completed', (job) => {
     if (job.data.type === 'jellystat') void removeJellystatUpload(job.data.backupPath);
+    void getCacheService()
+      ?.invalidatePattern(REDIS_KEYS.HISTORY_AGGREGATES('*'))
+      .catch((err: unknown) => console.warn('[Import] Could not clear the history totals:', err));
   });
 
   // Handle job failures - notify frontend and move to DLQ if retries exhausted
@@ -534,13 +558,7 @@ export function startImportWorker(): void {
     }
 
     // Always notify frontend of failure
-    const pubSubService = getPubSubService();
-    if (pubSubService) {
-      void pubSubService.publish(importProgressChannel(job.data.type), {
-        ...buildFailedProgress(job.data.type, error?.message || 'Unknown error'),
-        jobId: job.id,
-      });
-    }
+    publishImportFailed(job.data.type, error, job.id);
 
     if (exhausted) {
       console.error(`[Import] Job ${job.id} exhausted retries, moving to DLQ:`, error);
@@ -790,6 +808,60 @@ async function processTofaImportJob(job: Job<TofaImportJobData>): Promise<TofaIm
   return result;
 }
 
+function importInProgress(serverId: string, jobId: string): Error {
+  return new Error(`Import already in progress for server ${serverId} (job ${jobId})`);
+}
+
+/**
+ * Adds an import unless one of its type is already queued or running for the server. The read
+ * checks before it cannot see a start made in the same moment; this refusal is atomic in Redis.
+ */
+async function addImport(
+  queue: Queue<ImportJobData>,
+  name: string,
+  data: ImportJobData,
+  opts?: { delay: number }
+): Promise<string> {
+  const { jobId, accepted } = await addSingleton(
+    queue,
+    name,
+    data,
+    `${data.type}-import-${data.serverId}`,
+    opts
+  );
+  if (!accepted) throw importInProgress(data.serverId, jobId);
+  return jobId;
+}
+
+// A sync still running after this long is not waited for: the import then reads the library as it stands
+const HELD_IMPORT_MAX_WAIT_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Adds an import whose plays take their season and show keys from the library as they are
+ * written, held like the tofa import while the server's first library sync is queued or running.
+ * Plays written before it keep those keys empty.
+ */
+async function addImportAfterFirstSync(
+  queue: Queue<ImportJobData>,
+  name: string,
+  data: JellystatImportJobData | PlaybackReportingImportJobData
+): Promise<string> {
+  if (!(await hasPendingFirstSync(data.serverId))) return addImport(queue, name, data);
+  const jobId = await addImport(
+    queue,
+    name,
+    { ...data, heldForFirstSync: true },
+    { delay: HELD_IMPORT_MAX_WAIT_MS }
+  );
+  // A sync that completed before the add had nothing to release
+  if (!(await hasPendingFirstSync(data.serverId))) {
+    await promoteIfDelayed(await queue.getJob(jobId)).catch((err: unknown) => {
+      console.warn(`[Import] Could not release held import ${jobId}:`, err);
+    });
+  }
+  return jobId;
+}
+
 /**
  * Get active import job for a server (if any)
  */
@@ -819,36 +891,35 @@ export async function enqueueImport(
 
   // Check for existing active import for this server
   const existingJobId = await getActiveImportForServer(serverId);
+  if (existingJobId) throw importInProgress(serverId, existingJobId);
 
-  if (existingJobId) {
-    throw new Error(`Import already in progress for server ${serverId} (job ${existingJobId})`);
-  }
-
-  const job = await importQueue.add('tautulli-import', {
+  const jobId = await addImport(importQueue, 'tautulli-import', {
     type: 'tautulli',
     serverId,
     userId,
     overwriteFriendlyNames,
     includeStreamDetails,
   });
-
-  const jobId = job.id ?? `unknown-${Date.now()}`;
   console.log(`[Import] Enqueued job ${jobId} for server ${serverId}`);
   return jobId;
+}
+
+interface ImportJobStatus<Result = ImportJobResult> {
+  jobId: string;
+  state: string;
+  /** Queued held for the server's first library sync; see addImportAfterFirstSync */
+  held: boolean;
+  progress: number | object | null;
+  result?: Result;
+  failedReason?: string;
+  createdAt?: number;
+  finishedAt?: number;
 }
 
 /**
  * Get import job status
  */
-export async function getImportStatus(jobId: string): Promise<{
-  jobId: string;
-  state: string;
-  progress: number | object | null;
-  result?: ImportJobResult;
-  failedReason?: string;
-  createdAt?: number;
-  finishedAt?: number;
-} | null> {
+export async function getImportStatus(jobId: string): Promise<ImportJobStatus | null> {
   if (!importQueue) {
     return null;
   }
@@ -866,6 +937,7 @@ export async function getImportStatus(jobId: string): Promise<{
   return {
     jobId: job.id ?? jobId, // Fallback to input jobId if somehow null
     state,
+    held: isHeldImport(job),
     progress: typeof progress === 'number' || typeof progress === 'object' ? progress : null,
     result: job.returnvalue as ImportJobResult | undefined,
     failedReason: job.failedReason,
@@ -965,12 +1037,9 @@ export async function enqueueJellystatImport(
 
   // Check for existing active import for this server
   const existingJobId = await getActiveJellystatImportForServer(serverId);
+  if (existingJobId) throw importInProgress(serverId, existingJobId);
 
-  if (existingJobId) {
-    throw new Error(`Import already in progress for server ${serverId} (job ${existingJobId})`);
-  }
-
-  const job = await importQueue.add('jellystat-import', {
+  const jobId = await addImportAfterFirstSync(importQueue, 'jellystat-import', {
     type: 'jellystat',
     serverId,
     userId,
@@ -978,8 +1047,6 @@ export async function enqueueJellystatImport(
     enrichMedia,
     updateStreamDetails,
   });
-
-  const jobId = job.id ?? `unknown-${Date.now()}`;
   console.log(`[Import] Enqueued Jellystat job ${jobId} for server ${serverId}`);
   return jobId;
 }
@@ -987,24 +1054,10 @@ export async function enqueueJellystatImport(
 /**
  * Get Jellystat import job status (alias for getImportStatus with Jellystat-specific typing)
  */
-export async function getJellystatImportStatus(jobId: string): Promise<{
-  jobId: string;
-  state: string;
-  progress: number | object | null;
-  result?: JellystatImportResult;
-  failedReason?: string;
-  createdAt?: number;
-  finishedAt?: number;
-} | null> {
-  return getImportStatus(jobId) as Promise<{
-    jobId: string;
-    state: string;
-    progress: number | object | null;
-    result?: JellystatImportResult;
-    failedReason?: string;
-    createdAt?: number;
-    finishedAt?: number;
-  } | null>;
+export async function getJellystatImportStatus(
+  jobId: string
+): Promise<ImportJobStatus<JellystatImportResult> | null> {
+  return getImportStatus(jobId) as Promise<ImportJobStatus<JellystatImportResult> | null>;
 }
 
 /**
@@ -1045,12 +1098,9 @@ export async function enqueuePlaybackReportingImport(
   }
 
   const existingJobId = await getActivePlaybackReportingImportForServer(serverId);
+  if (existingJobId) throw importInProgress(serverId, existingJobId);
 
-  if (existingJobId) {
-    throw new Error(`Import already in progress for server ${serverId} (job ${existingJobId})`);
-  }
-
-  const job = await importQueue.add('playback-reporting-import', {
+  const jobId = await addImportAfterFirstSync(importQueue, 'playback-reporting-import', {
     type: 'playback-reporting',
     serverId,
     userId,
@@ -1058,8 +1108,6 @@ export async function enqueuePlaybackReportingImport(
     enrichMedia,
     importFullRange,
   });
-
-  const jobId = job.id ?? `unknown-${Date.now()}`;
   console.log(`[Import] Enqueued Playback Reporting job ${jobId} for server ${serverId}`);
   return jobId;
 }
@@ -1078,22 +1126,30 @@ export async function enqueueTofaImport(serverId: string, userId: string): Promi
   if (!importQueue) throw new Error('Import queue not initialized');
 
   const existingJobId = await getActiveTofaImportForServer(serverId);
-  if (existingJobId) {
-    throw new Error(`Import already in progress for server ${serverId} (job ${existingJobId})`);
-  }
+  if (existingJobId) throw importInProgress(serverId, existingJobId);
 
-  const job = await importQueue.add('tofa-import', { type: 'tofa', serverId, userId });
-  const jobId = job.id ?? `unknown-${Date.now()}`;
+  const jobId = await addImport(importQueue, 'tofa-import', { type: 'tofa', serverId, userId });
   console.log(`[Import] Enqueued tofa history job ${jobId} for server ${serverId}`);
   return jobId;
 }
 
-// A sync still running after this long is not waited for: the import then reads the library as it stands
-const HELD_IMPORT_MAX_WAIT_MS = 24 * 60 * 60 * 1000;
-
 const heldImportId = (serverId: string) => `held-import-${serverId}`;
 
-const isHeldImport = (job: Job<ImportJobData>) => job.id === heldImportId(job.data.serverId);
+const wasHeldImport = (job: Job<ImportJobData>) =>
+  job.id === heldImportId(job.data.serverId) ||
+  ('heldForFirstSync' in job.data && job.data.heldForFirstSync === true);
+
+// Once a held import has run, a delayed state is a retry backoff, not the hold
+const isHeldImport = (job: Job<ImportJobData>) => !job.processedOn && wasHeldImport(job);
+
+async function promoteIfDelayed(job: Job<ImportJobData> | undefined): Promise<void> {
+  if (job && (await job.isDelayed())) await job.promote();
+}
+
+async function heldImportsOf(serverId: string, held = isHeldImport): Promise<Job<ImportJobData>[]> {
+  const delayed = (await importQueue?.getJobs(['delayed'])) ?? [];
+  return delayed.filter((job) => job.data.serverId === serverId && held(job));
+}
 
 /**
  * Queues the history import of a server just added, held until a library sync of the server
@@ -1110,10 +1166,9 @@ export async function holdTofaImport(serverId: string): Promise<void> {
   console.log(`[Import] Held tofa history import for server ${serverId}`);
 }
 
-/** Runs the server's held import now: a library sync of it completed. */
+/** Runs the server's held imports now: a library sync of it completed. */
 export async function releaseHeldImport(serverId: string): Promise<void> {
-  const job = await importQueue?.getJob(heldImportId(serverId));
-  if (job && (await job.isDelayed())) await job.promote();
+  await Promise.all((await heldImportsOf(serverId)).map(promoteIfDelayed));
 }
 
 function isTofaImportProgress(value: unknown): value is TofaImportProgress {
@@ -1164,12 +1219,12 @@ export async function getLatestTofaImport(serverId: string): Promise<{
   };
 }
 
-/** Removes the server's held import: the server is gone or no longer live. */
+/** Removes the server's held imports: the server is gone or no longer live. */
 export async function dropHeldImport(serverId: string): Promise<void> {
-  const job = await importQueue?.getJob(heldImportId(serverId));
-  if (job && (await job.isDelayed())) {
+  for (const job of await heldImportsOf(serverId, wasHeldImport)) {
     await job.remove();
-    console.log(`[Import] Dropped the held history import for server ${serverId}`);
+    if (job.data.type === 'jellystat') await removeJellystatUpload(job.data.backupPath);
+    console.log(`[Import] Dropped the held ${job.data.type} import for server ${serverId}`);
   }
 }
 

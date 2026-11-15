@@ -8,8 +8,8 @@
  * queued with a single attempt, and only when a server is behind.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { UnrecoverableError, type Job } from 'bullmq';
+import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
+import { DelayedError, UnrecoverableError, type Job } from 'bullmq';
 
 const { mockGetJobs, mockAdd } = vi.hoisted(() => ({ mockGetJobs: vi.fn(), mockAdd: vi.fn() }));
 
@@ -41,6 +41,17 @@ vi.mock('../../services/cache.js', () => ({
   getPubSubService: vi.fn().mockReturnValue(null),
 }));
 
+vi.mock('../../services/settings.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../services/settings.js')>()),
+  getSetting: vi.fn(),
+  setSetting: vi.fn(),
+}));
+
+vi.mock('../heavyOpsLock.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../heavyOpsLock.js')>()),
+  isImportWaiting: vi.fn(),
+}));
+
 vi.mock('../lockUtils.js', () => ({
   extendJobLock: vi.fn(),
   DEFAULT_LOCK_DURATION_MS: 60_000,
@@ -55,11 +66,15 @@ import {
 import { PROGRESS_COLUMNS, walkFixImportedProgress } from '../sessionNormalize.js';
 import { queryChain } from '../../test/helpers.js';
 import { extendJobLock } from '../lockUtils.js';
+import { isImportWaiting } from '../heavyOpsLock.js';
+import { getSetting, setSetting } from '../../services/settings.js';
 import {
   enqueueMaintenanceJob,
   enqueueServerLocationSyncIfBehind,
   getMaintenanceJobHistory,
   initMaintenanceQueue,
+  processBackfillLibrarySnapshotsJob,
+  processNormalizeLibrarySnapshotsJob,
   processFixImportedProgressJob,
   runSessionMaintenanceWalk,
   getMaintenanceProgress,
@@ -346,5 +361,114 @@ describe('enqueueServerLocationSyncIfBehind', () => {
       jobId: expect.stringMatching(/^maintenance-/),
       deduplication: { id: 'maintenance' },
     });
+  });
+});
+
+describe('library snapshot backfill', () => {
+  const resume = {
+    processed: 2,
+    created: 40,
+    cleanedUp: 0,
+    errors: 0,
+    earliest: '2020-01-01',
+    refreshFrom: '2024-01-01T00:00:00.000Z',
+    startedAt: Date.parse('2026-11-15T10:00:00Z'),
+  };
+
+  function backfillJob(
+    data: MaintenanceJobData = {
+      type: 'backfill_library_snapshots',
+      userId: 'system',
+      backfillResume: resume,
+    }
+  ) {
+    return {
+      id: 'backfill-job',
+      token: 'token',
+      data,
+      updateData: vi.fn(),
+      updateProgress: vi.fn(),
+      moveToDelayed: vi.fn(),
+    } as unknown as Job<MaintenanceJobData> & { updateData: Mock; moveToDelayed: Mock };
+  }
+
+  beforeEach(() => {
+    vi.mocked(extendJobLock).mockResolvedValue(undefined);
+    vi.mocked(db.execute).mockResolvedValue({ rows: [{ count: 3 }] } as never);
+    vi.mocked(safeFullRefreshAggregate).mockImplementation(async (_name, _start, _end, options) => {
+      options?.onProgress?.({ currentBatchEnd: '2024-01-31T00:00:00.000Z' } as never);
+      await options?.pauseWhen?.();
+      return [];
+    });
+  });
+
+  it('hands the lock to a waiting import after a refresh batch and keeps where it stopped', async () => {
+    vi.mocked(isImportWaiting).mockResolvedValue(true);
+    const job = backfillJob();
+
+    await expect(processBackfillLibrarySnapshotsJob(job)).rejects.toBeInstanceOf(DelayedError);
+
+    expect(safeFullRefreshAggregate).toHaveBeenCalledWith(
+      'library_stats_daily',
+      new Date(resume.refreshFrom),
+      expect.any(Date),
+      expect.any(Object)
+    );
+    expect(job.updateData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        backfillResume: { ...resume, refreshFrom: '2024-01-31T00:00:00.000Z' },
+      })
+    );
+    expect(job.moveToDelayed).toHaveBeenCalledOnce();
+  });
+
+  it('finishes a resumed run with the counts and start time of the run it continues', async () => {
+    vi.mocked(isImportWaiting).mockResolvedValue(false);
+    vi.setSystemTime(resume.startedAt + 90_000);
+    const job = backfillJob();
+
+    const result = await processBackfillLibrarySnapshotsJob(job);
+
+    expect(result).toMatchObject({
+      success: true,
+      processed: 2,
+      updated: 40,
+      skipped: 0,
+      durationMs: 90_000,
+    });
+    expect(job.moveToDelayed).not.toHaveBeenCalled();
+  });
+
+  it('refreshes a snapshot normalization through to its stamp while an import waits', async () => {
+    vi.mocked(isImportWaiting).mockResolvedValue(true);
+    vi.mocked(getSetting).mockImplementation((async (key: string) =>
+      key === 'mediaVersionsBackfilledAt' ? '2026-11-01T00:00:00Z' : null) as never);
+    vi.mocked(db.execute).mockImplementation((async (query: unknown) => {
+      const text = JSON.stringify(query);
+      if (text.includes('GROUP BY server_id, library_id')) {
+        return {
+          rows: [
+            {
+              server_id: 'srv-1',
+              library_id: 'lib-1',
+              start_date: '2026-11-10',
+              end_date: '2026-11-15',
+              item_count: '5',
+            },
+          ],
+        };
+      }
+      if (text.includes('MIN(snapshot_time)')) return { rows: [{ earliest: '2020-01-01' }] };
+      return { rows: [{ count: 3 }], rowCount: 0 };
+    }) as never);
+    vi.mocked(db.transaction).mockImplementation((async (run: (tx: unknown) => unknown) =>
+      run({ execute: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }) })) as never);
+    const job = backfillJob({ type: 'normalize_library_snapshots', userId: 'system' });
+
+    const result = await processNormalizeLibrarySnapshotsJob(job);
+
+    expect(result).toMatchObject({ success: true, type: 'normalize_library_snapshots' });
+    expect(job.moveToDelayed).not.toHaveBeenCalled();
+    expect(setSetting).toHaveBeenCalledWith('snapshotsNormalizedAt', expect.any(String));
   });
 });

@@ -119,6 +119,7 @@
     "othersStreaming_one": "{{count}} other stream playing",
     "othersStreaming_other": "{{count}} other streams playing",
     "dayStreak": "Day streak",
+    "noServers": "Connect a Plex, Jellyfin, Emby or tofa server to see its streams, history and libraries here.",
     "view": {
       "label": "Dashboard view",
       "admin": "Server",
@@ -690,6 +691,10 @@
       "notSynced": {
         "title": "Library not synced yet",
         "body": "Library statistics will appear here once the library has been synced. A sync starts when a server is added and repeats every 12 hours."
+      },
+      "syncQueued": {
+        "title": "Library sync queued",
+        "body": "A library sync is waiting to start. Library statistics will appear here once it completes."
       },
       "noMedia": {
         "title": "No movies or shows yet",

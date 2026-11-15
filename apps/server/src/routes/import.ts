@@ -12,6 +12,7 @@ import {
   playbackReportingImportSchema,
   playbackReportingTestSchema,
   tofaImportSchema,
+  type ImportWaitingForLibrarySync,
   type TofaBackfillStatus,
 } from '@tracearr/shared';
 import { TautulliService } from '../services/tautulli.js';
@@ -24,7 +25,6 @@ import {
 import { importPlaybackReporting } from '../services/playbackReporting.js';
 import { importTofaHistory } from '../services/import/tofaHistory.js';
 import { getPubSubService } from '../services/cache.js';
-import { syncServer } from '../services/sync.js';
 import { HISTORICAL_IMPORT_MESSAGE } from '../services/liveServers.js';
 import { createJellyfinEmbyClient, isJellyfinEmby } from '../services/mediaServer/index.js';
 import { db } from '../db/client.js';
@@ -44,8 +44,27 @@ import {
   getActivePlaybackReportingImportForServer,
   getActiveTofaImportForServer,
   getLatestTofaImport,
+  publishImportFailed,
 } from '../jobs/importQueue.js';
 import { getLibrarySyncStatus } from '../jobs/librarySyncQueue.js';
+
+/**
+ * The library sync an import held for it waits on, or null when the import is not held: a
+ * delayed import the owner started is waiting out a retry, not a library sync.
+ */
+async function heldForLibrarySync(
+  serverId: string,
+  job: { state: string; held: boolean }
+): Promise<ImportWaitingForLibrarySync | null> {
+  if (job.state !== 'delayed' || !job.held) return null;
+  const sync = await getLibrarySyncStatus(serverId);
+  return {
+    state: 'waitingForLibrarySync',
+    librarySync: sync?.jobId
+      ? { state: sync.isActive ? 'running' : 'queued', progress: sync.progress ?? null }
+      : null,
+  };
+}
 
 /**
  * Where the server's latest tofa history import stands: the one held for it when it was added,
@@ -54,17 +73,8 @@ import { getLibrarySyncStatus } from '../jobs/librarySyncQueue.js';
 async function readTofaBackfill(serverId: string): Promise<TofaBackfillStatus | null> {
   const latest = await getLatestTofaImport(serverId);
   switch (latest?.state) {
-    case 'delayed': {
-      // A delayed import the owner started is waiting out a retry, not a library sync
-      if (!latest.held) return { state: 'queued' };
-      const sync = await getLibrarySyncStatus(serverId);
-      return {
-        state: 'waitingForLibrarySync',
-        librarySync: sync?.jobId
-          ? { state: sync.isActive ? 'running' : 'queued', progress: sync.progress ?? null }
-          : null,
-      };
-    }
+    case 'delayed':
+      return (await heldForLibrarySync(serverId, latest)) ?? { state: 'queued' };
     case 'waiting':
     case 'prioritized':
       return { state: 'queued' };
@@ -126,16 +136,6 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       return reply.conflict(HISTORICAL_IMPORT_MESSAGE);
     }
 
-    // Sync server users first to ensure we have all users before importing history
-    try {
-      app.log.info({ serverId }, 'Syncing server before Tautulli import');
-      await syncServer(serverId, { syncUsers: true, syncLibraries: false });
-      app.log.info({ serverId }, 'Server sync completed, enqueueing import');
-    } catch (error) {
-      app.log.error({ err: error, serverId }, 'Failed to sync server before import');
-      return reply.internalServerError('Failed to sync server users before import');
-    }
-
     // Enqueue import job
     try {
       const jobId = await enqueueImport(
@@ -186,6 +186,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         })
         .catch((err: unknown) => {
           console.error(`[Import] Tautulli import failed:`, err);
+          publishImportFailed('tautulli', err);
         });
 
       return {
@@ -396,17 +397,6 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       return reply.payloadTooLarge('Backup file is larger than 500 MB');
     }
 
-    // Sync server users first
-    try {
-      app.log.info({ serverId }, 'Syncing server before Jellystat import');
-      await syncServer(parsed.data.serverId, { syncUsers: true, syncLibraries: false });
-      app.log.info({ serverId }, 'Server sync completed');
-    } catch (error) {
-      await removeJellystatUpload(backupPath);
-      app.log.error({ err: error, serverId }, 'Failed to sync server before import');
-      return reply.internalServerError('Failed to sync server users before import');
-    }
-
     // Enqueue import job
     try {
       const jobId = await enqueueJellystatImport(
@@ -450,6 +440,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         })
         .catch((err: unknown) => {
           console.error(`[Import] Jellystat import failed:`, err);
+          publishImportFailed('jellystat', err);
         })
         .finally(() => {
           void removeJellystatUpload(backupPath);
@@ -472,16 +463,12 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       const { serverId } = request.params;
 
       const jobId = await getActiveJellystatImportForServer(serverId);
-      if (!jobId) {
-        return { active: false };
-      }
-
-      const status = await getJellystatImportStatus(jobId);
+      const status = jobId ? await getJellystatImportStatus(jobId) : null;
       if (!status) {
         return { active: false };
       }
 
-      return { active: true, ...status };
+      return { active: true, ...status, waiting: await heldForLibrarySync(serverId, status) };
     }
   );
 
@@ -559,15 +546,6 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
     }
 
     try {
-      app.log.info({ serverId }, 'Syncing server before Playback Reporting import');
-      await syncServer(serverId, { syncUsers: true, syncLibraries: false });
-      app.log.info({ serverId }, 'Server sync completed, enqueueing import');
-    } catch (error) {
-      app.log.error({ err: error, serverId }, 'Failed to sync server before import');
-      return reply.internalServerError('Failed to sync server users before import');
-    }
-
-    try {
       const jobId = await enqueuePlaybackReportingImport(
         serverId,
         authUser.userId,
@@ -602,6 +580,7 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
         })
         .catch((err: unknown) => {
           console.error(`[Import] Playback Reporting import failed:`, err);
+          publishImportFailed('playback-reporting', err);
         });
 
       return {
@@ -690,16 +669,12 @@ export const importRoutes: FastifyPluginAsync = async (app) => {
       const { serverId } = request.params;
 
       const jobId = await getActivePlaybackReportingImportForServer(serverId);
-      if (!jobId) {
-        return { active: false };
-      }
-
-      const status = await getImportStatus(jobId);
+      const status = jobId ? await getImportStatus(jobId) : null;
       if (!status) {
         return { active: false };
       }
 
-      return { active: true, ...status };
+      return { active: true, ...status, waiting: await heldForLibrarySync(serverId, status) };
     }
   );
 

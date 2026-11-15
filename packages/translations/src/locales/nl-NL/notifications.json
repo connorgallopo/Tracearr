@@ -169,6 +169,7 @@
       "serverAddFailed": "Server toevoegen mislukt",
       "serverRemoveFailed": "Server verwijderen mislukt",
       "serverSyncFailed": "Server synchroniseren mislukt",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Instellingen bijwerken mislukt",
       "copyManual": "",

@@ -47,6 +47,7 @@ import {
 } from './import/index.js';
 import { markImportedServerLocations } from './serverLocations.js';
 import { getSettings, rearmImportedHistoryLink } from './settings.js';
+import { syncServer } from './sync.js';
 
 const GUID_HISTORY_LENGTH = 100000;
 const PAGE_SIZE = 5000; // Larger batches = fewer API calls (tested up to 10k, scales linearly)
@@ -866,6 +867,10 @@ export class TautulliService {
     );
 
     publishProgress(progress);
+
+    progress.message = 'Syncing server users...';
+    publishProgress(progress);
+    await syncServer(serverId, { syncUsers: true, syncLibraries: false });
 
     // Sync friendly/custom names from Tautulli before importing history
     progress.message = 'Syncing user display names from Tautulli...';

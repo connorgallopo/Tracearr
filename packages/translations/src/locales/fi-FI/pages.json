@@ -120,6 +120,7 @@
     "noActiveStreams": "Ei aktiivisia striimejä",
     "streamsAppearHere": "Aktiiviset striimit näkyvät täällä, kun käyttäjät alkavat katsella",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -692,6 +693,10 @@
       "notSynced": {
         "title": "Kirjastoa ei ole vielä synkronoitu",
         "body": "Kirjaston tilastot näkyvät täällä, kun kirjasto on synkronoitu. Tämä tapahtuu yleensä automaattisesti tunnin välein."
+      },
+      "syncQueued": {
+        "title": "",
+        "body": ""
       },
       "noMedia": {
         "title": "Ei vielä elokuvia tai ohjelmia",

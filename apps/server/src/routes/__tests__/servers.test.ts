@@ -73,6 +73,7 @@ vi.mock('../../jobs/serverUpdateChecker.js', () => ({
 
 vi.mock('../../jobs/librarySyncQueue.js', () => ({
   enqueueLibrarySync: vi.fn().mockResolvedValue(undefined),
+  markFirstSyncOwed: vi.fn().mockResolvedValue(undefined),
   rebuildAutoSyncSchedules: vi.fn().mockResolvedValue(undefined),
   scheduleAutoSync: vi.fn().mockResolvedValue(undefined),
 }));

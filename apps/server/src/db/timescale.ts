@@ -1339,6 +1339,8 @@ export interface SafeRefreshOptions {
   onProgress?: (progress: AggregateRefreshProgress) => void;
   /** AbortSignal for cancellation */
   signal?: AbortSignal;
+  /** Asked after each batch that leaves more to do; true stops the refresh there */
+  pauseWhen?: () => Promise<boolean>;
 }
 
 /**
@@ -1429,7 +1431,7 @@ export async function safeFullRefreshAggregate(
   endDate: Date,
   options: SafeRefreshOptions = {}
 ): Promise<FailedRefreshBatch[]> {
-  const { batchDays = 30, delayBetweenBatches = 2000, onProgress, signal } = options;
+  const { batchDays = 30, delayBetweenBatches = 2000, onProgress, signal, pauseWhen } = options;
 
   const window = alignRefreshWindow(startDate, endDate);
   if (!window) {
@@ -1498,6 +1500,8 @@ export async function safeFullRefreshAggregate(
 
     // Move to next batch
     batchStart = batchEnd;
+
+    if (batchStart < alignedEnd && (await pauseWhen?.())) break;
 
     // Delay between batches to let system breathe
     if (batchStart < alignedEnd && delayBetweenBatches > 0) {

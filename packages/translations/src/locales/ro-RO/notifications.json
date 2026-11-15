@@ -175,6 +175,7 @@
       "serverAddFailed": "Adăugarea serverului a eșuat",
       "serverRemoveFailed": "Ștergerea serverului a eșuat",
       "serverSyncFailed": "Sincronizarea serverului a eșuat",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Actualizarea setărilor a eșuat",
       "copyManual": "",

@@ -68,9 +68,18 @@ vi.mock('@/lib/api', () => ({
 }));
 
 vi.mock('@/components/settings/servers/AddServerDialog', () => ({
-  AddServerDialog: ({ open, form }: { open: boolean; form: AddServerForm }) =>
+  AddServerDialog: ({
+    open,
+    form,
+    added,
+  }: {
+    open: boolean;
+    form: AddServerForm;
+    added?: { id: string; type: string } | null;
+  }) =>
     open ? (
       <div>
+        {added && <p>import step for {added.id}</p>}
         <button
           onClick={() => {
             form.changeServerType('jellyfin');
@@ -283,5 +292,32 @@ describe('Connections', () => {
         publicUrl: 'jellyfin.example.com',
       })
     );
+  });
+
+  it('moves the owner on to the import step for the server just added', async () => {
+    connectJellyfinWithApiKey.mockResolvedValue({ serverId: 'jf-new' });
+    render(<Connections />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'servers.addServer' }));
+    await userEvent.click(screen.getByRole('button', { name: 'fill jellyfin' }));
+    await userEvent.click(screen.getByRole('button', { name: 'connect' }));
+
+    expect(await screen.findByText('import step for jf-new')).toBeInTheDocument();
+  });
+
+  it('closes the dialog for a member, who cannot import history', async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { role: 'admin' },
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useAuth>);
+    connectJellyfinWithApiKey.mockResolvedValue({ serverId: 'jf-new' });
+    render(<Connections />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'servers.addServer' }));
+    await userEvent.click(screen.getByRole('button', { name: 'fill jellyfin' }));
+    await userEvent.click(screen.getByRole('button', { name: 'connect' }));
+
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'connect' })).toBeNull());
+    expect(screen.queryByText(/import step/)).toBeNull();
   });
 });

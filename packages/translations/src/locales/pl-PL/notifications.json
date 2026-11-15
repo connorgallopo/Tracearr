@@ -181,6 +181,7 @@
       "serverAddFailed": "Nie udało się dodać serwera",
       "serverRemoveFailed": "Nie udało się usunąć serwera",
       "serverSyncFailed": "Nie udało się zsynchronizować serwera",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "Nie udało się zmienić statusu serwera",
       "settingsUpdateFailed": "Nie udało się zaktualizować ustawień",
       "copyManual": "Wciśnij Ctrl+C lub ⌘C, aby skopiować",

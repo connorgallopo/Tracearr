@@ -169,6 +169,7 @@
       "serverAddFailed": "Impossibile aggiungere il server",
       "serverRemoveFailed": "Impossibile rimuovere il server",
       "serverSyncFailed": "Sincronizzazione del server non riuscita",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Impossibile aggiornare le impostazioni",
       "copyManual": "",

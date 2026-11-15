@@ -120,6 +120,7 @@
     "noActiveStreams": "Brak aktywnych strumieni",
     "streamsAppearHere": "Aktywne strumienie pojawią się tutaj, gdy użytkownicy zaczną oglądać",
     "dayStreak": "Seria dni",
+    "noServers": "",
     "view": {
       "label": "Widok pulpitu",
       "admin": "Serwer",
@@ -758,6 +759,10 @@
       "notSynced": {
         "title": "Biblioteka nie jest jeszcze zsynchronizowana",
         "body": "Statystyki biblioteki pojawią się tutaj, gdy zostanie ona zsynchronizowana. Zwykle dzieje się to automatycznie co godzinę."
+      },
+      "syncQueued": {
+        "title": "",
+        "body": ""
       },
       "noMedia": {
         "title": "Brak filmów ani seriali",

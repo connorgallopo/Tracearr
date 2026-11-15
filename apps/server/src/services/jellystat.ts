@@ -78,6 +78,7 @@ import { createJellyfinEmbyClient, isJellyfinEmby } from './mediaServer/index.js
 import { parseMediaType } from './mediaServer/shared/jellyfinEmbyUtils.js';
 import { markImportedServerLocations } from './serverLocations.js';
 import { getWatchedThresholds, watchedThresholdFor, type WatchedThresholds } from './settings.js';
+import { syncServer } from './sync.js';
 
 const BATCH_SIZE = 500;
 const DEDUP_BATCH_SIZE = 5000;
@@ -661,6 +662,10 @@ export async function importJellystatBackup(
   );
 
   publishProgress(progress);
+
+  progress.message = 'Syncing server users...';
+  publishProgress(progress);
+  await syncServer(serverId, { syncUsers: true, syncLibraries: false });
 
   try {
     progress.status = 'parsing';

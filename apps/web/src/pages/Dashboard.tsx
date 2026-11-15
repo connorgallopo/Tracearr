@@ -1,8 +1,20 @@
 import { lazy, Suspense, useCallback, useMemo, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Play, Clock, AlertTriangle, MapPin, Calendar, Users, Activity } from 'lucide-react';
-import { useSearchParams } from 'react-router';
+import {
+  Play,
+  Clock,
+  AlertTriangle,
+  MapPin,
+  Calendar,
+  Users,
+  Activity,
+  ArrowRight,
+  Server as ServerIcon,
+} from 'lucide-react';
+import { Link, useSearchParams } from 'react-router';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { StatCard } from '@/components/ui/stat-card';
 const StreamCard = lazy(() =>
   import('@/components/map/StreamCard').then((m) => ({ default: m.StreamCard }))
@@ -15,7 +27,11 @@ import { SectionHeading } from '@/components/dashboard/SectionHeading';
 import { PersonalDashboard } from '@/components/dashboard/PersonalDashboard';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useDashboardStats, useActiveSessions } from '@/hooks/queries';
-import { useServerLiveStats, useMultiServerLiveStats } from '@/hooks/queries/useServers';
+import {
+  useServers,
+  useServerLiveStats,
+  useMultiServerLiveStats,
+} from '@/hooks/queries/useServers';
 import { useAuth } from '@/hooks/useAuth';
 import { useServer } from '@/hooks/useServer';
 import { useServerColorMap } from '@/hooks/useServerColorMap';
@@ -335,14 +351,41 @@ function DashboardPage({ children }: { children: ReactNode }) {
   );
 }
 
+function NoServers() {
+  const { t } = useTranslation(['pages', 'settings']);
+
+  return (
+    <EmptyState
+      icon={ServerIcon}
+      title={t('settings:servers.noServersConnected')}
+      description={t('dashboard.noServers')}
+    >
+      <Button asChild>
+        <Link to="/settings/servers/connections">
+          {t('settings:nav.sections.connections')}
+          <ArrowRight />
+        </Link>
+      </Button>
+    </EmptyState>
+  );
+}
+
 export function Dashboard() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { data: servers, isSuccess: serversLoaded } = useServers();
 
   if (user?.role === 'member') {
     return (
       <DashboardPage>
         <PersonalDashboard />
+      </DashboardPage>
+    );
+  }
+  if (user?.role === 'owner' && serversLoaded && servers.length === 0) {
+    return (
+      <DashboardPage>
+        <NoServers />
       </DashboardPage>
     );
   }

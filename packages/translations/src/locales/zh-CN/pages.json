@@ -120,6 +120,7 @@
     "noActiveStreams": "没有活动流",
     "streamsAppearHere": "当用户开始观看时活跃的流将出现在这里",
     "dayStreak": "连续天数",
+    "noServers": "",
     "view": {
       "label": "仪表盘视图",
       "admin": "服务器",
@@ -659,6 +660,10 @@
       "notSynced": {
         "title": "库尚未同步",
         "body": "库同步后，库统计将显示在这里。通常每小时自动发生。"
+      },
+      "syncQueued": {
+        "title": "",
+        "body": ""
       },
       "noMedia": {
         "title": "尚无电影或剧集",

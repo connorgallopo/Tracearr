@@ -120,6 +120,7 @@
     "noActiveStreams": "Ingen aktive streams",
     "streamsAppearHere": "Aktive streams vises her, når brugerne begynder at se",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -690,6 +691,10 @@
         "body": ""
       },
       "notSynced": {
+        "title": "",
+        "body": ""
+      },
+      "syncQueued": {
         "title": "",
         "body": ""
       },

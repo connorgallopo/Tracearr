@@ -1,5 +1,6 @@
-import { useEffect, useEffectEvent } from 'react';
+import { useEffect, useEffectEvent, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { MultiServerQueryResult } from '@/hooks/useMultiServerQuery';
 
 export interface ActiveImportStatus {
   active: boolean;
@@ -8,26 +9,26 @@ export interface ActiveImportStatus {
 }
 
 /**
- * Picks up an import still running from an earlier visit: the servers are asked in order and the
- * first with a running job is handed back with a progress message. A server that cannot be asked
- * counts as having none. Asked again only when the number of servers changes, not on every
- * re-filter of the list.
+ * Picks up an import still running from an earlier visit: once every server has answered, the
+ * first in order with a running job is handed back with a progress message. A server that could
+ * not be asked counts as having none. Looked at again only when the list of servers changes, not
+ * on every refresh of the answers.
  */
 export function useActiveImport(
   serverIds: string[],
-  getActive: (serverId: string) => Promise<ActiveImportStatus>,
-  onActive: (serverId: string, jobId: string, message: string) => void
+  imports: MultiServerQueryResult<ActiveImportStatus>,
+  onActive: (serverId: string, message: string) => void
 ): void {
   const { t } = useTranslation('settings');
+  const restoredFor = useRef<string | null>(null);
 
-  const findActive = useEffectEvent(async () => {
+  const restore = useEffectEvent(() => {
     for (const serverId of serverIds) {
-      const status = await getActive(serverId).catch(() => null);
+      const status = imports.byServer.get(serverId)?.data;
       if (status?.active && status.jobId) {
         const percent = typeof status.progress === 'number' ? status.progress : 0;
         onActive(
           serverId,
-          status.jobId,
           percent > 0
             ? t('import.importInProgressPercent', { percent })
             : t('import.importInProgressGeneric')
@@ -37,8 +38,12 @@ export function useActiveImport(
     }
   });
 
-  const serverCount = serverIds.length;
+  const serverKey = serverIds.join(',');
+  const answered = serverKey !== '' && !imports.isLoading;
   useEffect(() => {
-    if (serverCount > 0) void findActive();
-  }, [serverCount]);
+    if (serverKey === '') restoredFor.current = null;
+    if (!answered || restoredFor.current === serverKey) return;
+    restoredFor.current = serverKey;
+    restore();
+  }, [answered, serverKey]);
 }

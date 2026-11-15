@@ -163,6 +163,7 @@
       "serverAddFailed": "サーバーの追加に失敗しました",
       "serverRemoveFailed": "サーバーの削除に失敗しました",
       "serverSyncFailed": "サーバーの同期に失敗しました",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "設定の更新に失敗しました",
       "copyManual": "",

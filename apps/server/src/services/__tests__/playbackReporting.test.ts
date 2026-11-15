@@ -21,6 +21,7 @@ import {
   queryExistingByExternalIds,
 } from '../import/index.js';
 import type * as ImportModule from '../import/index.js';
+import { syncServer } from '../sync.js';
 import type { PubSubService } from '../cache.js';
 
 const JF_COLUMNS = [...BASE_COLUMNS];
@@ -77,6 +78,10 @@ vi.mock('../serverLocations.js', () => ({
 
 vi.mock('../../jobs/poller/database.js', () => ({
   batchGetLibraryItemIdentity: vi.fn(),
+}));
+
+vi.mock('../sync.js', () => ({
+  syncServer: vi.fn(),
 }));
 
 vi.mock('../settings.js', async (importActual) => ({
@@ -432,8 +437,54 @@ describe('importPlaybackReporting', () => {
     vi.mocked(fetchMediaEnrichment).mockResolvedValue(new Map());
     vi.mocked(flushInsertBatch).mockResolvedValue(0);
     vi.mocked(batchGetLibraryItemIdentity).mockResolvedValue(new Map());
+    vi.mocked(syncServer).mockResolvedValue({ usersRead: true, errors: [] } as never);
 
     mockDbSelects([JF_SERVER], [{ min: new Date('2026-01-01T00:00:00Z') }]);
+  });
+
+  it('syncs the server users before it maps any play to them', async () => {
+    const published: string[] = [];
+    const pubSubService = {
+      publish: vi.fn(async (_channel: string, progress: { message: string }) => {
+        published.push(progress.message);
+      }),
+    } as unknown as PubSubService;
+    let shownDuringSync: string | undefined;
+    vi.mocked(syncServer).mockImplementationOnce(async () => {
+      shownDuringSync = published.at(-1);
+      return { usersRead: true, errors: [] } as never;
+    });
+
+    const result = await importPlaybackReporting(SERVER_ID, defaultOptions, pubSubService);
+
+    expect(result.success).toBe(true);
+    expect(shownDuringSync).toBe('Syncing server users...');
+    expect(syncServer).toHaveBeenCalledWith(SERVER_ID, { syncUsers: true, syncLibraries: false });
+    expect(vi.mocked(syncServer).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(createUserMapping).mock.invocationCallOrder[0] ?? 0
+    );
+  });
+
+  it('goes on when the user sync could not read the user list', async () => {
+    vi.mocked(syncServer).mockResolvedValue({
+      usersRead: false,
+      errors: ['jellyfin unreachable'],
+    } as never);
+
+    const result = await importPlaybackReporting(SERVER_ID, defaultOptions);
+
+    expect(result.success).toBe(true);
+    expect(createUserMapping).toHaveBeenCalled();
+  });
+
+  it('stops, throwing, when the user sync throws', async () => {
+    vi.mocked(syncServer).mockRejectedValue(new Error('sync lock timed out'));
+
+    await expect(importPlaybackReporting(SERVER_ID, defaultOptions)).rejects.toThrow(
+      'sync lock timed out'
+    );
+    expect(mockGetPlaybackReportingInfo).not.toHaveBeenCalled();
+    expect(createUserMapping).not.toHaveBeenCalled();
   });
 
   it('refuses a historical server before contacting it', async () => {

@@ -163,6 +163,7 @@
       "serverAddFailed": "添加服务器失败",
       "serverRemoveFailed": "删除服务器失败",
       "serverSyncFailed": "同步服务器失败",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "无法更改服务器状态",
       "settingsUpdateFailed": "更新设置失败",
       "copyManual": "按 Ctrl+C 或 ⌘C 复制",

@@ -120,6 +120,7 @@
     "noActiveStreams": "沒有活躍的串流",
     "streamsAppearHere": "當使用者開始觀看時，活躍的串流將顯示在此",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -657,6 +658,10 @@
         "body": ""
       },
       "notSynced": {
+        "title": "",
+        "body": ""
+      },
+      "syncQueued": {
         "title": "",
         "body": ""
       },

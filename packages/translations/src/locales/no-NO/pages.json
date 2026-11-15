@@ -120,6 +120,7 @@
     "noActiveStreams": "Ingen aktive strømminger",
     "streamsAppearHere": "Aktive strømmer vises her når brukere begynner å se",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -690,6 +691,10 @@
         "body": ""
       },
       "notSynced": {
+        "title": "",
+        "body": ""
+      },
+      "syncQueued": {
         "title": "",
         "body": ""
       },

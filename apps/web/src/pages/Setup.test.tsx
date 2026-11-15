@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -12,10 +12,13 @@ vi.mock('react-i18next', () => ({
 const auth = vi.hoisted(() => ({
   user: { role: 'owner', username: 'dana' } as { role: string; username?: string } | null,
 }));
-const servers = vi.hoisted(() => ({ data: [] as { type: string; name: string }[] }));
+const servers = vi.hoisted(() => ({
+  data: [] as { type: string; name: string }[],
+  refetch: vi.fn(),
+}));
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ ...auth, refetch: vi.fn() }) }));
 vi.mock('@/hooks/queries', () => ({
-  useServers: () => ({ data: servers.data, refetch: vi.fn() }),
+  useServers: () => ({ data: servers.data, refetch: servers.refetch }),
   usePlexAccounts: () => ({ data: { accounts: [], clientIdentifier: 'client-1' } }),
 }));
 
@@ -144,6 +147,58 @@ describe('Setup', () => {
     expect(screen.getByRole('button', { name: 'common:actions.skip' })).toBeDisabled();
   });
 
+  it('back, skip and the rail wait while a Jellyfin key connects', async () => {
+    connectJellyfinWithApiKey.mockReturnValue(new Promise(() => {}));
+    renderSetup('/setup?type=jellyfin');
+
+    await userEvent.type(screen.getByLabelText('servers.serverUrl'), 'http://10.0.0.5:8096');
+    await userEvent.type(screen.getByLabelText('servers.serverName'), 'Attic');
+    await userEvent.type(screen.getByLabelText('common:labels.apiKey'), 'key-1');
+    await userEvent.click(screen.getByRole('button', { name: 'servers.connectServer' }));
+
+    const rail = screen.getByRole('navigation', { name: 'setup.stepsLabel' });
+    expect(within(rail).queryAllByRole('button')).toHaveLength(0);
+    expect(screen.getByRole('button', { name: 'common:actions.back' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'common:actions.skip' })).toBeDisabled();
+  });
+
+  it('skip waits until a tofa server added through sign-in has been refetched', async () => {
+    vi.spyOn(window, 'open').mockReturnValue(null);
+    apiAuth.initiateTofa.mockResolvedValue({
+      handle: 'h-1',
+      verificationUri: 'https://app.tofa.tv/link?code=ABCD',
+      userCode: 'ABCD',
+      expiresIn: 600,
+      interval: 0,
+    });
+    apiAuth.checkTofa.mockResolvedValue({
+      status: 'select-server',
+      tempToken: 'temp-1',
+      username: 'dana',
+      servers: [{ id: 'srv-1', name: 'Attic', online: true, localAddress: null }],
+    });
+    apiAuth.addTofaServer.mockResolvedValue({
+      status: 'added',
+      server: { name: 'Attic', canStopStreams: true },
+      canStopStreams: true,
+    });
+    let finishRefetch = () => {};
+    servers.refetch.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishRefetch = resolve;
+      })
+    );
+    renderSetup('/setup?type=tofa');
+    await userEvent.click(screen.getByRole('button', { name: 'pages:tofa.signIn' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'common:actions.connect' }));
+
+    await waitFor(() => expect(servers.refetch).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: 'common:actions.skip' })).toBeDisabled();
+
+    finishRefetch();
+    expect(await screen.findByText('importers for tofa')).toBeInTheDocument();
+  });
+
   it('the manual fields stay one click away', async () => {
     renderSetup('/setup?type=tofa');
     await userEvent.click(screen.getByRole('button', { name: 'pages:tofa.manual' }));
@@ -171,9 +226,9 @@ describe('Setup', () => {
   });
 
   it('leaves for the dashboard from the history step without importing', async () => {
-    renderSetup('/setup?type=tofa&step=import');
+    renderSetup('/setup?type=jellyfin&step=import');
 
-    expect(screen.getByText('importers for tofa')).toBeInTheDocument();
+    expect(screen.getByText('importers for jellyfin')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'common:actions.skip' }));
     expect(screen.getByText('dashboard')).toBeInTheDocument();
   });

@@ -1,6 +1,8 @@
 import type {
+  ImportWaitingForLibrarySync,
   Server,
   ServerDownReason,
+  TofaBackfillStatus,
   UpdateUserAccessInput,
   UserRole,
   ServerUserWithIdentity,
@@ -2198,6 +2200,7 @@ class ApiClient {
           state?: string;
           progress?: number | object;
           createdAt?: number;
+          waiting?: ImportWaitingForLibrarySync | null;
         }>(`/import/jellystat/active/${serverId}`),
       getStatus: (jobId: string) =>
         this.request<{
@@ -2255,6 +2258,7 @@ class ApiClient {
           state?: string;
           progress?: number | object;
           createdAt?: number;
+          waiting?: ImportWaitingForLibrarySync | null;
         }>(`/import/playback-reporting/active/${serverId}`),
       getStatus: (jobId: string) =>
         this.request<{
@@ -2290,6 +2294,7 @@ class ApiClient {
           state?: string;
           progress?: number | object;
           createdAt?: number;
+          backfill: TofaBackfillStatus | null;
         }>(`/import/tofa/active/${serverId}`),
     },
   };

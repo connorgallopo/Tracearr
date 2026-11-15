@@ -73,6 +73,7 @@ const echoAdd = async (_name: string, _data: unknown, opts?: { jobId?: string })
 });
 const mockQueueAdd = vi.fn(echoAdd);
 const mockQueueGetJobs = vi.fn().mockResolvedValue([]);
+const mockQueueGetJob = vi.fn().mockResolvedValue(undefined);
 const mockQueueClose = vi.fn().mockResolvedValue(undefined);
 const mockGetJobSchedulers = vi.fn().mockResolvedValue([]);
 const mockRemoveJobScheduler = vi.fn().mockResolvedValue(undefined);
@@ -83,6 +84,7 @@ vi.mock('bullmq', () => ({
     return {
       add: mockQueueAdd,
       getJobs: mockQueueGetJobs,
+      getJob: mockQueueGetJob,
       close: mockQueueClose,
       getJobSchedulers: mockGetJobSchedulers,
       removeJobScheduler: mockRemoveJobScheduler,
@@ -267,6 +269,43 @@ describe('enqueueLibrarySync', () => {
     expect(await getAllActiveLibrarySyncs()).toEqual([
       expect.objectContaining({ serverId: 'srv-1', firstSync: true, attemptsMade: 1 }),
     ]);
+  });
+
+  it('manual: carries the first-sync flag of the queued job it replaces', async () => {
+    mockQueueGetJobs.mockResolvedValue([
+      plainJob('srv-1', 'scheduled', {
+        data: { serverId: 'srv-1', triggeredBy: 'scheduled', firstSync: true },
+        remove: vi.fn().mockResolvedValue(undefined),
+      }),
+    ]);
+
+    await enqueueLibrarySync('srv-1', 'manual', { userId: 'user-1' });
+
+    const [, data] = mockQueueAdd.mock.calls[0] ?? [];
+    expect(data).toEqual({
+      serverId: 'srv-1',
+      triggeredBy: 'manual',
+      userId: 'user-1',
+      firstSync: true,
+    });
+  });
+
+  it('stamps the first-sync flag on the sync that holds the server when the add is refused', async () => {
+    mockQueueAdd.mockResolvedValueOnce({ id: 'holder' });
+    const holder = {
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      updateData: vi.fn().mockResolvedValue(undefined),
+    };
+    mockQueueGetJob.mockResolvedValueOnce(holder);
+
+    await enqueueLibrarySync('srv-1', 'event', { firstSync: true });
+
+    expect(mockQueueGetJob).toHaveBeenCalledWith('holder');
+    expect(holder.updateData).toHaveBeenCalledWith({
+      serverId: 'srv-1',
+      triggeredBy: 'scheduled',
+      firstSync: true,
+    });
   });
 
   it('boot passes the stagger delay through', async () => {
@@ -455,6 +494,28 @@ describe('worker processor', () => {
       2,
       expect.objectContaining({ completedLibraryIds: ['lib-a', 'lib-b'] })
     );
+  });
+
+  it('keeps a first-sync flag stamped on the job while it runs', async () => {
+    vi.mocked(librarySyncService.syncServer).mockImplementation(async (_id, _p, _t, r) => {
+      await r!.onLibraryComplete('lib-a');
+      return [];
+    });
+    mockQueueGetJob.mockResolvedValueOnce({
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled', firstSync: true },
+    });
+    const processor = startProcessor();
+    const job = fakeJob({ serverId: 'srv-1', triggeredBy: 'scheduled' });
+
+    await processor(job);
+
+    expect(mockQueueGetJob).toHaveBeenCalledWith('job-1');
+    expect(job.updateData).toHaveBeenCalledWith({
+      serverId: 'srv-1',
+      triggeredBy: 'scheduled',
+      completedLibraryIds: ['lib-a'],
+      firstSync: true,
+    });
   });
 
   it('yields on SyncInterruptedError', async () => {

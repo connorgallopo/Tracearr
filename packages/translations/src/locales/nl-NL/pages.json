@@ -120,6 +120,7 @@
     "noActiveStreams": "Geen actieve streams",
     "streamsAppearHere": "Actieve streams zullen hier verschijnen wanneer gebruikers gaan kijken",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -692,6 +693,10 @@
       "notSynced": {
         "title": "Bibliotheek nog niet gesynchroniseerd",
         "body": "De bibliotheekstatistieken verschijnen hier zodra de bibliotheek is gesynchroniseerd. Dit gebeurt doorgaans automatisch elk uur."
+      },
+      "syncQueued": {
+        "title": "",
+        "body": ""
       },
       "noMedia": {
         "title": "Nog geen films of series beschikbaar",

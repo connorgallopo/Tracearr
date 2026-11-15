@@ -18,6 +18,7 @@ vi.mock('../../jobs/poller/database.js', () => ({
 }));
 vi.mock('../../jobs/librarySyncQueue.js', () => ({
   enqueueLibrarySync: vi.fn(step('librarySync')),
+  markFirstSyncOwed: vi.fn(step('markFirstSyncOwed')),
   rebuildAutoSyncSchedules: vi.fn(step('rebuildAutoSyncSchedules')),
 }));
 vi.mock('../../jobs/requestSyncQueue.js', () => ({
@@ -49,7 +50,7 @@ beforeEach(() => {
 });
 
 describe('startAddedServer', () => {
-  it('holds the history import, then syncs users, queues the library sync and syncs requests', async () => {
+  it('holds the history import and marks the first sync owed, then syncs users, queues the library sync and syncs requests', async () => {
     await startAddedServer(tofa, ['service-1']);
     await settled('requestSync');
 
@@ -57,6 +58,7 @@ describe('startAddedServer', () => {
       'publishServersChanged',
       'rebuildAutoSyncSchedules',
       'holdImport',
+      'markFirstSyncOwed',
       'sseRefresh',
       'userSync',
       'librarySync',

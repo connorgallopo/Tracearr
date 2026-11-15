@@ -31,6 +31,7 @@ import {
   type TautulliUserRecord,
 } from '../tautulli.js';
 import { getSettings, rearmImportedHistoryLink } from '../settings.js';
+import { syncServer } from '../sync.js';
 import { db } from '../../db/client.js';
 import { checkAggregateNeedsRebuild, refreshAggregates } from '../../db/timescale.js';
 import {
@@ -102,6 +103,10 @@ vi.mock('../../jobs/poller/database.js', () => ({
 vi.mock('../settings.js', () => ({
   getSettings: vi.fn(),
   rearmImportedHistoryLink: vi.fn(),
+}));
+
+vi.mock('../sync.js', () => ({
+  syncServer: vi.fn().mockResolvedValue({ usersRead: true, errors: [] }),
 }));
 
 vi.mock('../import/index.js', async (importActual) => {
@@ -2358,6 +2363,45 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
       String(call[0]).includes('cmd=get_history')
     );
     expect(historyCall?.[0]).toContain('grouping=1');
+  });
+
+  it('syncs the server users before it maps any play to them', async () => {
+    mockFetch = mockTautulliFetch([makeRecord()], 1);
+    global.fetch = mockFetch as typeof global.fetch;
+
+    const result = await TautulliService.importHistory(SERVER_ID);
+
+    expect(result.success).toBe(true);
+    expect(syncServer).toHaveBeenCalledWith(SERVER_ID, { syncUsers: true, syncLibraries: false });
+    expect(vi.mocked(syncServer).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(createUserMapping).mock.invocationCallOrder[0] ?? 0
+    );
+  });
+
+  it('goes on when the user sync could not read the user list', async () => {
+    vi.mocked(syncServer).mockResolvedValueOnce({
+      usersRead: false,
+      errors: ['plex unreachable'],
+    } as never);
+    mockFetch = mockTautulliFetch([makeRecord()], 1);
+    global.fetch = mockFetch as typeof global.fetch;
+
+    const result = await TautulliService.importHistory(SERVER_ID);
+
+    expect(result.success).toBe(true);
+    expect(createUserMapping).toHaveBeenCalled();
+  });
+
+  it('stops, throwing, when the user sync throws', async () => {
+    vi.mocked(syncServer).mockRejectedValueOnce(new Error('sync lock timed out'));
+    mockFetch = mockTautulliFetch([makeRecord()], 1);
+    global.fetch = mockFetch as typeof global.fetch;
+
+    await expect(TautulliService.importHistory(SERVER_ID)).rejects.toThrow('sync lock timed out');
+    expect(createUserMapping).not.toHaveBeenCalled();
+    expect(
+      mockFetch.mock.calls.some((call: unknown[]) => String(call[0]).includes('cmd=get_history'))
+    ).toBe(false);
   });
 
   it('asks for archived users and libraries and leaves current activity out', async () => {

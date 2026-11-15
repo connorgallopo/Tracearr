@@ -38,19 +38,14 @@ Shield monogram with stylized T-path + radar arcs.
 
 ### Brand colors
 
-The logo (`components/brand/Logo.tsx`) is the only user of these tokens. The cyan steps follow
-the accent hue, so the logo matches the accent the user picked.
+The logo (`components/brand/Logo.tsx`) is the only user of these tokens. The cyan follows the
+accent hue, so the logo matches the accent the user picked.
 
 | Token        | Value                     | Usage              |
 | ------------ | ------------------------- | ------------------ |
 | `cyan-core`  | `hsl(accent-hue 80% 50%)` | Logo mark and arcs |
-| `cyan-deep`  | `hsl(accent-hue 86% 42%)` | Brand gradients    |
-| `cyan-dark`  | `hsl(accent-hue 85% 31%)` | Brand outlines     |
 | `blue-core`  | `#0B1A2E`                 | Logo shield fill   |
 | `blue-steel` | `#162840`                 | Logo shield panel  |
-| `blue-soft`  | `#1E3A5C`                 | Brand hover        |
-
-Logo glow: `0px 0px 14px rgba(24, 209, 231, 0.22)`.
 
 ---
 
@@ -60,8 +55,16 @@ Each token is a bare channel triplet in a CSS variable, and the `@theme inline` 
 `globals.css` wraps it once to make the Tailwind color (`bg-card`, `text-success`, `/50`
 opacity modifiers and all).
 
-- Neutrals and surfaces are HSL triplets: in TypeScript, `hsl(var(--border))`.
-- Accent, status and data-viz tokens are OKLCH triplets: `oklch(var(--chart-1))`.
+- Everything is an OKLCH triplet (`L C H`): in TypeScript, `oklch(var(--border))`,
+  `oklch(var(--chart-1))`.
+- Four exceptions stay HSL triplets, `hsl(var(--overlay))`: `overlay` and `overlay-foreground`
+  (fixed scrim colors), `destructive-foreground` (white) and the logo tokens in section 2.
+
+The neutral grays (page, surfaces, fills, borders, text grays) take the accent's hue:
+`L C var(--accent-h)`, with L fixed per mode and C too low to read as color, 0.006 in light and
+0.012 in dark (0.005 for body text; 0.014 and 0.016 for `muted-foreground` and `control`). They
+follow whichever accent preset is picked, the way Material 3 builds its neutral palettes from the
+source color at very low chroma. Status and chart colors do not move with the accent.
 
 Highcharts and inline styles cannot use Tailwind classes, so they write the wrapper
 themselves. Chart code imports its colors from `components/charts/chartUtils.ts`
@@ -80,49 +83,96 @@ No raw Tailwind palette class (`text-green-500`, `bg-amber-500/10`), hex, `hsl(.
 ## 4. Surfaces and elevation
 
 Three surface steps plus the popover. A panel separates from the page by fill, so borders stay
-quiet.
+quiet. Values are `L C`; the hue is `var(--accent-h)` (section 3).
 
-| Token         | Dark         | Light          | Usage                                            |
-| ------------- | ------------ | -------------- | ------------------------------------------------ |
-| `background`  | `240 10% 4%` | `240 5% 97%`   | Page                                             |
-| `card`        | `240 6% 7%`  | `0 0% 100%`    | Panels, stat tiles, dialogs, sheets              |
-| `card-raised` | `240 5% 10%` | `240 5% 98.5%` | Anything nested in a card or sheet, builder rows |
-| `popover`     | `240 5% 11%` | `0 0% 100%`    | Menus, popovers, chart tooltips                  |
-| `muted`       | `240 4% 16%` | `240 5% 96%`   | Skeletons, subtle fills, placeholder art         |
-| `sidebar`     | `240 6% 6%`  | `0 0% 98%`     | App sidebar                                      |
-| `overlay`     | `240 10% 4%` | same           | Scrims over artwork, maps and modals             |
+| Token            | Dark          | Light         | Usage                                    |
+| ---------------- | ------------- | ------------- | ---------------------------------------- |
+| `background`     | `0.142 0.012` | `0.976 0.006` | Page                                     |
+| `card`           | `0.178 0.012` | `1 0` (white) | Panels, stat tiles, dialogs, sheets      |
+| `card-raised`    | `0.211 0.012` | `0.976 0.006` | Anything nested in a card or sheet       |
+| `popover`        | `0.222 0.012` | `1 0` (white) | Menus, popovers, chart tooltips          |
+| `muted`          | `0.275 0.012` | `0.92 0.006`  | Skeletons, subtle fills, placeholder art |
+| `sidebar`        | `0.166 0.012` | `0.985 0.006` | App sidebar                              |
+| `sidebar-accent` | `0.275 0.012` | `0.896 0.006` | Selected nav item                        |
+| `overlay`        | `240 10% 4%`  | same (HSL)    | Scrims over artwork, maps and modals     |
+
+`accent` (hover and focused menu items) and `secondary` share `muted`'s value in both modes.
+
+In light mode the card is the lightest surface, so a nested panel steps down to the page tone
+instead of up. Each fill in this table separates from the surface under it by at least the
+step dark mode uses for the same element, or within 0.02 of it (WCAG ratio of fill against
+surface, lowest preset):
+
+| Element                              | Dark | Light |
+| ------------------------------------ | ---- | ----- |
+| `muted` / `accent` fill on a card    | 1.27 | 1.26  |
+| `muted/50` (row hover) on a card     | 1.11 | 1.12  |
+| ghost hover on the page              | 1.12 | 1.18  |
+| focused menu item on the popover     | 1.16 | 1.26  |
+| nested card (`card-raised`) on card  | 1.07 | 1.07  |
+| hovered linked card against the page | 1.12 | 1.12  |
+| selected nav item on the sidebar     | 1.29 | 1.31  |
+| `border` on a card                   | 1.36 | 1.37  |
+| `sidebar-border` on the sidebar      | 1.29 | 1.33  |
+
+Three light pairs stay below dark's step on purpose. A fill sitting on the bare page (skeletons
+on a loading page, the empty-state icon, poster placeholders) reads 1.18 against dark's 1.34,
+because the light page is a mid step rather than the darkest surface, and matching it would put
+hover fills near 86% lightness. `border` on the page reads 1.28 against 1.43; light cards also
+carry `shadow-sm`, which dark mode cannot show. A top-level panel on the page reads 1.07 in
+light (the card) against 1.12 in dark, where those panels use `card-raised` (next paragraph).
 
 `Card` steps itself up: a `Card` or `StatCard` inside a `Card` (or a `StatCard` inside a sheet)
 takes `bg-card-raised` and drops its shadow. Do not set `bg-card-raised` by hand on a card.
+
+Panels that sit straight on the page without being a `Card` (the automation builder's rows, its
+name and description panel, the step numbers) are `bg-card dark:bg-card-raised`: light has no
+surface lighter than the card, and in dark the raised step keeps them apart from the page.
+Rows nested in an If row take the other step from the If row's branch container
+(`IfRow.tsx`: `card-raised` in light, `card` in dark), so they separate from it by 1.07:1 in
+both modes; an orphaned condition keeps its `warning/5` tint at any depth.
 
 `overlay` and `overlay-foreground` (`0 0% 98%`) do not change with the theme. Artwork has no
 theme, so anything laid over a poster (chips, the hover panel, the paused scrim on Now
 Playing) uses `bg-overlay/NN` and `text-overlay-foreground`. Never put `text-foreground` on a
 scrim: in light mode it is near-black on near-black.
 
-Shadows: cards `shadow-sm`; dialogs `shadow-lg`; lifted posters
-`shadow-[0_12px_32px_hsl(var(--overlay)/0.7)]`.
+Shadows: cards `shadow-sm`; dialogs `shadow-lg`; lifted posters `shadow-(--poster-lift)` and the
+media detail poster `shadow-(--poster-hero)`. Those two are set per mode in `globals.css`:
+`overlay` at 0.7 and 0.6 alpha in dark mode, 0.2 and 0.18 in light, where the dark-mode blur
+spread a gray smear over the cards below it.
 
 ---
 
 ## 5. Text and borders
 
-| Token              | Dark         | Light        | Usage                                             |
-| ------------------ | ------------ | ------------ | ------------------------------------------------- |
-| `foreground`       | `0 0% 98%`   | `240 10% 4%` | Body text, values                                 |
-| `muted-foreground` | `240 5% 65%` | `240 4% 46%` | Labels, captions, axis labels, neutral state      |
-| `border`           | `240 4% 18%` | `240 6% 88%` | Layout lines, card edges, table rules             |
-| `input`            | `240 4% 16%` | `240 6% 90%` | Input fill in dark mode                           |
-| `control`          | `240 4% 44%` | `240 4% 55%` | Boundary of checkboxes, radios, text fields (3:1) |
+| Token              | Dark          | Light         | Usage                                                         |
+| ------------------ | ------------- | ------------- | ------------------------------------------------------------- |
+| `foreground`       | `0.985 0.005` | `0.142 0.005` | Body text, values                                             |
+| `muted-foreground` | `0.713 0.016` | `0.499 0.014` | Labels, captions, axis labels, neutral state                  |
+| `border`           | `0.295 0.012` | `0.895 0.006` | Layout lines, card edges, table rules                         |
+| `sidebar-border`   | `0.275 0.012` | `0.89 0.006`  | Sidebar edge and its separators                               |
+| `input`            | `0.275 0.012` | `0.92 0.006`  | Off switch track, outline toggle border, input fill in dark   |
+| `control`          | `0.533 0.016` | `0.629 0.014` | Boundary of checkboxes, radios, text fields, off switch (3:1) |
 
-Contrast, WCAG 2.x:
+Contrast, WCAG 2.x, lowest preset:
 
 | Pair                        | Dark   | Light  |
 | --------------------------- | ------ | ------ |
-| foreground on card          | 18.0:1 | 19.8:1 |
-| muted-foreground on card    | 7.3:1  | 4.8:1  |
-| muted-foreground on page    | 7.7:1  | 4.5:1  |
-| muted-foreground on popover | 6.7:1  | 4.8:1  |
+| foreground on card          | 18.1:1 | 19.8:1 |
+| muted-foreground on card    | 7.4:1  | 6.0:1  |
+| muted-foreground on page    | 7.8:1  | 5.6:1  |
+| muted-foreground on popover | 6.7:1  | 6.0:1  |
+| muted-foreground on muted   | 5.8:1  | 4.7:1  |
+| control on card             | 3.6:1  | 3.5:1  |
+| control on page             | 3.8:1  | 3.3:1  |
+
+Light `muted-foreground` is dark enough to keep 4.5:1 on `muted` (count pills, `kbd`, the
+focused menu item). Text never takes an opacity modifier on `muted-foreground`: at `/70` it
+falls to 3.1:1 in light and 4.2:1 in dark. Ratios in this guide are computed from the token
+values (HSL and OKLCH to sRGB, alpha composited in sRGB, WCAG relative luminance) for all eight
+accent presets and checked against pixels from a headless Chromium render, which agreed within
+0.1.
 
 ---
 
@@ -152,12 +202,21 @@ Presets (HSL hue is what is stored in the browser; OKLCH hue is what renders):
 | Teal   | 175     | 183       | 8.9:1                 | 5.7:1                   |
 
 Teal is a Tracearr preset that predates tofa's teal brand color; the two stay separate tokens.
-The light column is against pure white; the rendered `oklch(0.99 0 0)` ink reads about 0.15
+The light column is against pure white; the rendered `oklch(0.99 0 0)` ink reads about 0.17
 lower (Green 5.5:1, the lowest). Primary as text reads at 7.8:1 or better on the dark card
 and 5.3:1 or better on the light page.
 
+A stored hue that is not one of the presets takes the nearest preset's values
+(`accentPreset`), so the grays and the accent stay on a preset's hue.
+
 The accent is for interaction: buttons, links, focus rings, selected states, the active nav
 mark, stat tile icon chips and single-series charts. It is never a status color.
+
+Focus halos are `ring-ring/(--ring-alpha)`: 80% in light mode and 60% in dark. At 50% the halo
+measured 2.1:1 on the light page and, on the dark card, 2.8 to 3.1:1 depending on the preset
+(Blue, Purple, Pink, Red and Orange under 3:1). At these values every preset keeps 3:1 against
+the card, page, popover, `card-raised`, sidebar and `muted`; the lowest is Pink on dark `muted`,
+3.1:1. Destructive buttons use the same halo.
 
 ---
 
@@ -173,18 +232,18 @@ Reserved for state. A status color is never a chart series and never decoration.
 | `info`        | `0.74 0.12 250`    | `0.49 0.13 250` | In progress, informational         |
 | neutral       | `muted-foreground` | same            | Unknown, skipped, not started      |
 
-Measured from a headless Chrome render (sRGB, pixels sampled, alpha composited by the
-browser), in the order success, warning, destructive, info:
+Computed for the lowest accent preset (the surfaces carry its hue), in the order success,
+warning, destructive, info:
 
 | Where the text sits              | Dark               | Light              |
 | -------------------------------- | ------------------ | ------------------ |
 | Flat card (white in light mode)  | 9.3, 9.9, 6.0, 8.2 | 6.2, 6.2, 6.4, 6.3 |
-| Callout tint `/10` on the card   | 7.9, 8.4, 5.4, 7.1 | 5.3, 5.3, 5.4, 5.4 |
-| Pill tint `/15` on the card      | 7.2, 7.6, 5.0, 6.5 | 4.9, 5.0, 4.9, 5.0 |
-| Pill tint `/15` on the page      | 7.9, 8.3, 5.4, 7.1 | 4.6, 4.7, 4.6, 4.7 |
-| Pill tint `/15` on `card-raised` | 6.7, 7.0, 4.7, 6.0 | 4.8, 4.8, 4.7, 4.8 |
+| Callout tint `/10` on the card   | 7.9, 8.4, 5.4, 7.0 | 5.3, 5.4, 5.4, 5.4 |
+| Pill tint `/15` on the card      | 7.1, 7.5, 5.0, 6.4 | 4.9, 5.0, 4.9, 5.0 |
+| Pill tint `/15` on the page      | 7.7, 8.2, 5.4, 6.9 | 4.6, 4.7, 4.6, 4.7 |
+| Pill tint `/15` on `card-raised` | 6.5, 6.9, 4.6, 5.9 | 4.6, 4.7, 4.6, 4.7 |
 
-The lowest is 4.58:1 (light destructive pill on the page). Every status color passes AA as
+The lowest is 4.58:1 (light destructive pill on the page, Pink preset). Every status color passes AA as
 12px text on its own tint and on every surface, in both modes. Light values sit at L 0.48 to
 0.51 for that reason; at 0.52 to 0.55 the pills measured 3.9 to 4.3:1.
 
@@ -199,7 +258,8 @@ Patterns:
   from one tone map per component.
 
 `destructive-foreground` is the text on a filled destructive button or badge: white on the
-light fill reads 6.4:1, and on the dark button (`destructive/60` over the card) 6.6:1.
+light fill reads 6.4:1, and the dark mode's 98% white on the dark button (`destructive/60` over
+the card) 6.3:1.
 
 ---
 
@@ -212,18 +272,18 @@ Three kinds of palette, each with one job.
 For unordered categories: platforms, top lists, media types, playback decisions. Light mode
 varies lightness by hue (warm hues lighter, so orange stays orange instead of brown) and keeps
 every step at 3:1 or better against the white card. Dark mode sits at L 0.70 to 0.78.
-Ratios are measured from a headless Chrome render.
+The dark column is against the dark card for the lowest preset.
 
 | Token     | Hue     | Dark (oklch)    | Light (oklch)   | Light vs white | Dark vs card |
 | --------- | ------- | --------------- | --------------- | -------------- | ------------ |
 | `chart-1` | blue    | `0.72 0.14 255` | `0.55 0.17 255` | 4.9:1          | 7.6:1        |
-| `chart-2` | orange  | `0.76 0.15 55`  | `0.68 0.17 50`  | 3.1:1          | 8.5:1        |
-| `chart-3` | magenta | `0.72 0.16 340` | `0.58 0.19 340` | 4.8:1          | 7.1:1        |
+| `chart-2` | orange  | `0.76 0.15 55`  | `0.68 0.17 50`  | 3.1:1          | 8.4:1        |
+| `chart-3` | magenta | `0.72 0.16 340` | `0.58 0.19 340` | 4.8:1          | 7.0:1        |
 | `chart-4` | teal    | `0.74 0.11 200` | `0.6 0.1 200`   | 3.8:1          | 8.5:1        |
 | `chart-5` | violet  | `0.7 0.15 295`  | `0.55 0.17 295` | 5.2:1          | 6.7:1        |
 | `chart-6` | olive   | `0.78 0.13 100` | `0.66 0.13 100` | 3.1:1          | 9.5:1        |
 | `chart-7` | green   | `0.74 0.15 150` | `0.6 0.15 150`  | 3.7:1          | 8.7:1        |
-| `chart-8` | rose    | `0.7 0.16 15`   | `0.6 0.17 15`   | 4.3:1          | 6.6:1        |
+| `chart-8` | rose    | `0.7 0.16 15`   | `0.6 0.17 15`   | 4.3:1          | 6.5:1        |
 
 Eight hues cannot all avoid the four server brand hues. chart-4 sits near tofa teal, chart-6
 near Plex gold, chart-5 near Jellyfin purple and chart-7 near Emby green, so the fixed mappings
@@ -292,9 +352,10 @@ lines are 3px, because neighboring steps are close in color.
 | Emby     | `#39C668` |
 | tofa     | `#14B8A6` |
 
-Brand colors are identity marks only: a dot, a 2 to 3px edge, a map pin, the Plex sign-in
-button (gold with dark `overlay` ink; white on the gold is about 2:1). They are never a text
-color and never a fill in a data chart. A server's chosen color (`servers.color`) is user data
+Brand colors are identity marks only: a dot, a 2 to 4px edge (the Connections row's 4px left
+border), a map pin. They are never a text
+color and never a fill in a data chart. The Plex sign-in button is outside this table: it keeps
+`#E5A00D` with white text, hovering to `#C88A0B`. A server's chosen color (`servers.color`) is user data
 and is used as given.
 
 ---
@@ -313,13 +374,22 @@ real semibold). No request leaves the instance for fonts.
 | `text-lg`    | 18 / 28            | 600      | Compact stat values                                             |
 | `text-xl`    | 20 / 28            | 600      | Page titles (h1), sheet titles, stat values                     |
 | `text-2xl`   | 24 / 32            | 600, 700 | User and setup headers, poster rank, standalone summary numbers |
-| `text-3xl`   | 30 / 36            | 700      | Media detail hero title and poster initials                     |
+| `text-3xl`   | 30 / 36            | 700      | Media detail hero title, poster initials, `lg` logo wordmark    |
+| `text-4xl`   | 36 / 40            | 700      | Sign-in page title, the 404 numeral, `xl` logo wordmark         |
+
+The member sign-in code (`auth/MemberLogin.tsx`) is a monospace `text-3xl` that grows to
+`text-4xl` from the `sm` breakpoint.
 
 Rules:
 
-- Nothing a user reads is below 12px. No `text-[Npx]` arbitrary sizes.
+- Nothing a user reads is below 12px. No `text-[Npx]` arbitrary sizes. Inline code is
+  `text-xs`. Two arbitrary sizes remain on purpose: the initial in a 24px avatar
+  (`users/UserCell.tsx`, 10px), which is `aria-hidden` decoration beside the name it repeats,
+  and the builder's sentence chips at `text-[0.9375em]` (`builder/Sentence.tsx`, 15px in a
+  16px sentence), which scale with the sentence they sit in.
 - Most list pages keep their h1 in `PageHeader` as `sr-only`; where a page shows its title
-  (Settings, automation and violation detail, Maintenance), it is `text-xl font-semibold`.
+  (Settings, automation and violation detail, the automation builder, Maintenance, Debug), it is
+  `text-xl font-semibold`. Setup and user detail headers are `text-2xl`.
 - `CardTitle` is an h3 at `text-base font-semibold`. Page sections (dashboard
   `SectionHeading`, `SettingsSection`, media detail panels) are h2 at `text-base font-semibold`.
 - Numbers that line up or tick (stat values, durations, table numbers) use `tabular-nums`.
@@ -334,13 +404,15 @@ Rules:
 
 | Token          | Value | Use                                                       |
 | -------------- | ----- | --------------------------------------------------------- |
+| `rounded-xs`   | 2px   | Tooltip arrow, sheet close button                         |
 | `rounded-sm`   | 4px   | Checkboxes, kbd, tiny chips, heat cells                   |
 | `rounded-md`   | 6px   | Buttons, inputs, selects, toggles                         |
 | `rounded-lg`   | 8px   | Inline boxes inside a panel, menus, icon chips, small art |
 | `rounded-xl`   | 12px  | Cards, stat tiles, dialogs, media panels, posters, hero   |
 | `rounded-full` | pill  | Badges, avatars, dots, chips over artwork                 |
 
-No `rounded-[...]` arbitrary values.
+No `rounded-[...]` arbitrary values; `rounded-[inherit]` on the scroll area viewport only passes
+its parent's radius through.
 
 ---
 
@@ -365,15 +437,58 @@ p-6 shadow-sm` with an h2 at `text-base font-semibold`.
 
 ### Selected, hover, focus, disabled
 
+- Pickers: a form select shows a `control` boundary, 3:1 against what it sits on, like every
+  form field. The sidebar's server picker and account menu trigger use `SidebarMenuButton`
+  `variant="outline"`, which draws the same `border` edge cards use: their label and chevron
+  identify them, so they match the cards around them instead of standing out. The server picker
+  keeps its 2px left bar in the server's color when one server is selected. Plain nav items and segmented toggles carry no boundary: their label is
+  what identifies them.
 - "Where am I" (sidebar, settings nav): neutral `sidebar-accent` fill, accent icon, 2px accent
   bar on the leading edge.
-- "Which value" (toggle groups, segmented controls): `primary/15` tint with `primary` text.
+- "Which value" (toggle groups, segmented controls): a `primary` tint with `primary` text, `/15`
+  in dark mode and `/10` in light, where `/15` left Cyan, Green and Teal text under 4.5:1 on the
+  page (lowest now: Green, 4.6:1).
 - "Which view" (page tabs): underline.
-- Hover brightens: text goes to `foreground`, a surface goes up one step (`card-hover` is
-  `hover:bg-card-raised hover:border-foreground/15`). Panels do not scale on hover; posters
-  lift 3px because they are objects.
-- Focus: `ring` at 3px, `ring/50`. Never remove an outline without a ring.
+- Hover: text goes to `foreground`; a linked card moves one step away from the page
+  (`card-hover`: `hover:bg-muted/70` in light, `dark:hover:bg-card-raised` in dark, and
+  `hover:border-foreground/15`; 1.12:1 against the page in both). Panels do not scale on hover;
+  posters lift 3px because they are objects.
+- Focus: controls (buttons, inputs, selects, toggles, badges, builder chips) take the 3px halo,
+  `ring/(--ring-alpha)` (section 6). Navigation items and whole-object links, where a 3px halo
+  would crowd neighbors or be clipped, take a 2px full-strength ring instead: `ring-sidebar-ring`
+  in the sidebar and settings nav, `ring-ring` on posters, album tiles, heat cells and setup
+  steps, with `ring-offset-2` on linked stat tiles and the dialog and sheet close buttons, inset
+  on the media detail history rows. A full-strength ring is the accent itself: 5.3:1 or better
+  on every surface, 4.1:1 on the selected nav fill. Never remove an outline without a ring.
+- Switch, off: light mode outlines the track in `control` (3.5:1 on the card) with a white
+  thumb; dark mode shows a `foreground` thumb on `input/80`.
 - Disabled: 50% opacity, no pointer events.
+
+### Connections server row
+
+`settings/servers/ServerRow.tsx`. An outline `Item` with a 4px left border in the server's
+color (user data), a drag handle when there is more than one server, the server icon on a
+`bg-muted` 40px chip, the name with its badges, a `text-xs` meta line and a `text-xs` definition
+list (requests, the owner's own account). On the right, one ghost Sync button and one ghost
+icon button that opens the row's single menu: edit, open on server, the request service and
+own-account items, mark historical or resume (owner only), and remove as a destructive item.
+Badges carry state with the status rule: `success` for real time, `outline` for polling or
+checking, `danger` for a broken plugin (clicking it opens setup), `warning` for an update or
+for "cannot stop streams", `outline` for a historical server. A badge with a hint gets a
+tooltip and is focusable.
+
+### Import card
+
+`import/ImportProgressCard.tsx` renders inside each import source. With no import it renders
+only its live region. Otherwise it is `rounded-lg border p-4` with a status line and an icon:
+waiting and retrying show a pulsing muted clock, running shows a muted spinner, complete a
+`text-success` check, failed a `text-destructive` cross and the message in `text-destructive`.
+Counts below use status text (imported `success`, skipped and filtered `warning`, enriched
+`info`, errors `destructive`) beside `muted-foreground` labels, over a `Progress` bar.
+
+`import/StartImportButton.tsx` is every source's start button, `size="lg"`: hidden while the
+import waits, a spinner and "Importing" while it runs, the source's icon and label otherwise,
+and "Start again" after a failure.
 
 ### Density
 
@@ -384,8 +499,8 @@ p-6 shadow-sm` with an h2 at `text-base font-semibold`.
 ### Motion
 
 Durations from `globals.css`: accordion 200ms, fade-in 300ms, fade-in-up 400ms, scale-in 200ms,
-slide-in-right 300ms, all ease-out. Color and opacity transitions run 150 to 200ms. Animate
-color, opacity and transform only.
+slide-in-right 300ms, all ease-out. Sheets slide in over 500ms and out over 300ms. Color and
+opacity transitions run 150 to 200ms. Animate color, opacity and transform only.
 
 ---
 
@@ -394,13 +509,29 @@ color, opacity and transform only.
 Places that keep a literal color, and why:
 
 - **Map basemap and map paint** (`components/map/maplibre.ts`, `StreamMap.tsx`,
-  `LocationPicker.tsx`, `MiniMap.tsx`): MapLibre paints on WebGL and cannot read CSS variables, so the
-  basemap palette, label colors, the white highlight ring and the accent-derived point colors
-  are concrete values. The basemap mirrors the neutral surfaces.
+  `StreamCard.tsx`, `LocationPicker.tsx`, `MiniMap.tsx`): MapLibre paints on WebGL and cannot
+  read CSS variables. `palette()` in `maplibre.ts` holds every basemap color. The grays (land,
+  urban areas, landuse, roads, tunnels, rail, buildings, borders, the canvas behind the tiles)
+  and the place, road and count labels follow the gray rule in code: `oklchRgb` builds each from
+  its fixed lightness, the accent preset's OKLCH hue (`useAccentH`) and the gray chroma (labels
+  take the muted-text chroma), and every map rebuilds its style when the preset or theme
+  changes. Water (OKLCH hue 235) and parks and woods (hue 150) keep fixed hues at low chroma so
+  they read as water and green on warm presets too. Roads step by lightness, highway darker than
+  major darker than minor in light and the reverse in dark, with casings in the land color.
+  Labels meet 4.5:1 (city and town names) and 3:1 (state, country, neighborhood, road and water
+  names) against their halos and the land, on every preset in both themes; town names are a
+  step lighter (light) or dimmer (dark) than city names. Label sizes are the Protomaps layers'
+  own (8 to 20px by zoom), outside the 12px rule. Data layers go in through `addDataLayers`,
+  which draws them above the road and water labels and below the place names, with the data's
+  own count labels on top; place names sit beside their point at every zoom so a circle at a
+  city's coordinates is not hidden by that city's name. Data colors stay concrete: the server
+  colors, the accent-derived points and heatmap ramp, and the white highlight ring.
 - **QR code** (`settings/access/MobileDevices.tsx`): `bg-white` behind the code; scanners need a
   white quiet zone in both themes.
 - **Email preview frame** (`settings/shared/HtmlPreviewDialog.tsx`): `bg-[#0f1115]` is the email
   template's own page color (`packages/emails/src/styles.ts`), so the frame does not flash.
+- **Plex sign-in button** (`auth/PlexSignIn.tsx`): `#E5A00D` with white text, hovering to
+  `#C88A0B` (section 9).
 - **User data**: server colors, the newsletter branding colors, poster dominant colors.
 - **Logo brand tokens** (section 2).
 
@@ -409,8 +540,8 @@ Places that keep a literal color, and why:
 ## 14. Implementation notes
 
 - Web tokens: `apps/web/src/styles/globals.css`.
-- Mobile: the Expo app lives in the sibling `mobile-app` checkout, is dark mode only, and mirrors
-  these neutrals in its own `global.css`.
+- Mobile: the Expo app lives in the sibling `mobile-app` checkout, is dark mode only, and keeps
+  its own neutrals as hex in `global.css` (the zinc values from before the accent-tinted grays).
 - Theme switching: `.dark` on the document root; the accent is set at runtime by
   `ThemeProvider`.
 

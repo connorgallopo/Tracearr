@@ -1460,15 +1460,21 @@ export interface TofaImportResult {
 }
 
 /**
- * A tofa server's latest history import: the one queued when the server was added, which waits
- * for a library sync of the server to complete (or a day at most), or a later one the owner ran.
+ * An import held while the server's first library sync is owed, queued or running, until a
+ * library sync of the server completes (or a day at most).
+ */
+export interface ImportWaitingForLibrarySync {
+  state: 'waitingForLibrarySync';
+  /** The library sync it waits for; null when none is queued or running for the server */
+  librarySync: { state: 'queued' | 'running'; progress: number | null } | null;
+}
+
+/**
+ * A tofa server's latest history import: the one queued when the server was added, held for its
+ * library sync, or a later one the owner ran.
  */
 export type TofaBackfillStatus =
-  | {
-      state: 'waitingForLibrarySync';
-      /** The library sync it waits for; null when none is queued or running for the server */
-      librarySync: { state: 'queued' | 'running'; progress: number | null } | null;
-    }
+  | ImportWaitingForLibrarySync
   | { state: 'queued' }
   | { state: 'running'; progress: TofaImportProgress | null }
   | { state: 'complete'; result: TofaImportResult; finishedAt: number | null }
