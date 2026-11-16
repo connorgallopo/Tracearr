@@ -181,6 +181,7 @@
       "serverAddFailed": "Nepodařilo se přidat server",
       "serverRemoveFailed": "Nepodařilo se odstranit server",
       "serverSyncFailed": "Synchronizace serveru se nezdařila",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Aktualizace nastavení se nezdařila",
       "copyManual": "",

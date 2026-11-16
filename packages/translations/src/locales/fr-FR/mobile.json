@@ -133,6 +133,7 @@
     "noTerminations": "Aucune interruption de lecture",
     "lastSeen": "Vu la dernière fois {{relative}}",
     "terminatedBy": "Par @{{username}}",
+    "terminatedByName": "",
     "trustScoreConfirm": "Régler le score de confiance de @{{username}} à {{score}} ?",
     "trustScoreRange": "",
     "moreLocations_one": "",

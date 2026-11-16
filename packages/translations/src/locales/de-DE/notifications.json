@@ -169,6 +169,7 @@
       "serverAddFailed": "Server hinzufügen fehlgeschlagen",
       "serverRemoveFailed": "Server entfernen fehlgeschlagen",
       "serverSyncFailed": "Server-Synchronisation fehlgeschlagen",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Einstellungen aktualisieren fehlgeschlagen",
       "copyManual": "Drücke Ctrl+C oder ⌘C zum Kopieren",

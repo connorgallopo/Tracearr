@@ -287,7 +287,6 @@
     "suggestionsPairEmailMore_other": "{{first}} i {{second}} comparteixen un correu, i {{count}} més",
     "suggestionsPairEmailUsernameMore_one": "{{first}} i {{second}} utilitzen la mateixa adreça com a nom d'usuari o correu del compte, i {{count}} més",
     "suggestionsPairEmailUsernameMore_other": "{{first}} i {{second}} utilitzen la mateixa adreça com a nom d'usuari o correu del compte, i {{count}} més",
-    "suggestionsPairLinkedMore_one": "",
     "suggestionsPairLinkedMore_other": "",
     "suggestionsPairUsernameMore_one": "{{first}} i {{second}} comparteixen un nom d'usuari, i {{count}} més",
     "suggestionsPairUsernameMore_other": "{{first}} i {{second}} comparteixen un nom d'usuari, i {{count}} més",

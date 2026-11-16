@@ -287,7 +287,6 @@
     "suggestionsPairEmailMore_other": "{{first}} ja {{second}} jakavat saman sähköpostiosoitteen sekä {{count}} muuta",
     "suggestionsPairEmailUsernameMore_one": "{{first}} ja {{second}} käyttävät samaa osoitetta käyttäjänimenä tai tilin sähköpostiosoitteena sekä {{count}} muu",
     "suggestionsPairEmailUsernameMore_other": "{{first}} ja {{second}} käyttävät samaa osoitetta käyttäjänimenä tai tilin sähköpostiosoitteena sekä {{count}} muuta",
-    "suggestionsPairLinkedMore_one": "",
     "suggestionsPairLinkedMore_other": "",
     "suggestionsPairUsernameMore_one": "{{first}} ja {{second}} jakavat käyttäjänimen sekä {{count}} muu",
     "suggestionsPairUsernameMore_other": "{{first}} ja {{second}} jakavat käyttäjänimen sekä {{count}} muuta",

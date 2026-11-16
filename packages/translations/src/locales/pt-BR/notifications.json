@@ -169,6 +169,7 @@
       "serverAddFailed": "Falha ao adicionar servidor",
       "serverRemoveFailed": "Falha ao remover servidor",
       "serverSyncFailed": "Falha ao sincronizar servidor",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Falha ao atualizar definições",
       "copyManual": "",
