@@ -193,7 +193,6 @@
       "serverAddFailed": "فشل في إضافة الخادم",
       "serverRemoveFailed": "فشل في إزالة الخادم",
       "serverSyncFailed": "فشل في مزامنة الخادم",
-      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "فشل تحديث الإعدادات",
       "copyManual": "",

@@ -139,7 +139,6 @@
     "noTerminations": "Завершённых потоков нет",
     "lastSeen": "Последняя активность: {{relative}}",
     "terminatedBy": "Кем: @{{username}}",
-    "terminatedByName": "",
     "trustScoreConfirm": "Установить для @{{username}} балл доверия {{score}}?",
     "trustScoreRange": "Балл доверия @{{username}}, от 0 до 100.",
     "moreLocations_one": "+{{count}} местоположение",

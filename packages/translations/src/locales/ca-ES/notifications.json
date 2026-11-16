@@ -169,7 +169,6 @@
       "serverAddFailed": "No s'ha pogut afegir el servidor",
       "serverRemoveFailed": "No s'ha pogut suprimir el servidor",
       "serverSyncFailed": "No s'ha pogut sincronitzar el servidor",
-      "firstSyncFailed": "",
       "serverHistoricalFailed": "No s'ha pogut canviar l'estat del servidor",
       "settingsUpdateFailed": "No s'ha pogut actualitzar la configuració",
       "copyManual": "Premeu Ctrl+C o ⌘C per copiar",
