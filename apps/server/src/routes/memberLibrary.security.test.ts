@@ -341,6 +341,7 @@ describe('media detail for a member', () => {
         server_id: SERVER,
         username: null,
         identity_name: null,
+        person_name: 'someone',
         thumb: null,
       },
       plays: 1,

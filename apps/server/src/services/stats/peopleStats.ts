@@ -557,7 +557,7 @@ function peopleRowsCte(input: PeopleRowsInput): SQL {
     rows AS (
       SELECT
         u.id AS user_id,
-        u.name AS identity_name,
+        ${personNameSql()} AS identity_name,
         u.aggregate_trust_score AS trust_score,
         rep.id AS server_user_id,
         u.username,

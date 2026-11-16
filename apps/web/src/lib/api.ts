@@ -707,6 +707,7 @@ class ApiClient {
       this.request<{
         userId: string;
         username: string;
+        name?: string | null;
         email: string | null;
         thumbnail: string | null;
         thumbnailServerId?: string | null;

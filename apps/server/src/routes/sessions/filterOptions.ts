@@ -136,7 +136,7 @@ export async function queryFilterOptions(params: {
         u.username,
         su.thumb_url,
         su.server_id,
-        u.name as identity_name,
+        COALESCE(u.name, u.username) as identity_name,
         COALESCE(
           (SELECT ARRAY_AGG(su2.id ORDER BY su2.id)
            FROM server_users su2

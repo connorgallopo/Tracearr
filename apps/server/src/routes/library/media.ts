@@ -179,7 +179,7 @@ function toWatcherEntry(r: MediaWatcherRow): MediaWatcherEntry {
       userId: r.user.user_id,
       serverId: r.user.server_id,
       username: r.user.username,
-      identityName: r.user.identity_name,
+      identityName: r.user.person_name,
       thumb: r.user.thumb,
     },
     plays: r.plays,

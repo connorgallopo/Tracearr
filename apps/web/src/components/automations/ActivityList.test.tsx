@@ -140,7 +140,7 @@ describe('ActivityList', () => {
 
     const link = screen.getByRole('link', { name: /Rebecca Lin/ });
     expect(link).toHaveAttribute('href', '/users/su-1');
-    expect(screen.getByText('@rebecc101')).toBeInTheDocument();
+    expect(screen.queryByText(/rebecc101/)).not.toBeInTheDocument();
   });
 
   it('names the item rather than a person when the triggers watch media', () => {

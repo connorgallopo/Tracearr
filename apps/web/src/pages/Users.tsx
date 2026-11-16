@@ -285,7 +285,6 @@ export function Users() {
                   thumbUrl={user.thumbUrl}
                   serverId={user.serverId}
                   size="md"
-                  showUsername
                   details={[
                     ...(user.email ? [user.email] : []),
                     ...(multiServer ? [t('common:count.server', { count: serverCount })] : []),

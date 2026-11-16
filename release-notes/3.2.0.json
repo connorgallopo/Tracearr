@@ -88,6 +88,10 @@
       "text": "people lists keep each person's Tracearr name under a server filter, not a media server account's name"
     },
     {
+      "type": "note",
+      "text": "public API names a person with no display name by their Tracearr username, not a media server account's username"
+    },
+    {
       "type": "fix",
       "text": "a Jellyfin or Emby server re-added at its address syncs its libraries right away"
     },

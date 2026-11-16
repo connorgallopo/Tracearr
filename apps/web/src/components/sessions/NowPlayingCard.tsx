@@ -161,9 +161,9 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
             <div className="flex items-start justify-between gap-2">
               <div className="flex min-w-0 items-center gap-2">
                 <Avatar className="border-background h-7 w-7 shrink-0 border-2 shadow">
-                  <AvatarImage src={avatarUrl} alt={session.user.username} />
+                  <AvatarImage src={avatarUrl} alt={displayName} />
                   <AvatarFallback className="text-xs">
-                    {session.user.username.slice(0, 2).toUpperCase()}
+                    {displayName.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <span className="truncate text-sm font-medium" title={displayName}>
@@ -319,7 +319,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
         onOpenChange={setShowTerminateDialog}
         sessionId={session.id}
         mediaTitle={title}
-        username={session.user.username}
+        username={displayName}
       />
     </>
   );

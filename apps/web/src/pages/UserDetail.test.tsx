@@ -244,14 +244,14 @@ describe('UserDetail', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Alice' })).toBeInTheDocument();
     expect(screen.getByText('80')).toBeInTheDocument();
     const facts = screen.getByTestId('user-facts');
-    expect(facts).toHaveTextContent('@alice');
+    expect(facts.textContent).not.toMatch(/(^|\s)@/);
     expect(facts).toHaveTextContent('alice@example.com');
     expect(facts).toHaveTextContent('pages:userDetail.access.roleMember');
     expect(facts).toHaveTextContent('common:labels.joined');
     expect(screen.getByRole('link', { name: 'nav:users' })).toHaveAttribute('href', '/users');
   });
 
-  it('names a person without a display name by their Tracearr username, keeping the account handle', async () => {
+  it('names a person without a display name by their Tracearr username alone', async () => {
     mockUseUserFull.mockReturnValue({
       data: {
         ...fullData,
@@ -263,7 +263,7 @@ describe('UserDetail', () => {
     renderDetail();
 
     expect(screen.getByRole('heading', { level: 1, name: 'zoe' })).toBeInTheDocument();
-    expect(screen.getByTestId('user-facts')).toHaveTextContent('@aaron_tofa');
+    expect(screen.queryByText(/aaron_tofa/)).not.toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', { name: 'pages:userDetail.editIdentity' }));
     expect(await screen.findByPlaceholderText('zoe')).toBeInTheDocument();

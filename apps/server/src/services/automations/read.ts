@@ -50,7 +50,7 @@ const automationColumns = {
   accountName: serverUsers.username,
   accountServerId: accountServers.id,
   accountServerName: accountServers.name,
-  personName: users.name,
+  personName: sql<string | null>`coalesce(${users.name}, ${users.username})`,
   templateSlug: automationTemplates.slug,
   templateName: automationTemplates.name,
   templateCurrentVersion: automationTemplates.currentVersion,

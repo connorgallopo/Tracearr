@@ -9,6 +9,7 @@ import { dropUserData } from '@/lib/queryCache';
 import { stopViewingAs } from '@/hooks/queries/useImpersonation';
 
 interface UserProfile extends AuthUser {
+  name: string | null;
   email: string | null;
   thumbUrl: string | null;
   hasPassword?: boolean;
@@ -50,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return {
           userId: user.userId ?? user.id ?? '',
           username: user.username,
+          name: user.name ?? null,
           role: user.role,
           serverIds: user.serverIds ?? (user.serverId ? [user.serverId] : []),
           email: user.email ?? null,

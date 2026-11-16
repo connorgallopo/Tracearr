@@ -128,9 +128,8 @@ export function UserDetailHeader({
             data-testid="user-facts"
             className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
           >
-            <span>@{user.username}</span>
-            {user.email && <span>· {user.email}</span>}
-            <span>· {t(ROLE_LABEL_KEYS[user.role])}</span>
+            {user.email && <span>{user.email} ·</span>}
+            <span>{t(ROLE_LABEL_KEYS[user.role])}</span>
             <span>
               · {t('common:labels.joined')}{' '}
               {formatDate(new Date(user.joinedAt ?? user.createdAt), { dateStyle: 'medium' })}

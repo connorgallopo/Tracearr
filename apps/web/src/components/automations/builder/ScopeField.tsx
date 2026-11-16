@@ -12,6 +12,7 @@ import { Switch } from '@/components/ui/switch';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Combobox } from '@/components/ui/combobox';
 import { ServerSelect } from '@/components/server';
+import { rosterPersonName } from '@/components/users/utils';
 import { useServer } from '@/hooks/useServer';
 import { useUsers } from '@/hooks/queries/useUsers';
 import {
@@ -165,7 +166,7 @@ export function ScopeField({
                     value={scope.userId || null}
                     options={identities.map((identity) => ({
                       value: identity.userId,
-                      label: identity.identityName ?? identity.username,
+                      label: rosterPersonName(identity),
                     }))}
                     onChange={(userId) => onChange({ mode: 'person', userId })}
                     placeholder={t('automations.builder.scope.personPlaceholder')}

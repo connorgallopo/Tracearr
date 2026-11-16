@@ -18,6 +18,7 @@ import { db } from '../db/client.js';
 import { users, serverUsers, serverUserExternalAliases, automationRuns } from '../db/schema.js';
 import { clearScope } from '../lib/scope.js';
 import { NotFoundError } from '../utils/errors.js';
+import { personNameColumn } from '../utils/representativeAccount.js';
 import { violationAliasConditions } from './automations/aliasFilter.js';
 
 // Type for user identity table row
@@ -181,9 +182,8 @@ export async function getServerUserByUsername(
 }
 
 /**
- * Batch-resolve display names for server-user IDs.
- * Single query: serverUsers LEFT JOIN users WHERE id IN (...).
- * Returns id → (identityName ?? username). Safe to call with empty array.
+ * Batch-resolve the person's name behind each server-user ID, never the account's.
+ * Single query: serverUsers LEFT JOIN users WHERE id IN (...). Safe to call with empty array.
  */
 export async function getServerUserDisplayNames(ids: string[]): Promise<Record<string, string>> {
   if (ids.length === 0) return {};
@@ -192,8 +192,7 @@ export async function getServerUserDisplayNames(ids: string[]): Promise<Record<s
   const rows = await db
     .select({
       id: serverUsers.id,
-      username: serverUsers.username,
-      identityName: users.name,
+      name: personNameColumn(),
     })
     .from(serverUsers)
     .leftJoin(users, eq(serverUsers.userId, users.id))
@@ -201,7 +200,7 @@ export async function getServerUserDisplayNames(ids: string[]): Promise<Record<s
 
   const result: Record<string, string> = {};
   for (const row of rows) {
-    result[row.id] = row.identityName ?? row.username;
+    result[row.id] = row.name;
   }
   return result;
 }

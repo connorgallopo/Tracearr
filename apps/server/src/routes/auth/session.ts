@@ -56,6 +56,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     return {
       userId: user.id,
       username: user.username,
+      name: user.name,
       email: user.email,
       thumbnail: user.thumbnail,
       thumbnailServerId: pictureAccount?.serverId ?? null,

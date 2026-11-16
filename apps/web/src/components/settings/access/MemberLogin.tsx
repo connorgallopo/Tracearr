@@ -27,6 +27,7 @@ import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
 import { ServerBadge } from '@/components/server/ServerBadge';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { UserCell } from '@/components/users/UserCell';
+import { rosterPersonName } from '@/components/users/utils';
 import {
   useServers,
   useSettings,
@@ -194,13 +195,11 @@ function ServerRows() {
   );
 }
 
-const personName = (row: ServerUserWithIdentity) => row.identityName ?? row.username;
-
 function OverrideRow({ row }: { row: ServerUserWithIdentity }) {
   const { t } = useTranslation('settings');
   const update = useUpdateUserAccess();
   const status = useMutationSaveStatus(update);
-  const name = personName(row);
+  const name = rosterPersonName(row);
   const pending = update.isPending ? update.variables?.data : undefined;
   const loginAccess = pending?.loginAccess ?? row.loginAccess;
   const role = pending?.role ?? row.role;
@@ -212,6 +211,7 @@ function OverrideRow({ row }: { row: ServerUserWithIdentity }) {
           serverUserId={row.id}
           username={row.username}
           identityName={row.identityName}
+          personName={row.personName}
           thumbUrl={row.thumbUrl}
           serverId={row.serverId}
         />
@@ -271,7 +271,7 @@ function AddOverride({ taken }: { taken: Set<string> }) {
   const { data } = useUsers({ pageSize: 100 });
   const options = (data?.data ?? [])
     .filter((row) => (row.role === 'admin' || row.role === 'member') && !taken.has(row.userId))
-    .map((row) => ({ value: row.id, label: personName(row) }));
+    .map((row) => ({ value: row.id, label: rosterPersonName(row) }));
 
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">

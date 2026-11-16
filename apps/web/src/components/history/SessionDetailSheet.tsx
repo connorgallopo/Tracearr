@@ -347,13 +347,7 @@ function SessionContent({
                 <p className="truncate font-medium">
                   {session.user.identityName ?? session.user.username}
                 </p>
-                {session.user.identityName &&
-                  session.user.identityName !== session.user.username && (
-                    <p className="text-muted-foreground truncate text-xs">
-                      @{session.user.username}
-                    </p>
-                  )}
-                {canOpenUser && !session.user.identityName && (
+                {canOpenUser && (
                   <p className="text-muted-foreground text-xs">{t('actions.viewProfile')}</p>
                 )}
               </div>

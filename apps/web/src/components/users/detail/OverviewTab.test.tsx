@@ -43,6 +43,8 @@ describe('OverviewTab', () => {
         period="week"
         detail={
           {
+            user: { identityName: null },
+            identity: { username: 'alice' },
             sessions: { data: [], total: 0 },
             devices: [],
             locations: [],
@@ -88,6 +90,8 @@ describe('OverviewTab', () => {
         period="custom"
         detail={
           {
+            user: { identityName: null },
+            identity: { username: 'alice' },
             sessions: { data: [], total: 0 },
             devices: [],
             locations: [],

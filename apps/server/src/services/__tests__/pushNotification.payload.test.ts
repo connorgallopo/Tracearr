@@ -185,6 +185,19 @@ describe('push category and thread', () => {
   });
 });
 
+describe('push text', () => {
+  it('names the person, not the account, on a stream start', async () => {
+    await pushNotificationService.notifySessionStarted(
+      createMockActiveSession({
+        server: { id: SERVER_ID, name: 'Living Room', type: 'plex' },
+        user: { id: 'su-1', username: 'aaron_tofa', thumbUrl: null, identityName: 'zoe' },
+      })
+    );
+
+    expect(sent[0]?.body).toMatch(/^zoe: /);
+  });
+});
+
 describe('violation sessionId', () => {
   it('carries the session while it is still active', async () => {
     activeSessionIds.push('session-1');

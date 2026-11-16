@@ -511,10 +511,10 @@ describe('getServerUserDisplayNames', () => {
     expect(db.select).not.toHaveBeenCalled();
   });
 
-  it('returns id→name map using identityName when present', async () => {
+  it('returns an id→name map of the names the query resolves', async () => {
     const rows = [
-      { id: 'id-1', username: 'alice', identityName: 'Alice Smith' },
-      { id: 'id-2', username: 'bob', identityName: null },
+      { id: 'id-1', name: 'Alice Smith' },
+      { id: 'id-2', name: 'bob' },
     ];
     mockSelectWithLeftJoin(rows);
 
@@ -524,7 +524,7 @@ describe('getServerUserDisplayNames', () => {
   });
 
   it('issues a single query for multiple ids', async () => {
-    mockSelectWithLeftJoin([{ id: 'id-1', username: 'u', identityName: null }]);
+    mockSelectWithLeftJoin([{ id: 'id-1', name: 'u' }]);
 
     await getServerUserDisplayNames(['id-1', 'id-2', 'id-3']);
 
@@ -532,7 +532,7 @@ describe('getServerUserDisplayNames', () => {
   });
 
   it('deduplicates ids before querying', async () => {
-    const chain = mockSelectWithLeftJoin([{ id: 'id-1', username: 'u', identityName: null }]);
+    const chain = mockSelectWithLeftJoin([{ id: 'id-1', name: 'u' }]);
 
     await getServerUserDisplayNames(['id-1', 'id-1', 'id-1']);
 

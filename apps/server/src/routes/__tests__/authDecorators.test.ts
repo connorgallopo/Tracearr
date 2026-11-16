@@ -124,6 +124,7 @@ async function signUpOwner(
         {
           id: userId,
           username: 'owner',
+          name: 'Owner',
           email: 'owner@example.com',
           thumbnail: picture?.thumbnail ?? null,
           role: 'owner',
@@ -278,6 +279,7 @@ describe('auth decorators with better auth sessions', () => {
     expect(res.statusCode).toBe(200);
     expect(res.json()).toMatchObject({
       username: expect.any(String),
+      name: 'Owner',
       role: 'owner',
       hasPassword: true,
       hasPlexLinked: false,

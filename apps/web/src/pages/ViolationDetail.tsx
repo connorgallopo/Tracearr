@@ -533,7 +533,6 @@ export function ViolationDetail() {
                 <p className="truncate font-semibold group-hover:underline">
                   {violation.user.identityName ?? violation.user.username}
                 </p>
-                <p className="text-muted-foreground truncate text-sm">@{violation.user.username}</p>
                 {violation.server && (
                   <ServerBadge
                     server={{

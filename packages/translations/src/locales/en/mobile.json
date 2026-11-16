@@ -137,6 +137,7 @@
     "noTerminations": "No stream terminations",
     "lastSeen": "Last seen {{relative}}",
     "terminatedBy": "By @{{username}}",
+    "terminatedByName": "By {{name}}",
     "trustScoreConfirm": "Set the trust score for @{{username}} to {{score}}?",
     "trustScoreRange": "Trust score for @{{username}}, from 0 to 100."
   },

@@ -57,7 +57,6 @@ const row = {
   serverType: 'plex',
   userId: identityId,
   serverUserId: accountId,
-  serverUsername: 'alice',
   thumbUrl: null,
   identityName: 'Alice',
 };

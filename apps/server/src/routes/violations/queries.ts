@@ -15,6 +15,7 @@ import {
   users,
   ruleActionResults,
 } from '../../db/schema.js';
+import { personNameColumn } from '../../utils/representativeAccount.js';
 import { isLocalSession } from '../../db/sessions/rules.js';
 import { MAX_AUTOMATION_WINDOW_HOURS } from '../../jobs/poller/database.js';
 import { scopeSessions, type Scope } from '../../lib/scope.js';
@@ -35,7 +36,7 @@ const VIOLATION_SORT_KEYS: Record<ViolationSortField, SortKey> = {
     key: sql`CASE ${automationRuns.severity} WHEN 'high' THEN 3 WHEN 'warning' THEN 2 WHEN 'low' THEN 1 END`,
     defaultDir: 'desc',
   },
-  user: { key: sql`lower(coalesce(${users.name}, ${serverUsers.username}))`, defaultDir: 'desc' },
+  user: { key: sql`lower(${personNameColumn()})`, defaultDir: 'desc' },
   rule: { key: sql`lower(${automations.name})`, defaultDir: 'desc' },
 };
 
@@ -288,7 +289,7 @@ export function violationSelect(runSessionRow: ReturnType<typeof runSession>) {
     serverUserId: serverUsers.id,
     username: serverUsers.username,
     userThumb: serverUsers.thumbUrl,
-    identityName: users.name,
+    identityName: personNameColumn(),
     identityUserId: serverUsers.userId,
     serverId: serverUsers.serverId,
     serverName: servers.name,

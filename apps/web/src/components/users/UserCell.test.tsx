@@ -13,18 +13,12 @@ function renderCell(props: Partial<React.ComponentProps<typeof UserCell>> = {}) 
 }
 
 describe('UserCell', () => {
-  it('leads with the display name and puts the account under it', () => {
-    renderCell({ showUsername: true });
+  it('shows the name alone, never the account under it', () => {
+    renderCell({ details: ['rebecca@example.com'] });
 
     expect(screen.getByText('Rebecca Lin')).toBeInTheDocument();
-    expect(screen.getByText('@rebecc101')).toBeInTheDocument();
-  });
-
-  it('falls back to the account name, and does not repeat it underneath', () => {
-    renderCell({ identityName: null, showUsername: true });
-
-    expect(screen.getByText('rebecc101')).toBeInTheDocument();
-    expect(screen.queryByText('@rebecc101')).not.toBeInTheDocument();
+    expect(screen.getByText('rebecca@example.com')).toBeInTheDocument();
+    expect(screen.queryByText(/rebecc101/)).not.toBeInTheDocument();
   });
 
   it('links to the account without opening whatever the row opens', async () => {

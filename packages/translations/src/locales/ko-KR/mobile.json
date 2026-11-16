@@ -130,6 +130,7 @@
     "noTerminations": "스트림 종료 기록이 없습니다",
     "lastSeen": "마지막으로 확인된 {{relative}}",
     "terminatedBy": "작성자: @{{username}}",
+    "terminatedByName": "",
     "trustScoreConfirm": "@{{username}}의 신뢰 점수를 {{score}}(으)로 설정하시겠습니까?",
     "trustScoreRange": "@{{username}}의 신뢰 점수(0~100)",
     "moreLocations_other": "위치 {{count}}곳 더 보기",

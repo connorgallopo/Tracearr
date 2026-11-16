@@ -2134,7 +2134,7 @@ export interface TerminationLogWithDetails {
   serverUserId: string;
   trigger: TerminationTrigger;
   triggeredByUserId: string | null;
-  triggeredByUsername: string | null; // Joined from users table
+  triggeredByUsername: string | null; // The person who terminated: users.name, else users.username
   ruleId: string | null;
   ruleName: string | null; // Joined from rules table
   violationId: string | null;
@@ -2584,7 +2584,7 @@ export interface DailyBandwidthResponse {
 // Top bandwidth user
 export interface BandwidthTopUser {
   username: string;
-  /** Display name from linked identity (null if no linked user) */
+  /** The person's name: the Tracearr display name, else the Tracearr username */
   identityName: string | null;
   /** Avatar URL from server user */
   thumbUrl: string | null;

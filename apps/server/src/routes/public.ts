@@ -471,7 +471,6 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         // Server-specific data
         serverId: serverUsers.serverId,
         serverUserId: serverUsers.id,
-        serverUsername: serverUsers.username,
         thumbUrl: serverUsers.thumbUrl,
         lastActivityAt: serverUsers.lastActivityAt,
         // Server name joined directly
@@ -502,7 +501,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
     const userData = userRows.map((row) => ({
       id: row.id,
       username: row.username,
-      displayName: row.name ?? row.serverUsername ?? row.username,
+      displayName: row.name ?? row.username,
       thumbUrl: row.thumbUrl,
       avatarUrl: buildAvatarUrl(row.serverId, row.thumbUrl),
       role: row.role,
@@ -576,7 +575,6 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         ruleName: automations.name,
         // User info
         userId: serverUsers.userId,
-        serverUsername: serverUsers.username,
         thumbUrl: serverUsers.thumbUrl,
         userName: users.name,
         userUsername: users.username,
@@ -606,7 +604,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       },
       user: {
         id: row.userId,
-        username: row.userName ?? row.serverUsername ?? row.userUsername,
+        username: row.userName ?? row.userUsername,
         thumbUrl: row.thumbUrl,
         avatarUrl: buildAvatarUrl(row.serverId, row.thumbUrl),
       },
@@ -718,7 +716,6 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         s.transcode_info,
         s.subtitle_info,
         su.user_id,
-        su.username as server_username,
         su.thumb_url as user_thumb_url,
         u.name as user_name,
         u.username as user_username
@@ -777,10 +774,9 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         transcode_info: TranscodeInfo | null;
         subtitle_info: SubtitleInfo | null;
         user_id: string;
-        server_username: string;
         user_thumb_url: string | null;
         user_name: string | null;
-        user_username: string | null;
+        user_username: string;
       }[]
     ).map((row) => ({
       id: row.id,
@@ -838,7 +834,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       }),
       user: {
         id: row.user_id,
-        username: row.user_name ?? row.server_username ?? row.user_username,
+        username: row.user_name ?? row.user_username,
         thumbUrl: row.user_thumb_url,
         avatarUrl: buildAvatarUrl(row.server_id, row.user_thumb_url),
       },

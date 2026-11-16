@@ -153,7 +153,6 @@ function RunSubjectBlock({ run }: { run: AutomationRun }) {
           identityName={run.subject.personName}
           thumbUrl={run.subject.thumbUrl}
           serverId={run.serverId}
-          showUsername
         />
       ) : (
         who

@@ -250,18 +250,17 @@ function SessionPopupContent({ session }: { session: ActiveSession }) {
       </div>
 
       {(() => {
+        const name = session.user.identityName ?? session.user.username;
         const body = (
           <>
             <div className="bg-muted flex h-5 w-5 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
               {avatarUrl ? (
-                <img src={avatarUrl} alt={session.user.username} className="h-5 w-5 object-cover" />
+                <img src={avatarUrl} alt={name} className="h-5 w-5 object-cover" />
               ) : (
                 <User className="text-muted-foreground h-3 w-3" />
               )}
             </div>
-            <span className="text-xs font-medium">
-              {session.user.identityName ?? session.user.username}
-            </span>
+            <span className="text-xs font-medium">{name}</span>
           </>
         );
         return canOpenUser ? (

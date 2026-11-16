@@ -269,12 +269,6 @@ export const HistoryTableRow = memo(
                   <span className="block truncate text-sm">
                     {session.user.identityName ?? session.user.username}
                   </span>
-                  {session.user.identityName &&
-                    session.user.identityName !== session.user.username && (
-                      <span className="text-muted-foreground block truncate text-xs">
-                        @{session.user.username}
-                      </span>
-                    )}
                 </div>
               </Link>
             </TableCell>

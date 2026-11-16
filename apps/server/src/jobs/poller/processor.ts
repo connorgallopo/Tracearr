@@ -32,6 +32,7 @@ import {
   sessions,
   users,
 } from '../../db/schema.js';
+import { personNameColumn } from '../../utils/representativeAccount.js';
 import { ACTIVE_SESSION_CHUNK_BOUND_MS, sessionRowById } from '../../db/sessions/row.js';
 import { getGeoIPSettings } from '../../routes/settings.js';
 import { isMaintenance } from '../../serverState.js';
@@ -41,10 +42,7 @@ import { isLiveRow } from '../../services/liveServers.js';
 import type { CacheService, PubSubService, TerminationCooldown } from '../../services/cache.js';
 import { geoipService } from '../../services/geoip.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
-import {
-  emailForSessionUser,
-  serverWatchedThreshold,
-} from '../../services/mediaServer/byServerType.js';
+import { serverWatchedThreshold } from '../../services/mediaServer/byServerType.js';
 import {
   RELAYED_SESSION_GEO,
   resolveSessionGeo,
@@ -76,6 +74,7 @@ import {
   batchGetIdentityServerUserIds,
   batchGetLibraryItemIdentity,
   batchGetRecentUserSessions,
+  createSessionServerUsers,
   getActiveAutomations,
   getCachedServers,
   widenRecentSessionsForMergedIdentities,
@@ -972,7 +971,7 @@ async function processServerSessions(
         lastActivityAt: serverUsers.lastActivityAt,
         createdAt: serverUsers.createdAt,
         updatedAt: serverUsers.updatedAt,
-        identityName: users.name,
+        identityName: personNameColumn(),
       })
       .from(serverUsers)
       .innerJoin(users, eq(serverUsers.userId, users.id))
@@ -1015,7 +1014,7 @@ async function processServerSessions(
           lastActivityAt: serverUsers.lastActivityAt,
           createdAt: serverUsers.createdAt,
           updatedAt: serverUsers.updatedAt,
-          identityName: users.name,
+          identityName: personNameColumn(),
         })
         .from(serverUserExternalAliases)
         .innerJoin(serverUsers, eq(serverUserExternalAliases.serverUserId, serverUsers.id))
@@ -1089,54 +1088,15 @@ async function processServerSessions(
       }
     }
 
-    // Batch create new server users (and their identity users)
-    // Wrapped in transaction to prevent orphan identity users if server user insert fails
     if (serverUsersToCreate.length > 0) {
-      const { newIdentityUsers, newServerUsers } = await db.transaction(async (tx) => {
-        // First, create identity users for each new server user
-        const identityUsers = await tx
-          .insert(users)
-          .values(
-            serverUsersToCreate.map((u) => ({
-              username: u.username, // Login identifier
-              name: u.username, // Use username as initial display name
-              thumbnail: u.thumbUrl,
-            }))
-          )
-          .returning();
-
-        // Then create server users linked to the identity users
-        const serverUserRows = await tx
-          .insert(serverUsers)
-          .values(
-            serverUsersToCreate.map((u, idx) => ({
-              userId: identityUsers[idx]!.id,
-              serverId: server.id,
-              externalId: u.externalId,
-              username: u.username,
-              email: emailForSessionUser(server.type, u.username),
-              thumbUrl: u.thumbUrl,
-            }))
-          )
-          .returning();
-
-        return { newIdentityUsers: identityUsers, newServerUsers: serverUserRows };
-      });
-
-      // Update sessionServerUserIds with newly created server user IDs
+      const created = await createSessionServerUsers(server, serverUsersToCreate);
       for (let i = 0; i < serverUsersToCreate.length; i++) {
         const serverUserToCreate = serverUsersToCreate[i]!;
-        const newServerUser = newServerUsers[i];
-        const newIdentityUser = newIdentityUsers[i];
-        if (newServerUser && newIdentityUser) {
+        const newServerUser = created[i];
+        if (newServerUser) {
           sessionServerUserIds[serverUserToCreate.sessionIndex] = newServerUser.id;
-          // Add to cache with identityName from the identity user
-          const serverUserWithIdentity = {
-            ...newServerUser,
-            identityName: newIdentityUser.name,
-          };
-          serverUserById.set(newServerUser.id, serverUserWithIdentity);
-          serverUserByExternalId.set(serverUserToCreate.externalId, serverUserWithIdentity);
+          serverUserById.set(newServerUser.id, newServerUser);
+          serverUserByExternalId.set(serverUserToCreate.externalId, newServerUser);
         }
       }
     }

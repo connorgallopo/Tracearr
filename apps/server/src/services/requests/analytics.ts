@@ -284,7 +284,7 @@ export async function getRequestsAnalytics(
       su.user_id AS lens_user_id,
       su.server_id AS user_server_id,
       su.username,
-      u.name AS identity_name,
+      COALESCE(u.name, u.username) AS identity_name,
       COALESCE(u.thumbnail, su.thumb_url) AS thumb
     FROM media_requests mr
     JOIN request_services rs ON rs.id = mr.service_id

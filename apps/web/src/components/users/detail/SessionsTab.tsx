@@ -11,7 +11,9 @@ const PAGE_SIZE = 10;
 
 interface UserSessionsTableProps {
   sessions: Session[];
-  user: Pick<ServerUserDetail, 'id' | 'username' | 'thumbUrl' | 'identityName'>;
+  user: Pick<ServerUserDetail, 'id' | 'username' | 'thumbUrl'>;
+  /** The Tracearr user's name, which the account's own username may not be. */
+  personName: string;
   isLoading?: boolean;
   showServer: boolean;
   onSessionClick: (session: SessionWithDetails) => void;
@@ -21,6 +23,7 @@ interface UserSessionsTableProps {
 export function UserSessionsTable({
   sessions,
   user,
+  personName,
   isLoading,
   showServer,
   onSessionClick,
@@ -37,7 +40,7 @@ export function UserSessionsTable({
             id: user.id,
             username: user.username,
             thumbUrl: user.thumbUrl,
-            identityName: user.identityName ?? null,
+            identityName: personName,
           },
           server: {
             id: session.serverId,
@@ -46,7 +49,7 @@ export function UserSessionsTable({
           },
         };
       }),
-    [sessions, user, servers]
+    [sessions, user, personName, servers]
   );
 
   const columnVisibility = useMemo<ColumnVisibility>(
@@ -79,11 +82,19 @@ interface SessionsTabProps {
   userId: string;
   scope: 'identity' | undefined;
   user: UserSessionsTableProps['user'];
+  personName: string;
   showServer: boolean;
   onSessionClick: (session: SessionWithDetails) => void;
 }
 
-export function SessionsTab({ userId, scope, user, showServer, onSessionClick }: SessionsTabProps) {
+export function SessionsTab({
+  userId,
+  scope,
+  user,
+  personName,
+  showServer,
+  onSessionClick,
+}: SessionsTabProps) {
   const [page, setPage] = useState(1);
   const { data, isLoading } = useUserSessions(userId, { page, pageSize: PAGE_SIZE, scope });
   const pageCount = Math.ceil((data?.total ?? 0) / PAGE_SIZE);
@@ -94,6 +105,7 @@ export function SessionsTab({ userId, scope, user, showServer, onSessionClick }:
       <UserSessionsTable
         sessions={data?.data ?? []}
         user={user}
+        personName={personName}
         isLoading={isLoading}
         showServer={showServer}
         onSessionClick={onSessionClick}

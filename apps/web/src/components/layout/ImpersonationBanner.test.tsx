@@ -10,7 +10,7 @@ vi.mock('react-i18next', () => ({
 }));
 
 const auth = vi.hoisted(() => ({
-  user: null as { username: string; impersonatedBy?: string } | null,
+  user: null as { username: string; name?: string | null; impersonatedBy?: string } | null,
 }));
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: auth.user }) }));
 
@@ -49,6 +49,13 @@ describe('ImpersonationBanner', () => {
 
     expect(screen.getByText('impersonation.banner:bob')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'impersonation.stopLabel:bob' })).toBeEnabled();
+  });
+
+  it('names the member by their display name when they have one', () => {
+    auth.user = { username: 'bob', name: 'Bob Ray', impersonatedBy: 'owner-1' };
+    renderBanner();
+
+    expect(screen.getByText('impersonation.banner:Bob Ray')).toBeInTheDocument();
   });
 
   it('shows the failure in place of the message and keeps the button for a retry', async () => {

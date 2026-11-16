@@ -133,6 +133,7 @@
     "noTerminations": "Ei lopetettuja striimejä",
     "lastSeen": "Viimeksi nähty {{relative}}",
     "terminatedBy": "Tekijä: @{{username}}",
+    "terminatedByName": "",
     "trustScoreConfirm": "Asetetaanko käyttäjän @{{username}} luottamuspisteiksi {{score}}?",
     "trustScoreRange": "Käyttäjän @{{username}} luottamuspisteet, 0 - 100.",
     "moreLocations_one": "+{{count}} sijainti lisää",

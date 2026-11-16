@@ -16,6 +16,7 @@ import { and, eq, isNull, type SQL } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { db } from '../db/client.js';
 import { servers, serverUserExternalAliases, serverUsers, sessions, users } from '../db/schema.js';
+import { personNameColumn } from '../utils/representativeAccount.js';
 import {
   ACTIVE_SESSION_CHUNK_BOUND_MS,
   readSessionRow,
@@ -1107,7 +1108,7 @@ async function resolveAliasedServerUser(serverId: string, externalId: string) {
       userId: serverUsers.userId,
       username: serverUsers.username,
       thumbUrl: serverUsers.thumbUrl,
-      identityName: users.name,
+      identityName: personNameColumn(),
       trustScore: serverUsers.trustScore,
       lastActivityAt: serverUsers.lastActivityAt,
       createdAt: serverUsers.createdAt,
@@ -1163,7 +1164,7 @@ async function createNewSession(
       userId: serverUsers.userId,
       username: serverUsers.username,
       thumbUrl: serverUsers.thumbUrl,
-      identityName: users.name,
+      identityName: personNameColumn(),
       trustScore: serverUsers.trustScore,
       lastActivityAt: serverUsers.lastActivityAt,
       createdAt: serverUsers.createdAt,

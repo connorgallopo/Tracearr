@@ -238,6 +238,7 @@ export function UserDetail() {
             userId={effectiveId}
             scope={identityScope}
             user={user}
+            personName={user.identityName ?? identity.username}
             showServer={showServer}
             onSessionClick={handleSessionClick}
           />

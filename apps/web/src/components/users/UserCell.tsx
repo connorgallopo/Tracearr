@@ -17,8 +17,6 @@ interface UserCellProps {
   serverId?: string | null;
   /** `sm` for table rows, `md` for the pages that lead with a person. */
   size?: 'sm' | 'md';
-  /** The @username under the name, rendered only where it differs from it. */
-  showUsername?: boolean;
   /** Muted facts on the handle's line, such as the email. */
   details?: string[];
   link?: boolean;
@@ -36,7 +34,6 @@ export function UserCell({
   thumbUrl,
   serverId,
   size = 'sm',
-  showUsername = false,
   details = [],
   link = true,
   trailing,
@@ -47,8 +44,7 @@ export function UserCell({
 
   const small = size === 'sm';
   const avatarUrl = getAvatarUrl(serverId, thumbUrl, small ? 24 : 40);
-  const handle = showUsername && username !== null && username !== name ? `@${username}` : null;
-  const subline = [...(handle === null ? [] : [handle]), ...details].join(' · ');
+  const subline = details.join(' · ');
 
   const body = (
     <>

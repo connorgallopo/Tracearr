@@ -196,7 +196,7 @@ export function ViolationsTab({
             if (log.trigger === 'manual') {
               return (
                 <span className="text-sm">
-                  @{log.triggeredByUsername ?? t('common:labels.unknown')}
+                  {log.triggeredByUsername ?? t('common:labels.unknown')}
                 </span>
               );
             }

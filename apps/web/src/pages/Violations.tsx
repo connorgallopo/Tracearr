@@ -543,14 +543,11 @@ export function Violations() {
                   }
                 />
                 <AvatarFallback>
-                  {(selectedPeople[0].identityName ??
-                    selectedPeople[0].username)[0]?.toUpperCase() ?? '?'}
+                  {rosterPersonName(selectedPeople[0])[0]?.toUpperCase() ?? '?'}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">
-                  {selectedPeople[0].identityName ?? selectedPeople[0].username}
-                </p>
+                <p className="font-medium">{rosterPersonName(selectedPeople[0])}</p>
                 <p className="text-muted-foreground text-sm">
                   {t('common:count.violation', { count: total })}
                 </p>
@@ -580,12 +577,10 @@ export function Violations() {
                       src={getAvatarUrl(person.serverId, person.thumbUrl, 24) ?? undefined}
                     />
                     <AvatarFallback className="text-xs">
-                      {(person.identityName ?? person.username)[0]?.toUpperCase() ?? '?'}
+                      {rosterPersonName(person)[0]?.toUpperCase() ?? '?'}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium">
-                    {person.identityName ?? person.username}
-                  </span>
+                  <span className="text-sm font-medium">{rosterPersonName(person)}</span>
                   {person.identityServers && person.identityServers.length > 0 && (
                     <div className="flex gap-1">
                       {person.identityServers.map((server) => (

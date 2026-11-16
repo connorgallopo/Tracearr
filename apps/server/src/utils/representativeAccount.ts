@@ -12,6 +12,7 @@
  */
 
 import { sql, type SQL } from 'drizzle-orm';
+import { users } from '../db/schema.js';
 
 export function representativeAccountOrderSql(alias: string): SQL {
   return sql.raw(
@@ -29,4 +30,9 @@ export function representativeAccountOrderSql(alias: string): SQL {
  */
 export function personNameSql(): SQL {
   return sql`coalesce(u.name, u.username)`;
+}
+
+/** personNameSql for Drizzle selects that join the users table itself rather than as `u`. */
+export function personNameColumn(): SQL<string> {
+  return sql<string>`coalesce(${users.name}, ${users.username})`;
 }

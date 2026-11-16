@@ -186,7 +186,7 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
       result = await db.execute(sql`
         SELECT
           u.username AS username,
-          u.name AS identity_name,
+          COALESCE(u.name, u.username) AS identity_name,
           rep.thumb_url AS thumb_url,
           rep.id AS server_user_id,
           rep.server_id AS server_id,
@@ -227,7 +227,7 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
       result = await db.execute(sql`
         SELECT
           u.username AS username,
-          u.name AS identity_name,
+          COALESCE(u.name, u.username) AS identity_name,
           rep.thumb_url AS thumb_url,
           rep.id AS server_user_id,
           rep.server_id AS server_id,

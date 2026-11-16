@@ -22,6 +22,7 @@ import {
   serverUsers,
   users,
 } from '../../db/schema.js';
+import { personNameColumn } from '../../utils/representativeAccount.js';
 import { violationAliasConditions } from '../../services/automations/aliasFilter.js';
 import { buildAvatarUrl } from '../../services/imageProxy.js';
 import { cursorPage, cursorPaginationSchema, type RouteConfig } from './shared.js';
@@ -62,9 +63,8 @@ const violationColumns = {
   serverType: servers.type,
   userId: serverUsers.userId,
   serverUserId: serverUsers.id,
-  serverUsername: serverUsers.username,
   thumbUrl: serverUsers.thumbUrl,
-  identityName: users.name,
+  identityName: personNameColumn(),
 };
 
 function selectViolations() {
@@ -91,7 +91,7 @@ export function formatViolation(row: ViolationRow) {
     user: {
       id: row.userId,
       server_user_id: row.serverUserId,
-      username: row.identityName ?? row.serverUsername,
+      username: row.identityName,
       thumb_url: row.thumbUrl,
       avatar_url: buildAvatarUrl(row.serverId, row.thumbUrl),
     },
