@@ -40,7 +40,7 @@
       "memberLogin": "",
       "mobile": "Laitteet, jotka on liitetty Tracearr-mobiilisovellukseen.",
       "remote": "Kuinka verkkosi ulkopuolella olevat ihmiset saavuttavat tämän instanssin.",
-      "import": "Tuo katseluhistoria: Tautulli, Jellystat tai Playback Reporting.",
+      "import": "",
       "backup": "Tietokannan ja kokoonpanon tilannekuvat.",
       "jobs": "Huoltotehtäviä, joita voit suorittaa pyydettäessä.",
       "api": "Julkinen API-avain, sen pyyntörajoitus ja mikä lasketaan katselluksi.",
@@ -121,7 +121,7 @@
       "plugin": "Reaaliaikainen liitännäinen",
       "pluginDesc": "Tarkista, onko Tracearr-liitännäisestä, jonka kautta Jellyfin- ja Emby-palvelimesi välittävät tapahtumia, saatavilla uusia julkaisuja.",
       "server": "Mediapalvelimet",
-      "serverDesc": "Vertaa kunkin Plex-, Jellyfin- ja Emby-palvelimen versiota sen valmistajan uusimpaan julkaisuun."
+      "serverDesc": ""
     },
     "imageCache": {
       "title": "Julisteiden välimuisti",
@@ -150,7 +150,7 @@
     "serverUrl": "Palvelimen URL",
     "testConnection": "Testaa Yhteys",
     "noServersConnected": "Palvelimia ei yhdistetty",
-    "noServersConnectedHint": "Klikkaa \"Add Server\" yhdistääksesi Jellyfin- tai Emby- palvelimen",
+    "noServersConnectedHint": "",
     "serverType": "Palvelimen Tyyppi",
     "loadingAccounts": "Ladataan linkitettyjä Plex tilejä...",
     "selectPlexAccount": "Valitse Plex Tili",
@@ -172,7 +172,7 @@
     "updating": "Päivitetään...",
     "allFieldsRequired": "Kaikki kentät ovat pakollisia",
     "addServerDialogDescPlex": "Valitse Plex palvelin linkitetystä tililtäsi.",
-    "addServerDialogDescOther": "Yhdistä Jellyfin tai Emby palvelin.",
+    "addServerDialogDescOther": "",
     "discoveringServers": "Löydät saatavilla olevat Plex palvelimet...",
     "discoveringConnections": "Löytää yhteyksiä...",
     "plexAccount": "Plex Tili",
