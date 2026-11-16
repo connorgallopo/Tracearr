@@ -2183,6 +2183,7 @@
   "terminateStream": {
     "title": "終止串流",
     "stopMedia": "對 @{{username}} 停止 \"{{mediaTitle}}\" 嗎？",
+    "stopMediaFor": "",
     "messageLabel": "給使用者發送訊息（可選）",
     "messagePlaceholder": "例如：請勿共享您的帳號",
     "messageHint": "播放過程中會向他們顯示此訊息",

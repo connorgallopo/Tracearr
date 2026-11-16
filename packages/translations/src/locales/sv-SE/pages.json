@@ -2236,6 +2236,7 @@
   "terminateStream": {
     "title": "Avsluta ström",
     "stopMedia": "Stoppa \"{{mediaTitle}}\" för @{{username}}?",
+    "stopMediaFor": "",
     "messageLabel": "Meddelande till användare (valfritt)",
     "messagePlaceholder": "T.ex. dela inte ditt konto",
     "messageHint": "Detta meddelande kommer att visas för dem under uppspelning",

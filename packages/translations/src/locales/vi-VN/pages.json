@@ -2183,6 +2183,7 @@
   "terminateStream": {
     "title": "",
     "stopMedia": "",
+    "stopMediaFor": "",
     "messageLabel": "",
     "messagePlaceholder": "",
     "messageHint": "",

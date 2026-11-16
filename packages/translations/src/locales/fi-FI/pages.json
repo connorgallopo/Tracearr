@@ -2236,6 +2236,7 @@
   "terminateStream": {
     "title": "Lopeta striimi",
     "stopMedia": "Pysäytä \"{{mediaTitle}}\" @{{username}}?",
+    "stopMediaFor": "",
     "messageLabel": "Viesti käyttäjälle (valinnainen)",
     "messagePlaceholder": "esim., Älä jaa tiliäsi",
     "messageHint": "Tämä viesti näytetään heille soiton aikana",

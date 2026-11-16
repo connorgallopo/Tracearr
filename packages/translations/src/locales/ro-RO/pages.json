@@ -2289,6 +2289,7 @@
   "terminateStream": {
     "title": "Terminare stream",
     "stopMedia": "Opriți \"{{mediaTitle}}\" pentru @{{username}}?",
+    "stopMediaFor": "",
     "messageLabel": "Mesaj către utilizator (opţional)",
     "messagePlaceholder": "de exemplu, vă rugăm să nu partajați contul dvs.",
     "messageHint": "Acest mesaj le va fi afișat în timpul redării",

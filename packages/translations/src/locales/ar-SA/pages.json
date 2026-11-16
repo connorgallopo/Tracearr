@@ -2448,6 +2448,7 @@
   "terminateStream": {
     "title": "إنهاء البث",
     "stopMedia": "إيقاف \"{{mediaTitle}}\" لـ @{{username}}؟",
+    "stopMediaFor": "",
     "messageLabel": "رسالة إلى المستخدم (اختياري)",
     "messagePlaceholder": "على سبيل المثال، الرجاء عدم مشاركة حسابك",
     "messageHint": "سيتم عرض هذه الرسالة لهم أثناء التشغيل",

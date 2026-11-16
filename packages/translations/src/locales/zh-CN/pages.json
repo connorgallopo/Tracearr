@@ -2183,6 +2183,7 @@
   "terminateStream": {
     "title": "终止流",
     "stopMedia": "停止 \"{{mediaTitle}}\" 对 @{{username}} 吗？",
+    "stopMediaFor": "",
     "messageLabel": "给用户的消息(可选)",
     "messagePlaceholder": "例如，请不要分享您的帐户",
     "messageHint": "此消息将在播放时显示给他们",

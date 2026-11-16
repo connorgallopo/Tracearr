@@ -2236,6 +2236,7 @@
   "terminateStream": {
     "title": "Afslut Stream",
     "stopMedia": "",
+    "stopMediaFor": "",
     "messageLabel": "Besked til bruger (valgfrit)",
     "messagePlaceholder": "f.eks. Del ikke din konto",
     "messageHint": "Denne besked vil blive vist til dem under afspilning",

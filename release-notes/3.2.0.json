@@ -109,6 +109,10 @@
     },
     {
       "type": "fix",
+      "text": "the stop stream dialog no longer puts an @ in front of a person's name"
+    },
+    {
+      "type": "fix",
       "text": "with two servers of one type, import progress shows only under the server being imported"
     }
   ]

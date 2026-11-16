@@ -2236,6 +2236,7 @@
   "terminateStream": {
     "title": "Stream beenden",
     "stopMedia": "\"{{mediaTitle}}\" für @{{username}} stoppen?",
+    "stopMediaFor": "",
     "messageLabel": "Nachricht an Benutzer (optional)",
     "messagePlaceholder": "z.B. Bitte teilen Sie Ihr Konto nicht",
     "messageHint": "Diese Nachricht wird während der Wiedergabe angezeigt",

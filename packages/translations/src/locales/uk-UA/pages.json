@@ -2342,6 +2342,7 @@
   "terminateStream": {
     "title": "Завершити потік",
     "stopMedia": "Зупинити \"{{mediaTitle}}\" для @{{username}}?",
+    "stopMediaFor": "",
     "messageLabel": "Повідомлення користувачу (необов'язково)",
     "messagePlaceholder": "наприклад, Будь ласка, не діліться своїм обліковим записом",
     "messageHint": "Це повідомлення буде показано їм під час відтворення",

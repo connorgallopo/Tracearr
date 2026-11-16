@@ -2183,6 +2183,7 @@
   "terminateStream": {
     "title": "ストリームを終了",
     "stopMedia": "@{{mediaTitle}}の \"{{username}}\" を停止しますか？",
+    "stopMediaFor": "",
     "messageLabel": "ユーザーへのメッセージ (オプション)",
     "messagePlaceholder": "例えば、アカウントを共有しないでください",
     "messageHint": "このメッセージは再生中に表示されます",

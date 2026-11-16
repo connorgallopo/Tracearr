@@ -2342,6 +2342,7 @@
   "terminateStream": {
     "title": "Ukončit stream",
     "stopMedia": "Zastavit \"{{mediaTitle}}\" za @{{username}}?",
+    "stopMediaFor": "",
     "messageLabel": "Zpráva uživateli (volitelné)",
     "messagePlaceholder": "Např. nesdílejte svůj účet",
     "messageHint": "Tato zpráva se jim zobrazí během přehrávání",

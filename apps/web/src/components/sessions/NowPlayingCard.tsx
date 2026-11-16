@@ -319,7 +319,7 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
         onOpenChange={setShowTerminateDialog}
         sessionId={session.id}
         mediaTitle={title}
-        username={displayName}
+        name={displayName}
       />
     </>
   );

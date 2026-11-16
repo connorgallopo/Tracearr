@@ -2236,6 +2236,7 @@
   "terminateStream": {
     "title": "Stream afbreken",
     "stopMedia": "\"{{mediaTitle}}\" stoppen voor @{{username}}?",
+    "stopMediaFor": "",
     "messageLabel": "Bericht aan gebruiker (optioneel)",
     "messagePlaceholder": "bijv.: account niet delen a.u.b.",
     "messageHint": "Dit bericht wordt getoond tijdens het afspelen",

@@ -2236,6 +2236,7 @@
   "terminateStream": {
     "title": "Interrompre la lecture",
     "stopMedia": "Interrompre « {{mediaTitle}} » pour @{{username}} ?",
+    "stopMediaFor": "",
     "messageLabel": "Message à l'utilisateur (facultatif)",
     "messagePlaceholder": "ex. : Merci de ne pas partager ton compte",
     "messageHint": "Ce message sera affiché lors de la lecture",

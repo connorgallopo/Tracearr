@@ -2342,6 +2342,7 @@
   "terminateStream": {
     "title": "Przerwij strumień",
     "stopMedia": "Zatrzymać „{{mediaTitle}}” dla @{{username}}?",
+    "stopMediaFor": "",
     "messageLabel": "Wiadomość do użytkownika (opcjonalnie)",
     "messagePlaceholder": "np. Nie udostępniaj swojego konta",
     "messageHint": "Ta wiadomość zostanie wyświetlona użytkownikowi podczas odtwarzania",

@@ -2236,6 +2236,7 @@
   "terminateStream": {
     "title": "Terminar transmissão",
     "stopMedia": "Parar \"{{mediaTitle}}\" para @{{username}}?",
+    "stopMediaFor": "",
     "messageLabel": "Mensagem para o usuário (opcional)",
     "messagePlaceholder": "ex: Por favor não partilhe a sua conta",
     "messageHint": "Esta mensagem será mostrada durante a reprodução",

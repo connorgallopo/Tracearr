@@ -18,7 +18,7 @@ interface TerminateSessionDialogProps {
   onOpenChange: (open: boolean) => void;
   sessionId: string;
   mediaTitle: string;
-  username: string;
+  name: string;
 }
 
 /**
@@ -30,7 +30,7 @@ export function TerminateSessionDialog({
   onOpenChange,
   sessionId,
   mediaTitle,
-  username,
+  name,
 }: TerminateSessionDialogProps) {
   const { t } = useTranslation(['pages', 'common']);
   const [reason, setReason] = useState('');
@@ -61,7 +61,7 @@ export function TerminateSessionDialog({
         <DialogHeader>
           <DialogTitle>{t('terminateStream.title')}</DialogTitle>
           <DialogDescription>
-            {t('terminateStream.stopMedia', { mediaTitle, username })}
+            {t('terminateStream.stopMediaFor', { mediaTitle, name })}
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
