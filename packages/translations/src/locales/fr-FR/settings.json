@@ -40,7 +40,7 @@
       "memberLogin": "Qui peut se connecter à Tracearr, et comment.",
       "mobile": "Appareil appairé à l'application Tracearr.",
       "remote": "Comment les gens à l'extérieur de votre réseau rejoigne votre instance.",
-      "import": " ",
+      "import": "",
       "backup": "Instantané de la base de donnée et configuration.",
       "jobs": "Tâches de maintenance que vous pouvez exécuter sur demande.",
       "api": "La clé publique de l'API, sa limite de taux et ce qui compte comme regardé.",
@@ -121,7 +121,7 @@
       "plugin": "Plugin en temps réel",
       "pluginDesc": "Vérifiez les nouvelles versions du plugin Tracearr de vos serveurs Jellyfin et Emby pour les événements de streaming.",
       "server": "Serveur multimédia",
-      "serverDesc": "Comparez ce que chaque serveur Plex, Jellyfin et Emby exécute avec la dernière version publiée par ses créateurs."
+      "serverDesc": ""
     },
     "imageCache": {
       "title": "Cache des affiches",
@@ -150,7 +150,7 @@
     "serverUrl": "URL du serveur",
     "testConnection": "Tester la connexion",
     "noServersConnected": "Aucun serveur connecté",
-    "noServersConnectedHint": "Cliquez sur \"Ajouter un serveur\" pour connecter un serveur Jellyfin ou Emby",
+    "noServersConnectedHint": "",
     "serverType": "Type de serveur",
     "loadingAccounts": "Chargement des comptes Plex liés...",
     "selectPlexAccount": "Sélectionnez le compte Plex",
@@ -172,7 +172,7 @@
     "updating": "Mise à jour en cours...",
     "allFieldsRequired": "Tous les champs sont obligatoires",
     "addServerDialogDescPlex": "Sélectionnez un serveur Plex à partir de votre compte lié.",
-    "addServerDialogDescOther": "Connectez un serveur Jellyfin ou Emby.",
+    "addServerDialogDescOther": "",
     "discoveringServers": "Recherche des serveurs Plex disponibles...",
     "discoveringConnections": "Découverte des connexions...",
     "plexAccount": "Compte Plex",
