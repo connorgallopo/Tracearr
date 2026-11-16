@@ -1,6 +1,6 @@
 {
   "version": "3.2.0",
-  "date": "2026-11-15",
+  "date": "2026-11-16",
   "upgradeWarning": "Back up before upgrading. Request ids are stored differently from this release on, so going back to an older version needs that backup",
   "changes": [
     {
@@ -102,6 +102,10 @@
     {
       "type": "fix",
       "text": "a Jellyfin or Emby server re-added at its address syncs its libraries right away"
+    },
+    {
+      "type": "fix",
+      "text": "a server added after the first fills in its library growth history within the hour"
     },
     {
       "type": "fix",

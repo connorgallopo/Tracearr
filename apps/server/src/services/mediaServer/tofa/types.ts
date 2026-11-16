@@ -186,6 +186,8 @@ export interface TofaMediaFile {
   part_count: number | null;
   /** When the file changed on disk, which tofa takes as the date the item was added */
   file_modified_at: string | null;
+  /** When tofa first saw the file */
+  created_at: string;
   audio_tracks: { channels: number | null; atmos?: boolean }[];
   /** The qualities a client can download; the original is the file itself */
   download_options?:

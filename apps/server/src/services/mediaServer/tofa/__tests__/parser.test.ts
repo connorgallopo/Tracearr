@@ -423,33 +423,43 @@ describe('parseTofaShowChildren', () => {
     expect(episode?.thumbPath).toBeUndefined();
   });
 
-  it('dates a show and its episodes at the 2015 fallback when tofa gives no date', () => {
-    const undated = {
+  it('dates a file by its modified time from the episode air day until tofa saw it', () => {
+    const dated = {
       ...show,
-      added_at: null,
-      files: show.files.map((file) => ({ ...file, file_modified_at: null })),
+      files: show.files.map((file) => ({ ...file, file_modified_at: '2014-09-26T03:00:00Z' })),
     };
-    const fallback = new Date('2015-01-01T00:00:00Z');
-    const { seasons, episodes } = parseTofaShowChildren(undated);
+    const airDay = new Date('2014-09-26T03:00:00Z');
+    const { seasons, episodes } = parseTofaShowChildren(dated);
 
-    expect(parseTofaLibraryItem(undated).addedAt).toEqual(fallback);
+    expect(parseTofaLibraryItem(dated).addedAt).toEqual(airDay);
     expect([...seasons, ...episodes].map((item) => item.addedAt)).toEqual(
-      Array.from({ length: 4 }, () => fallback)
+      Array.from({ length: 4 }, () => airDay)
     );
   });
 
-  it('ignores a file date before 2015, as the other servers do', () => {
-    const old = {
+  it('dates a file by when tofa saw it when its modified time is missing, before release or later', () => {
+    const seen = new Date('2025-03-01T12:00:00Z');
+    const early = {
       ...show,
       added_at: '2005-04-18T10:00:00Z',
       files: show.files.map((file) => ({ ...file, file_modified_at: '2005-04-18T10:00:00Z' })),
     };
-    const fallback = new Date('2015-01-01T00:00:00Z');
+    const late = {
+      ...show,
+      files: show.files.map((file) => ({ ...file, file_modified_at: '2026-01-01T00:00:00Z' })),
+    };
+    const undated = {
+      ...show,
+      files: show.files.map((file) => ({ ...file, file_modified_at: null })),
+    };
 
-    expect(parseTofaLibraryItem(old).addedAt).toEqual(fallback);
-    expect(parseTofaShowChildren(old).episodes.map((item) => item.addedAt)).toEqual(
-      parseTofaShowChildren(old).episodes.map(() => fallback)
-    );
+    for (const detail of [early, late, undated]) {
+      const { seasons, episodes } = parseTofaShowChildren(detail);
+      expect(parseTofaLibraryItem(detail).addedAt).toEqual(seen);
+      expect([...seasons, ...episodes].map((item) => item.addedAt)).toEqual(
+        Array.from({ length: 4 }, () => seen)
+      );
+    }
   });
 });
 

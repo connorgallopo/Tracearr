@@ -180,19 +180,38 @@ function yearOf(releaseDate: string | null | undefined): number | null {
   return releaseDate ? Number(releaseDate.slice(0, 4)) : null;
 }
 
-const ADDED_DATE_FLOOR = Date.UTC(2015, 0, 1);
-
 /**
- * The earliest of the given dates. A date before 2015 is a file's own timestamp, not when the
- * library gained the item, and is dropped as the other servers' parsers drop it. An item left
- * with no date counts as added on 1 January 2015, so it stays the same on every sync and never
- * reads as newly added.
+ * When a file joined the library. tofa dates it by its modified time, which a release can carry
+ * from years before the title came out, so a modified time before the release day, or after tofa
+ * first saw the file, gives way to when tofa first saw it.
  */
-function addedDate(dates: (string | null | undefined)[]): Date {
-  const times = dates
-    .flatMap((date) => (date ? [new Date(date).getTime()] : []))
-    .filter((time) => time >= ADDED_DATE_FLOOR);
-  return new Date(times.length > 0 ? Math.min(...times) : ADDED_DATE_FLOOR);
+function fileAddedAt(file: TofaMediaFile, released: string | null | undefined): number {
+  const seen = Date.parse(file.created_at);
+  const modified = file.file_modified_at ? Date.parse(file.file_modified_at) : NaN;
+  const releaseDay = released ? Date.parse(released.slice(0, 10)) : -Infinity;
+  return modified >= releaseDay && modified <= seen ? modified : seen;
+}
+
+/** An episode's file was released with the episode, any other file with its title */
+function fileReleaseDates(
+  detail: TofaMediaDetail
+): (file: TofaMediaFile) => string | null | undefined {
+  const airDates = new Map(
+    (detail.seasons ?? []).flatMap((season) =>
+      (season.episodes ?? []).map((episode) => [episode.id, episode.air_date])
+    )
+  );
+  return (file) => (file.episode_id ? airDates.get(file.episode_id) : null) ?? detail.release_date;
+}
+
+/** The earliest file's date; tofa's own date for a title without files */
+function addedDate(
+  files: TofaMediaFile[],
+  releasedOf: (file: TofaMediaFile) => string | null | undefined,
+  fallback?: string | null
+): Date {
+  const times = files.map((file) => fileAddedAt(file, releasedOf(file)));
+  return new Date(times.length > 0 ? Math.min(...times) : fallback ? Date.parse(fallback) : 0);
 }
 
 /** Artwork goes through the image proxy, which reads it from the server with the API key */
@@ -268,7 +287,7 @@ export function parseTofaLibraryItem(detail: TofaMediaDetail): MediaLibraryItem 
     title: detail.title,
     mediaType: 'movie',
     year: yearOf(detail.release_date) ?? undefined,
-    addedAt: addedDate([detail.added_at]),
+    addedAt: addedDate(detail.files, fileReleaseDates(detail), detail.added_at),
     imdbId: detail.imdb_id ?? undefined,
     tmdbId: detail.tmdb_id ?? undefined,
     tvdbId: tvdbId ? Number(tvdbId) : undefined,
@@ -285,7 +304,7 @@ export function parseTofaLibraryItem(detail: TofaMediaDetail): MediaLibraryItem 
 
 /**
  * The seasons and episodes of a show that have a file. An episode was added when its first
- * file was, the date tofa itself goes by; it shows its show's poster, as every server's does.
+ * file was; it shows its show's poster, as every server's does.
  */
 export function parseTofaShowChildren(show: TofaMediaDetail): {
   seasons: MediaLibraryItem[];
@@ -295,6 +314,7 @@ export function parseTofaShowChildren(show: TofaMediaDetail): {
     show.files.filter((file) => file.episode_id !== null),
     (file) => file.episode_id
   );
+  const releasedOf = fileReleaseDates(show);
   const seasons: MediaLibraryItem[] = [];
   const episodes: MediaLibraryItem[] = [];
   for (const season of show.seasons ?? []) {
@@ -303,7 +323,7 @@ export function parseTofaShowChildren(show: TofaMediaDetail): {
     for (const episode of season.episodes ?? []) {
       const files = filesByEpisode.get(episode.id);
       if (!files) continue;
-      const addedAt = addedDate(files.map((file) => file.file_modified_at));
+      const addedAt = addedDate(files, releasedOf);
       if (!firstAdded || addedAt < firstAdded) firstAdded = addedAt;
       episodes.push({
         ratingKey: episode.id,
