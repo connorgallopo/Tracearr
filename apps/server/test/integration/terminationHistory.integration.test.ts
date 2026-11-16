@@ -8,7 +8,7 @@
  */
 
 import { describe, expect, it } from 'vitest';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, sql } from 'drizzle-orm';
 import {
   createTestServer,
   createTestServerUser,
@@ -33,7 +33,7 @@ function idOnlyJoin(serverUserId: string) {
       serverUserId: terminationLogs.serverUserId,
       trigger: terminationLogs.trigger,
       triggeredByUserId: terminationLogs.triggeredByUserId,
-      triggeredByUsername: users.username,
+      triggeredByUsername: sql<string | null>`coalesce(${users.name}, ${users.username})`,
       ruleId: terminationLogs.ruleId,
       ruleName: automations.name,
       violationId: terminationLogs.violationId,
