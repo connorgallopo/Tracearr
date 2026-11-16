@@ -2,9 +2,7 @@
   "login": {
     "title": "",
     "tagline": "Tracearr - Gestión de acceso a reproducciones",
-    "createAccountHeading": "Crea tu cuenta para empezar",
     "signInHeading": "Inicia sesión en tu cuenta",
-    "createAccountDescription": "Crear una cuenta para administrar sus servidores multimedia",
     "signInDescription": "Inicia sesión para acceder a tu panel de control",
     "selectPlexServer": "Seleccione su servidor Plex",
     "waitingForPlex": "Esperando autorización de Plex...",
@@ -19,7 +17,6 @@
     "displayNamePlaceholder": "Elige un nombre para mostrar",
     "passwordPlaceholder": "Mínimo 8 caracteres",
     "yourPasswordPlaceholder": "Su contraseña",
-    "setupNote": "Después de crear su cuenta, agregará su servidor Plex o Jellyfin desde Configuración.",
     "localDisabledHint": "",
     "oidcError": "",
     "accountCreated": "¡Cuenta creada con éxito!",
@@ -54,6 +51,60 @@
       "notPermitted": ""
     }
   },
+  "setup": {
+    "serverTitle": "",
+    "connectTitle": "",
+    "connectDescription": "",
+    "linkPlexTitle": "",
+    "linkPlexDescription": "",
+    "stepsLabel": "",
+    "stepOfNamed": "",
+    "steps": {
+      "server": "",
+      "account": "",
+      "connect": "",
+      "import": ""
+    },
+    "stepStatus": {
+      "done": "",
+      "current": "",
+      "upcoming": ""
+    },
+    "signedInAs": "",
+    "serverHint": "",
+    "ownerTitle": "",
+    "ownerDescription": "",
+    "ownerDescriptionSignIn": "",
+    "plexWaitingDescription": "",
+    "pickerTitle": "",
+    "pickerDescription": "",
+    "connectHint": "",
+    "connectedTitle": "",
+    "connectedDescription": "",
+    "importTitle": "",
+    "importDescription": "",
+    "goToDashboard": "",
+    "codeExpired": "",
+    "signInAgain": "",
+    "timedOut": "",
+    "checkAgain": ""
+  },
+  "tofa": {
+    "signIn": "",
+    "waiting": "",
+    "waitingHint": "",
+    "waitingDescription": "",
+    "openAgain": "",
+    "expiresIn": "",
+    "codeFallback": "",
+    "pickerNote": "",
+    "unreachable": "",
+    "noAddress": "",
+    "noServersTitle": "",
+    "noServers": "",
+    "noServersPassword": "",
+    "manual": ""
+  },
   "dashboard": {
     "alerts": "Alertas",
     "plays": "Reproducciones",
@@ -66,6 +117,7 @@
     "noActiveStreams": "No hay reproducciones activas",
     "streamsAppearHere": "Las reproducciones activas aparecerán aquí cuando los usuarios comiencen a reproducir",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -168,6 +220,7 @@
     "mergeTitleBulk": "",
     "mergeReasonEmail": "",
     "mergeReasonEmailUsername": "",
+    "mergeReasonLinked": "",
     "mergeReasonUsername": "",
     "mergeKeep": "",
     "mergeFoldIn": "",
@@ -194,12 +247,14 @@
     "suggestionsTitle": "",
     "suggestionsPairEmail": "",
     "suggestionsPairEmailUsername": "",
+    "suggestionsPairLinked": "",
     "suggestionsPairUsername": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "",
     "suggestionsNotSame": "",
     "suggestionsMatchEmail": "",
     "suggestionsMatchEmailUsername": "",
+    "suggestionsMatchLinked": "",
     "suggestionsMatchUsername": "",
     "suggestionsEmpty": "",
     "suggestionsDismissed": "",
@@ -232,6 +287,8 @@
     "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsernameMore_one": "",
     "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairLinkedMore_one": "",
+    "suggestionsPairLinkedMore_other": "",
     "suggestionsPairUsernameMore_one": "",
     "suggestionsPairUsernameMore_other": "",
     "pendingLink_one": "",
@@ -377,6 +434,8 @@
     "stream": {
       "notAvailable": "",
       "bitrateUnavailable": "",
+      "rebuffers": "",
+      "droppedFrames": "",
       "stereo": "",
       "mono": "",
       "noDetails": "",
@@ -632,6 +691,10 @@
       "notSynced": {
         "title": "Biblioteca aún no sincronizada",
         "body": "Las estadísticas de la biblioteca aparecerán aquí una vez sincronizada. Esto suele ocurrir automáticamente cada hora."
+      },
+      "syncQueued": {
+        "title": "",
+        "body": ""
       },
       "noMedia": {
         "title": "Todavía no hay películas ni series",
@@ -2174,6 +2237,7 @@
   "terminateStream": {
     "title": "Terminar Reproducción",
     "stopMedia": "Detener \"{{mediaTitle}}\" para @{{username}}?",
+    "stopMediaFor": "",
     "messageLabel": "Mensaje para el usuario (opcional)",
     "messagePlaceholder": "ej. Por favor, no compartas tu cuenta",
     "messageHint": "Este mensaje será mostrado durante la reproducción",
