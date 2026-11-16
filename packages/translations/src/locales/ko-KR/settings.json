@@ -40,7 +40,7 @@
       "memberLogin": "",
       "mobile": "Tracearr 모바일 앱과 페어링된 기기입니다.",
       "remote": "네트워크 외부에서 이 인스턴스에 접속하는 방법입니다.",
-      "import": "Tautulli, Jellystat 또는 Playback Reporting에서 시청 기록을 가져옵니다.",
+      "import": "",
       "backup": "데이터베이스와 구성의 스냅샷입니다.",
       "jobs": "필요할 때 실행할 수 있는 유지 관리 작업입니다.",
       "api": "공개 API 키, 요청 한도, 시청으로 간주할 기준입니다.",
@@ -121,7 +121,7 @@
       "plugin": "실시간 플러그인",
       "pluginDesc": "Jellyfin과 Emby 서버가 이벤트를 전달하는 Tracearr 플러그인의 새 릴리스를 확인합니다.",
       "server": "미디어 서버",
-      "serverDesc": "각 Plex, Jellyfin, Emby 서버의 설치 버전을 제작자가 배포한 최신 릴리스와 비교합니다."
+      "serverDesc": ""
     },
     "imageCache": {
       "title": "포스터 캐시",
@@ -149,7 +149,7 @@
     "serverUrl": "서버 URL",
     "testConnection": "연결 테스트",
     "noServersConnected": "연결된 서버가 없습니다",
-    "noServersConnectedHint": "Jellyfin 또는 Emby 서버를 연결하려면 \"서버 추가\"를 클릭하세요",
+    "noServersConnectedHint": "",
     "serverType": "서버 유형",
     "loadingAccounts": "연결된 Plex 계정을 불러오는 중...",
     "selectPlexAccount": "Plex 계정 선택",
@@ -171,7 +171,7 @@
     "updating": "업데이트 중...",
     "allFieldsRequired": "모든 항목을 입력해야 합니다",
     "addServerDialogDescPlex": "연결된 계정에서 Plex 서버를 선택하세요.",
-    "addServerDialogDescOther": "Jellyfin 또는 Emby 서버를 연결하세요.",
+    "addServerDialogDescOther": "",
     "discoveringServers": "사용 가능한 Plex 서버를 검색하는 중...",
     "discoveringConnections": "연결을 검색하는 중...",
     "plexAccount": "Plex 계정",
