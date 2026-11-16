@@ -133,7 +133,6 @@
     "noTerminations": "Keine beendeten Streams",
     "lastSeen": "Zuletzt gesehen vor {{relative}}",
     "terminatedBy": "Von @{{username}}",
-    "terminatedByName": "",
     "trustScoreConfirm": "Soll der Vertrauenswert für @{{username}} auf {{score}} gesetzt werden?",
     "trustScoreRange": "Vertrauenswert für @{{username}}, von 0 auf 100.",
     "moreLocations_one": "+{{count}} weiteren Standort",
