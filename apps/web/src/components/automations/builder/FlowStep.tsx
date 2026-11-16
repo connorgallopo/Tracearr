@@ -45,7 +45,7 @@ export function FlowStep({
           id={headingId}
           className="flex flex-wrap items-center gap-2 text-lg font-semibold tracking-tight"
         >
-          <span className="bg-card-raised text-muted-foreground absolute top-0 left-0 grid size-8 shrink-0 place-items-center rounded-full border text-xs font-semibold @max-lg:static @max-lg:size-6">
+          <span className="bg-card dark:bg-card-raised text-muted-foreground absolute top-0 left-0 grid size-8 shrink-0 place-items-center rounded-full border text-xs font-semibold @max-lg:static @max-lg:size-6">
             {step}
           </span>
           {title}

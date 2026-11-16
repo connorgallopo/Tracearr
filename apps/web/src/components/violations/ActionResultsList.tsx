@@ -25,16 +25,16 @@ export function ActionResultsList({ results }: ActionResultsListProps) {
             {result.skipped ? (
               <SkipForward className="text-muted-foreground h-4 w-4" />
             ) : result.success ? (
-              <CheckCircle className="h-4 w-4 text-green-500" />
+              <CheckCircle className="text-success h-4 w-4" />
             ) : (
-              <XCircle className="h-4 w-4 text-red-500" />
+              <XCircle className="text-destructive h-4 w-4" />
             )}
             <span className="capitalize">{result.actionType.replace(/_/g, ' ')}</span>
             {result.skipped && result.skipReason && (
               <span className="text-muted-foreground">({result.skipReason})</span>
             )}
             {!result.success && !result.skipped && result.errorMessage && (
-              <span className="text-red-500">({result.errorMessage})</span>
+              <span className="text-destructive">({result.errorMessage})</span>
             )}
           </li>
         ))}

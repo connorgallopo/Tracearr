@@ -152,8 +152,8 @@ function outcomeToActionResult(result: ReverifyKillConditionResult): ActionResul
   if (result.outcome === 'killed') {
     return { action, success: true, skipped: false, message: 'killed' };
   }
-  if (result.outcome === 'failed') {
-    return { action, success: false, message: result.error ?? 'failed' };
+  if (result.outcome === 'failed' || result.outcome === 'refused') {
+    return { action, success: false, message: result.error ?? result.outcome };
   }
   return { action, success: true, skipped: true, skipReason: result.skipReason ?? result.outcome };
 }

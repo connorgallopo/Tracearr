@@ -24,6 +24,8 @@ interface LibraryStatusResponse {
   isSynced: boolean;
   /** Whether a library sync is currently running */
   isSyncRunning: boolean;
+  /** Whether a library sync is queued and none is running */
+  isSyncQueued: boolean;
   /** Whether historical snapshots need backfilling */
   needsBackfill: boolean;
   /** Whether the backfill job is currently running or queued */
@@ -187,6 +189,15 @@ function deriveLibraryStatus(
   };
 }
 
+function syncState(
+  status: Awaited<ReturnType<typeof getLibrarySyncStatus>> | undefined
+): Pick<LibraryStatusResponse, 'isSyncRunning' | 'isSyncQueued'> {
+  return {
+    isSyncRunning: status?.isActive ?? false,
+    isSyncQueued: status?.jobId !== undefined && !status.isActive,
+  };
+}
+
 export const libraryStatusRoute: FastifyPluginAsync = async (app) => {
   /**
    * GET /status - Check library sync and backfill status
@@ -221,7 +232,7 @@ export const libraryStatusRoute: FastifyPluginAsync = async (app) => {
         targetIds.forEach((id, i) => {
           response[id] = {
             ...deriveLibraryStatus(rowsById.get(id) ?? EMPTY_ROW),
-            isSyncRunning: syncStatuses[i]?.isActive ?? false,
+            ...syncState(syncStatuses[i]),
             isBackfillRunning: backfillStatus.isRunning,
             backfillState: backfillStatus.state,
             versionsBackfillPending: sentinelServers.has(id),
@@ -240,7 +251,7 @@ export const libraryStatusRoute: FastifyPluginAsync = async (app) => {
 
         return reply.send({
           ...deriveLibraryStatus(rowsById.get(serverId) ?? EMPTY_ROW),
-          isSyncRunning: syncStatus?.isActive ?? false,
+          ...syncState(syncStatus),
           isBackfillRunning: backfillStatus.isRunning,
           backfillState: backfillStatus.state,
           versionsBackfillPending: sentinelServers.has(serverId),
@@ -276,6 +287,7 @@ export const libraryStatusRoute: FastifyPluginAsync = async (app) => {
           earliestSnapshotDate: row.earliest_snapshot,
         }),
         isSyncRunning: false,
+        isSyncQueued: false,
         isBackfillRunning: backfillStatus.isRunning,
         backfillState: backfillStatus.state,
         versionsBackfillPending: (await fetchVersionsBackfillPending(resolvedIds)).size > 0,

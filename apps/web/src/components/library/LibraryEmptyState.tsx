@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import { useLibraryStatus } from '@/hooks/queries';
 import { useSocket } from '@/hooks/useSocket';
 import { WS_EVENTS } from '@tracearr/shared';
-import type { MaintenanceJobProgress } from '@tracearr/shared';
+import type { LibrarySyncProgress, MaintenanceJobProgress } from '@tracearr/shared';
 import { ServerBadge } from '@/components/server';
 
 interface LibraryEmptyStateProps {
@@ -35,7 +35,7 @@ interface LibraryEmptyStateProps {
  * job shared by every server, so it keeps one button for all of them.
  */
 export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
-  const { t } = useTranslation('pages');
+  const { t } = useTranslation(['pages', 'common']);
   const { selectedServerIds, selectedServers } = useServer();
   const queryClient = useQueryClient();
   const [syncingIds, setSyncingIds] = useState<Set<string>>(new Set());
@@ -78,6 +78,30 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
       socket.off(WS_EVENTS.MAINTENANCE_PROGRESS, handleProgress);
     };
   }, [socket, queryClient, onComplete, t]);
+
+  // The global handler refetches status when a sync ends, not when it starts, so a queued
+  // sync would read as waiting for its whole run
+  const queuedIds = selectedServerIds
+    .filter((id) => statusResult.byServer.get(id)?.data?.isSyncQueued)
+    .join(',');
+
+  useEffect(() => {
+    if (!socket || !queuedIds) return;
+    const queued = new Set(queuedIds.split(','));
+
+    const handleSyncProgress = (progress: LibrarySyncProgress) => {
+      if (progress.status !== 'running' || !queued.has(progress.serverId)) return;
+      void queryClient.invalidateQueries(
+        { queryKey: ['library', 'status'] },
+        { cancelRefetch: false }
+      );
+    };
+
+    socket.on(WS_EVENTS.LIBRARY_SYNC_PROGRESS, handleSyncProgress);
+    return () => {
+      socket.off(WS_EVENTS.LIBRARY_SYNC_PROGRESS, handleSyncProgress);
+    };
+  }, [socket, queuedIds, queryClient]);
 
   const handleSync = async (serverId: string | undefined) => {
     if (!serverId) {
@@ -157,7 +181,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
     return (
       <div className="rounded-xl border border-dashed p-8 text-center">
         <Loader2 className="text-muted-foreground/50 mx-auto h-12 w-12 animate-spin" />
-        <h3 className="mt-4 text-lg font-medium">
+        <h3 className="mt-4 text-base font-medium">
           {t('library.emptyState.backfillRunning.title')}
         </h3>
         <p className="text-muted-foreground mx-auto mt-2 max-w-md">
@@ -186,7 +210,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
   if (selectedServerIds.length <= 1) {
     const selectedServerId = selectedServerIds[0];
     const data = selectedServerId ? statusResult.byServer.get(selectedServerId)?.data : undefined;
-    const { isSynced, isSyncRunning, needsBackfill, backfillDays } = data ?? {};
+    const { isSynced, isSyncRunning, isSyncQueued, needsBackfill, backfillDays } = data ?? {};
     const isSyncing = selectedServerId ? syncingIds.has(selectedServerId) : false;
 
     // Show backfill prompt if synced but needs backfill
@@ -196,7 +220,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
         return (
           <div className="rounded-xl border border-dashed p-8 text-center">
             <Loader2 className="text-muted-foreground/50 mx-auto h-12 w-12 animate-spin" />
-            <h3 className="mt-4 text-lg font-medium">
+            <h3 className="mt-4 text-base font-medium">
               {t('library.emptyState.backfillAvailable.syncRunningTitle')}
             </h3>
             <p className="text-muted-foreground mx-auto mt-2 max-w-md">
@@ -209,7 +233,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
       return (
         <div className="rounded-xl border border-dashed p-8 text-center">
           <Clock className="text-muted-foreground/50 mx-auto h-12 w-12" />
-          <h3 className="mt-4 text-lg font-medium">
+          <h3 className="mt-4 text-base font-medium">
             {t('library.emptyState.backfillAvailable.title')}
           </h3>
           <p className="text-muted-foreground mx-auto mt-2 max-w-md">
@@ -245,7 +269,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
       return (
         <div className="rounded-xl border border-dashed p-8 text-center">
           <Loader2 className="text-muted-foreground/50 mx-auto h-12 w-12 animate-spin" />
-          <h3 className="mt-4 text-lg font-medium">
+          <h3 className="mt-4 text-base font-medium">
             {t('library.emptyState.syncInProgress.title')}
           </h3>
           <p className="text-muted-foreground mx-auto mt-2 max-w-md">
@@ -261,7 +285,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
       return (
         <div className="rounded-xl border border-dashed p-8 text-center">
           <Database className="text-muted-foreground/50 mx-auto h-12 w-12" />
-          <h3 className="mt-4 text-lg font-medium">{t('library.emptyState.noMedia.title')}</h3>
+          <h3 className="mt-4 text-base font-medium">{t('library.emptyState.noMedia.title')}</h3>
           <p className="text-muted-foreground mx-auto mt-2 max-w-md">
             {t('library.emptyState.noMedia.body')}
           </p>
@@ -280,12 +304,19 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
     }
 
     // Default: Library not synced
+    const NotSyncedIcon = isSyncQueued ? Clock : Database;
     return (
       <div className="rounded-xl border border-dashed p-8 text-center">
-        <Database className="text-muted-foreground/50 mx-auto h-12 w-12" />
-        <h3 className="mt-4 text-lg font-medium">{t('library.emptyState.notSynced.title')}</h3>
+        <NotSyncedIcon className="text-muted-foreground/50 mx-auto h-12 w-12" />
+        <h3 className="mt-4 text-base font-medium">
+          {isSyncQueued
+            ? t('library.emptyState.syncQueued.title')
+            : t('library.emptyState.notSynced.title')}
+        </h3>
         <p className="text-muted-foreground mx-auto mt-2 max-w-md">
-          {t('library.emptyState.notSynced.body')}
+          {isSyncQueued
+            ? t('library.emptyState.syncQueued.body')
+            : t('library.emptyState.notSynced.body')}
         </p>
         <Button
           variant="outline"
@@ -313,7 +344,7 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
   return (
     <div className="rounded-xl border border-dashed p-8 text-center">
       <Database className="text-muted-foreground/50 mx-auto h-12 w-12" />
-      <h3 className="mt-4 text-lg font-medium">{t('library.emptyState.multiServer.title')}</h3>
+      <h3 className="mt-4 text-base font-medium">{t('library.emptyState.multiServer.title')}</h3>
       <p className="text-muted-foreground mx-auto mt-2 max-w-md">
         {t('library.emptyState.multiServer.body')}
       </p>
@@ -332,7 +363,9 @@ export function LibraryEmptyState({ onComplete }: LibraryEmptyStateProps) {
                   <span className="text-muted-foreground text-sm">
                     {isSyncing
                       ? t('library.emptyState.syncing')
-                      : t('library.emptyState.notSyncedShort')}
+                      : data?.isSyncQueued
+                        ? t('common:tasks.queued')
+                        : t('library.emptyState.notSyncedShort')}
                   </span>
                 </div>
                 <Button

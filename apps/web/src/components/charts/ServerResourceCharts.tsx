@@ -14,14 +14,13 @@ import { ChartEmpty } from './ChartEmpty';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Cpu, MemoryStick } from 'lucide-react';
 
-// Colors matching Plex's style
 const COLORS = {
-  process: '#00b4e4', // Plex-style cyan for "Plex Media Server"
-  system: '#cc7b9f', // Pink/purple for "System"
-  processGradientStart: 'rgba(0, 180, 228, 0.3)',
-  processGradientEnd: 'rgba(0, 180, 228, 0.05)',
-  systemGradientStart: 'rgba(204, 123, 159, 0.3)',
-  systemGradientEnd: 'rgba(204, 123, 159, 0.05)',
+  process: 'oklch(var(--chart-1))',
+  system: 'oklch(var(--chart-2))',
+  processGradientStart: 'oklch(var(--chart-1) / 0.3)',
+  processGradientEnd: 'oklch(var(--chart-1) / 0.05)',
+  systemGradientStart: 'oklch(var(--chart-2) / 0.3)',
+  systemGradientEnd: 'oklch(var(--chart-2) / 0.05)',
 };
 
 // In highcharts-react's effect deps - inline literals would update per render
@@ -35,6 +34,8 @@ export interface ResourceMultiSeries {
   serverId: string;
   serverName: string;
   color: string;
+  /** How long this server's line may go without a sample before it breaks. */
+  gapSeconds: number;
   data: ServerResourceDataPoint[];
 }
 
@@ -51,6 +52,8 @@ interface ServerResourceChartsProps {
   multiSeries?: ResourceMultiSeries[];
   /** Single-view name for the process series (defaults to Plex's) */
   processLabel?: string;
+  /** Single-view counterpart of a series' gapSeconds */
+  gapSeconds?: number;
   clockSkewMs?: number;
 }
 
@@ -89,6 +92,7 @@ function ResourceChart({
   isLoading,
   multiSeries,
   processLabel,
+  gapSeconds: gap = SERVER_STATS_CONFIG.GAP_BREAK_SECONDS,
   clockSkewMs = 0,
 }: ResourceChartProps) {
   const { t } = useTranslation(['pages', 'common']);
@@ -101,15 +105,13 @@ function ResourceChart({
   const chartOptions = useMemo<Highcharts.Options>(() => {
     if (!hasData) return {};
 
-    const gap = SERVER_STATS_CONFIG.GAP_BREAK_SECONDS;
-
     // Host metrics belong to the box: N co-hosted servers, N identical lines
     const series: Highcharts.SeriesOptionsType[] = isMulti
       ? multiSeries.map((s) => ({
           type: 'line' as const,
           name: s.serverName,
           color: s.color,
-          data: withGaps(pointsFor(s.data, processKey), gap),
+          data: withGaps(pointsFor(s.data, processKey), s.gapSeconds),
         }))
       : [
           {
@@ -168,20 +170,20 @@ function ResourceChart({
         verticalAlign: 'top',
         floating: false,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
           fontWeight: 'normal',
-          fontSize: '11px',
+          fontSize: '12px',
         },
-        itemHoverStyle: { color: 'hsl(var(--foreground))' },
+        itemHoverStyle: { color: 'oklch(var(--foreground))' },
       },
       xAxis: liveStatsTimeAxis(Date.now() + clockSkewMs),
       yAxis: {
         title: { text: undefined },
         labels: {
-          style: { color: 'hsl(var(--muted-foreground))', fontSize: '10px' },
+          style: { color: 'oklch(var(--muted-foreground))', fontSize: '12px' },
           format: '{value}%',
         },
-        gridLineColor: 'hsl(var(--border) / 0.5)',
+        gridLineColor: 'oklch(var(--border) / 0.5)',
         min: 0,
         max: yMax,
         tickInterval: yMax <= 10 ? 1 : yMax <= 20 ? 5 : 10,
@@ -196,9 +198,9 @@ function ResourceChart({
         area: { threshold: null },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
-        style: { color: 'hsl(var(--popover-foreground))', fontSize: '11px' },
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
+        style: { color: 'oklch(var(--popover-foreground))', fontSize: '12px' },
         formatter: nearestPointTooltip((y) => `${Math.round(y)}%`),
       },
       series,
@@ -210,7 +212,6 @@ function ResourceChart({
               legend: {
                 align: 'center',
                 layout: 'horizontal',
-                itemStyle: { fontSize: '10px' },
               },
               xAxis: liveStatsTimeAxis(Date.now() + clockSkewMs, true),
             },
@@ -218,7 +219,7 @@ function ResourceChart({
         ],
       },
     };
-  }, [data, processKey, hostKey, multiSeries, isMulti, hasData, processLabel, clockSkewMs, t]);
+  }, [data, processKey, hostKey, multiSeries, isMulti, hasData, processLabel, gap, clockSkewMs, t]);
 
   const header = (
     <CardHeader>
@@ -298,9 +299,10 @@ export function ServerResourceCharts({
   averages,
   multiSeries,
   processLabel,
+  gapSeconds,
   clockSkewMs,
 }: ServerResourceChartsProps) {
-  const shared = { data, isLoading, multiSeries, processLabel, clockSkewMs };
+  const shared = { data, isLoading, multiSeries, processLabel, gapSeconds, clockSkewMs };
 
   return (
     <>

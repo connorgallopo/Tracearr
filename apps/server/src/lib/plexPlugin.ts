@@ -25,12 +25,12 @@ import { createAuthEndpoint, APIError } from 'better-auth/api';
 import { expireCookie, type setSessionCookie } from 'better-auth/cookies';
 import { z } from 'zod';
 import { eq, and, asc, desc, ne, or, sql } from 'drizzle-orm';
-import { REDIS_KEYS, type PlexDiscoveredServer } from '@tracearr/shared';
+import { REDIS_KEYS, SIGN_IN_ERROR_CODES, type PlexDiscoveredServer } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { users, servers, serverUsers, plexAccounts, authAccounts } from '../db/schema.js';
 import { PlexClient } from '../services/mediaServer/index.js';
 import { testServerConnections } from '../services/mediaServer/plex/connectionTest.js';
-import { syncServer } from '../services/sync.js';
+import { startAddedServer } from '../services/serverCreate.js';
 import { getOwnerUser, getUserById } from '../services/userService.js';
 import { getRedis } from './redisShared.js';
 import { invalidateServersCache } from '../jobs/poller/database.js';
@@ -438,6 +438,7 @@ export const plexPlugin = () =>
                 needsServerSelection: true,
                 servers: testedServers,
                 tempToken,
+                username: authResult.username,
               });
             }
 
@@ -508,6 +509,7 @@ export const plexPlugin = () =>
           const stored = await getRedis().get(REDIS_KEYS.PLEX_TEMP_TOKEN(tempToken));
           if (!stored) {
             throw new APIError('UNAUTHORIZED', {
+              code: SIGN_IN_ERROR_CODES.signInExpired,
               message: 'Invalid or expired temp token. Please restart login.',
             });
           }
@@ -552,113 +554,121 @@ export const plexPlugin = () =>
             const ownerLocalAccount = localAccounts.find((a) => a.isAdmin) ?? localAccounts[0];
             const ownerLocalId = ownerLocalAccount?.id ?? '1';
 
-            let server = await db
-              .select()
-              .from(servers)
-              .where(and(eq(servers.url, serverUri), eq(servers.type, 'plex')))
-              .limit(1);
+            const { serverId, newUser } = await db.transaction(async (tx) => {
+              let server = await tx
+                .select()
+                .from(servers)
+                .where(and(eq(servers.url, serverUri), eq(servers.type, 'plex')))
+                .limit(1);
 
-            if (server.length === 0) {
-              server = await writeWithoutParams(
+              if (server.length === 0) {
+                server = await writeWithoutParams(
+                  () =>
+                    tx
+                      .insert(servers)
+                      .values({
+                        name: serverName,
+                        type: 'plex',
+                        url: serverUri,
+                        token: plexToken,
+                        machineIdentifier: clientIdentifier,
+                      })
+                      .returning(),
+                  { plexAccountId }
+                );
+              } else {
+                const existingServer = server[0]!;
+                await writeWithoutParams(
+                  () =>
+                    tx
+                      .update(servers)
+                      .set({
+                        token: plexToken,
+                        updatedAt: new Date(),
+                        ...(clientIdentifier && !existingServer.machineIdentifier
+                          ? { machineIdentifier: clientIdentifier }
+                          : {}),
+                      })
+                      .where(eq(servers.id, existingServer.id)),
+                  { plexAccountId }
+                );
+              }
+
+              const serverId = server[0]!.id;
+
+              const [newUser] = await tx
+                .insert(users)
+                .values({
+                  username: plexUsername,
+                  email: plexEmail,
+                  thumbnail: plexThumb,
+                  plexAccountId,
+                  role: 'owner',
+                })
+                .returning();
+
+              if (!newUser) {
+                throw new APIError('INTERNAL_SERVER_ERROR', { message: 'Failed to create user' });
+              }
+
+              const [newPlexAccount] = await writeWithoutParams(
                 () =>
-                  db
-                    .insert(servers)
+                  tx
+                    .insert(plexAccounts)
                     .values({
-                      name: serverName,
-                      type: 'plex',
-                      url: serverUri,
-                      token: plexToken,
-                      machineIdentifier: clientIdentifier,
+                      userId: newUser.id,
+                      plexAccountId,
+                      plexUsername,
+                      plexEmail,
+                      plexThumbnail: plexThumb,
+                      plexToken,
+                      allowLogin: true,
                     })
                     .returning(),
-                { plexAccountId }
+                { userId: newUser.id }
               );
-            } else {
-              const existingServer = server[0]!;
-              await writeWithoutParams(
-                () =>
-                  db
-                    .update(servers)
-                    .set({
-                      token: plexToken,
-                      updatedAt: new Date(),
-                      ...(clientIdentifier && !existingServer.machineIdentifier
-                        ? { machineIdentifier: clientIdentifier }
-                        : {}),
-                    })
-                    .where(eq(servers.id, existingServer.id)),
-                { plexAccountId }
+
+              if (!newPlexAccount) {
+                ctx.context.logger.error('Failed to create plex_account entry', {
+                  plexAccountId,
+                  userId: newUser.id,
+                });
+                throw new APIError('INTERNAL_SERVER_ERROR', {
+                  message: 'Failed to link Plex account',
+                });
+              }
+
+              await upsertPlexAuthAccount(
+                newUser.id,
+                plexAccountId,
+                {
+                  token: plexToken,
+                  tokenKind: plexTokenKind ?? 'legacy',
+                  refreshToken: plexRefreshToken ?? null,
+                  expiresAt: plexTokenExpiresAt ? new Date(plexTokenExpiresAt) : null,
+                },
+                tx
               );
-            }
-            invalidateServersCache();
 
-            const serverId = server[0]!.id;
+              await tx
+                .update(servers)
+                .set({ plexAccountId: newPlexAccount.id })
+                .where(eq(servers.id, serverId));
 
-            const [newUser] = await db
-              .insert(users)
-              .values({
+              await tx.insert(serverUsers).values({
+                userId: newUser.id,
+                serverId,
+                externalId: ownerLocalId,
+                plexAccountId,
                 username: plexUsername,
                 email: plexEmail,
-                thumbnail: plexThumb,
-                plexAccountId,
-                role: 'owner',
-              })
-              .returning();
-
-            if (!newUser) {
-              throw new APIError('INTERNAL_SERVER_ERROR', { message: 'Failed to create user' });
-            }
-
-            const [newPlexAccount] = await writeWithoutParams(
-              () =>
-                db
-                  .insert(plexAccounts)
-                  .values({
-                    userId: newUser.id,
-                    plexAccountId,
-                    plexUsername,
-                    plexEmail,
-                    plexThumbnail: plexThumb,
-                    plexToken,
-                    allowLogin: true,
-                  })
-                  .returning(),
-              { userId: newUser.id }
-            );
-
-            if (!newPlexAccount) {
-              ctx.context.logger.error('Failed to create plex_account entry', {
-                plexAccountId,
-                userId: newUser.id,
+                thumbUrl: plexThumb,
+                isServerAdmin: true,
               });
-              throw new APIError('INTERNAL_SERVER_ERROR', {
-                message: 'Failed to link Plex account',
-              });
-            }
 
-            await upsertPlexAuthAccount(newUser.id, plexAccountId, {
-              token: plexToken,
-              tokenKind: plexTokenKind ?? 'legacy',
-              refreshToken: plexRefreshToken ?? null,
-              expiresAt: plexTokenExpiresAt ? new Date(plexTokenExpiresAt) : null,
+              return { serverId, newUser };
             });
-
-            await db
-              .update(servers)
-              .set({ plexAccountId: newPlexAccount.id })
-              .where(eq(servers.id, serverId));
             invalidateServersCache();
-
-            await db.insert(serverUsers).values({
-              userId: newUser.id,
-              serverId,
-              externalId: ownerLocalId,
-              plexAccountId,
-              username: plexUsername,
-              email: plexEmail,
-              thumbUrl: plexThumb,
-              isServerAdmin: true,
-            });
 
             // Consume the temp token now that records are committed.
             await getRedis().del(REDIS_KEYS.PLEX_TEMP_TOKEN(tempToken));
@@ -669,20 +679,7 @@ export const plexPlugin = () =>
               role: 'owner',
             });
 
-            syncServer(serverId, { syncUsers: true, syncLibraries: true })
-              .then((result) => {
-                ctx.context.logger.info('Auto-sync completed for Plex server', {
-                  serverId,
-                  usersAdded: result.usersAdded,
-                  librariesSynced: result.librariesSynced,
-                });
-              })
-              .catch((error: unknown) => {
-                ctx.context.logger.error('Auto-sync failed for Plex server', {
-                  err: error,
-                  serverId,
-                });
-              });
+            await startAddedServer({ id: serverId, type: 'plex' }, []);
 
             const sessionUser = await createSignedInSession(ctx, newUser.id);
             return await ctx.json({

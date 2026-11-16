@@ -2,9 +2,7 @@
   "login": {
     "title": "Tracearr",
     "tagline": "Tracearr - 流访问管理",
-    "createAccountHeading": "开始创建你的账户",
     "signInHeading": "登录到您的帐户",
-    "createAccountDescription": "创建一个帐户来管理您的媒体服务器",
     "signInDescription": "登录以访问您的仪表板",
     "selectPlexServer": "选择您的Plex服务器",
     "waitingForPlex": "等待Plex授权……",
@@ -19,7 +17,6 @@
     "displayNamePlaceholder": "选择显示名称",
     "passwordPlaceholder": "至少8个字符",
     "yourPasswordPlaceholder": "您的密码",
-    "setupNote": "在创建您的帐户后，您会从设置中添加您的 Plex或 Jellyfin 服务器。",
     "localDisabledHint": "本地登录已禁用。请管理员从 Tracearr CLI 运行 `enable-local-login` 以重新启用。",
     "oidcError": "单次登录失败。请重试或使用其他登录方法。",
     "accountCreated": "账户创建成功！",
@@ -54,6 +51,60 @@
       "notPermitted": "你无权登录。请联系服务器所有者。"
     }
   },
+  "setup": {
+    "serverTitle": "",
+    "connectTitle": "",
+    "connectDescription": "",
+    "linkPlexTitle": "",
+    "linkPlexDescription": "",
+    "stepsLabel": "",
+    "stepOfNamed": "",
+    "steps": {
+      "server": "",
+      "account": "",
+      "connect": "",
+      "import": ""
+    },
+    "stepStatus": {
+      "done": "",
+      "current": "",
+      "upcoming": ""
+    },
+    "signedInAs": "",
+    "serverHint": "",
+    "ownerTitle": "",
+    "ownerDescription": "",
+    "ownerDescriptionSignIn": "",
+    "plexWaitingDescription": "",
+    "pickerTitle": "",
+    "pickerDescription": "",
+    "connectHint": "",
+    "connectedTitle": "",
+    "connectedDescription": "",
+    "importTitle": "",
+    "importDescription": "",
+    "goToDashboard": "",
+    "codeExpired": "",
+    "signInAgain": "",
+    "timedOut": "",
+    "checkAgain": ""
+  },
+  "tofa": {
+    "signIn": "",
+    "waiting": "",
+    "waitingHint": "",
+    "waitingDescription": "",
+    "openAgain": "",
+    "expiresIn": "",
+    "codeFallback": "",
+    "pickerNote": "",
+    "unreachable": "",
+    "noAddress": "",
+    "noServersTitle": "",
+    "noServers": "",
+    "noServersPassword": "",
+    "manual": ""
+  },
   "dashboard": {
     "alerts": "警报",
     "plays": "播放次数",
@@ -66,6 +117,7 @@
     "noActiveStreams": "没有活动流",
     "streamsAppearHere": "当用户开始观看时活跃的流将出现在这里",
     "dayStreak": "连续天数",
+    "noServers": "",
     "view": {
       "label": "仪表盘视图",
       "admin": "服务器",
@@ -159,6 +211,7 @@
     "mergeTitleBulk": "合并这些用户吗？",
     "mergeReasonEmail": "两者的服务器账户都使用邮箱 {{value}}。",
     "mergeReasonEmailUsername": "两者都把 {{value}} 用作用户名或账户邮箱。",
+    "mergeReasonLinked": "",
     "mergeReasonUsername": "两者都使用用户名 {{value}}。",
     "mergeKeep": "保留",
     "mergeFoldIn": "折叠，然后删除",
@@ -185,12 +238,14 @@
     "suggestionsTitle": "可能重复的用户",
     "suggestionsPairEmail": "{{first}} 和 {{second}} 共用一个邮箱",
     "suggestionsPairEmailUsername": "{{first}} 和 {{second}} 将同一地址用作用户名或账户邮箱",
+    "suggestionsPairLinked": "",
     "suggestionsPairUsername": "{{first}} 和 {{second}} 共用一个用户名",
     "suggestionsSheetDescription": "合并时保留一个用户并删除另一个用户。一对被标记为不是同一个人停止显示直到你还原。",
     "suggestionsReview": "审查",
     "suggestionsNotSame": "不是同一个人",
     "suggestionsMatchEmail": "相同的邮件",
     "suggestionsMatchEmailUsername": "两者都使用 {{value}} 作为用户名或账户邮箱",
+    "suggestionsMatchLinked": "",
     "suggestionsMatchUsername": "相同的用户名",
     "suggestionsEmpty": "没有待处理的发现。",
     "suggestionsDismissed": "已忽略 ({{count}})",
@@ -217,6 +272,7 @@
     "suggestionsCount_other": "{{count}} 个可能的重复用户",
     "suggestionsPairEmailMore_other": "{{first}} 和 {{second}} 共用一个邮箱，另有 {{count}} 个",
     "suggestionsPairEmailUsernameMore_other": "{{first}} 和 {{second}} 将同一地址用作用户名或账户邮箱，另有 {{count}} 个",
+    "suggestionsPairLinkedMore_other": "",
     "suggestionsPairUsernameMore_other": "{{first}} 和 {{second}} 共用一个用户名，另有 {{count}} 个",
     "pendingLink_other": "{{count}} 个待处理"
   },
@@ -355,6 +411,8 @@
     "stream": {
       "notAvailable": "不适用",
       "bitrateUnavailable": "Jellyfin 和 Emby 在转码期间不会暴露单独的视频和音频比特率，只能获取总媒体流比特率。",
+      "rebuffers": "",
+      "droppedFrames": "",
       "stereo": "立体声",
       "mono": "单声道",
       "noDetails": "暂无详细的媒体流信息",
@@ -599,6 +657,10 @@
       "notSynced": {
         "title": "库尚未同步",
         "body": "库同步后，库统计将显示在这里。通常每小时自动发生。"
+      },
+      "syncQueued": {
+        "title": "",
+        "body": ""
       },
       "noMedia": {
         "title": "尚无电影或剧集",

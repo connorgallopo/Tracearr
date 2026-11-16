@@ -31,7 +31,7 @@ const VALID_MEDIA_TYPES = new Set<string>(MEDIA_TYPES);
  * Using lookup table makes it easy to add new media types
  */
 const THUMB_PATH_RESOLVERS: Record<string, (session: MediaSession) => string> = {
-  live: (s) => s.live?.channelThumb ?? s.media.thumbPath ?? '',
+  live: (s) => s.media.thumbPath ?? s.live?.channelThumb ?? '',
   episode: (s) => s.episode?.showThumbPath ?? s.media.thumbPath ?? '',
   movie: (s) => s.media.thumbPath ?? '',
   track: (s) => s.media.thumbPath ?? '',
@@ -122,8 +122,8 @@ export function pickLiveSessionFields(processed: ProcessedSession): Partial<Sess
     mediaType: processed.mediaType,
     mediaTitle: processed.mediaTitle,
     grandparentTitle: processed.grandparentTitle || null,
-    seasonNumber: processed.mediaType === 'episode' ? processed.seasonNumber : null,
-    episodeNumber: processed.mediaType === 'episode' ? processed.episodeNumber : null,
+    seasonNumber: processed.seasonNumber,
+    episodeNumber: processed.episodeNumber,
     year: processed.year || null,
     thumbPath: processed.thumbPath || null,
     totalDurationMs: processed.totalDurationMs || null,
@@ -186,8 +186,9 @@ export function mapMediaSession(session: MediaSession, serverType: ServerType): 
     serverVersionKey: session.serverVersionKey ?? null,
     // User data
     externalUserId: session.user.id,
-    username: session.user.username || 'Unknown',
+    username: session.user.username,
     userThumb: session.user.thumb ?? '',
+    profileName: session.user.profileName ?? null,
     mediaTitle: session.media.title,
     mediaType,
     // Enhanced media metadata
@@ -208,6 +209,7 @@ export function mapMediaSession(session: MediaSession, serverType: ServerType): 
     discNumber: session.music?.discNumber ?? null,
     // Connection info
     ipAddress,
+    relayed: session.network.relayed,
     playerName: session.player.name?.slice(0, 255) ?? '',
     deviceId: session.player.deviceId?.slice(0, 255),
     product: session.player.product?.slice(0, 255) ?? '',
@@ -287,6 +289,7 @@ export function mapSessionRow(s: typeof sessions.$inferSelect): Session {
     geoAsnNumber: s.geoAsnNumber,
     geoAsnOrganization: s.geoAsnOrganization,
     isLocal: isLocalSession(s),
+    profileName: s.profileName,
     playerName: s.playerName,
     deviceId: s.deviceId,
     product: s.product,

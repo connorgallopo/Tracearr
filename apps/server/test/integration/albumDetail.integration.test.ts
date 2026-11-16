@@ -182,6 +182,26 @@ describe('GET /library/media/:id/album', () => {
     expect(body.tracks.map((track) => track.title)).toEqual(['One More Time']);
   });
 
+  it('names a listener by their Tracearr user, not by the account on the selected server', async () => {
+    const s = await seedAlbum();
+    await db.execute(sql`
+      UPDATE server_users SET username = 'zoe_a', last_activity_at = now()
+      WHERE server_id = ${s.serverA}
+    `);
+    await db.execute(sql`
+      UPDATE users SET name = NULL, username = 'zoe'
+      WHERE id = (SELECT user_id FROM server_users WHERE server_id = ${s.serverA})
+    `);
+    await db.execute(sql`
+      UPDATE server_users SET username = 'aaron_b', last_activity_at = now() - interval '1 day',
+        user_id = (SELECT user_id FROM server_users WHERE server_id = ${s.serverA})
+      WHERE server_id = ${s.serverB}
+    `);
+
+    const { body } = await fetchAlbum(owner(), s.albumId, [s.serverB]);
+    expect(body.allTime.listeners.map(({ name }) => name)).toEqual(['zoe']);
+  });
+
   it('gives a member their own plays and no listener names', async () => {
     const s = await seedAlbum();
 

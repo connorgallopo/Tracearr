@@ -625,15 +625,22 @@ const executeMessageClient: ActionExecutor = async (
     identityServerUserIds: rule.enforceAcrossServers ? identityServerUserIds : undefined,
   });
 
+  // One server refusing a message must not keep it from the other targets
   let historicalTargets = 0;
+  let failure: unknown;
   for (const targetSession of sessionsToMessage) {
-    const outcome = await currentDeps.sendClientMessage(
-      targetSession.id,
-      message,
-      targetSession.startedAt
-    );
-    if (outcome?.skipReason === 'server_historical') historicalTargets += 1;
+    try {
+      const outcome = await currentDeps.sendClientMessage(
+        targetSession.id,
+        message,
+        targetSession.startedAt
+      );
+      if (outcome?.skipReason === 'server_historical') historicalTargets += 1;
+    } catch (error) {
+      failure ??= error;
+    }
   }
+  if (failure !== undefined) throw failure;
   if (sessionsToMessage.length > 0 && historicalTargets === sessionsToMessage.length) {
     return { skipReason: 'server_historical' };
   }

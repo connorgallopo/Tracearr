@@ -1,7 +1,28 @@
 {
   "version": "3.2.0",
   "date": "2026-11-08",
+  "upgradeWarning": "Back up before upgrading. Request ids are stored differently from this release on, so going back to an older version needs that backup",
   "changes": [
+    {
+      "type": "new",
+      "text": "new media server: tofa, with live sessions, library, history import and its built-in requests"
+    },
+    {
+      "type": "new",
+      "text": "connect a tofa server by signing in to tofa, in setup or Settings → Servers, with no API key to paste"
+    },
+    {
+      "type": "new",
+      "text": "the owner and members can sign in with their tofa account, with its own switch under Settings → Access → Sign-in"
+    },
+    {
+      "type": "note",
+      "text": "a tofa server needs version 0.13.3 or newer"
+    },
+    {
+      "type": "improved",
+      "text": "first-run setup walks through signing in, connecting a server and importing history"
+    },
     {
       "type": "new",
       "text": "option under Settings → Access → Sign-in to make single sign-on the only way admins and members sign in",
@@ -28,6 +49,55 @@
       "type": "fix",
       "text": "signing out of a single sign-on account returns to the login page instead of the identity provider's logout page",
       "refs": ["#1445"]
+    },
+    {
+      "type": "fix",
+      "text": "Live TV names the program's show, season and episode, with the channel under the title",
+      "refs": ["#1441"]
+    },
+    {
+      "type": "fix",
+      "text": "Jellyfin and Emby Live TV shows the program on air, where it showed only the channel"
+    },
+    {
+      "type": "improved",
+      "text": "Plex Live TV takes the channel and art from the program guide when the session doesn't name them"
+    },
+    {
+      "type": "improved",
+      "text": "starting a history import no longer waits on the media server; on a new server it waits for the first library sync"
+    },
+    {
+      "type": "improved",
+      "text": "a failed import tries again on its own, 3 attempts in all; a rejected key fails at once and shows the reason"
+    },
+    {
+      "type": "improved",
+      "text": "Add Server offers the same history import step as first-run setup"
+    },
+    {
+      "type": "improved",
+      "text": "Library and Tasks show a new server's first sync while it's queued, and a toast says if it fails for good"
+    },
+    {
+      "type": "improved",
+      "text": "Settings → Servers → Connections rows have one Sync button and one menu, with status shown as badges"
+    },
+    {
+      "type": "fix",
+      "text": "people lists keep each person's Tracearr name under a server filter, not a media server account's name"
+    },
+    {
+      "type": "note",
+      "text": "public API names a person with no display name by their Tracearr username, not a media server account's username"
+    },
+    {
+      "type": "fix",
+      "text": "a Jellyfin or Emby server re-added at its address syncs its libraries right away"
+    },
+    {
+      "type": "fix",
+      "text": "with two servers of one type, import progress shows only under the server being imported"
     }
   ]
 }

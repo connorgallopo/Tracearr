@@ -451,7 +451,7 @@ const ActiveStream = z
     server_name: z.string(),
     server_type: ServerTypeEnum,
     username: z.string().openapi({
-      description: "Identity display name when linked, else the server account's username",
+      description: 'The Tracearr display name, else the Tracearr username',
     }),
     user_thumb: z.string().nullable().openapi({ description: 'Avatar as the server reports it' }),
     user_avatar_url: z.string().nullable().openapi({ description: 'Proxied avatar URL' }),
@@ -583,7 +583,7 @@ const ViolationUser = z
       .openapi({ description: 'Tracearr identity id, the same id /users and /history use' }),
     server_user_id: z.uuid().openapi({ description: "Tracearr's id for the per-server account" }),
     username: z.string().openapi({
-      description: 'The identity display name when it has one, else the account name on the server',
+      description: 'The Tracearr display name, else the Tracearr username',
     }),
     thumb_url: z.string().nullable().openapi({ description: 'Avatar as the server reports it' }),
     avatar_url: z.string().nullable().openapi({ description: 'Proxied avatar URL' }),

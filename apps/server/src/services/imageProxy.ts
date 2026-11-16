@@ -13,13 +13,17 @@ import sharp from 'sharp';
 import { and, eq, isNull } from 'drizzle-orm';
 import {
   POSTER_IMAGE_SIZE,
+  SERVER_PROFILES,
   SQUARE_POSTER_SIZE,
   TIME_MS,
   assertNever,
   isDirectAvatarUrl,
+  isProxiableAvatarUrl,
+  type RequestServiceType,
+  type ServerType,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
-import { servers, libraryItems } from '../db/schema.js';
+import { servers, libraryItems, mediaRequests, requestServices } from '../db/schema.js';
 import { assertSafeProbeUrl, SsrfBlockedError } from '../utils/ssrf.js';
 import { cacheWriteAllowed, noteCacheWrite } from './imageCacheGuard.js';
 import { mediaBrowserTokenHeader } from './mediaServer/shared/baseMediaServerClient.js';
@@ -377,18 +381,55 @@ function assertCanonicalImagePath(baseUrl: string, imagePath: string): void {
   }
 }
 
-const IMAGE_PATH_ALLOWLIST: Record<(typeof servers.$inferSelect)['type'], RegExp> = {
+type ServerRow = typeof servers.$inferSelect;
+
+/**
+ * Where an image is fetched from: a media server, or a Seerr service's own image cache. A request
+ * service's origin carries its id, since it serves only the posters its requests hold.
+ */
+type ImageOrigin =
+  | { kind: 'server'; server: ServerRow; requestServiceId: string | null }
+  | { kind: 'seerr'; url: string; requestServiceId: string };
+
+const UPSTREAM_TIMEOUT_MS = 10_000;
+
+const IMAGE_PATH_ALLOWLIST: Record<ServerType, RegExp> = {
   plex: /^\/library\/metadata\/[^/?#]+\/thumb\/[^/?#]+$/,
   jellyfin: /^\/(Items|Users)\/[^/?#]+\/Images\/Primary(\?tag=[^&#]+)?$/,
   emby: /^\/(Items|Users)\/[^/?#]+\/Images\/Primary(\?tag=[^&#]+)?$/,
+  // An artwork path, or the image cache path it redirects to with the size it was asked for,
+  // or one of the avatars bundled with the server
+  tofa: /^\/(api\/v1\/artwork\/[0-9a-f-]+\/poster|api\/v1\/profiles\/avatars\/[\w-]+\.png|cache\/images\/[a-z]+\/[^/?#]+(\?[wh]=\d+)?)$/,
 };
 
+/** A guide image on a host the server's guide links art from, as an https address; null for anything else */
+function guideImageUrl(server: ServerRow, imagePath: string): string | null {
+  if (!URL.canParse(imagePath)) return null;
+  const url = new URL(imagePath);
+  const allowed =
+    SERVER_PROFILES[server.type].guideImageHosts.includes(url.hostname) &&
+    /^https?:$/.test(url.protocol) &&
+    !url.port &&
+    !url.username &&
+    !url.password;
+  return allowed ? `https://${url.hostname}${url.pathname}${url.search}` : null;
+}
+
+interface UpstreamRequest {
+  imageUrl: string;
+  headers: Record<string, string>;
+}
+
 export function buildUpstreamRequest(
-  server: typeof servers.$inferSelect,
+  server: ServerRow,
   imagePath: string,
   resize?: { width: number; height: number }
-): { imageUrl: string; headers: Record<string, string> } {
+): UpstreamRequest {
   const headers: Record<string, string> = { Accept: 'image/*' };
+  // Fetched from the guide's own host, without the server's token
+  const guideImage = guideImageUrl(server, imagePath);
+  if (guideImage) return { imageUrl: guideImage, headers };
+
   const baseUrl = server.url.replace(/\/$/, '');
 
   // Origin pinning makes the configured server the only reachable host, so one
@@ -441,8 +482,111 @@ export function buildUpstreamRequest(
       }
       return { imageUrl: `${baseUrl}${imagePath}`, headers };
     }
+    case 'tofa': {
+      headers.Authorization = `Bearer ${server.token}`;
+      if (resize) {
+        const dimension =
+          resize.height >= resize.width ? `h=${resize.height}` : `w=${resize.width}`;
+        return { imageUrl: `${baseUrl}${imagePath}?${dimension}`, headers };
+      }
+      return { imageUrl: `${baseUrl}${imagePath}`, headers };
+    }
     default:
       return assertNever(server.type);
+  }
+}
+
+// The size Seerr's own request cards ask its image cache for, so the file is often cached there already
+const SEERR_POSTER_PREFIX = '/imageproxy/tmdb/t/p/w600_and_h900_bestv2';
+const SEERR_IMAGE_PATH = /^\/imageproxy\/tmdb\/t\/p\/w600_and_h900_bestv2\/[\w-]+\.[a-z]+$/;
+
+/** A TMDB poster file as Seerr's image cache serves it; null for anything but a bare file name */
+export function seerrPosterPath(tmdbPosterPath: string | null | undefined): string | null {
+  if (!tmdbPosterPath) return null;
+  const path = `${SEERR_POSTER_PREFIX}${tmdbPosterPath}`;
+  return SEERR_IMAGE_PATH.test(path) ? path : null;
+}
+
+/** Seerr's image cache answers without the API key, so none is sent */
+function buildSeerrImageRequest(url: string, imagePath: string): UpstreamRequest {
+  const baseUrl = url.replace(/\/+$/, '');
+  assertCanonicalImagePath(baseUrl, imagePath);
+  assertSafeProbeUrl(baseUrl);
+  if (!SEERR_IMAGE_PATH.test(imagePath)) {
+    throw new SsrfBlockedError(`Not a Seerr image path: ${imagePath}`);
+  }
+  return { imageUrl: `${baseUrl}${imagePath}`, headers: { Accept: 'image/*' } };
+}
+
+/** tofa answers an artwork path with a redirect into its own image cache, which needs the key too. */
+function followsImageRedirect(type: ServerType): boolean {
+  switch (type) {
+    case 'plex':
+    case 'jellyfin':
+    case 'emby':
+      return false;
+    case 'tofa':
+      return true;
+    default:
+      return assertNever(type);
+  }
+}
+
+/**
+ * A redirect is followed, with the key, only where the server's images live behind one and the
+ * target passes the same path checks as the first request. Any other redirect is returned as
+ * the failure it is, since following it would carry the key past those checks.
+ */
+async function fetchUpstreamImage(
+  server: ServerRow,
+  imageUrl: string,
+  headers: Record<string, string>
+): Promise<Response> {
+  const init = { redirect: 'manual', signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS) } as const;
+  const response = await fetch(imageUrl, { ...init, headers });
+  const location = response.headers.get('location');
+  const redirected = response.status >= 300 && response.status < 400;
+  const onServer = new URL(imageUrl).origin === new URL(server.url).origin;
+  if (!redirected || !location || !onServer || !followsImageRedirect(server.type)) return response;
+
+  const target = new URL(location, imageUrl);
+  if (target.origin !== new URL(imageUrl).origin) return response;
+  await response.body?.cancel().catch(() => undefined);
+  const next = buildUpstreamRequest(server, `${target.pathname}${target.search}`);
+  return fetch(next.imageUrl, { ...init, headers: next.headers });
+}
+
+/** A media server is asked for a resized image first, then the original; Seerr's cache has one size. */
+function upstreamRequests(
+  origin: ImageOrigin,
+  imagePath: string,
+  size: { width: number; height: number },
+  resizedOnly: boolean
+): UpstreamRequest[] {
+  switch (origin.kind) {
+    case 'server': {
+      const resized = buildUpstreamRequest(origin.server, imagePath, size);
+      return resizedOnly ? [resized] : [resized, buildUpstreamRequest(origin.server, imagePath)];
+    }
+    case 'seerr':
+      return [buildSeerrImageRequest(origin.url, imagePath)];
+    default:
+      return assertNever(origin);
+  }
+}
+
+function fetchFromOrigin(origin: ImageOrigin, request: UpstreamRequest): Promise<Response> {
+  switch (origin.kind) {
+    case 'server':
+      return fetchUpstreamImage(origin.server, request.imageUrl, request.headers);
+    case 'seerr':
+      return fetch(request.imageUrl, {
+        headers: request.headers,
+        redirect: 'manual',
+        signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+      });
+    default:
+      return assertNever(origin);
   }
 }
 
@@ -457,35 +601,101 @@ interface MissPipelineArgs {
   resizedOnly: boolean;
 }
 
+// Origins change rarely (URL or token edits), and every cache miss needs one -
+// during a warm pass that's hundreds of identical point lookups. The short TTL
+// means a token rotation takes at most 30s to reach this path.
+const ORIGIN_TTL_MS = 30_000;
+const originCache = new Map<string, { origin: ImageOrigin | null; at: number }>();
+
+export function _resetImageOriginCacheForTests(): void {
+  originCache.clear();
+}
+
+async function selectServer(serverId: string): Promise<ServerRow | undefined> {
+  const [row] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
+  return row;
+}
+
+function serverOrigin(
+  server: ServerRow | undefined,
+  requestServiceId: string | null
+): ImageOrigin | null {
+  return server && !server.historicalAt ? { kind: 'server', server, requestServiceId } : null;
+}
+
+/** tofa's requests are its server's own, so their art comes from that server with its key */
+async function requestServiceOrigin(service: {
+  id: string;
+  type: RequestServiceType;
+  url: string;
+  serverId: string;
+}): Promise<ImageOrigin | null> {
+  switch (service.type) {
+    case 'tofa':
+      return serverOrigin(await selectServer(service.serverId), service.id);
+    case 'seerr':
+      return { kind: 'seerr', url: service.url, requestServiceId: service.id };
+    default:
+      return assertNever(service.type);
+  }
+}
+
+/** The id is a media server's, or a request service's for a request whose title is in no library */
+async function readImageOrigin(id: string): Promise<ImageOrigin | null> {
+  const server = await selectServer(id);
+  if (server) return serverOrigin(server, null);
+  const [service] = await db
+    .select({
+      id: requestServices.id,
+      type: requestServices.type,
+      url: requestServices.url,
+      serverId: requestServices.serverId,
+      enabled: requestServices.enabled,
+    })
+    .from(requestServices)
+    .where(eq(requestServices.id, id))
+    .limit(1);
+  return service?.enabled ? requestServiceOrigin(service) : null;
+}
+
 /**
- * The whole cache-miss pipeline: server lookup, upstream fetch (behind the
+ * The route is unauthenticated, so a request service is asked only for a poster one of its
+ * requests holds, never any image it would serve.
+ */
+async function originServes(origin: ImageOrigin, imagePath: string): Promise<boolean> {
+  if (origin.requestServiceId === null) return true;
+  const [held] = await db
+    .select({ id: mediaRequests.id })
+    .from(mediaRequests)
+    .where(
+      and(
+        eq(mediaRequests.serviceId, origin.requestServiceId),
+        eq(mediaRequests.posterPath, imagePath)
+      )
+    )
+    .limit(1);
+  return held !== undefined;
+}
+
+async function getImageOrigin(id: string): Promise<ImageOrigin | null> {
+  const cached = originCache.get(id);
+  if (cached && Date.now() - cached.at < ORIGIN_TTL_MS) return cached.origin;
+  const origin = await readImageOrigin(id);
+  originCache.set(id, { origin, at: Date.now() });
+  return origin;
+}
+
+/**
+ * The whole cache-miss pipeline: origin lookup, upstream fetch (behind the
  * global semaphore), resize/encode, atomic cache write, and the write-once
  * dominant color persist. Wrapped by the coalescing map in proxyImage so
  * concurrent misses for the same key run this exactly once.
  */
-// Server rows change rarely (URL or token edits), and every cache miss needs
-// one - during a warm pass that's hundreds of identical point lookups. The
-// short TTL means a token rotation takes at most 30s to reach this path.
-const SERVER_ROW_TTL_MS = 30_000;
-const serverRowCache = new Map<string, { row: typeof servers.$inferSelect | null; at: number }>();
-
-export function _resetServerRowCacheForTests(): void {
-  serverRowCache.clear();
-}
-
-async function getServerRow(serverId: string): Promise<typeof servers.$inferSelect | null> {
-  const cached = serverRowCache.get(serverId);
-  if (cached && Date.now() - cached.at < SERVER_ROW_TTL_MS) return cached.row;
-  const [row] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
-  serverRowCache.set(serverId, { row: row ?? null, at: Date.now() });
-  return row ?? null;
-}
-
 async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
   const { serverId, imagePath, width, height, fallback, cachePath, shardDir, resizedOnly } = args;
 
-  const server = await getServerRow(serverId);
-  if (!server || server.historicalAt) {
+  const origin = await getImageOrigin(serverId);
+  if (!origin || !(await originServes(origin, imagePath))) {
     return {
       data: getFallbackImage(fallback, width, height),
       contentType: 'image/svg+xml',
@@ -503,22 +713,12 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
   try {
     // Inside the try so a blocked path degrades to the fallback image like any
     // other upstream failure, instead of escaping as a 500.
-    const candidates = resizedOnly
-      ? [buildUpstreamRequest(server, imagePath, { width, height })]
-      : [
-          buildUpstreamRequest(server, imagePath, { width, height }),
-          buildUpstreamRequest(server, imagePath),
-        ];
+    const candidates = upstreamRequests(origin, imagePath, { width, height }, resizedOnly);
     let imageBuffer: Buffer | null = null;
     let lastError: unknown = null;
-    for (const { imageUrl, headers } of candidates) {
+    for (const candidate of candidates) {
       try {
-        // A redirect would carry the token past the path checks, so it counts as a failure.
-        const response = await fetch(imageUrl, {
-          headers,
-          redirect: 'manual',
-          signal: AbortSignal.timeout(10000), // 10 second timeout
-        });
+        const response = await fetchFromOrigin(origin, candidate);
         serverAnswered = true;
 
         // Reject only clearly-non-image payloads (the Plex transcoder can
@@ -694,6 +894,42 @@ export async function proxyImage(options: ProxyOptions): Promise<ProxyResult> {
 }
 
 /**
+ * A person's own picture at an address no media server holds, such as their OIDC provider's,
+ * fetched here so their browser never asks that host. Null when it cannot be fetched.
+ */
+export async function proxyAccountPicture(url: string, size: number): Promise<ProxyResult | null> {
+  const { fileName, shard } = buildCacheKeyInfo('account', url, size, size);
+  const shardDir = join(IMAGE_CACHE_DIR, shard);
+  const cachePath = join(shardDir, fileName);
+  const cached = await readFromCache(cachePath, false);
+  if (cached) return cached;
+
+  const release = await acquireFetchSlot();
+  try {
+    assertSafeProbeUrl(url);
+    const response = await fetch(url, {
+      headers: { Accept: 'image/*' },
+      redirect: 'manual',
+      signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS),
+    });
+    if (!response.ok) {
+      await response.body?.cancel().catch(() => undefined);
+      return null;
+    }
+    const resized = await sharp(Buffer.from(await response.arrayBuffer()), { autoOrient: true })
+      .resize(size, size, { fit: 'cover', position: 'center' })
+      .webp({ quality: 80 })
+      .toBuffer();
+    await writeCacheAtomic(shardDir, cachePath, resized);
+    return { data: resized, contentType: 'image/webp', cached: false };
+  } catch {
+    return null;
+  } finally {
+    release();
+  }
+}
+
+/**
  * Get a gravatar URL for an email
  */
 export function getGravatarUrl(email: string | null | undefined, size: number = 100): string {
@@ -813,7 +1049,8 @@ export function buildPosterUrl(
 
 /**
  * Build an avatar URL for API responses (relative).
- * Returns the URL as-is if it's already an absolute URL (e.g., from Plex.tv).
+ * An absolute plex.tv URL is returned as-is, one on a host the proxy may fetch goes through it,
+ * and any other absolute URL gives null.
  */
 export function buildAvatarUrl(
   serverId: string | null | undefined,
@@ -821,7 +1058,9 @@ export function buildAvatarUrl(
   size: number = IMAGE_SIZES.apiAvatar.width
 ): string | null {
   if (!thumbUrl) return null;
-  if (thumbUrl.startsWith('http')) return isDirectAvatarUrl(thumbUrl) ? thumbUrl : null;
+  if (thumbUrl.startsWith('http') && !isProxiableAvatarUrl(thumbUrl)) {
+    return isDirectAvatarUrl(thumbUrl) ? thumbUrl : null;
+  }
   if (!serverId) return null;
   return buildProxyUrl({
     serverId,
@@ -852,7 +1091,7 @@ export function buildPushPosterUrl(
 
 /**
  * Build an avatar URL for push notifications (absolute).
- * Returns the URL as-is if it's already an absolute URL.
+ * Absolute URLs are handled as in buildAvatarUrl.
  */
 export function buildPushAvatarUrl(
   baseUrl: string | null | undefined,
@@ -860,7 +1099,9 @@ export function buildPushAvatarUrl(
   thumbUrl: string | null | undefined
 ): string | null {
   if (!thumbUrl) return null;
-  if (thumbUrl.startsWith('http')) return isDirectAvatarUrl(thumbUrl) ? thumbUrl : null;
+  if (thumbUrl.startsWith('http') && !isProxiableAvatarUrl(thumbUrl)) {
+    return isDirectAvatarUrl(thumbUrl) ? thumbUrl : null;
+  }
   if (!serverId) return null;
   return buildAbsoluteProxyUrl(baseUrl, {
     serverId,

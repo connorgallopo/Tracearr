@@ -54,6 +54,7 @@ import type { Redis } from 'ioredis';
 import type { ServerType } from '@tracearr/shared';
 import { LibrarySyncService, initLibrarySyncRedis } from '../librarySync.js';
 import { createMediaServerClient } from '../mediaServer/index.js';
+import { NOT_NEEDED } from '../mediaServer/types.js';
 import { fakeEmbyClient, fakeJellyfinClient, fakePlexClient } from '../../test/mediaServerFakes.js';
 import { db } from '../../db/client.js';
 
@@ -172,6 +173,7 @@ function makeMockClient(
         fileSize: 1000000,
       })),
       totalCount: itemsSinceCount,
+      feed: NOT_NEEDED,
     }),
   });
 }
@@ -244,7 +246,10 @@ describe('LibrarySyncService full-scan cycle', () => {
       expect(client.getLibraryItemsSince).toHaveBeenCalledTimes(1);
       expect(client.getLibraryLeavesSince).toHaveBeenCalledTimes(leafCalls);
       if (leafCalls > 0) {
-        expect(client.getLibraryLeavesSince).toHaveBeenCalledWith('1', lastSyncedAt);
+        expect(client.getLibraryLeavesSince).toHaveBeenCalledWith('1', {
+          kind: 'date',
+          since: lastSyncedAt,
+        });
       }
     }
   );

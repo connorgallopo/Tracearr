@@ -6,6 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
+import { APIError } from 'better-auth/api';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '@tracearr/shared';
@@ -102,6 +103,22 @@ describe('owner link routes', () => {
 
     expect(response.statusCode).toBe(200);
     expect(mockUnlink).toHaveBeenCalledWith(owner.userId, serverUserId, 'session-1');
+  });
+
+  it("refuses an unlink that would take the owner's last way to sign in", async () => {
+    app = await buildTestApp(createAuthUser('owner'));
+    mockResolveSession.mockResolvedValue(null);
+    mockUnlink.mockRejectedValueOnce(
+      new APIError('BAD_REQUEST', { message: 'That would leave the owner with no way to sign in.' })
+    );
+
+    const response = await app.inject({
+      method: 'DELETE',
+      url: `/users/owner-links/${randomUUID()}`,
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().message).toBe('That would leave the owner with no way to sign in.');
   });
 
   it('rejects non-owners', async () => {

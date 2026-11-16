@@ -20,6 +20,7 @@ import {
   notInArray,
   or,
   sql,
+  type SQL,
 } from 'drizzle-orm';
 import {
   rankMergeTarget,
@@ -40,6 +41,7 @@ import { db } from '../db/client.js';
 import {
   users,
   serverUsers,
+  serverUserLinks,
   serverUserExternalAliases,
   servers,
   sessions,
@@ -65,8 +67,9 @@ import {
 } from '../db/timescale.js';
 import { invalidateAutomationsCache } from '../jobs/poller/database.js';
 import { getAuth } from '../lib/auth.js';
+import { assertOwnerKeepsALoginAfter } from '../lib/authGuards.js';
+import { upsertTofaAccount } from '../lib/memberLogin.js';
 import { refreshUserSessionSnapshots, revokeSessionsForUsers } from '../lib/revoke.js';
-import { representativeAccountOrderSql } from '../utils/representativeAccount.js';
 import {
   recomputeIdentityAggregates,
   ServerUserNotFoundError,
@@ -124,7 +127,7 @@ export function stricterLoginAccess(a: LoginAccess, b: LoginAccess): LoginAccess
  * whoever owns it, so the row is no way in on its own and follows the account through a merge or
  * split. A password or OIDC row is the lookup itself, so it still makes its identity login-capable.
  */
-export const MEDIA_AUTH_PROVIDERS = ['plex', 'jellyfin', 'emby'];
+export const MEDIA_AUTH_PROVIDERS = ['plex', 'jellyfin', 'emby', 'tofa'];
 
 export function isLoginCapable(user: MergeIdentitySnapshot): boolean {
   return (
@@ -212,26 +215,12 @@ async function loadIdentitySnapshot(tx: Tx, userId: string): Promise<MergeIdenti
   };
 }
 
-async function shownName(tx: Tx, userId: string): Promise<string | null> {
-  const result = await tx.execute(sql`
-    SELECT coalesce(u.name, rep.username) AS name
-    FROM users u
-    LEFT JOIN LATERAL (
-      SELECT su.username
-      FROM server_users su
-      WHERE su.user_id = u.id
-      ORDER BY ${representativeAccountOrderSql('su')}
-      LIMIT 1
-    ) rep ON true
-    WHERE u.id = ${userId}
-  `);
-  return (result.rows[0] as { name: string | null } | undefined)?.name ?? null;
-}
-
 export interface MergedIdentityRowIds {
   plexAccountIds: string[];
   mobileSessionIds: string[];
   mobileTokenIds: string[];
+  /** The tofa sign-in rows the merge brought, absent on audits written before it was kept */
+  tofaSignInIds?: string[];
 }
 
 async function repointIdentityRows(
@@ -282,7 +271,7 @@ async function repointIdentityRows(
   // Not recorded for split: split moves them by the account they name. The
   // source's sessions are revoked (not moved) through internalAdapter in
   // mergeUsers, since Better Auth has no primitive to re-key a session.
-  await tx
+  const movedSignIns = await tx
     .update(authAccounts)
     .set({ userId: targetUserId, updatedAt: new Date() })
     .where(
@@ -290,11 +279,14 @@ async function repointIdentityRows(
         eq(authAccounts.userId, sourceUserId),
         inArray(authAccounts.providerId, MEDIA_AUTH_PROVIDERS)
       )
-    );
+    )
+    .returning({ id: authAccounts.id, providerId: authAccounts.providerId });
   return {
     plexAccountIds: movedPlexAccounts.map((r) => r.id),
     mobileSessionIds: movedMobileSessions.map((r) => r.id),
     mobileTokenIds: movedMobileTokens.map((r) => r.id),
+    // Split tells the owner's own tofa sign-in from one a merged person brought by these.
+    tofaSignInIds: movedSignIns.filter((r) => r.providerId === 'tofa').map((r) => r.id),
   };
 }
 
@@ -460,6 +452,11 @@ async function combineServerUsers(
 
 export interface MergeUsersOptions {
   confirmSameServerCombine?: boolean;
+  /**
+   * A tofa cloud identity whose sign-in the source takes into the merge, written in its
+   * transaction so the sign-in moves only if the merge lands, and recorded as brought by it.
+   */
+  bringsTofaSignIn?: string;
 }
 
 export async function mergeUsers(
@@ -513,8 +510,6 @@ export async function mergeUsers(
     // above so a rejected merge leaves the source's sessions untouched.
     await (await getAuth().$context).internalAdapter.deleteUserSessions(sourceUserId);
 
-    const keptName = await shownName(tx, targetUserId);
-
     const combinedSourceIds = plan.combines.map((c) => c.sourceServerUserId);
     if (combinedSourceIds.length > 0) {
       [combinedHistory] = await tx
@@ -543,17 +538,11 @@ export async function mergeUsers(
         .where(inArray(serverUsers.id, plan.repointServerUserIds));
     }
 
+    if (options.bringsTofaSignIn) {
+      await upsertTofaAccount(sourceUserId, options.bringsTofaSignIn, tx);
+    }
     const movedIdentityRowIds = await repointIdentityRows(tx, sourceUserId, targetUserId);
     await recomputeIdentityAggregates(targetUserId, tx);
-
-    const nameSetOnTarget =
-      keptName !== null && (await shownName(tx, targetUserId)) !== keptName
-        ? await tx
-            .update(users)
-            .set({ name: keptName, updatedAt: new Date() })
-            .where(and(eq(users.id, targetUserId), isNull(users.name)))
-            .returning({ id: users.id })
-        : [];
 
     // If this source was itself the target of an earlier merge, that earlier
     // audit's targetUserId still points at it. user_merge_audits.targetUserId
@@ -649,7 +638,6 @@ export async function mergeUsers(
           role: sourceUser.role,
           contactEmail: sourceUser.contactEmail,
           contactEmailCarried: carriedContactEmail.length > 0,
-          nameSetOnTarget: nameSetOnTarget.length > 0 ? keptName : null,
         },
         movedIdentityRowIds,
       })
@@ -707,6 +695,31 @@ async function refreshCombinedHistory(oldest: Date, newest: Date): Promise<void>
   }
 }
 
+/**
+ * The owner's own tofa sign-in names this account's cloud identity and no live merge that moved the
+ * account brought it, so splitting the account off would hand the owner's sign-in to a member.
+ * Any such merge counts, not only the oldest: in a chain (A into B, then B into the owner) the
+ * oldest audit is the one that moved the account away from A, while the sign-in arrives with the
+ * later merge that brought B in, and both audits list the account.
+ */
+export function keepsOwnerTofaSignIn(account: {
+  id: SQL | string;
+  userId: SQL | string;
+  cloudIdentityId: SQL | string;
+}): SQL<boolean> {
+  return sql<boolean>`exists (
+    select 1 from auth_accounts aa join users u on u.id = aa.user_id
+    where aa.user_id = ${account.userId} and u.role = 'owner'
+      and aa.provider_id = 'tofa' and aa.account_id = ${account.cloudIdentityId}
+      and not exists (
+        select 1 from user_merge_audits uma
+        where uma.target_user_id = aa.user_id and uma.undone_at is null
+          and uma.moved_server_user_ids @> jsonb_build_array((${account.id})::text)
+          and uma.moved_identity_row_ids -> 'tofaSignInIds' @> jsonb_build_array(aa.id)
+      )
+  )`;
+}
+
 export async function splitServerUser(
   serverUserId: string,
   actingUserId: string,
@@ -714,6 +727,8 @@ export async function splitServerUser(
   options: { allowLastAccount?: boolean } = {}
 ): Promise<ServerUserSplitResult> {
   void actingUserId;
+
+  await assertOwnerKeepsALoginAfter({ kind: 'unlinkAccount', serverUserId });
 
   const result = await db.transaction(async (tx) => {
     const [serverUser] = await tx
@@ -755,6 +770,21 @@ export async function splitServerUser(
       )
       .orderBy(asc(userMergeAudits.createdAt))
       .limit(1);
+
+    if (serverUser.cloudIdentityId) {
+      const {
+        rows: [ownerSignIn],
+      } = await tx.execute<{ kept: boolean }>(
+        sql`select ${keepsOwnerTofaSignIn({
+          id: serverUser.id,
+          userId: serverUser.userId,
+          cloudIdentityId: serverUser.cloudIdentityId,
+        })} as kept`
+      );
+      if (ownerSignIn?.kept) {
+        throw new MergeValidationError('cannot split off the account the owner signs in with');
+      }
+    }
 
     const [accountServer] = await tx
       .select({ type: servers.type })
@@ -815,46 +845,44 @@ export async function splitServerUser(
             ? 'default'
             : 'block',
       })
-      .returning();
+      .returning({ id: users.id });
+    if (!newUser) throw new Error('Failed to create the split identity');
 
     const oldUserId = serverUser.userId;
     await tx
       .update(serverUsers)
-      .set({ userId: newUser!.id, updatedAt: new Date() })
+      .set({ userId: newUser.id, updatedAt: new Date() })
       .where(eq(serverUsers.id, serverUserId));
 
     // The sign-in rows that name this account go with it, so blocking the old identity later can
-    // never log out this person's Jellyfin or Emby token. A plex.tv account the old identity still
-    // has on another Plex server keeps its row there.
-    const [plexStillOnOld] = serverUser.plexAccountId
-      ? await tx
-          .select({ id: serverUsers.id })
-          .from(serverUsers)
-          .where(
-            and(
-              eq(serverUsers.userId, oldUserId),
-              eq(serverUsers.plexAccountId, serverUser.plexAccountId)
-            )
-          )
-          .limit(1)
-      : [];
+    // never log out this person's Jellyfin or Emby token. A plex.tv or tofa cloud account the old
+    // identity still has on another server keeps its row there.
+    const cloudAccountRow = async (
+      providerId: 'plex' | 'tofa',
+      accountId: string | null,
+      column: typeof serverUsers.plexAccountId | typeof serverUsers.cloudIdentityId
+    ) => {
+      if (!accountId) return [];
+      const [stillOnOld] = await tx
+        .select({ id: serverUsers.id })
+        .from(serverUsers)
+        .where(and(eq(serverUsers.userId, oldUserId), eq(column, accountId)))
+        .limit(1);
+      return stillOnOld
+        ? []
+        : [and(eq(authAccounts.providerId, providerId), eq(authAccounts.accountId, accountId))];
+    };
     const namesThisAccount = [
       and(
         inArray(authAccounts.providerId, ['jellyfin', 'emby']),
         eq(authAccounts.accountId, `${serverUser.serverId}:${serverUser.externalId}`)
       ),
-      ...(serverUser.plexAccountId && !plexStillOnOld
-        ? [
-            and(
-              eq(authAccounts.providerId, 'plex'),
-              eq(authAccounts.accountId, serverUser.plexAccountId)
-            ),
-          ]
-        : []),
+      ...(await cloudAccountRow('plex', serverUser.plexAccountId, serverUsers.plexAccountId)),
+      ...(await cloudAccountRow('tofa', serverUser.cloudIdentityId, serverUsers.cloudIdentityId)),
     ];
     await tx
       .update(authAccounts)
-      .set({ userId: newUser!.id, updatedAt: new Date() })
+      .set({ userId: newUser.id, updatedAt: new Date() })
       .where(and(eq(authAccounts.userId, oldUserId), or(...namesThisAccount)));
 
     if (audit) {
@@ -864,7 +892,7 @@ export async function splitServerUser(
       // this is a no-op for them - the fallback path's current behavior
       // (those rows stay on the target) is preserved on purpose.
       if (audit.movedIdentityRowIds) {
-        await repointIdentityRowsBack(tx, audit.movedIdentityRowIds, oldUserId, newUser!.id);
+        await repointIdentityRowsBack(tx, audit.movedIdentityRowIds, oldUserId, newUser.id);
       }
 
       // Only a gap-filled address the owner has not since retyped goes back.
@@ -909,10 +937,26 @@ export async function splitServerUser(
       }
     }
 
-    await recomputeIdentityAggregates(oldUserId, tx);
-    await recomputeIdentityAggregates(newUser!.id, tx);
+    // Every live merge that still lists the account, this split's own included, stops listing it:
+    // none speaks for it once it has left, so none can lend it a snapshot or vouch for a tofa
+    // sign-in if the account comes back another way.
+    await tx
+      .update(userMergeAudits)
+      .set({
+        movedServerUserIds: sql`${userMergeAudits.movedServerUserIds} - ${serverUserId}::text`,
+      })
+      .where(
+        and(
+          eq(userMergeAudits.targetUserId, oldUserId),
+          isNull(userMergeAudits.undoneAt),
+          sql`${userMergeAudits.movedServerUserIds} @> ${JSON.stringify([serverUserId])}::jsonb`
+        )
+      );
 
-    return { newUserId: newUser!.id, serverUserId, oldUserId };
+    await recomputeIdentityAggregates(oldUserId, tx);
+    await recomputeIdentityAggregates(newUser.id, tx);
+
+    return { newUserId: newUser.id, serverUserId, oldUserId };
   });
 
   // The old identity's aggregates changed above but any live session's
@@ -926,6 +970,13 @@ export async function splitServerUser(
 
   return { newUserId: result.newUserId, serverUserId: result.serverUserId };
 }
+
+/** Strongest evidence first */
+const MATCH_RANK: Record<MergeSuggestion['matchType'], number> = {
+  linkedAccount: 0,
+  email: 1,
+  username: 2,
+};
 
 // Matches server_users.email/username across identities, never users.email
 // (that column is already unique, so two identities can never share it).
@@ -941,12 +992,12 @@ export async function getMergeSuggestions(): Promise<MergeSuggestion[]> {
   // account into its replacement on the same server, so excluding removed
   // rows would hide exactly the suggestions we want to surface. The UI
   // labels removed accounts to the reviewer.
-  const pairRows = await db
+  const sharedRows = await db
     .selectDistinct({
       userA: sql<string>`least(${a.userId}, ${b.userId})`,
       userB: sql<string>`greatest(${a.userId}, ${b.userId})`,
       matchType: sql<
-        'email' | 'username'
+        MergeSuggestion['matchType']
       >`case when ${emailMatch} then 'email' else 'username' end`,
       matchValue: sql<string>`case when ${emailMatch} then lower(${a.email}) else ${a.username} end`,
     })
@@ -960,16 +1011,49 @@ export async function getMergeSuggestions(): Promise<MergeSuggestion[]> {
       )
     );
 
+  // An account one server says is its user's account on another server, found there by the
+  // other server's identifier and the account's id. Plex accounts are known by two ids.
+  const linkedRows = await db
+    .selectDistinct({
+      userA: sql<string>`least(${a.userId}, ${b.userId})`,
+      userB: sql<string>`greatest(${a.userId}, ${b.userId})`,
+      matchType: sql<MergeSuggestion['matchType']>`'linkedAccount'`,
+      matchValue: b.username,
+    })
+    .from(serverUserLinks)
+    .innerJoin(a, eq(a.id, serverUserLinks.serverUserId))
+    .innerJoin(
+      servers,
+      and(
+        eq(servers.machineIdentifier, serverUserLinks.externalServerId),
+        sql`${servers.type}::text = ${serverUserLinks.provider}`
+      )
+    )
+    .innerJoin(
+      b,
+      and(
+        eq(b.serverId, servers.id),
+        ne(a.userId, b.userId),
+        or(
+          eq(b.externalId, serverUserLinks.externalUserId),
+          eq(b.plexAccountId, serverUserLinks.externalUserId)
+        )
+      )
+    );
+
+  const pairRows = [...linkedRows, ...sharedRows];
   if (pairRows.length === 0) return [];
 
-  // One suggestion per identity pair; email matches outrank username matches.
-  // When two rows share the same matchType, the lexicographically smallest
-  // matchValue wins so the result never depends on unspecified SQL row order.
+  // One suggestion per identity pair; a linked account outranks an email match, which
+  // outranks a username match. When two rows share the same matchType, the
+  // lexicographically smallest matchValue wins so the result never depends on
+  // unspecified SQL row order.
   const pairKey = (row: (typeof pairRows)[number]) => mergeSuggestionKey(row.userA, row.userB);
   const bestByPair = new Map<string, (typeof pairRows)[number]>();
   for (const row of pairRows) {
     const existing = bestByPair.get(pairKey(row));
-    const rowIsBetterMatchType = existing?.matchType === 'username' && row.matchType === 'email';
+    const rowIsBetterMatchType =
+      existing !== undefined && MATCH_RANK[row.matchType] < MATCH_RANK[existing.matchType];
     const rowIsSmallerValue =
       existing?.matchType === row.matchType && row.matchValue < existing.matchValue;
     if (!existing || rowIsBetterMatchType || rowIsSmallerValue) {
@@ -1019,12 +1103,9 @@ export async function getMergeSuggestions(): Promise<MergeSuggestion[]> {
     });
   }
 
-  suggestions.sort((x, y) =>
-    x.matchType === y.matchType
-      ? x.matchValue.localeCompare(y.matchValue)
-      : x.matchType === 'email'
-        ? -1
-        : 1
+  suggestions.sort(
+    (x, y) =>
+      MATCH_RANK[x.matchType] - MATCH_RANK[y.matchType] || x.matchValue.localeCompare(y.matchValue)
   );
   return suggestions;
 }

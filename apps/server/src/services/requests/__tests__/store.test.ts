@@ -86,6 +86,7 @@ function makeRow(overrides: Partial<RequestServiceRow> = {}): RequestServiceRow 
     config: 'enc:eyJhcGlLZXkiOiJrIn0=',
     configStatus: 'ok',
     enabled: true,
+    takesRequests: true,
     remoteServerId: 'abc',
     version: 'develop-4fc2',
     syncCursor: null,

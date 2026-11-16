@@ -133,6 +133,7 @@
     "noTerminations": "Cap transmissió finalitzada",
     "lastSeen": "Vist per últim cop {{relative}}",
     "terminatedBy": "Per @{{username}}",
+    "terminatedByName": "",
     "trustScoreConfirm": "Voleu establir la puntuació de confiança de @{{username}} a {{score}}?",
     "trustScoreRange": "Puntuació de confiança de @{{username}}, de 0 a 100.",
     "moreLocations_one": "+{{count}} ubicació més",

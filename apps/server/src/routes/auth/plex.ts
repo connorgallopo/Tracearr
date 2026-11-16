@@ -46,8 +46,7 @@ import {
   testServerConnections,
 } from '../../services/mediaServer/plex/connectionTest.js';
 // Token encryption removed - tokens now stored in plain text (DB is localhost-only)
-import { syncServer } from '../../services/sync.js';
-import { rebuildAutoSyncSchedules } from '../../jobs/librarySyncQueue.js';
+import { startAddedServer } from '../../services/serverCreate.js';
 import { getUserById } from '../../services/userService.js';
 import { isClaimCodeEnabled, validateClaimCode } from '../../utils/claimCode.js';
 
@@ -601,31 +600,7 @@ export const plexRoutes: FastifyPluginAsync = async (app) => {
 
       app.log.info({ serverId: newServer.id, serverName }, 'Additional Plex server added');
 
-      rebuildAutoSyncSchedules().catch((error: unknown) => {
-        app.log.error(
-          { err: error, serverId: newServer.id },
-          'Auto-sync schedule failed for new Plex server'
-        );
-      });
-
-      // Auto-sync server users and libraries in background
-      syncServer(newServer.id, { syncUsers: true, syncLibraries: true })
-        .then((result) => {
-          app.log.info(
-            {
-              serverId: newServer.id,
-              usersAdded: result.usersAdded,
-              librariesSynced: result.librariesSynced,
-            },
-            'Auto-sync completed for new Plex server'
-          );
-        })
-        .catch((error: unknown) => {
-          app.log.error(
-            { err: error, serverId: newServer.id },
-            'Auto-sync failed for new Plex server'
-          );
-        });
+      await startAddedServer(newServer, []);
 
       return {
         success: true,

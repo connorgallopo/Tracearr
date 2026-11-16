@@ -420,7 +420,7 @@ export function Jobs() {
                   <TabsTrigger key={category} value={category} className="gap-1.5">
                     <CategoryIcon className="h-3.5 w-3.5" />
                     <span className="hidden @md/job-tabs:inline">{t(config.labelKey)}</span>
-                    <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+                    <Badge variant="secondary" className="ml-1 h-5 px-1.5">
                       {jobCount}
                     </Badge>
                   </TabsTrigger>

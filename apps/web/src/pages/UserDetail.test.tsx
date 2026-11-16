@@ -96,6 +96,7 @@ const fullData = {
   },
   identity: {
     userId: 'u-1',
+    username: 'alice',
     aggregateTrustScore: 80,
     totalViolations: 1,
     contactEmail: null,
@@ -243,11 +244,29 @@ describe('UserDetail', () => {
     expect(screen.getByRole('heading', { level: 1, name: 'Alice' })).toBeInTheDocument();
     expect(screen.getByText('80')).toBeInTheDocument();
     const facts = screen.getByTestId('user-facts');
-    expect(facts).toHaveTextContent('@alice');
+    expect(facts.textContent).not.toMatch(/(^|\s)@/);
     expect(facts).toHaveTextContent('alice@example.com');
     expect(facts).toHaveTextContent('pages:userDetail.access.roleMember');
     expect(facts).toHaveTextContent('common:labels.joined');
     expect(screen.getByRole('link', { name: 'nav:users' })).toHaveAttribute('href', '/users');
+  });
+
+  it('names a person without a display name by their Tracearr username alone', async () => {
+    mockUseUserFull.mockReturnValue({
+      data: {
+        ...fullData,
+        user: { ...fullData.user, identityName: null, username: 'aaron_tofa' },
+        identity: { ...fullData.identity, username: 'zoe' },
+      },
+      isLoading: false,
+    } as unknown as ReturnType<typeof useUserFull>);
+    renderDetail();
+
+    expect(screen.getByRole('heading', { level: 1, name: 'zoe' })).toBeInTheDocument();
+    expect(screen.queryByText(/aaron_tofa/)).not.toBeInTheDocument();
+
+    await userEvent.click(screen.getByRole('button', { name: 'pages:userDetail.editIdentity' }));
+    expect(await screen.findByPlaceholderText('zoe')).toBeInTheDocument();
   });
 
   it('renders six stat cards with deltas from the range stats', () => {
@@ -256,7 +275,7 @@ describe('UserDetail', () => {
     const cards = screen.getByTestId('range-stat-cards');
     expect(cards.children).toHaveLength(6);
     expect(within(cards).getByText('+12%')).toBeInTheDocument();
-    expect(within(cards).getByText('(pages:userDetail.cards.vsPrior)')).toBeInTheDocument();
+    expect(within(cards).getByText('pages:userDetail.cards.vsPrior')).toBeInTheDocument();
   });
 
   it('defaults to the overview tab and syncs ?tab=sessions on click with replace', async () => {

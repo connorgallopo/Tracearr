@@ -148,7 +148,7 @@ export function TemplateGallery({
         <CommandList className="max-h-none flex-1 px-2 pb-2">
           <CommandEmpty>
             <p>{t('automations.gallery.noMatches', { query })}</p>
-            <p className="text-muted-foreground mt-1 text-[0.8125rem]">
+            <p className="text-muted-foreground text-dense mt-1">
               {t('automations.gallery.noMatchesHint')}
             </p>
           </CommandEmpty>

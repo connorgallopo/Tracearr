@@ -2,9 +2,7 @@
   "login": {
     "title": "Tracearr",
     "tagline": "Tracearr - Gestion d'accès aux lectures",
-    "createAccountHeading": "Créez votre compte pour démarrer",
     "signInHeading": "Connectez-vous à votre compte",
-    "createAccountDescription": "Créez un compte pour gérer vos serveurs multimédias",
     "signInDescription": "Connectez-vous pour accéder à votre tableau de bord",
     "selectPlexServer": "Choisissez votre serveur Plex",
     "waitingForPlex": "En attente d'autorisation de Plex...",
@@ -19,7 +17,6 @@
     "displayNamePlaceholder": "Choisissez un nom d'utilisateur",
     "passwordPlaceholder": "8 caractères minimum",
     "yourPasswordPlaceholder": "Votre mot de passe",
-    "setupNote": "Après avoir créé votre compte, vous pourrez ajouter vos serveurs Plex ou Jellyfin depuis les réglages.",
     "localDisabledHint": "La connexion locale est désactivée pour cette instance. Demandez à un administrateur d'exécuter \"enable-local-login\" depuis la ligne de commande Tracearr pour la réactiver.",
     "oidcError": "Échec de l'authentification unique. Veuillez réessayer ou utiliser une autre méthode de connexion disponible.",
     "accountCreated": "Compte créé avec succès !",
@@ -54,6 +51,60 @@
       "notPermitted": "Vous n'êtes pas autorisé à vous connecter. S'il vous plaît, contacter le propriétaire du serveur."
     }
   },
+  "setup": {
+    "serverTitle": "",
+    "connectTitle": "",
+    "connectDescription": "",
+    "linkPlexTitle": "",
+    "linkPlexDescription": "",
+    "stepsLabel": "",
+    "stepOfNamed": "",
+    "steps": {
+      "server": "",
+      "account": "",
+      "connect": "",
+      "import": ""
+    },
+    "stepStatus": {
+      "done": "",
+      "current": "",
+      "upcoming": ""
+    },
+    "signedInAs": "",
+    "serverHint": "",
+    "ownerTitle": "",
+    "ownerDescription": "",
+    "ownerDescriptionSignIn": "",
+    "plexWaitingDescription": "",
+    "pickerTitle": "",
+    "pickerDescription": "",
+    "connectHint": "",
+    "connectedTitle": "",
+    "connectedDescription": "",
+    "importTitle": "",
+    "importDescription": "",
+    "goToDashboard": "",
+    "codeExpired": "",
+    "signInAgain": "",
+    "timedOut": "",
+    "checkAgain": ""
+  },
+  "tofa": {
+    "signIn": "",
+    "waiting": "",
+    "waitingHint": "",
+    "waitingDescription": "",
+    "openAgain": "",
+    "expiresIn": "",
+    "codeFallback": "",
+    "pickerNote": "",
+    "unreachable": "",
+    "noAddress": "",
+    "noServersTitle": "",
+    "noServers": "",
+    "noServersPassword": "",
+    "manual": ""
+  },
   "dashboard": {
     "alerts": "Alertes",
     "plays": "Lectures",
@@ -66,6 +117,7 @@
     "noActiveStreams": "Aucune lecture en cours",
     "streamsAppearHere": "Les lectures actives apparaîtront ici lorsque les utilisateurs commenceront à regarder",
     "dayStreak": "Séquence de jours",
+    "noServers": "",
     "view": {
       "label": "Vue du tableau de bord",
       "admin": "Serveur",
@@ -168,6 +220,7 @@
     "mergeTitleBulk": "Fusionner ces utilisateurs ?",
     "mergeReasonEmail": "",
     "mergeReasonEmailUsername": "",
+    "mergeReasonLinked": "",
     "mergeReasonUsername": "",
     "mergeKeep": "Conserver",
     "mergeFoldIn": "",
@@ -194,12 +247,14 @@
     "suggestionsTitle": "Utilisateurs potentiellement en double",
     "suggestionsPairEmail": "",
     "suggestionsPairEmailUsername": "",
+    "suggestionsPairLinked": "",
     "suggestionsPairUsername": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "Vérification",
     "suggestionsNotSame": "Pas la même personne",
     "suggestionsMatchEmail": "Même adresse email",
     "suggestionsMatchEmailUsername": "",
+    "suggestionsMatchLinked": "",
     "suggestionsMatchUsername": "Nom d'utilisateur identique",
     "suggestionsEmpty": "",
     "suggestionsDismissed": "",
@@ -232,6 +287,7 @@
     "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsernameMore_one": "",
     "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairLinkedMore_other": "",
     "suggestionsPairUsernameMore_one": "",
     "suggestionsPairUsernameMore_other": "",
     "pendingLink_one": "",
@@ -377,6 +433,8 @@
     "stream": {
       "notAvailable": "",
       "bitrateUnavailable": "",
+      "rebuffers": "",
+      "droppedFrames": "",
       "stereo": "",
       "mono": "",
       "noDetails": "",
@@ -632,6 +690,10 @@
       "notSynced": {
         "title": "Bibliothèque pas encore synchronisée",
         "body": "Les statistiques de la bibliothèque apparaîtront ici une fois celle-ci synchronisée. Cela se produit généralement automatiquement chaque heure."
+      },
+      "syncQueued": {
+        "title": "",
+        "body": ""
       },
       "noMedia": {
         "title": "Aucun film ni série pour le moment",

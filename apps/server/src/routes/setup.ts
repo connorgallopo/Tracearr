@@ -35,6 +35,7 @@ async function offersQuickConnect(type: ServerType, url: string): Promise<boolea
       return quickConnectEnabled(url);
     case 'plex':
     case 'emby':
+    case 'tofa':
       return false;
     default:
       return assertNever(type);
@@ -106,6 +107,7 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
         plex: needsSetup || (usable.plex && !ssoOnly),
         oidc: usable.oidc,
         oidcProviderName: usable.oidc ? (process.env.OIDC_PROVIDER_NAME ?? 'SSO') : null,
+        tofa: needsSetup || (usable.tofa && !ssoOnly),
         member: all ? loginServers.length > 0 : usable.member,
         ssoOnly,
       },

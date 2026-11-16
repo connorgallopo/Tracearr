@@ -188,13 +188,13 @@ export function TasksTab() {
                         <div className="flex items-center gap-2">
                           <span className="font-medium">{t(info.nameKey)}</span>
                           {isActive && (
-                            <Badge variant="default" className="gap-1 px-1.5 py-0 text-[10px]">
+                            <Badge variant="default" className="gap-1 px-1.5 py-0">
                               <Cpu className="h-2.5 w-2.5" />
                               {t('debug.tasksTab.processing')}
                             </Badge>
                           )}
                           {(hasFailed || hasDlqItems) && (
-                            <Badge variant="danger" className="gap-1 px-1.5 py-0 text-[10px]">
+                            <Badge variant="danger" className="gap-1 px-1.5 py-0">
                               <AlertCircle className="h-2.5 w-2.5" />
                               {hasDlqItems
                                 ? t('debug.tasksTab.dlq', { count: stats?.dlqSize ?? 0 })

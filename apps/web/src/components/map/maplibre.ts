@@ -71,6 +71,37 @@ export function hsl(h: number, s: number, l: number, a?: number): string {
   return a === undefined ? `hsl(${h}, ${s}%, ${l}%)` : `hsla(${h}, ${s}%, ${l}%, ${a})`;
 }
 
+/**
+ * An OKLCH color as CSS `rgb()`/`rgba()`. The basemap paints on WebGL and cannot read the
+ * gray tokens, so it builds the same accent-tinted grays from their lightness here.
+ */
+export function oklchRgb(l: number, c: number, h: number, alpha?: number): string {
+  const a = c * Math.cos((h * Math.PI) / 180);
+  const b = c * Math.sin((h * Math.PI) / 180);
+  const lms = [
+    (l + 0.3963377774 * a + 0.2158037573 * b) ** 3,
+    (l - 0.1055613458 * a - 0.0638541728 * b) ** 3,
+    (l - 0.0894841775 * a - 1.291485548 * b) ** 3,
+  ] as const;
+  const linear = [
+    4.0767416621 * lms[0] - 3.3077115913 * lms[1] + 0.2309699292 * lms[2],
+    -1.2684380046 * lms[0] + 2.6097574011 * lms[1] - 0.3413193965 * lms[2],
+    -0.0041960863 * lms[0] - 0.7034186147 * lms[1] + 1.707614701 * lms[2],
+  ];
+  const [r, g, bl] = linear.map((v) => {
+    const x = Math.min(1, Math.max(0, v));
+    return Math.round((x <= 0.0031308 ? 12.92 * x : 1.055 * x ** (1 / 2.4) - 0.055) * 255);
+  });
+  return alpha === undefined ? `rgb(${r}, ${g}, ${bl})` : `rgba(${r}, ${g}, ${bl}, ${alpha})`;
+}
+
+/** A basemap gray at lightness `l` on the accent hue, with the chroma the gray tokens use. */
+function gray(l: number, dark: boolean, accentH: number, variant = false): string {
+  if (l >= 0.995) return oklchRgb(1, 0, 0);
+  const chroma = dark ? (variant ? 0.016 : 0.012) : variant ? 0.014 : 0.006;
+  return oklchRgb(l, chroma, accentH);
+}
+
 export function colorToHue(color: string): number | null {
   const hslMatch = /^hsla?\(\s*(-?[\d.]+)/.exec(color);
   if (hslMatch?.[1] !== undefined) return ((Number(hslMatch[1]) % 360) + 360) % 360;
@@ -173,11 +204,33 @@ export function highlightOpacity(base: ExpressionSpecification | number): Expres
   return ['case', HIGHLIGHTED, ['max', 0.75, base], base];
 }
 
+/** One circle per place or area: a translucent fill, so the map reads through, inside a solid ring. */
+export function circlesLayer(
+  source: string,
+  color: ExpressionSpecification | string,
+  strokeColor: ExpressionSpecification | string
+): LayerSpecification {
+  return {
+    id: 'circles',
+    type: 'circle',
+    source,
+    paint: {
+      'circle-radius': ['get', 'r'],
+      'circle-color': color,
+      'circle-stroke-color': ['case', HIGHLIGHTED, '#ffffff', strokeColor],
+      'circle-stroke-width': ['case', HIGHLIGHTED, 2, 1.5],
+      'circle-opacity': highlightOpacity(['+', 0.3, ['*', 0.3, ['get', 'w']]]),
+      'circle-stroke-opacity': 1,
+    },
+  };
+}
+
 export function crossfadeCircleLayers(
   source: string,
   color: ExpressionSpecification | string,
   strokeColor: ExpressionSpecification | string,
-  dark: boolean
+  dark: boolean,
+  accentH: number
 ): LayerSpecification[] {
   return [
     {
@@ -221,8 +274,8 @@ export function crossfadeCircleLayers(
         'text-size': 10.5,
       },
       paint: {
-        'text-color': dark ? 'hsl(220, 15%, 88%)' : 'hsl(215, 20%, 18%)',
-        'text-halo-color': dark ? 'hsla(240, 10%, 6%, 0.85)' : 'hsla(0, 0%, 100%, 0.85)',
+        'text-color': gray(dark ? 0.903 : 0.292, dark, accentH, true),
+        'text-halo-color': dark ? oklchRgb(0.164, 0.012, accentH, 0.85) : oklchRgb(1, 0, 0, 0.85),
         'text-halo-width': 1.2,
       },
     },
@@ -419,13 +472,12 @@ export function circlesGeojson(circles: Map<string, PlaceCircle>): FeatureCollec
   return { type: 'FeatureCollection', features };
 }
 
-const LANDCOVER_KEYS = [
-  'park_a',
-  'park_b',
-  'wood_a',
-  'wood_b',
-  'scrub_a',
-  'scrub_b',
+function fill(keys: readonly (keyof Flavor)[], color: string): Partial<Flavor> {
+  return Object.fromEntries(keys.map((k) => [k, color]));
+}
+
+const PARK_KEYS = ['park_a', 'park_b', 'wood_a', 'wood_b', 'scrub_a', 'scrub_b'] as const;
+const LANDUSE_KEYS = [
   'hospital',
   'industrial',
   'school',
@@ -435,54 +487,210 @@ const LANDCOVER_KEYS = [
   'aerodrome',
   'sand',
   'beach',
-  'glacier',
+  'pier',
+  'runway',
+] as const;
+const MINOR_KEYS = [
+  'other',
+  'minor_service',
+  'minor_a',
+  'minor_b',
+  'bridges_other',
+  'bridges_minor',
+] as const;
+const MAJOR_KEYS = ['major', 'link', 'bridges_major', 'bridges_link'] as const;
+const TUNNEL_KEYS = [
+  'tunnel_other',
+  'tunnel_minor',
+  'tunnel_link',
+  'tunnel_major',
+  'tunnel_highway',
+] as const;
+const CASING_KEYS = [
+  'minor_service_casing',
+  'minor_casing',
+  'link_casing',
+  'major_casing_early',
+  'major_casing_late',
+  'highway_casing_early',
+  'highway_casing_late',
+  'tunnel_other_casing',
+  'tunnel_minor_casing',
+  'tunnel_link_casing',
+  'tunnel_major_casing',
+  'tunnel_highway_casing',
+  'bridges_other_casing',
+  'bridges_minor_casing',
+  'bridges_link_casing',
+  'bridges_major_casing',
+  'bridges_highway_casing',
 ] as const;
 
-function fill(keys: readonly (keyof Flavor)[], color: string): Partial<Flavor> {
-  return Object.fromEntries(keys.map((k) => [k, color]));
+// Water and vegetation keep fixed hues so they read as water and green on every preset; an
+// orange or pink accent would turn accent-derived water beige or mauve.
+const WATER_H = 235;
+const GREEN_H = 150;
+
+interface MapPalette {
+  land: string;
+  urban: string;
+  forest: string;
+  grass: string;
+  landuse: string;
+  water: string;
+  buildings: string;
+  minor: string;
+  major: string;
+  highway: string;
+  tunnel: string;
+  rail: string;
+  boundary: string;
+  country: string;
+  state: string;
+  city: string;
+  town: string;
+  subplace: string;
+  road: string;
+  waterLabel: string;
 }
 
-// Colors sampled from the Carto dark_all and light_all raster tiles the map
-// used before the MapLibre swap.
-function flavorFor(dark: boolean): Flavor {
+function palette(dark: boolean, accentH: number): MapPalette {
+  const g = (l: number) => gray(l, dark, accentH);
+  const label = (l: number) => gray(l, dark, accentH, true);
+  const water = (l: number, c: number) => oklchRgb(l, c, WATER_H);
+  const green = (l: number, c: number) => oklchRgb(l, c, GREEN_H);
   if (dark) {
     return {
-      ...namedFlavor('black'),
-      ...fill(LANDCOVER_KEYS, '#0e0e0e'),
-      ...fill(['other', 'minor_service', 'minor_a', 'minor_b', 'link'], '#1a1a1a'),
-      ...fill(
-        ['minor_service_casing', 'minor_casing', 'link_casing', 'major_casing_early'],
-        '#090909'
-      ),
-      earth: '#090909',
-      water: '#262626',
-      buildings: '#111111',
-      major: '#2a2b2b',
-      highway: '#424343',
-      boundaries: '#5c5e5e',
-      city_label: '#a8b0b4',
-      city_label_halo: '#111111',
-      country_label: '#9d9d9d',
-      ocean_label: '#6d7b81',
+      land: g(0.165),
+      urban: g(0.19),
+      forest: green(0.18, 0.012),
+      grass: green(0.172, 0.008),
+      landuse: g(0.18),
+      water: water(0.125, 0.028),
+      buildings: g(0.2),
+      minor: g(0.225),
+      major: g(0.27),
+      highway: g(0.33),
+      tunnel: g(0.205),
+      rail: g(0.27),
+      boundary: g(0.42),
+      country: label(0.68),
+      state: label(0.6),
+      city: label(0.84),
+      town: label(0.72),
+      subplace: label(0.6),
+      road: label(0.6),
+      waterLabel: water(0.58, 0.04),
     };
   }
   return {
-    ...namedFlavor('white'),
-    ...fill(LANDCOVER_KEYS, '#f2f5f0'),
-    ...fill(['other', 'minor_service', 'minor_a', 'minor_b', 'link', 'major'], '#fefefe'),
+    land: g(0.975),
+    urban: g(0.95),
+    forest: green(0.95, 0.014),
+    grass: green(0.962, 0.008),
+    landuse: g(0.955),
+    water: water(0.86, 0.035),
+    buildings: g(0.93),
+    minor: g(0.925),
+    major: g(0.89),
+    highway: g(0.84),
+    tunnel: g(0.935),
+    rail: g(0.86),
+    boundary: g(0.74),
+    country: label(0.5),
+    state: label(0.58),
+    city: label(0.36),
+    town: label(0.46),
+    subplace: label(0.55),
+    road: label(0.55),
+    waterLabel: water(0.5, 0.05),
+  };
+}
+
+// Casings take the land color: at this archive's zooms a casing only thickens the line, and
+// the road classes separate by their own lightness and width.
+function flavorFor(p: MapPalette, dark: boolean): Flavor {
+  return {
+    ...namedFlavor(dark ? 'black' : 'white'),
+    background: p.land,
+    earth: p.land,
+    landcover: {
+      urban_area: p.urban,
+      forest: p.forest,
+      grassland: p.grass,
+      farmland: p.grass,
+      scrub: p.grass,
+      barren: p.land,
+      glacier: p.land,
+    },
+    ...fill(PARK_KEYS, p.forest),
+    ...fill(LANDUSE_KEYS, p.landuse),
+    glacier: p.land,
+    water: p.water,
+    buildings: p.buildings,
+    ...fill(CASING_KEYS, p.land),
+    ...fill(MINOR_KEYS, p.minor),
+    ...fill(MAJOR_KEYS, p.major),
+    ...fill(TUNNEL_KEYS, p.tunnel),
+    highway: p.highway,
+    bridges_highway: p.highway,
+    railway: p.rail,
+    boundaries: p.boundary,
+    roads_label_minor: p.road,
+    roads_label_major: p.road,
+    ocean_label: p.waterLabel,
+    subplace_label: p.subplace,
+    city_label: p.city,
+    state_label: p.state,
+    country_label: p.country,
+    address_label: p.road,
     ...fill(
-      ['minor_service_casing', 'minor_casing', 'link_casing', 'major_casing_early'],
-      '#e1e1e1'
+      [
+        'roads_label_minor_halo',
+        'roads_label_major_halo',
+        'subplace_label_halo',
+        'city_label_halo',
+        'state_label_halo',
+        'address_label_halo',
+      ],
+      p.land
     ),
-    earth: '#fafaf8',
-    water: '#d4dadc',
-    buildings: '#e9e9e9',
-    highway: '#ffffff',
-    highway_casing_early: '#e1e1e1',
-    city_label: '#697b89',
-    country_label: '#8a99a4',
-    state_label: '#97a4ae',
-    ocean_label: '#abb6be',
+  };
+}
+
+/**
+ * Data draws below the basemap's place names, so they stay readable over it, and above its road
+ * and water labels; the data's own labels go on top of everything.
+ */
+export function addDataLayers(style: StyleSpecification, ...layers: LayerSpecification[]): void {
+  const at = style.layers.findIndex((l) => l.id.startsWith('places_'));
+  style.layers.splice(
+    at === -1 ? style.layers.length : at,
+    0,
+    ...layers.filter((l) => l.type !== 'symbol')
+  );
+  style.layers.push(...layers.filter((l) => l.type === 'symbol'));
+}
+
+/**
+ * Town names step down from city names in color. Place names sit beside their point at every zoom
+ * (Protomaps centers them on it from z8, where the town dot goes), so a stream circle at a city's
+ * coordinates is not buried under that city's name.
+ */
+function withPlaceLabels(layer: LayerSpecification, p: MapPalette): LayerSpecification {
+  if (layer.id !== 'places_locality' || layer.type !== 'symbol') return layer;
+  return {
+    ...layer,
+    layout: {
+      ...layer.layout,
+      'text-variable-anchor': ['bottom', 'left', 'right', 'top'],
+      'text-radial-offset': ['step', ['zoom'], 0.3, 8, 0.8],
+    },
+    paint: {
+      ...layer.paint,
+      'text-color': ['case', ['<=', ['get', 'min_zoom'], 5], p.city, p.town],
+      'text-halo-width': 1.5,
+    },
   };
 }
 
@@ -490,11 +698,19 @@ export interface BaseStyleOptions {
   dark: boolean;
   basemapOk: boolean;
   lang: string;
+  /** The accent preset's OKLCH hue, which the basemap grays take. */
+  accentH: number;
 }
 
-export function buildBaseStyle({ dark, basemapOk, lang }: BaseStyleOptions): StyleSpecification {
+export function buildBaseStyle({
+  dark,
+  basemapOk,
+  lang,
+  accentH,
+}: BaseStyleOptions): StyleSpecification {
   const assets = new URL('basemaps/', document.baseURI).href;
   const flavorName = dark ? 'dark' : 'light';
+  const colors = palette(dark, accentH);
   const style: StyleSpecification = {
     version: 8,
     glyphs: `${assets}fonts/{fontstack}/{range}.pbf`,
@@ -504,7 +720,7 @@ export function buildBaseStyle({ dark, basemapOk, lang }: BaseStyleOptions): Sty
       {
         id: 'app-background',
         type: 'background',
-        paint: { 'background-color': dark ? 'hsl(240, 10%, 4%)' : 'hsl(240, 5%, 96%)' },
+        paint: { 'background-color': colors.land },
       },
     ],
   };
@@ -516,7 +732,9 @@ export function buildBaseStyle({ dark, basemapOk, lang }: BaseStyleOptions): Sty
         'Protomaps &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     };
     style.layers.push(
-      ...flavorLayers('basemap', flavorFor(dark), { lang }).filter((l) => l.type !== 'background')
+      ...flavorLayers('basemap', flavorFor(colors, dark), { lang })
+        .filter((l) => l.type !== 'background')
+        .map((l) => withPlaceLabels(l, colors))
     );
   }
   return style;

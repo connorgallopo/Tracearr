@@ -33,7 +33,7 @@ export function AccessTab({
   return (
     <div className="space-y-6">
       {isOwner && user.role !== 'owner' && (
-        <UserAccessControls user={user} name={user.identityName ?? user.username} />
+        <UserAccessControls user={user} name={user.identityName ?? identity.username} />
       )}
 
       {identity.serverUsers.length > 1 && (

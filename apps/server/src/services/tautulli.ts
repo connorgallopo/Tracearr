@@ -3,6 +3,7 @@
  */
 
 import type { TautulliImportProgress, TautulliImportResult } from '@tracearr/shared';
+import { UnrecoverableError } from 'bullmq';
 import { and, eq, isNotNull, isNull, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { db } from '../db/client.js';
@@ -44,6 +45,7 @@ import {
   storedSessionRowById,
   type SessionUpdate,
   type TimeBounds,
+  syncImportUsers,
 } from './import/index.js';
 import { markImportedServerLocations } from './serverLocations.js';
 import { getSettings, rearmImportedHistoryLink } from './settings.js';
@@ -801,47 +803,32 @@ export class TautulliService {
     const config = await getSettings(['tautulliUrl', 'tautulliApiKey']);
 
     if (!config.tautulliUrl || !config.tautulliApiKey) {
-      return {
-        success: false,
-        imported: 0,
-        updated: 0,
-        skipped: 0,
-        errors: 0,
-        message: 'Tautulli is not configured. Please add URL and API key in Settings.',
-      };
+      throw new UnrecoverableError(
+        'Tautulli is not configured. Please add URL and API key in Settings.'
+      );
     }
 
     const tautulli = new TautulliService(config.tautulliUrl, config.tautulliApiKey);
 
-    // Test connection
-    const connected = await tautulli.testConnection();
-    if (!connected) {
-      return {
-        success: false,
-        imported: 0,
-        updated: 0,
-        skipped: 0,
-        errors: 0,
-        message: 'Failed to connect to Tautulli. Please check URL and API key.',
-      };
+    // Not testConnection, which answers false for an unreachable Tautulli too: that one is retried
+    const check = await tautulli.request<{ response?: { result?: unknown } } | null>('arnold');
+    if (!check?.response) {
+      throw new UnrecoverableError('Invalid Tautulli API response: the connection check had none');
+    }
+    if (check.response.result !== 'success') {
+      throw new UnrecoverableError('Failed to connect to Tautulli. Please check URL and API key.');
     }
 
     const cutoff = await getServerTrackingStart(serverId);
     if (!cutoff) {
-      return {
-        success: false,
-        imported: 0,
-        updated: 0,
-        skipped: 0,
-        errors: 0,
-        message: 'Server not found; cannot determine import cutoff.',
-      };
+      throw new UnrecoverableError('Server not found; cannot determine import cutoff.');
     }
 
     const guidFallback = await TautulliService.monitorsServer(tautulli, serverId);
 
     // Initialize progress with detailed tracking
     const progress: TautulliImportProgress = {
+      serverId,
       status: 'fetching',
       totalRecords: 0,
       fetchedRecords: 0,
@@ -866,6 +853,10 @@ export class TautulliService {
     );
 
     publishProgress(progress);
+
+    progress.message = 'Syncing server users...';
+    publishProgress(progress);
+    await syncImportUsers(serverId);
 
     // Sync friendly/custom names from Tautulli before importing history
     progress.message = 'Syncing user display names from Tautulli...';
@@ -1698,6 +1689,7 @@ export class TautulliService {
 
     // Initialize progress
     const progress: TautulliImportProgress = {
+      serverId,
       status: 'processing',
       totalRecords: 0,
       fetchedRecords: 0,

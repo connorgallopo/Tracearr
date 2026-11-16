@@ -151,6 +151,7 @@ describe('split restores rows a merge moved off the source identity', () => {
       plexAccountIds: [],
       mobileSessionIds: [sourceMobileSession!.id],
       mobileTokenIds: [sourceMobileToken!.id],
+      tofaSignInIds: [],
     });
 
     const splitResult = await splitServerUser(sourceSu.id, admin.id);

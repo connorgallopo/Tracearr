@@ -130,6 +130,7 @@
     "noTerminations": "没有流终止",
     "lastSeen": "最后活跃 {{relative}}",
     "terminatedBy": "由 @{{username}} 终止",
+    "terminatedByName": "",
     "trustScoreConfirm": "将 @{{username}} 的信任分数设为 {{score}}？",
     "trustScoreRange": "@{{username}} 的信任分数，范围 0 到 100。",
     "moreLocations_other": "+{{count}} 个更多连接",

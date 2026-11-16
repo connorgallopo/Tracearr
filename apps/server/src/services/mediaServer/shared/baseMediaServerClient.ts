@@ -27,6 +27,7 @@ import {
 } from './jellyfinEmbyParser.js';
 import {
   NOT_NEEDED,
+  cursorDate,
   type IMediaServerClient,
   type IMediaServerClientWithHistory,
   type MediaSession,
@@ -39,6 +40,7 @@ import {
   type DownloadSourceDescription,
   type DownloadSourceRequest,
   type NotNeeded,
+  type SyncCursor,
 } from '../types.js';
 
 // Client identification constants
@@ -338,14 +340,15 @@ export abstract class BaseMediaServerClient
    * Handles its own pagination internally — the caller's offset/limit are ignored.
    *
    * @param libraryId - The parent library ID
-   * @param since - Only return items added after this date
+   * @param cursor - Only return items added after its date
    * @returns Items and total count for pagination tracking
    */
   async getLibraryItemsSince(
     libraryId: string,
-    since: Date,
+    cursor: SyncCursor,
     options?: { offset?: number; limit?: number; libraryType?: string }
-  ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number; feed: NotNeeded }> {
+    const since = cursorDate(cursor);
     const PAGE_SIZE = 200;
     const allItems: MediaLibraryItem[] = [];
     let serverOffset = 0;
@@ -390,7 +393,7 @@ export abstract class BaseMediaServerClient
       serverOffset += rawCount;
     }
 
-    return { items: allItems, totalCount: allItems.length };
+    return { items: allItems, totalCount: allItems.length, feed: NOT_NEEDED };
   }
 
   /**
@@ -450,14 +453,15 @@ export abstract class BaseMediaServerClient
    * and filters client-side to work around unreliable minDateLastSaved.
    *
    * @param libraryId - The parent library ID
-   * @param since - Only return episodes added after this date
+   * @param cursor - Only return episodes added after its date
    * @returns Episodes and total count for pagination tracking
    */
   async getLibraryLeavesSince(
     libraryId: string,
-    since: Date,
+    cursor: SyncCursor,
     _options?: { offset?: number; limit?: number }
   ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
+    const since = cursorDate(cursor);
     const PAGE_SIZE = 200;
     const allItems: MediaLibraryItem[] = [];
     let serverOffset = 0;
@@ -499,6 +503,11 @@ export abstract class BaseMediaServerClient
     }
 
     return { items: allItems, totalCount: allItems.length };
+  }
+
+  // Changes are listed after a date, which the sync takes when it saves
+  async getLibraryRevision(): Promise<NotNeeded> {
+    return NOT_NEEDED;
   }
 
   // Seasons arrive with getLibraryLeaves and getLibraryLeavesSince

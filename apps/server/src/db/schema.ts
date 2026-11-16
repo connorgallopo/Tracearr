@@ -111,6 +111,10 @@ export const servers = pgTable(
     // The version the media server reports, and the newest release known for it.
     version: text('version'),
     latestVersion: text('latest_version'),
+    // tofa only, refreshed on each user sync: whether the API key may stop streams, and the
+    // completion percent tofa itself counts as watched. Null for every other server type.
+    canStopStreams: boolean('can_stop_streams'),
+    watchedRulePercent: integer('watched_rule_percent'),
     // Bumped on every save of this server's server_locations; the sync job records the version it applied
     locationVersion: integer('location_version').notNull().default(1),
     locationSyncedVersion: integer('location_synced_version').notNull().default(0),
@@ -304,6 +308,8 @@ export const serverUsers = pgTable(
     // For Plex: plex.tv account ID (different from local PMS ID). Used for sync matching.
     // Sessions use externalId (local PMS ID), sync uses plexAccountId (plex.tv ID)
     plexAccountId: varchar('plex_account_id', { length: 255 }),
+    // For tofa: the tofa cloud account that signs in as this user; null once its access is revoked
+    cloudIdentityId: text('cloud_identity_id'),
     username: varchar('username', { length: 255 }).notNull(), // Username on this server
     email: varchar('email', { length: 255 }), // Email from server sync (may differ from users.email)
     thumbUrl: text('thumb_url'), // Avatar from server
@@ -341,10 +347,38 @@ export const serverUsers = pgTable(
     index('server_users_username_idx').on(table.username),
     // For Plex sync matching by plex.tv account ID
     index('server_users_plex_account_idx').on(table.serverId, table.plexAccountId),
+    // For tofa sign-in by cloud identity
+    index('server_users_cloud_identity_idx').on(table.cloudIdentityId),
     // For account inactivity rule queries
     index('server_users_last_activity_idx').on(table.lastActivityAt),
     // For filtering out removed users
     index('server_users_removed_at_idx').on(table.removedAt),
+  ]
+);
+
+/**
+ * Accounts on other media servers that a server says belong to one of its users, such as the
+ * Plex account a tofa user imports from. The other server is named by its own identifier.
+ */
+export const serverUserLinks = pgTable(
+  'server_user_links',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    serverUserId: uuid('server_user_id')
+      .notNull()
+      .references(() => serverUsers.id, { onDelete: 'cascade' }),
+    provider: varchar('provider', { length: 20 }).notNull(),
+    externalUserId: varchar('external_user_id', { length: 255 }).notNull(),
+    externalServerId: varchar('external_server_id', { length: 100 }).notNull(),
+  },
+  (table) => [
+    uniqueIndex('server_user_links_unique').on(
+      table.serverUserId,
+      table.provider,
+      table.externalUserId,
+      table.externalServerId
+    ),
+    index('server_user_links_external_idx').on(table.externalServerId, table.externalUserId),
   ]
 );
 
@@ -448,6 +482,8 @@ export const sessions = pgTable(
     geoAsnOrganization: varchar('geo_asn_organization', { length: 255 }),
     // From the IP at insert; null on rows the location sync has not classified yet
     isLocal: boolean('is_local'),
+    // tofa only: the profile that played, where one account holds several. Null for every other server.
+    profileName: text('profile_name'),
     playerName: varchar('player_name', { length: 255 }), // Player title/friendly name
     deviceId: varchar('device_id', { length: 255 }), // Machine identifier (unique device UUID)
     product: varchar('product', { length: 255 }), // Product name (e.g., "Plex for iOS")
@@ -886,7 +922,10 @@ export const requestServices = pgTable(
       .default('ok')
       .$type<'ok' | 'reencrypt'>(),
     enabled: boolean('enabled').notNull().default(true),
-    remoteServerId: text('remote_server_id').notNull(),
+    // False while a server's built-in requests are turned off on the server; a linked service always takes them
+    takesRequests: boolean('takes_requests').notNull().default(true),
+    // The media server id the service reports; null for a server's built-in requests
+    remoteServerId: text('remote_server_id'),
     version: text('version'),
     syncCursor: timestamp('sync_cursor', { withTimezone: true }),
     lastCounts: jsonb('last_counts').$type<RequestCounts>(),
@@ -906,8 +945,9 @@ export const mediaRequests = pgTable(
     serviceId: uuid('service_id')
       .notNull()
       .references(() => requestServices.id, { onDelete: 'cascade' }),
-    remoteId: integer('remote_id').notNull(),
-    remoteMediaId: integer('remote_media_id').notNull(),
+    remoteId: text('remote_id').notNull(),
+    // Seerr's media id; tofa requests carry only tmdb and tvdb ids
+    remoteMediaId: integer('remote_media_id'),
     mediaType: varchar('media_type', { length: 10 }).notNull().$type<'movie' | 'show'>(),
     title: text('title'),
     year: integer('year'),
@@ -915,12 +955,14 @@ export const mediaRequests = pgTable(
     tvdbId: integer('tvdb_id'),
     imdbId: varchar('imdb_id', { length: 20 }),
     ratingKey: varchar('rating_key', { length: 255 }),
+    // An image path on the request service itself, shown while the title is in no library
+    posterPath: text('poster_path'),
     // Same convention as libraryItems.mediaId: media rows merge-fold, so no FK
     mediaId: uuid('media_id'),
     serverUserId: uuid('server_user_id').references(() => serverUsers.id, {
       onDelete: 'set null',
     }),
-    remoteUserId: integer('remote_user_id').notNull(),
+    remoteUserId: text('remote_user_id').notNull(),
     remoteUsername: text('remote_username').notNull(),
     remotePlexId: varchar('remote_plex_id', { length: 64 }),
     remoteJellyfinUserId: varchar('remote_jellyfin_user_id', { length: 64 }),
@@ -942,6 +984,10 @@ export const mediaRequests = pgTable(
     index('media_requests_server_user_idx').on(table.serverUserId),
     index('media_requests_requested_at_idx').on(table.requestedAt),
     index('media_requests_service_updated_idx').on(table.serviceId, table.remoteUpdatedAt),
+    // The image proxy checks a request service's poster against its rows on every cache miss
+    index('media_requests_service_poster_idx')
+      .on(table.serviceId, table.posterPath)
+      .where(sql`poster_path IS NOT NULL`),
   ]
 );
 
@@ -1198,6 +1244,7 @@ export const userMergeAudits = pgTable(
       // Absent on audits written before merges carried the contact email
       contactEmail?: string | null;
       contactEmailCarried?: boolean;
+      // Only on audits from merges that pinned the target's name; split still clears it
       nameSetOnTarget?: string | null;
     }>(),
     // Which plex_accounts / mobile_sessions / mobile_tokens rows repointIdentityRows
@@ -1209,6 +1256,7 @@ export const userMergeAudits = pgTable(
       plexAccountIds: string[];
       mobileSessionIds: string[];
       mobileTokenIds: string[];
+      tofaSignInIds?: string[];
     }>(),
     undoneAt: timestamp('undone_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),

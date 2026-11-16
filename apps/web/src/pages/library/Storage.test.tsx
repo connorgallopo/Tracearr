@@ -97,7 +97,7 @@ describe('LibraryStorage', () => {
 
     expect(screen.queryByText(/deadWeight/)).not.toBeInTheDocument();
     expect(screen.getByText('library.storage.itemCount:{"count":8}')).toBeInTheDocument();
-    expect(screen.getByText('(library.storage.unusedSize:{"size":"52 GB"})')).toBeInTheDocument();
+    expect(screen.getByText('library.storage.unusedSize:{"size":"52 GB"}')).toBeInTheDocument();
     expect(mockUseLibraryStale).toHaveBeenCalledWith(['srv-1'], null, 90, 'all', 1, 1);
   });
 

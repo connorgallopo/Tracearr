@@ -169,6 +169,7 @@
       "serverAddFailed": "Det gick inte att lägga till server",
       "serverRemoveFailed": "Det gick inte att ta bort servern",
       "serverSyncFailed": "Det gick inte att synkronisera servern",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Det gick inte att uppdatera inställningarna",
       "copyManual": "",

@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useViewAs } from '@/hooks/queries/useImpersonation';
+import { rosterPersonName } from '@/components/users/utils';
 
 interface UserRowMenuProps {
   row: ServerUserWithIdentity;
@@ -32,7 +33,7 @@ export function UserRowMenu({ row, isOwner, onEditIdentity, onAdjustTrust }: Use
         <Button
           variant="ghost"
           size="icon-sm"
-          aria-label={t('pages:users.rowActions', { name: row.identityName ?? row.username })}
+          aria-label={t('pages:users.rowActions', { name: rosterPersonName(row) })}
           onClick={(event) => event.stopPropagation()}
         >
           <MoreHorizontal />

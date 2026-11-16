@@ -5,10 +5,11 @@ import type { ReactNode } from 'react';
 import type * as ApiModule from '@/lib/api';
 
 vi.mock('@/lib/api', async () => {
-  const { ApiError } = await vi.importActual<typeof ApiModule>('@/lib/api');
+  const { ApiError, imageProxyUrl } = await vi.importActual<typeof ApiModule>('@/lib/api');
   return {
     api: { auth: { me: vi.fn() } },
     ApiError,
+    imageProxyUrl,
     AUTH_STATE_CHANGE_EVENT: 'tracearr:auth-state-change',
     BASE_URL: '/',
   };
@@ -115,6 +116,44 @@ describe('useAuth', () => {
     expect(result.current.user?.username).toBe('alice');
     expect(typeof result.current.logout).toBe('function');
     expect(typeof result.current.refetch).toBe('function');
+  });
+
+  it.each([
+    ['a tofa preset', '/api/v1/profiles/avatars/astronaut.png'],
+    ['a tofa upload', 'https://api.tofa.tv/avatars/u1.jpg'],
+  ])('loads %s picture through the image proxy', async (_kind, thumbnail) => {
+    mockMe.mockResolvedValue({ ...alice, thumbnail, thumbnailServerId: 's-tofa' });
+
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper() });
+
+    await waitFor(() => expect(result.current.user).not.toBeNull());
+    const url = new URL(result.current.user?.thumbUrl ?? '', 'http://tracearr.test');
+    expect(url.pathname).toBe('/api/v1/images/proxy');
+    expect(url.searchParams.get('server')).toBe('s-tofa');
+    expect(url.searchParams.get('url')).toBe(thumbnail);
+  });
+
+  it('loads a plex.tv picture straight from plex.tv', async () => {
+    const thumbnail = 'https://plex.tv/users/abc/avatar?c=1';
+    mockMe.mockResolvedValue({ ...alice, thumbnail, thumbnailServerId: null });
+
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper() });
+
+    await waitFor(() => expect(result.current.user).not.toBeNull());
+    expect(result.current.user?.thumbUrl).toBe(thumbnail);
+  });
+
+  it("loads an OIDC provider's picture through the server", async () => {
+    mockMe.mockResolvedValue({
+      ...alice,
+      thumbnail: 'https://idp.example.com/avatars/alice.png',
+      thumbnailServerId: null,
+    });
+
+    const { result } = renderHook(() => useAuth(), { wrapper: wrapper() });
+
+    await waitFor(() => expect(result.current.user).not.toBeNull());
+    expect(result.current.user?.thumbUrl).toBe('/api/v1/images/account');
   });
 
   it('reports unauthenticated when the session lookup fails', async () => {

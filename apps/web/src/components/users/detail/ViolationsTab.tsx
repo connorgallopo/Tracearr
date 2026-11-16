@@ -111,9 +111,7 @@ export function ViolationsTab({
           cell: ({ row }) => (
             <span
               className={
-                row.original.acknowledgedAt
-                  ? 'text-muted-foreground'
-                  : 'font-medium text-yellow-500'
+                row.original.acknowledgedAt ? 'text-muted-foreground' : 'text-warning font-medium'
               }
             >
               {row.original.acknowledgedAt
@@ -198,7 +196,7 @@ export function ViolationsTab({
             if (log.trigger === 'manual') {
               return (
                 <span className="text-sm">
-                  @{log.triggeredByUsername ?? t('common:labels.unknown')}
+                  {log.triggeredByUsername ?? t('common:labels.unknown')}
                 </span>
               );
             }
@@ -222,7 +220,9 @@ export function ViolationsTab({
           header: t('common:labels.status'),
           enableSorting: false,
           cell: ({ row }) => (
-            <span className={row.original.success ? 'text-green-500' : 'font-medium text-red-500'}>
+            <span
+              className={row.original.success ? 'text-success' : 'text-destructive font-medium'}
+            >
               {row.original.success ? t('common:states.success') : t('common:states.failed')}
             </span>
           ),

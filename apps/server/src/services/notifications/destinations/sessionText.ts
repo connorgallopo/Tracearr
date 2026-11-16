@@ -1,4 +1,9 @@
-import { formatEpisodeLabel, type PlaybackDecision, playbackDecision } from '@tracearr/shared';
+import {
+  formatEpisodeLabel,
+  namesShow,
+  type PlaybackDecision,
+  playbackDecision,
+} from '@tracearr/shared';
 import type { ActiveSession } from '../types.js';
 
 export function formatDuration(ms: number): string {
@@ -22,7 +27,7 @@ export function getMediaDisplay(session: ActiveSession): {
   title: string;
   subtitle: string | null;
 } {
-  if (session.mediaType === 'episode' && session.grandparentTitle) {
+  if (namesShow(session)) {
     const episodeInfo =
       formatEpisodeLabel(session.seasonNumber, session.episodeNumber, { spaced: true }) ?? '';
     return {

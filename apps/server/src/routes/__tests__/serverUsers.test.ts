@@ -6,6 +6,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
+import { APIError } from 'better-auth/api';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '@tracearr/shared';
@@ -78,6 +79,33 @@ describe('POST /server-users/:id/split', () => {
     });
 
     expect(response.statusCode).toBe(400);
+  });
+
+  it("refuses a split that would take the owner's last way to sign in", async () => {
+    app = await buildTestApp(createAuthUser('owner'));
+    mockSplit.mockRejectedValue(
+      new APIError('BAD_REQUEST', { message: 'That would leave the owner with no way to sign in.' })
+    );
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/server-users/${randomUUID()}/split`,
+    });
+
+    expect(response.statusCode).toBe(400);
+    expect(response.json().message).toBe('That would leave the owner with no way to sign in.');
+  });
+
+  it('keeps the status of any other sign-in refusal', async () => {
+    app = await buildTestApp(createAuthUser('owner'));
+    mockSplit.mockRejectedValue(new APIError('FORBIDDEN', { message: 'not yours' }));
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/server-users/${randomUUID()}/split`,
+    });
+
+    expect(response.statusCode).toBe(403);
   });
 
   it('rejects non-owners', async () => {

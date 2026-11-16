@@ -12,6 +12,7 @@
 
 import { randomUUID } from 'node:crypto';
 import {
+  DelayedError,
   Queue,
   Worker,
   UnrecoverableError,
@@ -26,6 +27,7 @@ import { DEFAULT_LOCK_DURATION_MS, extendJobLock } from './lockUtils.js';
 import {
   WORKER_DEFAULTS,
   addSingleton,
+  checkpoint,
   registerQueue,
   registerWorker,
   yieldJob,
@@ -34,7 +36,9 @@ import {
   acquireHeavyOpsLock,
   releaseHeavyOpsLock,
   extendHeavyOpsLock,
+  isImportWaiting,
   startHeavyOpsLockHeartbeat,
+  HEAVY_OPS_WAIT_INTERVAL_MS,
   type HeavyOpsLockHolder,
 } from './heavyOpsLock.js';
 import type {
@@ -124,6 +128,21 @@ export interface MaintenanceJobData {
     /** For link_imported_history and sync_server_locations: 'auto' when the server enqueued it; missing means manual */
     trigger?: 'manual' | 'auto';
   };
+  /** backfill_library_snapshots that gave the lock to an import: its snapshots are written */
+  backfillResume?: SnapshotBackfillResume;
+}
+
+interface SnapshotBackfillCounts {
+  processed: number;
+  created: number;
+  cleanedUp: number;
+  errors: number;
+}
+
+interface SnapshotBackfillResume extends SnapshotBackfillCounts {
+  earliest: string;
+  refreshFrom: string;
+  startedAt: number;
 }
 
 // Queue configuration
@@ -234,7 +253,6 @@ export function startMaintenanceWorker(): void {
       const runToken = randomUUID();
       let lockHolder: HeavyOpsLockHolder | null;
       const pubSubService = getPubSubService();
-      const WAIT_INTERVAL_MS = 5000; // Check every 5 seconds
       const MAX_WAIT_MS = 4 * 60 * 60 * 1000; // Max 4 hours wait
       let waitedMs = 0;
 
@@ -282,10 +300,11 @@ export function startMaintenanceWorker(): void {
         await extendJobLock(job);
 
         // Wait before retry
-        await new Promise((resolve) => setTimeout(resolve, WAIT_INTERVAL_MS));
-        waitedMs += WAIT_INTERVAL_MS;
+        await new Promise((resolve) => setTimeout(resolve, HEAVY_OPS_WAIT_INTERVAL_MS));
+        waitedMs += HEAVY_OPS_WAIT_INTERVAL_MS;
 
-        if (waitedMs >= MAX_WAIT_MS) {
+        // A backfill that stepped aside for an import waits for it however long it runs
+        if (waitedMs >= MAX_WAIT_MS && !job.data.backfillResume) {
           activeJobProgress = null;
           throw new Error(
             `Timed out waiting for ${lockHolder.description} after ${MAX_WAIT_MS / 1000 / 60} minutes`
@@ -309,7 +328,11 @@ export function startMaintenanceWorker(): void {
         return result;
       } catch (error) {
         const duration = Math.round((Date.now() - startTime) / 1000);
-        console.error(`[Maintenance] Job ${job.id} failed after ${duration}s:`, error);
+        if (error instanceof DelayedError) {
+          console.log(`[Maintenance] Job ${job.id} gave up the lock after ${duration}s`);
+        } else {
+          console.error(`[Maintenance] Job ${job.id} failed after ${duration}s:`, error);
+        }
         throw error;
       } finally {
         stopHeartbeat();
@@ -1193,7 +1216,7 @@ async function processBackfillUserDatesJob(
 export async function processBackfillLibrarySnapshotsJob(
   job: Job<MaintenanceJobData>
 ): Promise<MaintenanceJobResult> {
-  const startTime = Date.now();
+  const startTime = job.data.backfillResume?.startedAt ?? Date.now();
   const pubSubService = getPubSubService();
 
   // Batch size in days to avoid exhausting PostgreSQL's lock table
@@ -1223,6 +1246,11 @@ export async function processBackfillLibrarySnapshotsJob(
 
   try {
     await publishProgress();
+
+    const resume = job.data.backfillResume;
+    if (resume) {
+      return await refreshBackfilledSnapshots(job, resume, resume, startTime, publishProgress);
+    }
 
     // Extend locks before initial scan - can be slow on large libraries
     await extendJobLock(job);
@@ -1573,88 +1601,26 @@ export async function processBackfillLibrarySnapshotsJob(
       console.error('[Maintenance] Error during snapshot cleanup:', error);
     }
 
-    // Refresh the continuous aggregate to include backfilled data
-    if (activeJobProgress) {
-      activeJobProgress.message = 'Refreshing library_stats_daily continuous aggregate...';
-      await publishProgress();
-    }
-
     // Get the earliest snapshot date to refresh from
     const earliestResult = await db.execute(sql`
       SELECT MIN(snapshot_time)::date AS earliest FROM library_snapshots
     `);
     const earliestDate = (earliestResult.rows[0] as { earliest: string | null })?.earliest;
 
-    if (earliestDate) {
-      // Batched, never one CALL over the whole span: a backfill reaching
-      // years back makes a single-call refresh materialize the entire range
-      // in one transaction, which can OOM postgres on memory-limited
-      // containers - and the crash loop re-triggers this very job through
-      // the gap check. Per-batch failures (including the materialization-
-      // range-overlaps race against the policy refresh) are logged, not
-      // fatal; the policy catches whatever a failed batch leaves behind.
-      let refreshLockExtension = Date.now();
-      const refreshFailures = await safeFullRefreshAggregate(
-        'library_stats_daily',
-        new Date(earliestDate),
-        new Date(),
-        {
-          onProgress: () => {
-            if (Date.now() - refreshLockExtension > LOCK_EXTENSION_INTERVAL) {
-              refreshLockExtension = Date.now();
-              void extendJobLock(job).catch(() => undefined);
-              void extendHeavyOpsLock(job.id!);
-            }
-          },
-        }
-      );
-      if (refreshFailures.length > 0) {
-        console.warn(
-          `[Maintenance] ${refreshFailures.length} aggregate refresh batch(es) failed; the refresh policy will fill the gaps`
-        );
-      }
-
-      // Verify the refresh succeeded by checking aggregate has data
-      const verifyResult = await db.execute(sql`
-        SELECT COUNT(*)::int as count FROM library_stats_daily
-        WHERE day >= ${earliestDate}::date
-      `);
-      const aggregateCount = (verifyResult.rows[0] as { count: number })?.count ?? 0;
-
-      if (aggregateCount === 0 && totalSnapshotsCreated > 0) {
-        console.warn(
-          `[Maintenance] Aggregate refresh may have failed - created ${totalSnapshotsCreated} snapshots but aggregate has no data from ${earliestDate}`
-        );
-      } else {
-        console.log(
-          `[Maintenance] Aggregate refresh verified - ${aggregateCount} days of data from ${earliestDate}`
-        );
-      }
-    }
-
-    const durationMs = Date.now() - startTime;
-    if (activeJobProgress) {
-      activeJobProgress.status = 'complete';
-      activeJobProgress.processedRecords = totalProcessed;
-      activeJobProgress.skippedRecords = totalCleanedUp;
-      activeJobProgress.message = `Completed! Created ${totalSnapshotsCreated.toLocaleString()} snapshots for ${totalProcessed} libraries${totalCleanedUp > 0 ? `, cleaned up ${totalCleanedUp} invalid` : ''} in ${Math.round(durationMs / 1000)}s`;
-      activeJobProgress.completedAt = new Date().toISOString();
-      await publishProgress();
-    }
-
-    activeJobProgress = null;
-
-    return {
-      success: true,
-      type: 'backfill_library_snapshots',
-      processed: totalProcessed,
-      updated: totalSnapshotsCreated,
-      skipped: totalCleanedUp,
-      errors: totalErrors,
-      durationMs,
-      message: `Created ${totalSnapshotsCreated.toLocaleString()} snapshots for ${totalProcessed} libraries${totalCleanedUp > 0 ? `, cleaned up ${totalCleanedUp} invalid` : ''}`,
-    };
+    return await refreshBackfilledSnapshots(
+      job,
+      {
+        processed: totalProcessed,
+        created: totalSnapshotsCreated,
+        cleanedUp: totalCleanedUp,
+        errors: totalErrors,
+      },
+      earliestDate ? { earliest: earliestDate, refreshFrom: earliestDate } : null,
+      startTime,
+      publishProgress
+    );
   } catch (error) {
+    if (error instanceof DelayedError) throw error;
     const errorMessage = error instanceof Error ? error.message : String(error);
     const isCorruptedChunk = errorMessage.includes('pg_attribute catalog is missing');
 
@@ -1668,6 +1634,113 @@ export async function processBackfillLibrarySnapshotsJob(
     }
     throw error;
   }
+}
+
+/**
+ * Refreshes library_stats_daily over the backfilled span. Between refresh batches the lock goes
+ * to an import that is waiting for it: the job saves where it stopped, steps back for longer than
+ * the import takes to try again, and resumes from there. Every run refreshes at least one batch.
+ */
+async function refreshBackfilledSnapshots(
+  job: Job<MaintenanceJobData>,
+  counts: SnapshotBackfillCounts,
+  span: { earliest: string; refreshFrom: string } | null,
+  startTime: number,
+  publishProgress: () => Promise<void>
+): Promise<MaintenanceJobResult> {
+  const { processed, created, cleanedUp, errors } = counts;
+  if (activeJobProgress) {
+    activeJobProgress.message = 'Refreshing library_stats_daily continuous aggregate...';
+    await publishProgress();
+  }
+
+  if (span) {
+    // Batched, never one CALL over the whole span: a backfill reaching
+    // years back makes a single-call refresh materialize the entire range
+    // in one transaction, which can OOM postgres on memory-limited
+    // containers - and the crash loop re-triggers this very job through
+    // the gap check. Per-batch failures (including the materialization-
+    // range-overlaps race against the policy refresh) are logged, not
+    // fatal; the policy catches whatever a failed batch leaves behind.
+    let refreshLockExtension = Date.now();
+    let refreshedTo = span.refreshFrom;
+    let importWaiting = false;
+    const refreshFailures = await safeFullRefreshAggregate(
+      'library_stats_daily',
+      new Date(span.refreshFrom),
+      new Date(),
+      {
+        onProgress: (progress) => {
+          refreshedTo = progress.currentBatchEnd;
+          if (Date.now() - refreshLockExtension > LOCK_EXTENSION_INTERVAL) {
+            refreshLockExtension = Date.now();
+            void extendJobLock(job).catch(() => undefined);
+            void extendHeavyOpsLock(job.id!);
+          }
+        },
+        // Only the backfill job yields: the snapshot normalization runs this refresh as its tail
+        pauseWhen:
+          job.data.type === 'backfill_library_snapshots'
+            ? async () => (importWaiting = await isImportWaiting())
+            : undefined,
+      }
+    );
+    if (refreshFailures.length > 0) {
+      console.warn(
+        `[Maintenance] ${refreshFailures.length} aggregate refresh batch(es) failed; the refresh policy will fill the gaps`
+      );
+    }
+
+    if (importWaiting) {
+      await checkpoint(job, {
+        backfillResume: { ...counts, ...span, refreshFrom: refreshedTo, startedAt: startTime },
+      });
+      console.log(`[Maintenance] Job ${job.id} steps aside for a waiting import at ${refreshedTo}`);
+      activeJobProgress = null;
+      await yieldJob(job, job.token, HEAVY_OPS_WAIT_INTERVAL_MS * 2);
+    }
+
+    // Verify the refresh succeeded by checking aggregate has data
+    const verifyResult = await db.execute(sql`
+      SELECT COUNT(*)::int as count FROM library_stats_daily
+      WHERE day >= ${span.earliest}::date
+    `);
+    const aggregateCount = (verifyResult.rows[0] as { count: number })?.count ?? 0;
+
+    if (aggregateCount === 0 && created > 0) {
+      console.warn(
+        `[Maintenance] Aggregate refresh may have failed - created ${created} snapshots but aggregate has no data from ${span.earliest}`
+      );
+    } else {
+      console.log(
+        `[Maintenance] Aggregate refresh verified - ${aggregateCount} days of data from ${span.earliest}`
+      );
+    }
+  }
+
+  const durationMs = Date.now() - startTime;
+  const summary = `Created ${created.toLocaleString()} snapshots for ${processed} libraries${cleanedUp > 0 ? `, cleaned up ${cleanedUp} invalid` : ''}`;
+  if (activeJobProgress) {
+    activeJobProgress.status = 'complete';
+    activeJobProgress.processedRecords = processed;
+    activeJobProgress.skippedRecords = cleanedUp;
+    activeJobProgress.message = `Completed! ${summary} in ${Math.round(durationMs / 1000)}s`;
+    activeJobProgress.completedAt = new Date().toISOString();
+    await publishProgress();
+  }
+
+  activeJobProgress = null;
+
+  return {
+    success: true,
+    type: 'backfill_library_snapshots',
+    processed,
+    updated: created,
+    skipped: cleanedUp,
+    errors,
+    durationMs,
+    message: summary,
+  };
 }
 
 /**
@@ -2093,11 +2166,6 @@ export async function getAllActiveMaintenanceJobs(): Promise<
 }
 
 /**
- * Enqueue unless a maintenance job is already pending - the queue is
- * deliberately single-flight. Returns null when busy (or when the queue isn't
- * up), for automated callers that treat "already covered" as success.
- */
-/**
  * One-time snapshot normalization: everything older than raw retention is
  * already version-aware reconstruction (the 2.0 aggregate rebuild), so
  * regenerating the surviving pre-stamp band the same way leaves the whole
@@ -2184,6 +2252,30 @@ export async function processNormalizeLibrarySnapshotsJob(
   };
 }
 
+/**
+ * Boot decides once whether there is anything to normalize. Old-semantics history lives in
+ * snapshot or aggregate rows, or arrives later through items that still carry the 'legacy:1'
+ * sentinel; a database with no items, snapshots or aggregate rows has neither and never will,
+ * so it is stamped and the first library sync queues the plain backfill instead.
+ */
+export async function seedSnapshotsNormalizedAt(): Promise<void> {
+  if ((await getSetting('snapshotsNormalizedAt')) !== null) return;
+  const { extensionInstalled } = await getTimescaleStatus();
+  const result = await db.execute(sql`
+    SELECT EXISTS (SELECT 1 FROM library_items)
+      OR EXISTS (SELECT 1 FROM library_snapshots)
+      ${extensionInstalled ? sql`OR EXISTS (SELECT 1 FROM library_stats_daily)` : sql``}
+      AS has_history
+  `);
+  if ((result.rows[0] as { has_history: boolean } | undefined)?.has_history !== false) return;
+  await setSetting('snapshotsNormalizedAt', new Date().toISOString());
+}
+
+/**
+ * Enqueue unless a maintenance job is already pending - the queue is
+ * deliberately single-flight. Returns null when busy (or when the queue isn't
+ * up), for automated callers that treat "already covered" as success.
+ */
 export async function maybeEnqueueMaintenanceJob(
   type: MaintenanceJobType,
   userId: string,

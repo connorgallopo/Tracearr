@@ -60,7 +60,7 @@ import { refreshUserSessionSnapshots, revokeSessionsForUsers } from '../../lib/r
 import { getSetting } from '../../services/settings.js';
 import { disconnectUserSockets } from '../../websocket/index.js';
 import { parseDateString } from '../../utils/parsing.js';
-import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
+import { personNameSql, representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 import { VIOLATION_ALIAS_SQL } from '../../services/automations/aliasFilter.js';
 import { identityAccountsWhere, userHistoryWindow, userPlayTotals } from './queries/index.js';
 
@@ -77,16 +77,13 @@ const RESET_TRUST_REASON = 'reset by an owner';
  * buildOrderBy. `pendingViolations` is the exception: it names the page query's
  * select-list count, which no index covers, so that sort counts every identity.
  *
- * `username` orders on the identity's display name rather than the
- * representative account's server username. Those differ only when users.name
- * is set or a server-side rename left users.username behind, and the roster
- * renders identityName ?? username, so this sorts by what the row shows.
- * lower() because the database collation is byte order on every install family
- * but the glibc dev image, so capitals would otherwise sort before every
- * lowercase name.
+ * `username` orders on personNameSql, the name the row shows, which
+ * users_display_name_idx holds. lower() because the database collation is byte
+ * order on every install family but the glibc dev image, so capitals would
+ * otherwise sort before every lowercase name.
  */
 const USER_SORT_KEYS: Record<UserSortField, SortKey> = {
-  username: { key: sql`lower(coalesce(u.name, u.username))`, defaultDir: 'asc', nulls: 'last' },
+  username: { key: sql`lower(${personNameSql()})`, defaultDir: 'asc', nulls: 'last' },
   trustScore: { key: sql`u.aggregate_trust_score`, defaultDir: 'desc', nulls: 'last' },
   joinedAt: { key: sql`u.first_joined_at`, defaultDir: 'desc', nulls: 'last' },
   lastActivityAt: { key: sql`u.last_activity_at`, defaultDir: 'desc', nulls: 'last' },
@@ -140,10 +137,10 @@ export function buildUserRosterSql(
 
   if (filters.search) {
     const pattern = likePattern(filters.search);
-    // Any account's username matches, not just the representative's: someone
+    // The person's name matches, and so does any account's username in scope: someone
     // who is bob_plex on Plex and robert on Jellyfin is findable as either.
     identityConditions.push(sql`(
-      u.name ILIKE ${pattern}
+      ${personNameSql()} ILIKE ${pattern}
       OR EXISTS (
         SELECT 1 FROM server_users rsu
         WHERE rsu.user_id = u.id AND rsu.username ILIKE ${pattern} ${serverScope('rsu')}
@@ -240,6 +237,7 @@ export function buildUserRosterPageQuery(params: {
     SELECT
       u.id AS "userId",
       u.name AS "identityName",
+      ${personNameSql()} AS "personName",
       u.role AS "role",
       u.login_access AS "loginAccess",
       u.last_login_at AS "lastLoginAt",
@@ -317,6 +315,7 @@ export function buildUserRosterAccountIdQuery(roster: UserRosterSql): SQL {
 interface RosterPageRow {
   userId: string;
   identityName: string | null;
+  personName: string;
   role: UserRole;
   loginAccess: LoginAccess;
   lastLoginAt: string | null;
@@ -368,6 +367,7 @@ interface UserRosterRow {
   removedAt: string | null;
   updatedAt: string;
   identityName: string | null;
+  personName: string;
   role: UserRole;
   loginAccess: LoginAccess;
   lastLoginAt: string | null;
@@ -482,6 +482,7 @@ export const listRoutes: FastifyPluginAsync = async (app) => {
       removedAt: parseDateString(row.removedAt),
       updatedAt: new Date(row.updatedAt).toISOString(),
       identityName: row.identityName,
+      personName: row.personName,
       role: row.role,
       loginAccess: row.loginAccess,
       lastLoginAt: parseDateString(row.lastLoginAt),

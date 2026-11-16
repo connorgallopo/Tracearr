@@ -45,7 +45,11 @@ vi.mock('socket.io-client', () => ({ io: fake.io }));
 vi.mock('./useAuth', () => ({ useAuth: () => fake.auth }));
 vi.mock('./useMaintenanceMode', () => ({ useMaintenanceMode: () => fake.maintenance }));
 vi.mock('./queries', () => ({ useDestinations: () => fake.destinations }));
-vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => key }) }));
+vi.mock('react-i18next', () => ({
+  useTranslation: () => ({
+    t: (key: string, opts?: { server?: string }) => (opts?.server ? `${key}:${opts.server}` : key),
+  }),
+}));
 vi.mock('sonner', () => ({
   toast: { info: vi.fn(), warning: vi.fn(), error: vi.fn(), success: vi.fn() },
 }));
@@ -212,6 +216,7 @@ describe('SocketProvider', () => {
     fire('disconnect');
     fire('connect');
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['sessions', 'active'] });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['import'] });
 
     invalidate.mockClear();
     fake.socket.recovered = true;
@@ -280,12 +285,13 @@ describe('SocketProvider', () => {
     expect(invalidate).toHaveBeenCalledWith({ queryKey: REQUESTS_KEY });
   });
 
-  it('refetches servers and filter options when a server changes', () => {
+  it('refetches servers, filter options and request services when a server changes', () => {
     const { invalidate } = setup();
     fire(WS_EVENTS.SERVERS_CHANGED);
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['servers'] });
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['sessions', 'filter-options'] });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['requests', 'services'] });
   });
 
   it('coalesces a burst of finished runs into one refetch', () => {
@@ -310,6 +316,60 @@ describe('SocketProvider', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+
+  it.each([
+    ['Playback Reporting', WS_EVENTS.IMPORT_PLAYBACK_REPORTING_PROGRESS],
+    ['tofa', WS_EVENTS.IMPORT_TOFA_PROGRESS],
+  ])('refetches sessions, stats and users when a %s import completes', (_name, event) => {
+    const { invalidate } = setup();
+
+    fire(event, { status: 'processing' });
+    expect(invalidate).not.toHaveBeenCalled();
+
+    fire(event, { status: 'complete' });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['sessions'] });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['stats'] });
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['users'] });
+  });
+
+  it('refreshes held import statuses as the library sync they wait on moves', () => {
+    vi.useFakeTimers();
+    try {
+      const { invalidate } = setup();
+      fire(WS_EVENTS.LIBRARY_SYNC_PROGRESS, { serverId: 's1', status: 'running' });
+
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(invalidate).toHaveBeenCalledWith({ queryKey: ['import'] });
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  const syncError = {
+    serverId: 's1',
+    serverName: 'Living Room',
+    status: 'error',
+    message: 'Sync failed: connect ECONNREFUSED',
+  };
+
+  it('toasts the server name when its first library sync fails for good', () => {
+    setup();
+    fire(WS_EVENTS.LIBRARY_SYNC_PROGRESS, { ...syncError, firstSyncFailed: true });
+
+    expect(toast.error).toHaveBeenCalledWith(
+      'notifications:toast.error.firstSyncFailed:Living Room',
+      { description: 'Sync failed: connect ECONNREFUSED' }
+    );
+  });
+
+  it('stays quiet for a sync error that is not a final first-sync failure', () => {
+    setup();
+    fire(WS_EVENTS.LIBRARY_SYNC_PROGRESS, syncError);
+
+    expect(toast.error).not.toHaveBeenCalled();
   });
 
   it('renders an automation toast from the notification payload', () => {

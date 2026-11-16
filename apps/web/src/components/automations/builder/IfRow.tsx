@@ -96,7 +96,7 @@ export function IfRow({
       {...rowProps}
       data-pulse={pulseId === id}
       className={cn(
-        'bg-card-raised @container flex-col items-stretch gap-3',
+        'bg-card dark:bg-card-raised @container flex-col items-stretch gap-3',
         'data-[pulse=true]:ring-primary/60 data-[pulse=true]:ring-2',
         !enabled && 'opacity-60'
       )}
@@ -140,7 +140,7 @@ export function IfRow({
       <Collapsible open={open} onOpenChange={() => expansion.toggle(id)}>
         <CollapsibleContent
           id={branchId}
-          className="border-primary/40 [&_[data-slot=item]:not([data-orphaned=true])]:bg-card ml-3 space-y-3 border-l-2 pl-3.5 @max-lg:ml-1 @max-lg:pl-2.5"
+          className="border-primary/40 [&_[data-slot=item]:not([data-orphaned=true])]:bg-card-raised dark:[&_[data-slot=item]:not([data-orphaned=true])]:bg-card ml-3 space-y-3 border-l-2 pl-3.5 @max-lg:ml-1 @max-lg:pl-2.5"
         >
           {/* The header said "If", so the checks go straight underneath with no second label. */}
           {groups.map((group) => (
@@ -170,7 +170,7 @@ export function IfRow({
           </Button>
           <RowIssues issues={issues.get(id)} />
 
-          <FieldSeparator align="start" surface="raised">
+          <FieldSeparator align="start" surface="panel">
             <span className="text-foreground font-medium">
               {t('automations.builder.actions.branchThen')}
             </span>
@@ -186,7 +186,7 @@ export function IfRow({
             dispatch={dispatch}
           />
 
-          <FieldSeparator align="start" surface="raised">
+          <FieldSeparator align="start" surface="panel">
             <span className="text-foreground font-medium">
               {t('automations.builder.actions.branchElse')}
             </span>

@@ -7,66 +7,18 @@
 @theme {
   /* Font Family */
   --font-sans:
-    'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-
-  /* Border Radius */
-  --radius-lg: var(--radius);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-sm: calc(var(--radius) - 4px);
+    'Inter Variable', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
 
   /* Colors - Brand */
   --color-cyan-core: hsl(var(--cyan-core));
-  --color-cyan-deep: hsl(var(--cyan-deep));
-  --color-cyan-dark: hsl(var(--cyan-dark));
   --color-blue-core: hsl(var(--blue-core));
   --color-blue-steel: hsl(var(--blue-steel));
-  --color-blue-soft: hsl(var(--blue-soft));
 
-  /* Colors - Icon */
-  --color-icon: hsl(var(--icon-default));
-  --color-icon-active: hsl(var(--icon-active));
-  --color-icon-danger: hsl(var(--icon-danger));
-
-  /* Colors - shadcn/ui semantic */
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-card-raised: hsl(var(--card-raised));
-  --color-success: hsl(var(--success));
-  --color-warning: hsl(var(--warning));
-
-  /* Colors - Sidebar */
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
-
-  /* Colors - Chart */
-  --color-chart-1: hsl(var(--chart-1));
-  --color-chart-2: hsl(var(--chart-2));
-  --color-chart-3: hsl(var(--chart-3));
-  --color-chart-4: hsl(var(--chart-4));
-  --color-chart-5: hsl(var(--chart-5));
+  /* Type scale: Tailwind's xs, sm, base, xl, 2xl and 3xl plus this 13px step for dense
+     tables and media meta. Nothing a user reads goes below text-xs (12px). */
+  --text-dense: 0.8125rem;
+  --text-dense--line-height: 1.125rem;
 
   /* Animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -141,123 +93,172 @@
 
 /* CSS Variables for both light and dark modes */
 :root {
-  /* Accent Hue - Customizable via ThemeProvider */
-  /* Default: 187 (Cyan). Other options: 220 (Blue), 270 (Purple), 330 (Pink), 0 (Red), 24 (Orange), 150 (Green) */
+  /* Accent - set by ThemeProvider from ACCENT_PRESETS. --accent-hue is the
+     preset's HSL hue (maps and the legacy brand tokens); --accent-h is its
+     OKLCH hue and --accent-cl / --accent-cd the largest in-gamut chroma at the
+     fixed light (0.5) and dark (0.75) lightness, so every preset keeps the
+     same contrast against white and near-black text. */
   --accent-hue: 187;
+  --accent-h: 212;
+  --accent-cl: 0.085;
+  --accent-cd: 0.128;
 
-  /* Brand Colors - Tracearr (derived from accent hue) */
-  --cyan-core: var(--accent-hue) 80% 50%; /* Primary accent */
-  --cyan-deep: var(--accent-hue) 86% 42%; /* Hover/gradients */
-  --cyan-dark: var(--accent-hue) 85% 31%; /* Shadows/outlines */
-  --blue-core: 213 62% 11%; /* #0B1A2E - Dark background */
-  --blue-steel: 213 47% 17%; /* #162840 - Panels/cards */
-  --blue-soft: 212 49% 24%; /* #1E3A5C - Hover/selection */
+  /* Logo colors (components/brand/Logo.tsx); the cyan follows the accent hue */
+  --cyan-core: var(--accent-hue) 80% 50%; /* mark and arcs */
+  --blue-core: 213 62% 11%; /* #0B1A2E, shield fill */
+  --blue-steel: 213 47% 17%; /* #162840, shield panel */
 
-  /* Light Mode - shadcn neutral backgrounds with accent primary */
-  --background: 0 0% 100%; /* Pure white */
-  --foreground: 240 10% 4%; /* Near black text */
-  --card: 0 0% 100%; /* Pure white cards */
-  --card-foreground: 240 10% 4%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 240 10% 4%;
-  --primary: var(--accent-hue) 85% 38%; /* Accent color */
-  --primary-foreground: 0 0% 100%; /* White text on primary */
-  --secondary: 240 5% 96%; /* Neutral gray */
-  --secondary-foreground: 240 6% 10%;
-  --muted: 240 5% 96%; /* Neutral gray */
-  --muted-foreground: 240 4% 46%;
-  --accent: 240 5% 96%; /* Neutral gray for hover */
-  --accent-foreground: 240 6% 10%;
-  --destructive: 0 84% 60%;
+  /* Neutral grays (oklch): each keeps a fixed lightness per mode and takes the accent's hue at
+     a chroma too low to read as color (0.006 light, 0.012 dark; muted text and the control
+     boundary 0.014 and 0.016), so the grays follow whichever accent preset is picked. */
+  --background: 0.976 0.006 var(--accent-h);
+  --foreground: 0.142 0.005 var(--accent-h);
+  --card: 1 0 0;
+  --card-foreground: 0.142 0.005 var(--accent-h);
+  --popover: 1 0 0;
+  --popover-foreground: 0.142 0.005 var(--accent-h);
+  --primary: 0.5 var(--accent-cl) var(--accent-h); /* oklch */
+  --primary-foreground: 0.99 0 0; /* oklch */
+  --secondary: 0.92 0.006 var(--accent-h);
+  --secondary-foreground: 0.21 0.005 var(--accent-h);
+  --muted: 0.92 0.006 var(--accent-h);
+  --muted-foreground: 0.499 0.014 var(--accent-h);
+  --accent: 0.92 0.006 var(--accent-h);
+  --accent-foreground: 0.21 0.005 var(--accent-h);
+  --destructive: 0.51 0.2 25; /* oklch */
   --destructive-foreground: 0 0% 100%;
-  --border: 240 6% 90%; /* Neutral border */
-  --input: 240 6% 90%;
-  --ring: var(--accent-hue) 85% 38%; /* Accent color for focus */
+  --border: 0.895 0.006 var(--accent-h);
+  --input: 0.92 0.006 var(--accent-h);
+  /* Boundary of checkboxes, radios and text fields: 3:1 against white and the page */
+  --control: 0.629 0.014 var(--accent-h);
+  --ring: 0.5 var(--accent-cl) var(--accent-h); /* oklch */
+  /* Focus halos are ring/(--ring-alpha): the strength at which every accent preset keeps 3:1
+     against each surface a focused control sits on. */
+  --ring-alpha: 80%;
   --radius: 0.5rem;
 
-  /* Semantic status colors */
-  --success: 150 60% 38%;
-  --warning: 43 90% 45%;
+  /* Status (oklch). Reserved for state, never used as a series color. Light values sit at
+     L 0.48-0.51 so 12px text passes 4.5:1 on its own /15 tint over the page, which is the
+     pill and callout case. Neutral state is muted-foreground. */
+  --success: 0.48 0.13 150;
+  --warning: 0.5 0.11 65;
+  --info: 0.49 0.13 250;
 
-  /* The app's raised surface (KPI cards, panels, builder rows) - light --card
-     is already pure white, so this is a hair off-white rather than literally
-     lighter. */
-  --card-raised: 240 5% 98%;
+  /* Surface ladder: page 97%, card white, raised (nested panels, KPI tiles) back down to
+     the page tone, so it separates inside a card by the same step dark mode uses. */
+  --card-raised: 0.976 0.006 var(--accent-h);
 
-  /* Chart Colors - Light Mode */
-  --chart-1: var(--accent-hue) 85% 38%; /* Accent */
-  --chart-2: var(--accent-hue) 70% 50%; /* Accent variant */
-  --chart-3: 197 37% 24%; /* Neutral dark */
-  --chart-4: 43 90% 45%; /* Amber */
-  --chart-5: 0 72% 51%; /* Red */
+  /* Chart palette (oklch). chart-1..8 are categorical, for unordered series. Light mode
+     varies lightness by hue (warm hues lighter) so orange and olive read as hues instead
+     of brown, and every step keeps 3:1 against the white card. seq-1..7 is an ordered
+     ramp, highest tier first, for resolution tiers, engagement and funnels. Single-series
+     charts use primary. */
+  --chart-1: 0.55 0.17 255; /* blue */
+  --chart-2: 0.68 0.17 50; /* orange */
+  --chart-3: 0.58 0.19 340; /* magenta */
+  --chart-4: 0.6 0.1 200; /* teal */
+  --chart-5: 0.55 0.17 295; /* violet */
+  --chart-6: 0.66 0.13 100; /* olive */
+  --chart-7: 0.6 0.15 150; /* green */
+  --chart-8: 0.6 0.17 15; /* rose */
+  --seq-1: 0.33 0.14 295;
+  --seq-2: 0.39 0.16 285;
+  --seq-3: 0.45 0.17 272;
+  --seq-4: 0.51 0.16 260;
+  --seq-5: 0.57 0.14 248;
+  --seq-6: 0.62 0.11 236;
+  --seq-7: 0.66 0.08 225;
 
-  /* Icon Colors - Light Mode */
-  --icon-default: 240 4% 46%; /* Neutral */
-  --icon-active: var(--accent-hue) 85% 38%; /* Accent color */
-  --icon-danger: 0 72% 51%;
+  /* Scrims over artwork, maps and modals, and the ink that sits on them. Artwork has no
+     theme, so these are the same in both modes. */
+  --overlay: 240 10% 4%;
+  --overlay-foreground: 0 0% 98%;
+  /* Poster shadows: a lifted tile on hover and the media detail hero. Lighter here than in
+     dark mode, where the same blur has to read against a near-black page. */
+  --poster-lift: 0 12px 32px hsl(var(--overlay) / 0.2);
+  --poster-hero: 0 24px 60px hsl(var(--overlay) / 0.18);
+
+  /* Fixed data mappings, defined once. Declared on :root only: .dark sits on the same
+     element, so these resolve against whichever chart values are active. */
+  --media-movie: var(--chart-1);
+  --media-show: var(--chart-2);
+  --media-music: var(--chart-3);
+  --media-other: var(--chart-4);
+  --playback-direct: var(--chart-1);
+  --playback-copy: var(--chart-4);
+  --playback-audio: var(--chart-5);
+  --playback-transcode: var(--chart-2);
 
   /* Sidebar Colors - Light Mode */
-  --sidebar: 0 0% 98%; /* Slight off-white */
-  --sidebar-foreground: 240 6% 10%;
-  --sidebar-primary: var(--accent-hue) 85% 38%;
-  --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 240 5% 96%;
-  --sidebar-accent-foreground: 240 6% 10%;
-  --sidebar-border: 240 6% 90%;
-  --sidebar-ring: var(--accent-hue) 85% 38%;
+  --sidebar: 0.985 0.006 var(--accent-h);
+  --sidebar-foreground: 0.21 0.005 var(--accent-h);
+  --sidebar-primary: 0.5 var(--accent-cl) var(--accent-h); /* oklch */
+  --sidebar-primary-foreground: 0.99 0 0; /* oklch */
+  --sidebar-accent: 0.896 0.006 var(--accent-h);
+  --sidebar-accent-foreground: 0.21 0.005 var(--accent-h);
+  --sidebar-border: 0.89 0.006 var(--accent-h);
+  --sidebar-ring: 0.5 var(--accent-cl) var(--accent-h); /* oklch */
 }
 
 .dark {
-  /* Dark Mode - shadcn neutral backgrounds with accent primary */
-  --background: 240 10% 4%; /* Near black */
-  --foreground: 0 0% 98%; /* Off-white text */
-  --card: 240 10% 4%; /* Same as background */
-  --card-foreground: 0 0% 98%;
-  --popover: 240 10% 4%;
-  --popover-foreground: 0 0% 98%;
-  --primary: var(--accent-hue) 80% 50%; /* Accent color */
-  --primary-foreground: 240 6% 10%; /* Dark text on primary */
-  --secondary: 240 4% 16%; /* Dark neutral */
-  --secondary-foreground: 0 0% 98%;
-  --muted: 240 4% 16%; /* Dark neutral */
-  --muted-foreground: 240 5% 65%;
-  --accent: 240 4% 16%; /* Dark neutral for hover */
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62% 50%;
+  --background: 0.142 0.012 var(--accent-h);
+  --foreground: 0.985 0.005 var(--accent-h);
+  --card: 0.178 0.012 var(--accent-h);
+  --card-foreground: 0.985 0.005 var(--accent-h);
+  --popover: 0.222 0.012 var(--accent-h);
+  --popover-foreground: 0.985 0.005 var(--accent-h);
+  --primary: 0.75 var(--accent-cd) var(--accent-h); /* oklch */
+  --primary-foreground: 0.18 0.02 var(--accent-h); /* oklch */
+  --secondary: 0.275 0.012 var(--accent-h);
+  --secondary-foreground: 0.985 0.005 var(--accent-h);
+  --muted: 0.275 0.012 var(--accent-h);
+  --muted-foreground: 0.713 0.016 var(--accent-h);
+  --accent: 0.275 0.012 var(--accent-h);
+  --accent-foreground: 0.985 0.005 var(--accent-h);
+  --destructive: 0.68 0.19 25; /* oklch */
   --destructive-foreground: 0 0% 98%;
-  --border: 240 4% 16%; /* Dark neutral border */
-  --input: 240 4% 16%;
-  --ring: var(--accent-hue) 80% 50%; /* Accent color */
+  --border: 0.295 0.012 var(--accent-h);
+  --input: 0.275 0.012 var(--accent-h);
+  /* Boundary of checkboxes, radios and text fields: 3:1 against card and popover */
+  --control: 0.533 0.016 var(--accent-h);
+  --ring: 0.75 var(--accent-cd) var(--accent-h); /* oklch */
+  --ring-alpha: 60%;
 
-  /* Semantic status colors */
-  --success: 150 60% 45%;
-  --warning: 43 80% 55%;
+  --success: 0.76 0.15 150;
+  --warning: 0.8 0.15 80;
+  --info: 0.74 0.12 250;
 
-  /* The app's raised surface (KPI cards, panels, builder rows) - lighter than
-     --card, which is flat against --background in dark mode. */
-  --card-raised: 240 8% 7%;
+  /* Nested panels, KPI tiles, builder rows: one step above --card */
+  --card-raised: 0.211 0.012 var(--accent-h);
 
-  /* Chart Colors - Dark Mode */
-  --chart-1: var(--accent-hue) 80% 50%; /* Accent color */
-  --chart-2: var(--accent-hue) 70% 60%; /* Accent variant */
-  --chart-3: 197 37% 50%; /* Neutral */
-  --chart-4: 43 80% 55%; /* Warning */
-  --chart-5: 0 75% 55%; /* Danger */
+  --poster-lift: 0 12px 32px hsl(var(--overlay) / 0.7);
+  --poster-hero: 0 24px 60px hsl(var(--overlay) / 0.6);
 
-  /* Icon Colors - Dark Mode */
-  --icon-default: 240 5% 65%; /* Neutral */
-  --icon-active: var(--accent-hue) 80% 50%; /* Accent color */
-  --icon-danger: 0 100% 65%;
+  --chart-1: 0.72 0.14 255;
+  --chart-2: 0.76 0.15 55;
+  --chart-3: 0.72 0.16 340;
+  --chart-4: 0.74 0.11 200;
+  --chart-5: 0.7 0.15 295;
+  --chart-6: 0.78 0.13 100;
+  --chart-7: 0.74 0.15 150;
+  --chart-8: 0.7 0.16 15;
+  --seq-1: 0.9 0.04 300;
+  --seq-2: 0.83 0.07 290;
+  --seq-3: 0.76 0.11 278;
+  --seq-4: 0.69 0.15 266;
+  --seq-5: 0.62 0.14 254;
+  --seq-6: 0.56 0.11 242;
+  --seq-7: 0.5 0.08 230;
 
   /* Sidebar Colors - Dark Mode */
-  --sidebar: 240 6% 10%; /* Slightly lighter than bg */
-  --sidebar-foreground: 0 0% 98%;
-  --sidebar-primary: var(--accent-hue) 80% 50%;
-  --sidebar-primary-foreground: 240 6% 10%;
-  --sidebar-accent: 240 4% 16%;
-  --sidebar-accent-foreground: 0 0% 98%;
-  --sidebar-border: 240 4% 16%;
-  --sidebar-ring: var(--accent-hue) 80% 50%;
+  --sidebar: 0.166 0.012 var(--accent-h);
+  --sidebar-foreground: 0.985 0.005 var(--accent-h);
+  --sidebar-primary: 0.75 var(--accent-cd) var(--accent-h); /* oklch */
+  --sidebar-primary-foreground: 0.18 0.02 var(--accent-h); /* oklch */
+  --sidebar-accent: 0.275 0.012 var(--accent-h);
+  --sidebar-accent-foreground: 0.985 0.005 var(--accent-h);
+  --sidebar-border: 0.275 0.012 var(--accent-h);
+  --sidebar-ring: 0.75 var(--accent-cd) var(--accent-h); /* oklch */
 }
 
 /* Container utility - Tailwind v4 requires @utility for custom config */
@@ -267,19 +268,27 @@
   max-width: 1400px;
 }
 
-/* Shared card hover effects */
+/* Linked cards on the page: in dark the hover goes up to card-raised; light has no lighter
+   surface than the card, so it steps down by the same ratio against the page. */
 @utility card-hover {
-  @apply hover:shadow-primary/10 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg;
+  @apply hover:bg-muted/70 dark:hover:bg-card-raised hover:border-foreground/15 transition-colors duration-200;
 }
 
-@utility card-hover-border {
-  @apply hover:shadow-primary/10 hover:border-primary/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg;
+/* Accent picker swatch: the primary token computed from the swatch's own
+   --accent-h / --accent-cl / --accent-cd, so it shows what the app renders. */
+.accent-swatch {
+  background-color: oklch(0.5 var(--accent-cl) var(--accent-h));
+  color: oklch(0.99 0 0);
+}
+.dark .accent-swatch {
+  background-color: oklch(0.75 var(--accent-cd) var(--accent-h));
+  color: oklch(0.18 0.02 var(--accent-h));
 }
 
 /* Thin styled scrollbar matching shadcn ScrollArea appearance */
 @utility scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--border)) transparent;
+  scrollbar-color: oklch(var(--border)) transparent;
 
   &::-webkit-scrollbar {
     width: 8px;
@@ -289,13 +298,13 @@
     background: transparent;
   }
   &::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--border));
+    background-color: oklch(var(--border));
     border-radius: 9999px;
     border: 2px solid transparent;
     background-clip: content-box;
   }
   &::-webkit-scrollbar-thumb:hover {
-    background-color: hsl(var(--muted-foreground) / 0.5);
+    background-color: oklch(var(--muted-foreground) / 0.5);
   }
 }
 
@@ -304,46 +313,57 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  --color-card-raised: hsl(var(--card-raised));
-  --color-success: hsl(var(--success));
-  --color-warning: hsl(var(--warning));
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
-  --color-destructive: hsl(var(--destructive));
+  --color-background: oklch(var(--background));
+  --color-foreground: oklch(var(--foreground));
+  --color-card: oklch(var(--card));
+  --color-card-foreground: oklch(var(--card-foreground));
+  --color-card-raised: oklch(var(--card-raised));
+  --color-success: oklch(var(--success));
+  --color-warning: oklch(var(--warning));
+  --color-info: oklch(var(--info));
+  --color-popover: oklch(var(--popover));
+  --color-popover-foreground: oklch(var(--popover-foreground));
+  --color-primary: oklch(var(--primary));
+  --color-primary-foreground: oklch(var(--primary-foreground));
+  --color-secondary: oklch(var(--secondary));
+  --color-secondary-foreground: oklch(var(--secondary-foreground));
+  --color-muted: oklch(var(--muted));
+  --color-muted-foreground: oklch(var(--muted-foreground));
+  --color-accent: oklch(var(--accent));
+  --color-accent-foreground: oklch(var(--accent-foreground));
+  --color-destructive: oklch(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-chart-1: hsl(var(--chart-1));
-  --color-chart-2: hsl(var(--chart-2));
-  --color-chart-3: hsl(var(--chart-3));
-  --color-chart-4: hsl(var(--chart-4));
-  --color-chart-5: hsl(var(--chart-5));
-  --color-sidebar: hsl(var(--sidebar));
-  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
-  --color-sidebar-primary: hsl(var(--sidebar-primary));
-  --color-sidebar-primary-foreground: hsl(var(--sidebar-primary-foreground));
-  --color-sidebar-accent: hsl(var(--sidebar-accent));
-  --color-sidebar-accent-foreground: hsl(var(--sidebar-accent-foreground));
-  --color-sidebar-border: hsl(var(--sidebar-border));
-  --color-sidebar-ring: hsl(var(--sidebar-ring));
+  --color-border: oklch(var(--border));
+  --color-input: oklch(var(--input));
+  --color-control: oklch(var(--control));
+  --color-ring: oklch(var(--ring));
+  --color-chart-1: oklch(var(--chart-1));
+  --color-chart-2: oklch(var(--chart-2));
+  --color-chart-3: oklch(var(--chart-3));
+  --color-chart-4: oklch(var(--chart-4));
+  --color-chart-5: oklch(var(--chart-5));
+  --color-chart-6: oklch(var(--chart-6));
+  --color-chart-7: oklch(var(--chart-7));
+  --color-chart-8: oklch(var(--chart-8));
+  --color-overlay: hsl(var(--overlay));
+  --color-overlay-foreground: hsl(var(--overlay-foreground));
+  --color-media-movie: oklch(var(--media-movie));
+  --color-media-show: oklch(var(--media-show));
+  --color-media-music: oklch(var(--media-music));
+  --color-media-other: oklch(var(--media-other));
+  --color-sidebar: oklch(var(--sidebar));
+  --color-sidebar-foreground: oklch(var(--sidebar-foreground));
+  --color-sidebar-primary: oklch(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: oklch(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: oklch(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: oklch(var(--sidebar-accent-foreground));
+  --color-sidebar-border: oklch(var(--sidebar-border));
+  --color-sidebar-ring: oklch(var(--sidebar-ring));
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring/(--ring-alpha);
   }
   body {
     @apply bg-background text-foreground;
@@ -365,7 +385,7 @@
   padding-left: 1.25rem;
 }
 .tiptap p.is-editor-empty:first-child::before {
-  color: var(--muted-foreground);
+  color: oklch(var(--muted-foreground));
   content: attr(data-placeholder);
   float: left;
   height: 0;

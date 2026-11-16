@@ -291,7 +291,7 @@ function EmptyShelf({ id, title, message }: { id: string; title: string; message
   const headingId = `${id}-heading`;
   return (
     <section aria-labelledby={headingId} className="space-y-3">
-      <h2 id={headingId} className="text-[16px] font-semibold tracking-[-0.01em]">
+      <h2 id={headingId} className="text-base font-semibold tracking-[-0.01em]">
         {title}
       </h2>
       <p className="text-muted-foreground text-sm">{message}</p>

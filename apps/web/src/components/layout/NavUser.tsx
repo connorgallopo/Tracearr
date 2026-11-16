@@ -85,7 +85,8 @@ export function NavUser() {
     });
   };
 
-  const initials = user.username.slice(0, 2).toUpperCase();
+  const displayName = user.name ?? user.username;
+  const initials = displayName.slice(0, 2).toUpperCase();
   const ThemeIcon = THEME_ICONS[theme];
 
   // The rail is narrow, so the footer button carries the name alone; the
@@ -93,13 +94,13 @@ export function NavUser() {
   const identity = (withEmail: boolean) => (
     <>
       <Avatar className="size-8 rounded-lg">
-        {user.thumbUrl && <AvatarImage src={user.thumbUrl} alt={user.username} />}
+        {user.thumbUrl && <AvatarImage src={user.thumbUrl} alt={displayName} />}
         <AvatarFallback className="bg-primary/10 text-primary rounded-lg text-xs">
           {initials}
         </AvatarFallback>
       </Avatar>
       <div className="grid flex-1 text-left text-sm leading-tight">
-        <span className="truncate font-medium">{user.username}</span>
+        <span className="truncate font-medium">{displayName}</span>
         {withEmail && user.email && (
           <span className="text-muted-foreground truncate text-xs">{user.email}</span>
         )}
@@ -113,6 +114,7 @@ export function NavUser() {
         <DropdownMenuTrigger asChild>
           <SidebarMenuButton
             size="lg"
+            variant="outline"
             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
           >
             {identity(false)}

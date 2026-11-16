@@ -167,9 +167,20 @@ export function parseSessionCore(
   // For music tracks, extract metadata early so we can use album artwork as fallback
   const musicMetadata = mediaType === 'track' ? extractMusicMetadata(nowPlaying) : undefined;
 
-  // Build thumb path: use item's Primary image, or album artwork for music tracks
+  // A live session plays the channel; the program on air is its CurrentProgram. The server
+  // fills it when playback starts and does not replace it, so it is dropped once it has ended.
+  const onAir = mediaType === 'live' ? getNestedObject(nowPlaying, 'CurrentProgram') : undefined;
+  const endsAt = Date.parse(parseString(onAir?.EndDate));
+  const program = endsAt < Date.now() ? undefined : onAir;
+  const programImageTags = program && getNestedObject(program, 'ImageTags');
+  const programThumbPath =
+    program &&
+    buildItemImagePath(parseString(program.Id), parseOptionalString(programImageTags?.Primary));
+  const episodeTitle = parseOptionalString(program?.EpisodeTitle);
+
+  // Build thumb path: the program's image, the item's Primary image, or album artwork for music tracks
   const itemThumbPath = buildItemImagePath(itemId, primaryImageTag);
-  const thumbPath = itemThumbPath ?? musicMetadata?.albumThumbPath;
+  const thumbPath = programThumbPath ?? itemThumbPath ?? musicMetadata?.albumThumbPath;
 
   // Parse lastPausedDate only if the platform supports it (Jellyfin only)
   let lastPausedDate: Date | undefined;
@@ -188,7 +199,7 @@ export function parseSessionCore(
       thumb: buildUserImagePath(userId, userImageTag),
     },
     media: {
-      title: parseString(nowPlaying.Name),
+      title: episodeTitle ?? parseString(program?.Name ?? nowPlaying.Name),
       type: mediaType,
       durationMs,
       year: parseOptionalNumber(nowPlaying.ProductionYear),
@@ -239,6 +250,14 @@ export function parseSessionCore(
   // Add Live TV metadata if this is a live stream
   if (mediaType === 'live') {
     result.live = extractLiveTvMetadata(nowPlaying);
+    // A program with an episode title is an episode of the show it is named for
+    if (program && episodeTitle) {
+      result.episode = {
+        showTitle: parseString(program.Name),
+        seasonNumber: parseOptionalNumber(program.ParentIndexNumber) ?? null,
+        episodeNumber: parseOptionalNumber(program.IndexNumber) ?? null,
+      };
+    }
   }
 
   // Add music track metadata if this is a track (already extracted above for thumb fallback)

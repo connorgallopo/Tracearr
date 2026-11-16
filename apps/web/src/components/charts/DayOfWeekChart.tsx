@@ -48,21 +48,21 @@ export function DayOfWeekChart({ data, isLoading, height = 250 }: DayOfWeekChart
       legend: {
         enabled: groups.length >= 2,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
       },
       xAxis: {
         categories: days.map((day) => weekdayName(day, 'short')),
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
-        lineColor: 'hsl(var(--border))',
-        tickColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
+        tickColor: 'oklch(var(--border))',
       },
       yAxis: {
         title: {
@@ -70,10 +70,10 @@ export function DayOfWeekChart({ data, isLoading, height = 250 }: DayOfWeekChart
         },
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
-        gridLineColor: 'hsl(var(--border))',
+        gridLineColor: 'oklch(var(--border))',
         min: 0,
       },
       plotOptions: {
@@ -81,19 +81,19 @@ export function DayOfWeekChart({ data, isLoading, height = 250 }: DayOfWeekChart
           ? { borderRadius: 4, stacking: 'normal' }
           : {
               borderRadius: 4,
-              color: 'hsl(var(--primary))',
+              color: 'oklch(var(--primary))',
               states: {
                 hover: {
-                  color: 'hsl(var(--primary) / 0.8)',
+                  color: 'oklch(var(--primary) / 0.8)',
                 },
               },
             },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         shared: stacked,
         formatter: function () {
@@ -119,24 +119,6 @@ export function DayOfWeekChart({ data, isLoading, height = 250 }: DayOfWeekChart
               data: days.map((day) => data.find((d) => d.day === day)?.count ?? 0),
             },
           ],
-      responsive: {
-        rules: [
-          {
-            condition: {
-              maxWidth: 400,
-            },
-            chartOptions: {
-              xAxis: {
-                labels: {
-                  style: {
-                    fontSize: '9px',
-                  },
-                },
-              },
-            },
-          },
-        ],
-      },
     };
   }, [data, height, t]);
 

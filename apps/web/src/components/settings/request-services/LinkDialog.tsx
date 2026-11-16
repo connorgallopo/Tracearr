@@ -26,6 +26,7 @@ import {
   useTestRequestService,
   useUpdateRequestService,
 } from '@/hooks/queries';
+import { useRestoreFocus } from '@/hooks/useRestoreFocus';
 import { shortVersion } from './requestServiceFormat';
 
 const TEST_RESULT_ID = 'request-service-test-result';
@@ -47,6 +48,7 @@ interface TestState {
 
 export function LinkDialog({ open, onOpenChange, server, existing }: LinkDialogProps) {
   const { t } = useTranslation(['settings', 'common']);
+  const focusHandlers = useRestoreFocus();
   const [url, setUrl] = useState(existing?.url ?? '');
   const [apiKey, setApiKey] = useState('');
   const [keyVisible, setKeyVisible] = useState(false);
@@ -101,7 +103,7 @@ export function LinkDialog({ open, onOpenChange, server, existing }: LinkDialogP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent {...focusHandlers}>
         <DialogHeader>
           <DialogTitle>
             {existing

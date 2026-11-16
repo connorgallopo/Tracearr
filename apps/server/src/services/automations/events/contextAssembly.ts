@@ -8,6 +8,7 @@ import type {
 } from '@tracearr/shared';
 import { db } from '../../../db/client.js';
 import { servers, serverUsers, users } from '../../../db/schema.js';
+import { personNameColumn } from '../../../utils/representativeAccount.js';
 import {
   batchGetRecentUserSessions,
   maxWindowHoursFromAutomations,
@@ -100,7 +101,7 @@ export async function loadEvaluationServerUser(
       userId: serverUsers.userId,
       username: serverUsers.username,
       thumbUrl: serverUsers.thumbUrl,
-      identityName: users.name,
+      identityName: personNameColumn(),
       trustScore: serverUsers.trustScore,
       lastActivityAt: serverUsers.lastActivityAt,
       createdAt: serverUsers.createdAt,

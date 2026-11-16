@@ -16,6 +16,7 @@ import { and, eq, isNull, type SQL } from 'drizzle-orm';
 import { randomUUID } from 'node:crypto';
 import { db } from '../db/client.js';
 import { servers, serverUserExternalAliases, serverUsers, sessions, users } from '../db/schema.js';
+import { personNameColumn } from '../utils/representativeAccount.js';
 import {
   ACTIVE_SESSION_CHUNK_BOUND_MS,
   readSessionRow,
@@ -42,7 +43,7 @@ import {
 } from '../services/automations/events/producers.js';
 import { registerService, unregisterService } from '../services/serviceTracker.js';
 import { getWatchedThreshold } from '../services/settings.js';
-import { sseManager } from '../services/sseManager.js';
+import { sseManager, type SSEManagerEvents } from '../services/sseManager.js';
 import { getIdentityServerUserIds } from '../services/userService.js';
 import { createLogger } from '../utils/logger.js';
 import {
@@ -79,7 +80,11 @@ import {
   isPlaybackConfirmed,
   updateConfirmationState,
 } from './poller/stateTracker.js';
-import { PENDING_STOP_PERSIST_MIN_PROGRESS_MS, type PendingSessionData } from './poller/types.js';
+import {
+  PENDING_STOP_PERSIST_MIN_PROGRESS_MS,
+  type PendingSessionData,
+  type SessionStopInput,
+} from './poller/types.js';
 import { broadcastViolations } from './poller/violations.js';
 
 const sseLogger = createLogger('SSEProcessor');
@@ -114,11 +119,13 @@ interface FallbackEvent {
   serverId: string;
   serverName: string;
 }
+type TofaStopEvent = SSEManagerEvents['tofa:session:stopped'];
 const wrappedHandlers = {
   playing: (e: SessionEvent) => void handlePlaying(e),
   paused: (e: SessionEvent) => void handlePaused(e),
   stopped: (e: SessionEvent) => void handleStopped(e),
   progress: (e: SessionEvent) => void handleProgress(e),
+  tofaStopped: (e: TofaStopEvent) => void handleTofaStopped(e),
   reconciliation: () =>
     void handleReconciliation().catch((err: unknown) =>
       console.error('[SSEProcessor] Error in reconciliation handler:', err)
@@ -237,6 +244,7 @@ export function startSSEProcessor(): void {
   sseManager.on('plex:session:paused', wrappedHandlers.paused);
   sseManager.on('plex:session:stopped', wrappedHandlers.stopped);
   sseManager.on('plex:session:progress', wrappedHandlers.progress);
+  sseManager.on('tofa:session:stopped', wrappedHandlers.tofaStopped);
   sseManager.on('reconciliation:needed', wrappedHandlers.reconciliation);
 
   // Subscribe to server health events (SSE connection state changes)
@@ -281,6 +289,7 @@ export function stopSSEProcessor(): void {
   sseManager.off('plex:session:paused', wrappedHandlers.paused);
   sseManager.off('plex:session:stopped', wrappedHandlers.stopped);
   sseManager.off('plex:session:progress', wrappedHandlers.progress);
+  sseManager.off('tofa:session:stopped', wrappedHandlers.tofaStopped);
   sseManager.off('reconciliation:needed', wrappedHandlers.reconciliation);
   sseManager.off('fallback:activated', wrappedHandlers.fallbackActivated);
   sseManager.off('fallback:deactivated', wrappedHandlers.fallbackDeactivated);
@@ -515,45 +524,15 @@ async function handleStopped(event: {
     if (cacheService) {
       const pendingData = await cacheService.getPendingSession(serverId, notification.sessionKey);
       if (pendingData) {
-        const { maxViewOffset, initialViewOffset } = pendingData.confirmation;
-        const progress = maxViewOffset - (initialViewOffset ?? maxViewOffset);
-
-        if (progress >= PENDING_STOP_PERSIST_MIN_PROGRESS_MS) {
-          // Real playback happened; a short resume near the end of a file must
-          // still reach history and flip watched-state. Age-based confirmation
-          // was never reached, so the observed progress is the evidence here.
-          const persisted = await confirmPendingSessionAndPersist(
+        const outcome = await settlePendingStop(serverId, notification.sessionKey, pendingData);
+        if (outcome === 'discarded') return;
+        if (outcome === 'persisted') {
+          const sessionRow = await findActiveSession({
             serverId,
-            notification.sessionKey,
-            {
-              ...pendingData,
-              confirmation: { ...pendingData.confirmation, confirmedPlayback: true },
-            }
-          );
-          if (persisted) {
-            const sessionRow = await findActiveSession({
-              serverId,
-              sessionKey: notification.sessionKey,
-              ratingKey: pendingData.processed.ratingKey,
-            });
-            if (sessionRow) await stopSession(sessionRow);
-            return;
-          }
-          // False here has three causes: the in-lock pending recheck found
-          // the entry already discarded (no row exists to close), the
-          // existingActive recheck found a row already persisted or the
-          // create lock was contended (a concurrent caller got there
-          // first), or a kill_stream rule terminated the session while
-          // confirming it (termination.ts already closed and broadcast
-          // it). Fall through to the lookup-and-stop below so a row from
-          // the concurrent-caller case still gets closed instead of
-          // lingering until the stale sweep.
-        } else {
-          await discardPendingSession(serverId, notification.sessionKey, pendingData);
-          console.log(
-            `[SSEProcessor] Discarded phantom session ${notification.sessionKey} (id: ${pendingData.id}) ` +
-              `(stopped before 30s confirmation)`
-          );
+            sessionKey: notification.sessionKey,
+            ratingKey: pendingData.processed.ratingKey,
+          });
+          if (sessionRow) await stopSession(sessionRow);
           return;
         }
       }
@@ -594,6 +573,83 @@ async function handleStopped(event: {
     }
   } catch (error) {
     console.error('[SSEProcessor] Error handling stopped event:', error);
+  }
+}
+
+/**
+ * A pending session that stopped: discarded unless it showed real progress (a short resume
+ * near the end of a file), in which case it is persisted so the caller can close the row.
+ */
+async function settlePendingStop(
+  serverId: string,
+  sessionKey: string,
+  pendingData: PendingSessionData
+): Promise<'discarded' | 'persisted' | 'not-persisted'> {
+  const { maxViewOffset, initialViewOffset } = pendingData.confirmation;
+  const progress = maxViewOffset - (initialViewOffset ?? maxViewOffset);
+
+  if (progress < PENDING_STOP_PERSIST_MIN_PROGRESS_MS) {
+    await discardPendingSession(serverId, sessionKey, pendingData);
+    console.log(
+      `[SSEProcessor] Discarded phantom session ${sessionKey} (id: ${pendingData.id}) ` +
+        `(stopped before 30s confirmation)`
+    );
+    return 'discarded';
+  }
+
+  // Real playback happened; a short resume near the end of a file must still reach history
+  // and flip watched-state. Age-based confirmation was never reached, so the observed
+  // progress is the evidence here.
+  const persisted = await confirmPendingSessionAndPersist(serverId, sessionKey, {
+    ...pendingData,
+    confirmation: { ...pendingData.confirmation, confirmedPlayback: true },
+  });
+  // Not persisted has three causes: the in-lock pending recheck found the entry already
+  // discarded (no row exists to close), the existingActive recheck found a row already
+  // persisted or the create lock was contended (a concurrent caller got there first), or a
+  // kill_stream rule terminated the session while confirming it (termination.ts already
+  // closed and broadcast it). Callers fall through to their lookup-and-stop so a row from
+  // the concurrent-caller case still gets closed instead of lingering until the stale sweep.
+  return persisted ? 'persisted' : 'not-persisted';
+}
+
+/**
+ * tofa reports a stop with the final position and whether an admin stopped it. Its session
+ * ids are never reused, so every open row under the id is the play that stopped, and a later
+ * poll must not open the id again.
+ */
+async function handleTofaStopped(event: TofaStopEvent): Promise<void> {
+  const { serverId, sessionId, positionMs, stoppedByAdmin } = event;
+  // The poller checks the hold only for a listed session with an item key, so a play whose
+  // media never resolved cannot be held off this way.
+  const holdOff = async (ratingKey: string | null) => {
+    if (ratingKey) await cacheService?.setTerminationCooldown(serverId, sessionId, ratingKey);
+  };
+
+  try {
+    if (cacheService) {
+      const pendingData = await cacheService.getPendingSession(serverId, sessionId);
+      if (
+        pendingData &&
+        (await settlePendingStop(serverId, sessionId, pendingData)) === 'discarded'
+      ) {
+        await holdOff(pendingData.processed.ratingKey);
+        return;
+      }
+    }
+
+    const rows = await findActiveSessionsAll({ serverId, sessionKey: sessionId });
+    for (const row of rows) {
+      // A channel play's position never moves, and would cap its time watched at that position
+      const progressMs = row.mediaType === 'live' ? row.progressMs : (positionMs ?? row.progressMs);
+      // Stopped first: once the row is stopped, a poll still holding the older position
+      // cannot write it over the final one.
+      await stopSession({ ...row, progressMs }, { forceStopped: stoppedByAdmin });
+      await db.update(sessions).set({ progressMs }).where(sessionRowById(row));
+      await holdOff(row.ratingKey);
+    }
+  } catch (error) {
+    console.error('[SSEProcessor] Error handling tofa stopped event:', error);
   }
 }
 
@@ -1052,7 +1108,7 @@ async function resolveAliasedServerUser(serverId: string, externalId: string) {
       userId: serverUsers.userId,
       username: serverUsers.username,
       thumbUrl: serverUsers.thumbUrl,
-      identityName: users.name,
+      identityName: personNameColumn(),
       trustScore: serverUsers.trustScore,
       lastActivityAt: serverUsers.lastActivityAt,
       createdAt: serverUsers.createdAt,
@@ -1108,7 +1164,7 @@ async function createNewSession(
       userId: serverUsers.userId,
       username: serverUsers.username,
       thumbUrl: serverUsers.thumbUrl,
-      identityName: users.name,
+      identityName: personNameColumn(),
       trustScore: serverUsers.trustScore,
       lastActivityAt: serverUsers.lastActivityAt,
       createdAt: serverUsers.createdAt,
@@ -1851,10 +1907,14 @@ async function confirmPendingSessionAndPersist(
 /**
  * Stop a session
  */
-async function stopSession(existingSession: typeof sessions.$inferSelect): Promise<void> {
+async function stopSession(
+  existingSession: typeof sessions.$inferSelect,
+  options: Pick<SessionStopInput, 'forceStopped'> = {}
+): Promise<void> {
   const { wasUpdated, needsRetry, retryData } = await stopSessionAtomic({
     session: existingSession,
     stoppedAt: new Date(),
+    ...options,
   });
 
   clearDbWriteTracking(existingSession.id);

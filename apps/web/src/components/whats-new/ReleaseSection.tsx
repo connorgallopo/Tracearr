@@ -37,7 +37,7 @@ const LINK_GAP = '  ';
 function withInlineCode(text: string): ReactNode[] {
   return text.split('`').map((part, i) =>
     i % 2 === 1 ? (
-      <code key={i} className="bg-muted rounded px-1 py-0.5 font-mono text-[0.85em]">
+      <code key={i} className="bg-muted rounded px-1 py-0.5 font-mono text-xs">
         {part}
       </code>
     ) : (

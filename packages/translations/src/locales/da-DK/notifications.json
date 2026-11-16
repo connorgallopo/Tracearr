@@ -169,6 +169,7 @@
       "serverAddFailed": "Mislykkedes at tilføje server",
       "serverRemoveFailed": "Mislykkedes at fjerne server",
       "serverSyncFailed": "Synkronisering af server mislykkedes",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Kunne ikke opdatere indstillinger",
       "copyManual": "",

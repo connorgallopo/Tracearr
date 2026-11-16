@@ -25,6 +25,10 @@ export const POSTER_ASPECT_CLASS = {
   square: 'aspect-square',
 } as const satisfies Record<PosterAspect, string>;
 
+/** A chip laid over artwork: the overlay scrim and ink, the same in both themes. */
+const ART_CHIP_CLASS =
+  'bg-overlay/75 text-overlay-foreground border-overlay-foreground/12 rounded-full border backdrop-blur-sm';
+
 /** One URL per poster: the server keeps one cached copy at 360x540, or 360x360 for square art. The grid alone asks for the LQIP race. */
 export function buildPosterSrc(
   posterUrl: string,
@@ -75,7 +79,7 @@ function darkenHex(hex: string, amount = 0.55): string {
  */
 function fallbackGradient(dominantColor: string | null): string {
   if (!dominantColor) {
-    return 'linear-gradient(160deg, hsl(var(--muted)) 0%, hsl(var(--card-raised)) 100%)';
+    return 'linear-gradient(160deg, oklch(var(--muted)) 0%, oklch(var(--card-raised)) 100%)';
   }
   return `linear-gradient(160deg, ${dominantColor} 0%, ${darkenHex(dominantColor)} 100%)`;
 }
@@ -102,6 +106,8 @@ export function PosterArt({
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
   if (!src || failedSrc === src) {
+    // The dominant-color gradient is darkened artwork, so it takes the overlay ink in both themes.
+    const ink = dominantColor ? 'text-overlay-foreground/85' : 'text-foreground/85';
     return (
       <div
         className="flex h-full w-full flex-col items-center justify-center gap-0.5 p-2 text-center"
@@ -109,12 +115,25 @@ export function PosterArt({
       >
         <span
           aria-hidden="true"
-          className="text-foreground/85 text-[34px] leading-none font-bold tracking-[-0.02em] [text-shadow:0_2px_12px_hsl(240_10%_2%/0.4)]"
+          className={cn(
+            'text-3xl leading-none font-bold tracking-[-0.02em]',
+            ink,
+            // On the neutral gradient a dark shadow under dark ink smears in light mode.
+            dominantColor
+              ? '[text-shadow:0_2px_12px_hsl(var(--overlay)/0.4)]'
+              : 'dark:[text-shadow:0_2px_12px_hsl(var(--overlay)/0.4)]'
+          )}
         >
           {posterInitials(title)}
         </span>
         {caption && (
-          <small className="text-foreground/75 line-clamp-2 text-[9px] font-semibold tracking-[0.14em] uppercase">
+          <small
+            className={cn(
+              'line-clamp-2 text-xs font-semibold tracking-wide uppercase',
+              ink,
+              'opacity-90'
+            )}
+          >
             {title}
           </small>
         )}
@@ -293,17 +312,17 @@ export function PosterCard({
           aria-hidden="true"
           style={{
             textShadow: [
-              '1.25px 0 0 hsl(var(--foreground) / 0.45)',
-              '-1.25px 0 0 hsl(var(--foreground) / 0.45)',
-              '0 1.25px 0 hsl(var(--foreground) / 0.45)',
-              '0 -1.25px 0 hsl(var(--foreground) / 0.45)',
-              '0.9px 0.9px 0 hsl(var(--foreground) / 0.45)',
-              '-0.9px 0.9px 0 hsl(var(--foreground) / 0.45)',
-              '0.9px -0.9px 0 hsl(var(--foreground) / 0.45)',
-              '-0.9px -0.9px 0 hsl(var(--foreground) / 0.45)',
+              '1.25px 0 0 oklch(var(--foreground) / 0.45)',
+              '-1.25px 0 0 oklch(var(--foreground) / 0.45)',
+              '0 1.25px 0 oklch(var(--foreground) / 0.45)',
+              '0 -1.25px 0 oklch(var(--foreground) / 0.45)',
+              '0.9px 0.9px 0 oklch(var(--foreground) / 0.45)',
+              '-0.9px 0.9px 0 oklch(var(--foreground) / 0.45)',
+              '0.9px -0.9px 0 oklch(var(--foreground) / 0.45)',
+              '-0.9px -0.9px 0 oklch(var(--foreground) / 0.45)',
             ].join(', '),
           }}
-          className="pointer-events-none absolute top-0 left-0 z-10 flex w-9 justify-end pr-1 text-[26px] leading-none font-extrabold tracking-[-0.01em] text-transparent tabular-nums transition-transform duration-200 group-hover:-translate-y-[3px]"
+          className="pointer-events-none absolute top-0 left-0 z-10 flex w-9 justify-end pr-1 text-2xl leading-none font-extrabold tracking-[-0.01em] text-transparent tabular-nums transition-transform duration-200 group-hover:-translate-y-[3px]"
         >
           {rank}
         </span>
@@ -311,7 +330,7 @@ export function PosterCard({
       <CardSurface mediaId={mediaId} accessibleName={accessibleName}>
         <div
           className={cn(
-            'bg-muted relative overflow-hidden rounded-[calc(var(--radius)+2px)] transition-transform duration-200 group-hover:-translate-y-[3px] group-hover:shadow-[0_12px_32px_hsl(240_10%_2%/0.7)]',
+            'bg-muted relative overflow-hidden rounded-xl transition-transform duration-200 group-hover:-translate-y-[3px] group-hover:shadow-(--poster-lift)',
             POSTER_ASPECT_CLASS[aspect]
           )}
           style={dominantColor ? { backgroundColor: dominantColor } : undefined}
@@ -335,7 +354,7 @@ export function PosterCard({
               {showNewEpisodesChip && (
                 <span
                   aria-hidden="true"
-                  className="text-foreground rounded-full border border-white/12 bg-[hsl(240_10%_4%/0.75)] px-2 py-0.5 text-[10.5px] font-semibold backdrop-blur-sm"
+                  className={cn(ART_CHIP_CLASS, 'px-2 py-0.5 text-xs font-semibold')}
                 >
                   {t('media.landing.card.newEpisodesChip', { count: newEpisodes })}
                 </span>
@@ -343,7 +362,7 @@ export function PosterCard({
               {showVersionsChip && (
                 <span
                   aria-hidden="true"
-                  className="text-foreground rounded-full border border-white/12 bg-[hsl(240_10%_4%/0.75)] px-2 py-0.5 text-[10.5px] font-semibold backdrop-blur-sm"
+                  className={cn(ART_CHIP_CLASS, 'px-2 py-0.5 text-xs font-semibold')}
                 >
                   {versionsChipLabel}
                 </span>
@@ -356,10 +375,7 @@ export function PosterCard({
             </div>
           )}
           <div className="absolute right-1.5 bottom-1.5">
-            <ServerDots
-              servers={servers}
-              className="rounded-full border border-white/12 bg-[hsl(240_10%_4%/0.75)] px-1.5 py-1 backdrop-blur-sm"
-            />
+            <ServerDots servers={servers} className={cn(ART_CHIP_CLASS, 'px-1.5 py-1')} />
           </div>
           <HoverOverlay
             title={title}

@@ -11,7 +11,13 @@ import fastifyStatic from '@fastify/static';
 import { existsSync, readFileSync } from 'node:fs';
 import { gzipSync, createGzip } from 'node:zlib';
 import { Redis } from 'ioredis';
-import { API_BASE_PATH, API_V2_BASE_PATH, REDIS_KEYS, WS_EVENTS } from '@tracearr/shared';
+import {
+  API_BASE_PATH,
+  API_V2_BASE_PATH,
+  REDIS_KEYS,
+  SERVER_TYPES,
+  WS_EVENTS,
+} from '@tracearr/shared';
 import { createBetterAuthHandler, deriveScheme } from './lib/betterAuthRequest.js';
 import { getBasePath } from './lib/basePath.js';
 import { registerOriginPolicy, trustProxyFromEnv } from './lib/origins.js';
@@ -46,6 +52,7 @@ import type {
   TautulliImportProgress,
   JellystatImportProgress,
   PlaybackReportingImportProgress,
+  TofaImportProgress,
   MaintenanceJobProgress,
   LibrarySyncProgress,
   NotificationToast,
@@ -164,6 +171,7 @@ import {
   startMaintenanceWorker,
   shutdownMaintenanceQueue,
   enqueueServerLocationSyncIfBehind,
+  seedSnapshotsNormalizedAt,
 } from './jobs/maintenanceQueue.js';
 import {
   initLibrarySyncQueue,
@@ -195,6 +203,7 @@ import {
   scheduleRequestSync,
   shutdownRequestSyncQueue,
 } from './jobs/requestSyncQueue.js';
+import { addBuiltInRequestServices } from './services/requests/store.js';
 import {
   initBackupQueue,
   startBackupWorker,
@@ -942,6 +951,13 @@ async function initializeServices(app: FastifyInstance) {
     app.log.warn({ err }, "Failed to seed what's-new last-seen version");
   }
 
+  // Wrapped the same way: a failed seed leaves the setting null and the first sync normalizes.
+  try {
+    await seedSnapshotsNormalizedAt();
+  } catch (err) {
+    app.log.warn({ err }, 'Failed to seed snapshot normalization marker');
+  }
+
   try {
     await sweepDestinationConfigs();
   } catch (err) {
@@ -1152,9 +1168,15 @@ async function initializeServices(app: FastifyInstance) {
 
   try {
     startRequestSyncWorker();
-    scheduleRequestSync().catch((err: unknown) => {
-      app.log.error({ err }, 'Failed to schedule request sync');
-    });
+    // Servers added before their type had requests built in get theirs here
+    void addBuiltInRequestServices(db, SERVER_TYPES)
+      .catch((err: unknown) => {
+        app.log.error({ err }, 'Failed to add built-in request services');
+      })
+      .then(scheduleRequestSync)
+      .catch((err: unknown) => {
+        app.log.error({ err }, 'Failed to schedule request sync');
+      });
     app.log.info('Request sync queue initialized');
   } catch (err) {
     app.log.error({ err }, 'Failed to initialize request sync queue');
@@ -1408,6 +1430,9 @@ async function initializePostListen(app: FastifyInstance) {
             'import:playbackreporting:progress',
             data as PlaybackReportingImportProgress
           );
+          break;
+        case WS_EVENTS.IMPORT_TOFA_PROGRESS:
+          broadcastToSessions('import:tofa:progress', data as TofaImportProgress);
           break;
         case WS_EVENTS.MAINTENANCE_PROGRESS:
           broadcastToSessions('maintenance:progress', data as MaintenanceJobProgress);

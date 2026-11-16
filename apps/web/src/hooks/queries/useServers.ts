@@ -199,6 +199,13 @@ export function useUpdateServerUrl() {
   });
 }
 
+export function usePlexAccounts() {
+  return useQuery({
+    queryKey: ['plex-accounts'],
+    queryFn: () => api.auth.getPlexAccounts(),
+  });
+}
+
 /**
  * Hook for fetching available connections for an existing Plex server
  * Used when editing the server URL to show available connection options

@@ -3,7 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import type { Server } from '@tracearr/shared';
+import { WS_EVENTS, type Server } from '@tracearr/shared';
 import { initI18n } from '@tracearr/translations';
 import { LibraryEmptyState } from './LibraryEmptyState';
 
@@ -54,6 +54,7 @@ function server(id: string, name: string): Server {
 interface StatusData {
   isSynced: boolean;
   isSyncRunning: boolean;
+  isSyncQueued?: boolean;
   needsBackfill: boolean;
   isBackfillRunning: boolean;
   backfillDays: number | null;
@@ -129,6 +130,90 @@ describe('LibraryEmptyState', () => {
     await userEvent.click(screen.getByRole('button', { name: /Sync Now/i }));
 
     await waitFor(() => expect(api.servers.sync).toHaveBeenCalledWith('s1'));
+  });
+
+  it('single server with a queued sync: says the sync is queued and keeps Sync Now', () => {
+    mockUseServer.mockReturnValue(useServerReturn(['s1'], [server('s1', 'Plex')]));
+    mockUseLibraryStatus.mockReturnValue(
+      statusResult({
+        s1: {
+          isSynced: false,
+          isSyncRunning: false,
+          isSyncQueued: true,
+          needsBackfill: false,
+          isBackfillRunning: false,
+          backfillDays: null,
+        },
+      })
+    );
+
+    render(<LibraryEmptyState />, { wrapper: wrapper() });
+
+    expect(screen.getByText('Library sync queued')).toBeInTheDocument();
+    expect(screen.queryByText('Library not synced yet')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Sync Now/i })).toBeInTheDocument();
+  });
+
+  it('refetches status once a queued sync reports it is running', () => {
+    const handlers = new Map<string, (payload: unknown) => void>();
+    const socket = {
+      on: vi.fn((event: string, cb: (payload: unknown) => void) => handlers.set(event, cb)),
+      off: vi.fn(),
+    };
+    mockUseSocket.mockReturnValue({ socket } as unknown as ReturnType<typeof useSocket>);
+    mockUseServer.mockReturnValue(
+      useServerReturn(['s1', 's2'], [server('s1', 'Plex'), server('s2', 'Jellyfin')])
+    );
+    const notSynced = {
+      isSynced: false,
+      isSyncRunning: false,
+      needsBackfill: false,
+      isBackfillRunning: false,
+      backfillDays: null,
+    };
+    mockUseLibraryStatus.mockReturnValue(
+      statusResult({ s1: { ...notSynced, isSyncQueued: true }, s2: notSynced })
+    );
+    const client = new QueryClient();
+    const invalidate = vi.spyOn(client, 'invalidateQueries').mockResolvedValue();
+
+    render(
+      <QueryClientProvider client={client}>
+        <LibraryEmptyState />
+      </QueryClientProvider>
+    );
+    const onSync = handlers.get(WS_EVENTS.LIBRARY_SYNC_PROGRESS);
+
+    onSync?.({ serverId: 's2', status: 'running' });
+    onSync?.({ serverId: 's1', status: 'complete' });
+    expect(invalidate).not.toHaveBeenCalled();
+
+    onSync?.({ serverId: 's1', status: 'running' });
+    expect(invalidate).toHaveBeenCalledWith(
+      { queryKey: ['library', 'status'] },
+      { cancelRefetch: false }
+    );
+  });
+
+  it('multi-server: a server with a queued sync reads Queued, not Not synced yet', () => {
+    mockUseServer.mockReturnValue(
+      useServerReturn(['s1', 's2'], [server('s1', 'Plex'), server('s2', 'Jellyfin')])
+    );
+    const notSynced = {
+      isSynced: false,
+      isSyncRunning: false,
+      needsBackfill: false,
+      isBackfillRunning: false,
+      backfillDays: null,
+    };
+    mockUseLibraryStatus.mockReturnValue(
+      statusResult({ s1: { ...notSynced, isSyncQueued: true }, s2: notSynced })
+    );
+
+    render(<LibraryEmptyState />, { wrapper: wrapper() });
+
+    expect(screen.getByText('Queued')).toBeInTheDocument();
+    expect(screen.getAllByText('Not synced yet')).toHaveLength(1);
   });
 
   it('single server synced with an empty library: shows a media-appropriate message, not "not synced"', () => {

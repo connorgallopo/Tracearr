@@ -17,11 +17,20 @@ import {
   createTestSession,
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
-import { authSessions, mobileSessions, serverUsers, sessions, users } from '../../src/db/schema.js';
-import { MergeValidationError } from '../../src/services/mergeService.js';
+import {
+  authAccounts,
+  authSessions,
+  mobileSessions,
+  serverUsers,
+  sessions,
+  users,
+} from '../../src/db/schema.js';
+import { upsertTofaAccount } from '../../src/lib/memberLogin.js';
+import { MergeValidationError, mergeUsers } from '../../src/services/mergeService.js';
 import {
   getOwnerLinks,
   linkOwnerAccount,
+  linkOwnerTofaAccount,
   unlinkOwnerAccount,
 } from '../../src/services/ownerAccountLink.js';
 import { ServerUserNotFoundError } from '../../src/services/userService.js';
@@ -94,7 +103,11 @@ describe('getOwnerLinks', () => {
     const [here] = await getOwnerLinks(owner.id);
 
     expect(here?.serverId).toBe(server.id);
-    expect(here?.linked).toEqual({ serverUserId: account.id, username: 'gabriel' });
+    expect(here?.linked).toEqual({
+      serverUserId: account.id,
+      username: 'gabriel',
+      canUnlink: true,
+    });
     expect(here?.candidates).toEqual([]);
   });
 });
@@ -164,6 +177,23 @@ describe('linkOwnerAccount', () => {
 });
 
 describe('unlinkOwnerAccount', () => {
+  it('restores the person of the latest link after an earlier link of the same account was undone', async () => {
+    const owner = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'jellyfin' });
+    const first = await createTestUser({ role: 'member', username: 'alpha' });
+    const account = await createTestServerUser({ userId: first.id, serverId: server.id });
+    const holder = await createTestUser({ role: 'member', username: 'bravo' });
+    await mergeUsers(first.id, holder.id, owner.id);
+    await linkOwnerAccount(owner.id, account.id);
+    await unlinkOwnerAccount(owner.id, account.id, undefined);
+    await linkOwnerAccount(owner.id, account.id);
+
+    const { newUserId } = await unlinkOwnerAccount(owner.id, account.id, undefined);
+
+    const [restored] = await db.select().from(users).where(eq(users.id, newUserId));
+    expect(restored?.username).toBe('alpha');
+  });
+
   it("restores the person, keeps this browser and paired phones, and ends the owner's other sessions", async () => {
     const { owner, account } = await ownerWithJellyfinAccount();
     await linkOwnerAccount(owner.id, account.id);
@@ -197,5 +227,205 @@ describe('unlinkOwnerAccount', () => {
     await expect(unlinkOwnerAccount(owner.id, account.id, undefined)).rejects.toBeInstanceOf(
       ServerUserNotFoundError
     );
+  });
+});
+
+describe('linkOwnerTofaAccount', () => {
+  async function ownerWithTofaAccount() {
+    const owner = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'tofa' });
+    const person = await createTestUser({ role: 'member', username: 'morgan' });
+    const account = await createTestServerUser({
+      userId: person.id,
+      serverId: server.id,
+      username: 'morgan',
+    });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-owner' })
+      .where(eq(serverUsers.id, account.id));
+    return { owner, server, account };
+  }
+
+  async function tofaSignInHolder(): Promise<string | undefined> {
+    const [row] = await db
+      .select({ userId: authAccounts.userId })
+      .from(authAccounts)
+      .where(eq(authAccounts.accountId, 'cloud-owner'));
+    return row?.userId;
+  }
+
+  it("folds in the account the sign-in names with the owner's tofa sign-in, and unlinking hands both back", async () => {
+    const { owner, server, account } = await ownerWithTofaAccount();
+    await db.insert(authAccounts).values({
+      id: randomUUID(),
+      providerId: 'credential',
+      accountId: owner.id,
+      userId: owner.id,
+      password: 'hash',
+    });
+    expect((await getOwnerLinks(owner.id)).find((l) => l.serverId === server.id)).toEqual({
+      serverId: server.id,
+      linked: null,
+      candidates: [],
+    });
+
+    await linkOwnerTofaAccount(owner.id, server.id, 'cloud-owner');
+
+    const [moved] = await db.select().from(serverUsers).where(eq(serverUsers.id, account.id));
+    expect(moved?.userId).toBe(owner.id);
+    expect(await tofaSignInHolder()).toBe(owner.id);
+    const [here] = await getOwnerLinks(owner.id);
+    expect(here?.linked).toEqual({
+      serverUserId: account.id,
+      username: 'morgan',
+      canUnlink: true,
+    });
+
+    const { newUserId } = await unlinkOwnerAccount(owner.id, account.id, undefined);
+
+    expect(await tofaSignInHolder()).toBe(newUserId);
+  });
+
+  it('offers no unlink for the tofa account the owner connected with, which keeps their sign-in', async () => {
+    const owner = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'tofa' });
+    const own = await createTestServerUser({ userId: owner.id, serverId: server.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-owner' })
+      .where(eq(serverUsers.id, own.id));
+    await db
+      .insert(authAccounts)
+      .values({ id: randomUUID(), providerId: 'tofa', accountId: 'cloud-owner', userId: owner.id });
+
+    const [here] = await getOwnerLinks(owner.id);
+
+    expect(here?.linked).toEqual({
+      serverUserId: own.id,
+      username: own.username,
+      canUnlink: false,
+    });
+  });
+
+  it('offers and performs the unlink of a tofa account that reached its person through an earlier merge', async () => {
+    const { owner, server, account } = await ownerWithTofaAccount();
+    await db.insert(authAccounts).values({
+      id: randomUUID(),
+      providerId: 'credential',
+      accountId: owner.id,
+      userId: owner.id,
+      password: 'hash',
+    });
+    // B holds only the account, folded in from its first person by an earlier merge.
+    const held = await createTestUser({ role: 'member', username: 'holder' });
+    await mergeUsers(account.userId, held.id, owner.id);
+    await linkOwnerTofaAccount(owner.id, server.id, 'cloud-owner');
+
+    const [here] = await getOwnerLinks(owner.id);
+    expect(here?.linked?.canUnlink).toBe(true);
+
+    const { newUserId } = await unlinkOwnerAccount(owner.id, account.id, undefined);
+
+    expect(await tofaSignInHolder()).toBe(newUserId);
+  });
+
+  it("keeps the owner's own tofa sign-in after a chained link was unlinked and the sign-in came back", async () => {
+    const { owner, server, account } = await ownerWithTofaAccount();
+    await db.insert(authAccounts).values({
+      id: randomUUID(),
+      providerId: 'credential',
+      accountId: owner.id,
+      userId: owner.id,
+      password: 'hash',
+    });
+    const second = await createTestUser({ role: 'member' });
+    const third = await createTestUser({ role: 'member' });
+    await mergeUsers(account.userId, second.id, owner.id);
+    await mergeUsers(second.id, third.id, owner.id);
+    await linkOwnerTofaAccount(owner.id, server.id, 'cloud-owner');
+    await unlinkOwnerAccount(owner.id, account.id, undefined);
+    // Connecting another tofa server through tofa cloud gives the owner this sign-in as their own.
+    await upsertTofaAccount(owner.id, 'cloud-owner');
+    await linkOwnerTofaAccount(owner.id, server.id, 'cloud-owner');
+
+    await expect(unlinkOwnerAccount(owner.id, account.id, undefined)).rejects.toThrow(
+      'cannot split off the account the owner signs in with'
+    );
+    expect(await tofaSignInHolder()).toBe(owner.id);
+  });
+
+  it('gives a sign-in that came back to the owner outside a merge an id no merge recorded', async () => {
+    const { owner, server, account } = await ownerWithTofaAccount();
+    await db.insert(authAccounts).values({
+      id: randomUUID(),
+      providerId: 'credential',
+      accountId: owner.id,
+      userId: owner.id,
+      password: 'hash',
+    });
+    await linkOwnerTofaAccount(owner.id, server.id, 'cloud-owner');
+    const member = await createTestUser({ role: 'member' });
+    // A member sign-in takes the row, and connecting a tofa server through tofa cloud brings it back.
+    await upsertTofaAccount(member.id, 'cloud-owner');
+    await upsertTofaAccount(owner.id, 'cloud-owner');
+
+    await expect(unlinkOwnerAccount(owner.id, account.id, undefined)).rejects.toThrow(
+      'cannot split off the account the owner signs in with'
+    );
+    expect(await tofaSignInHolder()).toBe(owner.id);
+  });
+
+  it('refuses a tofa sign-in with no live account on that server', async () => {
+    const { owner, server, account } = await ownerWithTofaAccount();
+    await db
+      .update(serverUsers)
+      .set({ removedAt: new Date() })
+      .where(eq(serverUsers.id, account.id));
+
+    await expect(linkOwnerTofaAccount(owner.id, server.id, 'cloud-owner')).rejects.toBeInstanceOf(
+      MergeValidationError
+    );
+    expect(await tofaSignInHolder()).toBeUndefined();
+  });
+
+  it('keeps the owner tofa sign-in where it was when the merge is refused', async () => {
+    const { owner, server, account } = await ownerWithTofaAccount();
+    const connected = await createTestServer({ type: 'tofa' });
+    const own = await createTestServerUser({ userId: owner.id, serverId: connected.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-owner' })
+      .where(eq(serverUsers.id, own.id));
+    await db
+      .insert(authAccounts)
+      .values({ id: randomUUID(), providerId: 'tofa', accountId: 'cloud-owner', userId: owner.id });
+    // An admin signs in on their own, so the merge refuses to fold them in.
+    await db.update(users).set({ role: 'admin' }).where(eq(users.id, account.userId));
+
+    await expect(linkOwnerTofaAccount(owner.id, server.id, 'cloud-owner')).rejects.toBeInstanceOf(
+      MergeValidationError
+    );
+    expect(await tofaSignInHolder()).toBe(owner.id);
+  });
+
+  it('writes no tofa sign-in when the merge it rides on is refused', async () => {
+    const { owner, server, account } = await ownerWithTofaAccount();
+    await db.update(users).set({ role: 'admin' }).where(eq(users.id, account.userId));
+
+    await expect(linkOwnerTofaAccount(owner.id, server.id, 'cloud-owner')).rejects.toBeInstanceOf(
+      MergeValidationError
+    );
+    expect(await tofaSignInHolder()).toBeUndefined();
+  });
+
+  it("refuses to unlink the tofa account that is the owner's last way to sign in", async () => {
+    const { owner, server, account } = await ownerWithTofaAccount();
+    await linkOwnerTofaAccount(owner.id, server.id, 'cloud-owner');
+
+    await expect(unlinkOwnerAccount(owner.id, account.id, undefined)).rejects.toMatchObject({
+      message: 'That would leave the owner with no way to sign in.',
+    });
+    expect(await tofaSignInHolder()).toBe(owner.id);
   });
 });

@@ -36,6 +36,8 @@ export function importForm(alias: string, type: DuplicateCleanupServer['type']):
     case 'jellyfin':
     case 'emby':
       return sql`(${a}.external_session_id IS NOT NULL AND ${a}.session_key = ${a}.external_session_id)`;
+    case 'tofa':
+      return sql`(${a}.session_key = 'tofa-' || ${a}.external_session_id)`;
     default:
       return assertNever(type);
   }

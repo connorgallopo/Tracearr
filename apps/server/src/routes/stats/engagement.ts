@@ -137,7 +137,7 @@ export const engagementRoutes: FastifyPluginAsync = async (app) => {
               u.server_user_id,
               su.username,
               su.thumb_url,
-              usr.name AS identity_name,
+              COALESCE(usr.name, usr.username) AS identity_name,
               u.content_started,
               u.total_plays,
               u.total_watch_hours,

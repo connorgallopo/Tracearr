@@ -138,10 +138,9 @@ interface HistoryRow {
   genres: string[] | null;
   server_user_id: string;
   user_id: string;
-  server_username: string;
   user_thumb_url: string | null;
   user_name: string | null;
-  user_username: string | null;
+  user_username: string;
 }
 
 export function idList(ids: string[]): SQL {
@@ -231,7 +230,7 @@ function mapHistoryRow(row: HistoryRow) {
     user: {
       id: row.user_id,
       server_user_id: row.server_user_id,
-      username: row.user_name ?? row.server_username ?? row.user_username,
+      username: row.user_name ?? row.user_username,
       thumb_url: row.user_thumb_url,
       avatar_url: buildAvatarUrl(row.server_id, row.user_thumb_url),
     },
@@ -388,7 +387,6 @@ async function aggregateChainPage(
       m.genres,
       su.id as server_user_id,
       su.user_id,
-      su.username as server_username,
       su.thumb_url as user_thumb_url,
       u.name as user_name,
       u.username as user_username

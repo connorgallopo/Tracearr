@@ -30,6 +30,14 @@ vi.mock('../../../db/client.js', () => ({
   },
 }));
 
+const { mockGetCachedServers } = vi.hoisted(() => ({ mockGetCachedServers: vi.fn() }));
+vi.mock('../database.js', () => ({ getCachedServers: mockGetCachedServers }));
+
+/** The server a stop reads its watched rule from, as the poller's server cache holds it */
+function serverRow(row: { type: string; watchedRulePercent: number | null }) {
+  mockGetCachedServers.mockResolvedValue([{ id: 'server-1', ...row }]);
+}
+
 vi.mock('../../../services/settings.js', () => ({
   getWatchedThreshold: vi.fn().mockResolvedValue(0.85),
 }));
@@ -45,6 +53,7 @@ vi.mock('../../../services/automations/events/producers.js', () => ({
 describe('stopSessionAtomic retry logic', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    serverRow({ type: 'plex', watchedRulePercent: null });
   });
 
   it('should retry on DB failure up to IMMEDIATE_RETRIES times', async () => {
@@ -114,11 +123,71 @@ describe('stopSessionAtomic retry logic', () => {
     expect(result.wasUpdated).toBe(false);
     expect(result.needsRetry).toBe(true);
   });
+
+  it('still returns retry data when the server read for the watched rule fails too', async () => {
+    const { db } = await import('../../../db/client.js');
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+    mockGetCachedServers.mockRejectedValueOnce(new Error('Connection refused'));
+    vi.mocked(db.update).mockImplementation((() => ({
+      set: () => ({
+        where: () => ({
+          returning: async () => {
+            throw new Error('Connection refused');
+          },
+        }),
+      }),
+    })) as never);
+
+    const result = await stopSessionAtomic({
+      session: {
+        id: 'session-1',
+        serverId: 'server-1',
+        mediaType: 'movie',
+        startedAt: new Date(),
+        lastPausedAt: null,
+        pausedDurationMs: 0,
+        progressMs: null,
+        totalDurationMs: 3600000,
+        watched: false,
+      } as Parameters<typeof stopSessionAtomic>[0]['session'],
+      stoppedAt: new Date(),
+    });
+
+    expect(result.needsRetry).toBe(true);
+    expect(getWatchedThreshold).toHaveBeenCalledWith('movie');
+  });
+
+  it('issues one query for a Plex stop, its update, while the server list is cached', async () => {
+    const { db } = await import('../../../db/client.js');
+    vi.mocked(db.update).mockImplementation((() => ({
+      set: () => ({ where: () => ({ returning: async () => [{ id: 'session-1' }] }) }),
+    })) as never);
+
+    await stopSessionAtomic({
+      session: {
+        id: 'session-1',
+        serverId: 'server-1',
+        mediaType: 'movie',
+        startedAt: new Date(),
+        lastPausedAt: null,
+        pausedDurationMs: 0,
+        progressMs: null,
+        totalDurationMs: 3600000,
+        watched: false,
+      } as Parameters<typeof stopSessionAtomic>[0]['session'],
+      stoppedAt: new Date(),
+    });
+
+    expect(db.update).toHaveBeenCalledTimes(1);
+    expect(db.select).not.toHaveBeenCalled();
+    expect(db.transaction).not.toHaveBeenCalled();
+  });
 });
 
 describe('stopSessionAtomic watched threshold wiring', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    serverRow({ type: 'plex', watchedRulePercent: null });
   });
 
   it('resolves the watched threshold from the session media type', async () => {
@@ -177,6 +246,37 @@ describe('stopSessionAtomic watched threshold wiring', () => {
     });
 
     expect(result.watched).toBe(false);
+  });
+
+  it("marks a tofa play watched by tofa's own rule", async () => {
+    const { db } = await import('../../../db/client.js');
+    serverRow({ type: 'tofa', watchedRulePercent: 90 });
+    vi.mocked(db.update).mockImplementation((() => ({
+      set: () => ({
+        where: () => ({
+          returning: async () => [{ id: 'session-1' }],
+        }),
+      }),
+    })) as never);
+
+    // 87% progress after 87s elapsed: watched by the 85% setting, not by tofa's 90%.
+    const result = await stopSessionAtomic({
+      session: {
+        id: 'session-1',
+        serverId: 'server-1',
+        mediaType: 'movie',
+        startedAt: new Date(Date.now() - 87000),
+        lastPausedAt: null,
+        pausedDurationMs: 0,
+        progressMs: 87000,
+        totalDurationMs: 100000,
+        watched: false,
+      } as Parameters<typeof stopSessionAtomic>[0]['session'],
+      stoppedAt: new Date(),
+    });
+
+    expect(result.watched).toBe(false);
+    expect(getWatchedThreshold).not.toHaveBeenCalled();
   });
 });
 

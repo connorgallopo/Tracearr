@@ -18,6 +18,7 @@ import { db } from '../../../db/client.js';
 import { countedSession } from '../../../db/sessions/rules.js';
 import { getRequestsAnalytics } from '../../requests/analytics.js';
 import { queryPlaysOverTime } from '../../../routes/stats/queries.js';
+import { personNameSql } from '../../../utils/representativeAccount.js';
 import {
   buildIdentityPlaysSql,
   buildPeopleRowsSql,
@@ -361,7 +362,7 @@ describe('people search', () => {
       })
     );
 
-    expect(normalize(text)).toContain('u.name ILIKE');
+    expect(normalize(text)).toContain(`${normalize(renderSql(personNameSql()).sql)} ILIKE`);
     expect(normalize(text)).toContain('msu.username ILIKE');
     expect(params).toContain('%\\_%');
     expect(params).not.toContain('%_%');

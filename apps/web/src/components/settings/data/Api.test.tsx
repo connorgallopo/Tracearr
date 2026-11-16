@@ -13,6 +13,7 @@ vi.mock('@/hooks/queries', () => ({
   useSettings: vi.fn(),
   useApiKey: vi.fn(),
   useRegenerateApiKey: vi.fn(),
+  useServers: vi.fn(),
 }));
 
 vi.mock('@/hooks/useDebouncedSave', () => ({
@@ -20,7 +21,7 @@ vi.mock('@/hooks/useDebouncedSave', () => ({
   TEXT_INPUT_DELAY: 1000,
 }));
 
-import { useApiKey, useRegenerateApiKey, useSettings } from '@/hooks/queries';
+import { useApiKey, useRegenerateApiKey, useServers, useSettings } from '@/hooks/queries';
 import { useDebouncedSave } from '@/hooks/useDebouncedSave';
 
 type DebouncedSaveReturn = ReturnType<typeof useDebouncedSave>;
@@ -69,6 +70,9 @@ describe('Api section', () => {
     } as unknown as ReturnType<typeof useRegenerateApiKey>);
     vi.mocked(useDebouncedSave).mockImplementation(((key: string) =>
       saveResult(key === 'publicApiRateLimitPerMinute' ? 240 : 85)) as typeof useDebouncedSave);
+    vi.mocked(useServers).mockReturnValue({
+      data: [{ id: 'a', type: 'plex' }],
+    } as unknown as ReturnType<typeof useServers>);
   });
 
   it('shows the saved key and links the reference', () => {
@@ -115,6 +119,25 @@ describe('Api section', () => {
     expect(group?.querySelector('[data-align="inline-end"]')).toHaveTextContent(
       'general.watchedThresholdSuffix'
     );
+  });
+
+  it('says a tofa server keeps its own watched rule, only while one is added', () => {
+    const { rerender } = renderApi();
+    expect(screen.queryByText('general.watchedThresholdServerRule')).not.toBeInTheDocument();
+
+    vi.mocked(useServers).mockReturnValue({
+      data: [
+        { id: 'a', type: 'plex' },
+        { id: 'b', type: 'tofa' },
+      ],
+    } as unknown as ReturnType<typeof useServers>);
+    rerender(
+      <MemoryRouter>
+        <Api />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('general.watchedThresholdServerRule')).toBeInTheDocument();
   });
 
   it('saves the rate limit under its settings key', async () => {

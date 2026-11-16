@@ -33,7 +33,7 @@ import {
 import { ErrorState } from '@/components/library/ErrorState';
 import { ServerColumnCell } from '@/components/server';
 import { UserCell } from '@/components/users/UserCell';
-import { getAvatarUrl } from '@/components/users/utils';
+import { getAvatarUrl, rosterPersonName } from '@/components/users/utils';
 import { PersonMultiSelectCombobox } from '@/components/violations/PersonMultiSelectCombobox';
 import { ruleIcons } from '@/components/violations/ruleIcons';
 import { SeverityBadge } from '@/components/violations/SeverityBadge';
@@ -241,7 +241,7 @@ export function Violations() {
   const resolvePersonName = useCallback(
     (id: string) => {
       const person = selectedPeople.find((candidate) => candidate.userId === id);
-      return person ? (person.identityName ?? person.username) : undefined;
+      return person ? rosterPersonName(person) : undefined;
     },
     [selectedPeople]
   );
@@ -440,9 +440,7 @@ export function Violations() {
           cell: ({ row }) => (
             <span
               className={
-                row.original.acknowledgedAt
-                  ? 'text-muted-foreground'
-                  : 'font-medium text-yellow-500'
+                row.original.acknowledgedAt ? 'text-muted-foreground' : 'text-warning font-medium'
               }
             >
               {row.original.acknowledgedAt
@@ -473,7 +471,7 @@ export function Violations() {
                       acknowledge(violation.id);
                     }}
                     disabled={isAcknowledging}
-                    className="text-green-600 hover:text-green-700 dark:text-green-500 dark:hover:text-green-400"
+                    className="text-success hover:text-success"
                   >
                     <Check className="mr-1 h-4 w-4" />
                     {t('common:actions.acknowledge')}
@@ -545,14 +543,11 @@ export function Violations() {
                   }
                 />
                 <AvatarFallback>
-                  {(selectedPeople[0].identityName ??
-                    selectedPeople[0].username)[0]?.toUpperCase() ?? '?'}
+                  {rosterPersonName(selectedPeople[0])[0]?.toUpperCase() ?? '?'}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium">
-                  {selectedPeople[0].identityName ?? selectedPeople[0].username}
-                </p>
+                <p className="font-medium">{rosterPersonName(selectedPeople[0])}</p>
                 <p className="text-muted-foreground text-sm">
                   {t('common:count.violation', { count: total })}
                 </p>
@@ -581,13 +576,11 @@ export function Violations() {
                     <AvatarImage
                       src={getAvatarUrl(person.serverId, person.thumbUrl, 24) ?? undefined}
                     />
-                    <AvatarFallback className="text-[10px]">
-                      {(person.identityName ?? person.username)[0]?.toUpperCase() ?? '?'}
+                    <AvatarFallback className="text-xs">
+                      {rosterPersonName(person)[0]?.toUpperCase() ?? '?'}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="text-sm font-medium">
-                    {person.identityName ?? person.username}
-                  </span>
+                  <span className="text-sm font-medium">{rosterPersonName(person)}</span>
                   {person.identityServers && person.identityServers.length > 0 && (
                     <div className="flex gap-1">
                       {person.identityServers.map((server) => (

@@ -168,7 +168,7 @@ function Stat({ value, label }: { value: number; label: string }) {
   return (
     <div className="bg-muted/60 rounded-md px-2.5 py-2">
       <div className="text-lg font-semibold tabular-nums">{value.toLocaleString()}</div>
-      <div className="text-muted-foreground text-[11px]">{label}</div>
+      <div className="text-muted-foreground text-xs">{label}</div>
     </div>
   );
 }
@@ -184,7 +184,7 @@ function Detail({ term, value }: { term: string; value: string }) {
 
 export function SectionHeading({ children }: { children: string }) {
   return (
-    <h3 className="text-muted-foreground mb-2 text-[11px] font-semibold tracking-wider uppercase">
+    <h3 className="text-muted-foreground mb-2 text-xs font-semibold tracking-wider uppercase">
       {children}
     </h3>
   );
@@ -335,9 +335,9 @@ function SessionRow({
       </div>
       <div className="min-w-0 flex-1">
         <div className="truncate text-sm font-medium">{title}</div>
-        <div className="text-muted-foreground truncate text-[11px]">{details}</div>
+        <div className="text-muted-foreground truncate text-xs">{details}</div>
       </div>
-      <div className="text-muted-foreground shrink-0 text-right text-[11px] leading-tight">
+      <div className="text-muted-foreground shrink-0 text-right text-xs leading-tight">
         <div>{formatDate(startedAt, { month: 'short', day: 'numeric' })}</div>
         <div>{formatDate(startedAt, { hour: 'numeric', minute: '2-digit' })}</div>
       </div>

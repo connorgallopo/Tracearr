@@ -9,14 +9,17 @@ export class SeerrProbeError extends Error {
   }
 }
 
-const MEDIA_SERVER_TYPES: Record<number, RequestServiceProbeResult['mediaServerType']> = {
+/** The media servers Seerr connects to, by its mediaServerType code */
+type SeerrMediaServerType = Extract<ServerType, 'plex' | 'jellyfin' | 'emby'>;
+
+const MEDIA_SERVER_TYPES: Record<number, SeerrMediaServerType> = {
   1: 'plex',
   2: 'jellyfin',
   3: 'emby',
 };
 
 /** Seerr keeps Jellyfin and Emby under one settings page. */
-async function remoteServerIdOf(client: SeerrClient, type: ServerType) {
+async function remoteServerIdOf(client: SeerrClient, type: SeerrMediaServerType) {
   switch (type) {
     case 'plex':
       return (await client.plexSettings()).machineId;

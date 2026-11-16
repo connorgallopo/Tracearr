@@ -111,6 +111,16 @@ describe('settings cache', () => {
     expect(mockDbSelect).toHaveBeenCalledTimes(2);
   });
 
+  it('reads tofa as on when the stored value predates it', async () => {
+    const stored = { local: true, plex: false, oidc: false, member: true };
+    mockSettingRow(stored);
+    expect(await getSetting('loginMethods')).toEqual({ ...stored, tofa: true });
+
+    resetSettingsCache();
+    mockSettingRows([{ name: 'loginMethods', value: stored }]);
+    expect((await getSettings(['loginMethods'])).loginMethods).toEqual({ ...stored, tofa: true });
+  });
+
   it('writes multiple settings in a single upsert, not a per-key transaction', async () => {
     await setSettings({ usePlexGeoip: true, mobileEnabled: true });
 

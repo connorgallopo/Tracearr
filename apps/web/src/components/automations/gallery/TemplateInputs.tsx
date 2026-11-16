@@ -144,7 +144,7 @@ export function TemplateSentencePanel({
     <div className="space-y-1">
       {label !== undefined && <p className="text-muted-foreground text-xs">{label}</p>}
       <SentencePanel>
-        <p className="text-muted-foreground text-[0.9375rem] leading-relaxed">
+        <p className="text-muted-foreground text-sm leading-relaxed">
           <TemplateSentence fragments={fragments} highlightKey={highlightKey} clauses />
         </p>
       </SentencePanel>

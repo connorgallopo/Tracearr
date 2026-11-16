@@ -9,7 +9,9 @@ import {
   extendHeavyOpsLock,
   getHeavyOpsStatus,
   startHeavyOpsLockHeartbeat,
+  isImportWaiting,
   HEAVY_OPS_HEARTBEAT_INTERVAL_MS,
+  HEAVY_OPS_WAIT_INTERVAL_MS,
 } from '../heavyOpsLock.js';
 
 /** Minimal in-memory Redis stand-in with real TTL semantics (get/set/expire/del + NX/EX). */
@@ -313,5 +315,47 @@ describe('heavyOpsLock', () => {
 
     const extended = await extendHeavyOpsLock('job-2');
     expect(extended).toBe(false);
+  });
+
+  it('marks an import that loses the lock as waiting until it takes the lock', async () => {
+    await initHeavyOpsLock(createFakeRedis());
+    await acquireHeavyOpsLock('maintenance', 'backfill', 'Backfill', 'run-a');
+
+    await acquireHeavyOpsLock('maintenance', 'normalize', 'Normalize', 'run-b');
+    const afterMaintenanceLost = await isImportWaiting();
+    await acquireHeavyOpsLock('import', 'import-1', 'Import', 'run-c');
+    const afterImportLost = await isImportWaiting();
+    await releaseHeavyOpsLock('backfill');
+    await acquireHeavyOpsLock('import', 'import-1', 'Import', 'run-c');
+
+    expect([afterMaintenanceLost, afterImportLost, await isImportWaiting()]).toEqual([
+      false,
+      true,
+      false,
+    ]);
+  });
+
+  it('keeps another import waiting when one import takes the lock', async () => {
+    await initHeavyOpsLock(createFakeRedis());
+    await acquireHeavyOpsLock('maintenance', 'backfill', 'Backfill', 'run-a');
+    await acquireHeavyOpsLock('import', 'import-1', 'Import', 'run-b');
+    await acquireHeavyOpsLock('import', 'import-2', 'Import', 'run-c');
+    await releaseHeavyOpsLock('backfill');
+
+    await acquireHeavyOpsLock('import', 'import-1', 'Import', 'run-b');
+
+    expect(await isImportWaiting()).toBe(true);
+  });
+
+  it('no longer counts an import that stopped trying the lock a few tries ago', async () => {
+    await initHeavyOpsLock(createFakeRedis());
+    await acquireHeavyOpsLock('maintenance', 'backfill', 'Backfill', 'run-a');
+    await acquireHeavyOpsLock('import', 'import-1', 'Import', 'run-b');
+
+    await vi.advanceTimersByTimeAsync(HEAVY_OPS_WAIT_INTERVAL_MS);
+    const betweenTries = await isImportWaiting();
+    await vi.advanceTimersByTimeAsync(HEAVY_OPS_WAIT_INTERVAL_MS * 2);
+
+    expect([betweenTries, await isImportWaiting()]).toEqual([true, false]);
   });
 });

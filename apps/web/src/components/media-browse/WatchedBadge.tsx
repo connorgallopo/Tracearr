@@ -101,8 +101,8 @@ export function WatchedBadge({
         )}
       >
         <svg viewBox="0 0 2 2" className="size-full" aria-hidden="true">
-          <circle cx="1" cy="1" r="1" fill="hsl(var(--muted-foreground) / 0.6)" />
-          <path d={PARTIAL_ARC} fill={`hsl(var(${tone}))`} />
+          <circle cx="1" cy="1" r="1" fill="oklch(var(--muted-foreground) / 0.6)" />
+          <path d={PARTIAL_ARC} fill={`oklch(var(${tone}))`} />
         </svg>
         <span className="sr-only">{t('media.posterCard.watchedState.partial')}</span>
       </span>

@@ -11,6 +11,10 @@ import { identityDisplayName, isEmailMatchOnUsername } from './mergeSelection';
 const HEADING_ID = 'merge-suggestions-heading';
 
 const PAIR_SUMMARY_KEYS = {
+  linkedAccount: {
+    single: 'pages:users.suggestionsPairLinked',
+    more: 'pages:users.suggestionsPairLinkedMore',
+  },
   email: {
     single: 'pages:users.suggestionsPairEmail',
     more: 'pages:users.suggestionsPairEmailMore',

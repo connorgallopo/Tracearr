@@ -65,12 +65,12 @@ export function DailyBandwidthChart({
             return row ? (row.avgBitrateMbps ?? row.avgBitrate) : null;
           }),
           yAxis: 0,
-          color: 'hsl(var(--primary))',
+          color: 'oklch(var(--primary))',
           fillColor: {
             linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
             stops: [
-              [0, 'hsl(var(--primary) / 0.3)'],
-              [1, 'hsl(var(--primary) / 0.05)'],
+              [0, 'oklch(var(--primary) / 0.3)'],
+              [1, 'oklch(var(--primary) / 0.05)'],
             ],
           },
         },
@@ -87,7 +87,7 @@ export function DailyBandwidthChart({
       name: t('common:labels.sessions'),
       data: categories.map((date) => sessionsByDate.get(date) ?? 0),
       yAxis: 1,
-      color: 'hsl(var(--chart-2))',
+      color: 'oklch(var(--chart-2))',
       opacity: 0.6,
     };
 
@@ -110,17 +110,17 @@ export function DailyBandwidthChart({
       legend: {
         enabled: true,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
       },
       xAxis: {
         categories,
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
           formatter: function () {
             const cats = this.axis.categories;
@@ -133,35 +133,35 @@ export function DailyBandwidthChart({
           },
           step: Math.ceil(categories.length / 12),
         },
-        lineColor: 'hsl(var(--border))',
-        tickColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
+        tickColor: 'oklch(var(--border))',
       },
       yAxis: [
         {
           title: {
             text: t('statsBandwidth.avgBitrateMbps'),
             style: {
-              color: 'hsl(var(--primary))',
+              color: 'oklch(var(--primary))',
             },
           },
           labels: {
             style: {
-              color: 'hsl(var(--muted-foreground))',
+              color: 'oklch(var(--muted-foreground))',
             },
           },
-          gridLineColor: 'hsl(var(--border))',
+          gridLineColor: 'oklch(var(--border))',
           min: 0,
         },
         {
           title: {
             text: t('common:labels.sessions'),
             style: {
-              color: 'hsl(var(--chart-2))',
+              color: 'oklch(var(--chart-2))',
             },
           },
           labels: {
             style: {
-              color: 'hsl(var(--muted-foreground))',
+              color: 'oklch(var(--muted-foreground))',
             },
           },
           opposite: true,
@@ -193,10 +193,10 @@ export function DailyBandwidthChart({
         },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         shared: true,
         formatter: function () {

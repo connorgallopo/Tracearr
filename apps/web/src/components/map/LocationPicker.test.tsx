@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { LngLat } from 'maplibre-gl';
+import { LngLat, type LayerSpecification, type StyleSpecification } from 'maplibre-gl';
 import { LocationPicker } from './LocationPicker';
 
 const handlers: Record<string, (event: unknown) => void> = {};
@@ -16,12 +16,15 @@ vi.mock('react-i18next', () => ({
 }));
 vi.mock('@/components/theme-provider', () => ({ useTheme: () => ({ accentHue: 200 }) }));
 vi.mock('./maplibre', () => ({
+  addDataLayers: (s: StyleSpecification, ...layers: LayerSpecification[]) =>
+    s.layers.push(...layers),
   buildBaseStyle: () => ({ version: 8, sources: {}, layers: [] }),
   hsl: () => 'hsl(200, 80%, 60%)',
   isWebglSupported: () => true,
 }));
 vi.mock('./useMapLibre', () => ({
   useResolvedDark: () => false,
+  useAccentH: () => 212,
   useMapLang: () => 'en',
   useBasemapAvailable: vi.fn(() => true),
   useMapLibre: () => fakeMap,

@@ -16,7 +16,7 @@ export function UserFlagsCell({ row }: { row: ServerUserWithIdentity }) {
     <div className="flex flex-wrap items-center gap-1.5">
       {row.role === 'owner' && (
         <span title={t('common:labels.serverOwner')}>
-          <Crown className="h-4 w-4 text-yellow-500" />
+          <Crown className="text-foreground h-4 w-4" />
         </span>
       )}
       {trust < 100 && <TrustScoreBadge score={trust} />}

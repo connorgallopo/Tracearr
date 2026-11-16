@@ -17,6 +17,10 @@ vi.mock('../../jobs/poller/index.js', () => ({
   triggerServerPoll: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('../../jobs/librarySyncQueue.js', () => ({
+  enqueueLibrarySyncForChange: vi.fn().mockResolvedValue(undefined),
+}));
+
 // Mock the event sources so addServer() doesn't open real network connections.
 // Must use regular functions (not arrows) so `new` works.
 vi.mock('../mediaServer/plex/eventSource.js', () => ({
@@ -61,6 +65,27 @@ vi.mock('../mediaServer/shared/jellyfinEmbyEventSource.js', () => ({
   }),
 }));
 
+vi.mock('../mediaServer/tofa/eventSource.js', () => ({
+  TofaEventSource: vi.fn(function () {
+    return {
+      on: vi.fn(),
+      connect: vi.fn().mockResolvedValue(undefined),
+      disconnect: vi.fn(),
+      removeAllListeners: vi.fn(),
+      retryFromFallback: vi.fn(),
+      getStatus: vi.fn().mockReturnValue({
+        serverId: 'tofa-1',
+        serverName: 'tofa',
+        state: 'connected',
+        connectedAt: new Date('2026-01-01T00:00:00Z'),
+        lastEventAt: null,
+        reconnectAttempts: 0,
+        error: null,
+      }),
+    };
+  }),
+}));
+
 vi.mock('../serviceTracker.js', () => ({
   registerService: vi.fn(),
   unregisterService: vi.fn(),
@@ -72,6 +97,9 @@ vi.mock('../leaderLease.js', () => ({
 
 import { SSEManager } from '../sseManager.js';
 import { PlexEventSource } from '../mediaServer/plex/eventSource.js';
+import { TofaEventSource } from '../mediaServer/tofa/eventSource.js';
+import { enqueueLibrarySyncForChange } from '../../jobs/librarySyncQueue.js';
+import { triggerServerPoll } from '../../jobs/poller/index.js';
 import type { CacheService, PubSubService } from '../cache.js';
 
 interface PrivateManager {
@@ -452,6 +480,78 @@ describe('SSEManager.refresh', () => {
 
     expect(mockLiveServers).toHaveBeenCalledTimes(1);
     expect(PlexEventSource).toHaveBeenCalledTimes(1);
+  });
+
+  describe('a tofa server', () => {
+    const tofa = { ...row, id: 'tofa-1', name: 'tofa', type: 'tofa' as const, token: 'tofa-key' };
+
+    /** The handler the manager registered on the tofa socket for an event */
+    function onTofa(event: string): (payload: unknown) => void {
+      const source = vi.mocked(TofaEventSource).mock.results[0]?.value as {
+        on: ReturnType<typeof vi.fn>;
+      };
+      const call = source.on.mock.calls.find(([name]) => name === event);
+      return call?.[1] as (payload: unknown) => void;
+    }
+
+    beforeEach(async () => {
+      await manager.initialize(makeCacheService(), makePubSubService());
+      mockServerRows([tofa, row]);
+      await manager.start();
+    });
+
+    it('is polled until its socket connects, then left to the socket', () => {
+      expect(vi.mocked(TofaEventSource).mock.calls[0]![0]).toMatchObject({ token: 'tofa-key' });
+      expect(manager.getServersNeedingPoll()).toContain('tofa-1');
+
+      onTofa('connection:state')('connected');
+
+      expect(manager.getServersNeedingPoll()).not.toContain('tofa-1');
+    });
+
+    it('reads the session list when a session changes', async () => {
+      vi.useFakeTimers();
+      onTofa('stream')({ kind: 'changed', sessionId: 'session-1' });
+      await vi.advanceTimersByTimeAsync(1000);
+      vi.useRealTimers();
+
+      expect(triggerServerPoll).toHaveBeenCalledWith('tofa-1');
+    });
+
+    it('reconciles at once when the socket says frames were missed', () => {
+      onTofa('stream')({ kind: 'missed' });
+
+      expect(triggerServerPoll).toHaveBeenCalledWith('tofa-1');
+    });
+
+    it('asks for one delayed library sync for every library change the socket reports', () => {
+      onTofa('library:changed')(undefined);
+      onTofa('library:changed')(undefined);
+
+      expect(vi.mocked(enqueueLibrarySyncForChange).mock.calls).toEqual([
+        ['tofa-1', 60_000],
+        ['tofa-1', 60_000],
+      ]);
+    });
+
+    it('hands a stop with its position to the session processor', () => {
+      const stopped = vi.fn();
+      manager.on('tofa:session:stopped', stopped);
+
+      onTofa('stream')({
+        kind: 'stopped',
+        sessionId: 'session-1',
+        positionMs: 172476,
+        stoppedByAdmin: false,
+      });
+
+      expect(stopped).toHaveBeenCalledWith({
+        serverId: 'tofa-1',
+        sessionId: 'session-1',
+        positionMs: 172476,
+        stoppedByAdmin: false,
+      });
+    });
   });
 
   it('drops the connection of a server that is no longer live', async () => {

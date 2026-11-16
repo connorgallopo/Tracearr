@@ -116,7 +116,7 @@ export function buildHistoryFilterConditions(
             SELECT 1 FROM server_users su_search
             LEFT JOIN users u_search ON u_search.id = su_search.user_id
             WHERE su_search.id = s.server_user_id
-            AND (su_search.username ILIKE ${searchPattern} OR u_search.name ILIKE ${searchPattern})
+            AND (su_search.username ILIKE ${searchPattern} OR u_search.name ILIKE ${searchPattern} OR u_search.username ILIKE ${searchPattern})
           )
         )`
     );
@@ -212,7 +212,7 @@ const HISTORY_ROW_COLUMNS = sql`
     s.server_user_id,
     su.username,
     su.thumb_url as user_thumb,
-    u.name as identity_name,
+    COALESCE(u.name, u.username) as identity_name,
     s.session_key,
     s.media_type,
     s.media_title,
@@ -237,6 +237,7 @@ const HISTORY_ROW_COLUMNS = sql`
     s.geo_asn_number,
     s.geo_asn_organization,
     ${localSessionSql('s')} AS is_local,
+    s.profile_name,
     s.player_name,
     s.device_id,
     s.product,

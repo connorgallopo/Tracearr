@@ -82,7 +82,7 @@ export function UpdateDialog({ open, onOpenChange, version }: UpdateDialogProps)
         <DialogHeader>
           <div className="flex items-center gap-2">
             <DialogTitle className="flex items-center gap-2">
-              <updateType.icon className="h-5 w-5 text-green-500" />
+              <updateType.icon className="text-success h-5 w-5" />
               {t('settings:update.title')}
             </DialogTitle>
             <Badge variant={updateType.variant} className="text-xs">
@@ -92,7 +92,7 @@ export function UpdateDialog({ open, onOpenChange, version }: UpdateDialogProps)
           <DialogDescription className="flex items-center gap-2 pt-1">
             <span className="text-muted-foreground">{currentDisplay}</span>
             <ArrowRight className="text-muted-foreground h-3 w-3" />
-            <span className="font-medium text-green-600 dark:text-green-400">{latestDisplay}</span>
+            <span className="text-success font-medium">{latestDisplay}</span>
           </DialogDescription>
         </DialogHeader>
 

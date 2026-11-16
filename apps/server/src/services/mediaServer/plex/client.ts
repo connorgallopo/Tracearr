@@ -15,19 +15,23 @@ import {
   HttpClientError,
 } from '../../../utils/http.js';
 import { normalizeClient } from '../../../utils/platformNormalizer.js';
-import { assertSafeProbeUrl, SsrfBlockedError } from '../../../utils/ssrf.js';
+import { probeRefusal } from '../../../utils/ssrf.js';
 import { mapWithConcurrency } from '../../../utils/concurrency.js';
-import type {
-  IMediaServerClient,
-  IMediaServerClientWithHistory,
-  MediaSession,
-  MediaUser,
-  MediaLibrary,
-  MediaLibraryItem,
-  MediaWatchHistoryItem,
-  MediaServerConfig,
-  DownloadSourceDescription,
-  DownloadSourceRequest,
+import {
+  NOT_NEEDED,
+  cursorDate,
+  type IMediaServerClient,
+  type IMediaServerClientWithHistory,
+  type MediaSession,
+  type MediaUser,
+  type MediaLibrary,
+  type MediaLibraryItem,
+  type MediaWatchHistoryItem,
+  type MediaServerConfig,
+  type DownloadSourceDescription,
+  type DownloadSourceRequest,
+  type NotNeeded,
+  type SyncCursor,
 } from '../types.js';
 import {
   parseSessionsResponse,
@@ -55,6 +59,9 @@ import {
   type PlexStatisticsDataPoint,
   type PlexBandwidthStats,
   type PlexOriginalMedia,
+  type PlexGuideEntry,
+  getLiveSessionsWithoutChannel,
+  parseGuideEntry,
 } from './parser.js';
 
 const PLEX_TV_BASE = 'https://plex.tv';
@@ -75,6 +82,20 @@ const GENRE_LOOKUP_PARAMS = new URLSearchParams({
     'Media,Role,Director,Writer,Producer,Country,Guid,Rating,Image,UltraBlurColors,Location,Similar,Field',
   excludeFields: 'summary,tagline',
 });
+
+/**
+ * Each server's program guide: its DVR guides and the entry, or none, found for each program.
+ * Kept across clients, since one is built for every poll and socket event. A new program has a
+ * new guid, so an entry stays right for as long as it is kept.
+ */
+const GUIDE_TTL_MS = 5 * 60 * 1000;
+const guideCache = new Map<
+  string,
+  { guides: string[]; entries: Map<string, Promise<GuideLookup>>; expiresAt: number }
+>();
+
+/** answered is false when a guide that did not answer could have listed the program */
+type GuideLookup = { entry: PlexGuideEntry | undefined; answered: boolean };
 
 /**
  * Plex Media Server client implementation
@@ -156,7 +177,74 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
       }
     }
 
-    return parseSessionsResponse(data, originalMediaMap);
+    return parseSessionsResponse(data, originalMediaMap, await this.getGuideEntries(data));
+  }
+
+  /** The program guide's entry for each live session that does not name its channel */
+  private async getGuideEntries(data: unknown): Promise<Map<string, PlexGuideEntry>> {
+    const entries = new Map<string, PlexGuideEntry>();
+    const sessions = getLiveSessionsWithoutChannel(data);
+    if (sessions.length === 0) return entries;
+
+    const guide = await this.getGuide();
+    await Promise.all(
+      sessions.map(async ({ sessionKey, guid }) => {
+        const { entry, answered } = await guide.entries.getOrInsertComputed(guid, () =>
+          this.findGuideEntry(guide.guides, guid)
+        );
+        if (!answered) guide.entries.delete(guid);
+        if (entry) entries.set(sessionKey, entry);
+      })
+    );
+    return entries;
+  }
+
+  /** The DVR guides, kept only when the server answered */
+  private async getGuide() {
+    const now = Date.now();
+    const cached = guideCache.get(this.cacheScope);
+    if (cached && cached.expiresAt > now) return cached;
+
+    const dvrs = await this.getSupplementary<{ MediaContainer?: { Dvr?: unknown[] } }>(
+      '/livetv/dvrs'
+    );
+    const guide = {
+      guides: (dvrs?.MediaContainer?.Dvr ?? []).flatMap((dvr) => {
+        const identifier = (dvr as Record<string, unknown>).epgIdentifier;
+        return typeof identifier === 'string' && identifier ? [identifier] : [];
+      }),
+      entries: new Map<string, Promise<GuideLookup>>(),
+      expiresAt: now + GUIDE_TTL_MS,
+    };
+    if (dvrs) guideCache.set(this.cacheScope, guide);
+    return guide;
+  }
+
+  /** A session does not say which DVR it plays from, so each guide is asked until one lists it */
+  private async findGuideEntry(guides: string[], guid: string): Promise<GuideLookup> {
+    let answered = true;
+    for (const guide of guides) {
+      const metadata = await this.getSupplementary(
+        `/${guide}/metadata/${encodeURIComponent(guid)}`
+      );
+      if (metadata === null) answered = false;
+      const entry = parseGuideEntry(metadata);
+      if (entry) return { entry, answered: true };
+    }
+    return { entry: undefined, answered };
+  }
+
+  /** Data a session is still complete without: null when the server does not answer */
+  private async getSupplementary<T = unknown>(path: string): Promise<T | null> {
+    try {
+      return await fetchJson<T>(`${this.baseUrl}${path}`, {
+        headers: this.buildHeaders(),
+        service: 'plex',
+        timeout: 5000,
+      });
+    } catch {
+      return null;
+    }
   }
 
   /**
@@ -168,15 +256,7 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
    * @param ratingKey - The media item's ratingKey
    */
   async getMediaMetadata(ratingKey: string): Promise<unknown> {
-    try {
-      return await fetchJson<unknown>(`${this.baseUrl}/library/metadata/${ratingKey}`, {
-        headers: this.buildHeaders(),
-        service: 'plex',
-        timeout: 5000, // Short timeout since this is supplementary data
-      });
-    } catch {
-      return null;
-    }
+    return this.getSupplementary(`/library/metadata/${ratingKey}`);
   }
 
   async getPartDetails(ratingKey: string, partId: string): Promise<PlexPartDetails | null> {
@@ -362,15 +442,24 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
    */
   async getLibraryItemsSince(
     libraryId: string,
-    since: Date,
+    since: SyncCursor,
     _options?: { offset?: number; limit?: number }
-  ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
-    const sinceUnix = Math.floor(since.getTime() / 1000);
+  ): Promise<{ items: MediaLibraryItem[]; totalCount: number; feed: NotNeeded }> {
+    const sinceUnix = Math.floor(cursorDate(since).getTime() / 1000);
     const result = await this.fetchItemsSortedByUpdatedAt(
       `/library/sections/${libraryId}/all`,
       sinceUnix
     );
-    return { ...result, items: await this.fillTruncatedGenres(result.items) };
+    return {
+      ...result,
+      items: await this.fillTruncatedGenres(result.items),
+      feed: NOT_NEEDED,
+    };
+  }
+
+  // Changes are listed after a date, which the sync takes when it saves
+  async getLibraryRevision(): Promise<NotNeeded> {
+    return NOT_NEEDED;
   }
 
   /**
@@ -509,10 +598,10 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
   /** Get leaf items (episodes/tracks) updated since the given date. */
   async getLibraryLeavesSince(
     libraryId: string,
-    since: Date,
+    since: SyncCursor,
     _options?: { offset?: number; limit?: number }
   ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
-    const sinceUnix = Math.floor(since.getTime() / 1000);
+    const sinceUnix = Math.floor(cursorDate(since).getTime() / 1000);
     return this.fetchItemsSortedByUpdatedAt(`/library/sections/${libraryId}/allLeaves`, sinceUnix);
   }
 
@@ -532,10 +621,10 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
   /** Get seasons updated since the given date. */
   async getLibrarySeasonsSince(
     libraryId: string,
-    since: Date,
+    since: SyncCursor,
     _options?: { offset?: number; limit?: number }
   ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
-    return this.getLibraryItemsOfTypeSince(libraryId, '3', since);
+    return this.getLibraryItemsOfTypeSince(libraryId, '3', cursorDate(since));
   }
 
   /**
@@ -553,10 +642,10 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
   /** Get albums updated since the given date. */
   async getLibraryAlbumsSince(
     libraryId: string,
-    since: Date,
+    since: SyncCursor,
     _options?: { offset?: number; limit?: number }
   ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
-    const result = await this.getLibraryItemsOfTypeSince(libraryId, '9', since);
+    const result = await this.getLibraryItemsOfTypeSince(libraryId, '9', cursorDate(since));
     return { ...result, items: await this.fillTruncatedGenres(result.items) };
   }
 
@@ -962,14 +1051,12 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
   ): Promise<{ success: true } | { success: false; code: string; message: string }> {
     const url = serverUrl.replace(/\/$/, '');
 
-    try {
-      assertSafeProbeUrl(url);
-    } catch (err) {
-      const message = err instanceof SsrfBlockedError ? err.message : 'URL not permitted';
+    const refusal = probeRefusal(url);
+    if (refusal) {
       return {
         success: false,
         code: PlexClient.AdminVerifyError.CONNECTION_FAILED,
-        message,
+        message: refusal,
       };
     }
 

@@ -298,14 +298,16 @@ describe('Users', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('opens Edit identity with the loaded contact email', async () => {
+  it("opens Edit identity with the loaded contact email and the Tracearr user's username", async () => {
     mockUseAuth.mockReturnValue({
       user: { role: 'owner' },
     } as unknown as ReturnType<typeof useAuth>);
     vi.mocked(useUserFull).mockImplementation(
       (id: string) =>
         ({
-          data: id ? { identity: { contactEmail: 'alice@news.example' } } : undefined,
+          data: id
+            ? { identity: { contactEmail: 'alice@news.example', username: 'ally' } }
+            : undefined,
         }) as unknown as ReturnType<typeof useUserFull>
     );
     mockList([aliceRow], 1);
@@ -318,6 +320,7 @@ describe('Users', () => {
 
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
     expect(screen.getByDisplayValue('alice@news.example')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('ally')).toBeInTheDocument();
   });
 
   it('sends the search box to the server and returns to the first page once it settles', async () => {

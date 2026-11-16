@@ -525,14 +525,14 @@ describe('data-table chrome', () => {
   it('swaps the header type scale without touching cell density', () => {
     render(<Harness data={people} headerVariant="micro" />);
     const head = screen.getAllByRole('columnheader')[0]!;
-    expect(head.className).toContain('text-[10.5px]');
-    expect(head.className).toContain('tracking-[0.07em]');
+    expect(head.className).toContain('font-semibold');
+    expect(head.className).toContain('tracking-wider');
     expect(firstCell().className).toContain('py-3');
   });
 
   it('leaves the header scale alone by default', () => {
     render(<Harness data={people} />);
-    expect(screen.getAllByRole('columnheader')[0]!.className).not.toContain('text-[10.5px]');
+    expect(screen.getAllByRole('columnheader')[0]!.className).not.toContain('tracking-wider');
   });
 
   it.each([

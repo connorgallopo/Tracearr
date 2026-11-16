@@ -110,7 +110,6 @@ function GenreDetailBody({
     <>
       <div className="grid grid-cols-2 gap-3">
         <StatCard
-          variant="kpi"
           compact
           icon={Play}
           label={t('common:labels.plays')}
@@ -123,7 +122,6 @@ function GenreDetailBody({
           subValue={t(`pages:media.landing.shelves.captionMostPopular.${period}`)}
         />
         <StatCard
-          variant="kpi"
           compact
           icon={CheckCircle2}
           label={t('pages:userDetail.cards.finished')}
@@ -135,7 +133,6 @@ function GenreDetailBody({
           }
         />
         <StatCard
-          variant="kpi"
           compact
           icon={Library}
           label={t('pages:media.genres.share.items')}
@@ -143,7 +140,6 @@ function GenreDetailBody({
           subValue={`${itemCount} · ${formatBytes(kpis.sizeBytes)}`}
         />
         <StatCard
-          variant="kpi"
           compact
           icon={Layers}
           label={t('pages:media.genres.share.plays')}

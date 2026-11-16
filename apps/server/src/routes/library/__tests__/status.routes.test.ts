@@ -23,12 +23,13 @@ vi.mock('../../../jobs/librarySyncQueue.js', () => ({
 }));
 
 import { db } from '../../../db/client.js';
+import { getLibrarySyncStatus } from '../../../jobs/librarySyncQueue.js';
 import { permissionGuard } from '../../../lib/scope.js';
 import { libraryStatusRoute } from '../status.js';
 
 const SERVER = '33333333-3333-4333-8333-333333333333';
 
-async function statusSql(user: AuthUser, url: string): Promise<string[]> {
+async function getStatus(user: AuthUser, url: string) {
   const app = Fastify({ logger: false });
   await app.register(sensible);
   app.decorate('authenticate', async (request: { user: AuthUser }) => {
@@ -39,6 +40,11 @@ async function statusSql(user: AuthUser, url: string): Promise<string[]> {
   const response = await app.inject({ method: 'GET', url });
   await app.close();
   expect(response.statusCode).toBe(200);
+  return response;
+}
+
+async function statusSql(user: AuthUser, url: string): Promise<string[]> {
+  await getStatus(user, url);
   return vi
     .mocked(db.execute)
     .mock.calls.map((call) => renderSql(call[0] as SQL).sql)
@@ -87,4 +93,21 @@ describe('GET /library/status', () => {
       expect(text).not.toContain('library_id');
     }
   );
+
+  it.each([
+    ['queued', { isActive: false, jobId: 'sync-1' }, { isSyncRunning: false, isSyncQueued: true }],
+    ['active', { isActive: true, jobId: 'sync-1' }, { isSyncRunning: true, isSyncQueued: false }],
+  ])('reports a %s sync', async (_state, syncStatus, expected) => {
+    vi.mocked(getLibrarySyncStatus).mockResolvedValueOnce(syncStatus);
+    const owner: AuthUser = {
+      userId: randomUUID(),
+      username: 'owner',
+      role: 'owner',
+      serverIds: [],
+    };
+
+    const response = await getStatus(owner, `/library/status?serverId=${SERVER}`);
+
+    expect(response.json()).toMatchObject(expected);
+  });
 });

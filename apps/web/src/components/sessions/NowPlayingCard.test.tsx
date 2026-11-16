@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
@@ -9,8 +9,14 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 
-vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: { role: 'member' } }) }));
-vi.mock('@/hooks/useServer', () => ({ useServer: () => ({ isMultiServer: false }) }));
+const auth = vi.hoisted(() => ({ role: 'member' }));
+vi.mock('@/hooks/useAuth', () => ({ useAuth: () => ({ user: auth }) }));
+vi.mock('@/hooks/useServer', () => ({
+  useServer: () => ({
+    isMultiServer: false,
+    servers: [{ id: 'server-2', canStopStreams: false }],
+  }),
+}));
 vi.mock('@/hooks/useServerColorMap', () => ({ useServerColorMap: () => new Map() }));
 
 // The dialog opens a mutation on mount, which would need a query client here
@@ -63,6 +69,18 @@ describe('NowPlayingCard device icon', () => {
 
   it('carries no hover text when the session reports no device at all', () => {
     expect(renderCard({})).not.toHaveAttribute('title');
+  });
+
+  it.each([
+    ['an iPad', { platform: 'iOS', device: 'iPad Pro' }, 'lucide-tablet'],
+    ['an Android TV', { platform: 'Android TV', device: 'BRAVIA 4K' }, 'lucide-tv'],
+    ['an NVIDIA Shield', { platform: 'Android TV', device: 'SHIELD Android TV' }, 'lucide-tv'],
+    ['an iPhone', { platform: 'iOS', device: 'iPhone 15' }, 'lucide-smartphone'],
+    ['an Android phone', { platform: 'Android', device: 'Pixel 8' }, 'lucide-smartphone'],
+    ['a browser', { platform: 'Chrome', device: 'Chrome' }, 'lucide-monitor'],
+  ])('draws %s with the matching icon', (_name, session, icon) => {
+    const svg = renderCard(session).querySelector('svg');
+    expect(svg).toHaveClass(icon);
   });
 });
 
@@ -124,5 +142,41 @@ describe('NowPlayingCard title links', () => {
 
     fireEvent.click(screen.getByText('alice'));
     expect(onClick).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('NowPlayingCard stop button', () => {
+  beforeEach(() => {
+    auth.role = 'owner';
+  });
+  afterEach(() => {
+    auth.role = 'member';
+  });
+
+  it('holds the stop with the reason when the server key cannot stop streams', () => {
+    renderCard({
+      canTerminate: true,
+      serverId: 'server-2',
+      server: { id: 'server-2', name: 'Den', type: 'tofa' },
+    });
+    expect(
+      screen.getByRole('button', { name: 'settings:servers.cannotStopStreams' })
+    ).toBeDisabled();
+    expect(screen.queryByTitle('pages:terminateStream.title')).not.toBeInTheDocument();
+  });
+
+  it('offers the stop for live TV on tofa', () => {
+    renderCard({
+      canTerminate: true,
+      mediaType: 'live',
+      serverId: 'server-3',
+      server: { id: 'server-3', name: 'Attic', type: 'tofa' },
+    });
+    expect(screen.getByTitle('pages:terminateStream.title')).toBeEnabled();
+  });
+
+  it('offers the stop for live TV on Plex', () => {
+    renderCard({ canTerminate: true, mediaType: 'live' });
+    expect(screen.getByTitle('pages:terminateStream.title')).toBeEnabled();
   });
 });

@@ -20,6 +20,7 @@ import {
 import { db } from '../../db/client.js';
 import { libraryFragment, scopeFragment, seesServerActivity, type Scope } from '../../lib/scope.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
+import { personNameSql } from '../../utils/representativeAccount.js';
 import { ARTIST_OF_TRACK, mediaSizeSubquery, neverPlayedSql } from '../../routes/library/utils.js';
 import { queryPlaysByHourOfDay, queryPlaysOverTime } from '../../routes/stats/queries.js';
 import {
@@ -204,7 +205,7 @@ export function buildGenreRowsSql(s: GenreScope, w: GenreWindow, genre?: string)
         json_agg(json_build_object(
           'userId', v.user_id,
           'serverUserId', v.server_user_id,
-          'name', COALESCE(u.name, su.username),
+          'name', ${personNameSql()},
           'thumbUrl', su.thumb_url,
           'serverId', su.server_id,
           'plays', v.plays

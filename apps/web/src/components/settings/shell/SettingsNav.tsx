@@ -17,7 +17,9 @@ const GROUP_LABEL =
 const LINK =
   'ring-sidebar-ring hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex h-8 items-center rounded-md px-2 text-sm outline-hidden transition-colors focus-visible:ring-2';
 
-const LINK_ACTIVE = 'bg-sidebar-primary text-sidebar-primary-foreground font-medium';
+// Where-am-I state: neutral fill plus an accent bar, so the page's own data stays the loudest thing.
+const LINK_ACTIVE =
+  'bg-sidebar-accent text-sidebar-accent-foreground relative font-medium before:absolute before:inset-y-2 before:left-0 before:w-0.5 before:rounded-full before:bg-sidebar-primary';
 
 export function SettingsNav(): React.JSX.Element {
   const { t } = useTranslation('settings');

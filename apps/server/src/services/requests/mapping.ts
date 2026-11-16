@@ -10,7 +10,6 @@ export type MappedRequest = Omit<
   | 'serviceId'
   | 'mediaId'
   | 'serverUserId'
-  | 'title'
   | 'year'
   | 'syncedAt'
   | 'createdAt'
@@ -47,7 +46,7 @@ export function deriveAvailableAt(
   return remoteUpdatedAt;
 }
 
-function toDate(value: string | null | undefined): Date | null {
+export function toDate(value: string | null | undefined): Date | null {
   if (!value) return null;
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date;
@@ -79,14 +78,15 @@ export function mapSeerrRequest(row: SeerrRequest): MappedRequest {
         }))
       : null;
   return {
-    remoteId: row.id,
+    remoteId: String(row.id),
     remoteMediaId: row.media.id,
     mediaType: row.type === 'tv' ? 'show' : 'movie',
+    title: null,
     tmdbId: row.media.tmdbId ?? null,
     tvdbId: row.media.tvdbId ?? null,
     imdbId: row.media.imdbId ?? null,
     ratingKey: row.media.ratingKey ?? row.media.jellyfinMediaId ?? null,
-    remoteUserId: row.requestedBy.id,
+    remoteUserId: String(row.requestedBy.id),
     remoteUsername: row.requestedBy.displayName,
     remotePlexId: row.requestedBy.plexId != null ? String(row.requestedBy.plexId) : null,
     remoteJellyfinUserId: row.requestedBy.jellyfinUserId ?? null,

@@ -238,6 +238,7 @@ export function UserDetail() {
             userId={effectiveId}
             scope={identityScope}
             user={user}
+            personName={user.identityName ?? identity.username}
             showServer={showServer}
             onSessionClick={handleSessionClick}
           />
@@ -290,7 +291,7 @@ export function UserDetail() {
         userId={id ?? ''}
         currentName={user.identityName}
         currentContactEmail={identity.contactEmail}
-        username={user.username}
+        username={identity.username}
       />
 
       {/* The target names one account, from the header or a linked-accounts row, never the person. */}

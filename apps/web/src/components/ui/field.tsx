@@ -151,8 +151,9 @@ function FieldSeparator({
 }: React.ComponentProps<'div'> & {
   children?: React.ReactNode;
   align?: 'center' | 'start';
-  /** The surface the label sits on, so it covers the line it is drawn over. */
-  surface?: 'background' | 'raised';
+  /** The surface the label sits on, so it covers the line it is drawn over. `panel` is a
+      builder row: the card in light, card-raised in dark. */
+  surface?: 'background' | 'panel';
 }) {
   return (
     <div
@@ -170,7 +171,7 @@ function FieldSeparator({
           className={cn(
             'text-muted-foreground relative block w-fit',
             align === 'start' ? 'pr-2' : 'mx-auto px-2',
-            surface === 'raised' ? 'bg-card-raised' : 'bg-background'
+            surface === 'panel' ? 'bg-card dark:bg-card-raised' : 'bg-background'
           )}
           data-slot="field-separator-content"
         >

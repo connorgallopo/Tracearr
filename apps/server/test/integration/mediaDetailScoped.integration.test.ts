@@ -389,6 +389,7 @@ describe('media detail scoping against a real database', () => {
         ratingKey: `rollup-ep-${i + 1}-a`,
         mediaType: 'episode',
         mediaId: episodeIds[i]!,
+        grandparentRatingKey: 'rollup-show-a',
         parentIndex: 1,
         itemIndex: i + 1,
         fileSize: filesA[i]![0],
@@ -445,6 +446,18 @@ describe('media detail scoping against a real database', () => {
     expect(scopedDetail.availability).toHaveLength(1);
     expect(scopedDetail.availability[0]!.episodeFileSize).toBe(18_000_000_000);
     expect(scopedDetail.availability[0]!.episodeResolutions).toEqual(['1080p', '4k']);
+
+    // An episode copy names its show and its place in it; the show copy names neither.
+    expect(rowA).toMatchObject({ showRatingKey: null, seasonNumber: null, episodeNumber: null });
+    const episode = await appViewer.inject({
+      method: 'GET',
+      url: `/library/media/${episodeIds[1]!}`,
+    });
+    expect(episode.json<MediaDetailResponse>().availability[0]).toMatchObject({
+      showRatingKey: 'rollup-show-a',
+      seasonNumber: 1,
+      episodeNumber: 2,
+    });
   });
 });
 

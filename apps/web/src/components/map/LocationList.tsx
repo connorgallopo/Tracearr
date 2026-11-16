@@ -173,9 +173,7 @@ function LocationRow({
                 <AvatarImage
                   src={getAvatarUrl(person.serverId, person.thumbUrl, 24) ?? undefined}
                 />
-                <AvatarFallback className="text-[10px]">
-                  {name[0]?.toUpperCase() ?? '?'}
-                </AvatarFallback>
+                <AvatarFallback className="text-xs">{name[0]?.toUpperCase() ?? '?'}</AvatarFallback>
               </Avatar>
             );
           })}

@@ -108,16 +108,10 @@ function DuplicateGroupFiles({ group, expanded }: { group: DuplicateGroup; expan
                       </span>
                     )}
                     {file.isMirror && (
-                      <Badge variant="outline" className="text-[10px]">
-                        {t('library.storage.mirror')}
-                      </Badge>
+                      <Badge variant="outline">{t('library.storage.mirror')}</Badge>
                     )}
                     {isMissing && (
-                      <Badge
-                        variant="destructive"
-                        className="text-[10px]"
-                        title={t('library.storage.missingOnServerHint')}
-                      >
+                      <Badge variant="destructive" title={t('library.storage.missingOnServerHint')}>
                         {t('library.storage.missingOnServer')}
                       </Badge>
                     )}

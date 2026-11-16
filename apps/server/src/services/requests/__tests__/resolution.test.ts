@@ -54,7 +54,8 @@ describe('resolveRequests', () => {
 
     const result = await resolveRequests('srv', 'plex', [
       {
-        remoteId: 1,
+        remoteId: '1',
+        remoteUserId: '31',
         mediaType: 'movie',
         tmdbId: 10,
         tvdbId: null,
@@ -63,7 +64,8 @@ describe('resolveRequests', () => {
         remoteJellyfinUserId: null,
       },
       {
-        remoteId: 2,
+        remoteId: '2',
+        remoteUserId: '31',
         mediaType: 'show',
         tmdbId: 20,
         tvdbId: 200,
@@ -72,7 +74,8 @@ describe('resolveRequests', () => {
         remoteJellyfinUserId: null,
       },
       {
-        remoteId: 3,
+        remoteId: '3',
+        remoteUserId: '31',
         mediaType: 'movie',
         tmdbId: 99,
         tvdbId: null,
@@ -82,19 +85,19 @@ describe('resolveRequests', () => {
       },
     ]);
 
-    expect(result.get(1)).toEqual({
+    expect(result.get('1')).toEqual({
       mediaId: 'm-1',
       serverUserId: 'su-1',
       title: 'Dune',
       year: 2021,
     });
-    expect(result.get(2)).toEqual({
+    expect(result.get('2')).toEqual({
       mediaId: 'm-2',
       serverUserId: 'su-1',
       title: 'Korra',
       year: 2012,
     });
-    expect(result.get(3)).toEqual({ mediaId: null, serverUserId: null, title: null, year: null });
+    expect(result.get('3')).toEqual({ mediaId: null, serverUserId: null, title: null, year: null });
   });
 
   it('falls back to the rating key on the linked server', async () => {
@@ -103,7 +106,8 @@ describe('resolveRequests', () => {
     });
     const result = await resolveRequests('srv', 'plex', [
       {
-        remoteId: 7,
+        remoteId: '7',
+        remoteUserId: '31',
         mediaType: 'movie',
         tmdbId: 1,
         tvdbId: null,
@@ -112,8 +116,8 @@ describe('resolveRequests', () => {
         remoteJellyfinUserId: null,
       },
     ]);
-    expect(result.get(7)?.mediaId).toBe('m-9');
-    expect(result.get(7)?.title).toBe('Late');
+    expect(result.get('7')?.mediaId).toBe('m-9');
+    expect(result.get('7')?.title).toBe('Late');
   });
 
   it('matches requesters by external id on jellyfin and emby', async () => {
@@ -122,7 +126,8 @@ describe('resolveRequests', () => {
     });
     const result = await resolveRequests('srv', 'jellyfin', [
       {
-        remoteId: 1,
+        remoteId: '1',
+        remoteUserId: '31',
         mediaType: 'movie',
         tmdbId: null,
         tvdbId: null,
@@ -131,14 +136,35 @@ describe('resolveRequests', () => {
         remoteJellyfinUserId: 'jf-abc',
       },
     ]);
-    expect(result.get(1)?.serverUserId).toBe('su-7');
+    expect(result.get('1')?.serverUserId).toBe('su-7');
+  });
+
+  it('matches a tofa requester by the tofa user id stored as the external id', async () => {
+    routeByQuery({
+      requester: [{ key: 'b1e4c7a2-5d38-4f91-8a6c-2e7f0d3b9c14', id: 'su-9' }],
+    });
+    const result = await resolveRequests('srv', 'tofa', [
+      {
+        remoteId: '5a1d0000-4c2e-4f6a-9b3d-000000000001',
+        remoteUserId: 'b1e4c7a2-5d38-4f91-8a6c-2e7f0d3b9c14',
+        mediaType: 'show',
+        tmdbId: null,
+        tvdbId: null,
+        ratingKey: null,
+        remotePlexId: null,
+        remoteJellyfinUserId: null,
+      },
+    ]);
+    expect(result.get('5a1d0000-4c2e-4f6a-9b3d-000000000001')?.serverUserId).toBe('su-9');
+    expect(sqlTextOf(mockExecute.mock.calls[0]?.[0])).toContain('external_id');
   });
 
   it('skips a lookup entirely when its id set is empty', async () => {
     routeByQuery();
     await resolveRequests('srv', 'plex', [
       {
-        remoteId: 1,
+        remoteId: '1',
+        remoteUserId: '31',
         mediaType: 'movie',
         tmdbId: null,
         tvdbId: null,

@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Marker, type StyleSpecification } from 'maplibre-gl';
 import {
   formatEpisodeLabel,
+  namesShow,
   isStaff,
   type ActiveSession,
   type LocationStats,
@@ -18,6 +19,7 @@ import { getAvatarUrl } from '@/components/users/utils';
 import { useAuth } from '@/hooks/useAuth';
 import { buildBaseStyle, DEFAULT_SERVER_COLOR } from './maplibre';
 import {
+  useAccentH,
   MapPopup,
   useAutoFit,
   useBasemapAvailable,
@@ -27,12 +29,12 @@ import {
 } from './useMapLibre';
 
 function formatMediaTitle(session: ActiveSession): { primary: string; secondary: string | null } {
-  const { mediaType, mediaTitle, grandparentTitle, seasonNumber, episodeNumber, year } = session;
+  const { mediaType, mediaTitle, seasonNumber, episodeNumber, year } = session;
 
-  if (mediaType === 'episode' && grandparentTitle) {
+  if (namesShow(session)) {
     const seasonEp = formatEpisodeLabel(seasonNumber, episodeNumber, { spaced: true });
     return {
-      primary: grandparentTitle,
+      primary: session.grandparentTitle,
       secondary: seasonEp ? `${seasonEp} · ${mediaTitle}` : mediaTitle,
     };
   }
@@ -49,7 +51,7 @@ function sessionMarkerElement(color: string): HTMLDivElement {
   el.className = 'cursor-pointer';
   el.innerHTML = `<div class="relative">
     <div class="absolute -inset-1 animate-ping rounded-full" style="background:${color}50"></div>
-    <div class="relative h-4 w-4 rounded-full border-2 border-white shadow-lg" style="background:${color}"></div>
+    <div class="relative h-4 w-4 rounded-full border-2 border-overlay-foreground shadow-lg" style="background:${color}"></div>
   </div>`;
   return el;
 }
@@ -57,7 +59,7 @@ function sessionMarkerElement(color: string): HTMLDivElement {
 function locationMarkerElement(): HTMLDivElement {
   const el = document.createElement('div');
   el.className = 'cursor-pointer';
-  el.innerHTML = `<div class="h-3 w-3 rounded-full bg-blue-500 border-2 border-white shadow-md"></div>`;
+  el.innerHTML = `<div class="h-3 w-3 rounded-full bg-primary border-2 border-overlay-foreground shadow-md"></div>`;
   return el;
 }
 
@@ -84,6 +86,7 @@ export function StreamCard({
 }: StreamCardProps) {
   const { t } = useTranslation('common');
   const dark = useResolvedDark();
+  const accentH = useAccentH();
   const lang = useMapLang();
   const basemapOk = useBasemapAvailable();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -108,8 +111,8 @@ export function StreamCard({
   }, [sessions, serverColorMap]);
 
   const style = useMemo<StyleSpecification | null>(
-    () => (basemapOk === null ? null : buildBaseStyle({ dark, basemapOk, lang })),
-    [basemapOk, dark, lang]
+    () => (basemapOk === null ? null : buildBaseStyle({ dark, basemapOk, lang, accentH })),
+    [basemapOk, dark, lang, accentH]
   );
 
   const map = useMapLibre(containerRef, style);
@@ -243,22 +246,21 @@ function SessionPopupContent({ session }: { session: ActiveSession }) {
             <MediaPageLink to={mediaLinks.subtitle}>{mediaSubtitle}</MediaPageLink>
           </span>
         )}
-        <ActiveSessionBadge state={session.state} className="px-1.5 py-0 text-[10px]" />
+        <ActiveSessionBadge state={session.state} className="px-1.5 py-0" />
       </div>
 
       {(() => {
+        const name = session.user.identityName ?? session.user.username;
         const body = (
           <>
             <div className="bg-muted flex h-5 w-5 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
               {avatarUrl ? (
-                <img src={avatarUrl} alt={session.user.username} className="h-5 w-5 object-cover" />
+                <img src={avatarUrl} alt={name} className="h-5 w-5 object-cover" />
               ) : (
                 <User className="text-muted-foreground h-3 w-3" />
               )}
             </div>
-            <span className="text-xs font-medium">
-              {session.user.identityName ?? session.user.username}
-            </span>
+            <span className="text-xs font-medium">{name}</span>
           </>
         );
         return canOpenUser ? (
@@ -273,7 +275,7 @@ function SessionPopupContent({ session }: { session: ActiveSession }) {
         );
       })()}
 
-      <div className="text-muted-foreground mt-1 flex items-center gap-2 text-[11px]">
+      <div className="text-muted-foreground mt-1 flex items-center gap-2 text-xs">
         {(session.geoCity || session.geoCountry) && (
           <>
             <MapPin className="h-3 w-3 flex-shrink-0" />
@@ -299,7 +301,7 @@ function LocationPopupContent({ location }: { location: LocationStats }) {
   return (
     <div className="text-foreground p-3">
       <div className="flex items-center gap-2">
-        <MapPin className="h-4 w-4 text-blue-500" />
+        <MapPin className="text-primary h-4 w-4" />
         <div>
           <p className="font-semibold">{location.city || t('common:labels.unknown')}</p>
           <p className="text-muted-foreground text-xs">{location.country}</p>

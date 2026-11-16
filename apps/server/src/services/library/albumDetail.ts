@@ -12,6 +12,7 @@ import { db } from '../../db/client.js';
 import { libraryFragment, scopeFragment, seesServerActivity, type Scope } from '../../lib/scope.js';
 import { buildPosterOrderFragment, posterFor } from '../../routes/library/catalog.js';
 import { idList } from '../../routes/publicV2/shared.js';
+import { personNameSql } from '../../utils/representativeAccount.js';
 import { FINISHED_SQL, percent, startOfUtcDay, toIso } from '../stats/windows.js';
 
 export interface AlbumWindow {
@@ -122,7 +123,7 @@ export function albumSummarySql(q: AlbumQuery, w: AlbumWindow): SQL {
 export function albumListenersSql(q: AlbumQuery): SQL {
   return sql`
     WITH ${albumChainsCte(q)}
-    SELECT COALESCE(u.name, MIN(su.username)) AS name, COUNT(*)::int AS plays
+    SELECT ${personNameSql()} AS name, COUNT(*)::int AS plays
     FROM chains c
     JOIN server_users su ON su.id = c.server_user_id
     JOIN users u ON u.id = su.user_id

@@ -5,12 +5,13 @@ import { HighchartsReact } from 'highcharts-react-official';
 import { ChartSkeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { PieChart } from 'lucide-react';
+import { PIE_SEGMENT_BORDER } from './chartUtils';
 
-// Colorblind-friendly completion status colors
+// Completion is ordered, so it sits on the sequential ramp with completed strongest.
 const COMPLETION_COLORS = {
-  completed: 'hsl(142, 76%, 36%)', // Green - success
-  inProgress: 'hsl(38, 92%, 50%)', // Orange - in progress
-  notStarted: 'hsl(var(--muted))', // Muted - not started
+  completed: 'oklch(var(--seq-2))',
+  inProgress: 'oklch(var(--seq-4))',
+  notStarted: 'oklch(var(--seq-7))',
 };
 
 interface CompletionDonutChartProps {
@@ -67,10 +68,10 @@ export function CompletionDonutChart({
         enabled: false,
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         pointFormatter: function () {
           return t('library.charts.completion.tooltip', {
@@ -82,7 +83,7 @@ export function CompletionDonutChart({
       plotOptions: {
         pie: {
           innerSize: '60%',
-          borderWidth: 0,
+          ...PIE_SEGMENT_BORDER,
           dataLabels: {
             enabled: false,
           },
@@ -94,10 +95,10 @@ export function CompletionDonutChart({
         verticalAlign: 'middle',
         layout: 'vertical',
         itemStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--primary))',
+          color: 'oklch(var(--primary))',
         },
       },
       series: [
@@ -118,9 +119,6 @@ export function CompletionDonutChart({
                 align: 'center',
                 verticalAlign: 'bottom',
                 layout: 'horizontal',
-                itemStyle: {
-                  fontSize: '10px',
-                },
               },
             },
           },

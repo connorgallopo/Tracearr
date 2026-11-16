@@ -51,7 +51,7 @@ export function OverviewTab({
             {
               name: t('pages:userDetail.overview.serverAverage'),
               data: stats.serverAvgPlaysByDay,
-              color: 'hsl(var(--chart-2))',
+              color: 'oklch(var(--primary))',
             },
           ]
         : []),
@@ -104,6 +104,7 @@ export function OverviewTab({
           <UserSessionsTable
             sessions={detail.sessions.data.slice(0, RECENT_SESSIONS)}
             user={detail.user}
+            personName={detail.user.identityName ?? detail.identity.username}
             showServer={showServer}
             onSessionClick={onSessionClick}
           />

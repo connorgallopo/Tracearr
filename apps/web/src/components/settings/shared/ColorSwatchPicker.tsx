@@ -1,4 +1,4 @@
-import { useId } from 'react';
+import { useId, type CSSProperties } from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -9,7 +9,9 @@ export function ColorSwatchPicker({
   onChange,
 }: {
   label: string;
-  options: { id: string; name: string; hex: string }[];
+  /** A swatch is a plain hex, or a class plus style that paints it (the accent
+   * swatches compute the live primary token that way). */
+  options: { id: string; name: string; hex?: string; className?: string; style?: CSSProperties }[];
   value: string;
   onChange: (id: string) => void;
 }) {
@@ -27,9 +29,10 @@ export function ColorSwatchPicker({
             title={option.name}
             className={cn(
               'ring-offset-background has-[:focus-visible]:ring-ring relative size-8 rounded-md transition-transform hover:scale-105 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-offset-2',
-              isSelected && 'ring-foreground scale-105 ring-2 ring-offset-2'
+              isSelected && 'ring-foreground scale-105 ring-2 ring-offset-2',
+              option.className
             )}
-            style={{ backgroundColor: option.hex }}
+            style={option.hex ? { backgroundColor: option.hex } : option.style}
           >
             <input
               type="radio"
@@ -44,7 +47,10 @@ export function ColorSwatchPicker({
             />
             {isSelected && (
               <Check
-                className="absolute inset-0 m-auto size-4 text-white drop-shadow-md"
+                className={cn(
+                  'absolute inset-0 m-auto size-4',
+                  option.hex && 'text-overlay-foreground drop-shadow-md'
+                )}
                 aria-hidden="true"
               />
             )}

@@ -629,6 +629,47 @@ describe('genres aggregate endpoint against a real database', () => {
     expect((await fetchGenre(app, 'show', 'Polka')).statusCode).toBe(404);
   });
 
+  it('names a viewer by their Tracearr user, not by the account on the selected server', async () => {
+    const emby = await createTestServer({ type: 'emby' });
+    const tofa = await createTestServer({ type: 'tofa' });
+    const user = await createTestUser({ name: null, username: 'zoe' });
+    await createTestServerUser({
+      serverId: emby.id,
+      userId: user.id,
+      username: 'zoe_emby',
+      lastActivityAt: new Date(),
+    });
+    const tofaAccount = await createTestServerUser({
+      serverId: tofa.id,
+      userId: user.id,
+      username: 'aaron_tofa',
+      lastActivityAt: new Date(Date.now() - 86_400_000),
+    });
+    const movie = await seedMovie({
+      serverId: tofa.id,
+      ratingKey: 'viewer-name-noir',
+      title: 'Viewer Name Noir',
+      year: 2019,
+      tmdbId: 906_001,
+      genres: ['Noir'],
+    });
+    await seedSession({
+      serverId: tofa.id,
+      serverUserId: tofaAccount.id,
+      mediaId: movie,
+      ratingKey: 'viewer-name-noir',
+      durationMs: 600_000,
+    });
+    await refreshPlaysAggregate();
+
+    const { app } = await buildApp(ownerFor());
+    const { body } = await fetchGenres(app, 'movie', `&serverIds=${tofa.id}`);
+    expect(body.data.find((row) => row.genre === 'Noir')?.topViewer).toMatchObject({
+      serverUserId: tofaAccount.id,
+      name: 'zoe',
+    });
+  });
+
   it('rolls track plays and sizes up to the artist genre, dropping a track with no artist row', async () => {
     const server = await createTestServer({ type: 'plex' });
     const user = await createTestUser();

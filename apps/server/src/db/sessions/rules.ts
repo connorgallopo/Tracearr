@@ -1,6 +1,17 @@
 import { sql, type SQL } from 'drizzle-orm';
 import { LOCAL_NETWORK_COUNTRY, TIME_MS } from '@tracearr/shared';
 
+/** geo_country on a session whose client reached tofa through its relay, which hides the address */
+export const RELAYED_COUNTRY = 'Tofa Relay';
+
+/**
+ * A relayed session has no address of its own, nor does one its server listed without one, so
+ * rules that read an address skip both.
+ */
+export function hasNoAddress(row: { ipAddress: string; geoCountry: string | null }): boolean {
+  return !row.ipAddress || row.geoCountry === RELAYED_COUNTRY;
+}
+
 export interface LocalSessionFields {
   isLocal?: boolean | null;
   geoCountry: string | null;

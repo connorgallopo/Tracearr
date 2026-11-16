@@ -1,12 +1,12 @@
 import type { ResolutionLabel } from '@tracearr/shared';
 
-/** Higher tiers get cooler colors, so a chart reads best to worst at a glance. */
+/** Tiers are ordered, so they sit on the sequential ramp: the highest tier is the strongest step. */
 export const RESOLUTION_COLORS: Record<ResolutionLabel, string> = {
-  '8K': '#8b5cf6',
-  '4K': '#10b981',
-  '1440p': '#06b6d4',
-  '1080p': '#3b82f6',
-  '720p': '#f59e0b',
-  '480p': '#f97316',
-  SD: '#ef4444',
+  '8K': 'oklch(var(--seq-1))',
+  '4K': 'oklch(var(--seq-2))',
+  '1440p': 'oklch(var(--seq-3))',
+  '1080p': 'oklch(var(--seq-4))',
+  '720p': 'oklch(var(--seq-5))',
+  '480p': 'oklch(var(--seq-6))',
+  SD: 'oklch(var(--seq-7))',
 };

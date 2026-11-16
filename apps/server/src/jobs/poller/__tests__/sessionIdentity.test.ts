@@ -92,12 +92,19 @@ describe('buildCompositeKey', () => {
 });
 
 describe('canTerminate', () => {
+  const sessionKey = 'sess';
+
   it('plex can terminate only with a session id; jellyfin and emby always can', () => {
-    expect(canTerminate('plex', null)).toBe(false);
-    expect(canTerminate('plex', undefined)).toBe(false);
-    expect(canTerminate('plex', 'abc')).toBe(true);
-    expect(canTerminate('jellyfin', null)).toBe(true);
-    expect(canTerminate('emby', null)).toBe(true);
+    expect(canTerminate('plex', { plexSessionId: null, sessionKey })).toBe(false);
+    expect(canTerminate('plex', { sessionKey })).toBe(false);
+    expect(canTerminate('plex', { plexSessionId: 'abc', sessionKey })).toBe(true);
+    expect(canTerminate('jellyfin', { plexSessionId: null, sessionKey })).toBe(true);
+    expect(canTerminate('emby', { plexSessionId: null, sessionKey })).toBe(true);
+  });
+
+  it('tofa can terminate a playback session but not a live viewer listed without one', () => {
+    expect(canTerminate('tofa', { sessionKey })).toBe(true);
+    expect(canTerminate('tofa', { sessionKey: 'viewer:viewer-1' })).toBe(false);
   });
 });
 

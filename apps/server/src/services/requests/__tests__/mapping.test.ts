@@ -61,14 +61,14 @@ describe('mapSeerrRequest', () => {
   it('maps tv to show, keeps ids, seasons, flags and the requester snapshot without email', () => {
     const mapped = mapSeerrRequest(base);
     expect(mapped).toMatchObject({
-      remoteId: 738,
+      remoteId: '738',
       remoteMediaId: 2081,
       mediaType: 'show',
       tmdbId: 33880,
       tvdbId: 251085,
       imdbId: null,
       ratingKey: '206215',
-      remoteUserId: 31,
+      remoteUserId: '31',
       remoteUsername: 'agelwarg',
       remotePlexId: '1577033',
       remoteJellyfinUserId: null,

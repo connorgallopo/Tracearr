@@ -32,6 +32,7 @@ import {
   sessions,
   users,
 } from '../../db/schema.js';
+import { personNameColumn } from '../../utils/representativeAccount.js';
 import { ACTIVE_SESSION_CHUNK_BOUND_MS, sessionRowById } from '../../db/sessions/row.js';
 import { getGeoIPSettings } from '../../routes/settings.js';
 import { isMaintenance } from '../../serverState.js';
@@ -41,8 +42,12 @@ import { isLiveRow } from '../../services/liveServers.js';
 import type { CacheService, PubSubService, TerminationCooldown } from '../../services/cache.js';
 import { geoipService } from '../../services/geoip.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
-import { emailForSessionUser } from '../../services/mediaServer/byServerType.js';
-import { resolveSessionGeo, type SessionGeo } from '../../services/serverLocations.js';
+import { serverWatchedThreshold } from '../../services/mediaServer/byServerType.js';
+import {
+  RELAYED_SESSION_GEO,
+  resolveSessionGeo,
+  type SessionGeo,
+} from '../../services/serverLocations.js';
 import {
   fetchRecentSessionsForIdentity,
   setContextAssemblyDeps,
@@ -55,12 +60,12 @@ import {
   sessionWatchedEvent,
 } from '../../services/automations/events/producers.js';
 import { registerRuleSubscribers } from '../../services/automations/events/subscribers.js';
+import type { EvaluationServerUser } from '../../services/automations/events/types.js';
 import {
   registerPauseWakeSubscriptions,
   setPauseWakeDeps,
 } from '../../services/automations/wakes/pauseWakes.js';
 import { registerService, unregisterService } from '../../services/serviceTracker.js';
-import { getWatchedThreshold } from '../../services/settings.js';
 import { sseManager } from '../../services/sseManager.js';
 import { HttpClientError } from '../../utils/http.js';
 import { createLogger } from '../../utils/logger.js';
@@ -69,6 +74,7 @@ import {
   batchGetIdentityServerUserIds,
   batchGetLibraryItemIdentity,
   batchGetRecentUserSessions,
+  createSessionServerUsers,
   getActiveAutomations,
   getCachedServers,
   widenRecentSessionsForMergedIdentities,
@@ -94,7 +100,12 @@ import {
   processPollResults,
   stopSessionAtomic,
 } from './sessionLifecycle.js';
-import { mapMediaSession, pickLiveSessionFields, pickStreamDetailFields } from './sessionMapper.js';
+import {
+  mapMediaSession,
+  mapSessionRow,
+  pickLiveSessionFields,
+  pickStreamDetailFields,
+} from './sessionMapper.js';
 import {
   buildCompositeKey,
   pendingKeyFromTrackingKey,
@@ -111,6 +122,7 @@ import {
 } from './stateTracker.js';
 import { PENDING_STOP_PERSIST_MIN_PROGRESS_MS } from './types.js';
 import type {
+  PauseAccumulationResult,
   PendingSessionData,
   PendingSessionOutcome,
   PollerConfig,
@@ -622,10 +634,23 @@ function stateThroughBuffering(
   return processed.buffering && current !== 'stopped' ? current : processed.state;
 }
 
+/** A relayed client has no address of its own, so it is labeled instead of placed. */
+function placeSession(
+  processed: ProcessedSession,
+  serverId: string,
+  usePlexGeoip: boolean
+): Promise<SessionGeo> {
+  return processed.relayed
+    ? Promise.resolve(RELAYED_SESSION_GEO)
+    : resolveSessionGeo(processed.ipAddress, serverId, usePlexGeoip);
+}
+
 /**
  * Issue #121: Plex can reassign a playback's sessionKey, so an open row for the same
  * user and item means a new key is a duplicate. JF/Emby key sessions by user, device
- * and item, so their tracking key already covers this.
+ * and item, so their tracking key already covers this. A tofa player that reconnects gets
+ * a new session id while the old one stays listed; the tofa client passes on only the
+ * newest per device and file, and the confirm step stops the row it replaces.
  */
 async function findOpenRowForSameContent(
   serverType: ServerType,
@@ -653,6 +678,7 @@ async function findOpenRowForSameContent(
     }
     case 'jellyfin':
     case 'emby':
+    case 'tofa':
       return undefined;
     default:
       return assertNever(serverType);
@@ -660,8 +686,37 @@ async function findOpenRowForSameContent(
 }
 
 /**
+ * tofa sessions name their media without describing it. One recorded while that lookup
+ * failed has no item key, and takes the media from the first poll that resolves it.
+ */
+function fillsInMediaLater(serverType: ServerType): boolean {
+  switch (serverType) {
+    case 'plex':
+    case 'jellyfin':
+    case 'emby':
+      return false;
+    case 'tofa':
+      return true;
+    default:
+      return assertNever(serverType);
+  }
+}
+
+function noSessionChanges(success: boolean): ServerProcessingResult {
+  return {
+    success,
+    newSessions: [],
+    stoppedSessionKeys: [],
+    updatedSessions: [],
+    watchedTransitionOccurred: false,
+    confirmedFromPendingIds: new Set(),
+  };
+}
+
+/**
  * Issue #57: Plex keeps a sessionKey across items (e.g. "Play Next Episode"), so a
- * tracked session can change media. JF/Emby key sessions by item.
+ * tracked session can change media. JF/Emby key sessions by item. Whether tofa moves a
+ * session to the next item is unknown, so a new item under its session id is a new play.
  * Normalize '' to null: a row stored during a metadata blip carries an empty
  * ratingKey, which detectMediaChange would otherwise read as a real key and treat
  * the arrival of the true key as a media change.
@@ -673,6 +728,7 @@ function isMediaChange(
 ): boolean {
   switch (serverType) {
     case 'plex':
+    case 'tofa':
       return detectMediaChange(existingRatingKey || null, ratingKey || null);
     case 'jellyfin':
     case 'emby':
@@ -721,7 +777,7 @@ async function resolvePendingSession(
     return { status: 'still-pending', updatedSession: buildPendingActiveSession(updatedData) };
   }
 
-  const geo = await resolveSessionGeo(processed.ipAddress, server.id, usePlexGeoip);
+  const geo = await placeSession(processed, server.id, usePlexGeoip);
   const createResult = await cacheService.withSessionCreateLock(
     server.id,
     processed.sessionKey,
@@ -831,12 +887,6 @@ async function processServerSessions(
 
   // Get GeoIP settings once at the start
   const { usePlexGeoip } = await getGeoIPSettings();
-  // Watched thresholds fetched once per cycle rather than per session (settings cache is 10s anyway)
-  const watchedThresholds = {
-    movie: await getWatchedThreshold('movie'),
-    episode: await getWatchedThreshold('episode'),
-    track: await getWatchedThreshold('track'),
-  };
 
   try {
     // Fetch sessions from server using unified adapter
@@ -848,6 +898,12 @@ async function processServerSessions(
     const mediaSessions = await client.getSessions();
     sseManager.nudgeReconnect(server.id);
     const { sessionIdentity } = SERVER_PROFILES[server.type];
+    // Watched thresholds fetched once per cycle rather than per session (settings cache is 10s anyway)
+    const watchedThresholds = {
+      movie: await serverWatchedThreshold(server, 'movie'),
+      episode: await serverWatchedThreshold(server, 'episode'),
+      track: await serverWatchedThreshold(server, 'track'),
+    };
 
     const processedSessions = mediaSessions.map((s) => mapMediaSession(s, server.type));
 
@@ -894,14 +950,7 @@ async function processServerSessions(
       await sweepGracePeriod(keysToSweep, server.id, server.type);
 
       // stoppedSessionKeys intentionally empty
-      return {
-        success: true,
-        newSessions: [],
-        stoppedSessionKeys: [],
-        updatedSessions: [],
-        watchedTransitionOccurred: false,
-        confirmedFromPendingIds: new Set(),
-      };
+      return noSessionChanges(true);
     }
 
     // OPTIMIZATION: Only load server users that match active sessions (not all users for server)
@@ -922,7 +971,7 @@ async function processServerSessions(
         lastActivityAt: serverUsers.lastActivityAt,
         createdAt: serverUsers.createdAt,
         updatedAt: serverUsers.updatedAt,
-        identityName: users.name,
+        identityName: personNameColumn(),
       })
       .from(serverUsers)
       .innerJoin(users, eq(serverUsers.userId, users.id))
@@ -965,7 +1014,7 @@ async function processServerSessions(
           lastActivityAt: serverUsers.lastActivityAt,
           createdAt: serverUsers.createdAt,
           updatedAt: serverUsers.updatedAt,
-          identityName: users.name,
+          identityName: personNameColumn(),
         })
         .from(serverUserExternalAliases)
         .innerJoin(serverUsers, eq(serverUserExternalAliases.serverUserId, serverUsers.id))
@@ -1000,28 +1049,29 @@ async function processServerSessions(
       const existingServerUser = serverUserByExternalId.get(processed.externalUserId);
 
       if (existingServerUser) {
+        const username = processed.username || existingServerUser.username;
         // An aliased match is a different account on the media server that was
         // folded into this one, so its name and avatar are not this account's.
         const needsUpdate =
           !aliasResolvedExternalIds.has(processed.externalUserId) &&
-          (existingServerUser.username !== processed.username ||
+          (existingServerUser.username !== username ||
             (processed.userThumb && existingServerUser.thumbUrl !== processed.userThumb));
 
         if (needsUpdate) {
           await db
             .update(serverUsers)
             .set({
-              username: processed.username,
+              username,
               thumbUrl: processed.userThumb || existingServerUser.thumbUrl,
               ...(SERVER_PROFILES[server.type].emailSource === 'username'
-                ? { email: usernameAsEmail(processed.username) }
+                ? { email: usernameAsEmail(username) }
                 : {}),
               updatedAt: new Date(),
             })
             .where(eq(serverUsers.id, existingServerUser.id));
 
           // Update cache
-          existingServerUser.username = processed.username;
+          existingServerUser.username = username;
           if (processed.userThumb) existingServerUser.thumbUrl = processed.userThumb;
         }
 
@@ -1030,7 +1080,7 @@ async function processServerSessions(
         // Need to create server user - mark for batch creation
         serverUsersToCreate.push({
           externalId: processed.externalUserId,
-          username: processed.username,
+          username: processed.username || 'Unknown',
           thumbUrl: processed.userThumb || null,
           sessionIndex: i,
         });
@@ -1038,54 +1088,15 @@ async function processServerSessions(
       }
     }
 
-    // Batch create new server users (and their identity users)
-    // Wrapped in transaction to prevent orphan identity users if server user insert fails
     if (serverUsersToCreate.length > 0) {
-      const { newIdentityUsers, newServerUsers } = await db.transaction(async (tx) => {
-        // First, create identity users for each new server user
-        const identityUsers = await tx
-          .insert(users)
-          .values(
-            serverUsersToCreate.map((u) => ({
-              username: u.username, // Login identifier
-              name: u.username, // Use username as initial display name
-              thumbnail: u.thumbUrl,
-            }))
-          )
-          .returning();
-
-        // Then create server users linked to the identity users
-        const serverUserRows = await tx
-          .insert(serverUsers)
-          .values(
-            serverUsersToCreate.map((u, idx) => ({
-              userId: identityUsers[idx]!.id,
-              serverId: server.id,
-              externalId: u.externalId,
-              username: u.username,
-              email: emailForSessionUser(server.type, u.username),
-              thumbUrl: u.thumbUrl,
-            }))
-          )
-          .returning();
-
-        return { newIdentityUsers: identityUsers, newServerUsers: serverUserRows };
-      });
-
-      // Update sessionServerUserIds with newly created server user IDs
+      const created = await createSessionServerUsers(server, serverUsersToCreate);
       for (let i = 0; i < serverUsersToCreate.length; i++) {
         const serverUserToCreate = serverUsersToCreate[i]!;
-        const newServerUser = newServerUsers[i];
-        const newIdentityUser = newIdentityUsers[i];
-        if (newServerUser && newIdentityUser) {
+        const newServerUser = created[i];
+        if (newServerUser) {
           sessionServerUserIds[serverUserToCreate.sessionIndex] = newServerUser.id;
-          // Add to cache with identityName from the identity user
-          const serverUserWithIdentity = {
-            ...newServerUser,
-            identityName: newIdentityUser.name,
-          };
-          serverUserById.set(newServerUser.id, serverUserWithIdentity);
-          serverUserByExternalId.set(serverUserToCreate.externalId, serverUserWithIdentity);
+          serverUserById.set(newServerUser.id, newServerUser);
+          serverUserByExternalId.set(serverUserToCreate.externalId, newServerUser);
         }
       }
     }
@@ -1190,6 +1201,55 @@ async function processServerSessions(
       ...excludeUncountableSessions(activeSessions, gracePeriodSessionIds()),
     ];
 
+    const dispatchPauseEdge = async (
+      existingSession: typeof sessions.$inferSelect,
+      serverUser: EvaluationServerUser,
+      newState: 'playing' | 'paused',
+      pause: PauseAccumulationResult,
+      live: Partial<Session>,
+      at: Date
+    ): Promise<void> => {
+      const previousState = existingSession.state;
+      if (previousState !== 'paused' && newState === 'paused' && activeAutomations.length > 0) {
+        try {
+          const recentSessions = await getOrFetchRecentSessions(recentSessionsMap, serverUser.id);
+          const { violations } = await dispatch(
+            {
+              type: 'session.paused',
+              at,
+              server: { id: server.id, name: server.name, type: server.type },
+              serverUser,
+              pauseData: {
+                lastPausedAt: pause.lastPausedAt,
+                pausedDurationMs: pause.pausedDurationMs,
+              },
+              session: toRuleSession(existingSession, {
+                ...live,
+                lastPausedAt: pause.lastPausedAt,
+                pausedDurationMs: pause.pausedDurationMs,
+              }),
+            },
+            { activeAutomations, activeSessions: ruleEvalSessions, recentSessions }
+          );
+          if (violations.length > 0 && pubSubService) {
+            await broadcastViolations(violations, existingSession, pubSubService);
+          }
+        } catch (error) {
+          console.error(
+            `[Poller] Error re-evaluating pause rules for session ${existingSession.id}:`,
+            error
+          );
+        }
+      } else if (previousState === 'paused' && newState === 'playing') {
+        await dispatch({
+          type: 'session.resumed',
+          at,
+          sessionId: existingSession.id,
+          serverId: server.id,
+        });
+      }
+    };
+
     // Process each session
     for (let i = 0; i < processedSessions.length; i++) {
       const processed = processedSessions[i]!;
@@ -1286,7 +1346,7 @@ async function processServerSessions(
           }
 
           // Get GeoIP location (uses Plex API if enabled, falls back to MaxMind)
-          const geo = await resolveSessionGeo(processed.ipAddress, server.id, usePlexGeoip);
+          const geo = await placeSession(processed, server.id, usePlexGeoip);
 
           const createResult = await cacheService.withSessionCreateLock<
             | { rediscovered: typeof sessions.$inferSelect }
@@ -1516,7 +1576,7 @@ async function processServerSessions(
                   asnOrganization: existingSession.geoAsnOrganization,
                   isLocal: existingSession.isLocal ?? geoipService.isPrivateIP(processed.ipAddress),
                 }
-              : await resolveSessionGeo(processed.ipAddress, server.id, usePlexGeoip);
+              : await placeSession(processed, server.id, usePlexGeoip);
 
           if (!existingSession) {
             // Issue #120: Stale cache entry - session key is in Redis but no active session exists in DB
@@ -1728,6 +1788,73 @@ async function processServerSessions(
             continue; // Skip normal update path
           }
 
+          // A read that did not describe a tracked play, which may be a channel's, carries no
+          // media or position to trust, so those stay as they are until a read describes it. Its
+          // pause state still comes from the stream list, so a pause or resume is recorded. Without
+          // one the play is still running, so it is marked seen on the flush clock or the stale
+          // sweep stops it.
+          if (fillsInMediaLater(server.type) && existingSession.ratingKey && !processed.ratingKey) {
+            const newState = stateThroughBuffering(existingSession.state, processed);
+            if (newState === existingSession.state) {
+              const seenAt = Date.now();
+              if (shouldFlushDbWrite(existingSession.id, seenAt)) {
+                await db
+                  .update(sessions)
+                  .set({ lastSeenAt: new Date(seenAt) })
+                  .where(and(sessionRowById(existingSession), isNull(sessions.stoppedAt)));
+                recordDbWrite(existingSession.id, seenAt);
+              }
+              continue;
+            }
+
+            const now = new Date();
+            const pauseResult = calculatePauseAccumulation(
+              existingSession.state,
+              newState,
+              existingSession,
+              now
+            );
+            const updateResult = await db
+              .update(sessions)
+              .set({ state: newState, ...pauseResult, lastSeenAt: now })
+              .where(and(sessionRowById(existingSession), isNull(sessions.stoppedAt)))
+              .returning({ id: sessions.id });
+            if (updateResult.length === 0) {
+              console.log(
+                `[Poller] Session ${existingSession.id} already stopped, skipping resurrection`
+              );
+              continue;
+            }
+            recordDbWrite(existingSession.id, now.getTime());
+
+            await dispatchPauseEdge(
+              existingSession,
+              userDetail,
+              newState,
+              pauseResult,
+              { state: newState },
+              now
+            );
+            // The cached entry has the position from the last described read, which the row only
+            // holds as of its last flush.
+            const cached = activeSessions.find((s) => s.id === existingSession.id);
+            updatedSessions.push({
+              ...(cached ?? {
+                ...buildActiveSession({
+                  session: existingSession,
+                  processed,
+                  user: userDetail,
+                  geo,
+                  server,
+                }),
+                ...mapSessionRow(existingSession),
+              }),
+              state: newState,
+              ...pauseResult,
+            });
+            continue;
+          }
+
           const previousState = existingSession.state;
           const newState = stateThroughBuffering(existingSession.state, processed);
           const now = new Date();
@@ -1766,6 +1893,22 @@ async function processServerSessions(
           // Update stream details when valid (skip if API returned incomplete data)
           if (processed.sourceAudioCodec || processed.sourceVideoCodec) {
             Object.assign(updatePayload, pickStreamDetailFields(processed));
+          }
+
+          const mediaFilledIn =
+            fillsInMediaLater(server.type) && !existingSession.ratingKey && !!processed.ratingKey;
+          if (mediaFilledIn) {
+            Object.assign(updatePayload, {
+              ratingKey: processed.ratingKey,
+              mediaType: processed.mediaType,
+              mediaTitle: processed.mediaTitle,
+              grandparentTitle: processed.grandparentTitle || null,
+              seasonNumber: processed.seasonNumber,
+              episodeNumber: processed.episodeNumber,
+              year: processed.year || null,
+              totalDurationMs: processed.totalDurationMs || null,
+              thumbPath: processed.thumbPath || null,
+            });
           }
 
           const pauseResult = calculatePauseAccumulation(
@@ -1820,7 +1963,7 @@ async function processServerSessions(
           // Guarded by isNull(stoppedAt): a stop racing this write must not
           // resurrect the session into updatedSessions/cache.
           let wasStoppedConcurrently = false;
-          if (hasChanges || flushElapsed) {
+          if (hasChanges || flushElapsed || mediaFilledIn) {
             const updateResult = await db
               .update(sessions)
               .set(updatePayload)
@@ -1879,47 +2022,14 @@ async function processServerSessions(
             }
           }
 
-          if (previousState !== 'paused' && newState === 'paused' && activeAutomations.length > 0) {
-            try {
-              const recentSessions = await getOrFetchRecentSessions(
-                recentSessionsMap,
-                serverUserId
-              );
-              const { violations } = await dispatch(
-                {
-                  type: 'session.paused',
-                  at: now,
-                  server: { id: server.id, name: server.name, type: server.type },
-                  serverUser: userDetail,
-                  pauseData: {
-                    lastPausedAt: pauseResult.lastPausedAt,
-                    pausedDurationMs: pauseResult.pausedDurationMs,
-                  },
-                  session: toRuleSession(existingSession, {
-                    ...pickLiveSessionFields(processed),
-                    lastPausedAt: pauseResult.lastPausedAt,
-                    pausedDurationMs: pauseResult.pausedDurationMs,
-                  }),
-                },
-                { activeAutomations, activeSessions: ruleEvalSessions, recentSessions }
-              );
-              if (violations.length > 0 && pubSubService) {
-                await broadcastViolations(violations, existingSession, pubSubService);
-              }
-            } catch (error) {
-              console.error(
-                `[Poller] Error re-evaluating pause rules for session ${existingSession.id}:`,
-                error
-              );
-            }
-          } else if (previousState === 'paused' && newState === 'playing') {
-            await dispatch({
-              type: 'session.resumed',
-              at: now,
-              sessionId: existingSession.id,
-              serverId: server.id,
-            });
-          }
+          await dispatchPauseEdge(
+            existingSession,
+            userDetail,
+            newState,
+            pauseResult,
+            pickLiveSessionFields(processed),
+            now
+          );
 
           if (watchedThresholdReached && activeAutomations.length > 0) {
             try {
@@ -2014,15 +2124,7 @@ async function processServerSessions(
     } else {
       console.error(`Error polling server ${server.name}:`, error);
     }
-    return {
-      success: false,
-      unauthorized,
-      newSessions: [],
-      stoppedSessionKeys: [],
-      updatedSessions: [],
-      watchedTransitionOccurred: false,
-      confirmedFromPendingIds: new Set(),
-    };
+    return { ...noSessionChanges(false), unauthorized };
   }
 }
 

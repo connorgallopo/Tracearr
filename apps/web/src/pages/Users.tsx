@@ -281,10 +281,10 @@ export function Users() {
                   serverUserId={user.id}
                   username={user.username}
                   identityName={user.identityName}
+                  personName={user.personName}
                   thumbUrl={user.thumbUrl}
                   serverId={user.serverId}
                   size="md"
-                  showUsername
                   details={[
                     ...(user.email ? [user.email] : []),
                     ...(multiServer ? [t('common:count.server', { count: serverCount })] : []),
@@ -578,7 +578,7 @@ export function Users() {
         userId={identityTarget?.id ?? ''}
         currentName={identityTarget?.identityName ?? null}
         currentContactEmail={identityDetail.data?.identity.contactEmail ?? null}
-        username={identityTarget?.username ?? ''}
+        username={identityDetail.data?.identity.username ?? ''}
       />
 
       <EditTrustScoreDialog

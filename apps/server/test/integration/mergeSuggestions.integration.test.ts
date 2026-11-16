@@ -5,6 +5,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { eq, inArray } from 'drizzle-orm';
 import { describe, it, expect } from 'vitest';
 import {
   createTestUser,
@@ -13,7 +14,7 @@ import {
   createTestSession,
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
-import { authAccounts } from '../../src/db/schema.js';
+import { authAccounts, serverUserLinks, serverUsers, servers } from '../../src/db/schema.js';
 import {
   dismissMergeSuggestion,
   getDismissedMergeSuggestions,
@@ -96,6 +97,45 @@ describe('getMergeSuggestions', () => {
         },
       ],
     });
+  });
+
+  it('suggests an account another server lists as its own user, ahead of a shared email', async () => {
+    const plex = await createTestServer({ type: 'plex' });
+    const otherPlex = await createTestServer({ type: 'plex' });
+    const tofa = await createTestServer({ type: 'tofa' });
+    const machineId = `plex-${randomUUID()}`;
+    await db.update(servers).set({ machineIdentifier: machineId }).where(eq(servers.id, plex.id));
+    const viewer = await createTestUser({ role: 'member' });
+    const sameViewer = await createTestUser({ role: 'member' });
+    const stranger = await createTestUser({ role: 'member' });
+    const email = `${randomUUID()}@example.com`;
+    const plexAccount = await createTestServerUser({ userId: viewer.id, serverId: plex.id, email });
+    const tofaAccount = await createTestServerUser({
+      userId: sameViewer.id,
+      serverId: tofa.id,
+      email,
+    });
+    // The same account id on a server with another identifier is someone else
+    const strangerAccount = await createTestServerUser({
+      userId: stranger.id,
+      serverId: otherPlex.id,
+    });
+    await db
+      .update(serverUsers)
+      .set({ plexAccountId: '308951159' })
+      .where(inArray(serverUsers.id, [plexAccount.id, strangerAccount.id]));
+    await db.insert(serverUserLinks).values({
+      serverUserId: tofaAccount.id,
+      provider: 'plex',
+      externalUserId: '308951159',
+      externalServerId: machineId,
+    });
+
+    const linked = (await getMergeSuggestions()).filter((s) => s.matchType === 'linkedAccount');
+
+    expect(linked).toHaveLength(1);
+    expect(linked[0]).toMatchObject({ matchValue: plexAccount.username });
+    expect(linked[0]?.users.map((u) => u.userId).sort()).toEqual([viewer.id, sameViewer.id].sort());
   });
 
   it('pairs a Plex owner with an Emby account whose username is their email, keeping the owner', async () => {

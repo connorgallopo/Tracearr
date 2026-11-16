@@ -55,7 +55,7 @@ export class HttpClientError extends Error {
   }
 }
 
-export function isHttpStatus(error: unknown, ...statuses: number[]): boolean {
+export function isHttpStatus(error: unknown, ...statuses: number[]): error is HttpClientError {
   return error instanceof HttpClientError && statuses.includes(error.statusCode);
 }
 

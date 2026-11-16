@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { BASE_URL } from '@/lib/basePath';
 
 interface MediaServerIconProps {
-  /** Server type: 'plex', 'jellyfin', or 'emby' */
+  /** Server type: 'plex', 'jellyfin', 'emby' or 'tofa' */
   type: ServerType;
   /** CSS class name for sizing (e.g., "h-4 w-4") */
   className?: string;
@@ -17,14 +17,14 @@ interface MediaServerIconProps {
 export function MediaServerIcon({ type, className, alt }: MediaServerIconProps) {
   return (
     <img
-      src={getIconPath(type)}
+      src={mediaServerIconPath(type)}
       alt={alt ?? `${type} server`}
       className={cn('object-contain', className)}
     />
   );
 }
 
-function getIconPath(type: ServerType): string {
+export function mediaServerIconPath(type: ServerType): string {
   const base = BASE_URL;
   switch (type) {
     case 'plex':
@@ -33,6 +33,8 @@ function getIconPath(type: ServerType): string {
       return `${base}images/servers/jellyfin.png`;
     case 'emby':
       return `${base}images/servers/emby.png`;
+    case 'tofa':
+      return `${base}images/servers/tofa.png`;
     default:
       return assertNever(type);
   }

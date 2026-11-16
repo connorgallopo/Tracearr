@@ -97,6 +97,7 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
           createdAt: serverUsers.createdAt,
           updatedAt: serverUsers.updatedAt,
           identityName: users.name,
+          identityUsername: users.username,
           identityContactEmail: users.contactEmail,
           role: users.role,
           loginAccess: users.loginAccess,
@@ -244,6 +245,7 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
       const {
         identityAggregateTrustScore,
         identityTotalViolations,
+        identityUsername,
         identityContactEmail,
         ...serverUserFields
       } = serverUser;
@@ -256,6 +258,7 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
         },
         identity: {
           userId: serverUser.userId,
+          username: identityUsername,
           aggregateTrustScore: identityAggregateTrustScore,
           totalViolations: identityTotalViolations,
           contactEmail: identityContactEmail,

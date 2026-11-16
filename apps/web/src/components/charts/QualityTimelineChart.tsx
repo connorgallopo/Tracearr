@@ -3,12 +3,28 @@ import { useTranslation } from 'react-i18next';
 import Highcharts from 'highcharts';
 import { HighchartsReact } from 'highcharts-react-official';
 import { BarChart3 } from 'lucide-react';
-import { RESOLUTION_LABELS, resolutionBucket, type LibraryQualityResponse } from '@tracearr/shared';
+import {
+  RESOLUTION_LABELS,
+  resolutionBucket,
+  type LibraryQualityResponse,
+  type ResolutionLabel,
+} from '@tracearr/shared';
 import { ChartSkeleton } from '@/components/ui/skeleton';
 import { EmptyState } from '@/components/ui/empty-state';
 import { formatDate, axisDateTimeLabelFormats, parseChartDate } from '@/lib/dateFormat';
 import { RESOLUTION_COLORS } from '@/lib/resolutionColors';
 import { chartLang } from './chartUtils';
+
+// Neighboring ramp steps are close in color, so each tier also gets its own stroke pattern.
+const TIER_DASH: Record<ResolutionLabel, Highcharts.DashStyleValue> = {
+  '8K': 'Solid',
+  '4K': 'ShortDash',
+  '1440p': 'ShortDot',
+  '1080p': 'LongDash',
+  '720p': 'DashDot',
+  '480p': 'Dot',
+  SD: 'LongDashDot',
+};
 
 interface QualityTimelineChartProps {
   data: LibraryQualityResponse | undefined;
@@ -55,12 +71,12 @@ export function QualityTimelineChart({ data, isLoading, height = 250 }: QualityT
         verticalAlign: 'top',
         floating: false,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
           fontWeight: 'normal',
-          fontSize: '11px',
+          fontSize: '12px',
         },
         itemHoverStyle: {
-          color: 'hsl(var(--foreground))',
+          color: 'oklch(var(--foreground))',
         },
       },
       xAxis: {
@@ -69,12 +85,12 @@ export function QualityTimelineChart({ data, isLoading, height = 250 }: QualityT
         dateTimeLabelFormats: axisDateTimeLabelFormats(),
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
-            fontSize: '11px',
+            color: 'oklch(var(--muted-foreground))',
+            fontSize: '12px',
           },
         },
-        lineColor: 'hsl(var(--border))',
-        tickColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
+        tickColor: 'oklch(var(--border))',
         tickLength: 5,
         startOnTick: false,
         endOnTick: false,
@@ -83,14 +99,14 @@ export function QualityTimelineChart({ data, isLoading, height = 250 }: QualityT
         title: {
           text: t('common:labels.items'),
           style: {
-            color: 'hsl(var(--muted-foreground))',
-            fontSize: '11px',
+            color: 'oklch(var(--muted-foreground))',
+            fontSize: '12px',
           },
         },
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
-            fontSize: '11px',
+            color: 'oklch(var(--muted-foreground))',
+            fontSize: '12px',
           },
           formatter: function () {
             // Format large numbers with K suffix
@@ -101,7 +117,7 @@ export function QualityTimelineChart({ data, isLoading, height = 250 }: QualityT
             return String(value);
           },
         },
-        gridLineColor: 'hsl(var(--border))',
+        gridLineColor: 'oklch(var(--border))',
         min: 0,
       },
       plotOptions: {
@@ -117,19 +133,19 @@ export function QualityTimelineChart({ data, isLoading, height = 250 }: QualityT
               },
             },
           },
-          lineWidth: 2,
+          lineWidth: 3,
           states: {
             hover: {
-              lineWidth: 2,
+              lineWidth: 3,
             },
           },
         },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         shared: true,
         formatter: function () {
@@ -153,6 +169,7 @@ export function QualityTimelineChart({ data, isLoading, height = 250 }: QualityT
         name: label,
         data: data.data.map((d) => [parseChartDate(d.day), countOf(label, d)]),
         color: RESOLUTION_COLORS[label],
+        dashStyle: TIER_DASH[label],
       })),
       responsive: {
         rules: [
@@ -164,23 +181,6 @@ export function QualityTimelineChart({ data, isLoading, height = 250 }: QualityT
               legend: {
                 align: 'center',
                 verticalAlign: 'bottom',
-                itemStyle: {
-                  fontSize: '10px',
-                },
-              },
-              xAxis: {
-                labels: {
-                  style: {
-                    fontSize: '9px',
-                  },
-                },
-              },
-              yAxis: {
-                labels: {
-                  style: {
-                    fontSize: '9px',
-                  },
-                },
               },
             },
           },

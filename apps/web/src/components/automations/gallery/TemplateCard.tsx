@@ -95,7 +95,7 @@ export function GalleryRow({
       </ItemMedia>
       <ItemContent className="gap-0.5">
         <ItemTitle>{title}</ItemTitle>
-        <ItemDescription className="line-clamp-none text-[0.8125rem] text-pretty">
+        <ItemDescription className="text-dense line-clamp-none text-pretty">
           {description}
         </ItemDescription>
         {meta && (

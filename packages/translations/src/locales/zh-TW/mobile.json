@@ -130,6 +130,7 @@
     "noTerminations": "",
     "lastSeen": "",
     "terminatedBy": "",
+    "terminatedByName": "",
     "trustScoreConfirm": "",
     "trustScoreRange": "",
     "moreLocations_other": "",

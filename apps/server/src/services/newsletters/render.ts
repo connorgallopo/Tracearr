@@ -83,10 +83,11 @@ export function substitutePosterRefs(
   });
 }
 
-/** Plex routes through app.plex.tv; a Jellyfin or Emby link opens on the server itself and needs an address members can reach. */
+/** Plex and tofa route through their hosted apps; a Jellyfin or Emby link opens on the server itself and needs an address members can reach. */
 function itemLinkBase(type: ServerType, server: ServerLink): string | null {
   switch (type) {
     case 'plex':
+    case 'tofa':
       return server.url;
     case 'jellyfin':
     case 'emby':

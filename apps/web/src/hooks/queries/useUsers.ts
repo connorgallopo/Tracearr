@@ -324,16 +324,24 @@ export function useOwnerLinks(enabled: boolean) {
   });
 }
 
-export function useLinkOwnerAccount() {
+/** Refreshes what an owner link changed and says it worked, however the account was proved. */
+export function useOwnerAccountLinked() {
   const { t } = useTranslation('notifications');
   const queryClient = useQueryClient();
 
+  return () => {
+    invalidateIdentityQueries(queryClient);
+    toast.success(t('toast.success.ownerAccountLinked'));
+  };
+}
+
+export function useLinkOwnerAccount() {
+  const { t } = useTranslation('notifications');
+  const linked = useOwnerAccountLinked();
+
   return useMutation({
     mutationFn: (serverUserId: string) => api.users.linkOwnerAccount(serverUserId),
-    onSuccess: () => {
-      invalidateIdentityQueries(queryClient);
-      toast.success(t('toast.success.ownerAccountLinked'));
-    },
+    onSuccess: linked,
     onError: (error: Error) => {
       toast.error(t('toast.error.ownerAccountLinkFailed'), { description: error.message });
     },

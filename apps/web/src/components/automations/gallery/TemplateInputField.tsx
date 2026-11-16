@@ -33,6 +33,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { NotificationTextField } from '@/components/automations/NotificationTextField';
 import { DestinationsField } from '@/components/automations/builder/DestinationsField';
 import { conditionValueView, FieldControl } from '@/components/automations/builder/fields';
+import { rosterPersonName } from '@/components/users/utils';
 import { useUsers } from '@/hooks/queries/useUsers';
 import {
   conditionFieldForInput,
@@ -177,7 +178,7 @@ export function TemplateInputField({
             value={typeof value === 'string' ? value : null}
             options={(identitiesPage?.data ?? []).map((identity) => ({
               value: identity.userId,
-              label: identity.identityName ?? identity.username,
+              label: rosterPersonName(identity),
             }))}
             onChange={onChange}
             placeholder={label}

@@ -112,7 +112,6 @@ export function ActivityList({ automation, onSelectRun }: ActivityListProps) {
                     identityName={row.original.subject.personName}
                     thumbUrl={row.original.subject.thumbUrl}
                     serverId={row.original.serverId}
-                    showUsername
                   />
                 ),
               }),

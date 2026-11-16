@@ -205,7 +205,7 @@ describe('PersonalDashboard', () => {
     expect(screen.getByText('1h 46m')).toBeInTheDocument();
     expect(screen.getByText('+25%')).toBeInTheDocument();
     expect(screen.getByText('+253%')).toBeInTheDocument();
-    expect(screen.getAllByText('(userDetail.cards.vsPrior)')).toHaveLength(2);
+    expect(screen.getAllByText('userDetail.cards.vsPrior')).toHaveLength(2);
   });
 
   it('takes listen time out of watch time and the change, and names it under the value', () => {
@@ -214,7 +214,7 @@ describe('PersonalDashboard', () => {
     renderPage();
 
     expect(screen.getByText('46m')).toBeInTheDocument();
-    expect(screen.getByText('(common:labels.listenTime 1h 0m)')).toBeInTheDocument();
+    expect(screen.getByText('common:labels.listenTime 1h 0m')).toBeInTheDocument();
     expect(screen.getByText('+53%')).toBeInTheDocument();
   });
 

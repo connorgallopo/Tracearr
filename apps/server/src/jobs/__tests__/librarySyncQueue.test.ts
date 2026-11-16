@@ -1,12 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 vi.mock('../../serverState.js', () => ({
   isMaintenance: vi.fn().mockReturnValue(false),
 }));
 
-const { mockDbServers, mockIsLiveServer } = vi.hoisted(() => ({
+const { mockDbServers, mockDbExecute, mockIsLiveServer, settingsStore } = vi.hoisted(() => ({
   mockDbServers: vi.fn(async (): Promise<Array<{ id: string; name: string }>> => []),
+  mockDbExecute: vi.fn(),
   mockIsLiveServer: vi.fn(async (_id: string) => true),
+  settingsStore: new Map<string, unknown>(),
 }));
 
 vi.mock('../../services/liveServers.js', () => ({
@@ -15,7 +17,14 @@ vi.mock('../../services/liveServers.js', () => ({
 }));
 
 vi.mock('../../db/client.js', () => ({
-  db: { select: () => ({ from: mockDbServers }) },
+  db: { select: () => ({ from: mockDbServers }), execute: mockDbExecute },
+}));
+
+vi.mock('../../services/settings.js', () => ({
+  getSetting: vi.fn(async (key: string) => settingsStore.get(key) ?? null),
+  setSetting: vi.fn(async (key: string, value: unknown) => {
+    settingsStore.set(key, value);
+  }),
 }));
 
 vi.mock('../../services/librarySync.js', () => ({
@@ -44,10 +53,15 @@ vi.mock('../../services/cache.js', () => ({
 
 vi.mock('../maintenanceQueue.js', () => ({
   enqueueMaintenanceJob: vi.fn().mockResolvedValue(undefined),
+  maybeEnqueueMaintenanceJob: vi.fn().mockResolvedValue(null),
 }));
 
 vi.mock('../imagePrecacheQueue.js', () => ({
   enqueueImagePrecache: vi.fn().mockResolvedValue(undefined),
+}));
+
+vi.mock('../importQueue.js', () => ({
+  releaseHeldImport: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../precachePassPolicy.js', () => ({
@@ -59,6 +73,7 @@ const echoAdd = async (_name: string, _data: unknown, opts?: { jobId?: string })
 });
 const mockQueueAdd = vi.fn(echoAdd);
 const mockQueueGetJobs = vi.fn().mockResolvedValue([]);
+const mockQueueGetJob = vi.fn().mockResolvedValue(undefined);
 const mockQueueClose = vi.fn().mockResolvedValue(undefined);
 const mockGetJobSchedulers = vi.fn().mockResolvedValue([]);
 const mockRemoveJobScheduler = vi.fn().mockResolvedValue(undefined);
@@ -69,6 +84,7 @@ vi.mock('bullmq', () => ({
     return {
       add: mockQueueAdd,
       getJobs: mockQueueGetJobs,
+      getJob: mockQueueGetJob,
       close: mockQueueClose,
       getJobSchedulers: mockGetJobSchedulers,
       removeJobScheduler: mockRemoveJobScheduler,
@@ -89,6 +105,9 @@ vi.mock('ioredis', () => ({
 }));
 
 import { DelayedError, Worker } from 'bullmq';
+import { WS_EVENTS } from '@tracearr/shared';
+import { PgDialect } from 'drizzle-orm/pg-core';
+import type { SQL } from 'drizzle-orm';
 import {
   LibrariesFailedError,
   librarySyncService,
@@ -97,7 +116,10 @@ import {
   type SyncResume,
 } from '../../services/librarySync.js';
 import { syncServer } from '../../services/sync.js';
+import { getPubSubService } from '../../services/cache.js';
 import { enqueueImagePrecache } from '../imagePrecacheQueue.js';
+import { enqueueMaintenanceJob, maybeEnqueueMaintenanceJob } from '../maintenanceQueue.js';
+import { releaseHeldImport } from '../importQueue.js';
 import { resolvePrecachePass } from '../precachePassPolicy.js';
 import {
   initLibrarySyncQueue,
@@ -161,7 +183,7 @@ describe('enqueueLibrarySync', () => {
       plainJob('srv-1', 'scheduled', { remove: scheduledRemove }),
     ]);
 
-    await enqueueLibrarySync('srv-1', 'manual', 'user-1');
+    await enqueueLibrarySync('srv-1', 'manual', { userId: 'user-1' });
 
     expect(mockQueueGetJobs).toHaveBeenCalledWith(['waiting', 'delayed']);
     expect(scheduledRemove).toHaveBeenCalledTimes(1);
@@ -233,8 +255,61 @@ describe('enqueueLibrarySync', () => {
     expect(mockQueueGetJobs).not.toHaveBeenCalled();
   });
 
+  it('stores the first-sync flag and lists it with the attempts made', async () => {
+    await enqueueLibrarySync('srv-1', 'event', { firstSync: true });
+
+    const [, data] = mockQueueAdd.mock.calls[0] ?? [];
+    expect(data).toEqual({ serverId: 'srv-1', triggeredBy: 'scheduled', firstSync: true });
+
+    mockQueueGetJobs
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        plainJob('srv-1', 'scheduled', { data, attemptsMade: 1, getState: async () => 'delayed' }),
+      ]);
+    expect(await getAllActiveLibrarySyncs()).toEqual([
+      expect.objectContaining({ serverId: 'srv-1', firstSync: true, attemptsMade: 1 }),
+    ]);
+  });
+
+  it('manual: carries the first-sync flag of the queued job it replaces', async () => {
+    mockQueueGetJobs.mockResolvedValue([
+      plainJob('srv-1', 'scheduled', {
+        data: { serverId: 'srv-1', triggeredBy: 'scheduled', firstSync: true },
+        remove: vi.fn().mockResolvedValue(undefined),
+      }),
+    ]);
+
+    await enqueueLibrarySync('srv-1', 'manual', { userId: 'user-1' });
+
+    const [, data] = mockQueueAdd.mock.calls[0] ?? [];
+    expect(data).toEqual({
+      serverId: 'srv-1',
+      triggeredBy: 'manual',
+      userId: 'user-1',
+      firstSync: true,
+    });
+  });
+
+  it('stamps the first-sync flag on the sync that holds the server when the add is refused', async () => {
+    mockQueueAdd.mockResolvedValueOnce({ id: 'holder' });
+    const holder = {
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      updateData: vi.fn().mockResolvedValue(undefined),
+    };
+    mockQueueGetJob.mockResolvedValueOnce(holder);
+
+    await enqueueLibrarySync('srv-1', 'event', { firstSync: true });
+
+    expect(mockQueueGetJob).toHaveBeenCalledWith('holder');
+    expect(holder.updateData).toHaveBeenCalledWith({
+      serverId: 'srv-1',
+      triggeredBy: 'scheduled',
+      firstSync: true,
+    });
+  });
+
   it('boot passes the stagger delay through', async () => {
-    await enqueueLibrarySync('srv-1', 'boot', undefined, 20_000);
+    await enqueueLibrarySync('srv-1', 'boot', { delay: 20_000 });
 
     expect(mockQueueAdd).toHaveBeenCalledWith(
       'boot-sync-srv-1',
@@ -419,6 +494,28 @@ describe('worker processor', () => {
       2,
       expect.objectContaining({ completedLibraryIds: ['lib-a', 'lib-b'] })
     );
+  });
+
+  it('keeps a first-sync flag stamped on the job while it runs', async () => {
+    vi.mocked(librarySyncService.syncServer).mockImplementation(async (_id, _p, _t, r) => {
+      await r!.onLibraryComplete('lib-a');
+      return [];
+    });
+    mockQueueGetJob.mockResolvedValueOnce({
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled', firstSync: true },
+    });
+    const processor = startProcessor();
+    const job = fakeJob({ serverId: 'srv-1', triggeredBy: 'scheduled' });
+
+    await processor(job);
+
+    expect(mockQueueGetJob).toHaveBeenCalledWith('job-1');
+    expect(job.updateData).toHaveBeenCalledWith({
+      serverId: 'srv-1',
+      triggeredBy: 'scheduled',
+      completedLibraryIds: ['lib-a'],
+      firstSync: true,
+    });
   });
 
   it('yields on SyncInterruptedError', async () => {
@@ -763,6 +860,7 @@ describe('library sync worker - user sync', () => {
       usersRemoved: 0,
       usersRestored: 0,
       librariesSynced: 0,
+      usersRead: true,
       errors: [],
     });
   });
@@ -841,5 +939,193 @@ describe('library sync worker - imported history link hand-off', () => {
     initLibrarySyncQueue('redis://localhost:6379');
     await complete('plex', { skipped: true, reason: 'sync already in progress' });
     expect(maybeEnqueueImportedHistoryLink).not.toHaveBeenCalled();
+  });
+});
+
+function handler(event: 'completed' | 'failed') {
+  const worker = vi.mocked(Worker).mock.results.at(-1)?.value as
+    { on: ReturnType<typeof vi.fn> } | undefined;
+  const registered = worker?.on.mock.calls.find((c) => c[0] === event);
+  if (!registered) throw new Error(`no ${event} handler`);
+  return registered[1] as (...args: unknown[]) => void;
+}
+
+describe('library sync worker - failure event', () => {
+  const publish = vi.fn().mockResolvedValue(undefined);
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    vi.mocked(getPubSubService).mockReturnValue({ publish } as never);
+    mockDbServers.mockImplementation((() => ({ where: async () => [{ name: 'Den' }] })) as never);
+    await shutdownLibrarySyncQueue();
+    initLibrarySyncQueue('redis://localhost:6379');
+    startLibrarySyncWorker();
+  });
+
+  afterEach(() => {
+    vi.mocked(getPubSubService).mockReturnValue(null);
+  });
+
+  function fail(attemptsMade: number, data: Record<string, unknown> = {}) {
+    handler('failed')(
+      {
+        id: 'job-1',
+        data: { serverId: 'srv-1', triggeredBy: 'scheduled', ...data },
+        attemptsMade,
+        opts: { attempts: 3 },
+      },
+      new Error('connect ECONNREFUSED')
+    );
+  }
+
+  it('names the server the sync failed for', async () => {
+    fail(1);
+
+    await vi.waitFor(() =>
+      expect(publish).toHaveBeenCalledExactlyOnceWith(
+        WS_EVENTS.LIBRARY_SYNC_PROGRESS,
+        expect.objectContaining({
+          serverId: 'srv-1',
+          serverName: 'Den',
+          status: 'error',
+          message: 'Sync failed: connect ECONNREFUSED',
+        })
+      )
+    );
+  });
+
+  it('marks only the last failed attempt of a first sync', async () => {
+    fail(2, { firstSync: true });
+    fail(3, { firstSync: true });
+    fail(3);
+
+    await vi.waitFor(() => expect(publish).toHaveBeenCalledTimes(3));
+    expect(publish.mock.calls.map(([, event]) => event.firstSyncFailed)).toEqual([
+      undefined,
+      true,
+      undefined,
+    ]);
+  });
+});
+
+describe('library sync worker - held history import', () => {
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    mockDbServers.mockImplementation((() => ({
+      where: () => Object.assign(Promise.resolve([{ type: 'tofa' }]), { limit: async () => [] }),
+    })) as never);
+    await shutdownLibrarySyncQueue();
+    initLibrarySyncQueue('redis://localhost:6379');
+    startLibrarySyncWorker();
+  });
+
+  it('releases the import once a sync of the server completes', async () => {
+    handler('completed')({
+      id: 'job-1',
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      returnvalue: { success: true, results: [] },
+    });
+    handler('completed')({
+      id: 'job-2',
+      data: { serverId: 'srv-2', triggeredBy: 'scheduled' },
+      returnvalue: { skipped: true, reason: 'server historical' },
+    });
+
+    expect(releaseHeldImport).toHaveBeenCalledExactlyOnceWith('srv-1');
+  });
+
+  it('keeps the import held through a failed sync, for the next completed sync to release', async () => {
+    handler('failed')(
+      {
+        id: 'job-1',
+        data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+        attemptsMade: 3,
+        opts: { attempts: 3 },
+      },
+      new Error('Library sync failed for Movies')
+    );
+    expect(releaseHeldImport).not.toHaveBeenCalled();
+
+    handler('completed')({
+      id: 'job-2',
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      returnvalue: { success: true, results: [] },
+    });
+    expect(releaseHeldImport).toHaveBeenCalledExactlyOnceWith('srv-1');
+  });
+});
+
+describe('library sync worker - snapshot backfill once snapshots are normalized', () => {
+  const dialect = new PgDialect();
+
+  beforeEach(async () => {
+    vi.clearAllMocks();
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2099-01-01T00:00:00Z'));
+    settingsStore.clear();
+    settingsStore.set('snapshotsNormalizedAt', '2098-12-31T00:00:00.000Z');
+    mockDbServers.mockImplementation((() => ({
+      where: () => Object.assign(Promise.resolve([{ type: 'plex' }]), { limit: async () => [] }),
+    })) as never);
+    mockDbExecute.mockImplementation(async (query: SQL) => {
+      const text = dialect.sqlToQuery(query).sql;
+      if (text.includes('earliest_aggregate')) {
+        return {
+          rows: [
+            {
+              earliest_aggregate: null,
+              latest_aggregate: null,
+              aggregate_days: '0',
+              has_items: true,
+            },
+          ],
+        };
+      }
+      if (text.includes('earliest_item')) return { rows: [{ earliest_item: '2098-01-01' }] };
+      return { rows: [] };
+    });
+    await shutdownLibrarySyncQueue();
+    initLibrarySyncQueue('redis://localhost:6379');
+    startLibrarySyncWorker();
+  });
+
+  afterEach(() => {
+    mockDbExecute.mockReset();
+    settingsStore.clear();
+    vi.useRealTimers();
+  });
+
+  async function completeSync(jobId: string) {
+    const worker = vi.mocked(Worker).mock.results.at(-1)?.value as
+      { on: ReturnType<typeof vi.fn> } | undefined;
+    const registered = worker?.on.mock.calls.find((c) => c[0] === 'completed');
+    if (!registered) throw new Error('no completed handler');
+    (registered[1] as (job: unknown) => void)({
+      id: jobId,
+      data: { serverId: 'srv-1', triggeredBy: 'scheduled' },
+      returnvalue: { success: true, results: [] },
+    });
+    await new Promise((resolve) => setImmediate(resolve));
+  }
+
+  const queuedMaintenance = () =>
+    [
+      ...vi.mocked(enqueueMaintenanceJob).mock.calls,
+      ...vi.mocked(maybeEnqueueMaintenanceJob).mock.calls,
+    ].map((call) => call[0]);
+
+  it('queues the plain backfill, never the normalization, on the first and a second completed sync', async () => {
+    await completeSync('job-1');
+    expect(queuedMaintenance()).toEqual(['backfill_library_snapshots']);
+    expect(settingsStore.get('mediaVersionsBackfilledAt')).not.toBeUndefined();
+
+    vi.setSystemTime(new Date('2099-01-01T02:00:00Z'));
+    await completeSync('job-2');
+    expect(queuedMaintenance()).toEqual([
+      'backfill_library_snapshots',
+      'backfill_library_snapshots',
+    ]);
   });
 });

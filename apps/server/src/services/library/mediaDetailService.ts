@@ -26,6 +26,7 @@ import {
   scopedServerFragment,
   type Scope,
 } from '../../lib/scope.js';
+import { personNameSql } from '../../utils/representativeAccount.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { buildPosterOrderFragment } from '../../routes/library/catalog.js';
 import { parseMediaRef } from './mediaRef.js';
@@ -145,6 +146,10 @@ export interface AvailabilityRow {
   /** Null when the owning server hasn't synced its library names yet (see librarySync.ts). */
   library_name: string | null;
   rating_key: string;
+  /** Episode and season rows only. */
+  show_rating_key: string | null;
+  season_number: number | null;
+  episode_number: number | null;
   added_at: Date;
   removed_at: Date | null;
   video_resolution: string | null;
@@ -259,6 +264,12 @@ export async function getAvailability(
       li.library_id,
       lib.name AS library_name,
       li.rating_key,
+      CASE li.media_type
+        WHEN 'episode' THEN li.grandparent_rating_key
+        WHEN 'season' THEN li.parent_rating_key
+      END AS show_rating_key,
+      CASE WHEN li.media_type IN ('episode', 'season') THEN li.parent_index END AS season_number,
+      CASE WHEN li.media_type = 'episode' THEN li.item_index END AS episode_number,
       li.created_at AS added_at,
       li.removed_at,
       li.video_resolution,
@@ -797,6 +808,7 @@ interface WatcherAggRow {
   server_id: string;
   username: string | null;
   identity_name: string | null;
+  person_name: string;
   thumb: string | null;
   plays: string | number;
   watch_time_ms: string | number;
@@ -812,6 +824,7 @@ export interface MediaWatcherRow {
     server_id: string;
     username: string | null;
     identity_name: string | null;
+    person_name: string;
     thumb: string | null;
   };
   plays: number;
@@ -845,6 +858,7 @@ export async function getMediaWatchers(args: GetMediaWatchersArgs): Promise<Medi
         su.server_id,
         su.username,
         u.name AS identity_name,
+        ${personNameSql()} AS person_name,
         COALESCE(u.thumbnail, su.thumb_url) AS thumb,
         COUNT(DISTINCT COALESCE(s.reference_id, s.id)) FILTER (WHERE ${countedSessionSql('s')}) AS plays,
         SUM(CASE WHEN ${countedSessionSql('s')} THEN s.duration_ms ELSE 0 END) AS watch_time_ms,
@@ -857,7 +871,7 @@ export async function getMediaWatchers(args: GetMediaWatchersArgs): Promise<Medi
       JOIN server_users su ON su.id = s.server_user_id
       LEFT JOIN users u ON u.id = su.user_id
       WHERE ${sql.join(scopeSessionConditions(scope), sql` AND `)}${rollupDayWindowSql(lastDaysWindow(days), sql`s.started_at`)} ${serverFilter} ${authFragment}
-      GROUP BY s.server_user_id, su.user_id, su.server_id, su.username, u.name, COALESCE(u.thumbnail, su.thumb_url)
+      GROUP BY s.server_user_id, su.user_id, su.server_id, su.username, u.name, u.username, COALESCE(u.thumbnail, su.thumb_url)
       HAVING COUNT(DISTINCT COALESCE(s.reference_id, s.id)) FILTER (WHERE ${countedSessionSql('s')}) > 0
       ORDER BY watch_time_ms DESC, s.server_user_id
     `);
@@ -876,6 +890,7 @@ export async function getMediaWatchers(args: GetMediaWatchersArgs): Promise<Medi
         su.server_id,
         su.username,
         u.name AS identity_name,
+        ${personNameSql()} AS person_name,
         COALESCE(u.thumbnail, su.thumb_url) AS thumb,
         COUNT(DISTINCT p.chain_id) FILTER (WHERE p.counted) AS plays,
         SUM(p.watched_ms) AS watch_time_ms,
@@ -888,7 +903,7 @@ export async function getMediaWatchers(args: GetMediaWatchersArgs): Promise<Medi
       JOIN server_users su ON su.id = p.server_user_id
       LEFT JOIN users u ON u.id = su.user_id
       WHERE ${scopeFilter}${rollupDayWindowSql(lastDaysWindow(days), sql`p.day`)} ${serverFilter} ${authFragment}
-      GROUP BY p.server_user_id, su.user_id, su.server_id, su.username, u.name, COALESCE(u.thumbnail, su.thumb_url)
+      GROUP BY p.server_user_id, su.user_id, su.server_id, su.username, u.name, u.username, COALESCE(u.thumbnail, su.thumb_url)
       HAVING BOOL_OR(p.counted)
       ORDER BY watch_time_ms DESC, p.server_user_id
     `);
@@ -902,6 +917,7 @@ export async function getMediaWatchers(args: GetMediaWatchersArgs): Promise<Medi
       server_id: r.server_id,
       username: r.username,
       identity_name: r.identity_name,
+      person_name: r.person_name,
       thumb: r.thumb,
     },
     plays: Number(r.plays ?? 0),

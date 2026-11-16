@@ -17,45 +17,45 @@
 .maplibregl-popup-anchor-bottom .maplibregl-popup-tip,
 .maplibregl-popup-anchor-bottom-left .maplibregl-popup-tip,
 .maplibregl-popup-anchor-bottom-right .maplibregl-popup-tip {
-  border-top-color: hsl(var(--popover));
+  border-top-color: oklch(var(--popover));
 }
 .maplibregl-popup-anchor-top .maplibregl-popup-tip,
 .maplibregl-popup-anchor-top-left .maplibregl-popup-tip,
 .maplibregl-popup-anchor-top-right .maplibregl-popup-tip {
-  border-bottom-color: hsl(var(--popover));
+  border-bottom-color: oklch(var(--popover));
 }
 .maplibregl-popup-anchor-left .maplibregl-popup-tip {
-  border-right-color: hsl(var(--popover));
+  border-right-color: oklch(var(--popover));
 }
 .maplibregl-popup-anchor-right .maplibregl-popup-tip {
-  border-left-color: hsl(var(--popover));
+  border-left-color: oklch(var(--popover));
 }
 
 .maplibregl-popup-close-button {
-  color: hsl(var(--muted-foreground));
+  color: oklch(var(--muted-foreground));
   font-size: 18px;
   padding: 4px 8px;
 }
 .maplibregl-popup-close-button:hover {
-  color: hsl(var(--foreground));
+  color: oklch(var(--foreground));
   background: transparent;
 }
 
 .maplibregl-ctrl-group {
-  background: hsl(var(--card));
-  border: 1px solid hsl(var(--border));
+  background: oklch(var(--card));
+  border: 1px solid oklch(var(--border));
   border-radius: var(--radius);
   overflow: hidden;
   box-shadow: none;
 }
 .maplibregl-ctrl-group button {
-  background: hsl(var(--card));
+  background: oklch(var(--card));
 }
 .maplibregl-ctrl-group button + button {
-  border-top: 1px solid hsl(var(--border));
+  border-top: 1px solid oklch(var(--border));
 }
 .maplibregl-ctrl-group button:hover {
-  background: hsl(var(--muted));
+  background: oklch(var(--muted));
 }
 .dark .maplibregl-ctrl-icon {
   filter: invert(1) hue-rotate(180deg);
@@ -64,16 +64,16 @@
 /* The vendor rules use two-class selectors, so these must match that
  * specificity to win the cascade. */
 .maplibregl-ctrl.maplibregl-ctrl-attrib {
-  background: hsl(var(--card) / 0.85);
-  color: hsl(var(--muted-foreground));
-  font-size: 10px;
+  background: oklch(var(--card) / 0.85);
+  color: oklch(var(--muted-foreground));
+  font-size: 12px;
 }
 .maplibregl-ctrl-attrib.maplibregl-compact {
-  background-color: hsl(var(--card) / 0.85);
+  background-color: oklch(var(--card) / 0.85);
 }
 .dark .maplibregl-ctrl-attrib.maplibregl-compact:after {
   filter: invert(1);
 }
 .maplibregl-ctrl-attrib a {
-  color: hsl(var(--muted-foreground));
+  color: oklch(var(--muted-foreground));
 }

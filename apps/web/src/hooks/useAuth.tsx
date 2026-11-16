@@ -2,16 +2,19 @@ import { createContext, useContext, useCallback, useMemo, useEffect, type ReactN
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import type { AuthUser } from '@tracearr/shared';
+import { getAvatarUrl } from '@/components/users/utils';
 import { api, ApiError, AUTH_STATE_CHANGE_EVENT, BASE_URL } from '@/lib/api';
 import { authClient } from '@/lib/authClient';
 import { dropUserData } from '@/lib/queryCache';
 import { stopViewingAs } from '@/hooks/queries/useImpersonation';
 
 interface UserProfile extends AuthUser {
+  name: string | null;
   email: string | null;
   thumbUrl: string | null;
   hasPassword?: boolean;
   hasPlexLinked?: boolean;
+  hasTofaLinked?: boolean;
 }
 
 interface AuthContextValue {
@@ -44,17 +47,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     queryFn: async () => {
       try {
         const user = await api.auth.me();
-        // Return full user profile including thumbUrl
+        const thumbnail = user.thumbnail ?? user.thumbUrl;
         return {
           userId: user.userId ?? user.id ?? '',
           username: user.username,
+          name: user.name ?? null,
           role: user.role,
           serverIds: user.serverIds ?? (user.serverId ? [user.serverId] : []),
           email: user.email ?? null,
-          thumbUrl: user.thumbnail ?? user.thumbUrl ?? null,
+          // A picture at an address of its own, such as an OIDC provider's, the server fetches.
+          thumbUrl:
+            getAvatarUrl(user.thumbnailServerId, thumbnail) ??
+            (thumbnail && URL.canParse(thumbnail) ? `${BASE_URL}api/v1/images/account` : null),
           impersonatedBy: user.impersonatedBy,
           hasPassword: user.hasPassword,
           hasPlexLinked: user.hasPlexLinked,
+          hasTofaLinked: user.hasTofaLinked,
         };
       } catch (error) {
         if (isSignedOut(error)) return null;

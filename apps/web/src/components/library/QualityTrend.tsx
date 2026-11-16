@@ -23,8 +23,8 @@ export function QualityTrend({
   const colorClass = isNeutral
     ? 'text-muted-foreground'
     : isPositive
-      ? 'text-green-600 dark:text-green-400'
-      : 'text-red-600 dark:text-red-400';
+      ? 'text-success'
+      : 'text-destructive';
 
   return (
     <div className={cn('flex items-center gap-1.5', colorClass)}>

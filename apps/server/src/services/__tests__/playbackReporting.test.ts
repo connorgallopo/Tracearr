@@ -1,4 +1,6 @@
 import { beforeEach, describe, it, expect, vi } from 'vitest';
+import { UnrecoverableError } from 'bullmq';
+import { HttpClientError } from '../../utils/http.js';
 import {
   BASE_COLUMNS,
   buildSelectColumns,
@@ -21,6 +23,8 @@ import {
   queryExistingByExternalIds,
 } from '../import/index.js';
 import type * as ImportModule from '../import/index.js';
+import { syncServer } from '../sync.js';
+import { ServerHistoricalError } from '../liveServers.js';
 import type { PubSubService } from '../cache.js';
 
 const JF_COLUMNS = [...BASE_COLUMNS];
@@ -77,6 +81,10 @@ vi.mock('../serverLocations.js', () => ({
 
 vi.mock('../../jobs/poller/database.js', () => ({
   batchGetLibraryItemIdentity: vi.fn(),
+}));
+
+vi.mock('../sync.js', () => ({
+  syncServer: vi.fn(),
 }));
 
 vi.mock('../settings.js', async (importActual) => ({
@@ -432,29 +440,87 @@ describe('importPlaybackReporting', () => {
     vi.mocked(fetchMediaEnrichment).mockResolvedValue(new Map());
     vi.mocked(flushInsertBatch).mockResolvedValue(0);
     vi.mocked(batchGetLibraryItemIdentity).mockResolvedValue(new Map());
+    vi.mocked(syncServer).mockResolvedValue({ usersRead: true, errors: [] } as never);
 
     mockDbSelects([JF_SERVER], [{ min: new Date('2026-01-01T00:00:00Z') }]);
+  });
+
+  it('syncs the server users before it maps any play to them', async () => {
+    const published: string[] = [];
+    const pubSubService = {
+      publish: vi.fn(async (_channel: string, progress: { message: string }) => {
+        published.push(progress.message);
+      }),
+    } as unknown as PubSubService;
+    let shownDuringSync: string | undefined;
+    vi.mocked(syncServer).mockImplementationOnce(async () => {
+      shownDuringSync = published.at(-1);
+      return { usersRead: true, errors: [] } as never;
+    });
+
+    const result = await importPlaybackReporting(SERVER_ID, defaultOptions, pubSubService);
+
+    expect(result.success).toBe(true);
+    expect(shownDuringSync).toBe('Syncing server users...');
+    expect(syncServer).toHaveBeenCalledWith(SERVER_ID, { syncUsers: true, syncLibraries: false });
+    expect(vi.mocked(syncServer).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(createUserMapping).mock.invocationCallOrder[0] ?? 0
+    );
+  });
+
+  it.each([
+    ['for a retry when the server could not be reached', new Error('connect ECONNREFUSED'), false],
+    [
+      'at once when the server refused the key',
+      new HttpClientError({
+        service: 'jellyfin',
+        statusCode: 401,
+        statusText: 'Unauthorized',
+        url: '',
+      }),
+      true,
+    ],
+  ])('stops %s while syncing users', async (_why, cause, permanent) => {
+    vi.mocked(syncServer).mockResolvedValueOnce({
+      usersRead: false,
+      usersError: cause,
+      errors: [`Jellyfin user sync failed: ${cause.message}`],
+    } as never);
+
+    const error = await importPlaybackReporting(SERVER_ID, defaultOptions).catch((e: unknown) => e);
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error instanceof UnrecoverableError).toBe(permanent);
+    expect(createUserMapping).not.toHaveBeenCalled();
+  });
+
+  it('stops, throwing, when the user sync throws', async () => {
+    vi.mocked(syncServer).mockRejectedValue(new Error('sync lock timed out'));
+
+    await expect(importPlaybackReporting(SERVER_ID, defaultOptions)).rejects.toThrow(
+      'sync lock timed out'
+    );
+    expect(mockGetPlaybackReportingInfo).not.toHaveBeenCalled();
+    expect(createUserMapping).not.toHaveBeenCalled();
   });
 
   it('refuses a historical server before contacting it', async () => {
     mockDbSelects([{ ...JF_SERVER, historicalAt: new Date('2026-09-01T00:00:00Z') }]);
 
-    const result = await importPlaybackReporting(SERVER_ID, defaultOptions);
-
-    expect(result.success).toBe(false);
-    expect(result.message).toContain(`Server ${SERVER_ID} is historical`);
+    await expect(importPlaybackReporting(SERVER_ID, defaultOptions)).rejects.toBeInstanceOf(
+      ServerHistoricalError
+    );
     expect(constructedClients).toHaveLength(0);
     expect(mockGetPlaybackReportingInfo).not.toHaveBeenCalled();
   });
 
-  it('fails with a plugin-not-installed message and inserts nothing', async () => {
+  it('fails at once with a plugin-not-installed message and inserts nothing', async () => {
     mockGetPlaybackReportingInfo = vi.fn().mockResolvedValue({ installed: false });
 
-    const result = await importPlaybackReporting(SERVER_ID, defaultOptions);
+    const run = importPlaybackReporting(SERVER_ID, defaultOptions);
 
-    expect(result.success).toBe(false);
-    expect(result.message).toMatch(/plugin is not installed/i);
-    expect(result.imported).toBe(0);
+    await expect(run).rejects.toBeInstanceOf(UnrecoverableError);
+    await expect(run).rejects.toThrow(/plugin is not installed/i);
     expect(mockQueryPlaybackReporting).not.toHaveBeenCalled();
     expect(flushInsertBatch).not.toHaveBeenCalled();
     expect(refreshAggregates).not.toHaveBeenCalled();
@@ -509,9 +575,11 @@ describe('importPlaybackReporting', () => {
       publish.mock.calls.every(([channel]) => channel === 'import:playbackreporting:progress')
     ).toBe(true);
     const lastProgress = publish.mock.calls.at(-1)?.[1] as {
+      serverId: string;
       status: string;
       importedRecords: number;
     };
+    expect(lastProgress.serverId).toBe(SERVER_ID);
     expect(lastProgress.status).toBe('complete');
     expect(lastProgress.importedRecords).toBe(2);
 
@@ -778,23 +846,17 @@ describe('importPlaybackReporting', () => {
     expect(vi.mocked(flushInsertBatch).mock.calls[0]?.[0]).toHaveLength(1);
   });
 
-  it('returns a failed result with partial counters when a later page fetch throws', async () => {
+  it('throws a later page fetch failure for a retry, keeping the page it already wrote', async () => {
     mockGetPlaybackReportingInfo = vi.fn().mockResolvedValue(pluginInfo(PAGE_SIZE + 2));
     mockQueryPlaybackReporting = vi
       .fn()
       .mockResolvedValueOnce(fullPage())
       .mockRejectedValue(new Error('plugin exploded'));
 
-    const result = await importPlaybackReporting(SERVER_ID, {
-      ...defaultOptions,
-      importFullRange: true,
-    });
+    const run = importPlaybackReporting(SERVER_ID, { ...defaultOptions, importFullRange: true });
 
-    expect(result.success).toBe(false);
-    expect(result.message).toContain('plugin exploded');
-    expect(result.imported).toBe(PAGE_SIZE);
-    expect(result.skipped).toBe(0);
-    expect(result.errors).toBe(0);
+    await expect(run).rejects.toThrow('plugin exploded');
+    await expect(run).rejects.not.toBeInstanceOf(UnrecoverableError);
     expect(flushInsertBatch).toHaveBeenCalledTimes(1);
     expect(vi.mocked(flushInsertBatch).mock.calls[0]?.[0]).toHaveLength(PAGE_SIZE);
   });

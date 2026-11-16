@@ -45,7 +45,11 @@ import type {
 } from '@tracearr/shared';
 import { normalizeResolution, normalizeDynamicRange } from '@tracearr/shared';
 import { calculateProgress } from '../shared/parserUtils.js';
-import { extractPlexLiveTvMetadata, extractPlexMusicMetadata } from './plexUtils.js';
+import {
+  extractPlexLiveTvMetadata,
+  extractPlexMusicMetadata,
+  plexChannelName,
+} from './plexUtils.js';
 
 // ============================================================================
 // Raw Plex API Response Types (for internal use)
@@ -693,7 +697,8 @@ function parsePlaybackState(state: unknown): MediaSession['playback']['state'] {
  */
 export function parseSession(
   item: Record<string, unknown>,
-  originalMedia?: PlexOriginalMedia | null
+  originalMedia?: PlexOriginalMedia | null,
+  guide?: PlexGuideEntry
 ): MediaSession {
   const player = (item.Player as Record<string, unknown>) ?? {};
   const user = (item.User as Record<string, unknown>) ?? {};
@@ -811,7 +816,7 @@ export function parseSession(
       type: mediaType,
       durationMs,
       year: parseOptionalNumber(item.year),
-      thumbPath: parseOptionalString(item.thumb),
+      thumbPath: parseOptionalString(item.thumb) ?? guide?.thumbPath,
     },
     playback: {
       state: parsePlaybackState(player.state),
@@ -848,21 +853,28 @@ export function parseSession(
     plexSessionId: parseOptionalString(sessionInfo.id),
   };
 
-  // Add episode-specific metadata if this is an episode
-  if (mediaType === 'episode') {
+  // A live program that is an episode has type 'live' and still names its show
+  if (parseMediaType(item.type) === 'episode') {
     session.episode = {
       showTitle: parseString(item.grandparentTitle),
       showId: parseOptionalString(item.grandparentRatingKey),
       seasonNumber: parseOptionalNumber(item.parentIndex) ?? null,
       episodeNumber: parseOptionalNumber(item.index) ?? null,
       seasonName: parseOptionalString(item.parentTitle),
-      showThumbPath: parseOptionalString(item.grandparentThumb),
+      showThumbPath: parseOptionalString(item.grandparentThumb) ?? guide?.showThumbPath,
     };
   }
 
   // Add Live TV metadata if this is a live stream
   if (mediaType === 'live') {
-    const liveTvMetadata = extractPlexLiveTvMetadata(item, selectedMediaElement);
+    const onSession = extractPlexLiveTvMetadata(item, selectedMediaElement);
+    const liveTvMetadata = guide?.channel
+      ? {
+          channelTitle: guide.channel.channelTitle,
+          channelIdentifier: guide.channel.channelIdentifier ?? onSession?.channelIdentifier,
+          channelThumb: guide.channel.channelThumb ?? onSession?.channelThumb,
+        }
+      : onSession;
     if (liveTvMetadata) {
       session.live = liveTvMetadata;
     }
@@ -899,7 +911,8 @@ function isUntrackedItem(item: Record<string, unknown>): boolean {
  */
 export function parseSessionsResponse(
   data: unknown,
-  originalMediaMap?: Map<string, PlexOriginalMedia>
+  originalMediaMap?: Map<string, PlexOriginalMedia>,
+  guideBySessionKey?: Map<string, PlexGuideEntry>
 ): MediaSession[] {
   const container = data as { MediaContainer?: { Metadata?: unknown[] } };
   // A valid "no sessions" response has a MediaContainer with no Metadata array.
@@ -926,8 +939,60 @@ export function parseSessionsResponse(
       originalMediaMap?.get(ratingKey) ??
       null;
 
-    return parseSession(session, originalMedia);
+    return parseSession(
+      session,
+      originalMedia,
+      guideBySessionKey?.get(parseString(session.sessionKey))
+    );
   });
+}
+
+/** What the program guide lists for a live session's program: its channel and its art */
+export interface PlexGuideEntry {
+  channel?: NonNullable<MediaSession['live']>;
+  thumbPath?: string;
+  showThumbPath?: string;
+}
+
+/**
+ * Live sessions that do not name their channel, with the guid the program guide lists
+ * the program under.
+ */
+export function getLiveSessionsWithoutChannel(
+  data: unknown
+): Array<{ sessionKey: string; guid: string }> {
+  const container = data as { MediaContainer?: { Metadata?: unknown[] } };
+  const metadata = container?.MediaContainer?.Metadata;
+  if (!Array.isArray(metadata)) return [];
+
+  return metadata.flatMap((item) => {
+    const session = item as Record<string, unknown>;
+    const media = findSelectedElement<Record<string, unknown>>(
+      session.Media as Array<Record<string, unknown>> | undefined
+    );
+    const sessionKey = parseString(session.sessionKey);
+    const guid = parseString(session.guid);
+    return parseString(session.live) === '1' &&
+      !plexChannelName(session, media) &&
+      sessionKey &&
+      guid
+      ? [{ sessionKey, guid }]
+      : [];
+  });
+}
+
+/** A guide's entry for one program, or undefined when the guide does not list it */
+export function parseGuideEntry(data: unknown): PlexGuideEntry | undefined {
+  const container = data as { MediaContainer?: { Metadata?: unknown[] } };
+  const entry = container?.MediaContainer?.Metadata?.[0] as Record<string, unknown> | undefined;
+  if (!entry) return undefined;
+
+  const media = (entry.Media as Array<Record<string, unknown>> | undefined)?.[0];
+  return {
+    channel: extractPlexLiveTvMetadata(entry, media),
+    thumbPath: parseOptionalBoundedString(entry.thumb, 500),
+    showThumbPath: parseOptionalBoundedString(entry.grandparentThumb, 500),
+  };
 }
 
 /** Narrow a /status/sessions response to one sessionKey, leaving the input untouched. */

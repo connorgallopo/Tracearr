@@ -52,4 +52,19 @@ describe('ConfirmDialog', () => {
 
     expect(screen.getByRole('button', { name: 'Split into separate user' })).toBeInTheDocument();
   });
+
+  it('dims the destructive action in dark mode like the destructive button', () => {
+    render(
+      <ConfirmDialog
+        open
+        onOpenChange={vi.fn()}
+        title="Delete"
+        description="Gone for good."
+        confirmLabel="Delete"
+        onConfirm={vi.fn()}
+      />
+    );
+
+    expect(screen.getByRole('button', { name: 'Delete' })).toHaveClass('dark:bg-destructive/60');
+  });
 });

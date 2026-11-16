@@ -43,7 +43,7 @@ export function AutomationIdentityFields({
   const { t } = useTranslation('pages');
 
   return (
-    <FieldGroup className="bg-card-raised gap-5 rounded-xl border p-5">
+    <FieldGroup className="bg-card dark:bg-card-raised gap-5 rounded-xl border p-5">
       <div className="grid items-start gap-4 @md/field-group:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] @md/field-group:gap-x-6">
         <Field>
           <FieldLabel htmlFor={nameId}>{t('automations.name')}</FieldLabel>

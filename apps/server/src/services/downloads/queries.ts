@@ -56,7 +56,7 @@ const downloadRowColumns = {
   serverType: servers.type,
   serverUserId: mediaDownloads.serverUserId,
   username: serverUsers.username,
-  identityName: users.name,
+  identityName: sql<string | null>`coalesce(${users.name}, ${users.username})`,
   thumbUrl: serverUsers.thumbUrl,
   libraryItemId: mediaDownloads.libraryItemId,
   mediaId: mediaDownloads.mediaId,

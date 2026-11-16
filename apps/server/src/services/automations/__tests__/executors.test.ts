@@ -76,6 +76,7 @@ function createMockSession(overrides: Partial<Session> = {}): Session {
     geoAsnNumber: 7922,
     geoAsnOrganization: 'Comcast',
     isLocal: false,
+    profileName: null,
     playerName: 'Living Room TV',
     deviceId: 'device-123',
     product: 'Plex Web',
@@ -1208,6 +1209,47 @@ describe('Action Executor Registry', () => {
             'Warning!',
             expect.anything()
           );
+        });
+      });
+
+      it('records the action as not done, with the reason, when the server cannot show a message', async () => {
+        (mockDeps.sendClientMessage as ReturnType<typeof vi.fn>).mockRejectedValue(
+          new Error('tofa can only show a message when it stops a stream')
+        );
+        const context = createMockContext();
+        const action: MessageClientAction = { type: 'message_client', message: 'Please stop!' };
+
+        const result = await executeAction(context, action);
+
+        expect(result).toMatchObject({
+          success: false,
+          message: 'tofa can only show a message when it stops a stream',
+        });
+      });
+
+      it('still messages the other targets when one server refuses, then records the refusal', async () => {
+        const tofaSession = createMockSession({ id: 's1', serverUserId: 'user-1' });
+        const jellyfinSession = createMockSession({ id: 's2', serverUserId: 'user-1' });
+        (mockDeps.sendClientMessage as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+          new Error('tofa can only show a message when it stops a stream')
+        );
+        const context = createMockContext({
+          session: tofaSession,
+          serverUser: createMockServerUser({ id: 'user-1' }),
+          activeSessions: [tofaSession, jellyfinSession],
+        });
+        const action: MessageClientAction = {
+          type: 'message_client',
+          message: 'Warning!',
+          target: 'all_user',
+        };
+
+        const result = await executeAction(context, action);
+
+        expect(mockDeps.sendClientMessage).toHaveBeenCalledWith('s2', 'Warning!', expect.anything());
+        expect(result).toMatchObject({
+          success: false,
+          message: 'tofa can only show a message when it stops a stream',
         });
       });
 

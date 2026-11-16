@@ -5,17 +5,42 @@ export type Theme = 'dark' | 'light' | 'system';
 // Default accent hue (cyan = 187)
 const DEFAULT_ACCENT_HUE = 187;
 
-// Preset accent colors with their hue values
+// Accent presets. `hue` is the HSL hue stored in localStorage (and used by the
+// maps); okHue and the two chromas feed the OKLCH primary in globals.css, where
+// lightness is fixed per mode. Each chroma is the largest that stays in sRGB at
+// that lightness, which keeps text on primary at 5.4:1 or better for every preset.
 export const ACCENT_PRESETS = [
-  { name: 'Cyan', hue: 187, hex: '#18D1E7' },
-  { name: 'Blue', hue: 220, hex: '#3B82F6' },
-  { name: 'Purple', hue: 270, hex: '#8B5CF6' },
-  { name: 'Pink', hue: 330, hex: '#EC4899' },
-  { name: 'Red', hue: 0, hex: '#EF4444' },
-  { name: 'Orange', hue: 24, hex: '#EA580C' }, // Matches shadcn orange theme
-  { name: 'Green', hue: 150, hex: '#22C55E' },
-  { name: 'Teal', hue: 175, hex: '#14B8A6' },
+  { name: 'Cyan', hue: 187, okHue: 212, chromaLight: 0.085, chromaDark: 0.128 },
+  { name: 'Blue', hue: 220, okHue: 260, chromaLight: 0.19, chromaDark: 0.126 },
+  { name: 'Purple', hue: 270, okHue: 293, chromaLight: 0.19, chromaDark: 0.139 },
+  { name: 'Pink', hue: 330, okHue: 354, chromaLight: 0.19, chromaDark: 0.17 },
+  { name: 'Red', hue: 0, okHue: 25, chromaLight: 0.19, chromaDark: 0.148 },
+  { name: 'Orange', hue: 24, okHue: 45, chromaLight: 0.14, chromaDark: 0.157 },
+  { name: 'Green', hue: 150, okHue: 150, chromaLight: 0.135, chromaDark: 0.17 },
+  { name: 'Teal', hue: 175, okHue: 183, chromaLight: 0.087, chromaDark: 0.131 },
 ] as const;
+
+type AccentPreset = (typeof ACCENT_PRESETS)[number];
+
+function hueDistance(a: number, b: number): number {
+  const d = Math.abs(a - b) % 360;
+  return Math.min(d, 360 - d);
+}
+
+/** A stored hue outside the presets takes the nearest preset's OKLCH values. */
+export function accentPreset(hue: number): AccentPreset {
+  return ACCENT_PRESETS.reduce((best, preset) =>
+    hueDistance(preset.hue, hue) < hueDistance(best.hue, hue) ? preset : best
+  );
+}
+
+export function accentVars(preset: AccentPreset): Record<string, string> {
+  return {
+    '--accent-h': String(preset.okHue),
+    '--accent-cl': String(preset.chromaLight),
+    '--accent-cd': String(preset.chromaDark),
+  };
+}
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -82,6 +107,9 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement;
     root.style.setProperty('--accent-hue', String(accentHue));
+    for (const [name, value] of Object.entries(accentVars(accentPreset(accentHue)))) {
+      root.style.setProperty(name, value);
+    }
   }, [accentHue]);
 
   const value = {

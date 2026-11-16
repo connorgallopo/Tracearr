@@ -17,6 +17,7 @@ import {
   createMediaServerClient,
   type MediaLibraryItem,
 } from '../../src/services/mediaServer/index.js';
+import { NOT_NEEDED } from '../../src/services/mediaServer/types.js';
 import { getRedis } from '../../src/lib/redisShared.js';
 import { initLibrarySyncRedis, librarySyncService } from '../../src/services/librarySync.js';
 
@@ -74,6 +75,7 @@ function stubPlexClient(albums: MediaLibraryItem[]) {
     getLibraryLeaves: (_id: string, options?: { offset?: number }) => page(tracks, options),
     getLibraryAlbums: (_id: string, options?: { offset?: number }) => page(albums, options),
     findExistingRatingKeys: () => Promise.resolve(new Set<string>()),
+    getLibraryRevision: () => Promise.resolve(NOT_NEEDED),
   } as never);
 }
 

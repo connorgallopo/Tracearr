@@ -8,6 +8,8 @@ interface FileDropzoneProps {
   accept?: string;
   maxSize?: number; // in bytes
   onFileSelect: (file: File | null) => void;
+  /** A file of a type `accept` leaves out was picked; it was not selected */
+  onWrongType?: () => void;
   selectedFile: File | null;
   disabled?: boolean;
   error?: string | null;
@@ -23,6 +25,7 @@ export function FileDropzone({
   accept = '.json',
   maxSize = 100 * 1024 * 1024, // 100MB default
   onFileSelect,
+  onWrongType,
   selectedFile,
   disabled = false,
   error,
@@ -54,6 +57,7 @@ export function FileDropzone({
 
       if (!extensions.includes(fileExt) && !extensions.includes('*')) {
         onFileSelect(null);
+        onWrongType?.();
         return;
       }
 
@@ -65,7 +69,7 @@ export function FileDropzone({
 
       onFileSelect(file);
     },
-    [accept, maxSize, onFileSelect]
+    [accept, maxSize, onFileSelect, onWrongType]
   );
 
   const handleDrop = useCallback(
@@ -124,7 +128,7 @@ export function FileDropzone({
           onDrop={handleDrop}
           disabled={disabled}
           className={cn(
-            'focus-visible:border-ring focus-visible:ring-ring/50 flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-8 transition-colors outline-none focus-visible:ring-[3px]',
+            'focus-visible:border-ring focus-visible:ring-ring/(--ring-alpha) flex w-full cursor-pointer flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-8 transition-colors outline-none focus-visible:ring-[3px]',
             isDragging && 'border-primary bg-primary/5',
             !isDragging &&
               'border-muted-foreground/25 hover:border-muted-foreground/50 hover:bg-muted/50',

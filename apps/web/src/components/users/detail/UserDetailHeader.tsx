@@ -59,7 +59,7 @@ export function UserDetailHeader({
   const { t } = useTranslation(['pages', 'common', 'nav']);
   const viewAs = useViewAs();
   const { user, identity } = detail;
-  const name = user.identityName ?? user.username;
+  const name = user.identityName ?? identity.username;
   const isMerged = identity.serverUsers.length > 1;
   const showsPerson = isMerged && !isSpecificServerScope;
   const avatarUrl = getAvatarUrl(user.serverId, user.thumbUrl, 64);
@@ -119,7 +119,7 @@ export function UserDetailHeader({
             />
             {user.role === 'owner' && (
               <span title={t('common:labels.serverOwner')}>
-                <Crown className="h-5 w-5 text-yellow-500" />
+                <Crown className="text-foreground h-5 w-5" />
               </span>
             )}
             {removed.removed && <RemovedBadge removedAt={removed.removedAt} />}
@@ -128,9 +128,8 @@ export function UserDetailHeader({
             data-testid="user-facts"
             className="text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-1 text-sm"
           >
-            <span>@{user.username}</span>
-            {user.email && <span>· {user.email}</span>}
-            <span>· {t(ROLE_LABEL_KEYS[user.role])}</span>
+            {user.email && <span>{user.email} ·</span>}
+            <span>{t(ROLE_LABEL_KEYS[user.role])}</span>
             <span>
               · {t('common:labels.joined')}{' '}
               {formatDate(new Date(user.joinedAt ?? user.createdAt), { dateStyle: 'medium' })}

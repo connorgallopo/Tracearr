@@ -138,9 +138,24 @@ export async function initHeavyOpsLock(redis: Redis): Promise<void> {
  * this call's own SET actually wrote the key, not that the gap was read as
  * "nobody holds it."
  *
+ * An import that loses the try is marked as waiting, for the library growth backfill to see.
+ *
  * @returns null if lock acquired, or HeavyOpsLockHolder if blocked
  */
 export async function acquireHeavyOpsLock(
+  jobType: 'import' | 'maintenance',
+  jobId: string,
+  description: string,
+  runToken: string
+): Promise<HeavyOpsLockHolder | null> {
+  const holder = await takeHeavyOpsLock(jobType, jobId, description, runToken);
+  if (jobType === 'import') {
+    await (holder ? markImportWaiting(jobId) : clearImportWaiting(jobId));
+  }
+  return holder;
+}
+
+async function takeHeavyOpsLock(
   jobType: 'import' | 'maintenance',
   jobId: string,
   description: string,
@@ -318,6 +333,33 @@ export async function extendHeavyOpsLock(jobId: string, runToken?: string): Prom
   );
 
   return result === 1;
+}
+
+/** How often a job waiting for the lock tries it again. */
+export const HEAVY_OPS_WAIT_INTERVAL_MS = 5000;
+
+// A few tries long, so a waiting import never looks gone between two of its tries.
+const IMPORT_WAITING_TTL_SECONDS = (HEAVY_OPS_WAIT_INTERVAL_MS / 1000) * 3;
+
+async function markImportWaiting(jobId: string): Promise<void> {
+  await redisClient?.set(
+    REDIS_KEYS.HEAVY_OPS_IMPORT_WAITING,
+    jobId,
+    'EX',
+    IMPORT_WAITING_TTL_SECONDS
+  );
+}
+
+/** The import took the lock. Another import's mark is left alone. */
+async function clearImportWaiting(jobId: string): Promise<void> {
+  if ((await redisClient?.get(REDIS_KEYS.HEAVY_OPS_IMPORT_WAITING)) === jobId) {
+    await redisClient?.del(REDIS_KEYS.HEAVY_OPS_IMPORT_WAITING);
+  }
+}
+
+/** True while an import waits for the lock; the library growth backfill gives the lock up to it. */
+export async function isImportWaiting(): Promise<boolean> {
+  return Boolean(await redisClient?.get(REDIS_KEYS.HEAVY_OPS_IMPORT_WAITING));
 }
 
 /** Renews the heavy ops lock on a fixed cadence for a job run's lifetime - stop it once the lock is released. */

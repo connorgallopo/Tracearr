@@ -75,6 +75,15 @@ vi.mock('../../jobs/importQueue.js', () => ({
   getImportQueueStats: vi.fn().mockResolvedValue(null),
   getActiveImportForServer: vi.fn().mockResolvedValue(null),
   getActivePlaybackReportingImportForServer: vi.fn().mockResolvedValue(null),
+  getActiveJellystatImportForServer: vi.fn().mockResolvedValue(null),
+  getJellystatImportStatus: vi.fn().mockResolvedValue(null),
+  getActiveTofaImportForServer: vi.fn().mockResolvedValue(null),
+  getLatestImport: vi.fn().mockResolvedValue(null),
+  publishImportFailed: vi.fn(),
+}));
+
+vi.mock('../../jobs/librarySyncQueue.js', () => ({
+  getLibrarySyncStatus: vi.fn().mockResolvedValue({ isActive: false }),
 }));
 
 // Import mocked services and routes
@@ -90,7 +99,14 @@ import {
   getImportQueueStats,
   getActiveImportForServer,
   getActivePlaybackReportingImportForServer,
+  getActiveJellystatImportForServer,
+  getJellystatImportStatus,
+  getActiveTofaImportForServer,
+  getLatestImport,
+  publishImportFailed,
 } from '../../jobs/importQueue.js';
+import { importPlaybackReporting } from '../../services/playbackReporting.js';
+import { getLibrarySyncStatus } from '../../jobs/librarySyncQueue.js';
 import { importRoutes } from '../import.js';
 import { permissionGuard } from '../../lib/scope.js';
 
@@ -215,12 +231,8 @@ describe('Import Routes', () => {
       // When queue is not available (no Redis in tests), falls back to direct execution
       expect(body.status).toBe('started');
       expect(body.message).toContain('Import started');
-
-      // Verify server sync was called
-      expect(syncServer).toHaveBeenCalledWith(validServerId, {
-        syncUsers: true,
-        syncLibraries: false,
-      });
+      // The importer syncs the users, so the start does not wait on the media server
+      expect(syncServer).not.toHaveBeenCalled();
     });
 
     it('rejects non-owner users', async () => {
@@ -261,23 +273,6 @@ describe('Import Routes', () => {
       });
 
       expect(response.statusCode).toBe(400);
-    });
-
-    it('handles sync failure gracefully', async () => {
-      app = await buildTestApp(ownerUser);
-
-      // Mock sync failure
-      vi.mocked(syncServer).mockRejectedValueOnce(new Error('Sync failed'));
-
-      const response = await app.inject({
-        method: 'POST',
-        url: '/import/tautulli',
-        payload: { serverId: validServerId },
-      });
-
-      expect(response.statusCode).toBe(500);
-      const body = response.json();
-      expect(body.message).toContain('Failed to sync server');
     });
   });
 
@@ -437,7 +432,7 @@ describe('Import Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = response.json();
-      expect(body).toEqual({ active: false });
+      expect(body).toEqual({ active: false, latest: null });
     });
 
     it('returns active: true with status when import is active', async () => {
@@ -446,6 +441,7 @@ describe('Import Routes', () => {
       const mockStatus = {
         jobId: 'job-123',
         state: 'active',
+        held: false,
         progress: { processed: 50, total: 100 },
       };
 
@@ -476,7 +472,7 @@ describe('Import Routes', () => {
 
       expect(response.statusCode).toBe(200);
       const body = response.json();
-      expect(body).toEqual({ active: false });
+      expect(body).toEqual({ active: false, latest: null });
     });
   });
 
@@ -487,6 +483,7 @@ describe('Import Routes', () => {
       const mockStatus = {
         jobId: 'job-456',
         state: 'completed',
+        held: false,
         progress: { processed: 100, total: 100 },
       };
 
@@ -694,10 +691,7 @@ describe('Import Routes', () => {
         true,
         false
       );
-      expect(syncServer).toHaveBeenCalledWith(validServerId, {
-        syncUsers: true,
-        syncLibraries: false,
-      });
+      expect(syncServer).not.toHaveBeenCalled();
     });
 
     it('rejects non-owner users', async () => {
@@ -740,6 +734,28 @@ describe('Import Routes', () => {
 
       expect(response.statusCode).toBe(400);
       expect(db.select).not.toHaveBeenCalled();
+    });
+
+    it('tells the progress panel when an import run without the queue fails', async () => {
+      app = await buildTestApp(ownerUser);
+      mockDbSelectLimit([jellyfinServerRow]);
+      const failure = new Error('sync lock timed out');
+      vi.mocked(importPlaybackReporting).mockRejectedValueOnce(failure);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/import/playback-reporting',
+        payload: { serverId: validServerId, timezone: 'UTC' },
+      });
+
+      expect(response.json().status).toBe('started');
+      await vi.waitFor(() =>
+        expect(publishImportFailed).toHaveBeenCalledWith(
+          'playback-reporting',
+          validServerId,
+          failure
+        )
+      );
     });
 
     it('returns 409 when an import is already in progress', async () => {
@@ -885,6 +901,7 @@ describe('Import Routes', () => {
       vi.mocked(getImportStatus).mockResolvedValueOnce({
         jobId: 'job-pr-active',
         state: 'active',
+        held: false,
         progress: { processed: 10, total: 100 },
       });
 
@@ -900,6 +917,32 @@ describe('Import Routes', () => {
       expect(getActivePlaybackReportingImportForServer).toHaveBeenCalledWith(serverId);
     });
 
+    it('says an import held for the first library sync waits for the queued sync', async () => {
+      app = await buildTestApp(ownerUser);
+      const serverId = randomUUID();
+      vi.mocked(getActivePlaybackReportingImportForServer).mockResolvedValueOnce('job-pr-held');
+      vi.mocked(getImportStatus).mockResolvedValueOnce({
+        jobId: 'job-pr-held',
+        state: 'delayed',
+        held: true,
+        progress: 0,
+      });
+      vi.mocked(getLibrarySyncStatus).mockResolvedValueOnce({ isActive: false, jobId: 'sync-1' });
+
+      const response = await app.inject({
+        url: `/import/playback-reporting/active/${serverId}`,
+      });
+
+      expect(response.json()).toMatchObject({
+        active: true,
+        jobId: 'job-pr-held',
+        waiting: {
+          state: 'waitingForLibrarySync',
+          librarySync: { state: 'queued', progress: null },
+        },
+      });
+    });
+
     it('returns active: false when no import is active', async () => {
       app = await buildTestApp(ownerUser);
       const serverId = randomUUID();
@@ -910,7 +953,7 @@ describe('Import Routes', () => {
       });
 
       expect(response.statusCode).toBe(200);
-      expect(response.json()).toEqual({ active: false });
+      expect(response.json()).toEqual({ active: false, latest: null });
     });
   });
 
@@ -921,6 +964,7 @@ describe('Import Routes', () => {
       vi.mocked(getImportStatus).mockResolvedValueOnce({
         jobId: 'job-pr-999',
         state: 'completed',
+        held: false,
         progress: { processed: 100, total: 100 },
       });
 
@@ -1011,6 +1055,7 @@ describe('Import Routes', () => {
       expect(response.json()).toMatchObject({ status: 'queued', jobId: 'job-js-1' });
       const backupPath = vi.mocked(enqueueJellystatImport).mock.calls[0]?.[2] ?? '';
       expect(await readFile(backupPath, 'utf-8')).toBe(backup);
+      expect(syncServer).not.toHaveBeenCalled();
       await rm(backupPath);
     });
 
@@ -1038,6 +1083,231 @@ describe('Import Routes', () => {
 
       expect(response.statusCode).toBe(409);
       expect(enqueueJellystatImport).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /import/jellystat/active/:serverId', () => {
+    it('says an import held for the first library sync waits for the running sync', async () => {
+      app = await buildTestApp(ownerUser);
+      const serverId = randomUUID();
+      vi.mocked(getActiveJellystatImportForServer).mockResolvedValueOnce('job-js-held');
+      vi.mocked(getJellystatImportStatus).mockResolvedValueOnce({
+        jobId: 'job-js-held',
+        state: 'delayed',
+        held: true,
+        progress: 0,
+      });
+      vi.mocked(getLibrarySyncStatus).mockResolvedValueOnce({
+        isActive: true,
+        progress: 65,
+        jobId: 'sync-1',
+      });
+
+      const response = await app.inject({ url: `/import/jellystat/active/${serverId}` });
+
+      expect(response.json()).toMatchObject({
+        active: true,
+        jobId: 'job-js-held',
+        waiting: {
+          state: 'waitingForLibrarySync',
+          librarySync: { state: 'running', progress: 65 },
+        },
+      });
+      expect(getActiveJellystatImportForServer).toHaveBeenCalledWith(serverId);
+    });
+
+    it('reports a running import as not waiting', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getActiveJellystatImportForServer).mockResolvedValueOnce('job-js-1');
+      vi.mocked(getJellystatImportStatus).mockResolvedValueOnce({
+        jobId: 'job-js-1',
+        state: 'active',
+        held: true,
+        progress: 20,
+      });
+
+      const response = await app.inject({ url: `/import/jellystat/active/${randomUUID()}` });
+
+      expect(response.json()).toMatchObject({ active: true, state: 'active', waiting: null });
+    });
+  });
+
+  describe('GET /import/tofa/active/:serverId', () => {
+    const serverId = randomUUID();
+    const result = {
+      success: true as const,
+      imported: 9,
+      skipped: 3,
+      duplicates: 3,
+      errors: 0,
+      message: 'Import complete: 9 imported, 3 already in Tracearr',
+    };
+
+    it('says the held backfill waits for the library sync running for the server', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getActiveTofaImportForServer).mockResolvedValueOnce('held-import-1');
+      vi.mocked(getImportStatus).mockResolvedValueOnce({
+        jobId: 'held-import-1',
+        state: 'delayed',
+        held: true,
+        progress: 0,
+      });
+      vi.mocked(getLatestImport).mockResolvedValueOnce({
+        held: true,
+        state: 'delayed',
+        progress: null,
+        result: null,
+        failedReason: null,
+        finishedAt: null,
+        attemptsMade: 0,
+        attempts: 3,
+      });
+      vi.mocked(getLibrarySyncStatus).mockResolvedValueOnce({
+        isActive: true,
+        progress: 40,
+        jobId: 'sync-1',
+      });
+
+      const response = await app.inject({ url: `/import/tofa/active/${serverId}` });
+
+      expect(response.json()).toMatchObject({
+        active: true,
+        jobId: 'held-import-1',
+        latest: {
+          state: 'waitingForLibrarySync',
+          librarySync: { state: 'running', progress: 40 },
+        },
+      });
+    });
+
+    it('reports a finished import as complete by its result, whatever progress it last wrote', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getLatestImport).mockResolvedValueOnce({
+        held: false,
+        state: 'completed',
+        progress: {
+          serverId,
+          status: 'processing',
+          fetchedRecords: 12,
+          processedRecords: 10,
+          importedRecords: 7,
+          skippedRecords: 3,
+          duplicateRecords: 3,
+          unknownUserRecords: 0,
+          activeRecords: 0,
+          errorRecords: 0,
+          message: 'Processing: 10 plays',
+        },
+        result,
+        failedReason: null,
+        finishedAt: 1_763_100_000_000,
+        attemptsMade: 1,
+        attempts: 3,
+      });
+
+      const response = await app.inject({ url: `/import/tofa/active/${serverId}` });
+
+      expect(response.json()).toEqual({
+        active: false,
+        latest: { state: 'complete', result, finishedAt: 1_763_100_000_000 },
+      });
+      expect(getLatestImport).toHaveBeenCalledWith('tofa', serverId);
+    });
+  });
+
+  describe('latest import status', () => {
+    const serverId = randomUUID();
+    const kept = {
+      held: false,
+      progress: null,
+      result: null,
+      failedReason: null,
+      finishedAt: null,
+      attemptsMade: 0,
+      attempts: 3,
+    };
+    const progress = {
+      serverId,
+      status: 'processing' as const,
+      fetchedRecords: 12,
+      processedRecords: 10,
+      importedRecords: 7,
+      skippedRecords: 3,
+      duplicateRecords: 3,
+      unknownUserRecords: 0,
+      activeRecords: 0,
+      errorRecords: 0,
+      message: 'Processing: 10 plays',
+    };
+
+    it.each([
+      ['tautulli', 'tautulli'],
+      ['jellystat', 'jellystat'],
+      ['playback-reporting', 'playback-reporting'],
+      ['tofa', 'tofa'],
+    ] as const)('answers the %s route in its latest field', async (path, type) => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getLatestImport).mockResolvedValueOnce({ ...kept, state: 'waiting' });
+
+      const response = await app.inject({ url: `/import/${path}/active/${serverId}` });
+
+      expect(response.json()).toEqual({ active: false, latest: { state: 'queued' } });
+      expect(getLatestImport).toHaveBeenCalledWith(type, serverId);
+    });
+
+    it.each([
+      [
+        'held for the first library sync',
+        { ...kept, state: 'delayed', held: true },
+        { state: 'waitingForLibrarySync', librarySync: null },
+      ],
+      ['queued', { ...kept, state: 'prioritized' }, { state: 'queued' }],
+      ['running', { ...kept, state: 'active', progress }, { state: 'running', progress }],
+      [
+        'waiting out a retry',
+        { ...kept, state: 'delayed', attemptsMade: 1, failedReason: 'connect ECONNREFUSED' },
+        { state: 'retrying', attempt: 1, attempts: 3, reason: 'connect ECONNREFUSED' },
+      ],
+      [
+        'failed',
+        { ...kept, state: 'failed', attemptsMade: 1, failedReason: 'Tautulli is not configured' },
+        { state: 'failed', reason: 'Tautulli is not configured' },
+      ],
+      [
+        'completed with a failure stored as its result',
+        { ...kept, state: 'completed', failedReason: 'Import failed: Plex answered 500' },
+        { state: 'failed', reason: 'Import failed: Plex answered 500' },
+      ],
+    ])('says an import %s is so', async (_state, latest, expected) => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getLatestImport).mockResolvedValueOnce(latest);
+
+      const response = await app.inject({ url: `/import/tautulli/active/${serverId}` });
+
+      expect(response.json().latest).toEqual(expected);
+    });
+
+    it('says a held Tautulli import waits for the library sync queued for the server', async () => {
+      app = await buildTestApp(ownerUser);
+      vi.mocked(getActiveImportForServer).mockResolvedValueOnce('job-tt-held');
+      vi.mocked(getImportStatus).mockResolvedValueOnce({
+        jobId: 'job-tt-held',
+        state: 'delayed',
+        held: true,
+        progress: 0,
+      });
+      vi.mocked(getLibrarySyncStatus).mockResolvedValueOnce({ isActive: false, jobId: 'sync-1' });
+
+      const response = await app.inject({ url: `/import/tautulli/active/${serverId}` });
+
+      expect(response.json()).toMatchObject({
+        active: true,
+        jobId: 'job-tt-held',
+        waiting: {
+          state: 'waitingForLibrarySync',
+          librarySync: { state: 'queued', progress: null },
+        },
+      });
     });
   });
 });

@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { Plus, Server as ServerIcon } from 'lucide-react';
 import {
   DndContext,
@@ -18,23 +17,17 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { SERVER_PROFILES, type Server, type ServerType } from '@tracearr/shared';
+import { SERVER_PROFILES, type Server } from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ItemGroup } from '@/components/ui/item';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
-import {
-  AddServerDialog,
-  type PlexAccountOption,
-  type PlexDialogStep,
-} from '@/components/settings/servers/AddServerDialog';
+import { AddServerDialog } from '@/components/settings/servers/AddServerDialog';
 import { EditServerDialog } from '@/components/settings/servers/EditServerDialog';
 import { ServerRow } from '@/components/settings/servers/ServerRow';
-import { api } from '@/lib/api';
-import type { PlexDiscoveredServer } from '@/lib/api';
-import { isJellyfinEmby } from '@/lib/serverType';
+import { useAddServer, type AddedServer } from '@/components/settings/servers/useAddServer';
 import { useAuth } from '@/hooks/useAuth';
 import { useSocket } from '@/hooks/useSocket';
 import {
@@ -49,15 +42,15 @@ import {
 } from '@/hooks/queries';
 
 export function Connections() {
-  const { t } = useTranslation(['settings', 'common', 'notifications']);
-  const { data: serversData, isLoading, refetch } = useServers();
+  const { t } = useTranslation(['settings', 'common']);
+  const { data: serversData, isLoading } = useServers();
   const deleteServer = useDeleteServer();
   const syncServer = useSyncServer();
   const updateServer = useUpdateServer();
   const reorderServers = useReorderServers();
   const setHistorical = useSetServerHistorical();
   const queryClient = useQueryClient();
-  const { refetch: refetchUser, user } = useAuth();
+  const { user } = useAuth();
   const { serverConnectionStatuses } = useSocket();
   const isOwner = user?.role === 'owner';
   const { data: requestServices, isLoading: requestServicesLoading } = useRequestServices({
@@ -68,160 +61,29 @@ export function Connections() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [historicalId, setHistoricalId] = useState<string | null>(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
+  const [addedServer, setAddedServer] = useState<AddedServer | null>(null);
   const [editServer, setEditServer] = useState<Server | null>(null);
-  const [serverType, setServerType] = useState<ServerType>('plex');
-  const [serverUrl, setServerUrl] = useState('');
-  const [publicUrl, setPublicUrl] = useState('');
-  const [serverName, setServerName] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [connectError, setConnectError] = useState<string | null>(null);
-  const [plexStep, setPlexStep] = useState<PlexDialogStep>('loading');
-  const [plexServers, setPlexServers] = useState<PlexDiscoveredServer[]>([]);
-  const [connectingPlexServer, setConnectingPlexServer] = useState<string | null>(null);
-  const [plexAccounts, setPlexAccounts] = useState<PlexAccountOption[]>([]);
-  const [selectedPlexAccountId, setSelectedPlexAccountId] = useState<string | null>(null);
-
-  const plexOAuth = SERVER_PROFILES[serverType].addServerAuth === 'plexOAuth';
+  // Only the owner can import history, so only the owner gets the dialog's import step
+  const form = useAddServer({
+    onAdded: (server) => (isOwner ? setAddedServer(server) : setShowAddDialog(false)),
+  });
+  const plexOAuth = SERVER_PROFILES[form.serverType].addServerAuth === 'plexOAuth';
 
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  useEffect(() => {
-    if (user && !isOwner && plexOAuth) {
-      setServerType('jellyfin');
-    }
-  }, [user, isOwner, plexOAuth]);
-
   const servers = Array.isArray(serversData)
     ? serversData
     : ((serversData as unknown as { data?: Server[] })?.data ?? []);
+  const nameOf = (id: string | null) => servers.find((s) => s.id === id)?.name ?? '';
 
-  const fetchPlexServers = async (accountId?: string) => {
-    setPlexStep('loading-servers');
-    setConnectError(null);
-
-    try {
-      const result = await api.auth.getAvailablePlexServers(accountId);
-      if (!result.hasPlexToken) {
-        setPlexStep('no-accounts');
-        return;
-      }
-      if (result.servers.length === 0) {
-        setPlexStep('no-servers');
-        return;
-      }
-      setPlexServers(result.servers);
-      setPlexStep('select');
-    } catch (error) {
-      setConnectError(error instanceof Error ? error.message : 'Failed to fetch Plex servers');
-      setPlexStep('no-servers');
-    }
-  };
-
-  const fetchPlexAccounts = async () => {
-    setPlexStep('loading');
-    setConnectError(null);
-
-    try {
-      const { accounts } = await api.auth.getPlexAccounts();
-      if (accounts.length === 0) {
-        setPlexStep('no-accounts');
-        return;
-      }
-      setPlexAccounts(accounts);
-
-      const firstAccount = accounts[0];
-      if (accounts.length === 1 && firstAccount) {
-        setSelectedPlexAccountId(firstAccount.id);
-        await fetchPlexServers(firstAccount.id);
-      } else {
-        setPlexStep('select-account');
-      }
-    } catch (error) {
-      setConnectError(error instanceof Error ? error.message : 'Failed to fetch Plex accounts');
-      setPlexStep('no-accounts');
-    }
-  };
-
-  useEffect(() => {
-    if (showAddDialog && plexOAuth && isOwner) {
-      void fetchPlexAccounts();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- only on dialog open, not on serverType changes
-  }, [showAddDialog]);
-
-  const resetAddForm = () => {
-    setServerUrl('');
-    setPublicUrl('');
-    setServerName('');
-    setApiKey('');
-    setConnectError(null);
-    setServerType(isOwner ? 'plex' : 'jellyfin');
-    setPlexStep('loading');
-    setPlexServers([]);
-    setConnectingPlexServer(null);
-    setPlexAccounts([]);
-    setSelectedPlexAccountId(null);
-  };
-
-  const handlePlexServerSelect = async (uri: string, name: string, clientIdentifier: string) => {
-    setConnectingPlexServer(name);
-    setConnectError(null);
-
-    try {
-      await api.auth.addPlexServer({
-        serverUri: uri,
-        serverName: name,
-        clientIdentifier,
-        accountId: selectedPlexAccountId ?? undefined,
-      });
-      toast.success(t('notifications:toast.success.serverAdded.title'), {
-        description: t('notifications:toast.success.serverAdded.message', { name }),
-      });
-      await refetch();
-      await refetchUser();
-      void queryClient.invalidateQueries({ queryKey: ['plex-accounts'] });
-      setShowAddDialog(false);
-      resetAddForm();
-    } catch (error) {
-      setConnectError(error instanceof Error ? error.message : 'Failed to connect Plex server');
-    } finally {
-      setConnectingPlexServer(null);
-    }
-  };
-
-  const handleAddServer = async () => {
-    if (!isJellyfinEmby(serverType)) return;
-    if (!serverUrl || !serverName || !apiKey) {
-      setConnectError(t('servers.allFieldsRequired'));
-      return;
-    }
-
-    setIsConnecting(true);
-    setConnectError(null);
-
-    try {
-      const connectFn = {
-        jellyfin: api.auth.connectJellyfinWithApiKey,
-        emby: api.auth.connectEmbyWithApiKey,
-      }[serverType];
-      await connectFn({
-        serverUrl,
-        serverName,
-        apiKey,
-        ...(publicUrl.trim() ? { publicUrl: publicUrl.trim() } : {}),
-      });
-      await refetchUser();
-      await refetch();
-      setShowAddDialog(false);
-      resetAddForm();
-    } catch (error) {
-      setConnectError(error instanceof Error ? error.message : 'Failed to connect server');
-    } finally {
-      setIsConnecting(false);
+  const openAddDialog = () => {
+    setAddedServer(null);
+    setShowAddDialog(true);
+    if (plexOAuth && isOwner) {
+      void form.loadPlexAccounts();
     }
   };
 
@@ -245,7 +107,7 @@ export function Connections() {
       title={t('nav.sections.connections')}
       description={t('nav.descriptions.connections')}
       actions={
-        <Button onClick={() => setShowAddDialog(true)}>
+        <Button onClick={openAddDialog}>
           <Plus />
           {t('servers.addServer')}
         </Button>
@@ -262,7 +124,7 @@ export function Connections() {
           title={t('servers.noServersConnected')}
           description={t('servers.noServersConnectedHint')}
         >
-          <Button onClick={() => setShowAddDialog(true)}>
+          <Button onClick={openAddDialog}>
             <Plus />
             {t('servers.addServer')}
           </Button>
@@ -286,7 +148,7 @@ export function Connections() {
                   }
                   isSwitching={setHistorical.isPending && setHistorical.variables?.id === server.id}
                   isSyncing={syncServer.isPending && syncServer.variables === server.id}
-                  isDraggable={isOwner}
+                  isDraggable={isOwner && servers.length > 1}
                   isOwner={isOwner}
                   requestService={
                     isOwner && !requestServicesLoading
@@ -304,54 +166,18 @@ export function Connections() {
       <AddServerDialog
         open={showAddDialog}
         onOpenChange={(open) => {
-          if (!open) resetAddForm();
+          if (!open) form.reset();
           setShowAddDialog(open);
         }}
-        isOwner={isOwner}
-        serverType={serverType}
-        onServerTypeChange={(newType) => {
-          setServerType(newType);
-          setConnectError(null);
-          if (SERVER_PROFILES[newType].addServerAuth === 'plexOAuth' && isOwner) {
-            void fetchPlexAccounts();
-          }
-        }}
-        serverUrl={serverUrl}
-        onServerUrlChange={setServerUrl}
-        publicUrl={publicUrl}
-        onPublicUrlChange={setPublicUrl}
-        serverName={serverName}
-        onServerNameChange={setServerName}
-        apiKey={apiKey}
-        onApiKeyChange={setApiKey}
-        isConnecting={isConnecting}
-        connectError={connectError}
-        onConnect={() => void handleAddServer()}
-        plexStep={plexStep}
-        plexAccounts={plexAccounts}
-        selectedPlexAccountId={selectedPlexAccountId}
-        onSelectPlexAccount={(id) => {
-          setSelectedPlexAccountId(id);
-          void fetchPlexServers(id);
-        }}
-        plexServers={plexServers}
-        connectingPlexServer={connectingPlexServer}
-        onSelectPlexServer={(uri, name, clientIdentifier) => {
-          void handlePlexServerSelect(uri, name, clientIdentifier);
-        }}
-        onTestPlexUrl={async (uri) => {
-          const result = await api.auth.testPlexConnection({
-            uri,
-            accountId: selectedPlexAccountId ?? undefined,
-          });
-          return result.connection;
-        }}
+        form={form}
+        added={addedServer}
       />
 
       <ConfirmDialog
         open={!!deleteId}
+        restoreFocus
         onOpenChange={() => setDeleteId(null)}
-        title={t('servers.removeServer')}
+        title={t('servers.removeServerTitle', { name: nameOf(deleteId) })}
         description={t('servers.removeServerConfirm')}
         confirmLabel={t('common:actions.remove')}
         isLoading={deleteServer.isPending}
@@ -368,10 +194,9 @@ export function Connections() {
 
       <ConfirmDialog
         open={!!historicalId}
+        restoreFocus
         onOpenChange={() => setHistoricalId(null)}
-        title={t('servers.markHistoricalTitle', {
-          name: servers.find((s) => s.id === historicalId)?.name ?? '',
-        })}
+        title={t('servers.markHistoricalTitle', { name: nameOf(historicalId) })}
         description={t('servers.markHistoricalConfirm')}
         confirmLabel={t('servers.markHistorical')}
         variant="default"

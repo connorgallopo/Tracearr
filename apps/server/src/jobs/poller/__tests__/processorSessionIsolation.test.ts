@@ -146,7 +146,7 @@ import {
   dispatchServerHealthById,
 } from '../../../services/automations/events/producers.js';
 import { HttpClientError } from '../../../utils/http.js';
-import { fakePlexClient } from '../../../test/mediaServerFakes.js';
+import { fakePlexClient, fakeTofaClient } from '../../../test/mediaServerFakes.js';
 
 const mockDispatchServerHealth = vi.mocked(dispatchServerHealth);
 const mockDispatchServerHealthById = vi.mocked(dispatchServerHealthById);
@@ -585,6 +585,24 @@ describe('per-session error isolation in processServerSessions', () => {
       expect(lastCall.updatedSessions).toEqual([
         expect.objectContaining({ id: 'active-b-updated' }),
       ]);
+    });
+
+    it('counts an unreachable tofa server as failing, like any other', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+      serverRows = [
+        serverRow,
+        { ...serverRow, id: 'server-2', name: 'tofa', type: 'tofa', watchedRulePercent: 90 },
+      ];
+      mockCreateMediaServerClient.mockImplementation((options: { type: string }) =>
+        options.type === 'tofa'
+          ? fakeTofaClient({ getSessions: vi.fn().mockRejectedValue(new Error('fetch failed')) })
+          : fakePlexClient({ getSessions: vi.fn().mockResolvedValue([processedB]) })
+      );
+
+      await triggerPoll();
+
+      expect(cacheService.incrServerFailCount).toHaveBeenCalledWith('server-2');
+      expect(cacheService.setServerHealth).toHaveBeenCalledWith('server-1', true);
     });
 
     it('keeps polling when a cached session belongs to a server that is gone', async () => {

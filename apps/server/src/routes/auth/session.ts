@@ -5,11 +5,11 @@
  */
 
 import type { FastifyPluginAsync } from 'fastify';
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { getAllServerIds } from './utils.js';
 import { getUserById } from '../../services/userService.js';
 import { db } from '../../db/client.js';
-import { authAccounts } from '../../db/schema.js';
+import { authAccounts, serverUsers } from '../../db/schema.js';
 import { loadScope } from '../../lib/scope.js';
 
 export const sessionRoutes: FastifyPluginAsync = async (app) => {
@@ -29,28 +29,44 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     const scope = await loadScope(user.id, user.role);
     const serverIds = scope === 'all' ? await getAllServerIds() : scope.serverIds;
 
-    const [credential] = await db
-      .select({ id: authAccounts.id })
-      .from(authAccounts)
-      .where(and(eq(authAccounts.userId, user.id), eq(authAccounts.providerId, 'credential')))
-      .limit(1);
-    const [plexLink] = await db
-      .select({ id: authAccounts.id })
-      .from(authAccounts)
-      .where(and(eq(authAccounts.userId, user.id), eq(authAccounts.providerId, 'plex')))
-      .limit(1);
+    const linked = new Set(
+      (
+        await db
+          .select({ providerId: authAccounts.providerId })
+          .from(authAccounts)
+          .where(
+            and(
+              eq(authAccounts.userId, user.id),
+              inArray(authAccounts.providerId, ['credential', 'plex', 'tofa'])
+            )
+          )
+      ).map((account) => account.providerId)
+    );
+
+    // A picture copied from a server account is a path on that server, loadable only through the
+    // image proxy, which needs the server.
+    const [pictureAccount] = user.thumbnail
+      ? await db
+          .select({ serverId: serverUsers.serverId })
+          .from(serverUsers)
+          .where(and(eq(serverUsers.userId, user.id), eq(serverUsers.thumbUrl, user.thumbnail)))
+          .limit(1)
+      : [];
 
     return {
       userId: user.id,
       username: user.username,
+      name: user.name,
       email: user.email,
       thumbnail: user.thumbnail,
+      thumbnailServerId: pictureAccount?.serverId ?? null,
       role: user.role,
       // A member never sees the trust score the owner keeps on them.
       ...(scope === 'all' ? { aggregateTrustScore: user.aggregateTrustScore } : {}),
       serverIds,
-      hasPassword: !!user.passwordHash || !!credential,
-      hasPlexLinked: !!user.plexAccountId || !!plexLink,
+      hasPassword: !!user.passwordHash || linked.has('credential'),
+      hasPlexLinked: !!user.plexAccountId || linked.has('plex'),
+      hasTofaLinked: linked.has('tofa'),
       impersonatedBy: authUser.impersonatedBy,
     };
   });

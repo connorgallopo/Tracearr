@@ -8,8 +8,14 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
 import { POSTER_IMAGE_SIZE, SQUARE_POSTER_SIZE } from '@tracearr/shared';
-import { posterVersionFor, proxyImage } from '../services/imageProxy.js';
+import {
+  IMAGE_SIZES,
+  posterVersionFor,
+  proxyAccountPicture,
+  proxyImage,
+} from '../services/imageProxy.js';
 import { readLogoPng } from '../services/notifications/emailLogo.js';
+import { getUserById } from '../services/userService.js';
 
 // Fallback SVG logo if no PNG exists
 const FALLBACK_LOGO_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
@@ -76,7 +82,8 @@ export const imageRoutes: FastifyPluginAsync = async (app) => {
    * Server ID is validated in proxyImage service.
    *
    * Query params:
-   * - server: UUID of the server to fetch from
+   * - server: UUID of the server to fetch from, or of the request service whose
+   *   poster a request shows while its title is in no library
    * - url: The image path (e.g., /library/metadata/123/thumb/456)
    * - width: Resize width (default 300)
    * - height: Resize height (default 450)
@@ -125,6 +132,23 @@ export const imageRoutes: FastifyPluginAsync = async (app) => {
     reply.header('Cache-Control', cacheControl);
     reply.header('Content-Type', result.contentType);
 
+    return reply.send(result.data);
+  });
+
+  /**
+   * GET /images/account - The signed-in person's own picture when it is an absolute address, such
+   * as their OIDC provider's. 404 when there is none or it cannot be fetched, so the page shows
+   * initials. Private, since the picture follows the session.
+   */
+  app.get('/account', { preHandler: [app.authenticate] }, async (request, reply) => {
+    const picture = (await getUserById(request.user.userId))?.thumbnail;
+    const result =
+      picture && URL.canParse(picture)
+        ? await proxyAccountPicture(picture, IMAGE_SIZES.apiAvatar.width)
+        : null;
+    if (!result) return reply.status(404).send();
+    reply.header('Cache-Control', 'private, no-store');
+    reply.header('Content-Type', result.contentType);
     return reply.send(result.data);
   });
 

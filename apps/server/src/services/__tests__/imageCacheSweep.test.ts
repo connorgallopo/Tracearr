@@ -16,7 +16,10 @@ vi.mock('node:fs/promises', () => ({
 }));
 
 vi.mock('../../db/client.js', () => ({
-  db: { select: vi.fn() },
+  db: {
+    select: vi.fn(),
+    selectDistinct: vi.fn(() => ({ from: () => ({ where: async () => [] }) })),
+  },
 }));
 
 vi.mock('../../lib/redisShared.js', () => ({
@@ -426,6 +429,19 @@ describe('buildExpectedFileNames', () => {
     // first page's last row id; drizzle embeds the literal value in the SQL chunks.
     const secondWhereArg = where.mock.calls[1]?.[0];
     expect(safeStringify(secondWhereArg)).toContain('id-04999');
+  });
+
+  it('expects the poster a request takes from its service while the title is in no library', async () => {
+    const serviceId = randomUUID();
+    const posterPath = '/imageproxy/tmdb/t/p/w600_and_h900_bestv2/abc.jpg';
+    mockLibraryItemsPages([]);
+    vi.mocked(db.selectDistinct).mockReturnValueOnce({
+      from: () => ({ where: async () => [{ serviceId, posterPath }] }),
+    } as never);
+
+    const expected = await buildExpectedFileNames();
+
+    expect(expected).toEqual(new Set([posterCacheFileName(serviceId, posterPath).fileName]));
   });
 });
 

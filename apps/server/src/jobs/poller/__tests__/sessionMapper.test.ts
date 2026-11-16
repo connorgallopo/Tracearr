@@ -244,9 +244,23 @@ describe('sessionMapper', () => {
         expect(result.thumbPath).toBe('/show/poster.jpg');
       });
 
-      it('should use channelThumb for live TV', () => {
+      it('should use the program art for live TV', () => {
         const session = createBaseMediaSession({
           media: { title: 'Live', type: 'live', durationMs: 0, thumbPath: '/media/thumb.jpg' },
+          live: {
+            channelTitle: 'ESPN',
+            channelThumb: '/channel/espn.jpg',
+          },
+        });
+
+        const result = mapMediaSession(session, 'jellyfin');
+
+        expect(result.thumbPath).toBe('/media/thumb.jpg');
+      });
+
+      it('should fall back to channelThumb for a live program with no art', () => {
+        const session = createBaseMediaSession({
+          media: { title: 'Live', type: 'live', durationMs: 0 },
           live: {
             channelTitle: 'ESPN',
             channelThumb: '/channel/espn.jpg',
@@ -258,7 +272,7 @@ describe('sessionMapper', () => {
         expect(result.thumbPath).toBe('/channel/espn.jpg');
       });
 
-      it('should fallback to media thumbPath for live TV without channelThumb', () => {
+      it('should use media thumbPath for live TV without channelThumb', () => {
         const session = createBaseMediaSession({
           media: { title: 'Live', type: 'live', durationMs: 0, thumbPath: '/media/thumb.jpg' },
           live: {
@@ -543,7 +557,7 @@ describe('sessionMapper', () => {
         expect(result.userThumb).toBe('');
       });
 
-      it('should default username to Unknown when empty', () => {
+      it('keeps an empty username, so the poller never stores a placeholder over a name', () => {
         const session = createBaseMediaSession({
           user: {
             id: 'user-id',
@@ -553,7 +567,7 @@ describe('sessionMapper', () => {
 
         const result = mapMediaSession(session, 'plex');
 
-        expect(result.username).toBe('Unknown');
+        expect(result.username).toBe('');
       });
 
       it('should include lastPausedDate when provided', () => {

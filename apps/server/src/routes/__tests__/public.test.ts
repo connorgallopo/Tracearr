@@ -94,7 +94,6 @@ describe('GET /api/v1/public/violations', () => {
       ruleType: null,
       ruleName: 'Max 2 concurrent streams',
       userId,
-      serverUsername: 'ada_plex',
       thumbUrl: 'https://plex.tv/users/ada/avatar',
       userName: 'Ada Lovelace',
       userUsername: 'ada',

@@ -12,10 +12,14 @@ vi.mock('react-i18next', () => ({
 
 vi.mock('@/hooks/queries', () => ({
   useLinkOwnerAccount: vi.fn(),
+  useOwnerAccountLinked: vi.fn(),
 }));
 
-import { useLinkOwnerAccount } from '@/hooks/queries';
-import { OwnerLinkDialog } from './OwnerLinkDialog';
+vi.mock('@/components/auth/useTofaSignIn', () => ({ useTofaSignIn: vi.fn() }));
+
+import { useTofaSignIn } from '@/components/auth/useTofaSignIn';
+import { useLinkOwnerAccount, useOwnerAccountLinked } from '@/hooks/queries';
+import { OwnerLinkDialog, TofaOwnerLinkDialog } from './OwnerLinkDialog';
 
 const server = { id: 'srv-1', name: 'Home', type: 'jellyfin' } as unknown as Server;
 
@@ -82,5 +86,31 @@ describe('OwnerLinkDialog', () => {
 
     expect(screen.getByText('servers.ownerAccount.dialog.otherAccounts')).toBeInTheDocument();
     expect(screen.queryByRole('textbox', { name: /confirmLabel/ })).not.toBeInTheDocument();
+  });
+});
+
+describe('TofaOwnerLinkDialog', () => {
+  it('links through a tofa sign-in for this server and closes once linked', async () => {
+    const user = userEvent.setup();
+    const start = vi.fn();
+    const linked = vi.fn();
+    const onOpenChange = vi.fn();
+    vi.mocked(useOwnerAccountLinked).mockReturnValue(linked);
+    vi.mocked(useTofaSignIn).mockReturnValue({
+      step: 'idle',
+      error: null,
+      start,
+    } as unknown as ReturnType<typeof useTofaSignIn>);
+    const tofaServer = { id: 'srv-2', name: 'Den', type: 'tofa' } as unknown as Server;
+
+    render(<TofaOwnerLinkDialog open onOpenChange={onOpenChange} server={tofaServer} />);
+    await user.click(screen.getByRole('button', { name: 'pages:tofa.signIn' }));
+
+    expect(start).toHaveBeenCalled();
+    const options = vi.mocked(useTofaSignIn).mock.calls[0]?.[0];
+    expect(options).toMatchObject({ purpose: { link: 'srv-2' } });
+    options?.onLinked?.();
+    expect(linked).toHaveBeenCalled();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });

@@ -920,6 +920,28 @@ describe('Plex Live TV Parser', () => {
     expect(session.live?.channelTitle).toBe('ESPN');
   });
 
+  it('keeps the show, season and episode of a live program that is an episode', () => {
+    const session = parseSession({
+      sessionKey: '7',
+      ratingKey: '10123913',
+      type: 'episode',
+      live: '1',
+      title: 'Episode 14',
+      grandparentTitle: 'Friends',
+      parentIndex: '3',
+      index: '14',
+      User: {},
+      Player: {},
+    });
+
+    expect(session.media).toMatchObject({ type: 'live', title: 'Episode 14' });
+    expect(session.episode).toMatchObject({
+      showTitle: 'Friends',
+      seasonNumber: 3,
+      episodeNumber: 14,
+    });
+  });
+
   it('should not set live metadata when live flag is not "1"', () => {
     const rawSession = {
       sessionKey: 'not-live',

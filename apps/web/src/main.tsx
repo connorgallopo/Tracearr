@@ -11,6 +11,7 @@ import { installClientErrorCapture } from '@/lib/clientErrors';
 import { sweepLegacyTokens } from '@/lib/legacyTokenSweep';
 import { App } from './App';
 import { i18nReady } from './i18n';
+import './styles/inter/inter.css';
 import './styles/globals.css';
 
 // Run before anything else can read stale localStorage tokens from pre-cookie-session builds.

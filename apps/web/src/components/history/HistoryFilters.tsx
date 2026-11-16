@@ -353,7 +353,7 @@ export function HistoryFiltersBar({
               <ListFilter className="h-4 w-4" />
               {t('common:labels.filters')}
               {activeFilterCount > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
                   {activeFilterCount}
                 </Badge>
               )}
@@ -368,7 +368,7 @@ export function HistoryFiltersBar({
                   <User className="mr-2 h-4 w-4" />
                   {t('nav:users')}
                   {filters.serverUserIds?.length ? (
-                    <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-[10px]">
+                    <Badge variant="secondary" className="ml-auto h-5 px-1.5">
                       {filters.serverUserIds.length}
                     </Badge>
                   ) : null}
@@ -410,7 +410,7 @@ export function HistoryFiltersBar({
                           >
                             <Avatar className="mr-2 h-5 w-5">
                               <AvatarImage src={user.thumbUrl ?? undefined} />
-                              <AvatarFallback className="text-[8px]">
+                              <AvatarFallback className="text-xs">
                                 {user.username?.[0]?.toUpperCase() ?? '?'}
                               </AvatarFallback>
                             </Avatar>
@@ -430,7 +430,7 @@ export function HistoryFiltersBar({
                 <Monitor className="mr-2 h-4 w-4" />
                 {t('pages:activity.platforms')}
                 {filters.platforms?.length ? (
-                  <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-[10px]">
+                  <Badge variant="secondary" className="ml-auto h-5 px-1.5">
                     {filters.platforms.length}
                   </Badge>
                 ) : null}
@@ -467,7 +467,7 @@ export function HistoryFiltersBar({
                         >
                           <Monitor className="text-muted-foreground mr-2 h-4 w-4" />
                           <span className="flex-1 truncate">{opt.value}</span>
-                          <Badge variant="secondary" className="ml-2 text-[10px]">
+                          <Badge variant="secondary" className="ml-2">
                             {opt.count}
                           </Badge>
                         </DropdownMenuCheckboxItem>
@@ -484,7 +484,7 @@ export function HistoryFiltersBar({
                 <Globe className="mr-2 h-4 w-4" />
                 {t('pages:history.filters.countries')}
                 {filters.geoCountries?.length ? (
-                  <Badge variant="secondary" className="ml-auto h-5 px-1.5 text-[10px]">
+                  <Badge variant="secondary" className="ml-auto h-5 px-1.5">
                     {filters.geoCountries.length}
                   </Badge>
                 ) : null}
@@ -521,7 +521,7 @@ export function HistoryFiltersBar({
                         >
                           <Globe className="text-muted-foreground mr-2 h-4 w-4" />
                           <span className="flex-1 truncate">{opt.value}</span>
-                          <Badge variant="secondary" className="ml-2 text-[10px]">
+                          <Badge variant="secondary" className="ml-2">
                             {opt.count}
                           </Badge>
                         </DropdownMenuCheckboxItem>
@@ -538,7 +538,7 @@ export function HistoryFiltersBar({
             <DropdownMenuLabel className="flex items-center justify-between">
               {t('pages:history.filters.mediaType')}
               {filters.mediaTypes?.length ? (
-                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+                <Badge variant="secondary" className="h-5 px-1.5">
                   {filters.mediaTypes.length}
                 </Badge>
               ) : null}
@@ -573,7 +573,7 @@ export function HistoryFiltersBar({
             <DropdownMenuLabel className="flex items-center justify-between">
               {t('common:labels.quality')}
               {filters.transcodeDecisions?.length ? (
-                <Badge variant="secondary" className="h-5 px-1.5 text-[10px]">
+                <Badge variant="secondary" className="h-5 px-1.5">
                   {filters.transcodeDecisions.length}
                 </Badge>
               ) : null}
@@ -655,7 +655,7 @@ export function HistoryFiltersBar({
               <Columns3 className="h-4 w-4" />
               {t('pages:history.filters.columns')}
               {hiddenColumnCount > 0 && (
-                <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+                <Badge variant="secondary" className="ml-1 h-5 px-1.5">
                   {HISTORY_COLUMNS.length - hiddenColumnCount}
                 </Badge>
               )}

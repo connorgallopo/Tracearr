@@ -25,6 +25,7 @@ import {
   WS_EVENTS,
   type Session,
   type EngineAutomation,
+  type ServerType,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import {
@@ -36,7 +37,9 @@ import {
   terminationLogs,
   libraryItems,
   media,
+  users,
 } from '../../db/schema.js';
+import { emailForSessionUser } from '../../services/mediaServer/byServerType.js';
 import { automationsLogger, createLogger } from '../../utils/logger.js';
 import { getPubSubService } from '../../services/cache.js';
 import { mapSessionRow } from './sessionMapper.js';
@@ -437,6 +440,47 @@ export async function getServerUserIdByExternalId(
     .limit(1);
 
   return aliased[0]?.id ?? null;
+}
+
+/**
+ * Create an account for each unknown session user, with a Tracearr user behind each, in one
+ * transaction so a failed account insert leaves no orphan user. Like user sync, the new user has
+ * no display name, so the person is named by users.username.
+ */
+export async function createSessionServerUsers(
+  server: { id: string; type: ServerType },
+  accounts: { externalId: string; username: string; thumbUrl: string | null }[]
+) {
+  return db.transaction(async (tx) => {
+    const identityUsers = await tx
+      .insert(users)
+      .values(accounts.map((u) => ({ username: u.username, thumbnail: u.thumbUrl })))
+      .returning();
+
+    const pairs = accounts.flatMap((account, idx) => {
+      const identity = identityUsers[idx];
+      return identity ? [{ account, identity }] : [];
+    });
+
+    const serverUserRows = await tx
+      .insert(serverUsers)
+      .values(
+        pairs.map(({ account, identity }) => ({
+          userId: identity.id,
+          serverId: server.id,
+          externalId: account.externalId,
+          username: account.username,
+          email: emailForSessionUser(server.type, account.username),
+          thumbUrl: account.thumbUrl,
+        }))
+      )
+      .returning();
+
+    return serverUserRows.flatMap((row, idx) => {
+      const identity = pairs[idx]?.identity;
+      return identity ? [{ ...row, identityName: identity.name ?? identity.username }] : [];
+    });
+  });
 }
 
 /**

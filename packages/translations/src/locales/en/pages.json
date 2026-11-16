@@ -2,9 +2,7 @@
   "login": {
     "title": "Tracearr",
     "tagline": "Tracearr - Stream access management",
-    "createAccountHeading": "Create your account to get started",
     "signInHeading": "Sign in to your account",
-    "createAccountDescription": "Create an account to manage your media servers",
     "signInDescription": "Sign in to access your dashboard",
     "selectPlexServer": "Select your Plex server",
     "waitingForPlex": "Waiting for Plex authorization...",
@@ -19,7 +17,6 @@
     "displayNamePlaceholder": "Choose a display name",
     "passwordPlaceholder": "At least 8 characters",
     "yourPasswordPlaceholder": "Your password",
-    "setupNote": "After creating your account, you'll add your Plex or Jellyfin servers from Settings.",
     "localDisabledHint": "Local sign-in is disabled for this instance. Ask an admin to run `enable-local-login` from the Tracearr CLI to re-enable it.",
     "oidcError": "Single sign-on failed. Please try again or use another sign-in method.",
     "accountCreated": "Account created successfully!",
@@ -54,6 +51,60 @@
       "notPermitted": "You are not permitted to sign in. Please contact the server owner."
     }
   },
+  "setup": {
+    "serverTitle": "Which media server do you use?",
+    "connectTitle": "Connect your {{server}} server",
+    "connectDescription": "Tracearr watches activity on this server. You can add other servers later in Settings.",
+    "linkPlexTitle": "Link your Plex account",
+    "linkPlexDescription": "Tracearr finds your Plex servers through your Plex account.",
+    "stepsLabel": "Setup steps",
+    "stepOfNamed": "Step {{step}} of {{total}}: {{name}}",
+    "steps": {
+      "server": "Media server",
+      "account": "Owner account",
+      "connect": "Connect server",
+      "import": "Import history"
+    },
+    "stepStatus": {
+      "done": "completed",
+      "current": "current step",
+      "upcoming": "not started"
+    },
+    "signedInAs": "Signed in as {{username}}",
+    "serverHint": "This is the first server you connect. You can add more in Settings.",
+    "ownerTitle": "Create the owner account",
+    "ownerDescription": "The owner account manages Tracearr and every server you connect.",
+    "ownerDescriptionSignIn": "Continue with {{server}} to create the owner account and connect your server, or use a username and password.",
+    "plexWaitingDescription": "Finish signing in to Plex in the window that opened.",
+    "pickerTitle": "Choose your {{server}} server",
+    "pickerDescription": "Signed in as {{username}}.",
+    "connectHint": "Tracearr reads activity from this server.",
+    "connectedTitle": "{{name}} is connected",
+    "connectedDescription": "Tracearr is reading activity from this server.",
+    "importTitle": "Import watch history",
+    "importDescription": "Bring in plays from before Tracearr was watching. Imports run in the background, so you can leave once one starts.",
+    "goToDashboard": "Go to dashboard",
+    "codeExpired": "The sign-in code expired.",
+    "signInAgain": "Sign in again",
+    "timedOut": "Your {{server}} sign-in timed out",
+    "checkAgain": "Check again"
+  },
+  "tofa": {
+    "signIn": "Sign in with tofa",
+    "waiting": "Waiting for you to approve Tracearr in tofa",
+    "waitingHint": "Sign in to tofa in the window that opened and choose Approve.",
+    "waitingDescription": "Once you approve, you pick your server and Tracearr creates the owner account.",
+    "openAgain": "Open tofa again",
+    "expiresIn": "Expires in {{time}}",
+    "codeFallback": "If tofa asks for a code, enter <code>{{code}}</code>.",
+    "pickerNote": "Only servers you own are listed. Tracearr creates its own API key that can read activity and stop streams.",
+    "unreachable": "Tracearr can't reach {{name}} at {{address}}.",
+    "noAddress": "tofa lists no local address for {{name}}.",
+    "noServersTitle": "No tofa servers to connect",
+    "noServers": "{{username}} owns no tofa servers. Only a server's owner can connect it.",
+    "noServersPassword": "{{username}} owns no tofa servers, so there is nothing to connect yet. Create the owner account with a username and password instead.",
+    "manual": "Enter a URL and API key instead"
+  },
   "dashboard": {
     "alerts": "Alerts",
     "plays": "Plays",
@@ -68,6 +119,7 @@
     "othersStreaming_one": "{{count}} other stream playing",
     "othersStreaming_other": "{{count}} other streams playing",
     "dayStreak": "Day streak",
+    "noServers": "Connect a Plex, Jellyfin, Emby or tofa server to see its streams, history and libraries here.",
     "view": {
       "label": "Dashboard view",
       "admin": "Server",
@@ -172,6 +224,7 @@
     "mergeTitleBulk": "Merge these users?",
     "mergeReasonEmail": "Both have the email {{value}} on their server accounts.",
     "mergeReasonEmailUsername": "Both use {{value}} as a username or account email.",
+    "mergeReasonLinked": "One server lists the account {{value}} on the other as this person's own.",
     "mergeReasonUsername": "Both use the username {{value}}.",
     "mergeKeep": "Keep",
     "mergeFoldIn": "Fold in, then deleted",
@@ -206,6 +259,9 @@
     "suggestionsPairEmailUsername": "{{first}} and {{second}} use the same address as a username or account email",
     "suggestionsPairEmailUsernameMore_one": "{{first}} and {{second}} use the same address as a username or account email, plus {{count}} more",
     "suggestionsPairEmailUsernameMore_other": "{{first}} and {{second}} use the same address as a username or account email, plus {{count}} more",
+    "suggestionsPairLinked": "{{first}} and {{second}} are linked on their servers",
+    "suggestionsPairLinkedMore_one": "{{first}} and {{second}} are linked on their servers, plus {{count}} more",
+    "suggestionsPairLinkedMore_other": "{{first}} and {{second}} are linked on their servers, plus {{count}} more",
     "suggestionsPairUsername": "{{first}} and {{second}} share a username",
     "suggestionsPairUsernameMore_one": "{{first}} and {{second}} share a username, plus {{count}} more",
     "suggestionsPairUsernameMore_other": "{{first}} and {{second}} share a username, plus {{count}} more",
@@ -214,6 +270,7 @@
     "suggestionsNotSame": "Not the same person",
     "suggestionsMatchEmail": "Same email",
     "suggestionsMatchEmailUsername": "Both use {{value}} as a username or account email",
+    "suggestionsMatchLinked": "Linked account",
     "suggestionsMatchUsername": "Same username",
     "suggestionsEmpty": "Nothing left to review.",
     "suggestionsDismissed": "Dismissed ({{count}})",
@@ -376,7 +433,9 @@
     },
     "stream": {
       "notAvailable": "N/A",
-      "bitrateUnavailable": "Jellyfin and Emby do not expose individual video and audio bitrates during transcoding. Only the total stream bitrate is available.",
+      "bitrateUnavailable": "Jellyfin, Emby and tofa do not expose individual video and audio bitrates during transcoding. Only the total stream bitrate is available.",
+      "rebuffers": "Rebuffers",
+      "droppedFrames": "Dropped frames",
       "stereo": "Stereo",
       "mono": "Mono",
       "channelCount_one": "{{count}}ch",
@@ -631,7 +690,11 @@
       },
       "notSynced": {
         "title": "Library not synced yet",
-        "body": "Library statistics will appear here once the library has been synced. This typically happens automatically every hour."
+        "body": "Library statistics will appear here once the library has been synced. A sync starts when a server is added and repeats every 12 hours."
+      },
+      "syncQueued": {
+        "title": "Library sync queued",
+        "body": "A library sync is waiting to start. Library statistics will appear here once it completes."
       },
       "noMedia": {
         "title": "No movies or shows yet",
@@ -978,7 +1041,7 @@
       "message_client": {
         "label": "Message Client",
         "description": "Send a message to the media player",
-        "hint": "Jellyfin and Emby only. Plex only supports messages when killing a stream.",
+        "hint": "Jellyfin and Emby only. Plex and tofa only show a message when killing a stream.",
         "fields": {
           "target": {
             "description": "Which sessions to message"

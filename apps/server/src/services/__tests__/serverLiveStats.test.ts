@@ -4,7 +4,7 @@ import {
   recordServerStatsSample,
   getPluginServerStats,
   getServerLiveStats,
-  plexClockShift,
+  serverClockShift,
   trimBandwidthStats,
 } from '../serverLiveStats.js';
 
@@ -157,34 +157,34 @@ describe('getPluginServerStats', () => {
   });
 });
 
-describe('plexClockShift', () => {
+describe('serverClockShift', () => {
   const now = () => Math.floor(Date.now() / 1000);
 
   it('leaves a synced server alone so its real sampling lag stays visible', () => {
-    expect(plexClockShift([{ at: now() - 4 }])).toBe(0);
+    expect(serverClockShift([{ at: now() - 4 }])).toBe(0);
   });
 
   it('drags a slow server back into the window, keeping a plausible lag', () => {
     // 200s behind is a broken clock: shift all but a plausible lag
-    expect(plexClockShift([{ at: now() - 200 }])).toBe(185);
+    expect(serverClockShift([{ at: now() - 200 }])).toBe(185);
   });
 
   it('pulls a server whose clock runs ahead back to now', () => {
-    expect(plexClockShift([{ at: now() + 60 }])).toBe(-60);
+    expect(serverClockShift([{ at: now() + 60 }])).toBe(-60);
   });
 
   it('anchors on the newest point across every series', () => {
-    expect(plexClockShift([{ at: now() - 300 }], [{ at: now() - 2 }])).toBe(0);
+    expect(serverClockShift([{ at: now() - 300 }], [{ at: now() - 2 }])).toBe(0);
   });
 
   it('is a no-op with no points', () => {
-    expect(plexClockShift([], [])).toBe(0);
+    expect(serverClockShift([], [])).toBe(0);
   });
 
   it('handles a day and a half of per-second points without overflowing the stack', () => {
     const newest = now() - 4;
     const points = Array.from({ length: 130_000 }, (_, i) => ({ at: newest - i }));
-    expect(plexClockShift([], points)).toBe(0);
+    expect(serverClockShift([], points)).toBe(0);
   });
 });
 

@@ -20,12 +20,12 @@ import { ArrowUpDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const COLORS = {
-  local: '#cc7b9f',
-  remote: '#00b4e4',
-  localGradientStart: 'rgba(204, 123, 159, 0.3)',
-  localGradientEnd: 'rgba(204, 123, 159, 0.05)',
-  remoteGradientStart: 'rgba(0, 180, 228, 0.3)',
-  remoteGradientEnd: 'rgba(0, 180, 228, 0.05)',
+  local: 'oklch(var(--chart-2))',
+  remote: 'oklch(var(--chart-1))',
+  localGradientStart: 'oklch(var(--chart-2) / 0.3)',
+  localGradientEnd: 'oklch(var(--chart-2) / 0.05)',
+  remoteGradientStart: 'oklch(var(--chart-1) / 0.3)',
+  remoteGradientEnd: 'oklch(var(--chart-1) / 0.05)',
 };
 
 /**
@@ -154,22 +154,22 @@ export function ServerBandwidthChart({
         verticalAlign: 'top',
         floating: false,
         itemStyle: {
-          color: 'hsl(var(--muted-foreground))',
+          color: 'oklch(var(--muted-foreground))',
           fontWeight: 'normal',
-          fontSize: '11px',
+          fontSize: '12px',
         },
-        itemHoverStyle: { color: 'hsl(var(--foreground))' },
+        itemHoverStyle: { color: 'oklch(var(--foreground))' },
       },
       xAxis: liveStatsTimeAxis(Date.now() + clockSkewMs),
       yAxis: {
         title: { text: undefined },
         labels: {
-          style: { color: 'hsl(var(--muted-foreground))', fontSize: '10px' },
+          style: { color: 'oklch(var(--muted-foreground))', fontSize: '12px' },
           formatter: function () {
             return formatBitsPerSecond(this.value as number);
           },
         },
-        gridLineColor: 'hsl(var(--border) / 0.5)',
+        gridLineColor: 'oklch(var(--border) / 0.5)',
         min: 0,
         softMax: 1000, // 1 Kbps floor so the axis has labels when traffic is zero
       },
@@ -188,9 +188,9 @@ export function ServerBandwidthChart({
         },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
-        style: { color: 'hsl(var(--popover-foreground))', fontSize: '11px' },
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
+        style: { color: 'oklch(var(--popover-foreground))', fontSize: '12px' },
         formatter: function () {
           const matched = nearestPoints(this);
           const secsAgo = Math.max(
@@ -209,7 +209,7 @@ export function ServerBandwidthChart({
           const total = matched.reduce((sum, p) => sum + p.y, 0);
 
           return (
-            `<span style="font-size:10px;color:hsl(var(--muted-foreground))">${timeLabel}</span><br/>` +
+            `<span style="color:oklch(var(--muted-foreground))">${timeLabel}</span><br/>` +
             `${rows}<br/><br/>Total \u2014 <b>${formatBitsPerSecond(total)}</b>`
           );
         },
@@ -220,7 +220,7 @@ export function ServerBandwidthChart({
           {
             condition: { maxWidth: 400 },
             chartOptions: {
-              legend: { align: 'center', layout: 'horizontal', itemStyle: { fontSize: '10px' } },
+              legend: { align: 'center', layout: 'horizontal' },
               xAxis: liveStatsTimeAxis(Date.now() + clockSkewMs, true),
             },
           },

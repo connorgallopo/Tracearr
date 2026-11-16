@@ -128,9 +128,9 @@ export function ConditionRow({
       data-pulse={pulsing}
       data-orphaned={orphaned.length > 0}
       className={cn(
-        'bg-card-raised items-center',
+        'bg-card dark:bg-card-raised items-center',
         'data-[pulse=true]:ring-primary/60 data-[pulse=true]:ring-2',
-        'data-[orphaned=true]:border-l-warning data-[orphaned=true]:bg-warning/5 data-[orphaned=true]:border-l-2',
+        'data-[orphaned=true]:border-l-warning data-[orphaned=true]:bg-warning/5 dark:data-[orphaned=true]:bg-warning/5 data-[orphaned=true]:border-l-2',
         !enabled && 'opacity-60'
       )}
     >

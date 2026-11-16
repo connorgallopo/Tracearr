@@ -132,7 +132,6 @@ function AlbumBody({ detail, isMember }: { detail: AlbumDetailResponse; isMember
     <>
       <div className="grid grid-cols-2 gap-3">
         <StatCard
-          variant="kpi"
           compact
           icon={Play}
           label={t('common:labels.plays')}
@@ -141,7 +140,6 @@ function AlbumBody({ detail, isMember }: { detail: AlbumDetailResponse; isMember
           subValue={playsDelta === null ? last30Caption : t('pages:media.detail.album.vsPrior30')}
         />
         <StatCard
-          variant="kpi"
           compact
           icon={Clock}
           label={t(verbKeysFor('album').watchTime)}
@@ -150,7 +148,6 @@ function AlbumBody({ detail, isMember }: { detail: AlbumDetailResponse; isMember
         />
         {showListeners && (
           <StatCard
-            variant="kpi"
             compact
             icon={Users}
             label={t('pages:media.detail.watchers.titleMusic')}
@@ -159,7 +156,6 @@ function AlbumBody({ detail, isMember }: { detail: AlbumDetailResponse; isMember
           />
         )}
         <StatCard
-          variant="kpi"
           compact
           icon={CheckCircle2}
           label={t('pages:userDetail.cards.finished')}
@@ -220,10 +216,10 @@ export function AlbumSheet({ albumId, serverIds, serverById, isMember, onClose }
               )}
             </div>
             <div className="min-w-0 space-y-1">
-              <p className="text-muted-foreground text-[11px] tracking-[0.06em] uppercase">
+              <p className="text-muted-foreground text-xs tracking-wide uppercase">
                 {[kind, album?.artistTitle, album?.year?.toString()].filter(Boolean).join(' · ')}
               </p>
-              <SheetTitle className="text-[22px] leading-tight">{album?.title ?? kind}</SheetTitle>
+              <SheetTitle className="text-xl leading-tight">{album?.title ?? kind}</SheetTitle>
               <SheetDescription className={cn('text-xs', !album && 'sr-only')}>
                 {album
                   ? [

@@ -186,7 +186,7 @@ async function queryLocations(
     ),
     people AS (
       SELECT DISTINCT ON (pa.loc_id, su.user_id)
-        pa.loc_id, su.user_id, su.id, su.server_id, su.username, su.thumb_url, u.name AS identity_name
+        pa.loc_id, su.user_id, su.id, su.server_id, u.username, su.thumb_url, COALESCE(u.name, u.username) AS identity_name
       FROM (SELECT DISTINCT loc_id, server_user_id FROM base ${onlySelected('loc_id')}) pa
       JOIN server_users su ON su.id = pa.server_user_id
       JOIN users u ON u.id = su.user_id
@@ -350,7 +350,7 @@ export const locationsRoutes: FastifyPluginAsync = async (app) => {
               ARRAY[rep.id::text]
             ) AS server_user_ids
           FROM (
-            SELECT DISTINCT ON (su.user_id) su.id, su.user_id, su.username, u.name as identity_name
+            SELECT DISTINCT ON (su.user_id) su.id, su.user_id, u.username, COALESCE(u.name, u.username) as identity_name
             FROM sessions s
             JOIN server_users su ON su.id = s.server_user_id
             JOIN users u ON su.user_id = u.id

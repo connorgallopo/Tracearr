@@ -20,6 +20,12 @@ import {
 import { ServerPillList } from './ServerPillList';
 import { identityDisplayName, isEmailMatchOnUsername } from './mergeSelection';
 
+const MATCH_LABEL_KEYS = {
+  linkedAccount: 'pages:users.suggestionsMatchLinked',
+  email: 'pages:users.suggestionsMatchEmail',
+  username: 'pages:users.suggestionsMatchUsername',
+} as const satisfies Record<MergeSuggestion['matchType'], string>;
+
 const pairKey = ([a, b]: [MergeSuggestionIdentity, MergeSuggestionIdentity]) =>
   `${a.userId}:${b.userId}`;
 
@@ -78,10 +84,7 @@ export function MergeSuggestionsSheet({
                     </p>
                   ) : (
                     <p className="text-muted-foreground text-sm">
-                      {suggestion.matchType === 'email'
-                        ? t('pages:users.suggestionsMatchEmail')
-                        : t('pages:users.suggestionsMatchUsername')}
-                      :{' '}
+                      {t(MATCH_LABEL_KEYS[suggestion.matchType])}:{' '}
                       <span className="text-foreground font-medium break-all">
                         {suggestion.matchValue}
                       </span>

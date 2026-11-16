@@ -39,7 +39,7 @@ import authPlugin, { loadJwtRevokeSettings } from '../../plugins/auth.js';
 import { getSetting } from '../../services/settings.js';
 import { sessionRoutes } from '../auth/session.js';
 import { registerErrorHandler } from '../../utils/errors.js';
-import { users, servers, authAccounts } from '../../db/schema.js';
+import { users, servers, serverUsers, authAccounts } from '../../db/schema.js';
 
 function mockBetterAuthSession(user: Record<string, unknown> | null) {
   const getSession = vi.fn().mockResolvedValue(user ? { user } : null);
@@ -69,6 +69,7 @@ function selectResult(rows: unknown[]) {
 function tableAwareSelect(rowsByTable: {
   users?: unknown[];
   servers?: unknown[];
+  serverUsers?: unknown[];
   authAccountsSequence?: unknown[][];
 }) {
   let authAccountsCallIndex = 0;
@@ -76,6 +77,7 @@ function tableAwareSelect(rowsByTable: {
     from: vi.fn((table: unknown) => {
       if (table === users) return selectResult(rowsByTable.users ?? []);
       if (table === servers) return selectResult(rowsByTable.servers ?? []);
+      if (table === serverUsers) return selectResult(rowsByTable.serverUsers ?? []);
       if (table === authAccounts) {
         const rows = rowsByTable.authAccountsSequence?.[authAccountsCallIndex] ?? [];
         authAccountsCallIndex += 1;
@@ -109,7 +111,10 @@ async function buildTestApp(): Promise<FastifyInstance> {
 // Simulates a Better Auth owner session backed by a credential account row
 // (the shape a real sign-up would leave behind), since no live Postgres is
 // available to run an actual sign-up through the drizzle adapter.
-async function signUpOwner(_app: FastifyInstance): Promise<string> {
+async function signUpOwner(
+  _app: FastifyInstance,
+  picture: { thumbnail: string; serverUsers: unknown[] } | null = null
+): Promise<string> {
   const userId = 'owner-1';
   mockBetterAuthSession({ id: userId, username: 'owner', name: 'Owner', role: 'owner' });
 
@@ -119,8 +124,9 @@ async function signUpOwner(_app: FastifyInstance): Promise<string> {
         {
           id: userId,
           username: 'owner',
+          name: 'Owner',
           email: 'owner@example.com',
-          thumbnail: null,
+          thumbnail: picture?.thumbnail ?? null,
           role: 'owner',
           aggregateTrustScore: 100,
           passwordHash: null,
@@ -128,7 +134,8 @@ async function signUpOwner(_app: FastifyInstance): Promise<string> {
         },
       ],
       servers: [{ id: 'server-1' }, { id: 'server-2' }],
-      authAccountsSequence: [[{ id: 'account-1' }], []],
+      serverUsers: picture?.serverUsers ?? [],
+      authAccountsSequence: [[{ providerId: 'credential' }]],
     }) as never
   );
 
@@ -272,9 +279,24 @@ describe('auth decorators with better auth sessions', () => {
     expect(res.statusCode).toBe(200);
     expect(res.json()).toMatchObject({
       username: expect.any(String),
+      name: 'Owner',
       role: 'owner',
       hasPassword: true,
       hasPlexLinked: false,
+      hasTofaLinked: false,
+    });
+  });
+
+  it('me names the server the picture comes from, so it loads through the image proxy', async () => {
+    app = await buildTestApp();
+    const cookie = await signUpOwner(app, {
+      thumbnail: '/api/v1/profiles/avatars/astronaut.png',
+      serverUsers: [{ serverId: 'server-2' }],
+    });
+    const res = await app.inject({ method: 'GET', url: '/api/v1/auth/me', headers: { cookie } });
+    expect(res.json()).toMatchObject({
+      thumbnail: '/api/v1/profiles/avatars/astronaut.png',
+      thumbnailServerId: 'server-2',
     });
   });
 });

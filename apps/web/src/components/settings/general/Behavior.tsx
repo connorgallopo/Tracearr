@@ -76,6 +76,9 @@ export function Behavior() {
               <p className="text-muted-foreground text-sm">
                 <strong>Jellyfin/Emby:</strong> {t('general.jellyfinPollingNote')}
               </p>
+              <p className="text-muted-foreground text-sm">
+                <strong>tofa:</strong> {t('general.tofaLiveEventsNote')}
+              </p>
             </div>
 
             <AutosaveSwitchField

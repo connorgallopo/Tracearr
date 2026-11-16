@@ -57,7 +57,7 @@ export const libraryRoutes: FastifyPluginAsync = async (app) => {
       }
 
       try {
-        const jobId = await enqueueLibrarySync(serverId, 'manual', authUser.userId);
+        const jobId = await enqueueLibrarySync(serverId, 'manual', { userId: authUser.userId });
         return {
           jobId,
           message: 'Sync job queued',

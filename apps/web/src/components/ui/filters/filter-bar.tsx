@@ -123,7 +123,7 @@ export function FilterBar<S extends FilterState>({
       <SlidersHorizontal className="h-3.5 w-3.5" />
       {labels.trigger}
       {panelCount > 0 && (
-        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+        <Badge variant="secondary" className="ml-1 h-5 px-1.5">
           {panelCount}
         </Badge>
       )}

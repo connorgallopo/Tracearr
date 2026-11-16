@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getDeviceDisplayName, getMediaLinks } from './utils';
+import { getDeviceDisplayName, getMediaDisplay, getMediaLinks } from './utils';
 
 describe('getDeviceDisplayName', () => {
   it('prefers the name the client gave itself', () => {
@@ -61,5 +61,33 @@ describe('getMediaLinks', () => {
         showMediaId: null,
       })
     ).toEqual({ title: null, subtitle: null });
+  });
+});
+
+describe('getMediaDisplay for live TV', () => {
+  it('names the show, episode and channel of a live episode', () => {
+    expect(
+      getMediaDisplay({
+        mediaType: 'live',
+        mediaTitle: 'Episode 14',
+        grandparentTitle: 'Friends',
+        seasonNumber: 3,
+        episodeNumber: 14,
+        channelTitle: 'TBS',
+      })
+    ).toEqual({ title: 'Friends', subtitle: 'S03 E14 · Episode 14 · TBS' });
+  });
+
+  it('puts the channel under a program that is not an episode', () => {
+    expect(
+      getMediaDisplay({ mediaType: 'live', mediaTitle: 'News at 3', channelTitle: 'NBC 5' })
+    ).toEqual({ title: 'News at 3', subtitle: 'NBC 5' });
+  });
+
+  it('does not repeat a channel that is also the title', () => {
+    expect(getMediaDisplay({ mediaType: 'live', mediaTitle: 'CNN', channelTitle: 'CNN' })).toEqual({
+      title: 'CNN',
+      subtitle: null,
+    });
   });
 });

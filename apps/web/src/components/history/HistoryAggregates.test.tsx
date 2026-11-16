@@ -32,6 +32,6 @@ describe('HistoryAggregates', () => {
     render(<HistoryAggregates aggregates={aggregates({ listenTimeMs: HOUR })} total={12} />);
 
     expect(screen.getByText('4h 0m')).toBeInTheDocument();
-    expect(screen.getByText('(common:labels.listenTime 1h 0m)')).toBeInTheDocument();
+    expect(screen.getByText('common:labels.listenTime 1h 0m')).toBeInTheDocument();
   });
 });

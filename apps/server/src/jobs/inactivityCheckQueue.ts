@@ -10,6 +10,7 @@ import type { Redis } from 'ioredis';
 import { TIME_MS, type EngineAutomation, type ServerType } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { serverUsers, users, servers } from '../db/schema.js';
+import { personNameColumn } from '../utils/representativeAccount.js';
 import { dispatch } from '../services/automations/events/dispatcher.js';
 import { matchesTrigger, triggerNodeFor } from '../services/automations/events/evaluate.js';
 import { liveServerCondition } from '../services/liveServers.js';
@@ -243,7 +244,7 @@ async function processInactivityCheck(job: Job<InactivityCheckJobData>): Promise
         userId: serverUsers.userId,
         username: serverUsers.username,
         thumbUrl: serverUsers.thumbUrl,
-        identityName: users.name,
+        identityName: personNameColumn(),
         lastActivityAt: serverUsers.lastActivityAt,
         trustScore: serverUsers.trustScore,
         createdAt: serverUsers.createdAt,

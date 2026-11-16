@@ -102,7 +102,7 @@ export function TriggerRow({ trigger, issues, pulsing, rowProps, dispatch }: Tri
       {...rowProps}
       data-pulse={pulsing}
       className={cn(
-        'bg-card-raised',
+        'bg-card dark:bg-card-raised',
         'data-[pulse=true]:ring-primary/60 data-[pulse=true]:ring-2',
         !trigger.enabled && 'opacity-60'
       )}

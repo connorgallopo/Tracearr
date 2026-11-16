@@ -53,9 +53,11 @@ import {
   posterCacheEntryExists,
   posterCacheFileName,
   buildLqipPlaceholder,
+  buildAvatarUrl,
   buildUpstreamRequest,
   persistDominantColorIfNeeded,
-  _resetServerRowCacheForTests,
+  proxyAccountPicture,
+  _resetImageOriginCacheForTests,
 } from '../imageProxy.js';
 
 const CACHE_DIR = join(process.cwd(), 'data', 'image-cache');
@@ -81,7 +83,7 @@ function mockUpdateChain() {
 
 afterEach(() => {
   vi.clearAllMocks();
-  _resetServerRowCacheForTests();
+  _resetImageOriginCacheForTests();
 });
 
 describe('posterVersionFor', () => {
@@ -420,6 +422,214 @@ describe('proxyImage cache-miss pipeline', () => {
     expect(cancel).toHaveBeenCalledTimes(2);
   });
 
+  describe('a tofa server', () => {
+    const artwork = '/api/v1/artwork/7e0f0000-3a1c-4d2e-9b5f-000000000004/poster';
+
+    function redirectTo(location: string): Response {
+      return new Response(null, { status: 302, headers: { location } });
+    }
+
+    beforeEach(() => {
+      mockSelectChain([
+        { id: 'server-t', type: 'tofa', url: 'http://tofa.local:33333', token: 'tofa-key' },
+      ]);
+    });
+
+    it('follows the artwork redirect into its image cache with the key', async () => {
+      fetchSpy
+        .mockResolvedValueOnce(redirectTo('/cache/images/posters/plex-abab.jpg?h=360'))
+        .mockResolvedValueOnce(
+          new Response(testImage, { status: 200, headers: { 'content-type': 'image/jpeg' } })
+        );
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: artwork,
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/webp');
+      const calls = fetchSpy.mock.calls as [string, RequestInit][];
+      expect(calls.map(([url]) => url)).toEqual([
+        `http://tofa.local:33333${artwork}?h=360`,
+        'http://tofa.local:33333/cache/images/posters/plex-abab.jpg?h=360',
+      ]);
+      expect(calls[1]?.[1].headers).toMatchObject({ Authorization: 'Bearer tofa-key' });
+    });
+
+    it("does not follow a redirect from a photo on tofa's cloud", async () => {
+      fetchSpy.mockResolvedValue(redirectTo('/cache/images/posters/a.jpg'));
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: 'https://api.tofa.tv/avatars/a.png',
+        width: 40,
+        height: 40,
+        fallback: 'avatar',
+      });
+
+      expect(result.contentType).toBe('image/svg+xml');
+      const urls = (fetchSpy.mock.calls as [string][]).map(([url]) => url);
+      expect(urls.every((url) => url.startsWith('https://api.tofa.tv/'))).toBe(true);
+    });
+
+    it('never follows a redirect off the server, so the key stays on it', async () => {
+      fetchSpy.mockResolvedValue(redirectTo('http://elsewhere.example/cache/images/posters/a.jpg'));
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: artwork,
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/svg+xml');
+      const urls = (fetchSpy.mock.calls as [string][]).map(([url]) => url);
+      expect(urls).toEqual([
+        `http://tofa.local:33333${artwork}?h=360`,
+        `http://tofa.local:33333${artwork}`,
+      ]);
+    });
+  });
+
+  describe('a request service', () => {
+    const seerrPoster = '/imageproxy/tmdb/t/p/w600_and_h900_bestv2/abc.jpg';
+
+    /**
+     * The servers lookup misses, then the request service is found, then its server if asked,
+     * then the request holding the poster.
+     */
+    function mockServiceOrigin(...rows: Record<string, unknown>[]) {
+      const limit = vi.fn().mockResolvedValueOnce([]);
+      for (const row of rows) limit.mockResolvedValueOnce([row]);
+      limit.mockResolvedValue([]);
+      vi.mocked(db.select).mockReturnValue({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit,
+      } as never);
+      return limit;
+    }
+
+    it("fetches a Seerr poster from Seerr's own image cache, without its key", async () => {
+      mockServiceOrigin(
+        { id: 'svc', type: 'seerr', url: 'http://seerr.local:5055/', enabled: true },
+        { id: 'req' }
+      );
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: seerrPoster,
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/webp');
+      const calls = fetchSpy.mock.calls as [string, RequestInit][];
+      expect(calls.map(([url]) => url)).toEqual([`http://seerr.local:5055${seerrPoster}`]);
+      expect(calls[0]?.[1].headers).toEqual({ Accept: 'image/*' });
+    });
+
+    it("refuses an image anywhere but the Seerr service's own image cache", async () => {
+      const limit = mockServiceOrigin({
+        id: 'svc',
+        type: 'seerr',
+        url: 'http://seerr.local:5055',
+        enabled: true,
+      });
+      limit.mockResolvedValue([{ id: 'req' }]);
+      const serviceId = randomUUID();
+
+      for (const imagePath of [
+        'https://image.tmdb.org/t/p/w600_and_h900_bestv2/abc.jpg',
+        '.attacker.example/imageproxy/tmdb/t/p/w600_and_h900_bestv2/abc.jpg',
+        '/api/v1/settings/main',
+      ]) {
+        const result = await proxyImage({
+          serverId: serviceId,
+          imagePath,
+          width: 240,
+          height: 360,
+        });
+        expect(result.degraded).toBe(true);
+      }
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it("fetches a tofa request's poster from its server's image cache with the key", async () => {
+      const serverId = randomUUID();
+      mockServiceOrigin(
+        { id: 'svc', type: 'tofa', url: 'http://tofa.local:33333', serverId, enabled: true },
+        { id: serverId, type: 'tofa', url: 'http://tofa.local:33333', token: 'tofa-key' },
+        { id: 'req' }
+      );
+
+      await proxyImage({
+        serverId: randomUUID(),
+        imagePath: '/cache/images/posters/abc.jpg',
+        width: 240,
+        height: 360,
+      });
+
+      const calls = fetchSpy.mock.calls as [string, RequestInit][];
+      expect(calls[0]?.[0]).toBe('http://tofa.local:33333/cache/images/posters/abc.jpg?h=360');
+      expect(calls[0]?.[1].headers).toMatchObject({ Authorization: 'Bearer tofa-key' });
+    });
+
+    it("fetches a tofa request's cloud poster from the cloud without the key", async () => {
+      const serverId = randomUUID();
+      const imagePath = 'https://api.tofa.tv/v1/metadata/assets/tmdb/title/0d/42/abc.jpg';
+      mockServiceOrigin(
+        { id: 'svc', type: 'tofa', url: 'http://tofa.local:33333', serverId, enabled: true },
+        { id: serverId, type: 'tofa', url: 'http://tofa.local:33333', token: 'tofa-key' },
+        { id: 'req' }
+      );
+
+      await proxyImage({ serverId: randomUUID(), imagePath, width: 240, height: 360 });
+
+      const calls = fetchSpy.mock.calls as [string, RequestInit][];
+      expect(calls[0]?.[0]).toBe(imagePath);
+      expect(calls[0]?.[1].headers).toEqual({ Accept: 'image/*' });
+    });
+
+    it('asks a request service only for a poster one of its requests holds', async () => {
+      mockServiceOrigin({
+        id: 'svc',
+        type: 'seerr',
+        url: 'http://seerr.local:5055',
+        enabled: true,
+      });
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: '/imageproxy/tmdb/t/p/w600_and_h900_bestv2/unheld.jpg',
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/svg+xml');
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
+    it('fetches nothing from a disabled request service', async () => {
+      mockServiceOrigin(
+        { id: 'svc', type: 'seerr', url: 'http://seerr.local:5055', enabled: false },
+        { id: 'req' }
+      );
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: seerrPoster,
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/svg+xml');
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+  });
+
   it('returns the degraded placeholder for a path outside the image routes without fetching', async () => {
     mockSelectChain([
       { id: 'server-9', type: 'plex', url: 'http://localhost:32400', token: 'token' },
@@ -539,6 +749,55 @@ describe('proxyImage cache-miss pipeline', () => {
     expect(result.cached).toBe(false);
     expect(result.contentType).toBe('image/webp');
     expect(result.data.byteLength).toBeGreaterThan(50);
+  });
+});
+
+describe('proxyAccountPicture', () => {
+  let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(async () => {
+    const sharp = (await import('sharp')).default;
+    const picture = await sharp({
+      create: { width: 8, height: 8, channels: 3, background: { r: 50, g: 100, b: 150 } },
+    })
+      .jpeg()
+      .toBuffer();
+    vi.mocked(stat).mockRejectedValue(new Error('ENOENT'));
+    vi.mocked(cacheWriteAllowed).mockResolvedValue(true);
+    fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(
+        new Response(picture, { status: 200, headers: { 'content-type': 'image/jpeg' } })
+      );
+  });
+
+  afterEach(() => {
+    fetchSpy.mockRestore();
+  });
+
+  it('fetches the picture without following redirects and caches it resized', async () => {
+    const result = await proxyAccountPicture('https://idp.example.com/a.png', 100);
+
+    expect(result?.contentType).toBe('image/webp');
+    expect(fetchSpy).toHaveBeenCalledWith(
+      'https://idp.example.com/a.png',
+      expect.objectContaining({ redirect: 'manual' })
+    );
+    expect(vi.mocked(rename)).toHaveBeenCalled();
+  });
+
+  it('never fetches a link-local address', async () => {
+    expect(await proxyAccountPicture('http://169.254.169.254/latest/meta-data', 100)).toBeNull();
+    expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('gives nothing when the host answers with a redirect', async () => {
+    fetchSpy.mockResolvedValue(
+      new Response(null, { status: 302, headers: { location: 'http://169.254.169.254/' } })
+    );
+
+    expect(await proxyAccountPicture('https://idp.example.com/a.png', 100)).toBeNull();
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -715,6 +974,60 @@ describe('buildUpstreamRequest', () => {
     expect(imageUrl).toBe(
       'http://media:1234/Items/abc/Images/Primary?tag=5&maxHeight=360&quality=90'
     );
+  });
+
+  it('fetches Plex guide art from its own host over https, without the token', () => {
+    const plex = { type: 'plex', url: 'http://plex.local:32400', token: 'secret' } as never;
+    expect(
+      buildUpstreamRequest(plex, 'http://plex.tmsimg.com/h3/NowShowing/1/s1_h3_aa.png')
+    ).toEqual({
+      imageUrl: 'https://plex.tmsimg.com/h3/NowShowing/1/s1_h3_aa.png',
+      headers: { Accept: 'image/*' },
+    });
+  });
+
+  it("fetches a tofa server's preset avatar with its key", () => {
+    const tofa = { type: 'tofa', url: 'http://tofa.local:33333', token: 'tofa-key' } as never;
+    expect(buildUpstreamRequest(tofa, '/api/v1/profiles/avatars/astronaut.png')).toEqual({
+      imageUrl: 'http://tofa.local:33333/api/v1/profiles/avatars/astronaut.png',
+      headers: { Accept: 'image/*', Authorization: 'Bearer tofa-key' },
+    });
+  });
+
+  it("fetches a tofa upload from tofa's cloud over https, without the key", () => {
+    const tofa = { type: 'tofa', url: 'http://tofa.local:33333', token: 'tofa-key' } as never;
+    expect(buildUpstreamRequest(tofa, 'https://api.tofa.tv/avatars/a.png')).toEqual({
+      imageUrl: 'https://api.tofa.tv/avatars/a.png',
+      headers: { Accept: 'image/*' },
+    });
+  });
+
+  it('proxies an avatar address that is not on plex.tv and loads plex.tv ones directly', () => {
+    expect(buildAvatarUrl('server-1', 'https://api.tofa.tv/avatars/a.png', 40)).toMatch(
+      /^\/api\/v1\/images\/proxy\?server=server-1&url=https%3A%2F%2Fapi\.tofa\.tv%2Favatars%2Fa\.png/
+    );
+    expect(buildAvatarUrl('server-1', 'https://plex.tv/users/x/avatar', 40)).toBe(
+      'https://plex.tv/users/x/avatar'
+    );
+  });
+
+  it('gives no avatar for an absolute address on a host no server type serves art from', () => {
+    expect(buildAvatarUrl('server-1', 'https://cdn.example.com/a.png', 40)).toBeNull();
+  });
+
+  it.each([
+    'https://evil.example.com/a.png',
+    'https://plex.tmsimg.com.evil.example.com/a.png',
+    'https://plex.tmsimg.com:8443/a.png',
+    'https://user@plex.tmsimg.com/a.png',
+    'file://plex.tmsimg.com/etc/passwd',
+  ])('refuses %s', (address) => {
+    const plex = { type: 'plex', url: 'http://plex.local:32400', token: 'secret' } as never;
+    const jellyfin = { type: 'jellyfin', url: 'http://jf.local:8096', token: 'secret' } as never;
+    expect(() => buildUpstreamRequest(plex, address)).toThrow(SsrfBlockedError);
+    expect(() =>
+      buildUpstreamRequest(jellyfin, 'https://plex.tmsimg.com/h3/NowShowing/1/s1_h3_aa.png')
+    ).toThrow(SsrfBlockedError);
   });
 
   describe('path allowlist', () => {

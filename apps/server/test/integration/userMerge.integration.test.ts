@@ -11,7 +11,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import Fastify from 'fastify';
 import sensible from '@fastify/sensible';
 import { DEFAULT_NEWSLETTER_SECTIONS } from '@tracearr/shared';
@@ -121,13 +121,13 @@ async function authSessionExists(id: string): Promise<boolean> {
   return rows.length > 0;
 }
 
-async function mergeSignInPlexAccountIntoJellyfinUser(targetName: string | null = null) {
+async function mergeSignInPlexAccountIntoJellyfinUser() {
   const admin = await createTestUser({ role: 'owner' });
   const plexServer = await createTestServer({ type: 'plex' });
   const jellyfinServer = await createTestServer({ type: 'jellyfin' });
   const target = await createTestUser({
     role: 'member',
-    name: targetName,
+    name: null,
     plexAccountId: 'plex-1263',
   });
   const source = await createTestUser({ role: 'member' });
@@ -149,6 +149,17 @@ async function mergeSignInPlexAccountIntoJellyfinUser(targetName: string | null 
 
   const result = await mergeUsers(source.id, target.id, admin.id);
   return { admin, target, targetSu, sourceSu, result };
+}
+
+/** What a merge wrote while merges could pin the target's name: the name, and the audit's record of it. */
+async function pinNameLikeAnOlderMerge(auditId: string, targetUserId: string, name: string) {
+  await db.update(users).set({ name }).where(eq(users.id, targetUserId));
+  await db
+    .update(userMergeAudits)
+    .set({
+      sourceUserSnapshot: sql`${userMergeAudits.sourceUserSnapshot} || ${JSON.stringify({ nameSetOnTarget: name })}::jsonb`,
+    })
+    .where(eq(userMergeAudits.id, auditId));
 }
 
 describe('mergeUsers', () => {
@@ -301,11 +312,11 @@ describe('mergeUsers', () => {
       .insert(mediaRequests)
       .values({
         serviceId: requestService!.id,
-        remoteId: 1,
+        remoteId: '1',
         remoteMediaId: 1,
         mediaType: 'movie',
         serverUserId: sourceSu.id,
-        remoteUserId: 1,
+        remoteUserId: '1',
         remoteUsername: 'dupe',
         status: 'completed',
         requestedAt: new Date('2026-08-01T00:00:00Z'),
@@ -608,47 +619,16 @@ describe('mergeUsers', () => {
     expect(survivor?.contactEmail).toBe('target-contact@example.com');
   });
 
-  it('keeps the kept person name when a folded-in account becomes the representative', async () => {
+  it("leaves the kept user's name alone and records no pinned name when a folded-in account becomes the representative", async () => {
     const { target, result } = await mergeSignInPlexAccountIntoJellyfinUser();
 
-    expect(await shownNameOf(target.id)).toBe('abc');
+    const [survivor] = await db.select().from(users).where(eq(users.id, target.id));
+    expect(survivor).toMatchObject({ name: null, username: target.username });
     const [audit] = await db
       .select()
       .from(userMergeAudits)
       .where(eq(userMergeAudits.id, result.auditId));
-    expect(audit?.sourceUserSnapshot.nameSetOnTarget).toBe('abc');
-  });
-
-  it('leaves the name unset when the merge does not change who represents the person', async () => {
-    const admin = await createTestUser({ role: 'owner' });
-    const target = await createTestUser({ role: 'member', name: null });
-    const source = await createTestUser({ role: 'member' });
-    await createTestServerUser({
-      userId: target.id,
-      serverId: (await createTestServer({ type: 'jellyfin' })).id,
-      username: 'abc',
-      lastActivityAt: new Date(),
-    });
-    await createTestServerUser({
-      userId: source.id,
-      serverId: (await createTestServer({ type: 'plex' })).id,
-      username: 'xyz',
-    });
-
-    const result = await mergeUsers(source.id, target.id, admin.id);
-
-    expect(await shownNameOf(target.id)).toBeNull();
-    const [audit] = await db
-      .select()
-      .from(userMergeAudits)
-      .where(eq(userMergeAudits.id, result.auditId));
-    expect(audit?.sourceUserSnapshot.nameSetOnTarget).toBeNull();
-  });
-
-  it('never overwrites a name the owner set', async () => {
-    const { target } = await mergeSignInPlexAccountIntoJellyfinUser('Grandma');
-
-    expect(await shownNameOf(target.id)).toBe('Grandma');
+    expect(audit?.sourceUserSnapshot).not.toHaveProperty('nameSetOnTarget');
   });
 
   it("signs the target out, since the person's data boundary changed, and leaves the owner signed in", async () => {
@@ -823,16 +803,18 @@ describe('splitServerUser', () => {
     expect(survivor?.contactEmail).toBeNull();
   });
 
-  it('clears the name the merge pinned once the folded account is split back out', async () => {
-    const { admin, target, sourceSu } = await mergeSignInPlexAccountIntoJellyfinUser();
+  it('clears the name an older merge pinned once the folded account is split back out', async () => {
+    const { admin, target, sourceSu, result } = await mergeSignInPlexAccountIntoJellyfinUser();
+    await pinNameLikeAnOlderMerge(result.auditId, target.id, 'abc');
 
     await splitServerUser(sourceSu.id, admin.id);
 
     expect(await shownNameOf(target.id)).toBeNull();
   });
 
-  it('keeps a pinned name the owner has since retyped when splitting', async () => {
-    const { admin, target, sourceSu } = await mergeSignInPlexAccountIntoJellyfinUser();
+  it('keeps a name an older merge pinned once the owner has retyped it, when splitting', async () => {
+    const { admin, target, sourceSu, result } = await mergeSignInPlexAccountIntoJellyfinUser();
+    await pinNameLikeAnOlderMerge(result.auditId, target.id, 'abc');
     await db.update(users).set({ name: 'Mireille' }).where(eq(users.id, target.id));
 
     await splitServerUser(sourceSu.id, admin.id);
@@ -906,6 +888,104 @@ describe('splitServerUser', () => {
 
     const [restored] = await db.select().from(users).where(eq(users.id, result.newUserId));
     expect(restored?.email).toBeNull();
+  });
+
+  async function mergeTofaMemberIntoOwner() {
+    const owner = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const tofa = await createTestServer({ type: 'tofa' });
+    const member = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: owner.id, serverId: plex.id });
+    const memberSu = await createTestServerUser({ userId: member.id, serverId: tofa.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-member' })
+      .where(eq(serverUsers.id, memberSu.id));
+    await db.insert(authAccounts).values({
+      id: randomUUID(),
+      providerId: 'tofa',
+      accountId: 'cloud-member',
+      userId: member.id,
+    });
+    await mergeUsers(member.id, owner.id, owner.id);
+    return { owner, memberSu };
+  }
+
+  async function tofaSignInOwner(): Promise<string | undefined> {
+    const [row] = await db
+      .select({ userId: authAccounts.userId })
+      .from(authAccounts)
+      .where(eq(authAccounts.accountId, 'cloud-member'));
+    return row?.userId;
+  }
+
+  it('moves the tofa sign-in back with the account it names', async () => {
+    const { owner, memberSu } = await mergeTofaMemberIntoOwner();
+    expect(await tofaSignInOwner()).toBe(owner.id);
+
+    const { newUserId } = await splitServerUser(memberSu.id, owner.id);
+
+    expect(await tofaSignInOwner()).toBe(newUserId);
+  });
+
+  it('keeps the tofa sign-in where another account still carries that cloud identity', async () => {
+    const { owner, memberSu } = await mergeTofaMemberIntoOwner();
+    const otherTofa = await createTestServer({ type: 'tofa' });
+    const kept = await createTestServerUser({ userId: owner.id, serverId: otherTofa.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-member' })
+      .where(eq(serverUsers.id, kept.id));
+
+    await splitServerUser(memberSu.id, owner.id);
+
+    expect(await tofaSignInOwner()).toBe(owner.id);
+  });
+
+  it("refuses to split off the owner's own tofa account, which their tofa sign-in names", async () => {
+    const owner = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const tofa = await createTestServer({ type: 'tofa' });
+    await createTestServerUser({ userId: owner.id, serverId: plex.id });
+    const ownTofa = await createTestServerUser({ userId: owner.id, serverId: tofa.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-owner' })
+      .where(eq(serverUsers.id, ownTofa.id));
+    await db
+      .insert(authAccounts)
+      .values({ id: randomUUID(), providerId: 'tofa', accountId: 'cloud-owner', userId: owner.id });
+
+    await expect(splitServerUser(ownTofa.id, owner.id)).rejects.toBeInstanceOf(
+      MergeValidationError
+    );
+    const [kept] = await db
+      .select({ userId: serverUsers.userId })
+      .from(serverUsers)
+      .where(eq(serverUsers.id, ownTofa.id));
+    expect(kept?.userId).toBe(owner.id);
+  });
+
+  it("refuses to split off the owner's tofa account even when a merge brought it, if the sign-in was the owner's", async () => {
+    const owner = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const tofa = await createTestServer({ type: 'tofa' });
+    await createTestServerUser({ userId: owner.id, serverId: plex.id });
+    await db
+      .insert(authAccounts)
+      .values({ id: randomUUID(), providerId: 'tofa', accountId: 'cloud-owner', userId: owner.id });
+    // The sync made the owner's tofa account its own person, which the owner then merged in.
+    const synced = await createTestUser({ role: 'member' });
+    const ownTofa = await createTestServerUser({ userId: synced.id, serverId: tofa.id });
+    await db
+      .update(serverUsers)
+      .set({ cloudIdentityId: 'cloud-owner' })
+      .where(eq(serverUsers.id, ownTofa.id));
+    await mergeUsers(synced.id, owner.id, owner.id);
+
+    await expect(splitServerUser(ownTofa.id, owner.id)).rejects.toBeInstanceOf(
+      MergeValidationError
+    );
   });
 });
 

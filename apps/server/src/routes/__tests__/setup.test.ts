@@ -71,11 +71,12 @@ function mockDbSelectMultiple(results: unknown[][]): SQL[] {
   return conditions;
 }
 
-function usable(methods: Partial<Record<'local' | 'plex' | 'oidc' | 'member', boolean>>) {
+function usable(methods: Partial<Record<'local' | 'plex' | 'oidc' | 'tofa' | 'member', boolean>>) {
   vi.mocked(usableLoginMethods).mockResolvedValue({
     local: true,
     plex: true,
     oidc: false,
+    tofa: false,
     member: false,
     ...methods,
   });
@@ -144,6 +145,7 @@ describe('Setup Routes', () => {
           plex: true,
           oidc: false,
           oidcProviderName: null,
+          tofa: true,
           member: false,
           ssoOnly: false,
         },
@@ -183,6 +185,7 @@ describe('Setup Routes', () => {
           plex: true,
           oidc: false,
           oidcProviderName: null,
+          tofa: true,
           member: false,
           ssoOnly: false,
         },
@@ -219,6 +222,7 @@ describe('Setup Routes', () => {
           plex: true,
           oidc: false,
           oidcProviderName: null,
+          tofa: false,
           member: false,
           ssoOnly: false,
         },
@@ -255,6 +259,7 @@ describe('Setup Routes', () => {
           plex: true,
           oidc: false,
           oidcProviderName: null,
+          tofa: true,
           member: false,
           ssoOnly: false,
         },
@@ -291,6 +296,7 @@ describe('Setup Routes', () => {
           plex: true,
           oidc: false,
           oidcProviderName: null,
+          tofa: false,
           member: false,
           ssoOnly: false,
         },
@@ -327,6 +333,7 @@ describe('Setup Routes', () => {
           plex: true,
           oidc: false,
           oidcProviderName: null,
+          tofa: false,
           member: false,
           ssoOnly: false,
         },
@@ -363,6 +370,7 @@ describe('Setup Routes', () => {
           plex: true,
           oidc: false,
           oidcProviderName: null,
+          tofa: true,
           member: false,
           ssoOnly: false,
         },
@@ -399,6 +407,7 @@ describe('Setup Routes', () => {
           plex: true,
           oidc: false,
           oidcProviderName: null,
+          tofa: false,
           member: false,
           ssoOnly: false,
         },
@@ -408,7 +417,7 @@ describe('Setup Routes', () => {
 
     it('reports only the usable methods once an owner exists', async () => {
       app = await buildTestApp();
-      usable({ local: false, plex: true, oidc: true, member: false });
+      usable({ local: false, plex: true, oidc: true, tofa: true, member: false });
       mockDbSelectMultiple([[{ id: 'server-1' }], [], [{ id: 'owner-1' }], []]);
 
       const response = await app.inject({ method: 'GET', url: '/setup/status' });
@@ -418,6 +427,7 @@ describe('Setup Routes', () => {
         plex: true,
         oidc: true,
         oidcProviderName: 'SSO',
+        tofa: true,
         member: false,
         ssoOnly: false,
       });
@@ -427,7 +437,7 @@ describe('Setup Routes', () => {
     it('offers only SSO while single sign-on only is on, and everything usable with ?all', async () => {
       app = await buildTestApp();
       vi.mocked(mediaSignInClosed).mockResolvedValue(true);
-      usable({ local: true, plex: true, oidc: true, member: false });
+      usable({ local: true, plex: true, oidc: true, tofa: true, member: false });
       const owner = [[{ id: 'server-1' }], [], [{ id: 'owner-1' }], []];
       mockDbSelectMultiple(owner);
 
@@ -436,6 +446,7 @@ describe('Setup Routes', () => {
         local: false,
         plex: false,
         oidc: true,
+        tofa: false,
         member: false,
         ssoOnly: true,
       });
@@ -447,6 +458,7 @@ describe('Setup Routes', () => {
         local: true,
         plex: true,
         oidc: true,
+        tofa: true,
         member: false,
         ssoOnly: false,
       });

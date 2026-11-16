@@ -52,7 +52,10 @@ describe('PlexClient sort-based incremental sync', () => {
       mockFetchJson.mockResolvedValue(emptyResponse());
       const client = makeClient();
 
-      await client.getLibraryItemsSince('3', new Date('2024-06-01T00:00:00Z'));
+      await client.getLibraryItemsSince('3', {
+        kind: 'date',
+        since: new Date('2024-06-01T00:00:00Z'),
+      });
 
       const url = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(url).toContain('sort=updatedAt%3Adesc');
@@ -62,7 +65,7 @@ describe('PlexClient sort-based incremental sync', () => {
       mockFetchJson.mockResolvedValue(emptyResponse());
       const client = makeClient();
 
-      await client.getLibraryItemsSince('42', new Date());
+      await client.getLibraryItemsSince('42', { kind: 'date', since: new Date() });
 
       const url = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(url).toContain('/library/sections/42/all');
@@ -72,7 +75,7 @@ describe('PlexClient sort-based incremental sync', () => {
       mockFetchJson.mockResolvedValue(emptyResponse());
       const client = makeClient();
 
-      await client.getLibraryItemsSince('3', new Date());
+      await client.getLibraryItemsSince('3', { kind: 'date', since: new Date() });
 
       const url = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(url).not.toContain('addedAt');
@@ -82,7 +85,7 @@ describe('PlexClient sort-based incremental sync', () => {
       mockFetchJson.mockResolvedValue(emptyResponse());
       const client = makeClient();
 
-      await client.getLibraryItemsSince('3', new Date());
+      await client.getLibraryItemsSince('3', { kind: 'date', since: new Date() });
 
       const url = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(url).toContain('includeGuids=1');
@@ -101,7 +104,7 @@ describe('PlexClient sort-based incremental sync', () => {
       );
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('3', since);
+      const result = await client.getLibraryItemsSince('3', { kind: 'date', since });
 
       expect(result.items).toHaveLength(2);
       expect(result.totalCount).toBe(2);
@@ -127,7 +130,7 @@ describe('PlexClient sort-based incremental sync', () => {
         );
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('3', since);
+      const result = await client.getLibraryItemsSince('3', { kind: 'date', since });
 
       expect(result.items).toHaveLength(2);
       expect(mockFetchJson).toHaveBeenCalledTimes(2);
@@ -137,7 +140,10 @@ describe('PlexClient sort-based incremental sync', () => {
       mockFetchJson.mockResolvedValue(emptyResponse());
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('3', new Date('2020-01-01'));
+      const result = await client.getLibraryItemsSince('3', {
+        kind: 'date',
+        since: new Date('2020-01-01'),
+      });
 
       expect(result.items).toHaveLength(0);
       expect(result.totalCount).toBe(0);
@@ -173,7 +179,7 @@ describe('PlexClient sort-based incremental sync', () => {
       });
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('3', since);
+      const result = await client.getLibraryItemsSince('3', { kind: 'date', since });
 
       expect(result.items).toHaveLength(1);
       expect(result.items[0]!.title).toBe('Has updatedAt');
@@ -204,7 +210,7 @@ describe('PlexClient sort-based incremental sync', () => {
         );
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('3', since);
+      const result = await client.getLibraryItemsSince('3', { kind: 'date', since });
 
       expect(result.items).toHaveLength(301);
       expect(mockFetchJson).toHaveBeenCalledTimes(4);
@@ -222,7 +228,7 @@ describe('PlexClient sort-based incremental sync', () => {
       mockFetchJson.mockResolvedValue(emptyResponse());
       const client = makeClient();
 
-      await client.getLibraryLeavesSince('7', new Date());
+      await client.getLibraryLeavesSince('7', { kind: 'date', since: new Date() });
 
       const url = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(url).toContain('/library/sections/7/allLeaves');
@@ -233,7 +239,7 @@ describe('PlexClient sort-based incremental sync', () => {
       mockFetchJson.mockResolvedValue(emptyResponse());
       const client = makeClient();
 
-      await client.getLibraryLeavesSince('7', new Date());
+      await client.getLibraryLeavesSince('7', { kind: 'date', since: new Date() });
 
       const url = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(url).not.toContain('addedAt');
@@ -251,7 +257,7 @@ describe('PlexClient sort-based incremental sync', () => {
       );
 
       const client = makeClient();
-      const result = await client.getLibraryLeavesSince('7', since);
+      const result = await client.getLibraryLeavesSince('7', { kind: 'date', since });
 
       expect(result.items).toHaveLength(1);
       expect(result.items[0]!.title).toBe('Recent Episode');
@@ -317,7 +323,7 @@ describe('PlexClient sort-based incremental sync', () => {
         .mockResolvedValueOnce(emptyResponse());
 
       const client = makeClient();
-      await client.getLibrarySeasonsSince('5', since);
+      await client.getLibrarySeasonsSince('5', { kind: 'date', since });
 
       const [url, options] = mockFetchJson.mock.calls[0]! as [string, { headers?: unknown }];
       expect(url).toContain('type=3');
@@ -341,7 +347,7 @@ describe('PlexClient sort-based incremental sync', () => {
       );
 
       const client = makeClient();
-      const result = await client.getLibrarySeasonsSince('5', since);
+      const result = await client.getLibrarySeasonsSince('5', { kind: 'date', since });
 
       expect(result.items).toHaveLength(1);
       expect(result.items[0]!.title).toBe('New');
@@ -395,7 +401,7 @@ describe('PlexClient sort-based incremental sync', () => {
       );
 
       const client = makeClient();
-      const result = await client.getLibraryAlbumsSince('7', since);
+      const result = await client.getLibraryAlbumsSince('7', { kind: 'date', since });
 
       const [url, options] = mockFetchJson.mock.calls[0]! as [string, { headers?: unknown }];
       expect(url).toContain('/library/sections/7/all');
@@ -405,5 +411,33 @@ describe('PlexClient sort-based incremental sync', () => {
       expect(options.headers).toMatchObject({ 'X-Plex-Container-Start': '0' });
       expect(result.items.map((i) => [i.ratingKey, i.mediaType])).toEqual([['new-album', 'album']]);
     });
+  });
+});
+
+describe('PlexClient sync cursor', () => {
+  const cursor = { kind: 'date', since: new Date('2024-06-01T00:00:00Z') } as const;
+
+  it('reads a date cursor with the requests a date always made', async () => {
+    mockFetchJson.mockResolvedValue(emptyResponse());
+    const client = makeClient();
+
+    await client.getLibraryItemsSince('7', cursor);
+    await client.getLibraryLeavesSince('7', cursor);
+    await client.getLibrarySeasonsSince('7', cursor);
+    await client.getLibraryAlbumsSince('7', cursor);
+
+    expect(mockFetchJson.mock.calls.map(([url]) => url)).toEqual([
+      'http://plex.local:32400/library/sections/7/all?includeGuids=1&sort=updatedAt%3Adesc&X-Plex-Container-Start=0&X-Plex-Container-Size=100',
+      'http://plex.local:32400/library/sections/7/allLeaves?includeGuids=1&sort=updatedAt%3Adesc&X-Plex-Container-Start=0&X-Plex-Container-Size=100',
+      'http://plex.local:32400/library/sections/7/all?includeGuids=1&sort=updatedAt%3Adesc&type=3',
+      'http://plex.local:32400/library/sections/7/all?includeGuids=1&sort=updatedAt%3Adesc&type=9',
+    ]);
+  });
+
+  it('refuses a revision cursor without asking the server', async () => {
+    await expect(
+      makeClient().getLibraryItemsSince('7', { kind: 'revision', since: 12 })
+    ).rejects.toThrow('by date, not by revision');
+    expect(mockFetchJson).not.toHaveBeenCalled();
   });
 });

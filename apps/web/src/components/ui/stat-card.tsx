@@ -1,8 +1,3 @@
-/**
- * Reusable stat card component for displaying metrics.
- * Used on Dashboard and History pages.
- */
-
 import type { LucideIcon } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Link } from 'react-router';
@@ -12,8 +7,9 @@ interface StatCardProps {
   icon?: LucideIcon;
   label: string;
   value: string | number;
+  /** Context after the label on the same line, e.g. "Plays · 5 sessions". */
   subValue?: string;
-  /** Percent change against the prior period; the label names the comparison. */
+  /** Percent change against the prior period; the label names the comparison beside it. */
   delta?: { value: number; label?: string };
   /** Muted text after the value, e.g. "of 43". */
   valueSuffix?: string;
@@ -21,12 +17,7 @@ interface StatCardProps {
   href?: string;
   /** Cut a long value (a show title) with an ellipsis instead of letting it overflow. */
   truncateValue?: boolean;
-  /**
-   * 'kpi' is the media detail unit's raised-surface treatment (uppercase label, larger value,
-   * sub-value on its own line). It fills its grid cell, so every tile in a row is one height.
-   */
-  variant?: 'default' | 'kpi';
-  /** kpi only: tighter padding and a 20px value, for tiles inside a sheet. */
+  /** Tighter padding, a smaller chip and an 18px value, for tiles inside a sheet. */
   compact?: boolean;
 }
 
@@ -42,43 +33,11 @@ function deltaTone(value: number): string {
   return 'text-muted-foreground';
 }
 
-/** The kpi chip is larger so it spans the three-line value, label and sub-line block. */
-function IconChip({ icon: Icon, large }: { icon: LucideIcon; large?: boolean }) {
-  return (
-    <div
-      className={cn(
-        'bg-primary/10 flex shrink-0 items-center justify-center rounded-md',
-        large ? 'size-11' : 'h-9 w-9'
-      )}
-    >
-      <Icon className={cn('text-primary', large ? 'size-5' : 'h-4 w-4')} />
-    </div>
-  );
-}
-
-function ValueExtras({
-  delta,
-  valueSuffix,
-}: Pick<StatCardProps, 'delta' | 'valueSuffix'>): React.JSX.Element {
-  return (
-    <>
-      {valueSuffix && (
-        <span className="text-muted-foreground ml-1 text-xs font-normal">{valueSuffix}</span>
-      )}
-      {delta && (
-        <>
-          <span className={cn('ml-2 text-xs font-medium', deltaTone(delta.value))}>
-            {deltaFormat.format(delta.value)}%
-          </span>
-          {delta.label && (
-            <span className="text-muted-foreground ml-1 text-xs font-normal">({delta.label})</span>
-          )}
-        </>
-      )}
-    </>
-  );
-}
-
+/**
+ * The one stat tile: a value line carrying the delta and its comparison, then a label line
+ * carrying the sub value. It fills its grid cell, so every tile in a row is one height, and steps
+ * up to the raised surface when it sits inside a card or a sheet.
+ */
 export function StatCard({
   icon: Icon,
   label,
@@ -89,82 +48,77 @@ export function StatCard({
   isLoading,
   href,
   truncateValue,
-  variant = 'default',
   compact,
 }: StatCardProps) {
-  const card =
-    variant === 'kpi' ? (
-      <div
-        className={cn(
-          'bg-card-raised flex h-full items-center gap-3 rounded-[calc(var(--radius)+2px)] border',
-          compact ? 'p-[10px_12px]' : 'p-[14px_16px]'
-        )}
-      >
-        {Icon && <IconChip icon={Icon} large />}
-        <div className="min-w-0 flex-1">
-          {isLoading ? (
-            <>
-              <Skeleton className="h-6 w-16" />
-              <Skeleton className="mt-2 h-3 w-20" />
-            </>
-          ) : (
-            <>
-              <div
-                className={cn(
-                  'font-bold tracking-[-0.02em] tabular-nums',
-                  compact ? 'text-[20px] leading-7' : 'text-[22px]'
-                )}
-              >
-                {value}
-                <ValueExtras delta={delta} valueSuffix={valueSuffix} />
-              </div>
-              <div className="text-muted-foreground mt-0.5 text-[11px] font-semibold tracking-[0.06em] uppercase">
-                {label}
-              </div>
-              {subValue && <div className="text-muted-foreground mt-1 text-[11px]">{subValue}</div>}
-            </>
+  const card = (
+    <div
+      className={cn(
+        'bg-card [[data-slot=card]_&]:bg-card-raised [[data-slot=sheet-content]_&]:bg-card-raised flex h-full items-center gap-3 rounded-xl border',
+        compact ? 'px-3 py-2' : 'p-3',
+        href && 'card-hover'
+      )}
+    >
+      {Icon && (
+        <div
+          className={cn(
+            'bg-primary/10 flex shrink-0 items-center justify-center rounded-lg',
+            compact ? 'size-7' : 'size-8'
           )}
+        >
+          <Icon className={cn('text-primary', compact ? 'size-3.5' : 'size-4')} />
         </div>
-      </div>
-    ) : (
-      <div
-        className={cn(
-          'bg-card flex items-center gap-3 rounded-lg border p-3',
-          href && 'card-hover'
+      )}
+      <div className="min-w-0 flex-1">
+        {isLoading ? (
+          <>
+            <Skeleton className="h-5 w-16" />
+            <Skeleton className="mt-1.5 h-3 w-20" />
+          </>
+        ) : (
+          <>
+            <div
+              className={cn(
+                'font-semibold tabular-nums',
+                compact ? 'text-lg' : 'text-xl',
+                truncateValue && 'truncate'
+              )}
+            >
+              {value}
+              {valueSuffix && (
+                <span className="text-muted-foreground ml-1 text-xs font-normal">
+                  {valueSuffix}
+                </span>
+              )}
+              {delta && (
+                <span className={cn('ml-2 text-xs font-medium', deltaTone(delta.value))}>
+                  {deltaFormat.format(delta.value)}%
+                </span>
+              )}
+              {delta?.label && (
+                <span className="text-muted-foreground ml-1 text-xs font-normal">
+                  {delta.label}
+                </span>
+              )}
+            </div>
+            <div className="text-muted-foreground text-dense">
+              <span>{label}</span>
+              {subValue && (
+                <>
+                  {' · '}
+                  <span>{subValue}</span>
+                </>
+              )}
+            </div>
+          </>
         )}
-      >
-        {Icon && <IconChip icon={Icon} />}
-        <div className="min-w-0 flex-1">
-          {isLoading ? (
-            <>
-              <Skeleton className="h-5 w-16" />
-              <Skeleton className="mt-1 h-3 w-12" />
-            </>
-          ) : (
-            <>
-              <div
-                className={cn('text-lg font-semibold tabular-nums', truncateValue && 'truncate')}
-              >
-                {value}
-                <ValueExtras delta={delta} valueSuffix={valueSuffix} />
-              </div>
-              <div className="text-muted-foreground text-xs">
-                {label}
-                {subValue && <span className="ml-1">({subValue})</span>}
-              </div>
-            </>
-          )}
-        </div>
       </div>
-    );
+    </div>
+  );
 
   return href ? (
     <Link
       to={href}
-      className={cn(
-        'group focus-visible:ring-ring focus-visible:ring-offset-background block rounded-lg focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none',
-        variant === 'kpi' && 'h-full'
-      )}
+      className="group focus-visible:ring-ring focus-visible:ring-offset-background block h-full rounded-xl focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
     >
       {card}
     </Link>

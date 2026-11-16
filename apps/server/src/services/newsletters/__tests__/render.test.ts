@@ -365,7 +365,7 @@ describe('buildDigestInput', () => {
     ]);
   });
 
-  it('builds the Jellyfin and Emby link from the public address first, then a public server url, else nothing', () => {
+  it('builds the Jellyfin and Emby link from the public address first, then a public server url, else nothing, and the tofa link through app.tofa.tv', () => {
     const link = (over: Partial<ServerLink>) =>
       digestLinks(
         { ...watched, serverId: 'j', imdbId: null },
@@ -407,6 +407,9 @@ describe('buildDigestInput', () => {
         label: 'Attic',
         url: 'https://emby.example.com/web/index.html#!/item?id=77&serverId=emb-1',
       },
+    ]);
+    expect(link({ type: 'tofa' })).toEqual([
+      { label: 'Attic', url: 'https://app.tofa.tv/media/77' },
     ]);
   });
 

@@ -60,11 +60,11 @@ export function MonthlyTrendChart({ trend, isLoading, height = 250 }: MonthlyTre
             return formatTrendDate(toIsoDate(new Date(this.value)), bucket);
           },
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
-        lineColor: 'hsl(var(--border))',
-        tickColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
+        tickColor: 'oklch(var(--border))',
         startOnTick: false,
         endOnTick: false,
       },
@@ -72,15 +72,15 @@ export function MonthlyTrendChart({ trend, isLoading, height = 250 }: MonthlyTre
         title: {
           text: t('library.charts.monthly.watchCount'),
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
+            color: 'oklch(var(--muted-foreground))',
           },
         },
-        gridLineColor: 'hsl(var(--border))',
+        gridLineColor: 'oklch(var(--border))',
         min: 0,
       },
       plotOptions: {
@@ -89,7 +89,7 @@ export function MonthlyTrendChart({ trend, isLoading, height = 250 }: MonthlyTre
             enabled: true,
             radius: 3,
           },
-          color: 'hsl(var(--primary))',
+          color: 'oklch(var(--primary))',
           states: {
             hover: {
               lineWidth: 3,
@@ -98,10 +98,10 @@ export function MonthlyTrendChart({ trend, isLoading, height = 250 }: MonthlyTre
         },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         formatter: function () {
           const watches = t('library.charts.watchesValue', { count: this.y ?? 0 });
@@ -122,21 +122,9 @@ export function MonthlyTrendChart({ trend, isLoading, height = 250 }: MonthlyTre
               maxWidth: 400,
             },
             chartOptions: {
-              xAxis: {
-                labels: {
-                  style: {
-                    fontSize: '9px',
-                  },
-                },
-              },
               yAxis: {
                 title: {
                   text: undefined,
-                },
-                labels: {
-                  style: {
-                    fontSize: '9px',
-                  },
                 },
               },
             },

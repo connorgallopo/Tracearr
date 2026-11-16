@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 import { KeyRound, Users, X } from 'lucide-react';
 import {
   LOGIN_ACCESS,
+  SERVER_PROFILES,
   type LoginAccess,
   type LoginMethods,
   type Server,
@@ -26,6 +27,7 @@ import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
 import { ServerBadge } from '@/components/server/ServerBadge';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { UserCell } from '@/components/users/UserCell';
+import { rosterPersonName } from '@/components/users/utils';
 import {
   useServers,
   useSettings,
@@ -103,9 +105,10 @@ function OwnerMethods({ methods }: { methods: LoginMethods }) {
   const held = {
     local: user?.hasPassword === true,
     plex: user?.hasPlexLinked === true,
+    tofa: user?.hasTofaLinked === true,
     oidc: settings?.oidcConfigured === true,
   } as const;
-  const shown = (['local', 'plex', 'oidc'] as const).filter((method) => held[method]);
+  const shown = (['local', 'plex', 'tofa', 'oidc'] as const).filter((method) => held[method]);
   const waysIn = shown.filter((method) => methods[method]).length;
 
   return (
@@ -125,11 +128,14 @@ function OwnerMethods({ methods }: { methods: LoginMethods }) {
 }
 
 function ServerLoginSwitch({ server }: { server: Server }) {
+  const { t } = useTranslation('settings');
   const update = useUpdateServer({ silent: true });
   const status = useMutationSaveStatus(update);
   const checked = update.isPending
     ? (update.variables?.allowMemberLogin ?? false)
     : (server.allowMemberLogin ?? false);
+  const profile = SERVER_PROFILES[server.type];
+  const unavailable = profile.memberSignIn === 'unavailable';
 
   return (
     <AutosaveSwitchField
@@ -140,7 +146,9 @@ function ServerLoginSwitch({ server }: { server: Server }) {
           <ServerBadge server={server} />
         </span>
       }
+      description={unavailable ? t('servers.noSignIn', { server: profile.displayName }) : undefined}
       checked={checked}
+      disabled={unavailable}
       onChange={(next) => update.mutate({ id: server.id, allowMemberLogin: next })}
       status={status}
       errorMessage={update.error?.message}
@@ -187,13 +195,11 @@ function ServerRows() {
   );
 }
 
-const personName = (row: ServerUserWithIdentity) => row.identityName ?? row.username;
-
 function OverrideRow({ row }: { row: ServerUserWithIdentity }) {
   const { t } = useTranslation('settings');
   const update = useUpdateUserAccess();
   const status = useMutationSaveStatus(update);
-  const name = personName(row);
+  const name = rosterPersonName(row);
   const pending = update.isPending ? update.variables?.data : undefined;
   const loginAccess = pending?.loginAccess ?? row.loginAccess;
   const role = pending?.role ?? row.role;
@@ -205,6 +211,7 @@ function OverrideRow({ row }: { row: ServerUserWithIdentity }) {
           serverUserId={row.id}
           username={row.username}
           identityName={row.identityName}
+          personName={row.personName}
           thumbUrl={row.thumbUrl}
           serverId={row.serverId}
         />
@@ -264,7 +271,7 @@ function AddOverride({ taken }: { taken: Set<string> }) {
   const { data } = useUsers({ pageSize: 100 });
   const options = (data?.data ?? [])
     .filter((row) => (row.role === 'admin' || row.role === 'member') && !taken.has(row.userId))
-    .map((row) => ({ value: row.id, label: personName(row) }));
+    .map((row) => ({ value: row.id, label: rosterPersonName(row) }));
 
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center">

@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import type { ParseKeys } from 'i18next';
 import { ExternalLink, Gauge, KeyRound, Loader2, RefreshCw } from 'lucide-react';
+import { SERVER_PROFILES } from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -14,12 +15,12 @@ import {
 } from '@/components/ui/card';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { CopyButton } from '@/components/ui/copy-button';
-import { FieldGroup } from '@/components/ui/field';
+import { FieldDescription, FieldGroup } from '@/components/ui/field';
 import { PasswordInput } from '@/components/ui/password-input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { AutosaveNumberField } from '@/components/ui/autosave-field';
 import { SettingsSection } from '@/components/settings/shell/SettingsSection';
-import { useApiKey, useRegenerateApiKey, useSettings } from '@/hooks/queries';
+import { useApiKey, useRegenerateApiKey, useServers, useSettings } from '@/hooks/queries';
 import { TEXT_INPUT_DELAY, useDebouncedSave } from '@/hooks/useDebouncedSave';
 
 function ApiKeyCard() {
@@ -131,6 +132,14 @@ interface ThresholdFieldConfig {
 export function Api() {
   const { t } = useTranslation(['settings', 'common']);
   const { data: settings } = useSettings();
+  const { data: servers } = useServers();
+  const ownRuleServers = [
+    ...new Set(
+      (servers ?? [])
+        .filter((server) => SERVER_PROFILES[server.type].watchedThreshold === 'serverRule')
+        .map((server) => SERVER_PROFILES[server.type].displayName)
+    ),
+  ];
 
   const movieField = useDebouncedSave(
     'watchedThresholdMovie',
@@ -203,6 +212,11 @@ export function Api() {
                 onReset={field.reset}
               />
             ))}
+            {ownRuleServers.length > 0 && (
+              <FieldDescription>
+                {t('general.watchedThresholdServerRule', { servers: ownRuleServers.join(', ') })}
+              </FieldDescription>
+            )}
 
             <AutosaveNumberField
               id="publicApiRateLimitPerMinute"

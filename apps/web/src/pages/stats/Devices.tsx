@@ -40,23 +40,14 @@ import { PerServerCardGrid, ServerColumnCell } from '@/components/server';
 import { PeopleLink } from '@/components/stats/PeopleLink';
 import type { Server } from '@tracearr/shared';
 
-// Color coding for direct play percentage
-function getDirectPlayColor(pct: number): string {
-  if (pct >= 80) return 'text-green-600 dark:text-green-400';
-  if (pct >= 50) return 'text-yellow-600 dark:text-yellow-400';
-  return 'text-red-600 dark:text-red-400';
-}
+const DIRECT_PLAY_TONES = {
+  high: { text: 'text-success', tint: 'bg-success/10', fill: 'bg-success' },
+  mid: { text: 'text-warning', tint: 'bg-warning/10', fill: 'bg-warning' },
+  low: { text: 'text-destructive', tint: 'bg-destructive/10', fill: 'bg-destructive' },
+} as const;
 
-function getDirectPlayBg(pct: number): string {
-  if (pct >= 80) return 'bg-green-500/10';
-  if (pct >= 50) return 'bg-yellow-500/10';
-  return 'bg-red-500/10';
-}
-
-function getProgressColor(pct: number): string {
-  if (pct >= 80) return 'bg-green-500';
-  if (pct >= 50) return 'bg-yellow-500';
-  return 'bg-red-500';
+function directPlayTone(pct: number) {
+  return DIRECT_PLAY_TONES[pct >= 80 ? 'high' : pct >= 50 ? 'mid' : 'low'];
 }
 
 const hotspotColumn = createDataTableColumnHelper<TranscodeHotspotRow>();
@@ -148,16 +139,16 @@ function MatrixView({ data, isLoading, error, onRetry }: MatrixViewProps) {
                   if (!cell) {
                     return (
                       <TableCell key={codec} className="text-center">
-                        <span className="text-muted-foreground/50">-</span>
+                        <span className="text-muted-foreground">-</span>
                       </TableCell>
                     );
                   }
                   return (
                     <TableCell
                       key={codec}
-                      className={cn('text-center', getDirectPlayBg(cell.directPct))}
+                      className={cn('text-center', directPlayTone(cell.directPct).tint)}
                     >
-                      <div className={cn('font-medium', getDirectPlayColor(cell.directPct))}>
+                      <div className={cn('font-medium', directPlayTone(cell.directPct).text)}>
                         {cell.directPct}%
                       </div>
                       <div className="text-muted-foreground text-xs">{cell.sessions}</div>
@@ -173,24 +164,9 @@ function MatrixView({ data, isLoading, error, onRetry }: MatrixViewProps) {
       {/* Legend */}
       <div className="mt-4 flex items-center gap-4 text-sm">
         <span className="text-muted-foreground">{t('devices.legend')}</span>
-        <Badge
-          variant="outline"
-          className="border-transparent bg-green-500/20 text-green-600 dark:text-green-400"
-        >
-          {t('devices.directPlayHigh')}
-        </Badge>
-        <Badge
-          variant="outline"
-          className="border-transparent bg-yellow-500/20 text-yellow-600 dark:text-yellow-400"
-        >
-          {t('devices.directPlayMid')}
-        </Badge>
-        <Badge
-          variant="outline"
-          className="border-transparent bg-red-500/20 text-red-600 dark:text-red-400"
-        >
-          {t('devices.directPlayLow')}
-        </Badge>
+        <Badge variant="success">{t('devices.directPlayHigh')}</Badge>
+        <Badge variant="warning">{t('devices.directPlayMid')}</Badge>
+        <Badge variant="danger">{t('devices.directPlayLow')}</Badge>
       </div>
     </>
   );
@@ -255,14 +231,7 @@ export function StatsDevices() {
           header: t('devices.pctOfTotal'),
           enableSorting: false,
           meta: { numeric: true },
-          cell: ({ row }) => (
-            <Badge
-              variant="destructive"
-              className="border-orange-500/30 bg-orange-500/20 text-orange-600 dark:text-orange-400"
-            >
-              {row.original.pctOfTotalTranscodes}%
-            </Badge>
-          ),
+          cell: ({ row }) => <Badge variant="warning">{row.original.pctOfTotalTranscodes}%</Badge>,
         }),
       ]),
     [t, isMultiServer, resolveServer]
@@ -367,7 +336,7 @@ export function StatsDevices() {
                           <span
                             className={cn(
                               'font-semibold',
-                              getDirectPlayColor(device.directPlayPct)
+                              directPlayTone(device.directPlayPct).text
                             )}
                           >
                             {device.directPlayPct}%
@@ -378,7 +347,7 @@ export function StatsDevices() {
                         <div
                           className={cn(
                             'absolute inset-y-0 left-0 rounded-full',
-                            getProgressColor(device.directPlayPct)
+                            directPlayTone(device.directPlayPct).fill
                           )}
                           style={{ width: `${device.directPlayPct}%` }}
                         />

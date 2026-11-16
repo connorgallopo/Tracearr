@@ -132,23 +132,23 @@ function VersionDisplay({ isStaff }: { isStaff: boolean }) {
         >
           {displayVersion}
           {version.current.isPrerelease && (
-            <span className="text-muted-foreground/60 ml-1">({t('common:beta')})</span>
+            <span className="ml-1">({t('common:beta')})</span>
           )}
         </button>
         {isStaff && version.updateAvailable && version.latest && (
           <Badge
-            variant="secondary"
-            className="h-5 cursor-pointer gap-1 bg-green-500/10 text-green-600 hover:bg-green-500/20 dark:text-green-400"
+            variant="success"
+            className="hover:bg-success/25 h-5 cursor-pointer gap-1"
             onClick={() => setDialogOpen(true)}
           >
             <ArrowUpCircle className="h-3 w-3" />
-            <span className="text-[10px]">{getUpdateLabel()}</span>
+            <span>{getUpdateLabel()}</span>
           </Badge>
         )}
         {isStaff && pluginUpdateAvailable && (
           <Badge
-            variant="secondary"
-            className="h-5 cursor-pointer bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 dark:text-amber-400"
+            variant="warning"
+            className="hover:bg-warning/25 h-5 cursor-pointer"
             onClick={() => navigate('/settings/servers/connections')}
             title={t('settings:servers.pluginUpdateAvailable')}
             aria-label={t('settings:servers.pluginUpdateAvailable')}

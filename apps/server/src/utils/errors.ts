@@ -183,7 +183,7 @@ export class ServiceUnavailableError extends AppError {
 }
 
 /**
- * External service error (Plex, Jellyfin, Emby, etc.)
+ * External service error (Plex, Jellyfin, Emby, tofa, etc.)
  */
 export class ExternalServiceError extends AppError {
   constructor(service: ServerType | 'geoip', message: string) {
@@ -191,6 +191,7 @@ export class ExternalServiceError extends AppError {
       plex: ErrorCodes.PLEX_ERROR,
       jellyfin: ErrorCodes.JELLYFIN_ERROR,
       emby: ErrorCodes.EMBY_ERROR,
+      tofa: ErrorCodes.TOFA_ERROR,
       geoip: ErrorCodes.GEOIP_ERROR,
     };
     const code = codeMap[service];

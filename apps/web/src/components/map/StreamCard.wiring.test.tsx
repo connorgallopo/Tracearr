@@ -117,6 +117,7 @@ vi.mock('@/hooks/useAuth', () => ({ useAuth: () => auth }));
 
 vi.mock('@/components/theme-provider', () => ({
   useTheme: () => ({ theme: 'dark', accentHue: 187 }),
+  accentPreset: () => ({ okHue: 212 }),
 }));
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (k: string) => k, i18n: { language: 'en' } }),

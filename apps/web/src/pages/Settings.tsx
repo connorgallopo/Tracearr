@@ -30,7 +30,7 @@ export function Settings() {
   return (
     // Layout follows this container, not the viewport: the app sidebar collapses to an icon rail.
     <div className="@container/settings space-y-6">
-      <h1 className="text-3xl font-bold">{t('title')}</h1>
+      <h1 className="text-xl font-semibold">{t('title')}</h1>
       <div className="grid gap-8 @3xl/settings:grid-cols-[13rem_minmax(0,1fr)]">
         <SettingsNav />
         <div className={cn('min-w-0', WIDE_SECTIONS.has(pathname) ? 'max-w-6xl' : 'max-w-4xl')}>

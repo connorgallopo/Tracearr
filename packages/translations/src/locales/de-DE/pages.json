@@ -2,9 +2,7 @@
   "login": {
     "title": "Tracearr",
     "tagline": "Tracearr - Stream-Zugriffsverwaltung",
-    "createAccountHeading": "Erstellen Sie Ihr Konto, um starten",
     "signInHeading": "Melden Sie sich in Ihrem Konto an",
-    "createAccountDescription": "Erstellen Sie ein Konto, um Ihre Medienserver zu verwalten",
     "signInDescription": "Melden Sie sich an, um auf Ihr Dashboard zuzugreifen",
     "selectPlexServer": "Wählen Sie Ihren Plex-Server aus",
     "waitingForPlex": "Warten auf Plex-Autorisierung...",
@@ -19,7 +17,6 @@
     "displayNamePlaceholder": "Wählen Sie einen Anzeigenamen",
     "passwordPlaceholder": "Mindestens 8 Zeichen",
     "yourPasswordPlaceholder": "Dein Password",
-    "setupNote": "Nachdem Sie Ihr Konto erstellt haben, fügen Sie Ihre Plex- oder Jellyfin-Server unter „Einstellungen“ hinzu",
     "localDisabledHint": "",
     "oidcError": "",
     "accountCreated": "Konto erfolgreich erstellt!",
@@ -54,6 +51,60 @@
       "notPermitted": "Sie sind nicht berechtigt, sich anzumelden. Bitte wenden Sie sich an den Serverbetreiber."
     }
   },
+  "setup": {
+    "serverTitle": "",
+    "connectTitle": "",
+    "connectDescription": "",
+    "linkPlexTitle": "",
+    "linkPlexDescription": "",
+    "stepsLabel": "",
+    "stepOfNamed": "",
+    "steps": {
+      "server": "",
+      "account": "",
+      "connect": "",
+      "import": ""
+    },
+    "stepStatus": {
+      "done": "",
+      "current": "",
+      "upcoming": ""
+    },
+    "signedInAs": "",
+    "serverHint": "",
+    "ownerTitle": "",
+    "ownerDescription": "",
+    "ownerDescriptionSignIn": "",
+    "plexWaitingDescription": "",
+    "pickerTitle": "",
+    "pickerDescription": "",
+    "connectHint": "",
+    "connectedTitle": "",
+    "connectedDescription": "",
+    "importTitle": "",
+    "importDescription": "",
+    "goToDashboard": "",
+    "codeExpired": "",
+    "signInAgain": "",
+    "timedOut": "",
+    "checkAgain": ""
+  },
+  "tofa": {
+    "signIn": "",
+    "waiting": "",
+    "waitingHint": "",
+    "waitingDescription": "",
+    "openAgain": "",
+    "expiresIn": "",
+    "codeFallback": "",
+    "pickerNote": "",
+    "unreachable": "",
+    "noAddress": "",
+    "noServersTitle": "",
+    "noServers": "",
+    "noServersPassword": "",
+    "manual": ""
+  },
   "dashboard": {
     "alerts": "Warnungen",
     "plays": "Wiedergaben",
@@ -66,6 +117,7 @@
     "noActiveStreams": "Keine aktiven Streams",
     "streamsAppearHere": "Streams werden hier angezeigt, wenn Benutzer anfangen zu schauen",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "Server",
@@ -168,6 +220,7 @@
     "mergeTitleBulk": "Diese Benutzer zusammenführen?",
     "mergeReasonEmail": "",
     "mergeReasonEmailUsername": "",
+    "mergeReasonLinked": "",
     "mergeReasonUsername": "Beide verwenden den Benutzernamen {{value}}.",
     "mergeKeep": "Behalte",
     "mergeFoldIn": "Eingefügt, dann gelöscht",
@@ -194,12 +247,14 @@
     "suggestionsTitle": "Mögliche doppelte Benutzer",
     "suggestionsPairEmail": "",
     "suggestionsPairEmailUsername": "",
+    "suggestionsPairLinked": "",
     "suggestionsPairUsername": "{{first}} und {{second}} haben denselben Benutzernamen",
     "suggestionsSheetDescription": "Beim Zusammenführen wird ein Benutzer beibehalten und der andere gelöscht. Ein Paar, das als nicht identisch markiert wurde, wird nicht mehr angezeigt, bis Sie es wiederherstellen.",
     "suggestionsReview": "Überprüfung",
     "suggestionsNotSame": "Nicht die gleiche Person",
     "suggestionsMatchEmail": "Gleiche E-Mail",
     "suggestionsMatchEmailUsername": "",
+    "suggestionsMatchLinked": "",
     "suggestionsMatchUsername": "Gleicher Nutzername",
     "suggestionsEmpty": "",
     "suggestionsDismissed": "",
@@ -232,6 +287,7 @@
     "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsernameMore_one": "{{first}} und {{second}} verwenden die gleiche Adresse wie eine Benutzername oder Konto-E-Mail, plus {{count}} mehr",
     "suggestionsPairEmailUsernameMore_other": "{{first}} und {{second}} verwenden die gleiche Adresse wie eine Benutzername oder Konto-E-Mail, plus {{count}} mehr",
+    "suggestionsPairLinkedMore_other": "",
     "suggestionsPairUsernameMore_one": "",
     "suggestionsPairUsernameMore_other": "",
     "pendingLink_one": "",
@@ -377,6 +433,8 @@
     "stream": {
       "notAvailable": "N/A",
       "bitrateUnavailable": "Jellyfin und Emby geben während der Transkodierung keine individuellen Video- und Audio-Bitraten an. Es wird lediglich die Gesamtbitrate des Streams angezeigt.",
+      "rebuffers": "",
+      "droppedFrames": "",
       "stereo": "Stereo",
       "mono": "Mono",
       "noDetails": "Es liegen keine detaillierten Informationen zum Stream vor",
@@ -632,6 +690,10 @@
       "notSynced": {
         "title": "Bibliothek noch nicht synchronisiert",
         "body": "Die Bibliotheksstatistiken werden hier angezeigt, sobald die Bibliothek synchronisiert wurde. Dies geschieht normalerweise automatisch jede Stunde."
+      },
+      "syncQueued": {
+        "title": "",
+        "body": ""
       },
       "noMedia": {
         "title": "Noch keine Filme oder Serien",

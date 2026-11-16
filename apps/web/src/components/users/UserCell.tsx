@@ -11,12 +11,12 @@ interface UserCellProps {
   username: string | null;
   /** The display name the identity carries, when it has one. */
   identityName?: string | null;
+  /** The person's name when `username` is an account's and may not be it. */
+  personName?: string;
   thumbUrl?: string | null;
   serverId?: string | null;
   /** `sm` for table rows, `md` for the pages that lead with a person. */
   size?: 'sm' | 'md';
-  /** The @username under the name, rendered only where it differs from it. */
-  showUsername?: boolean;
   /** Muted facts on the handle's line, such as the email. */
   details?: string[];
   link?: boolean;
@@ -30,22 +30,21 @@ export function UserCell({
   serverUserId,
   username,
   identityName,
+  personName,
   thumbUrl,
   serverId,
   size = 'sm',
-  showUsername = false,
   details = [],
   link = true,
   trailing,
   muted,
 }: UserCellProps) {
-  const name = identityName ?? username;
+  const name = personName ?? identityName ?? username;
   if (name === null) return <span className="text-muted-foreground">—</span>;
 
   const small = size === 'sm';
   const avatarUrl = getAvatarUrl(serverId, thumbUrl, small ? 24 : 40);
-  const handle = showUsername && username !== null && username !== name ? `@${username}` : null;
-  const subline = [...(handle === null ? [] : [handle]), ...details].join(' · ');
+  const subline = details.join(' · ');
 
   const body = (
     <>

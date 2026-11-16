@@ -6,7 +6,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import './map.css';
 import { useTranslation } from 'react-i18next';
 import { recordClientError } from '@/lib/clientErrors';
-import { useTheme } from '@/components/theme-provider';
+import { accentPreset, useTheme } from '@/components/theme-provider';
 import { autoFitBounds, type FitPoint } from './autoFitBounds';
 import { checkBasemap, isWebglSupported, mapMaxZoom, worldFillZoom } from './maplibre';
 
@@ -15,6 +15,11 @@ export function useResolvedDark(): boolean {
   return theme === 'system'
     ? window.matchMedia('(prefers-color-scheme: dark)').matches
     : theme === 'dark';
+}
+
+/** The accent preset's OKLCH hue, which the basemap grays take like the gray tokens do. */
+export function useAccentH(): number {
+  return accentPreset(useTheme().accentHue).okHue;
 }
 
 export function useBasemapAvailable(): boolean | null {

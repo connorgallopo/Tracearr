@@ -185,8 +185,8 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
 
       result = await db.execute(sql`
         SELECT
-          rep.username AS username,
-          u.name AS identity_name,
+          u.username AS username,
+          COALESCE(u.name, u.username) AS identity_name,
           rep.thumb_url AS thumb_url,
           rep.id AS server_user_id,
           rep.server_id AS server_id,
@@ -199,7 +199,7 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
         JOIN server_users su ON dbu.server_user_id = su.id
         JOIN users u ON su.user_id = u.id
         INNER JOIN LATERAL (
-          SELECT su2.id, su2.username, su2.thumb_url, su2.server_id
+          SELECT su2.id, su2.thumb_url, su2.server_id
           FROM server_users su2
           WHERE su2.user_id = u.id ${serverFilterSu2}
           ORDER BY ${representativeAccountOrderSql('su2')}
@@ -208,7 +208,7 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
         ${baseWhere}
         ${period === 'custom' ? sql`AND dbu.day < ${dateRange.end}` : sql``}
         ${serverFilter}
-        GROUP BY u.id, u.name, rep.id, rep.username, rep.thumb_url, rep.server_id
+        GROUP BY u.id, u.name, rep.id, rep.thumb_url, rep.server_id
         ORDER BY total_bytes DESC
         LIMIT 10
       `);
@@ -226,8 +226,8 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
 
       result = await db.execute(sql`
         SELECT
-          rep.username AS username,
-          u.name AS identity_name,
+          u.username AS username,
+          COALESCE(u.name, u.username) AS identity_name,
           rep.thumb_url AS thumb_url,
           rep.id AS server_user_id,
           rep.server_id AS server_id,
@@ -240,7 +240,7 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
         JOIN server_users su ON s.server_user_id = su.id
         JOIN users u ON su.user_id = u.id
         INNER JOIN LATERAL (
-          SELECT su2.id, su2.username, su2.thumb_url, su2.server_id
+          SELECT su2.id, su2.thumb_url, su2.server_id
           FROM server_users su2
           WHERE su2.user_id = u.id ${serverFilterSu2}
           ORDER BY ${representativeAccountOrderSql('su2')}
@@ -249,7 +249,7 @@ export const bandwidthRoutes: FastifyPluginAsync = async (app) => {
         ${baseWhere}
         ${period === 'custom' ? sql`AND s.started_at < ${dateRange.end}` : sql``}
         ${serverFilter}
-        GROUP BY u.id, u.name, rep.id, rep.username, rep.thumb_url, rep.server_id
+        GROUP BY u.id, u.name, rep.id, rep.thumb_url, rep.server_id
         ORDER BY total_bytes DESC
         LIMIT 10
       `);

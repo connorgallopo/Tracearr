@@ -881,7 +881,7 @@ export function CatalogToolbar({
       <SlidersHorizontal className="h-3.5 w-3.5" />
       {t('media.grid.toolbar.filtersLabel')}
       {filterCount > 0 && (
-        <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-[10px]">
+        <Badge variant="secondary" className="ml-1 h-5 px-1.5">
           {filterCount}
         </Badge>
       )}

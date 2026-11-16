@@ -121,7 +121,7 @@ function ConditionEvidenceRow({
     <div className="flex items-start gap-3 py-2">
       <div className="mt-0.5 shrink-0">
         {condition.matched ? (
-          <CheckCircle2 className="h-4 w-4 text-red-500" />
+          <CheckCircle2 className="text-destructive h-4 w-4" />
         ) : (
           <XCircle className="text-muted-foreground h-4 w-4" />
         )}
@@ -136,7 +136,7 @@ function ConditionEvidenceRow({
         </div>
         <div className="mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1">
           <span
-            className={`text-sm ${condition.matched ? 'font-semibold text-red-600' : 'text-muted-foreground'}`}
+            className={`text-sm ${condition.matched ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}
           >
             {t('violations.detail.actual')}: {actualDisplay}
             {unitSuffix}
@@ -446,7 +446,7 @@ export function ViolationDetail() {
             </div>
             <div>
               <div className="flex items-center gap-3">
-                <h1 className="text-2xl font-bold">{violation.rule.name}</h1>
+                <h1 className="text-xl font-semibold">{violation.rule.name}</h1>
                 <SeverityBadge severity={violation.severity} />
               </div>
               <p className="text-muted-foreground text-sm">{description}</p>
@@ -533,7 +533,6 @@ export function ViolationDetail() {
                 <p className="truncate font-semibold group-hover:underline">
                   {violation.user.identityName ?? violation.user.username}
                 </p>
-                <p className="text-muted-foreground truncate text-sm">@{violation.user.username}</p>
                 {violation.server && (
                   <ServerBadge
                     server={{
@@ -553,7 +552,7 @@ export function ViolationDetail() {
       {/* Condition Evidence (V2 violations) */}
       {violation.evidence && violation.evidence.length > 0 && (
         <div className="space-y-4">
-          <h2 className="flex items-center gap-2 text-lg font-semibold">
+          <h2 className="flex items-center gap-2 text-base font-semibold">
             <Shield className="h-5 w-5" />
             {t('violations.detail.conditionEvidence')}
           </h2>
@@ -654,7 +653,7 @@ export function ViolationDetail() {
                 <p className="text-muted-foreground mb-1 text-xs">
                   {t('pages:violations.detail.daysInactive')}
                 </p>
-                <p className="text-3xl font-bold">
+                <p className="text-2xl font-semibold tabular-nums">
                   {(violation.data.inactiveDays as number) ?? 'N/A'}
                 </p>
               </div>
@@ -662,7 +661,7 @@ export function ViolationDetail() {
                 <p className="text-muted-foreground mb-1 text-xs">
                   {t('pages:violations.detail.threshold')}
                 </p>
-                <p className="text-3xl font-bold">
+                <p className="text-2xl font-semibold tabular-nums">
                   {(violation.data.thresholdDays as number) ?? 'N/A'}
                   <span className="text-muted-foreground ml-1 text-sm font-normal">
                     {t('common:labels.days')}
@@ -674,7 +673,7 @@ export function ViolationDetail() {
                   {t('pages:violations.detail.lastActivity')}
                 </p>
                 {violation.data.neverActive ? (
-                  <p className="flex items-center gap-1 font-medium text-yellow-600">
+                  <p className="text-warning flex items-center gap-1 font-medium">
                     <AlertCircle className="h-4 w-4" />
                     {t('pages:violations.detail.neverActive')}
                   </p>

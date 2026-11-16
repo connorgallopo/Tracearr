@@ -133,6 +133,7 @@
     "noTerminations": "Geen afgebroken streams",
     "lastSeen": "",
     "terminatedBy": "",
+    "terminatedByName": "",
     "trustScoreConfirm": "",
     "trustScoreRange": "",
     "moreLocations_one": "",

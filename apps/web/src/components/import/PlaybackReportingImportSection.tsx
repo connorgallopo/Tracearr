@@ -24,15 +24,18 @@ import { StepBadge } from '@/components/settings/shared/StepBadge';
 import { TimezoneSelect } from '@/components/settings/shared/TimezoneSelect';
 import { browserTimeZone } from '@/lib/dateFormat';
 import { api } from '@/lib/api';
+import { cn } from '@/lib/utils';
+import type { CardProgress, ImportPhase } from '@/hooks/queries/useImports';
 import { ImportProgressCard, type ImportProgressData } from './ImportProgressCard';
+import { StartImportButton } from './StartImportButton';
 import type { Server, PlaybackReportingImportProgress } from '@tracearr/shared';
 
 interface PlaybackReportingImportSectionProps {
   jellyfinServers: Server[];
   selectedServerId: string;
   onServerChange: (id: string) => void;
-  progress: PlaybackReportingImportProgress | null;
-  isImporting: boolean;
+  progress: CardProgress<PlaybackReportingImportProgress> | null;
+  phase: ImportPhase;
   onStartImport: (opts: {
     serverId: string;
     timezone: string;
@@ -48,10 +51,11 @@ export function PlaybackReportingImportSection({
   selectedServerId,
   onServerChange,
   progress,
-  isImporting,
+  phase,
   onStartImport,
 }: PlaybackReportingImportSectionProps) {
   const { t } = useTranslation(['settings', 'common']);
+  const busy = phase === 'pending' || phase === 'importing';
 
   const [checkState, setCheckState] = useState<PluginCheckState>('idle');
   const [checkMessage, setCheckMessage] = useState('');
@@ -100,6 +104,8 @@ export function PlaybackReportingImportSection({
       }
     : null;
 
+  const pickServer = jellyfinServers.length > 1;
+
   return (
     <div className="space-y-6">
       <div className="space-y-1">
@@ -111,25 +117,27 @@ export function PlaybackReportingImportSection({
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-sm font-medium">
           <StepBadge n={1} />
-          {t('import.selectTargetServer')}
+          {t(pickServer ? 'import.selectTargetServer' : 'import.checkPlugin')}
         </div>
 
         <div className="ml-8 space-y-4">
-          <Select value={selectedServerId} onValueChange={onServerChange}>
-            <SelectTrigger>
-              <SelectValue placeholder={t('import.selectJellyfinServer')} />
-            </SelectTrigger>
-            <SelectContent>
-              {jellyfinServers.map((server) => (
-                <SelectItem key={server.id} value={server.id}>
-                  <div className="flex items-center gap-2">
-                    <MediaServerIcon type={server.type} className="h-4 w-4" />
-                    {server.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {pickServer && (
+            <Select value={selectedServerId} onValueChange={onServerChange}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('import.selectJellyfinServer')} />
+              </SelectTrigger>
+              <SelectContent>
+                {jellyfinServers.map((server) => (
+                  <SelectItem key={server.id} value={server.id}>
+                    <div className="flex items-center gap-2">
+                      <MediaServerIcon type={server.type} className="h-4 w-4" />
+                      {server.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
           <div className="flex flex-wrap items-center gap-3">
             <Button
@@ -152,7 +160,7 @@ export function PlaybackReportingImportSection({
             </Button>
 
             {checkState === 'installed' && (
-              <span className="flex items-center gap-1 text-sm text-green-600">
+              <span className="text-success flex items-center gap-1 text-sm">
                 <CheckCircle2 className="h-4 w-4" />
                 {t('import.pluginFound', {
                   records: (checkRecords ?? 0).toLocaleString(),
@@ -197,7 +205,7 @@ export function PlaybackReportingImportSection({
               onCheckedChange={(checked: boolean | 'indeterminate') =>
                 setEnrichMedia(checked === true)
               }
-              disabled={isImporting}
+              disabled={busy}
             />
             <div className="space-y-1">
               <Label htmlFor="prEnrichMedia" className="cursor-pointer text-sm font-normal">
@@ -214,7 +222,7 @@ export function PlaybackReportingImportSection({
               onCheckedChange={(checked: boolean | 'indeterminate') =>
                 setImportFullRange(checked === true)
               }
-              disabled={isImporting}
+              disabled={busy}
             />
             <div className="space-y-1">
               <Label htmlFor="prImportFullRange" className="cursor-pointer text-sm font-normal">
@@ -228,35 +236,27 @@ export function PlaybackReportingImportSection({
 
       {/* Import Button */}
       <div className="border-t pt-6">
-        <Button onClick={handleStart} disabled={!selectedServerId || isImporting} size="lg">
-          {isImporting ? (
-            <>
-              <Loader2 className="animate-spin" />
-              {t('import.importing')}
-            </>
-          ) : (
-            <>
-              <Download className="mr-2 h-4 w-4" />
-              {t('import.startImport')}
-            </>
-          )}
-        </Button>
+        <StartImportButton
+          phase={phase}
+          onClick={handleStart}
+          disabled={!selectedServerId}
+          icon={Download}
+          label={t('import.startImport')}
+        />
 
-        {progressData && (
-          <div className="mt-4 space-y-2">
-            <ImportProgressCard progress={progressData} />
-            {(progress?.overlapRecords ?? 0) > 0 || (progress?.duplicateRecords ?? 0) > 0 ? (
-              <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                {(progress?.overlapRecords ?? 0) > 0 && (
-                  <span>{t('import.overlapSkipped', { count: progress?.overlapRecords })}</span>
-                )}
-                {(progress?.duplicateRecords ?? 0) > 0 && (
-                  <span>{t('import.duplicates', { count: progress?.duplicateRecords })}</span>
-                )}
-              </div>
-            ) : null}
-          </div>
-        )}
+        <div className={cn('space-y-2', progressData && phase !== 'pending' && 'mt-4')}>
+          <ImportProgressCard progress={progressData} />
+          {(progress?.overlapRecords ?? 0) > 0 || (progress?.duplicateRecords ?? 0) > 0 ? (
+            <div className="text-muted-foreground flex flex-wrap gap-x-4 gap-y-1 text-xs">
+              {(progress?.overlapRecords ?? 0) > 0 && (
+                <span>{t('import.overlapSkipped', { count: progress?.overlapRecords })}</span>
+              )}
+              {(progress?.duplicateRecords ?? 0) > 0 && (
+                <span>{t('import.duplicates', { count: progress?.duplicateRecords })}</span>
+              )}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {/* Info cards */}
@@ -269,8 +269,8 @@ export function PlaybackReportingImportSection({
           </div>
         </div>
 
-        <div className="flex gap-3 rounded-lg border border-yellow-500/20 bg-yellow-500/5 p-4">
-          <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-600" />
+        <div className="border-warning/20 bg-warning/5 flex gap-3 rounded-lg border p-4">
+          <AlertTriangle className="text-warning mt-0.5 h-4 w-4 shrink-0" />
           <div className="space-y-2 text-sm">
             <p className="font-medium">{t('import.recordsMayBeSkipped')}</p>
             <ul className="text-muted-foreground list-inside list-disc space-y-1">

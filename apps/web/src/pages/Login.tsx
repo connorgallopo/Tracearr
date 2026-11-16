@@ -1,9 +1,8 @@
-import { type ReactNode, useState, useEffect } from 'react';
+import { type ReactNode, useState, useEffect, useEffectEvent } from 'react';
 import { useLocation, useNavigate, useSearchParams, type Location } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { Loader2, ExternalLink, User, KeyRound, LogIn, AlertTriangle } from 'lucide-react';
-import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
+import { Loader2, KeyRound, LogIn, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,31 +15,27 @@ import { authClient } from '@/lib/authClient';
 import { api, BASE_URL } from '@/lib/api';
 import { dropUserData } from '@/lib/queryCache';
 import { useSetupStatus } from '@/hooks/queries/useSetup';
-import { isNotPermitted, toastNotPermitted } from '@/lib/signInRefusal';
-import {
-  SERVER_PROFILES,
-  SIGN_IN_ERROR_CODES,
-  type PlexDiscoveredServer,
-  type SetupStatus,
-} from '@tracearr/shared';
+import { type SignInFailure, toastNotPermitted } from '@/lib/signInRefusal';
+import { SERVER_PROFILES, SIGN_IN_ERROR_CODES, type SetupStatus } from '@tracearr/shared';
 import { LogoIcon } from '@/components/brand/Logo';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
-import { AuthFormError } from '@/components/auth/AuthFormError';
+import { AuthFormError, SignInAgainAlert } from '@/components/auth/AuthFormError';
 import { MemberLogin } from '@/components/auth/MemberLogin';
-
-// Plex brand color
-const PLEX_COLOR = 'bg-[#E5A00D] hover:bg-[#C88A0B]';
+import { PlexSignInButton, PlexWaiting } from '@/components/auth/PlexSignIn';
+import { TofaSignInButton, TofaWaiting } from '@/components/auth/TofaSignIn';
+import { usePlexSignIn } from '@/components/auth/usePlexSignIn';
+import { useTofaSignIn } from '@/components/auth/useTofaSignIn';
+import { FirstRun } from '@/components/setup/FirstRun';
 
 const DEFAULT_AUTH_METHODS: SetupStatus['authMethods'] = {
   local: true,
   plex: true,
   oidc: false,
   oidcProviderName: null,
+  tofa: false,
   member: false,
   ssoOnly: false,
 };
-
-type AuthStep = 'initial' | 'plex-waiting' | 'server-select';
 
 export function Login() {
   const navigate = useNavigate();
@@ -61,23 +56,14 @@ export function Login() {
   const memberLoginServers = setup?.memberLoginServers ?? [];
   const [claimCodeValidated, setClaimCodeValidated] = useState(false);
 
-  // Auth flow state
-  const [authStep, setAuthStep] = useState<AuthStep>('initial');
-  const [plexAuthUrl, setPlexAuthUrl] = useState<string | null>(null);
-  const [plexServers, setPlexServers] = useState<PlexDiscoveredServer[]>([]);
-  const [plexTempToken, setPlexTempToken] = useState<string | null>(null);
-  const [connectingToServer, setConnectingToServer] = useState<string | null>(null);
-  const [plexPopup, setPlexPopup] = useState<ReturnType<typeof window.open>>(null);
+  // Set by a first-run sign-up, which continues at /setup rather than where /login was opened from
+  const [destination, setDestination] = useState<string | null>(null);
 
-  // Local auth form state (sign-in uses a single identifier field; sign-up
-  // collects a display name and a separate login username)
+  // Local sign-in form state; the identifier is an email or a username
   const [localPending, setLocalPending] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [signupUsername, setSignupUsername] = useState('');
-  const [email, setEmail] = useState('');
 
   // OIDC state
   const [oidcPending, setOidcPending] = useState(false);
@@ -104,17 +90,9 @@ export function Login() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      void navigate(redirectTo, { replace: true });
+      void navigate(destination ?? redirectTo, { replace: true });
     }
-  }, [isAuthenticated, authLoading, navigate, redirectTo]);
-
-  // Close Plex popup helper
-  const closePlexPopup = () => {
-    if (plexPopup && !plexPopup.closed) {
-      plexPopup.close();
-    }
-    setPlexPopup(null);
-  };
+  }, [isAuthenticated, authLoading, navigate, destination, redirectTo]);
 
   // Handle claim code validation (immediate feedback, server validates again during signup)
   const handleClaimCodeValidation = async (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -145,172 +123,50 @@ export function Login() {
     await queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
   };
 
-  const finishSignIn = async () => {
-    await refreshSession();
-    toast.success(t('notifications:toast.success.loggedIn.title'), {
-      description: t('notifications:toast.success.loggedIn.message'),
-    });
-    void navigate(redirectTo);
-  };
-
-  // Poll for Plex PIN claim
-  const pollPlexPin = async (handle: string) => {
-    try {
-      const result = await api.auth.checkPlexPin({
-        handle,
-        ...(requiresClaimCode && { claimCode: claimCode.trim() }),
-      });
-
-      if (result.expired) {
-        resetPlexAuth();
-        toast.error(t('pages:login.plexExpired'));
-        return;
-      }
-      if (!result.authorized) {
-        // Still waiting for PIN claim, continue polling
-        setTimeout(() => void pollPlexPin(handle), 2000);
-        return;
-      }
-
-      // PIN claimed - close the popup
-      closePlexPopup();
-
-      // Check what we got back
-      if (result.needsServerSelection && result.servers && result.tempToken) {
-        // New user - needs to select a server
-        setPlexServers(result.servers);
-        setPlexTempToken(result.tempToken);
-        setAuthStep('server-select');
-      } else if (result.user) {
-        // User authenticated (returning or no servers) - session cookie is already set
-        await finishSignIn();
-      }
-    } catch (error) {
-      resetPlexAuth();
-      if (isNotPermitted(error)) {
-        toastNotPermitted(t('pages:login.member.notPermitted'));
-        return;
-      }
-      toast.error(t('notifications:toast.error.authFailed'), {
-        description: error instanceof Error ? error.message : t('pages:login.plexAuthFailed'),
-      });
-    }
-  };
-
-  // Start Plex OAuth flow
-  const handlePlexLogin = async () => {
-    setAuthStep('plex-waiting');
-
-    // Open popup to blank page first (same origin) - helps with cross-origin close
-    const popup = window.open('about:blank', 'plex_auth', 'width=600,height=700,popup=yes');
-    setPlexPopup(popup);
-
-    try {
-      // Pass callback URL so Plex redirects back to our domain after auth
-      const callbackUrl = `${window.location.origin}${BASE_URL}auth/plex-callback`;
-      const result = await api.auth.initiatePlex(callbackUrl);
-      setPlexAuthUrl(result.authUrl);
-
-      // Navigate popup to Plex auth
-      if (popup && !popup.closed) {
-        popup.location.assign(result.authUrl);
-      }
-
-      // Start polling
-      void pollPlexPin(result.handle);
-    } catch (error) {
-      closePlexPopup();
-      setAuthStep('initial');
-      toast.error(t('common:errors.generic'), {
-        description: error instanceof Error ? error.message : t('pages:login.plexStartFailed'),
-      });
-    }
-  };
-
-  // Connect to selected Plex server
-  const handlePlexServerSelect = async (
-    serverUri: string,
-    serverName: string,
-    clientIdentifier: string
+  const finishSignIn = async (
+    description = t('notifications:toast.success.loggedIn.message'),
+    to = redirectTo
   ) => {
-    if (!plexTempToken) return;
+    setDestination(to);
+    await refreshSession();
+    toast.success(t('notifications:toast.success.loggedIn.title'), { description });
+    void navigate(to);
+  };
 
-    setConnectingToServer(serverName);
+  const claimCodeToSend = requiresClaimCode ? claimCode.trim() : undefined;
+  const plex = usePlexSignIn({
+    claimCode: claimCodeToSend,
+    onSignedIn: (connectedServer) =>
+      connectedServer
+        ? finishSignIn(t('pages:login.connectedTo', { name: connectedServer }))
+        : finishSignIn(),
+  });
 
-    try {
-      const result = await api.auth.connectPlexServer({
-        tempToken: plexTempToken,
-        serverUri,
-        serverName,
-        clientIdentifier,
-        ...(requiresClaimCode && { claimCode: claimCode.trim() }),
-      });
+  const tofa = useTofaSignIn({ purpose: 'sign-in', onSignedIn: () => finishSignIn() });
 
-      if (result.authorized) {
-        await refreshSession();
-        toast.success(t('notifications:toast.success.loggedIn.title'), {
-          description: t('pages:login.connectedTo', { name: serverName }),
-        });
-        void navigate(redirectTo);
-      }
-    } catch (error) {
+  // Effect events, so a language change while an error shows does not toast it again
+  const toastPlexError = useEffectEvent((error: SignInFailure) => {
+    if (error.kind === 'expired') {
+      toast.error(t('pages:login.plexExpired'));
+    } else {
       toast.error(t('common:errors.connectionFailed'), {
-        description: error instanceof Error ? error.message : t('pages:login.serverConnectFailed'),
+        description: error.message ?? t('pages:login.serverConnectFailed'),
       });
-    } finally {
-      setConnectingToServer(null);
     }
-  };
+  });
+  const toastTofaError = useEffectEvent((message: string | undefined) => {
+    toast.error(t('notifications:toast.error.authFailed'), {
+      ...(message !== undefined && { description: message }),
+    });
+  });
 
-  // Reset Plex auth state
-  const resetPlexAuth = () => {
-    // Close popup if still open
-    if (plexPopup && !plexPopup.closed) {
-      plexPopup.close();
-    }
-    setPlexPopup(null);
-    setAuthStep('initial');
-    setPlexAuthUrl(null);
-    setPlexServers([]);
-    setPlexTempToken(null);
-    setConnectingToServer(null);
-  };
+  useEffect(() => {
+    if (plex.error) toastPlexError(plex.error);
+  }, [plex.error]);
 
-  // Handle local sign-up (first-run owner account creation)
-  const handleSignUp = async (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setFormError(null);
-    setLocalPending(true);
-
-    try {
-      // signUp.email's typed client only accepts declared additionalFields;
-      // username and claimCode aren't declared there, so post through $fetch
-      // (the server's sign-up/email schema accepts arbitrary extra fields).
-      const { error } = await authClient.$fetch('/sign-up/email', {
-        method: 'POST',
-        body: {
-          name: name.trim(),
-          username: signupUsername.trim().toLowerCase(),
-          email: email.trim(),
-          password,
-          ...(requiresClaimCode && { claimCode: claimCode.trim() }),
-        },
-      });
-
-      if (error) {
-        setFormError(error.message ?? t('pages:login.createAccountFailed'));
-        return;
-      }
-
-      await refreshSession();
-      toast.success(t('notifications:toast.success.loggedIn.title'), {
-        description: t('pages:login.accountCreated'),
-      });
-      void navigate(redirectTo);
-    } finally {
-      setLocalPending(false);
-    }
-  };
+  useEffect(() => {
+    if (tofa.error?.kind === 'failed') toastTofaError(tofa.error.message);
+  }, [tofa.error]);
 
   // Handle local sign-in - identifier can be an email or a username
   const handleSignIn = async (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -422,8 +278,12 @@ export function Login() {
     );
   }
 
-  // Server selection step (only during Plex signup)
-  if (authStep === 'server-select' && plexServers.length > 0) {
+  if (needsSetup) {
+    return <FirstRun claimCode={claimCodeToSend} onSignedIn={finishSignIn} />;
+  }
+
+  // Plex signup picks a server here only when the setup status never arrived to say first run
+  if (plex.step === 'server-select' && plex.servers.length > 0) {
     return (
       <div className="bg-background flex min-h-screen flex-col items-center justify-center p-4">
         <div className="mb-8 flex flex-col items-center text-center">
@@ -439,25 +299,14 @@ export function Login() {
           </CardHeader>
           <CardContent className="space-y-4">
             <PlexServerSelector
-              servers={plexServers}
-              onSelect={handlePlexServerSelect}
-              connecting={connectingToServer !== null}
-              connectingToServer={connectingToServer}
-              onCancel={resetPlexAuth}
-              onTestCustomUrl={
-                plexTempToken
-                  ? async (uri) => {
-                      const result = await api.auth.testPlexConnection({
-                        uri,
-                        tempToken: plexTempToken,
-                        ...(requiresClaimCode && claimCode.trim()
-                          ? { claimCode: claimCode.trim() }
-                          : {}),
-                      });
-                      return result.connection;
-                    }
-                  : undefined
-              }
+              servers={plex.servers}
+              onSelect={(uri, name, clientIdentifier) => {
+                void plex.selectServer(uri, name, clientIdentifier);
+              }}
+              connecting={plex.connectingTo !== null}
+              connectingToServer={plex.connectingTo}
+              onCancel={plex.cancel}
+              onTestCustomUrl={plex.testCustomUrl}
             />
           </CardContent>
         </Card>
@@ -474,74 +323,18 @@ export function Login() {
     authMethods.plex ||
     (authMethods.member &&
       memberLoginServers.some((server) => SERVER_PROFILES[server.type].memberSignIn === 'plexTv'));
-  const showMember = authMethods.member && !needsSetup && memberServers.length > 0;
-  const hasPrimaryMethods = showPlex || authMethods.oidc;
+  // Likewise authMethods.tofa is the owner's own tofa sign-in; members come through their server.
+  const showTofa =
+    authMethods.tofa ||
+    (authMethods.member &&
+      memberLoginServers.some(
+        (server) => SERVER_PROFILES[server.type].memberSignIn === 'tofaCloud'
+      ));
+  const showMember = authMethods.member && memberServers.length > 0;
+  const hasPrimaryMethods = showPlex || showTofa || authMethods.oidc;
   const hasFormMethods = authMethods.local || showMember;
 
-  const localForm = needsSetup ? (
-    <form onSubmit={handleSignUp} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="name">{t('settings:account.displayName')}</Label>
-        <Input
-          id="name"
-          type="text"
-          autoComplete="name"
-          placeholder={t('pages:login.displayNamePlaceholder')}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-          disabled={localPending}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="username">{t('pages:login.username')}</Label>
-        <Input
-          id="username"
-          type="text"
-          autoComplete="username"
-          placeholder={t('pages:login.usernamePlaceholder')}
-          value={signupUsername}
-          onChange={(e) => setSignupUsername(e.target.value)}
-          required
-          minLength={3}
-          maxLength={30}
-          disabled={localPending}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="email">{t('settings:account.email')}</Label>
-        <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          placeholder={t('pages:login.emailPlaceholder')}
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-          disabled={localPending}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="password">{t('settings:account.password')}</Label>
-        <Input
-          id="password"
-          type="password"
-          autoComplete="new-password"
-          placeholder={t('pages:login.passwordPlaceholder')}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={8}
-          disabled={localPending}
-        />
-      </div>
-      <AuthFormError message={formError} />
-      <Button type="submit" className="w-full" disabled={localPending}>
-        {localPending ? <Loader2 className="animate-spin" /> : <User />}
-        {t('settings:account.createAccount')}
-      </Button>
-    </form>
-  ) : (
+  const localForm = (
     <form onSubmit={handleSignIn} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="identifier">{t('pages:login.usernameOrEmail')}</Label>
@@ -611,21 +404,13 @@ export function Login() {
       <div className="mb-8 flex flex-col items-center text-center">
         <LogoIcon className="mb-4 h-20 w-20" />
         <h1 className="text-4xl font-bold tracking-tight">{t('pages:login.title')}</h1>
-        <p className="text-muted-foreground mt-2">
-          {needsSetup ? t('pages:login.createAccountHeading') : t('pages:login.signInHeading')}
-        </p>
+        <p className="text-muted-foreground mt-2">{t('pages:login.signInHeading')}</p>
       </div>
 
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>
-            {needsSetup ? t('settings:account.createAccount') : t('common:actions.signIn')}
-          </CardTitle>
-          <CardDescription>
-            {needsSetup
-              ? t('pages:login.createAccountDescription')
-              : t('pages:login.signInDescription')}
-          </CardDescription>
+          <CardTitle>{t('common:actions.signIn')}</CardTitle>
+          <CardDescription>{t('pages:login.signInDescription')}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {oidcError && (
@@ -635,40 +420,36 @@ export function Login() {
             </Alert>
           )}
 
-          {authStep === 'plex-waiting' ? (
-            <div className="space-y-4">
-              <div className="bg-muted/50 rounded-lg p-4 text-center">
-                <Loader2 className="mx-auto mb-3 h-8 w-8 animate-spin text-[#E5A00D]" />
-                <p className="text-sm font-medium">{t('pages:login.waitingForPlex')}</p>
-                <p className="text-muted-foreground mt-1 text-xs">
-                  {t('pages:login.completeInPopup')}
-                </p>
-                {plexAuthUrl && (
-                  <Button
-                    type="button"
-                    variant="link"
-                    size="sm"
-                    onClick={() => window.open(plexAuthUrl, '_blank')}
-                    className="mt-2 h-auto gap-1 p-0"
-                  >
-                    <ExternalLink className="h-3 w-3" />
-                    {t('pages:login.reopenPlexLogin')}
-                  </Button>
-                )}
-              </div>
-              <Button variant="ghost" className="w-full" onClick={resetPlexAuth}>
-                {t('common:actions.cancel')}
-              </Button>
-            </div>
-          ) : (
+          {tofa.error?.kind === 'expired' && (
+            <SignInAgainAlert
+              title={t('pages:setup.codeExpired')}
+              onSignInAgain={() => void tofa.start()}
+            />
+          )}
+
+          {plex.step === 'waiting' && <PlexWaiting authUrl={plex.authUrl} onCancel={plex.cancel} />}
+          {tofa.step === 'waiting' && (
+            <TofaWaiting
+              verificationUri={tofa.verificationUri}
+              userCode={tofa.userCode}
+              expiresAt={tofa.expiresAt}
+              onCancel={tofa.cancel}
+            />
+          )}
+          {plex.step !== 'waiting' && tofa.step !== 'waiting' && (
             <>
               {showPlex && (
-                <Button className={`w-full ${PLEX_COLOR} text-white`} onClick={handlePlexLogin}>
-                  <MediaServerIcon type="plex" className="h-4 w-4" />
-                  {needsSetup
-                    ? t('settings:plex.signUpWithPlex')
-                    : t('settings:plex.signInWithPlex')}
-                </Button>
+                <PlexSignInButton
+                  label={t('settings:plex.signInWithPlex')}
+                  onClick={() => void plex.start()}
+                />
+              )}
+
+              {showTofa && (
+                <TofaSignInButton
+                  label={t('pages:tofa.signIn')}
+                  onClick={() => void tofa.start()}
+                />
               )}
 
               {authMethods.oidc && (
@@ -705,9 +486,7 @@ export function Login() {
         </CardContent>
       </Card>
 
-      <p className="text-muted-foreground mt-6 text-center text-xs">
-        {needsSetup ? t('pages:login.setupNote') : t('pages:login.tagline')}
-      </p>
+      <p className="text-muted-foreground mt-6 text-center text-xs">{t('pages:login.tagline')}</p>
     </div>
   );
 }

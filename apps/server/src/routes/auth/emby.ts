@@ -11,9 +11,8 @@ import { db } from '../../db/client.js';
 import { servers } from '../../db/schema.js';
 import { invalidateServersCache } from '../../jobs/poller/database.js';
 import { EmbyClient } from '../../services/mediaServer/index.js';
-import { syncServer } from '../../services/sync.js';
+import { startAddedServer, syncReconnectedServer } from '../../services/serverCreate.js';
 import { HISTORICAL_EDIT_MESSAGE } from '../../services/liveServers.js';
-import { rebuildAutoSyncSchedules } from '../../jobs/librarySyncQueue.js';
 
 export const embyRoutes: FastifyPluginAsync = async (app) => {
   /**
@@ -52,7 +51,8 @@ export const embyRoutes: FastifyPluginAsync = async (app) => {
         return reply.forbidden(adminCheck.message);
       }
 
-      if (server.length === 0) {
+      const added = server.length === 0;
+      if (added) {
         const inserted = await db
           .insert(servers)
           .values({
@@ -64,12 +64,6 @@ export const embyRoutes: FastifyPluginAsync = async (app) => {
           })
           .returning();
         server = inserted;
-        rebuildAutoSyncSchedules().catch((error: unknown) => {
-          app.log.error(
-            { err: error, serverId: inserted[0]?.id },
-            'Auto-sync schedule failed for new server'
-          );
-        });
       } else {
         const existingServer = server[0]!;
         await db
@@ -88,17 +82,11 @@ export const embyRoutes: FastifyPluginAsync = async (app) => {
 
       app.log.info({ userId: authUser.userId, serverId }, 'Emby server connected via API key');
 
-      // Auto-sync server users and libraries in background
-      syncServer(serverId, { syncUsers: true, syncLibraries: true })
-        .then((result) => {
-          app.log.info(
-            { serverId, usersAdded: result.usersAdded, librariesSynced: result.librariesSynced },
-            'Auto-sync completed for Emby server'
-          );
-        })
-        .catch((error: unknown) => {
-          app.log.error({ err: error, serverId }, 'Auto-sync failed for Emby server');
-        });
+      if (added) {
+        await startAddedServer({ id: serverId, type: 'emby' }, []);
+      } else {
+        syncReconnectedServer(serverId);
+      }
 
       return { serverId };
     } catch (error) {

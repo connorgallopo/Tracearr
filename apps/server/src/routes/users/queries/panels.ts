@@ -327,7 +327,7 @@ export async function queryTerminationHistory(
       serverUserId: terminationLogs.serverUserId,
       trigger: terminationLogs.trigger,
       triggeredByUserId: terminationLogs.triggeredByUserId,
-      triggeredByUsername: users.username,
+      triggeredByUsername: sql<string | null>`coalesce(${users.name}, ${users.username})`,
       ruleId: terminationLogs.ruleId,
       ruleName: automations.name,
       violationId: terminationLogs.violationId,

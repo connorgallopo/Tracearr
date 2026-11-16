@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 import type { SessionWithDetails } from '@tracearr/shared';
+import { TooltipProvider } from '@/components/ui/tooltip';
 import { SessionDetailSheet } from './SessionDetailSheet';
 
 const auth = vi.hoisted(() => ({ user: { role: 'owner' } }));
@@ -33,7 +34,9 @@ function renderSheet(overrides: Partial<SessionWithDetails>, onOpenChange = vi.f
 
   return render(
     <MemoryRouter>
-      <SessionDetailSheet session={session} open onOpenChange={onOpenChange} />
+      <TooltipProvider>
+        <SessionDetailSheet session={session} open onOpenChange={onOpenChange} />
+      </TooltipProvider>
     </MemoryRouter>
   );
 }
@@ -128,5 +131,21 @@ describe('SessionDetailSheet', () => {
     fireEvent.click(screen.getByRole('link', { name: 'Heat' }));
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  it('names tofa and the user alone, and labels a relayed play', () => {
+    renderSheet({
+      server: { id: 'server-1', name: 'Den', type: 'tofa' },
+      profileName: 'Robin',
+      geoCountry: 'Tofa Relay',
+      sourceVideoCodec: 'hevc',
+      transcodeInfo: { rebufferCount: 2, droppedFrames: 14 },
+    });
+
+    expect(screen.getByText('tofa')).toBeInTheDocument();
+    expect(screen.queryByText('· Robin')).toBeNull();
+    expect(screen.getByText('Tofa Relay')).toBeInTheDocument();
+    expect(screen.getByText('pages:history.stream.rebuffers')).toBeInTheDocument();
+    expect(screen.getByText('14')).toBeInTheDocument();
   });
 });

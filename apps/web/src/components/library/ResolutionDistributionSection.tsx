@@ -80,10 +80,10 @@ function ResolutionDonut({
         enabled: false,
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
         style: {
-          color: 'hsl(var(--popover-foreground))',
+          color: 'oklch(var(--popover-foreground))',
         },
         formatter: function () {
           const pct = total > 0 ? (((this.y ?? 0) / total) * 100).toFixed(1) : '0';
@@ -99,22 +99,22 @@ function ResolutionDonut({
         type: 'category',
         labels: {
           style: {
-            color: 'hsl(var(--foreground))',
-            fontSize: '11px',
+            color: 'oklch(var(--foreground))',
+            fontSize: '12px',
           },
         },
-        lineColor: 'hsl(var(--border))',
+        lineColor: 'oklch(var(--border))',
         tickLength: 0,
       },
       yAxis: {
         title: { text: undefined },
         labels: {
           style: {
-            color: 'hsl(var(--muted-foreground))',
-            fontSize: '11px',
+            color: 'oklch(var(--muted-foreground))',
+            fontSize: '12px',
           },
         },
-        gridLineColor: 'hsl(var(--border))',
+        gridLineColor: 'oklch(var(--border))',
         min: 0,
       },
       plotOptions: {
@@ -133,8 +133,8 @@ function ResolutionDonut({
           dataLabels: {
             enabled: true,
             style: {
-              color: 'hsl(var(--muted-foreground))',
-              fontSize: '10px',
+              color: 'oklch(var(--muted-foreground))',
+              fontSize: '12px',
               textOutline: 'none',
             },
           },
@@ -150,25 +150,6 @@ function ResolutionDonut({
           data: chartData,
         },
       ],
-      responsive: {
-        rules: [
-          {
-            condition: {
-              maxWidth: 300,
-            },
-            chartOptions: {
-              legend: {
-                align: 'center',
-                verticalAlign: 'bottom',
-                layout: 'horizontal',
-                itemStyle: {
-                  fontSize: '10px',
-                },
-              },
-            },
-          },
-        ],
-      },
     };
   }, [chartData, data, height, navigate, browseType, serverId, t]);
 

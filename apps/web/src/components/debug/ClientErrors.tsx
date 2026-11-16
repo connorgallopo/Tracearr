@@ -51,7 +51,7 @@ export function ClientErrors() {
                 </div>
                 <p className="mt-1.5 font-medium break-words">{err.message}</p>
                 {err.stack && (
-                  <pre className="text-muted-foreground mt-1.5 max-h-40 overflow-auto font-mono text-[11px] whitespace-pre-wrap">
+                  <pre className="text-muted-foreground mt-1.5 max-h-40 overflow-auto font-mono text-xs whitespace-pre-wrap">
                     {err.stack}
                   </pre>
                 )}

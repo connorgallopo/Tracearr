@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router';
+import { liveStatsGapSeconds } from '@tracearr/shared';
 import { Dashboard } from './Dashboard';
 
 function Search() {
@@ -40,6 +41,11 @@ const auth = vi.hoisted(() => ({
 }));
 vi.mock('@/hooks/useAuth', () => ({ useAuth: () => auth }));
 
+const serverList = vi.hoisted(() => ({
+  data: [{ id: 's1' }] as { id: string }[] | undefined,
+  isSuccess: true,
+}));
+
 const { multiLiveStats } = vi.hoisted(() => ({
   multiLiveStats: vi.fn((_ids: string[], _enabled: boolean) => ({
     series: [],
@@ -50,6 +56,7 @@ const { multiLiveStats } = vi.hoisted(() => ({
 
 // Not typechecked against the real module - keep in sync by hand
 vi.mock('@/hooks/queries/useServers', () => ({
+  useServers: () => serverList,
   useServerLiveStats: () => ({
     statistics: undefined,
     statisticsAverages: null,
@@ -61,8 +68,13 @@ vi.mock('@/hooks/queries/useServers', () => ({
   useMultiServerLiveStats: (ids: string[], enabled: boolean) => multiLiveStats(ids, enabled),
 }));
 
+const { resourceCharts } = vi.hoisted(() => ({
+  resourceCharts: vi.fn(
+    (_props: { multiSeries?: { serverId: string; gapSeconds: number }[] }) => null
+  ),
+}));
 vi.mock('@/components/charts/ServerResourceCharts', () => ({
-  ServerResourceCharts: () => null,
+  ServerResourceCharts: resourceCharts,
 }));
 
 vi.mock('@/components/charts/BandwidthChart', () => ({
@@ -112,8 +124,11 @@ function serverReturn() {
 describe('Dashboard', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    multiLiveStats.mockReset();
     auth.user.role = 'owner';
     auth.user.impersonatedBy = undefined;
+    serverList.data = [{ id: 's1' }];
+    serverList.isSuccess = true;
     localStorage.clear();
     mockUseServer.mockReturnValue(serverReturn());
   });
@@ -214,6 +229,49 @@ describe('Dashboard', () => {
     renderDashboard();
 
     expect(multiLiveStats).toHaveBeenCalledWith(['a'], true);
+  });
+
+  it('draws resource lines for the selected servers only, each with its own sampling gap', () => {
+    mockUseDashboardStats.mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useDashboardStats>);
+    mockUseActiveSessions.mockReturnValue({
+      data: [],
+      isError: false,
+      error: null,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useActiveSessions>);
+    mockUseServer.mockReturnValue({
+      selectedServerIds: ['a', 'b'],
+      selectedServers: [
+        { id: 'a', name: 'Attic', type: 'plex', historicalAt: null },
+        { id: 'b', name: 'Den', type: 'tofa', historicalAt: null },
+      ],
+      isMultiServer: true,
+      selectedServerId: null,
+    } as unknown as ReturnType<typeof useServer>);
+    const sample = [{ at: '2026-11-14T00:00:00.000Z', hostCpu: 1 }];
+    multiLiveStats.mockReturnValue({
+      series: [
+        { serverId: 'a', statistics: sample, bandwidth: [] },
+        { serverId: 'b', statistics: sample, bandwidth: [] },
+        { serverId: 'gone', statistics: sample, bandwidth: [] },
+      ],
+      clockSkewMs: 0,
+      isLoading: false,
+    } as never);
+
+    renderDashboard();
+
+    const series = resourceCharts.mock.lastCall?.[0].multiSeries;
+    expect(series?.map((line) => [line.serverId, line.gapSeconds])).toEqual([
+      ['a', liveStatsGapSeconds('plex')],
+      ['b', liveStatsGapSeconds('tofa')],
+    ]);
   });
 
   it('shows no server resources section when the only Plex server is historical', () => {
@@ -327,6 +385,38 @@ describe('Dashboard', () => {
       expect(localStorage.getItem('tracearr_dashboard_view')).toBe('admin');
     });
 
+    it('sends an owner with no servers to Connections instead of an empty dashboard', () => {
+      serverList.data = [];
+
+      renderDashboard();
+
+      expect(screen.getByText('settings:servers.noServersConnected')).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'settings:nav.sections.connections' })
+      ).toHaveAttribute('href', '/settings/servers/connections');
+      expect(screen.queryByText('dashboard.activeUsers')).not.toBeInTheDocument();
+    });
+
+    it('keeps the dashboard while the server list is still loading', () => {
+      serverList.data = undefined;
+      serverList.isSuccess = false;
+
+      renderDashboard();
+
+      expect(screen.queryByText('settings:servers.noServersConnected')).not.toBeInTheDocument();
+      expect(screen.getByText('dashboard.activeUsers')).toBeInTheDocument();
+    });
+
+    it('gives a member with no servers the personal view, not the Connections link', () => {
+      auth.user.role = 'member';
+      serverList.data = [];
+
+      renderDashboard();
+
+      expect(screen.getByTestId('personal')).toBeInTheDocument();
+      expect(screen.queryByText('settings:servers.noServersConnected')).not.toBeInTheDocument();
+    });
+
     it('gives an owner viewing as an admin the server view and no toggle, whatever the URL and storage say', () => {
       auth.user.role = 'admin';
       auth.user.impersonatedBy = 'owner-1';
@@ -365,7 +455,7 @@ describe('Dashboard', () => {
 
     mockUseDashboardStats.mockReturnValue(stats(3_600_000));
     renderDashboard();
-    expect(screen.getByText('(common:labels.listenTime 1h 0m)')).toBeInTheDocument();
+    expect(screen.getByText('common:labels.listenTime 1h 0m')).toBeInTheDocument();
   });
 
   it('leaves the server view with the active users tile and no member extras', () => {

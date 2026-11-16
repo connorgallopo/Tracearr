@@ -9,6 +9,7 @@ import {
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { compareNames } from '../../utils/collation.js';
+import { personNameSql } from '../../utils/representativeAccount.js';
 import { lastDeliveredUserIds } from './store.js';
 import { normalizeAddress, suppressedAmong } from './suppressions.js';
 
@@ -186,7 +187,7 @@ export async function loadCandidates(serverIds: string[]): Promise<RecipientCand
   const result = await db.execute(sql`
     SELECT u.id AS user_id,
            (array_agg(su.id ORDER BY su.created_at, su.id))[1] AS server_user_id,
-           u.name,
+           ${personNameSql()} AS name,
            u.contact_email,
            u.email AS identity_email,
            array_remove(array_agg(su.email ORDER BY s.type IN ${USERNAME_EMAIL_TYPES}, su.created_at, su.id), NULL) AS account_emails,

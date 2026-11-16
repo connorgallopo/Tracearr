@@ -27,7 +27,8 @@ describe('SessionsTab', () => {
       <SessionsTab
         userId="su-1"
         scope="identity"
-        user={{ id: 'su-1', username: 'alice', thumbUrl: null, identityName: null }}
+        user={{ id: 'su-1', username: 'alice', thumbUrl: null }}
+        personName="alice"
         showServer={false}
         onSessionClick={vi.fn()}
       />

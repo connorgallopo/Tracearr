@@ -21,6 +21,9 @@ import {
 } from './executors/index.js';
 import { convertLegacyRule, type LegacyRuleType } from './migration.js';
 
+/** tofa has no endpoint that shows a viewer a message without stopping the stream. */
+export const TOFA_MESSAGE_UNAVAILABLE = 'tofa can only show a message when it stops a stream';
+
 // ============================================================================
 // Action Result Storage
 // ============================================================================
@@ -174,7 +177,8 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
 
     /**
      * Send a message to the client device.
-     * Plex does not support client messaging - only Jellyfin/Emby do.
+     * Plex does not support client messaging - only Jellyfin/Emby do. A tofa target fails the
+     * action with the reason, so the run records it as not done.
      */
     sendClientMessage: async (sessionId, message, startedAt) => {
       const session = await readSessionRow(sessionId, startedAt, (where) =>
@@ -210,6 +214,8 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
           automationsLogger.debug('Client message sent', { sessionId, message });
           return undefined;
         }
+        case 'tofa':
+          throw new Error(TOFA_MESSAGE_UNAVAILABLE);
         default:
           return assertNever(session.server.type);
       }

@@ -181,6 +181,7 @@
       "serverAddFailed": "Не вдалося додати сервер",
       "serverRemoveFailed": "Не вдалося видалити сервер",
       "serverSyncFailed": "Не вдалося синхронізувати сервер",
+      "firstSyncFailed": "",
       "serverHistoricalFailed": "",
       "settingsUpdateFailed": "Не вдалося оновити налаштування",
       "copyManual": "",

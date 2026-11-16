@@ -9,6 +9,7 @@ import { eq, inArray, sql } from 'drizzle-orm';
 import {
   SESSION_LIMITS,
   type Settings,
+  type LoginMethods,
   type BackupScheduleType,
   type EmailBrandingSettings,
 } from '@tracearr/shared';
@@ -18,7 +19,7 @@ import { settings } from '../db/schema.js';
 /** Default values for public settings (returned by GET /settings). */
 const PUBLIC_DEFAULTS: Settings = {
   // Settings interface fields
-  loginMethods: { local: true, plex: true, oidc: true, member: false },
+  loginMethods: { local: true, plex: true, oidc: true, tofa: true, member: false },
   unitSystem: 'metric',
   pollerEnabled: true,
   pollerIntervalMs: 15000,
@@ -110,8 +111,17 @@ const SETTINGS_CACHE_TTL_MS = 10_000;
 
 const settingsCache = new Map<SettingKey, { value: unknown; expiresAt: number }>();
 
-function cacheSetting<K extends SettingKey>(key: K, value: SettingTypes[K]): void {
-  settingsCache.set(key, { value, expiresAt: Date.now() + SETTINGS_CACHE_TTL_MS });
+/** A stored login methods row written before a method existed lacks its key; the default fills it. */
+function storedValue<K extends SettingKey>(key: K, value: SettingTypes[K]): SettingTypes[K] {
+  return key === 'loginMethods'
+    ? ({ ...PUBLIC_DEFAULTS.loginMethods, ...(value as LoginMethods) } as SettingTypes[K])
+    : value;
+}
+
+function cacheSetting<K extends SettingKey>(key: K, value: SettingTypes[K]): SettingTypes[K] {
+  const filled = storedValue(key, value);
+  settingsCache.set(key, { value: filled, expiresAt: Date.now() + SETTINGS_CACHE_TTL_MS });
+  return filled;
 }
 
 /** Clear the in-process settings cache. Used by the factory-reset debug route. */
@@ -132,9 +142,8 @@ export async function getSetting<K extends SettingKey>(key: K): Promise<SettingT
     .where(eq(settings.name, key))
     .limit(1);
 
-  const value = rows.length === 0 ? ALL_DEFAULTS[key] : (rows[0]!.value as SettingTypes[K]);
-  cacheSetting(key, value);
-  return value;
+  const [row] = rows;
+  return cacheSetting(key, row ? (row.value as SettingTypes[K]) : ALL_DEFAULTS[key]);
 }
 
 /** Get multiple settings by keys. Returns a Record with defaults applied for missing keys. */
@@ -163,9 +172,10 @@ export async function getSettings<K extends SettingKey>(keys: K[]): Promise<Pick
     const found = new Map(rows.map((r) => [r.name, r.value]));
 
     for (const key of misses) {
-      const value = found.has(key) ? found.get(key) : ALL_DEFAULTS[key];
-      result[key] = value;
-      cacheSetting(key, value as SettingTypes[K]);
+      result[key] = cacheSetting(
+        key,
+        (found.has(key) ? found.get(key) : ALL_DEFAULTS[key]) as SettingTypes[K]
+      );
     }
   }
 

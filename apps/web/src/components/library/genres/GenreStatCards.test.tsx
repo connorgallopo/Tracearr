@@ -50,11 +50,11 @@ describe('GenreStatCards', () => {
     expect(card('pages:media.genres.cards.topFiveShare')).toHaveTextContent(/^93%/);
 
     const rise = card('pages:media.genres.cards.largestRise');
-    expect(rise).toHaveTextContent('+15+100%');
-    expect(rise).toHaveTextContent('(Comedy)');
+    expect(rise).toHaveTextContent('+15+100%pages:userDetail.cards.vsPrior');
+    expect(rise).toHaveTextContent('pages:media.genres.cards.largestRise · Comedy');
 
     const fall = card('pages:media.genres.cards.largestFall');
-    expect(fall).toHaveTextContent('-8-40%');
-    expect(fall).toHaveTextContent('(Action)');
+    expect(fall).toHaveTextContent('-8-40%pages:userDetail.cards.vsPrior');
+    expect(fall).toHaveTextContent('pages:media.genres.cards.largestFall · Action');
   });
 });

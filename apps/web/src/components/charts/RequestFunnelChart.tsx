@@ -18,10 +18,10 @@ interface RequestFunnelChartProps {
 }
 
 const STAGE_COLORS = [
-  'hsl(221, 83%, 53%)',
-  'hsl(199, 89%, 48%)',
-  'hsl(160, 84%, 39%)',
-  'hsl(142, 76%, 36%)',
+  'oklch(var(--seq-2))',
+  'oklch(var(--seq-3))',
+  'oklch(var(--seq-4))',
+  'oklch(var(--seq-5))',
 ];
 
 export function RequestFunnelChart({
@@ -46,14 +46,14 @@ export function RequestFunnelChart({
       legend: { enabled: false },
       xAxis: {
         categories: stages.map((stage) => stage.name),
-        labels: { style: { color: 'hsl(var(--muted-foreground))', fontSize: '11px' } },
-        lineColor: 'hsl(var(--border))',
-        tickColor: 'hsl(var(--border))',
+        labels: { style: { color: 'oklch(var(--muted-foreground))', fontSize: '12px' } },
+        lineColor: 'oklch(var(--border))',
+        tickColor: 'oklch(var(--border))',
       },
       yAxis: {
         title: { text: undefined },
-        labels: { style: { color: 'hsl(var(--muted-foreground))' } },
-        gridLineColor: 'hsl(var(--border))',
+        labels: { style: { color: 'oklch(var(--muted-foreground))' } },
+        gridLineColor: 'oklch(var(--border))',
         min: 0,
       },
       plotOptions: {
@@ -63,15 +63,15 @@ export function RequestFunnelChart({
           colors: STAGE_COLORS,
           dataLabels: {
             enabled: true,
-            style: { color: 'hsl(var(--muted-foreground))', textOutline: 'none' },
+            style: { color: 'oklch(var(--muted-foreground))', textOutline: 'none' },
           },
           states: { hover: { brightness: 0.15 } },
         },
       },
       tooltip: {
-        backgroundColor: 'hsl(var(--popover))',
-        borderColor: 'hsl(var(--border))',
-        style: { color: 'hsl(var(--popover-foreground))' },
+        backgroundColor: 'oklch(var(--popover))',
+        borderColor: 'oklch(var(--border))',
+        style: { color: 'oklch(var(--popover-foreground))' },
         headerFormat: '',
         pointFormatter: function (this: Highcharts.Point) {
           return `<b>${this.category as string}</b><br/>${formatShare(this.y ?? 0, first)}`;

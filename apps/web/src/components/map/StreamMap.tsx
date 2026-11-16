@@ -17,16 +17,16 @@ import { autoFitBounds, type FitPoint } from './autoFitBounds';
 import { locationKey, locationName } from './locationKey';
 import { MapUnavailable } from './MapUnavailable';
 import {
+  addDataLayers,
   buildBaseStyle,
   circlesGeojson,
+  circlesLayer,
   colorToHue,
   crossfadeCircleLayers,
   DEFAULT_SERVER_COLOR,
   hasMapPosition,
   HEAT_FADE,
   heatmapLayer,
-  highlightOpacity,
-  HIGHLIGHTED,
   hsl,
   isWebglSupported,
   largestServerCount,
@@ -37,6 +37,7 @@ import {
   type ViewBounds,
 } from './maplibre';
 import {
+  useAccentH,
   fitTo,
   useAutoFit,
   useBasemapAvailable,
@@ -137,6 +138,7 @@ export function StreamMap({
   const { t } = useTranslation(['pages']);
   const { accentHue } = useTheme();
   const dark = useResolvedDark();
+  const accentH = useAccentH();
   const lang = useMapLang();
   const basemapOk = useBasemapAvailable();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -179,7 +181,7 @@ export function StreamMap({
     if (basemapOk === null) return null;
     // oxlint-disable-next-line react/refs
     const zoom = zoomRef.current;
-    const s = buildBaseStyle({ dark, basemapOk, lang });
+    const s = buildBaseStyle({ dark, basemapOk, lang, accentH });
     if (!hasData) return { style: s, zoom };
 
     // The style carries the grouping for the current zoom: a style rebuild diffs the source
@@ -204,34 +206,22 @@ export function StreamMap({
     const circleStroke = perServer ? circleColor : accentStroke;
 
     if (viewMode === 'heatmap') {
-      if (perServer) {
-        for (const { id, color } of serverColors) {
-          s.layers.push(
+      const heat = perServer
+        ? serverColors.map(({ id, color }) =>
             heatmapLayer(`heat-${id}`, 'streams', colorToHue(color) ?? accentHue, [
               '==',
               ['get', 'serverId'],
               id,
             ])
-          );
-        }
-      } else {
-        s.layers.push(heatmapLayer('heat', 'streams', accentHue));
-      }
-      s.layers.push(...crossfadeCircleLayers('streams', circleColor, circleStroke, dark));
+          )
+        : [heatmapLayer('heat', 'streams', accentHue)];
+      addDataLayers(
+        s,
+        ...heat,
+        ...crossfadeCircleLayers('streams', circleColor, circleStroke, dark, accentH)
+      );
     } else {
-      s.layers.push({
-        id: 'circles',
-        type: 'circle',
-        source: 'streams',
-        paint: {
-          'circle-radius': ['get', 'r'],
-          'circle-color': circleColor,
-          'circle-stroke-color': ['case', HIGHLIGHTED, '#ffffff', circleStroke],
-          'circle-stroke-width': ['case', HIGHLIGHTED, 2, 1],
-          'circle-opacity': highlightOpacity(['+', 0.4, ['*', 0.4, ['get', 'w']]]),
-          'circle-stroke-opacity': 0.9,
-        },
-      });
+      addDataLayers(s, circlesLayer('streams', circleColor, circleStroke));
     }
     return { style: s, areas, zoom };
   }, [
@@ -244,6 +234,7 @@ export function StreamMap({
     serverColors,
     viewMode,
     accentHue,
+    accentH,
     groupAt,
   ]);
   const style = built?.style ?? null;

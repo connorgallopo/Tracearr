@@ -1,14 +1,21 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import type * as ServerVersionsModule from '../../utils/serverVersions.js';
 
-const { mockGetSettings, mockServerRows, mockUpdate, mockGetSoftwareVersion, mockCreateClient } =
-  vi.hoisted(() => ({
-    mockGetSettings: vi.fn(),
-    mockServerRows: vi.fn(),
-    mockUpdate: vi.fn(),
-    mockGetSoftwareVersion: vi.fn(),
-    mockCreateClient: vi.fn(),
-  }));
+const {
+  mockGetSettings,
+  mockServerRows,
+  mockUpdate,
+  mockGetSoftwareVersion,
+  mockCreateClient,
+  mockGetUpdateVersion,
+} = vi.hoisted(() => ({
+  mockGetSettings: vi.fn(),
+  mockServerRows: vi.fn(),
+  mockUpdate: vi.fn(),
+  mockGetSoftwareVersion: vi.fn(),
+  mockCreateClient: vi.fn(),
+  mockGetUpdateVersion: vi.fn(),
+}));
 
 vi.mock('../../services/settings.js', () => ({ getSettings: mockGetSettings }));
 vi.mock('../../services/liveServers.js', () => ({ liveServers: mockServerRows }));
@@ -24,6 +31,9 @@ vi.mock('../../db/client.js', () => ({
 }));
 vi.mock('../../services/mediaServer/index.js', () => ({
   createMediaServerClient: mockCreateClient,
+  TofaClient: vi.fn(function () {
+    return { getUpdateVersion: mockGetUpdateVersion };
+  }),
 }));
 
 vi.mock('../../utils/serverVersions.js', async (importActual) => {
@@ -43,10 +53,10 @@ import {
   startServerUpdateChecker,
   stopServerUpdateChecker,
 } from '../serverUpdateChecker.js';
-import { fakeJellyfinClient, fakePlexClient } from '../../test/mediaServerFakes.js';
+import { fakeJellyfinClient, fakePlexClient, fakeTofaClient } from '../../test/mediaServerFakes.js';
 
 const mockLatestVersionFor = vi.mocked(latestVersionFor);
-const fakeClients = { plex: fakePlexClient, jellyfin: fakeJellyfinClient };
+const fakeClients = { plex: fakePlexClient, jellyfin: fakeJellyfinClient, tofa: fakeTofaClient };
 
 const JELLYFIN = {
   id: 's1',
@@ -110,6 +120,25 @@ describe('runServerUpdateCheck', () => {
     await runServerUpdateCheck();
 
     expect(mockLatestVersionFor.mock.calls.map(([type]) => type)).toEqual(['jellyfin', 'plex']);
+  });
+
+  it('asks a tofa server for the release its own update check found', async () => {
+    mockServerRows.mockResolvedValue([
+      { id: 's4', name: 'tofa', type: 'tofa' as const, url: 'http://tofa.local', token: 't' },
+    ]);
+    mockGetSoftwareVersion.mockResolvedValue('0.13.2');
+    mockGetUpdateVersion.mockResolvedValue('0.14.0');
+
+    await runServerUpdateCheck();
+
+    expect(mockLatestVersionFor).not.toHaveBeenCalled();
+    expect(mockDispatchServerUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        installedVersion: '0.13.2',
+        latestVersion: '0.14.0',
+        releaseUrl: 'https://docs.tofa.tv/keep-your-server-updated.html',
+      })
+    );
   });
 
   it('re-arms when a newer release appears', async () => {

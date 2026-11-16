@@ -74,12 +74,8 @@ vi.mock('../../../services/mediaServer/index.js', () => {
   };
 });
 
-vi.mock('../../../services/sync.js', () => ({
-  syncServer: vi.fn(),
-}));
-
-vi.mock('../../../jobs/librarySyncQueue.js', () => ({
-  rebuildAutoSyncSchedules: vi.fn().mockResolvedValue(undefined),
+vi.mock('../../../services/serverCreate.js', () => ({
+  startAddedServer: vi.fn(),
 }));
 
 vi.mock('../../../services/userService.js', () => ({
@@ -101,8 +97,7 @@ vi.mock('../../../services/serverService.js', () => ({
 import { db } from '../../../db/client.js';
 import { getUserById } from '../../../services/userService.js';
 import { PlexClient } from '../../../services/mediaServer/index.js';
-import { syncServer } from '../../../services/sync.js';
-import { rebuildAutoSyncSchedules } from '../../../jobs/librarySyncQueue.js';
+import { startAddedServer } from '../../../services/serverCreate.js';
 import { publishServersChanged } from '../../../jobs/poller/database.js';
 import { renderSql } from '../../../test/helpers.js';
 import { reconcilePlexAccountToken } from '../../../services/plexAccounts.js';
@@ -272,9 +267,8 @@ describe('Plex Auth Routes', () => {
 
   // Re-establish default mock implementations after each reset. These are
   // depended on by multiple suites (PlexClient instance method, getAllServerIds
-  // lookup, fire-and-forget background sync) — hoisting them here
-  // keeps the resetAllMocks pattern free of order-dependent leaks across
-  // describes.
+  // lookup); hoisting them here keeps the resetAllMocks pattern free of
+  // order-dependent leaks across describes.
   beforeEach(() => {
     mockGetUsers.mockResolvedValue([{ id: '1', username: 'admin', isAdmin: true }]);
     mockGetAllServerIds.mockResolvedValue([]);
@@ -282,17 +276,6 @@ describe('Plex Auth Routes', () => {
     // reauthorize route chains .catch() onto refresh().
     vi.mocked(sseManager.removeServer).mockResolvedValue(undefined);
     vi.mocked(sseManager.refresh).mockResolvedValue(undefined);
-    // syncServer is awaited via .then() in the route's fire-and-forget path.
-    // Without a resolved value, the chained `.then` blows up.
-    vi.mocked(syncServer).mockResolvedValue({
-      usersAdded: 0,
-      usersUpdated: 0,
-      usersSkipped: 0,
-      usersRemoved: 0,
-      usersRestored: 0,
-      librariesSynced: 0,
-      errors: [],
-    });
   });
 
   afterEach(async () => {
@@ -559,19 +542,6 @@ describe('Plex Auth Routes', () => {
       // Mock insert
       const insertChain = mockDbInsert([newServer]);
 
-      vi.mocked(rebuildAutoSyncSchedules).mockResolvedValue(undefined);
-
-      // Mock sync
-      vi.mocked(syncServer).mockResolvedValue({
-        usersAdded: 5,
-        usersUpdated: 0,
-        usersSkipped: 0,
-        usersRemoved: 0,
-        usersRestored: 0,
-        librariesSynced: 3,
-        errors: [],
-      });
-
       const response = await app.inject({
         method: 'POST',
         url: '/plex/add-server',
@@ -586,7 +556,7 @@ describe('Plex Auth Routes', () => {
       const body = response.json();
       expect(body.server.id).toBe(newServerId);
       expect(body.success).toBe(true);
-      expect(rebuildAutoSyncSchedules).toHaveBeenCalledTimes(1);
+      expect(startAddedServer).toHaveBeenCalledExactlyOnceWith(newServer, []);
 
       // The resolved account owns the new row: its token and its id, not a
       // token copied off some other server with no account attribution.

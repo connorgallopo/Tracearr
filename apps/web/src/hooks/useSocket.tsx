@@ -21,8 +21,6 @@ import type {
   NotificationEventType,
   NotificationToast,
   LibrarySyncProgress,
-  TautulliImportProgress,
-  JellystatImportProgress,
   MaintenanceJobProgress,
   RunningTask,
   ServerConnectionStatus,
@@ -170,6 +168,8 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       tasksRefreshThrottleRef.current = setTimeout(() => {
         tasksRefreshThrottleRef.current = null;
         void queryClient.invalidateQueries({ queryKey: ['tasks', 'running'] });
+        // A held import waits on the library sync, so both kinds of event move it along
+        void queryClient.invalidateQueries({ queryKey: ['import'] });
       }, TASKS_REFRESH_THROTTLE_MS);
     };
 
@@ -181,6 +181,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       if (hasConnectedRef.current && !newSocket.recovered) {
         void queryClient.invalidateQueries({ queryKey: ['sessions', 'active'] });
         void queryClient.invalidateQueries({ queryKey: ['tasks', 'running'] });
+        void queryClient.invalidateQueries({ queryKey: ['import'] });
         void queryClient.invalidateQueries({ queryKey: ['stats', 'dashboard'] });
         refreshUnhealthyServers();
       }
@@ -332,10 +333,12 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     });
 
     // A server added, renamed, reordered or removed anywhere; the builder's
-    // server list comes from the filter options, so refresh both.
+    // server list comes from the filter options, and a server with its own
+    // requests brings its request service with it, so refresh all three.
     newSocket.on(WS_EVENTS.SERVERS_CHANGED, () => {
       void queryClient.invalidateQueries({ queryKey: ['servers'] });
       void queryClient.invalidateQueries({ queryKey: ['sessions', 'filter-options'] });
+      void queryClient.invalidateQueries({ queryKey: [...REQUESTS_KEY, 'services'] });
     });
 
     newSocket.on(WS_EVENTS.SERVER_CONNECTION, (status: ServerConnectionStatus) => {
@@ -352,37 +355,32 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       queryClient.setQueryData(['tasks', 'running'], { tasks });
     });
 
-    // Library sync progress - invalidate library caches when sync completes
     newSocket.on(WS_EVENTS.LIBRARY_SYNC_PROGRESS, (progress: LibrarySyncProgress) => {
       scheduleTasksRefresh();
       if (progress.status === 'complete' || progress.status === 'error') {
-        // Invalidate all library queries to refresh storage and stale content
         void queryClient.invalidateQueries({ queryKey: ['library'] });
         void queryClient.invalidateQueries({ queryKey: ['media'] });
       }
+      if (progress.firstSyncFailed) {
+        toast.error(
+          t('notifications:toast.error.firstSyncFailed', { server: progress.serverName }),
+          { description: progress.message }
+        );
+      }
     });
 
-    // Tautulli import progress - invalidate session data when import completes
-    newSocket.on(WS_EVENTS.IMPORT_PROGRESS, (progress: TautulliImportProgress) => {
+    const onImportProgress = (progress: { status: string }) => {
       scheduleTasksRefresh();
       if (progress.status === 'complete') {
-        // Invalidate session history and stats after importing watch history
         void queryClient.invalidateQueries({ queryKey: ['sessions'] });
         void queryClient.invalidateQueries({ queryKey: ['stats'] });
         void queryClient.invalidateQueries({ queryKey: ['users'] });
       }
-    });
-
-    // Jellystat import progress - invalidate session data when import completes
-    newSocket.on(WS_EVENTS.IMPORT_JELLYSTAT_PROGRESS, (progress: JellystatImportProgress) => {
-      scheduleTasksRefresh();
-      if (progress.status === 'complete') {
-        // Invalidate session history and stats after importing watch history
-        void queryClient.invalidateQueries({ queryKey: ['sessions'] });
-        void queryClient.invalidateQueries({ queryKey: ['stats'] });
-        void queryClient.invalidateQueries({ queryKey: ['users'] });
-      }
-    });
+    };
+    newSocket.on(WS_EVENTS.IMPORT_PROGRESS, onImportProgress);
+    newSocket.on(WS_EVENTS.IMPORT_JELLYSTAT_PROGRESS, onImportProgress);
+    newSocket.on(WS_EVENTS.IMPORT_PLAYBACK_REPORTING_PROGRESS, onImportProgress);
+    newSocket.on(WS_EVENTS.IMPORT_TOFA_PROGRESS, onImportProgress);
 
     // Maintenance job progress - invalidate relevant caches when jobs complete
     newSocket.on(WS_EVENTS.MAINTENANCE_PROGRESS, (progress: MaintenanceJobProgress) => {

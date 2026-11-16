@@ -169,6 +169,7 @@
       "serverAddFailed": "Failed to add server",
       "serverRemoveFailed": "Failed to remove server",
       "serverSyncFailed": "Failed to sync server",
+      "firstSyncFailed": "The first library sync of {{server}} failed",
       "serverHistoricalFailed": "Failed to change the server's status",
       "settingsUpdateFailed": "Failed to update settings",
       "copyManual": "Press Ctrl+C or ⌘C to copy",

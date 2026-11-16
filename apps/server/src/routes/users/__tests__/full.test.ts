@@ -134,7 +134,7 @@ describe('GET /users/:id/full violations panel', () => {
     expect(response.json().identity.serverUsers.map((su: any) => su.sessionCount)).toEqual([0, 4]);
   });
 
-  it('carries the identity contact email in the identity block', async () => {
+  it("carries the identity contact email and the Tracearr user's username in the identity block", async () => {
     const serverUserId = randomUUID();
     const serverId = randomUUID();
     const authUser: AuthUser = {
@@ -156,7 +156,9 @@ describe('GET /users/:id/full violations panel', () => {
                   id: serverUserId,
                   serverId,
                   userId: randomUUID(),
+                  username: 'ann_on_plex',
                   identityName: 'Ann',
+                  identityUsername: 'ann',
                   identityContactEmail: 'ann@example.com',
                   identityAggregateTrustScore: 90,
                   identityTotalViolations: 0,
@@ -175,7 +177,10 @@ describe('GET /users/:id/full violations panel', () => {
 
     expect(response.statusCode).toBe(200);
     expect(response.json().identity.contactEmail).toBe('ann@example.com');
+    expect(response.json().identity.username).toBe('ann');
+    expect(response.json().user.username).toBe('ann_on_plex');
     expect(response.json().user).not.toHaveProperty('identityContactEmail');
+    expect(response.json().user).not.toHaveProperty('identityUsername');
   });
 
   it('selects the identity sign-in facts and keeps them on the user block', async () => {

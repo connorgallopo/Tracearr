@@ -1,7 +1,6 @@
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertTriangle, Loader2, Server as ServerIcon, XCircle } from 'lucide-react';
-import { SERVER_PROFILES, type ServerType } from '@tracearr/shared';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { SERVER_TYPES, SERVER_PROFILES, type ServerType } from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,9 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { EmptyState } from '@/components/ui/empty-state';
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
+import { Field, FieldLabel } from '@/components/ui/field';
 import {
   Select,
   SelectContent,
@@ -21,308 +18,133 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
-import type { PlexDiscoveredServer } from '@/lib/api';
-import { isJellyfinEmby } from '@/lib/serverType';
+import { ImportSources } from '@/components/settings/data/Import';
+import { AddServerFields, ConnectServerButton } from './AddServerFields';
+import type { AddedServer, AddServerForm } from './useAddServer';
 import { SERVER_DIALOG_CONTENT_CLASS } from './dialogClasses';
 
 const DESCRIPTIONS = {
   plex: 'servers.addServerDialogDescPlex',
   jellyfin: 'servers.addServerDialogDescOther',
   emby: 'servers.addServerDialogDescOther',
-} as const;
-
-const SERVER_URL_HELP = {
-  jellyfin: 'servers.serverUrlHelpJellyfin',
-  emby: 'servers.serverUrlHelpEmby',
-} as const;
-
-export const API_KEY_HELP = {
-  jellyfin: 'servers.apiKeyHelpJellyfin',
-  emby: 'servers.apiKeyHelpEmby',
-} as const;
-
-export type PlexDialogStep =
-  'loading' | 'no-accounts' | 'select-account' | 'loading-servers' | 'no-servers' | 'select';
-
-export interface PlexAccountOption {
-  id: string;
-  plexUsername: string | null;
-  plexEmail: string | null;
-}
+  tofa: 'servers.addServerDialogDescOther',
+} as const satisfies Record<ServerType, string>;
 
 export interface AddServerDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  isOwner: boolean;
-  serverType: ServerType;
-  onServerTypeChange: (type: ServerType) => void;
-  serverUrl: string;
-  onServerUrlChange: (value: string) => void;
-  publicUrl: string;
-  onPublicUrlChange: (value: string) => void;
-  serverName: string;
-  onServerNameChange: (value: string) => void;
-  apiKey: string;
-  onApiKeyChange: (value: string) => void;
-  isConnecting: boolean;
-  connectError: string | null;
-  onConnect: () => void;
-  plexStep: PlexDialogStep;
-  plexAccounts: PlexAccountOption[];
-  selectedPlexAccountId: string | null;
-  onSelectPlexAccount: (id: string) => void;
-  plexServers: PlexDiscoveredServer[];
-  connectingPlexServer: string | null;
-  onSelectPlexServer: (serverUri: string, name: string, clientIdentifier: string) => void;
-  onTestPlexUrl: React.ComponentProps<typeof PlexServerSelector>['onTestCustomUrl'];
+  form: AddServerForm;
+  /** The server just added; the dialog then offers its history import, as first run does. */
+  added?: AddedServer | null;
 }
 
-function PlexAccountSelect({
-  accounts,
-  value,
-  onChange,
-  label,
-  description,
-  placeholder,
-}: {
-  accounts: PlexAccountOption[];
-  value: string | null;
-  onChange: (id: string) => void;
-  label: string;
-  description?: string;
-  placeholder?: string;
-}) {
-  const { t } = useTranslation('settings');
+/** First run's import step for the server just added; an import keeps running once it closes. */
+function ImportHistoryStep({ server, onClose }: { server: AddedServer; onClose: () => void }) {
+  const { t } = useTranslation(['pages', 'common']);
+  const [started, setStarted] = useState(false);
+  const title = useRef<HTMLHeadingElement>(null);
+
+  // The add form's focused control is gone, so the step's title takes focus, as in first run
+  useEffect(() => {
+    title.current?.focus();
+  }, []);
 
   return (
-    <Field className="max-w-sm">
-      <FieldLabel htmlFor="plex-account">{label}</FieldLabel>
-      <Select value={value ?? ''} onValueChange={onChange}>
-        <SelectTrigger id="plex-account" className="w-full" aria-label={label}>
-          <SelectValue placeholder={placeholder} />
-        </SelectTrigger>
-        <SelectContent>
-          {accounts.map((account) => (
-            <SelectItem key={account.id} value={account.id}>
-              {account.plexUsername ?? account.plexEmail ?? t('servers.plexAccount')}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      {description && <FieldDescription>{description}</FieldDescription>}
-    </Field>
+    <>
+      <DialogHeader className="px-6 pt-6 pr-12 pb-4">
+        <DialogTitle ref={title} tabIndex={-1} className="outline-none">
+          {t('pages:setup.importTitle')}
+        </DialogTitle>
+        <DialogDescription>{t('pages:setup.importDescription')}</DialogDescription>
+      </DialogHeader>
+      <div className="min-h-0 flex-1 scrollbar-thin overflow-y-auto px-6 pb-6">
+        <ImportSources serverId={server.id} onStarted={() => setStarted(true)} />
+      </div>
+      <DialogFooter className="border-t px-6 py-4">
+        <Button variant={started ? 'default' : 'ghost'} onClick={onClose}>
+          {started ? t('common:actions.close') : t('common:actions.skip')}
+        </Button>
+      </DialogFooter>
+    </>
   );
 }
 
-export function AddServerDialog({
-  open,
-  onOpenChange,
-  isOwner,
-  serverType,
-  onServerTypeChange,
-  serverUrl,
-  onServerUrlChange,
-  publicUrl,
-  onPublicUrlChange,
-  serverName,
-  onServerNameChange,
-  apiKey,
-  onApiKeyChange,
-  isConnecting,
-  connectError,
-  onConnect,
-  plexStep,
-  plexAccounts,
-  selectedPlexAccountId,
-  onSelectPlexAccount,
-  plexServers,
-  connectingPlexServer,
-  onSelectPlexServer,
-  onTestPlexUrl,
-}: AddServerDialogProps) {
-  const { t } = useTranslation(['settings', 'common']);
-  const showAccountPicker = plexAccounts.length > 1;
-  const auth = SERVER_PROFILES[serverType].addServerAuth;
+export function AddServerDialog({ open, onOpenChange, form, added }: AddServerDialogProps) {
+  const { busy } = form;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={SERVER_DIALOG_CONTENT_CLASS}>
-        <DialogHeader>
-          <DialogTitle>{t('servers.addServer')}</DialogTitle>
-          <DialogDescription>{t(DESCRIPTIONS[serverType])}</DialogDescription>
-        </DialogHeader>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (next || !busy) onOpenChange(next);
+      }}
+    >
+      <DialogContent
+        className={
+          added
+            ? 'flex max-h-[min(85dvh,48rem)] flex-col gap-0 p-0 sm:max-w-2xl'
+            : SERVER_DIALOG_CONTENT_CLASS
+        }
+        showCloseButton={!busy}
+      >
+        {added ? (
+          <ImportHistoryStep server={added} onClose={() => onOpenChange(false)} />
+        ) : (
+          <AddServerStep form={form} onCancel={() => onOpenChange(false)} />
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
 
-        <FieldGroup className="py-4">
+function AddServerStep({ form, onCancel }: { form: AddServerForm; onCancel: () => void }) {
+  const { t } = useTranslation(['settings', 'common']);
+  const { serverType, isOwner, addedWithoutStop, busy } = form;
+  const offeredTypes = SERVER_TYPES.filter(
+    (type) => isOwner || SERVER_PROFILES[type].addServerAuth !== 'plexOAuth'
+  );
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle>{t('servers.addServer')}</DialogTitle>
+        <DialogDescription>{t(DESCRIPTIONS[serverType])}</DialogDescription>
+      </DialogHeader>
+
+      <AddServerFields
+        form={form}
+        className="py-4"
+        typeSelect={
           <Field className="max-w-sm">
             <FieldLabel htmlFor="server-type">{t('servers.serverType')}</FieldLabel>
-            <Select value={serverType} onValueChange={(v) => onServerTypeChange(v as ServerType)}>
+            <Select
+              value={serverType}
+              onValueChange={(v) => form.changeServerType(v as ServerType)}
+            >
               <SelectTrigger id="server-type" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {isOwner && <SelectItem value="plex">Plex</SelectItem>}
-                <SelectItem value="jellyfin">Jellyfin</SelectItem>
-                <SelectItem value="emby">Emby</SelectItem>
+                {offeredTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {SERVER_PROFILES[type].displayName}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </Field>
+        }
+      />
 
-          {auth === 'plexOAuth' && (
-            <>
-              {(plexStep === 'loading' || plexStep === 'loading-servers') && (
-                <div className="flex flex-col items-center justify-center gap-3 py-8">
-                  <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-                  <p className="text-muted-foreground text-sm">
-                    {plexStep === 'loading'
-                      ? t('servers.loadingAccounts')
-                      : t('servers.discoveringServers')}
-                  </p>
-                </div>
-              )}
-
-              {plexStep === 'no-accounts' && (
-                <Alert variant="warning">
-                  <AlertTriangle />
-                  <AlertDescription>
-                    <span className="font-medium">{t('servers.noPlexAccountsLinked')}</span>
-                    <span>{t('servers.noPlexAccountsLinkedHint')}</span>
-                    {connectError && <span className="text-destructive">{connectError}</span>}
-                  </AlertDescription>
-                </Alert>
-              )}
-
-              {plexStep === 'select-account' && (
-                <PlexAccountSelect
-                  accounts={plexAccounts}
-                  value={selectedPlexAccountId}
-                  onChange={onSelectPlexAccount}
-                  label={t('servers.selectPlexAccount')}
-                  description={t('servers.selectAccountHelp')}
-                  placeholder={t('servers.chooseAccount')}
-                />
-              )}
-
-              {plexStep === 'no-servers' && (
-                <>
-                  {showAccountPicker && (
-                    <PlexAccountSelect
-                      accounts={plexAccounts}
-                      value={selectedPlexAccountId}
-                      onChange={onSelectPlexAccount}
-                      label={t('servers.plexAccount')}
-                    />
-                  )}
-                  <EmptyState
-                    icon={ServerIcon}
-                    title={t('servers.allServersConnected')}
-                    description={t('servers.allServersConnectedDesc')}
-                  />
-                </>
-              )}
-
-              {plexStep === 'select' && (
-                <>
-                  {showAccountPicker && (
-                    <PlexAccountSelect
-                      accounts={plexAccounts}
-                      value={selectedPlexAccountId}
-                      onChange={onSelectPlexAccount}
-                      label={t('servers.plexAccount')}
-                    />
-                  )}
-                  <PlexServerSelector
-                    servers={plexServers}
-                    onSelect={onSelectPlexServer}
-                    connecting={connectingPlexServer !== null}
-                    connectingToServer={connectingPlexServer}
-                    showCancel={false}
-                    onTestCustomUrl={onTestPlexUrl}
-                  />
-                  {connectError && (
-                    <Alert variant="destructive">
-                      <XCircle />
-                      <AlertDescription>{connectError}</AlertDescription>
-                    </Alert>
-                  )}
-                </>
-              )}
-            </>
-          )}
-          {isJellyfinEmby(serverType) && (
-            <>
-              <Field>
-                <FieldLabel htmlFor="serverUrl">{t('servers.serverUrl')}</FieldLabel>
-                <Input
-                  id="serverUrl"
-                  placeholder={t('servers.serverUrlPlaceholder')}
-                  value={serverUrl}
-                  onChange={(e) => onServerUrlChange(e.target.value)}
-                />
-                <FieldDescription>{t(SERVER_URL_HELP[serverType])}</FieldDescription>
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="publicUrl">{t('servers.publicUrl')}</FieldLabel>
-                <Input
-                  id="publicUrl"
-                  placeholder="https://jellyfin.example.com"
-                  value={publicUrl}
-                  onChange={(e) => onPublicUrlChange(e.target.value)}
-                />
-                <FieldDescription>{t('servers.publicUrlHint')}</FieldDescription>
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="serverName">{t('servers.serverName')}</FieldLabel>
-                <Input
-                  id="serverName"
-                  placeholder={t('servers.serverNamePlaceholder')}
-                  value={serverName}
-                  onChange={(e) => onServerNameChange(e.target.value)}
-                />
-              </Field>
-
-              <Field>
-                <FieldLabel htmlFor="apiKey">{t('common:labels.apiKey')}</FieldLabel>
-                <Input
-                  id="apiKey"
-                  type="password"
-                  placeholder={t('servers.apiKeyPlaceholder')}
-                  value={apiKey}
-                  onChange={(e) => onApiKeyChange(e.target.value)}
-                />
-                <FieldDescription>{t(API_KEY_HELP[serverType])}</FieldDescription>
-              </Field>
-
-              {connectError && (
-                <Alert variant="destructive">
-                  <XCircle />
-                  <AlertDescription>{connectError}</AlertDescription>
-                </Alert>
-              )}
-            </>
-          )}
-        </FieldGroup>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {t('common:actions.cancel')}
-          </Button>
-          {isJellyfinEmby(serverType) && (
-            <Button onClick={onConnect} disabled={isConnecting}>
-              {isConnecting ? (
-                <>
-                  <Loader2 className="animate-spin" />
-                  {t('common:states.connecting')}
-                </>
-              ) : (
-                t('servers.connectServer')
-              )}
-            </Button>
-          )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+      <DialogFooter>
+        <Button variant="outline" onClick={onCancel} disabled={busy}>
+          {addedWithoutStop ? t('common:actions.close') : t('common:actions.cancel')}
+        </Button>
+        {addedWithoutStop && isOwner && (
+          <Button onClick={form.continueAdded}>{t('common:actions.continue')}</Button>
+        )}
+        {form.keyFields && !addedWithoutStop && <ConnectServerButton form={form} />}
+      </DialogFooter>
+    </>
   );
 }

@@ -12,8 +12,7 @@ export function ConnectiveSelect({ match, onChange }: ConnectiveSelectProps) {
   const { t } = useTranslation('pages');
 
   return (
-    <div className="relative flex h-7 items-center">
-      <div className="bg-border absolute inset-x-0 top-1/2 h-px" />
+    <div className="flex h-7 items-center gap-2">
       <Select
         value={match}
         onValueChange={(next) => {
@@ -23,7 +22,7 @@ export function ConnectiveSelect({ match, onChange }: ConnectiveSelectProps) {
         <SelectTrigger
           size="sm"
           aria-label={t('automations.builder.conditions.matchLabel')}
-          className="bg-card-raised relative mr-2 h-6 gap-1 px-2 py-0 text-xs font-medium"
+          className="h-6 gap-1 px-2 py-0 text-xs font-medium"
         >
           {t(`automations.builder.conditions.${match}`)}
         </SelectTrigger>
@@ -32,6 +31,7 @@ export function ConnectiveSelect({ match, onChange }: ConnectiveSelectProps) {
           <SelectItem value="any">{t('automations.builder.conditions.anyHint')}</SelectItem>
         </SelectContent>
       </Select>
+      <div className="bg-border h-px flex-1" />
     </div>
   );
 }

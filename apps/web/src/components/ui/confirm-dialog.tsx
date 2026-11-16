@@ -8,6 +8,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { buttonVariants } from '@/components/ui/button';
+import { useRestoreFocus } from '@/hooks/useRestoreFocus';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -21,6 +23,8 @@ interface ConfirmDialogProps {
   onConfirm: () => void;
   isLoading?: boolean;
   variant?: 'destructive' | 'default';
+  /** Return focus to the element that had it when the dialog opened. */
+  restoreFocus?: boolean;
 }
 
 export function ConfirmDialog({
@@ -34,10 +38,12 @@ export function ConfirmDialog({
   onConfirm,
   isLoading = false,
   variant = 'destructive',
+  restoreFocus = false,
 }: ConfirmDialogProps) {
+  const focusHandlers = useRestoreFocus();
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent {...(restoreFocus ? focusHandlers : {})}>
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           <AlertDialogDescription>{description}</AlertDialogDescription>
@@ -48,9 +54,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={isLoading}
             className={
-              variant === 'destructive'
-                ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
-                : undefined
+              variant === 'destructive' ? buttonVariants({ variant: 'destructive' }) : undefined
             }
           >
             {isLoading

@@ -374,7 +374,9 @@ export function buildUserImagePath(
 export function extractLiveTvMetadata(
   nowPlaying: Record<string, unknown>
 ): { channelTitle: string; channelIdentifier?: string; channelThumb?: string } | undefined {
-  const channelId = parseOptionalString(nowPlaying.ChannelId);
+  // A channel item is the channel itself; its own ChannelId is empty or all zeros
+  const ownerId = parseOptionalString(nowPlaying.ChannelId);
+  const channelId = ownerId && /[^0-]/.test(ownerId) ? ownerId : parseOptionalString(nowPlaying.Id);
   const channelTitle =
     parseBoundedString(nowPlaying.ChannelName, 255) || parseBoundedString(nowPlaying.Name, 255);
 

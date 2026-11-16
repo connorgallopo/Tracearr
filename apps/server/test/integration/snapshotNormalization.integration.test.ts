@@ -9,18 +9,24 @@
  * lets the storage growth fit use full history instead of waiting out the
  * 7-day post-stamp window.
  *
- * Run with: pnpm --filter @tracearr/server test:integration -- snapshotNormalization
+ * Run with: pnpm --filter @tracearr/server test:integration snapshotNormalization
  */
 
 import { randomUUID } from 'node:crypto';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import type { Job } from 'bullmq';
 import { sql } from 'drizzle-orm';
-import { createTestServer, createTestLibraryItem } from '@tracearr/test-utils/factories';
+import { LEGACY_VERSION_SENTINEL } from '@tracearr/shared';
+import {
+  createTestServer,
+  createTestLibraryItem,
+  createTestLibraryItemVersion,
+} from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
 import { getSetting, setSetting } from '../../src/services/settings.js';
 import {
   processNormalizeLibrarySnapshotsJob,
+  seedSnapshotsNormalizedAt,
   type MaintenanceJobData,
 } from '../../src/jobs/maintenanceQueue.js';
 
@@ -97,5 +103,82 @@ describe('processNormalizeLibrarySnapshotsJob', () => {
     expect(result.success).toBe(true);
     expect(result.message).toContain('nothing to normalize');
     expect(await getSetting('snapshotsNormalizedAt')).toBeNull();
+  });
+});
+
+async function refreshStatsAggregate(): Promise<void> {
+  await db.execute(
+    sql`CALL refresh_continuous_aggregate('library_stats_daily'::regclass, NULL, NULL)`
+  );
+}
+
+async function insertSnapshot(serverId: string): Promise<void> {
+  await db.execute(sql`
+    INSERT INTO library_snapshots (server_id, library_id, snapshot_time, item_count, total_size)
+    VALUES (${serverId}::uuid, 'lib-seed', '2024-03-01T12:00:00Z'::timestamptz, 1, 40)
+  `);
+}
+
+describe('seedSnapshotsNormalizedAt', () => {
+  beforeEach(async () => {
+    await setSetting('snapshotsNormalizedAt', null);
+    // The database reset truncates library_snapshots but not the aggregate's materialization,
+    // which earlier files on this worker may have filled
+    await refreshStatsAggregate();
+  });
+
+  it('stamps a fresh database at boot', async () => {
+    await seedSnapshotsNormalizedAt();
+
+    expect(await getSetting('snapshotsNormalizedAt')).not.toBeNull();
+  });
+
+  it('does not stamp items that carry a legacy sentinel and have no snapshots', async () => {
+    const server = await createTestServer();
+    const item = await createTestLibraryItem({
+      serverId: server.id,
+      libraryId: 'lib-seed',
+      withoutVersion: true,
+    });
+    await createTestLibraryItemVersion({
+      libraryItemId: item.id,
+      serverVersionKey: LEGACY_VERSION_SENTINEL,
+    });
+
+    await seedSnapshotsNormalizedAt();
+
+    expect(await getSetting('snapshotsNormalizedAt')).toBeNull();
+  });
+
+  it('does not stamp when snapshot rows exist', async () => {
+    const server = await createTestServer();
+    await insertSnapshot(server.id);
+
+    await seedSnapshotsNormalizedAt();
+
+    expect(await getSetting('snapshotsNormalizedAt')).toBeNull();
+  });
+
+  it('does not stamp when only aggregate rows remain', async () => {
+    const server = await createTestServer();
+    await insertSnapshot(server.id);
+    await refreshStatsAggregate();
+    await db.execute(sql`DELETE FROM library_snapshots`);
+    const aggregate = await db.execute(sql`SELECT 1 FROM library_stats_daily`);
+    expect(aggregate.rows.length).toBeGreaterThan(0);
+
+    await seedSnapshotsNormalizedAt();
+
+    expect(await getSetting('snapshotsNormalizedAt')).toBeNull();
+    await refreshStatsAggregate();
+  });
+
+  it('leaves an existing stamp alone', async () => {
+    const stamp = '2026-01-01T00:00:00.000Z';
+    await setSetting('snapshotsNormalizedAt', stamp);
+
+    await seedSnapshotsNormalizedAt();
+
+    expect(await getSetting('snapshotsNormalizedAt')).toBe(stamp);
   });
 });

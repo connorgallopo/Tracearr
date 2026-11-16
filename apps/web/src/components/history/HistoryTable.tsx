@@ -43,6 +43,7 @@ import { playbackBadge } from '@/lib/playbackBadge';
 import { formatDate, formatDuration } from '@/lib/dateFormat';
 import { getAvatarUrl } from '@/components/users/utils';
 import { LocalBadge } from '@/components/sessions/LocalBadge';
+import { TIER_COLORS } from '@/components/charts/EngagementChart';
 import {
   PLAYBACK_DECISION_LABEL_KEYS,
   verbKeysFor,
@@ -58,39 +59,14 @@ import { useServerColorMap } from '@/hooks/useServerColorMap';
 type ShownTier = Exclude<EngagementTier, 'unknown'>;
 
 const ENGAGEMENT_TIER_CONFIG = {
-  abandoned: {
-    labelKey: 'pages:yourStats.tier.abandoned',
-    range: '<20%',
-    color: 'text-red-600',
-    bgClass: 'bg-red-100 dark:bg-red-900/30',
-  },
-  sampled: {
-    labelKey: 'pages:yourStats.tier.sampled',
-    range: '20-49%',
-    color: 'text-orange-600',
-    bgClass: 'bg-orange-100 dark:bg-orange-900/30',
-  },
-  engaged: {
-    labelKey: 'pages:yourStats.tier.engaged',
-    range: '50-84%',
-    color: 'text-yellow-600',
-    bgClass: 'bg-yellow-100 dark:bg-yellow-900/30',
-  },
-  watched: {
-    labelKey: 'pages:yourStats.tier.watched',
-    range: '85%+',
-    color: 'text-green-600',
-    bgClass: 'bg-green-100 dark:bg-green-900/30',
-  },
-  rewatched: {
-    labelKey: 'pages:yourStats.tier.rewatched',
-    range: '200%+',
-    color: 'text-blue-600',
-    bgClass: 'bg-blue-100 dark:bg-blue-900/30',
-  },
+  abandoned: { labelKey: 'pages:yourStats.tier.abandoned', range: '<20%' },
+  sampled: { labelKey: 'pages:yourStats.tier.sampled', range: '20-49%' },
+  engaged: { labelKey: 'pages:yourStats.tier.engaged', range: '50-84%' },
+  watched: { labelKey: 'pages:yourStats.tier.watched', range: '85%+' },
+  rewatched: { labelKey: 'pages:yourStats.tier.rewatched', range: '200%+' },
 } as const satisfies Record<
   ShownTier,
-  { labelKey: `pages:yourStats.tier.${ShownTier}`; range: string; color: string; bgClass: string }
+  { labelKey: `pages:yourStats.tier.${ShownTier}`; range: string }
 >;
 
 function getEngagementTier(progress: number | null): EngagementTier {
@@ -120,13 +96,11 @@ function EngagementTierBadge({
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span
-          className={cn(
-            'rounded px-1 py-0.5 text-[10px] font-medium',
-            config.color,
-            config.bgClass
-          )}
-        >
+        <span className="bg-muted text-muted-foreground inline-flex items-center gap-1 rounded-sm px-1 py-0.5 text-xs font-medium">
+          <span
+            className="size-1.5 shrink-0 rounded-full"
+            style={{ backgroundColor: TIER_COLORS[tier] }}
+          />
           {label}
         </span>
       </TooltipTrigger>
@@ -157,8 +131,8 @@ interface Props {
 }
 
 const STATE_ICON_CONFIG = {
-  playing: { icon: Play, color: 'text-green-500', labelKey: 'playback.playing' },
-  paused: { icon: Pause, color: 'text-yellow-500', labelKey: 'playback.paused' },
+  playing: { icon: Play, color: 'text-success', labelKey: 'playback.playing' },
+  paused: { icon: Pause, color: 'text-warning', labelKey: 'playback.paused' },
 } as const;
 
 // State icon component
@@ -295,12 +269,6 @@ export const HistoryTableRow = memo(
                   <span className="block truncate text-sm">
                     {session.user.identityName ?? session.user.username}
                   </span>
-                  {session.user.identityName &&
-                    session.user.identityName !== session.user.username && (
-                      <span className="text-muted-foreground block truncate text-xs">
-                        @{session.user.username}
-                      </span>
-                    )}
                 </div>
               </Link>
             </TableCell>

@@ -11,6 +11,7 @@ import { db } from '../../db/client.js';
 import { servers, serverUsers, sessions, users } from '../../db/schema.js';
 import { sessionRowById } from '../../db/sessions/row.js';
 import type { automationRuns } from '../../db/schema.js';
+import { personNameColumn } from '../../utils/representativeAccount.js';
 import { publishRunFinished, runFinishedOf } from '../../services/automations/runRecorder.js';
 import type { PubSubService } from '../../services/cache.js';
 import { enqueueNotification } from '../notificationQueue.js';
@@ -56,7 +57,7 @@ export async function broadcastViolations(
     identityUserId: users.id,
     username: serverUsers.username,
     thumbUrl: serverUsers.thumbUrl,
-    identityName: users.name,
+    identityName: personNameColumn(),
     serverId: servers.id,
     serverName: servers.name,
     serverType: servers.type,

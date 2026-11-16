@@ -1,7 +1,6 @@
-import { Tv, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { Server, TopShowsResponse } from '@tracearr/shared';
-import { Badge } from '@/components/ui/badge';
 import { DataTablePager } from '@/components/ui/data-table';
 import {
   Table,
@@ -13,7 +12,7 @@ import {
 } from '@/components/ui/table';
 import { ServerBadge } from '@/components/server';
 import { EmptyState } from '@/components/ui/empty-state';
-import { getCompletionBadge } from './badges';
+import { getCompletionBadge, MediaTypeBadge } from './badges';
 import {
   SortableTableHead,
   nextSortOrder,
@@ -130,10 +129,7 @@ export function TopShowsTable({
             <TableRow key={item.mediaId}>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="gap-1 bg-blue-500/10 text-blue-500">
-                    <Tv className="h-3 w-3" />
-                    {t('common:media.tv')}
-                  </Badge>
+                  <MediaTypeBadge mediaType="show" />
                   <div>
                     <span className="font-medium">{item.showTitle}</span>
                     {item.year && <span className="text-muted-foreground ml-1">({item.year})</span>}

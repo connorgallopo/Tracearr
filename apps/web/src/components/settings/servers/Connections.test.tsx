@@ -4,9 +4,13 @@ import userEvent from '@testing-library/user-event';
 import type { DragEndEvent } from '@dnd-kit/core';
 import type { Server } from '@tracearr/shared';
 import { Connections } from './Connections';
+import type { AddServerForm } from './useAddServer';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string, options?: Record<string, unknown>) =>
+      options ? `${key}:${JSON.stringify(options)}` : key,
+  }),
 }));
 
 let capturedOnDragEnd: ((event: DragEndEvent) => void) | undefined;
@@ -29,7 +33,7 @@ vi.mock('@dnd-kit/core', async () => {
 });
 
 const { serverRowProps } = vi.hoisted(() => ({
-  serverRowProps: [] as { server: Server; requestService?: unknown }[],
+  serverRowProps: [] as { server: Server; requestService?: unknown; isDraggable?: boolean }[],
 }));
 
 vi.mock('@/components/settings/servers/ServerRow', () => ({
@@ -67,29 +71,30 @@ vi.mock('@/lib/api', () => ({
 }));
 
 vi.mock('@/components/settings/servers/AddServerDialog', () => ({
-  AddServerDialog: (props: {
+  AddServerDialog: ({
+    open,
+    form,
+    added,
+  }: {
     open: boolean;
-    onServerTypeChange: (type: 'jellyfin') => void;
-    onServerUrlChange: (value: string) => void;
-    onServerNameChange: (value: string) => void;
-    onApiKeyChange: (value: string) => void;
-    onPublicUrlChange: (value: string) => void;
-    onConnect: () => void;
+    form: AddServerForm;
+    added?: { id: string; type: string } | null;
   }) =>
-    props.open ? (
+    open ? (
       <div>
+        {added && <p>import step for {added.id}</p>}
         <button
           onClick={() => {
-            props.onServerTypeChange('jellyfin');
-            props.onServerUrlChange('http://192.168.1.20:8096');
-            props.onServerNameChange('Attic');
-            props.onApiKeyChange('key-1');
-            props.onPublicUrlChange(' jellyfin.example.com ');
+            form.changeServerType('jellyfin');
+            form.setServerUrl('http://192.168.1.20:8096');
+            form.setServerName('Attic');
+            form.setApiKey('key-1');
+            form.setPublicUrl(' jellyfin.example.com ');
           }}
         >
           fill jellyfin
         </button>
-        <button onClick={props.onConnect}>connect</button>
+        <button onClick={() => void form.connect()}>connect</button>
       </div>
     ) : null,
 }));
@@ -274,6 +279,29 @@ describe('Connections', () => {
     expect(invalidateQueries).toHaveBeenCalledWith({ queryKey: ['plex-accounts'] });
   });
 
+  it('names the server in the remove confirm', async () => {
+    render(<Connections />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'remove-server-2' }));
+
+    expect(screen.getByText('servers.removeServerTitle:{"name":"Server 2"}')).toBeInTheDocument();
+  });
+
+  it('offers reordering only when there is more than one server', () => {
+    const { unmount } = render(<Connections />);
+    expect(serverRowProps.every((props) => props.isDraggable)).toBe(true);
+    unmount();
+
+    vi.mocked(useServers).mockReturnValue({
+      data: [server()],
+      isLoading: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useServers>);
+    serverRowProps.length = 0;
+    render(<Connections />);
+    expect(serverRowProps.map((props) => props.isDraggable)).toEqual([false]);
+  });
+
   it('sends the trimmed public address with the Jellyfin connect call', async () => {
     connectJellyfinWithApiKey.mockResolvedValue({});
     render(<Connections />);
@@ -290,5 +318,32 @@ describe('Connections', () => {
         publicUrl: 'jellyfin.example.com',
       })
     );
+  });
+
+  it('moves the owner on to the import step for the server just added', async () => {
+    connectJellyfinWithApiKey.mockResolvedValue({ serverId: 'jf-new' });
+    render(<Connections />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'servers.addServer' }));
+    await userEvent.click(screen.getByRole('button', { name: 'fill jellyfin' }));
+    await userEvent.click(screen.getByRole('button', { name: 'connect' }));
+
+    expect(await screen.findByText('import step for jf-new')).toBeInTheDocument();
+  });
+
+  it('closes the dialog for a member, who cannot import history', async () => {
+    vi.mocked(useAuth).mockReturnValue({
+      user: { role: 'admin' },
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useAuth>);
+    connectJellyfinWithApiKey.mockResolvedValue({ serverId: 'jf-new' });
+    render(<Connections />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'servers.addServer' }));
+    await userEvent.click(screen.getByRole('button', { name: 'fill jellyfin' }));
+    await userEvent.click(screen.getByRole('button', { name: 'connect' }));
+
+    await waitFor(() => expect(screen.queryByRole('button', { name: 'connect' })).toBeNull());
+    expect(screen.queryByText(/import step/)).toBeNull();
   });
 });

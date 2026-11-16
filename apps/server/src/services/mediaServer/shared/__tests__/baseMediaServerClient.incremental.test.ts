@@ -44,7 +44,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryItemsSince('abc-123', new Date());
+      await client.getLibraryItemsSince('abc-123', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('ParentId=abc-123');
@@ -55,7 +55,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryItemsSince('lib-1', new Date());
+      await client.getLibraryItemsSince('lib-1', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('SortBy=DateCreated');
@@ -67,7 +67,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
 
       const since = new Date('2024-06-01T12:00:00.000Z');
       const client = makeClient();
-      await client.getLibraryItemsSince('lib-1', since);
+      await client.getLibraryItemsSince('lib-1', { kind: 'date', since });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain(`minDateLastSaved=${encodeURIComponent(since.toISOString())}`);
@@ -77,7 +77,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryItemsSince('lib-1', new Date());
+      await client.getLibraryItemsSince('lib-1', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('IncludeItemTypes=Movie%2CSeries%2CMusicAlbum%2CAudio');
@@ -87,8 +87,16 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryItemsSince('lib-1', new Date(), { libraryType: 'movies' });
-      await client.getLibraryItemsSince('lib-2', new Date(), { libraryType: 'music' });
+      await client.getLibraryItemsSince(
+        'lib-1',
+        { kind: 'date', since: new Date() },
+        { libraryType: 'movies' }
+      );
+      await client.getLibraryItemsSince(
+        'lib-2',
+        { kind: 'date', since: new Date() },
+        { libraryType: 'music' }
+      );
 
       const [moviesUrl, musicUrl] = mockFetchJson.mock.calls.map((call) => call[0] as string);
       expect(moviesUrl).toContain('IncludeItemTypes=Movie&');
@@ -100,7 +108,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryItemsSince('lib-1', new Date());
+      await client.getLibraryItemsSince('lib-1', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('IsMissing=false');
@@ -110,7 +118,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryItemsSince('lib-1', new Date());
+      await client.getLibraryItemsSince('lib-1', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('Fields=');
@@ -128,7 +136,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       );
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('lib-1', since);
+      const result = await client.getLibraryItemsSince('lib-1', { kind: 'date', since });
 
       expect(result.items).toHaveLength(2);
       expect(result.totalCount).toBe(2);
@@ -144,7 +152,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       );
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('lib-1', since);
+      const result = await client.getLibraryItemsSince('lib-1', { kind: 'date', since });
 
       expect(result.items).toHaveLength(0);
       expect(result.totalCount).toBe(0);
@@ -170,7 +178,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
         );
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('lib-1', since);
+      const result = await client.getLibraryItemsSince('lib-1', { kind: 'date', since });
 
       expect(result.items).toHaveLength(201);
       expect(result.totalCount).toBe(201);
@@ -181,7 +189,10 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse([]));
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('lib-1', new Date());
+      const result = await client.getLibraryItemsSince('lib-1', {
+        kind: 'date',
+        since: new Date(),
+      });
 
       expect(result.items).toHaveLength(0);
       expect(result.totalCount).toBe(0);
@@ -192,7 +203,10 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue({ Items: [] });
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('lib-1', new Date());
+      const result = await client.getLibraryItemsSince('lib-1', {
+        kind: 'date',
+        since: new Date(),
+      });
 
       expect(result.totalCount).toBe(0);
       expect(result.items).toEqual([]);
@@ -210,7 +224,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
         .mockResolvedValueOnce(makeItemsResponse([]));
 
       const client = makeClient();
-      const result = await client.getLibraryItemsSince('lib-1', since);
+      const result = await client.getLibraryItemsSince('lib-1', { kind: 'date', since });
 
       expect(result.items).toHaveLength(1);
       expect(mockFetchJson).toHaveBeenCalledTimes(3);
@@ -224,7 +238,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryLeavesSince('lib-2', new Date());
+      await client.getLibraryLeavesSince('lib-2', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('/Items?');
@@ -236,7 +250,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryLeavesSince('lib-2', new Date());
+      await client.getLibraryLeavesSince('lib-2', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('SortBy=DateCreated');
@@ -248,7 +262,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
 
       const since = new Date('2024-03-20T08:30:00.000Z');
       const client = makeClient();
-      await client.getLibraryLeavesSince('lib-2', since);
+      await client.getLibraryLeavesSince('lib-2', { kind: 'date', since });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain(`minDateLastSaved=${encodeURIComponent(since.toISOString())}`);
@@ -258,7 +272,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryLeavesSince('lib-2', new Date());
+      await client.getLibraryLeavesSince('lib-2', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('IncludeItemTypes=Episode');
@@ -268,7 +282,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryLeavesSince('lib-2', new Date());
+      await client.getLibraryLeavesSince('lib-2', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('IsMissing=false');
@@ -278,7 +292,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue(makeItemsResponse());
 
       const client = makeClient();
-      await client.getLibraryLeavesSince('lib-2', new Date());
+      await client.getLibraryLeavesSince('lib-2', { kind: 'date', since: new Date() });
 
       const calledUrl = mockFetchJson.mock.calls[0]?.[0] as string;
       expect(calledUrl).toContain('Fields=');
@@ -314,7 +328,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       );
 
       const client = makeClient();
-      const result = await client.getLibraryLeavesSince('lib-2', since);
+      const result = await client.getLibraryLeavesSince('lib-2', { kind: 'date', since });
 
       expect(result.items).toHaveLength(1);
       expect(result.totalCount).toBe(1);
@@ -330,7 +344,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       );
 
       const client = makeClient();
-      const result = await client.getLibraryLeavesSince('lib-2', since);
+      const result = await client.getLibraryLeavesSince('lib-2', { kind: 'date', since });
 
       expect(result.items).toHaveLength(0);
       expect(result.totalCount).toBe(0);
@@ -341,7 +355,10 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       mockFetchJson.mockResolvedValue({ Items: [] });
 
       const client = makeClient();
-      const result = await client.getLibraryLeavesSince('lib-2', new Date());
+      const result = await client.getLibraryLeavesSince('lib-2', {
+        kind: 'date',
+        since: new Date(),
+      });
 
       expect(result.totalCount).toBe(0);
       expect(result.items).toEqual([]);
@@ -375,7 +392,7 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
         .mockResolvedValueOnce(makeItemsResponse([]));
 
       const client = makeClient();
-      const result = await client.getLibraryLeavesSince('lib-2', since);
+      const result = await client.getLibraryLeavesSince('lib-2', { kind: 'date', since });
 
       expect(result.items).toHaveLength(1);
       expect(mockFetchJson).toHaveBeenCalledTimes(3);
@@ -431,5 +448,28 @@ describe('BaseMediaServerClient incremental fetch methods', () => {
       );
       expect(sentIds).toEqual([keys.slice(0, 100), keys.slice(100)]);
     });
+  });
+});
+
+describe('JellyfinClient sync cursor', () => {
+  it('reads a date cursor with the requests a date always made', async () => {
+    mockFetchJson.mockResolvedValue(makeItemsResponse());
+    const cursor = { kind: 'date', since: new Date('2024-06-01T00:00:00Z') } as const;
+    const client = new JellyfinClient({ url: 'http://jf.local:8096', token: 'test-api-key' });
+
+    await client.getLibraryItemsSince('7', cursor, { libraryType: 'movie' });
+    await client.getLibraryLeavesSince('7', cursor);
+
+    expect(mockFetchJson.mock.calls.map(([url]) => url)).toEqual([
+      'http://jf.local:8096/Items?ParentId=7&Recursive=true&IncludeItemTypes=Movie%2CSeries%2CMusicAlbum%2CAudio&CollapseBoxSetItems=false&IsMissing=false&Fields=ProviderIds%2CPath%2CMediaSources%2CDateCreated%2CProductionYear%2CSeriesName%2CSeriesId%2CParentIndexNumber%2CIndexNumber%2CAlbum%2CAlbumArtist%2CArtists%2CAlbumId%2CAlbumPrimaryImageTag%2CGenres%2CImageTags&StartIndex=0&Limit=200&SortBy=DateCreated&SortOrder=Descending&minDateLastSaved=2024-06-01T00%3A00%3A00.000Z',
+      'http://jf.local:8096/Items?ParentId=7&Recursive=true&IncludeItemTypes=Episode%2CSeason&IsMissing=false&Fields=ProviderIds%2CPath%2CMediaSources%2CDateCreated%2CProductionYear%2CSeriesName%2CSeriesId%2CParentIndexNumber%2CIndexNumber%2CGenres%2CImageTags&StartIndex=0&Limit=200&SortBy=DateCreated&SortOrder=Descending&minDateLastSaved=2024-06-01T00%3A00%3A00.000Z',
+    ]);
+  });
+
+  it('refuses a revision cursor without asking the server', async () => {
+    await expect(
+      makeClient().getLibraryLeavesSince('7', { kind: 'revision', since: 12 })
+    ).rejects.toThrow('by date, not by revision');
+    expect(mockFetchJson).not.toHaveBeenCalled();
   });
 });

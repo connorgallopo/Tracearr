@@ -64,6 +64,7 @@ import { excludeUncountableSessions } from '../../jobs/poller/utils.js';
 import { gracePeriodSessionIds } from '../../jobs/poller/processor.js';
 import { buildRuleContextSessions } from './events/contextAssembly.js';
 import { terminateSession } from '../termination.js';
+import { stopRefusal } from '../mediaServer/byServerType.js';
 import { automationsLogger } from '../../utils/logger.js';
 import { isLocalSession } from '../../db/sessions/rules.js';
 import { evaluateRulesAsync } from './engine.js';
@@ -74,7 +75,9 @@ export type ReverifyOutcome =
   | 'skipped_already_stopped'
   | 'skipped_rule_gone'
   | 'skipped_condition_cleared'
-  | 'failed';
+  | 'failed'
+  /** The server's key may not stop streams: recorded once with the reason, never retried */
+  | 'refused';
 
 export interface ReverifyKillConditionParams {
   /** Session whose match produced this kill. The evaluation context (session,
@@ -351,6 +354,21 @@ export async function reverifyKillCondition(
 
   if (!matched) {
     return { outcome: 'skipped_condition_cleared' };
+  }
+
+  // A refusal does not change between attempts. The termination service writes its one failed
+  // log row without asking the server, and the outcome keeps the queue from retrying.
+  const refusal = stopRefusal(targetRow);
+  if (refusal) {
+    await terminateSession({
+      sessionId: targetSessionId,
+      sessionStartedAt: targetRow.startedAt,
+      trigger: 'rule',
+      ruleId,
+      violationId: violationId ?? undefined,
+      reason: message,
+    });
+    return { outcome: 'refused', error: refusal };
   }
 
   try {
