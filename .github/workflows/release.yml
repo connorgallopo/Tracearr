@@ -652,6 +652,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --filter @tracearr/server...
 
+      - name: Build shared
+        run: pnpm --filter @tracearr/shared build
+
       - name: Generate OpenAPI specs
         run: pnpm --filter @tracearr/server openapi:dump "$GITHUB_WORKSPACE"
 
