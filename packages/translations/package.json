@@ -40,13 +40,13 @@
     "check:english": "tsx scripts/find-english-regressions.ts"
   },
   "dependencies": {
-    "i18next": "^26.3.6",
-    "react-i18next": "^17.0.9"
+    "i18next": "^27.1.1",
+    "react-i18next": "^18.0.1"
   },
   "devDependencies": {
-    "tsx": "^4.23.1",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "vite": "^8.0.5"
+    "vite": "^8.3.8"
   },
   "peerDependencies": {
     "react": ">=18.0.0"

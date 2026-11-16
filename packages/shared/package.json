@@ -36,11 +36,11 @@
     "clean": "rm -rf dist .turbo"
   },
   "dependencies": {
-    "zod": "^4.4.3"
+    "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/node": "^26.6.6",
     "typescript": "^7.0.2",
-    "vitest": "^5.0.0"
+    "vitest": "^5.1.0"
   }
 }

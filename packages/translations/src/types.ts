@@ -32,6 +32,7 @@ declare module 'i18next' {
   interface CustomTypeOptions {
     defaultNS: typeof defaultNS;
     resources: TranslationResources;
+    strictInterpolationChecks: false;
   }
 }
 

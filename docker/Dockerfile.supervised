@@ -5,9 +5,9 @@
 
 # Must match packageManager in package.json.
 # renovate: datasource=npm depName=pnpm versioning=npm
-ARG PNPM_VERSION=12.16.1
+ARG PNPM_VERSION=12.20.0
 
-FROM node:26-bookworm-slim@sha256:add5c17c14752c54d2f3d519ec46a3815684d41c33f198bcb09fb998f7dcbf68 AS builder
+FROM node:26-bookworm-slim@sha256:5df79989ed685e09f0a98019db4cebfb22fb9df1a53c0161664a011f7ff6b0f1 AS builder
 
 # pnpm's install script is what puts its native binary in place. corepack never runs it,
 # and npm 12 blocks it unless allowed, so both leave pnpm's shebang-less fallback shim instead.
@@ -39,7 +39,7 @@ RUN pnpm turbo run build --filter=@tracearr/shared --filter=@tracearr/server --f
 # =============================================================================
 # Same image and digest as the builder, so the runtime Node is the pinned one and every
 # layer below rebuilds when that pin moves instead of staying in the build cache.
-FROM node:26-bookworm-slim@sha256:add5c17c14752c54d2f3d519ec46a3815684d41c33f198bcb09fb998f7dcbf68
+FROM node:26-bookworm-slim@sha256:5df79989ed685e09f0a98019db4cebfb22fb9df1a53c0161664a011f7ff6b0f1
 
 # Install dependencies
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
@@ -77,7 +77,7 @@ RUN curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmo
 
 # Install Tailscale VPN binary (userspace networking, no root required)
 # renovate: datasource=deb depName=tailscale
-ARG TAILSCALE_VERSION=1.104.5
+ARG TAILSCALE_VERSION=1.104.7
 RUN curl -fsSL https://pkgs.tailscale.com/stable/debian/bookworm.noarmor.gpg -o /usr/share/keyrings/tailscale-keyring.gpg \
     && echo "deb [signed-by=/usr/share/keyrings/tailscale-keyring.gpg] https://pkgs.tailscale.com/stable/debian bookworm main" > /etc/apt/sources.list.d/tailscale.list \
     && apt-get update \

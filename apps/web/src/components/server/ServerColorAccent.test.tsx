@@ -33,7 +33,7 @@ describe('ServerColorAccent', () => {
 
     const wrapper = screen.getByTestId('child').parentElement!;
     expect(wrapper.style.boxShadow).toContain('inset');
-    expect(wrapper.style.boxShadow).toContain('#E5A00D');
+    expect(wrapper.style.boxShadow).toContain('rgb(229, 160, 13)');
   });
 
   it('renders no boxShadow when not multi-server', () => {
