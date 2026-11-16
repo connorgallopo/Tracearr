@@ -205,7 +205,7 @@
   },
   "activity": {
     "playsOverTime": "Přehrání v průběhu času",
-    "concurrentStreams": "",
+    "concurrentStreams": "Souběžné streamy",
     "platforms": "Platformy",
     "playbackQuality": ""
   },
