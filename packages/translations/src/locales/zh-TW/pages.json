@@ -2,9 +2,7 @@
   "login": {
     "title": "",
     "tagline": "Tracearr - 串流存取管理",
-    "createAccountHeading": "建立你的帳號即可開始使用",
     "signInHeading": "登入你的帳號",
-    "createAccountDescription": "建立一個帳號來管理你的媒體伺服器",
     "signInDescription": "登入以存取你的儀表板",
     "selectPlexServer": "選擇你的 Plex 伺服器",
     "waitingForPlex": "正在等待 Plex 認證……",
@@ -19,7 +17,6 @@
     "displayNamePlaceholder": "請選擇顯示名稱",
     "passwordPlaceholder": "至少 8 個字元",
     "yourPasswordPlaceholder": "你的密碼",
-    "setupNote": "建立帳號後，你會從設定中新增你的 Plex 或 Jellyfin 伺服器。",
     "localDisabledHint": "",
     "oidcError": "",
     "accountCreated": "帳號建立成功！",
@@ -54,6 +51,60 @@
       "notPermitted": ""
     }
   },
+  "setup": {
+    "serverTitle": "",
+    "connectTitle": "",
+    "connectDescription": "",
+    "linkPlexTitle": "",
+    "linkPlexDescription": "",
+    "stepsLabel": "",
+    "stepOfNamed": "",
+    "steps": {
+      "server": "",
+      "account": "",
+      "connect": "",
+      "import": ""
+    },
+    "stepStatus": {
+      "done": "",
+      "current": "",
+      "upcoming": ""
+    },
+    "signedInAs": "",
+    "serverHint": "",
+    "ownerTitle": "",
+    "ownerDescription": "",
+    "ownerDescriptionSignIn": "",
+    "plexWaitingDescription": "",
+    "pickerTitle": "",
+    "pickerDescription": "",
+    "connectHint": "",
+    "connectedTitle": "",
+    "connectedDescription": "",
+    "importTitle": "",
+    "importDescription": "",
+    "goToDashboard": "",
+    "codeExpired": "",
+    "signInAgain": "",
+    "timedOut": "",
+    "checkAgain": ""
+  },
+  "tofa": {
+    "signIn": "",
+    "waiting": "",
+    "waitingHint": "",
+    "waitingDescription": "",
+    "openAgain": "",
+    "expiresIn": "",
+    "codeFallback": "",
+    "pickerNote": "",
+    "unreachable": "",
+    "noAddress": "",
+    "noServersTitle": "",
+    "noServers": "",
+    "noServersPassword": "",
+    "manual": ""
+  },
   "dashboard": {
     "alerts": "警報",
     "plays": "",
@@ -66,6 +117,7 @@
     "noActiveStreams": "沒有活躍的串流",
     "streamsAppearHere": "當使用者開始觀看時，活躍的串流將顯示在此",
     "dayStreak": "",
+    "noServers": "",
     "view": {
       "label": "",
       "admin": "",
@@ -159,6 +211,7 @@
     "mergeTitleBulk": "",
     "mergeReasonEmail": "",
     "mergeReasonEmailUsername": "",
+    "mergeReasonLinked": "",
     "mergeReasonUsername": "",
     "mergeKeep": "",
     "mergeFoldIn": "",
@@ -185,12 +238,14 @@
     "suggestionsTitle": "",
     "suggestionsPairEmail": "",
     "suggestionsPairEmailUsername": "",
+    "suggestionsPairLinked": "",
     "suggestionsPairUsername": "",
     "suggestionsSheetDescription": "",
     "suggestionsReview": "",
     "suggestionsNotSame": "",
     "suggestionsMatchEmail": "",
     "suggestionsMatchEmailUsername": "",
+    "suggestionsMatchLinked": "",
     "suggestionsMatchUsername": "",
     "suggestionsEmpty": "",
     "suggestionsDismissed": "",
@@ -217,6 +272,7 @@
     "suggestionsCount_other": "",
     "suggestionsPairEmailMore_other": "",
     "suggestionsPairEmailUsernameMore_other": "",
+    "suggestionsPairLinkedMore_other": "",
     "suggestionsPairUsernameMore_other": "",
     "pendingLink_other": ""
   },
@@ -355,6 +411,8 @@
     "stream": {
       "notAvailable": "",
       "bitrateUnavailable": "",
+      "rebuffers": "",
+      "droppedFrames": "",
       "stereo": "",
       "mono": "",
       "noDetails": "",
@@ -597,6 +655,10 @@
         "body": ""
       },
       "notSynced": {
+        "title": "",
+        "body": ""
+      },
+      "syncQueued": {
         "title": "",
         "body": ""
       },
@@ -2121,6 +2183,7 @@
   "terminateStream": {
     "title": "終止串流",
     "stopMedia": "對 @{{username}} 停止 \"{{mediaTitle}}\" 嗎？",
+    "stopMediaFor": "",
     "messageLabel": "給使用者發送訊息（可選）",
     "messagePlaceholder": "例如：請勿共享您的帳號",
     "messageHint": "播放過程中會向他們顯示此訊息",
