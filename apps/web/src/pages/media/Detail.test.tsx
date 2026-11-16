@@ -124,6 +124,7 @@ function requestEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestE
       username: 'agelwarg',
       identityName: 'Alice',
       thumb: null,
+      thumbServerId: null,
     },
     ...overrides,
   };

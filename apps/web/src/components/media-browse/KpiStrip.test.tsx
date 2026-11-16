@@ -17,6 +17,7 @@ function watcher(overrides: Partial<MediaWatcherEntry> = {}): MediaWatcherEntry 
       username: 'sarah',
       identityName: 'Sarah',
       thumb: null,
+      thumbServerId: null,
     },
     plays: 10,
     watchTimeMs: 1000,

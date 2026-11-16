@@ -111,6 +111,7 @@ function requestEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestE
       username: 'agelwarg',
       identityName: 'Alice',
       thumb: null,
+      thumbServerId: null,
     },
     ...overrides,
   };
@@ -389,6 +390,7 @@ describe('DetailHero', () => {
           username: 'agelwarg',
           identityName: null,
           thumb: null,
+          thumbServerId: null,
         },
       }),
     });

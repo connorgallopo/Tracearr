@@ -32,7 +32,7 @@ export function RequesterCell({
       username={requester.username}
       identityName={requester.identityName}
       thumbUrl={requester.thumb}
-      serverId={requester.serverId}
+      serverId={requester.thumbServerId}
       link={!!user && isStaff(user.role)}
       trailing={trailing}
     />

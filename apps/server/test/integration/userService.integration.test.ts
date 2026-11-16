@@ -89,6 +89,31 @@ describe('userService integration tests', () => {
       expect(updateResult.serverUser.username).toBe('updatedname');
     });
 
+    it.each([
+      { path: 'Plex', isPlexServer: true },
+      { path: 'other servers', isPlexServer: false },
+    ])(
+      'carries a changed account picture to the person on sync ($path)',
+      async ({ isPlexServer }) => {
+        const mediaUser: MediaUser = {
+          id: `ext-${randomUUID().slice(0, 8)}`,
+          username: 'pictured',
+          thumb: 'https://example.com/old.jpg',
+          isAdmin: false,
+        };
+        const created = await syncUserFromMediaServer(testServerId, mediaUser, { isPlexServer });
+
+        await syncUserFromMediaServer(
+          testServerId,
+          { ...mediaUser, thumb: 'https://example.com/new.jpg' },
+          { isPlexServer }
+        );
+
+        const [person] = await db.select().from(users).where(eq(users.id, created!.user.id));
+        expect(person?.thumbnail).toBe('https://example.com/new.jpg');
+      }
+    );
+
     it('stores a Jellyfin or Emby username that is an email as the account email only', async () => {
       const [jellyfin] = await db
         .insert(servers)

@@ -18,6 +18,7 @@ function watcher(overrides: Partial<MediaWatcherEntry> = {}): MediaWatcherEntry 
       username: 'sarah',
       identityName: 'Sarah',
       thumb: 'https://plex.tv/users/sarah/avatar',
+      thumbServerId: null,
     },
     plays: 38,
     watchTimeMs: 1000,

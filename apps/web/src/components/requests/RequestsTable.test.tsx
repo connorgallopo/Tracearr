@@ -38,6 +38,7 @@ function makeMediaEntry(overrides: Partial<MediaRequestEntry> = {}): MediaReques
       username: 'alice',
       identityName: 'Alice',
       thumb: null,
+      thumbServerId: null,
     },
     ...overrides,
   };
@@ -269,6 +270,7 @@ describe('RequestsTable', () => {
               username: 'localbob',
               identityName: null,
               thumb: null,
+              thumbServerId: null,
             },
           }),
         ]}

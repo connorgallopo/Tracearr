@@ -92,6 +92,10 @@
       "text": "people lists keep each person's Tracearr name under a server filter, not a media server account's name"
     },
     {
+      "type": "fix",
+      "text": "a merged person shows the picture of any of their accounts that has one, and picks up picture changes at sync"
+    },
+    {
       "type": "note",
       "text": "public API names a person with no display name by their Tracearr username, not a media server account's username"
     },

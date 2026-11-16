@@ -71,6 +71,7 @@ const outcomeRow: RequestOutcomeRow = {
     username: 'alice',
     identityName: 'Alice',
     thumb: null,
+    thumbServerId: null,
   },
 };
 

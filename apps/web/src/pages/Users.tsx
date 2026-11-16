@@ -283,7 +283,7 @@ export function Users() {
                   identityName={user.identityName}
                   personName={user.personName}
                   thumbUrl={user.thumbUrl}
-                  serverId={user.serverId}
+                  serverId={user.thumbServerId}
                   size="md"
                   details={[
                     ...(user.email ? [user.email] : []),

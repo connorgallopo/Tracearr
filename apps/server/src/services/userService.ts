@@ -18,7 +18,7 @@ import { db } from '../db/client.js';
 import { users, serverUsers, serverUserExternalAliases, automationRuns } from '../db/schema.js';
 import { clearScope } from '../lib/scope.js';
 import { NotFoundError } from '../utils/errors.js';
-import { personNameColumn } from '../utils/representativeAccount.js';
+import { personNameColumn, representativeAccountOrderSql } from '../utils/representativeAccount.js';
 import { violationAliasConditions } from './automations/aliasFilter.js';
 
 // Type for user identity table row
@@ -494,10 +494,12 @@ export async function syncUserFromMediaServer(
 
       const updated = await writeChanges(existing, changes);
 
-      // Sync is the only thing that moves joined_at from the server side, so
-      // the identity rollups have to follow it. Guarded because this runs for
-      // every user on every sync tick.
-      if (advancedActivity || nextJoinedAt?.getTime() !== existing.joinedAt?.getTime()) {
+      // Guarded: this runs for every user on every sync tick.
+      if (
+        advancedActivity ||
+        nextJoinedAt?.getTime() !== existing.joinedAt?.getTime() ||
+        updated.thumbUrl !== existing.thumbUrl
+      ) {
         await recompute(existing.userId);
       }
       await clearScopeOnLibraryChange(existing);
@@ -615,7 +617,7 @@ export async function syncUserFromMediaServer(
 
     const updated = await writeChanges(existing, changes);
 
-    if (advancedActivity) {
+    if (advancedActivity || updated.thumbUrl !== existing.thumbUrl) {
       await recompute(existing.userId);
     }
     await clearScopeOnLibraryChange(existing);
@@ -741,6 +743,13 @@ export async function recomputeIdentityAggregates(
       total_violations = coalesce(v.count, 0),
       first_joined_at = a.first_joined,
       last_activity_at = a.last_activity,
+      -- A sign-in picture stays only while none of the person's accounts has one.
+      thumbnail = coalesce((
+        SELECT pa.thumb_url FROM ${serverUsers} pa
+        WHERE pa.user_id = u.id AND pa.thumb_url IS NOT NULL
+        ORDER BY ${representativeAccountOrderSql('pa')}
+        LIMIT 1
+      ), u.thumbnail),
       updated_at = now()
     FROM (
       SELECT ${users.id} AS user_id,

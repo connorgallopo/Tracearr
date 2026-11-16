@@ -32,6 +32,21 @@ export function personNameSql(): SQL {
   return sql`coalesce(u.name, u.username)`;
 }
 
+/**
+ * Joins `pic` to a `users` row aliased `u`: pic.server_id is the server the person's picture
+ * (u.thumbnail) loads through, since a Jellyfin or Emby picture is a path on its own server.
+ * Null for a picture from a sign-in, which is a full URL.
+ */
+export function personPictureJoinSql(): SQL {
+  return sql.raw(
+    `LEFT JOIN LATERAL (
+       SELECT pa.server_id FROM server_users pa
+       WHERE pa.user_id = u.id AND pa.thumb_url = u.thumbnail
+       ORDER BY pa.id LIMIT 1
+     ) pic ON true`
+  );
+}
+
 /** personNameSql for Drizzle selects that join the users table itself rather than as `u`. */
 export function personNameColumn(): SQL<string> {
   return sql<string>`coalesce(${users.name}, ${users.username})`;

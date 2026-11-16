@@ -117,6 +117,7 @@ function outcome(id: string, over: Record<string, unknown> = {}) {
       username: id,
       identityName: null,
       thumb: null,
+      thumbServerId: null,
     },
     ...over,
   };
@@ -131,6 +132,7 @@ function requester(username: string, over: Record<string, unknown> = {}) {
       username,
       identityName: null,
       thumb: null,
+      thumbServerId: null,
     },
     requested: 1,
     landed: 1,

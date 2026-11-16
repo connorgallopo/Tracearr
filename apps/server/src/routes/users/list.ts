@@ -60,7 +60,11 @@ import { refreshUserSessionSnapshots, revokeSessionsForUsers } from '../../lib/r
 import { getSetting } from '../../services/settings.js';
 import { disconnectUserSockets } from '../../websocket/index.js';
 import { parseDateString } from '../../utils/parsing.js';
-import { personNameSql, representativeAccountOrderSql } from '../../utils/representativeAccount.js';
+import {
+  personNameSql,
+  personPictureJoinSql,
+  representativeAccountOrderSql,
+} from '../../utils/representativeAccount.js';
 import { VIOLATION_ALIAS_SQL } from '../../services/automations/aliasFilter.js';
 import { identityAccountsWhere, userHistoryWindow, userPlayTotals } from './queries/index.js';
 
@@ -263,7 +267,8 @@ export function buildUserRosterPageQuery(params: {
       rep.external_id AS "externalId",
       rep.username AS "username",
       rep.email AS "email",
-      rep.thumb_url AS "thumbUrl",
+      u.thumbnail AS "thumbUrl",
+      pic.server_id AS "thumbServerId",
       rep.is_server_admin AS "isServerAdmin",
       rep.trust_score AS "trustScore",
       rep.joined_at AS "joinedAt",
@@ -271,8 +276,9 @@ export function buildUserRosterPageQuery(params: {
       rep.removed_at AS "removedAt",
       rep.updated_at AS "updatedAt"
     FROM users u
+    ${personPictureJoinSql()}
     JOIN LATERAL (
-      SELECT su.id, su.server_id, su.external_id, su.username, su.email, su.thumb_url,
+      SELECT su.id, su.server_id, su.external_id, su.username, su.email,
              su.is_server_admin, su.trust_score, su.joined_at, su.last_activity_at,
              su.removed_at, su.updated_at
       FROM server_users su
@@ -335,6 +341,7 @@ interface RosterPageRow {
   username: string;
   email: string | null;
   thumbUrl: string | null;
+  thumbServerId: string | null;
   isServerAdmin: boolean;
   trustScore: number;
   joinedAt: string | null;
@@ -360,6 +367,7 @@ interface UserRosterRow {
   username: string;
   email: string | null;
   thumbUrl: string | null;
+  thumbServerId: string | null;
   isServerAdmin: boolean;
   trustScore: number;
   joinedAt: string | null;
@@ -475,6 +483,7 @@ export const listRoutes: FastifyPluginAsync = async (app) => {
       username: row.username,
       email: row.email,
       thumbUrl: row.thumbUrl,
+      thumbServerId: row.thumbServerId,
       isServerAdmin: row.isServerAdmin,
       trustScore: row.trustScore,
       joinedAt: parseDateString(row.joinedAt),

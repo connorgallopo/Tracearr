@@ -108,6 +108,7 @@ describe('listMediaRequests', () => {
           username: null,
           identity_name: null,
           thumb: null,
+          thumb_server_id: null,
         }),
       ],
     });
@@ -130,6 +131,7 @@ describe('listMediaRequests', () => {
       username: 'remote-person',
       identityName: null,
       thumb: null,
+      thumbServerId: null,
     });
     expect(watched.resolveWatchedStates).toHaveBeenCalledTimes(1);
     expect(watched.resolveWatchedStates).toHaveBeenCalledWith(

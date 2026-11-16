@@ -17,6 +17,7 @@ import type {
 import { db } from '../../db/client.js';
 import { scopedServerFragment, seesServerActivity, type Scope } from '../../lib/scope.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
+import { personPictureJoinSql } from '../../utils/representativeAccount.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { buildPosterOrderFragment } from '../../routes/library/catalog.js';
 import { buildPosterUrl } from '../imageProxy.js';
@@ -68,6 +69,7 @@ interface MediaRequestSqlRow extends RequestBaseRow {
   username: string | null;
   identity_name: string | null;
   thumb: string | null;
+  thumb_server_id: string | null;
 }
 
 interface UserRequestSqlRow extends RequestBaseRow {
@@ -173,11 +175,13 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
       su.server_id AS user_server_id,
       su.username,
       COALESCE(u.name, u.username) AS identity_name,
-      COALESCE(u.thumbnail, su.thumb_url) AS thumb
+      u.thumbnail AS thumb,
+      pic.server_id AS thumb_server_id
     FROM media_requests mr
     JOIN request_services rs ON rs.id = mr.service_id
     LEFT JOIN server_users su ON su.id = mr.server_user_id
     LEFT JOIN users u ON u.id = su.user_id
+    ${personPictureJoinSql()}
     WHERE ${scopeFilter(scope)} ${authFragment}
     ORDER BY mr.requested_at, mr.id
   `);
@@ -196,6 +200,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
           username: row.username,
           identityName: row.identity_name,
           thumb: row.thumb,
+          thumbServerId: row.thumb_server_id,
         }
       : {
           serverUserId: null,
@@ -204,6 +209,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
           username: row.remote_username,
           identityName: null,
           thumb: null,
+          thumbServerId: null,
         },
   }));
 }

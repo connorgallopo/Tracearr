@@ -33,6 +33,7 @@ function makeEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestEntr
       username: 'alice',
       identityName: 'Alice',
       thumb: null,
+      thumbServerId: null,
     },
     ...overrides,
   };

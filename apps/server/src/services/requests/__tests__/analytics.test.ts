@@ -34,6 +34,7 @@ function row(overrides: Record<string, unknown> = {}) {
     username: 'matched-person',
     identity_name: 'Matched Person',
     thumb: null,
+    thumb_server_id: null,
     ...overrides,
   };
 }
@@ -299,6 +300,7 @@ describe('getRequestsAnalytics', () => {
       username: 'remote-person',
       identityName: null,
       thumb: null,
+      thumbServerId: null,
     });
   });
 });

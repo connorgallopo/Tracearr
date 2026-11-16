@@ -181,6 +181,7 @@ function toWatcherEntry(r: MediaWatcherRow): MediaWatcherEntry {
       username: r.user.username,
       identityName: r.user.person_name,
       thumb: r.user.thumb,
+      thumbServerId: r.user.thumb_server_id,
     },
     plays: r.plays,
     watchTimeMs: r.watch_time_ms,
@@ -489,8 +490,8 @@ export const libraryMediaRoute: FastifyPluginAsync = async (app) => {
     const scope = await buildMediaScope(canonical);
     if (!scope) return reply.notFound();
 
-    // watchers-v2: rows gained user thumb/serverId for avatars
-    const cacheKey = mediaCacheKey(canonical.id, `watchers-v2:${windowKey}`, resolvedIds);
+    // watchers-v3: rows gained the picture's own server
+    const cacheKey = mediaCacheKey(canonical.id, `watchers-v3:${windowKey}`, resolvedIds);
     const cached = await readCache<MediaWatchersResponse>(app.redis, cacheKey);
     if (cached) return ownWatchers(cached, request.scope);
 

@@ -343,6 +343,7 @@ describe('media detail for a member', () => {
         identity_name: null,
         person_name: 'someone',
         thumb: null,
+        thumb_server_id: null,
       },
       plays: 1,
       watch_time_ms: 0,

@@ -110,8 +110,11 @@ export function WatchersTable({
                             <Avatar className="h-[22px] w-[22px] shrink-0">
                               <AvatarImage
                                 src={
-                                  getAvatarUrl(watcher.user.serverId, watcher.user.thumb, 22) ??
-                                  undefined
+                                  getAvatarUrl(
+                                    watcher.user.thumbServerId,
+                                    watcher.user.thumb,
+                                    22
+                                  ) ?? undefined
                                 }
                               />
                               <AvatarFallback className="text-xs">

@@ -213,7 +213,7 @@ function OverrideRow({ row }: { row: ServerUserWithIdentity }) {
           identityName={row.identityName}
           personName={row.personName}
           thumbUrl={row.thumbUrl}
-          serverId={row.serverId}
+          serverId={row.thumbServerId}
         />
       </div>
       <Select

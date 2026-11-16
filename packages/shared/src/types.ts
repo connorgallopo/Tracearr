@@ -132,6 +132,9 @@ export interface ServerUserWithIdentity extends ServerUser {
   // The Tracearr user's name, the same under every server filter: identityName, else the
   // user's username, not this account's `username`. Only populated by the list endpoint.
   personName?: string;
+  // Only the list endpoint: there thumbUrl is the person's picture, loaded through this server
+  // (null for a full URL), not the representative account's picture.
+  thumbServerId?: string | null;
   role: UserRole; // From linked User identity
   loginAccess: LoginAccess; // From linked User identity
   lastLoginAt: Date | string | null; // Tracearr sign-ins of the linked identity
@@ -3334,8 +3337,10 @@ export interface MediaWatcherEntry {
     serverId: string;
     username: string | null;
     identityName: string | null;
-    /** Identity thumbnail when set, else the server account's avatar. */
+    /** The person's picture: their most recently active account's that has one. */
     thumb: string | null;
+    /** Server the picture loads through; null for a full URL. */
+    thumbServerId: string | null;
   };
   plays: number;
   watchTimeMs: number;

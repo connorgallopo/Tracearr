@@ -1448,6 +1448,50 @@ describe('GET /violations userId identity filter', () => {
 });
 
 describe('GET /users identityServers', () => {
+  it("gives a merged person the picture of an account that has one, through that account's server", async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const jellyfin = await createTestServer({ type: 'jellyfin' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    const targetSu = await createTestServerUser({
+      userId: target.id,
+      serverId: plex.id,
+      thumbUrl: null,
+      lastActivityAt: new Date('2026-06-02T00:00:00Z'),
+    });
+    await createTestServerUser({
+      userId: source.id,
+      serverId: jellyfin.id,
+      thumbUrl: '/Users/abc/Images/Primary',
+      lastActivityAt: new Date('2026-06-01T00:00:00Z'),
+    });
+
+    await mergeUsers(source.id, target.id, admin.id);
+
+    const [person] = await db.select().from(users).where(eq(users.id, target.id));
+    expect(person?.thumbnail).toBe('/Users/abc/Images/Primary');
+
+    const app = Fastify({ logger: false });
+    await app.register(sensible);
+    app.decorate('authenticate', async (request: any) => {
+      request.user = { userId: admin.id, username: 'owner', role: 'owner', serverIds: [] };
+    });
+    app.decorate('requirePermission', permissionGuard(app));
+    app.decorate('requireOwner', async () => {});
+    await app.register(listRoutes, { prefix: '/users' });
+    const response = await app.inject({ method: 'GET', url: '/users?pageSize=100' });
+    await app.close();
+
+    const row = (
+      response.json().data as { id: string; thumbUrl: string; thumbServerId: string }[]
+    ).find((r) => r.id === targetSu.id);
+    expect(row).toMatchObject({
+      thumbUrl: '/Users/abc/Images/Primary',
+      thumbServerId: jellyfin.id,
+    });
+  });
+
   it('shows a single row for a merged identity, using the deterministic representative account', async () => {
     const admin = await createTestUser({ role: 'owner' });
     const serverA = await createTestServer({ type: 'plex' });

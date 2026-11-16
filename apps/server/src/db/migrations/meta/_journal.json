@@ -925,6 +925,13 @@
       "when": 1794659580940,
       "tag": "0131_watery_santa_claus",
       "breakpoints": true
+    },
+    {
+      "idx": 132,
+      "version": "7",
+      "when": 1794798793266,
+      "tag": "0132_backfill_person_picture",
+      "breakpoints": true
     }
   ]
 }

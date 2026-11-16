@@ -132,7 +132,7 @@ export function PersonMultiSelectCombobox({
             icon: (
               <Avatar className="h-5 w-5">
                 <AvatarImage
-                  src={getAvatarUrl(option.serverId, option.thumbUrl, 40) ?? undefined}
+                  src={getAvatarUrl(option.thumbServerId, option.thumbUrl, 40) ?? undefined}
                 />
                 <AvatarFallback className="text-xs">
                   {rosterPersonName(option)[0]?.toUpperCase() ?? '?'}

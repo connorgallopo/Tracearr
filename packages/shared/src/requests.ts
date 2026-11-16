@@ -74,6 +74,8 @@ export interface RequestRequester {
   username: string | null;
   identityName: string | null;
   thumb: string | null;
+  /** Server the picture loads through; null for a full URL. */
+  thumbServerId: string | null;
 }
 
 interface RequestEntryBase {

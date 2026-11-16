@@ -232,6 +232,7 @@ export function Violations() {
           username: fromRow.user.username,
           thumbUrl: fromRow.user.thumbUrl,
           serverId: fromRow.user.serverId,
+          thumbServerId: fromRow.user.serverId,
           identityServers: undefined as { id: string; name: string }[] | undefined,
         };
       })
@@ -538,7 +539,7 @@ export function Violations() {
               <Avatar className="h-10 w-10">
                 <AvatarImage
                   src={
-                    getAvatarUrl(selectedPeople[0].serverId, selectedPeople[0].thumbUrl, 40) ??
+                    getAvatarUrl(selectedPeople[0].thumbServerId, selectedPeople[0].thumbUrl, 40) ??
                     undefined
                   }
                 />
@@ -574,7 +575,7 @@ export function Violations() {
                 >
                   <Avatar className="h-6 w-6">
                     <AvatarImage
-                      src={getAvatarUrl(person.serverId, person.thumbUrl, 24) ?? undefined}
+                      src={getAvatarUrl(person.thumbServerId, person.thumbUrl, 24) ?? undefined}
                     />
                     <AvatarFallback className="text-xs">
                       {rosterPersonName(person)[0]?.toUpperCase() ?? '?'}
