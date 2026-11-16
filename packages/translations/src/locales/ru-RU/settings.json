@@ -40,7 +40,7 @@
       "memberLogin": "Кто и как может войти в Tracearr.",
       "mobile": "Устройства, сопряжённые с мобильным приложением Tracearr.",
       "remote": "Как люди вне вашей сети подключаются к этому экземпляру.",
-      "import": "Перенос истории просмотров из Tautulli, Jellystat или Playback Reporting.",
+      "import": "",
       "backup": "Снимки базы данных и конфигурации.",
       "jobs": "Задания обслуживания, которые можно запускать вручную.",
       "api": "Публичный ключ API, его лимит запросов и условия, при которых контент считается просмотренным.",
@@ -121,7 +121,7 @@
       "plugin": "Плагин реального времени",
       "pluginDesc": "Проверять новые версии плагина Tracearr, через который серверы Jellyfin и Emby передают события.",
       "server": "Медиасерверы",
-      "serverDesc": "Сравнивать версию каждого сервера Plex, Jellyfin и Emby с последним выпуском от разработчиков."
+      "serverDesc": ""
     },
     "imageCache": {
       "title": "Кэш постеров",
@@ -152,7 +152,7 @@
     "serverUrl": "URL сервера",
     "testConnection": "Проверить соединение",
     "noServersConnected": "Нет подключенных серверов",
-    "noServersConnectedHint": "Нажмите \"Add Server\", чтобы подключить сервер Jellyfin или Emby",
+    "noServersConnectedHint": "",
     "serverType": "Тип сервера",
     "loadingAccounts": "Загрузка связанных аккаунтов...",
     "selectPlexAccount": "Выберите аккаунт Plex",
@@ -174,7 +174,7 @@
     "updating": "Обновление...",
     "allFieldsRequired": "Все поля обязательны",
     "addServerDialogDescPlex": "Выберите Plex сервер из связанного аккаунта.",
-    "addServerDialogDescOther": "Подключите сервер Jellyfin или Emby.",
+    "addServerDialogDescOther": "",
     "discoveringServers": "Поиск доступных серверов Plex...",
     "discoveringConnections": "Поиск соединений...",
     "plexAccount": "Аккаунт Plex",
