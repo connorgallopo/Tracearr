@@ -626,7 +626,7 @@
   "backup": {
     "title": "備份",
     "backToBackups": "返回備份",
-    "description": "",
+    "description": "備份並還原您的 Tracearr 數據",
     "createBackup": "建立備份",
     "creating": "正在建立備份……",
     "uploadBackup": "上傳備份",
