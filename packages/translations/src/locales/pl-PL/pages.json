@@ -82,7 +82,7 @@
     "connectedTitle": "{{name}} jest połączony",
     "connectedDescription": "Tracearr monitoruje aktywność tego serwera.",
     "importTitle": "Importuj historię oglądania",
-    "importDescription": "",
+    "importDescription": "Zaimportuj odtworzenia z okresu, którego Tracearr nie monitorował. Import odbywa się w tle, więc po uruchomieniu możesz opuścić ten ekran.",
     "goToDashboard": "Przejdź do pulpitu",
     "codeExpired": "Kod logowania stracił ważność.",
     "signInAgain": "Zaloguj się ponownie",
@@ -480,7 +480,7 @@
     "stream": {
       "notAvailable": "Nd.",
       "bitrateUnavailable": "Jellyfin i Emby nie ujawniają indywidualnych bitrate wideo i audio podczas transkodowania. Dostępny jest tylko całkowity bitrate strumienia.",
-      "rebuffers": "Rebuforowanie",
+      "rebuffers": "Ponowne buforowania",
       "droppedFrames": "Pominięte klatki",
       "stereo": "Stereo",
       "mono": "Mono",
