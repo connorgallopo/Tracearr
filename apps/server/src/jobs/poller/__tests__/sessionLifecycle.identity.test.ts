@@ -168,4 +168,14 @@ describe('findActiveSession with SessionIdentity', () => {
     const nullEq = capturedConditions.find((c) => c.type === 'eq' && c.value === null);
     expect(nullEq).toBeUndefined();
   });
+
+  it('does not match on an empty ratingKey, which a read that did not describe its media carries', async () => {
+    const { findActiveSession } = await import('../sessionLifecycle.js');
+
+    await findActiveSession({ serverId: 'server-1', sessionKey: 'abc123', ratingKey: '' });
+
+    const andCount = capturedConditions.find((c) => c.type === 'and_count');
+    expect(andCount?.value).toBe(4);
+    expect(capturedConditions.find((c) => c.type === 'eq' && c.value === '')).toBeUndefined();
+  });
 });

@@ -137,6 +137,7 @@ import {
   triggerServerPoll,
 } from '../processor.js';
 import {
+  findActiveSession,
   handleMediaChangeAtomic,
   processPollResults,
   stopSessionAtomic,
@@ -415,7 +416,7 @@ describe('tofa sessions in the poller', () => {
     );
 
     expect(firstTick).toEqual([{ lastSeenAt: expect.any(Date) }]);
-    expect(updated).toEqual([['session-1']]);
+    expect(updated).toEqual([['session-1'], ['session-1']]);
     expect(handleMediaChangeAtomic).not.toHaveBeenCalled();
     expect(stopSessionAtomic).not.toHaveBeenCalled();
     expect(cacheService.setPendingSession).not.toHaveBeenCalled();
@@ -431,12 +432,93 @@ describe('tofa sessions in the poller', () => {
     );
 
     expect(firstTick).toEqual([{ lastSeenAt: expect.any(Date) }]);
-    expect(updated).toEqual([['session-1']]);
+    expect(updated).toEqual([['session-1'], ['session-1']]);
     expect(handleMediaChangeAtomic).not.toHaveBeenCalled();
     expect(stopSessionAtomic).not.toHaveBeenCalled();
     expect(mockSetPayloads).toEqual([
       { lastSeenAt: expect.any(Date) },
       expect.objectContaining({ progressMs: movieRow.position_ms }),
+    ]);
+  });
+
+  it('keeps a play in the session cache through reads that now-playing does not describe', async () => {
+    tracked(existingRow());
+    mockCreateMediaServerClient.mockReturnValue(
+      fakeTofaClient({
+        getSessions: vi.fn(async () => [parseTofaSession(movieRow, undefined, movieMedia)]),
+      })
+    );
+
+    await triggerServerPoll('server-1');
+    await triggerServerPoll('server-1');
+
+    const updated = vi
+      .mocked(processPollResults)
+      .mock.calls.map(([results]) => results.updatedSessions);
+    const cachedEntry = {
+      id: 'session-1',
+      serverId: 'server-1',
+      serverUserId: 'server-user-1',
+      sessionKey: movieRow.session_id,
+      state: 'playing',
+    };
+    expect(updated).toEqual([[cachedEntry], [cachedEntry]]);
+    expect(mockSetPayloads).toEqual([{ lastSeenAt: expect.any(Date) }]);
+  });
+
+  it('sends the state the read gives when the cache holds another for a play read without its media', async () => {
+    const row = existingRow();
+    tracked(row);
+    cacheService.getAllActiveSessions?.mockResolvedValue([
+      {
+        id: row.id,
+        serverId: 'server-1',
+        serverUserId: row.serverUserId,
+        sessionKey: row.sessionKey,
+        state: 'paused',
+      },
+    ]);
+    mockCreateMediaServerClient.mockReturnValue(
+      fakeTofaClient({
+        getSessions: vi.fn(async () => [parseTofaSession(movieRow, undefined, movieMedia)]),
+      })
+    );
+
+    await triggerServerPoll('server-1');
+
+    const [results] = vi.mocked(processPollResults).mock.calls[0] ?? [];
+    expect(results?.updatedSessions).toEqual([
+      expect.objectContaining({ id: 'session-1', state: 'playing' }),
+    ]);
+  });
+
+  it('recovers a tracked play the cache lost from a read that now-playing does not describe, keeping its media', async () => {
+    const row = existingRow({ mediaTitle: 'The Paper Kite' });
+    mockBatchFindActiveSessionsByKey.mockResolvedValue(new Map([[row.sessionKey, [row]]]));
+    vi.mocked(findActiveSession).mockResolvedValueOnce(
+      row as unknown as Awaited<ReturnType<typeof findActiveSession>>
+    );
+    mockCreateMediaServerClient.mockReturnValue(
+      fakeTofaClient({
+        getSessions: vi.fn(async () => [parseTofaSession(movieRow, undefined, movieMedia)]),
+      })
+    );
+
+    await triggerServerPoll('server-1');
+
+    expect(cacheService.setPendingSession).not.toHaveBeenCalled();
+    const [results] = vi.mocked(processPollResults).mock.calls[0] ?? [];
+    expect(results?.newSessions).toEqual([]);
+    expect(results?.updatedSessions).toEqual([
+      expect.objectContaining({
+        id: 'session-1',
+        ratingKey: movieRow.media_id,
+        mediaType: 'movie',
+        mediaTitle: 'The Paper Kite',
+        totalDurationMs: movieRow.duration_ms,
+        progressMs: 150_000,
+        state: 'playing',
+      }),
     ]);
   });
 
@@ -593,6 +675,38 @@ describe('tofa sessions in the poller', () => {
     expect(mockSetPayloads).not.toContainEqual(
       expect.objectContaining({ username: expect.any(String) })
     );
+  });
+
+  it('does not open a killed play again when a read still lists it without its media', async () => {
+    mockBatchFindActiveSessionsByKey.mockResolvedValue(new Map());
+    cacheService.getAllActiveSessions?.mockResolvedValue([
+      {
+        id: 'session-1',
+        serverId: 'server-1',
+        serverUserId: 'server-user-1',
+        sessionKey: movieRow.session_id,
+        ratingKey: movieRow.media_id,
+      },
+    ]);
+    cacheService.hasTerminationCooldown?.mockResolvedValue(true);
+    mockCreateMediaServerClient.mockReturnValue(
+      fakeTofaClient({
+        getSessions: vi.fn(async () => [parseTofaSession(movieRow, undefined, movieMedia)]),
+      })
+    );
+
+    await triggerServerPoll('server-1');
+
+    expect(cacheService.hasTerminationCooldown).toHaveBeenCalledWith(
+      'server-1',
+      movieRow.session_id,
+      movieRow.media_id
+    );
+    const created = vi
+      .mocked(processPollResults)
+      .mock.calls.flatMap(([results]) => results.newSessions);
+    expect(created).toEqual([]);
+    expect(cacheService.setPendingSession).not.toHaveBeenCalled();
   });
 
   it('does not open a stopped play again when a list read still carries it', async () => {

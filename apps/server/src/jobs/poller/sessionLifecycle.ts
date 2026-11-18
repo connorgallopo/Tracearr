@@ -414,7 +414,8 @@ export function buildPendingActiveSession(pendingData: PendingSessionData): Acti
 
 /**
  * Find an active (not stopped) session by SessionIdentity.
- * When ratingKey is provided and non-null, validates the session has matching ratingKey.
+ * When ratingKey is given, validates the session has matching ratingKey. An empty one is a read
+ * that did not describe its media, which says nothing about which item the open row plays.
  */
 export async function findActiveSession(
   identity: SessionIdentity
@@ -431,8 +432,7 @@ export async function findActiveSession(
     gte(sessions.startedAt, chunkBound),
   ];
 
-  // Add ratingKey validation if provided and non-null
-  if (ratingKey != null) {
+  if (ratingKey) {
     conditions.push(eq(sessions.ratingKey, ratingKey));
   }
 

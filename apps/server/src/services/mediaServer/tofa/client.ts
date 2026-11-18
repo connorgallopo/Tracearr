@@ -64,6 +64,7 @@ import type {
   TofaMediaPage,
   TofaMetrics,
   TofaNowPlaying,
+  TofaNowPlayingSession,
   TofaPlaybackSession,
   TofaProfile,
   TofaRequest,
@@ -121,6 +122,44 @@ const LISTED_DOWNLOADS_KEPT_MS = 5 * 60 * 1000;
 
 const listedDownloadKey = (url: string, fileId: string | null, deviceId: string | null) =>
   `${url}:${fileId}:${deviceId}`;
+
+/**
+ * The sessions each server's last read left without their media, with why, by server URL. A
+ * session is logged when it goes undescribed, not every poll. A channel play can go back and forth,
+ * so its return is logged only at debug.
+ */
+const undescribedSessions = new Map<string, Map<string, string>>();
+
+function undescribedReason(
+  row: TofaPlaybackSession,
+  playing: TofaNowPlayingSession | undefined,
+  media: Map<string, TofaMedia>
+): string {
+  if (!playing) return 'now-playing does not list it';
+  if (!row.media_id) return 'it names no media';
+  if (!media.has(row.media_id)) return 'the media lookup did not return its media';
+  return 'its show does not list its file';
+}
+
+function logUndescribedSessions(
+  url: string,
+  kept: Set<string>,
+  undescribed: [string, string][]
+): void {
+  const previous = undescribedSessions.get(url) ?? new Map<string, string>();
+  const current = new Map(undescribed);
+  for (const [sessionId, reason] of current) {
+    if (previous.get(sessionId) !== reason) {
+      log.info(`session ${sessionId} read without its media: ${reason}`);
+    }
+  }
+  for (const sessionId of previous.keys()) {
+    if (kept.has(sessionId) && !current.has(sessionId)) {
+      log.debug(`session ${sessionId} read with its media again`);
+    }
+  }
+  undescribedSessions.set(url, current);
+}
 
 type LibraryPage = { items: MediaLibraryItem[]; totalCount: number; rawCount?: number };
 
@@ -224,19 +263,29 @@ export class TofaClient implements IMediaServerClient {
     ]);
     // Every listed id, so a set-aside session is not read back in as a live viewer
     const listed = new Set(listedRows.map((row) => row.session_id));
+    const sessions = rows.map((row) => {
+      const playing = nowPlayingById.get(row.session_id);
+      return parseTofaSession(
+        row,
+        playing,
+        row.media_id ? media.get(row.media_id) : undefined,
+        viewers.find(
+          (viewer) =>
+            viewer.user_id === row.user_id && viewer.channel_id === playing?.live_channel_id
+        )
+      );
+    });
+    logUndescribedSessions(
+      this.url,
+      new Set(rows.map((row) => row.session_id)),
+      rows.flatMap((row, i) =>
+        sessions[i]?.mediaId === ''
+          ? [[row.session_id, undescribedReason(row, nowPlayingById.get(row.session_id), media)]]
+          : []
+      )
+    );
     return [
-      ...rows.map((row) => {
-        const playing = nowPlayingById.get(row.session_id);
-        return parseTofaSession(
-          row,
-          playing,
-          row.media_id ? media.get(row.media_id) : undefined,
-          viewers.find(
-            (viewer) =>
-              viewer.user_id === row.user_id && viewer.channel_id === playing?.live_channel_id
-          )
-        );
-      }),
+      ...sessions,
       ...(nowPlaying.live_sessions ?? [])
         .filter((live) => !listed.has(live.session_id))
         .map(parseTofaLiveSession),

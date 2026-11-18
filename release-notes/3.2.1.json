@@ -1,0 +1,10 @@
+{
+  "version": "3.2.1",
+  "date": "2026-11-18",
+  "changes": [
+    {
+      "type": "fix",
+      "text": "a tofa play stays one session when tofa briefly stops describing it, instead of a second untitled one"
+    }
+  ]
+}

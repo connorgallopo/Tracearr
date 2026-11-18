@@ -158,7 +158,9 @@ describe('TofaClient', () => {
     const cloud =
       'https://api.tofa.tv/v1/metadata/assets/tmdb/title/0d/42/0d4252eba883956b9ec0de5c77520c2536237d76c128228f367b3a81f57f03a6.jpg';
     serve({
-      [detail]: { poster_url: 'images/cloud/9445b39736f344069814b0ce085be83d_0f0542149027fa84.jpg' },
+      [detail]: {
+        poster_url: 'images/cloud/9445b39736f344069814b0ce085be83d_0f0542149027fa84.jpg',
+      },
     });
     expect(await client().getRequestPosterPath('tv', 900101)).toBe(
       '/cache/images/cloud/9445b39736f344069814b0ce085be83d_0f0542149027fa84.jpg'
@@ -228,6 +230,64 @@ describe('TofaClient sessions', () => {
     expect(sessions.map((s) => [s.sessionKey, s.mediaId, s.media.type])).toEqual(
       tofa.playbackSessions.map((row) => [row.session_id, '', 'unknown'])
     );
+  });
+
+  it('logs once why a session is read without its media, not on every read', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+    const [row] = tofa.playbackSessions;
+    const described = {
+      '/system/playback/sessions': [row],
+      '/system/activity/now-playing': tofa.nowPlaying,
+    };
+    const omitted = {
+      '/system/playback/sessions': [row],
+      '/system/activity/now-playing': { ...tofa.nowPlaying, sessions: [] },
+    };
+
+    // The log remembers sessions by server URL, which other tests read too
+    serve(described);
+    await client().getSessions();
+    info.mockClear();
+
+    for (const responses of [omitted, omitted, described, described]) {
+      serve(responses);
+      await client().getSessions();
+    }
+
+    expect(info.mock.calls.map(([message]) => message)).toEqual([
+      `[tofa-client] session ${row?.session_id} read without its media: now-playing does not list it`,
+    ]);
+    info.mockRestore();
+  });
+
+  it('does not log a session set aside for a newer one on its device as described again', async () => {
+    const info = vi.spyOn(console, 'info').mockImplementation(() => {});
+    const debug = vi.spyOn(console, 'debug').mockImplementation(() => {});
+    vi.stubEnv('LOG_LEVEL', 'debug');
+    const [row] = tofa.playbackSessions;
+    if (!row) throw new Error('the recording is missing a play');
+    const newer = {
+      ...row,
+      session_id: '7e0f0000-3a1c-4d2e-9b5f-0000000000bb',
+      created_at: '2099-01-01T00:00:00.000000000+00:00',
+    };
+    const nowPlaying = { ...tofa.nowPlaying, sessions: [] };
+
+    serve({ '/system/playback/sessions': [row], '/system/activity/now-playing': nowPlaying });
+    await client().getSessions();
+    serve({
+      '/system/playback/sessions': [row, newer],
+      '/system/activity/now-playing': nowPlaying,
+    });
+    await client().getSessions();
+
+    const logged = [...info.mock.calls, ...debug.mock.calls].map(([message]) => message);
+    expect(logged).not.toContain(
+      `[tofa-client] session ${row.session_id} read with its media again`
+    );
+    vi.unstubAllEnvs();
+    info.mockRestore();
+    debug.mockRestore();
   });
 
   it('keeps only the newest session a device holds for a file, since tofa lists abandoned ones', async () => {

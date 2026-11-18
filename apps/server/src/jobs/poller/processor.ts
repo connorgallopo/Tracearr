@@ -702,6 +702,26 @@ function fillsInMediaLater(serverType: ServerType): boolean {
   }
 }
 
+/**
+ * A read that leaves a tracked play's media undescribed, which may be a channel's: the row holds
+ * the media, and the read only says the play is still listed and whether it is paused.
+ */
+function leavesMediaUndescribed(
+  serverType: ServerType,
+  row: typeof sessions.$inferSelect,
+  processed: ProcessedSession
+): boolean {
+  return fillsInMediaLater(serverType) && !!row.ratingKey && !processed.ratingKey;
+}
+
+/** The cache entry for a tracked play as its row records it, for a read that did not describe it */
+function activeSessionFromRow(
+  row: typeof sessions.$inferSelect,
+  input: Omit<Parameters<typeof buildActiveSession>[0], 'session'>
+): ActiveSession {
+  return { ...buildActiveSession({ ...input, session: row }), ...mapSessionRow(row) };
+}
+
 function noSessionChanges(success: boolean): ServerProcessingResult {
   return {
     success,
@@ -912,15 +932,21 @@ async function processServerSessions(
       processed: ProcessedSession,
       sessionKey: string
     ): Promise<boolean> => {
-      if (!cacheService || !processed.ratingKey) return false;
+      if (!cacheService) return false;
       switch (sessionIdentity) {
-        case 'sessionKey':
-          return cacheService.hasTerminationCooldown(
-            server.id,
-            processed.sessionKey,
-            processed.ratingKey
-          );
+        case 'sessionKey': {
+          // A read that did not describe its media has no key; the cache keeps the one the
+          // play was killed under.
+          const ratingKey =
+            processed.ratingKey ||
+            activeSessions.find(
+              (s) => s.serverId === server.id && s.sessionKey === processed.sessionKey
+            )?.ratingKey;
+          if (!ratingKey) return false;
+          return cacheService.hasTerminationCooldown(server.id, processed.sessionKey, ratingKey);
+        }
         case 'composite': {
+          if (!processed.ratingKey) return false;
           const kill = killCooldowns.get(sessionKey);
           if (!kill) return false;
           if (isLeftoverOfKill(kill, processed.progressMs, Date.now())) return true;
@@ -1468,20 +1494,18 @@ async function processServerSessions(
                   `[Poller] Rediscovered session ${existing.id} already stopped, skipping resurrection`
                 );
               } else {
-                const activeSession = buildActiveSession({
-                  session: existing,
-                  processed,
-                  user: userDetail,
-                  geo,
-                  server,
-                  overrides: {
-                    state: stateThroughBuffering(existing.state, processed),
-                    lastPausedAt: existing.lastPausedAt,
-                    pausedDurationMs: existing.pausedDurationMs ?? 0,
-                    watched: existing.watched ?? false,
-                  },
-                });
-                updatedSessions.push(activeSession);
+                const overrides = {
+                  state: stateThroughBuffering(existing.state, processed),
+                  lastPausedAt: existing.lastPausedAt,
+                  pausedDurationMs: existing.pausedDurationMs ?? 0,
+                  watched: existing.watched ?? false,
+                };
+                const recovered = { processed, user: userDetail, geo, server, overrides };
+                updatedSessions.push(
+                  leavesMediaUndescribed(server.type, existing, processed)
+                    ? { ...activeSessionFromRow(existing, recovered), ...overrides }
+                    : buildActiveSession({ ...recovered, session: existing })
+                );
               }
             } catch (err) {
               console.error(`[Poller] Failed to recover rediscovered session ${existing.id}:`, err);
@@ -1792,18 +1816,32 @@ async function processServerSessions(
           // media or position to trust, so those stay as they are until a read describes it. Its
           // pause state still comes from the stream list, so a pause or resume is recorded. Without
           // one the play is still running, so it is marked seen on the flush clock or the stale
-          // sweep stops it.
-          if (fillsInMediaLater(server.type) && existingSession.ratingKey && !processed.ratingKey) {
+          // sweep stops it, and its cache entry is sent on every read: once the entry expires, the
+          // play reads as new.
+          if (leavesMediaUndescribed(server.type, existingSession, processed)) {
+            // The cached entry has the media and position from the last described read, which the
+            // row only holds as of its last flush.
+            const kept =
+              activeSessions.find((s) => s.id === existingSession.id) ??
+              activeSessionFromRow(existingSession, { processed, user: userDetail, geo, server });
             const newState = stateThroughBuffering(existingSession.state, processed);
             if (newState === existingSession.state) {
               const seenAt = Date.now();
               if (shouldFlushDbWrite(existingSession.id, seenAt)) {
-                await db
+                const touched = await db
                   .update(sessions)
                   .set({ lastSeenAt: new Date(seenAt) })
-                  .where(and(sessionRowById(existingSession), isNull(sessions.stoppedAt)));
+                  .where(and(sessionRowById(existingSession), isNull(sessions.stoppedAt)))
+                  .returning({ id: sessions.id });
+                if (touched.length === 0) {
+                  console.log(
+                    `[Poller] Session ${existingSession.id} already stopped, skipping resurrection`
+                  );
+                  continue;
+                }
                 recordDbWrite(existingSession.id, seenAt);
               }
+              updatedSessions.push({ ...kept, state: newState });
               continue;
             }
 
@@ -1835,23 +1873,7 @@ async function processServerSessions(
               { state: newState },
               now
             );
-            // The cached entry has the position from the last described read, which the row only
-            // holds as of its last flush.
-            const cached = activeSessions.find((s) => s.id === existingSession.id);
-            updatedSessions.push({
-              ...(cached ?? {
-                ...buildActiveSession({
-                  session: existingSession,
-                  processed,
-                  user: userDetail,
-                  geo,
-                  server,
-                }),
-                ...mapSessionRow(existingSession),
-              }),
-              state: newState,
-              ...pauseResult,
-            });
+            updatedSessions.push({ ...kept, state: newState, ...pauseResult });
             continue;
           }
 
