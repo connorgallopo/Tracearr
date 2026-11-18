@@ -256,6 +256,8 @@ jobs:
       # and a stable that is newer than the newest beta, so beta users are
       # never behind stable after a hotfix
       moves-next: ${{ steps.check.outputs.moves_next }}
+      # false when cut-release was run with announce off, which writes "Announce: no" in the tag
+      announce: ${{ steps.check.outputs.announce }}
 
     steps:
       - name: Checkout
@@ -267,6 +269,13 @@ jobs:
         id: check
         run: |
           TAG="${{ github.ref_name }}"
+          # Checkout can leave the tag lightweight; fetch the tag object to read its message
+          git fetch --quiet --force origin "refs/tags/$TAG:refs/tags/$TAG"
+          if git tag -l --format='%(contents)' "$TAG" | grep -qx 'Announce: no'; then
+            echo "announce=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "announce=true" >> "$GITHUB_OUTPUT"
+          fi
           if [[ "$TAG" == *-* ]]; then
             echo "prerelease=true" >> "$GITHUB_OUTPUT"
             echo "moves_next=true" >> "$GITHUB_OUTPUT"
@@ -681,6 +690,7 @@ jobs:
     name: Post to Reddit
     runs-on: ubuntu-latest
     needs: [check-release-type, create-release]
+    if: needs.check-release-type.outputs.announce == 'true'
     continue-on-error: true
 
     steps:
@@ -707,6 +717,7 @@ jobs:
     name: Post to Discord
     runs-on: ubuntu-latest
     needs: [check-release-type, create-release]
+    if: needs.check-release-type.outputs.announce == 'true'
     continue-on-error: true
 
     steps:

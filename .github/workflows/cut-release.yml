@@ -7,6 +7,11 @@ on:
         description: 'Version without the v (e.g. 3.1.5 or 3.2.0-beta.1)'
         required: true
         type: string
+      announce:
+        description: 'Post the release to Discord and Reddit'
+        required: false
+        type: boolean
+        default: true
 
 concurrency:
   group: cut-release
@@ -68,9 +73,11 @@ jobs:
         env:
           RELEASE_TAG: v${{ inputs.version }}
 
+      # release.yml reads the Announce line from the tag message; a tag push carries no inputs.
       - name: Bump chart, tag and push
         env:
           VERSION: ${{ inputs.version }}
+          ANNOUNCE: ${{ inputs.announce }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -82,5 +89,9 @@ jobs:
               git commit -m "sync helm chart to $VERSION" "$CHART"
             fi
           fi
-          git tag -a "v$VERSION" -m "v$VERSION"
+          MESSAGE="v$VERSION"
+          if [[ "$ANNOUNCE" == "false" ]]; then
+            MESSAGE+=$'\n\nAnnounce: no'
+          fi
+          git tag -a "v$VERSION" -m "$MESSAGE"
           git push --atomic origin "HEAD:$GITHUB_REF_NAME" "v$VERSION"
