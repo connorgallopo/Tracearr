@@ -1,7 +1,30 @@
 {
   "version": "3.2.0",
-  "date": "2026-11-16",
+  "date": "2026-11-17",
+  "headline": "tofa servers, guided first-run setup, and single sign-on only",
   "upgradeWarning": "Back up before upgrading. Request ids are stored differently from this release on, so going back to an older version needs that backup",
+  "highlights": [
+    {
+      "title": "tofa",
+      "body": "Tracearr now monitors tofa servers: live sessions, library, history import and tofa's built-in requests. Connect one by signing in to tofa, in setup or Settings → Servers, with no API key to paste. The owner and members can sign in with their tofa account too. tofa 0.13.3 or newer is needed.",
+      "docs": "https://docs.tracearr.com/getting-started/first-server#tofa"
+    },
+    {
+      "title": "First-run setup",
+      "body": "A fresh install walks through signing in, connecting a server and importing history. Add Server offers the same import step later, and a new server starts its first library sync right away instead of waiting for the next scheduled one.",
+      "docs": "https://docs.tracearr.com/getting-started/first-server#initial-setup"
+    },
+    {
+      "title": "Single sign-on only",
+      "body": "With OIDC configured, a new switch under Settings → Access → Sign-in makes your identity provider the only way admins and members sign in. The login page then shows just the single sign-on button; your own password, Plex and tofa sign-in stay available at /login?all for when the identity provider is down.",
+      "docs": "https://docs.tracearr.com/configuration/member-sign-in#single-sign-on-only"
+    },
+    {
+      "title": "History imports",
+      "body": "Imports start without waiting on the media server, and on a new server they wait for its first library sync. A failed Tautulli, Jellystat or Playback Reporting import now tries again on its own, while a rejected API key fails at once with the reason on the import card.",
+      "docs": "https://docs.tracearr.com/getting-started/import"
+    }
+  ],
   "changes": [
     {
       "type": "new",
@@ -9,23 +32,7 @@
     },
     {
       "type": "new",
-      "text": "connect a tofa server by signing in to tofa, in setup or Settings → Servers, with no API key to paste"
-    },
-    {
-      "type": "new",
-      "text": "the owner and members can sign in with their tofa account, with its own switch under Settings → Access → Sign-in"
-    },
-    {
-      "type": "note",
-      "text": "a tofa server needs version 0.13.3 or newer"
-    },
-    {
-      "type": "improved",
-      "text": "first-run setup walks through signing in, connecting a server and importing history"
-    },
-    {
-      "type": "improved",
-      "text": "refreshed theme, with better contrast in light mode"
+      "text": "connect a tofa server or sign in to Tracearr with a tofa account, with no API key to paste"
     },
     {
       "type": "new",
@@ -33,87 +40,59 @@
       "refs": ["#1423"]
     },
     {
+      "type": "new",
+      "text": "Seerr requests for a title in no library show Seerr's poster when Seerr's image caching is on"
+    },
+    {
+      "type": "improved",
+      "text": "first-run setup and Add Server walk through signing in, connecting a server and importing history"
+    },
+    {
+      "type": "improved",
+      "text": "a new or re-added server starts its first library sync at once and fills in its growth history"
+    },
+    {
+      "type": "improved",
+      "text": "history imports start right away, retry on their own up to 3 times, and no longer wait behind a growth backfill"
+    },
+    {
+      "type": "improved",
+      "text": "people without a display name show their Tracearr username everywhere, the public API included"
+    },
+    {
+      "type": "improved",
+      "text": "Live TV shows the program on air on every server, with its show, episode and art, and the channel under the title",
+      "refs": ["#1441"]
+    },
+    {
+      "type": "improved",
+      "text": "refreshed theme and map colors with better light-mode contrast, and the Inter font no longer loads from Google"
+    },
+    {
       "type": "fix",
-      "text": "Jellyfin plays the server sends unchanged show as Direct Play, even when the client reports Direct Stream",
+      "text": "Jellyfin shows Direct Play, Direct Stream or Transcode by what the server does, music and remuxes included",
       "refs": ["#1428"]
     },
     {
       "type": "fix",
-      "text": "Jellyfin music no longer shows a video transcode, and a remuxed track no longer counts as a transcode"
+      "text": "episodes whose TVDB ids differ are no longer merged into one, even with the same IMDb id"
     },
     {
       "type": "fix",
-      "text": "duplicate titles merged in a library sync keep the copy Tracearr added first, so a library always merges the same way"
+      "text": "people's pictures follow their media server accounts and update at sync, your own in the sidebar included"
     },
     {
       "type": "fix",
-      "text": "episodes whose TVDB ids differ are no longer merged into one, even with the same IMDb id; earlier merges stay merged"
-    },
-    {
-      "type": "fix",
-      "text": "signing out of a single sign-on account returns to the login page instead of the identity provider's logout page",
+      "text": "signing out of single sign-on returns to the login page; you stay signed in at the identity provider",
       "refs": ["#1445"]
     },
     {
-      "type": "fix",
-      "text": "Live TV names the program's show, season and episode, with the channel under the title",
-      "refs": ["#1441"]
-    },
-    {
-      "type": "fix",
-      "text": "Jellyfin and Emby Live TV shows the program on air, where it showed only the channel"
-    },
-    {
-      "type": "improved",
-      "text": "Plex Live TV takes the channel and art from the program guide when the session doesn't name them"
-    },
-    {
-      "type": "improved",
-      "text": "starting a history import no longer waits on the media server; on a new server it waits for the first library sync"
-    },
-    {
-      "type": "improved",
-      "text": "a failed import tries again on its own, 3 attempts in all; a rejected key fails at once and shows the reason"
-    },
-    {
-      "type": "improved",
-      "text": "Add Server offers the same history import step as first-run setup"
-    },
-    {
-      "type": "improved",
-      "text": "Library and Tasks show a new server's first sync while it's queued, and a toast says if it fails for good"
-    },
-    {
-      "type": "improved",
-      "text": "Settings → Servers → Connections rows have one Sync button and one menu, with status shown as badges"
-    },
-    {
-      "type": "fix",
-      "text": "people lists keep each person's Tracearr name under a server filter, not a media server account's name"
-    },
-    {
-      "type": "fix",
-      "text": "a merged person shows the picture of any of their accounts that has one, and picks up picture changes at sync"
+      "type": "note",
+      "text": "a tofa server needs version 0.13.3 or newer"
     },
     {
       "type": "note",
-      "text": "public API names a person with no display name by their Tracearr username, not a media server account's username"
-    },
-    {
-      "type": "fix",
-      "text": "a Jellyfin or Emby server re-added at its address syncs its libraries right away"
-    },
-    {
-      "type": "fix",
-      "text": "a server added after the first fills in its library growth history within the hour"
-    },
-    {
-      "type": "fix",
-      "text": "the stop stream dialog no longer puts an @ in front of a person's name"
-    },
-    {
-      "type": "fix",
-      "text": "with two servers of one type, import progress shows only under the server being imported"
+      "text": "a person's name no longer follows a rename on the media server; set a display name to change it"
     }
   ]
 }
