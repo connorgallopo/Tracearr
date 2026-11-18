@@ -8,6 +8,7 @@ import {
   genericOAuth,
 } from 'better-auth/plugins';
 import { tryGetCurrentAuthEndpointContext } from '@better-auth/core/context';
+import type { DBTransactionAdapter } from '@better-auth/core/db/adapter';
 import { createAuthMiddleware, APIError, isAPIError } from 'better-auth/api';
 import { expireCookie } from 'better-auth/cookies';
 import type { Redis } from 'ioredis';
@@ -117,33 +118,42 @@ function bearerSessionToken(header: string | null | undefined): string | undefin
  * through their media server, never by Tracearr username. The plugin offers
  * no option for this, hence the adapter wrap. Email is narrowed the same way,
  * but only for password sign-in: OIDC matches members by email too.
+ * Plugins look users up through the transaction adapter while a transaction is
+ * open (the username plugin's create hook does), so that adapter is wrapped too.
  */
 function withLoginScopedUsernameLookup(
   factory: ReturnType<typeof drizzleAdapter>
 ): ReturnType<typeof drizzleAdapter> {
   return (options) => {
     const adapter = factory(options);
-    const findOne: typeof adapter.findOne = (data) => {
-      const byEmailForPassword =
-        data.where.some((w) => w.field === 'email') &&
-        tryGetCurrentAuthEndpointContext()?.path === '/sign-in/email';
-      if (
-        data.model === 'user' &&
-        (data.where.some((w) => w.field === 'username') || byEmailForPassword) &&
-        !data.where.some((w) => w.field === 'role')
-      ) {
-        return adapter.findOne({
-          ...data,
-          where: [
-            ...data.where,
-            { field: 'role', operator: 'in', value: [...STAFF_ROLES], connector: 'AND' },
-          ],
-        });
-      }
-      return adapter.findOne(data);
+    return {
+      ...scopeLoginLookups(adapter),
+      transaction: (callback) => adapter.transaction((trx) => callback(scopeLoginLookups(trx))),
     };
-    return { ...adapter, findOne };
   };
+}
+
+function scopeLoginLookups(adapter: DBTransactionAdapter): DBTransactionAdapter {
+  const findOne: typeof adapter.findOne = (data) => {
+    const byEmailForPassword =
+      data.where.some((w) => w.field === 'email') &&
+      tryGetCurrentAuthEndpointContext()?.path === '/sign-in/email';
+    if (
+      data.model === 'user' &&
+      (data.where.some((w) => w.field === 'username') || byEmailForPassword) &&
+      !data.where.some((w) => w.field === 'role')
+    ) {
+      return adapter.findOne({
+        ...data,
+        where: [
+          ...data.where,
+          { field: 'role', operator: 'in', value: [...STAFF_ROLES], connector: 'AND' },
+        ],
+      });
+    }
+    return adapter.findOne(data);
+  };
+  return { ...adapter, findOne };
 }
 
 // The only writes a session viewing as another user may make: leaving, either way.

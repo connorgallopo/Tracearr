@@ -40,8 +40,8 @@
     "check:english": "tsx scripts/find-english-regressions.ts"
   },
   "dependencies": {
-    "i18next": "^27.1.1",
-    "react-i18next": "^18.0.1"
+    "i18next": "^27.1.5",
+    "react-i18next": "^18.0.2"
   },
   "devDependencies": {
     "tsx": "^4.23.15",
