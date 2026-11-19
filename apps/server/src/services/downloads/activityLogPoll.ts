@@ -6,7 +6,11 @@ import { getRedis } from '../../lib/redisShared.js';
 import { liveServerCondition, type ServerRow } from '../liveServers.js';
 import { createJellyfinEmbyClient, isJellyfinEmby, TofaClient } from '../mediaServer/index.js';
 import type { TofaMedia, TofaDownload } from '../mediaServer/tofa/types.js';
-import { getServerUserIdByExternalId } from '../../jobs/poller/database.js';
+import {
+  getServerUserIdByExternalId,
+  getServerUserIdsByExternalId,
+} from '../../jobs/poller/database.js';
+import { profileIdOf, profileSightings, resolveProfiles } from '../profiles.js';
 import { deliveredFile } from './enrich.js';
 import { recordDownload, type DownloadSignal } from './recorder.js';
 import { pollServerTranscodePulls } from './transcodePull.js';
@@ -196,11 +200,13 @@ function tofaSignal(
   server: ServerRow,
   download: TofaDownload,
   media: TofaMedia | undefined,
-  serverUserId: string | null
+  serverUserId: string | null,
+  profileId: string | null
 ): DownloadSignal {
   return {
     serverId: server.id,
     serverUserId,
+    profileId,
     // An episode's item is the episode the file holds, which the show's media names
     ratingKey:
       download.media_type === 'tv'
@@ -230,18 +236,29 @@ async function pollTofa(server: ServerRow): Promise<void> {
       await client.getDownloadsAfter(new Date(cursor ?? Date.now() - SEED_WINDOW_MS))
     ).toSorted((a, b) => Date.parse(a.download.created_at) - Date.parse(b.download.created_at));
 
+    const rows = downloads.map(({ download }) => download);
+    const accountOf = await getServerUserIdsByExternalId(
+      server.id,
+      rows.map((download) => download.user_id)
+    );
+    const profileIds = await resolveProfiles(
+      server.id,
+      profileSightings(rows, accountOf),
+      'insertMissing'
+    );
+
     let last = cursor;
     try {
       for (const { download, media } of downloads) {
-        const serverUserId = await getServerUserIdByExternalId(server.id, download.user_id);
-        await recordDownload(tofaSignal(server, download, media, serverUserId)).catch(
-          (error: unknown) => {
-            console.error(
-              `[Downloads] Download ${download.id} on ${server.name} not recorded:`,
-              error
-            );
-          }
-        );
+        const serverUserId = accountOf.get(download.user_id) ?? null;
+        await recordDownload(
+          tofaSignal(server, download, media, serverUserId, profileIdOf(profileIds, download))
+        ).catch((error: unknown) => {
+          console.error(
+            `[Downloads] Download ${download.id} on ${server.name} not recorded:`,
+            error
+          );
+        });
         last = Date.parse(download.created_at);
       }
     } finally {

@@ -56,6 +56,7 @@ import {
   resolutionRankSql,
 } from '../utils/resolutionBuckets.js';
 import { getCacheService, getPubSubService } from '../services/cache.js';
+import { linkTofaPlayProfiles } from '../services/import/tofaHistory.js';
 import { getSetting, setSetting } from '../services/settings.js';
 import { recomputeAllIdentityDates } from '../services/userService.js';
 import {
@@ -114,6 +115,7 @@ function getMaintenanceJobDescription(type: MaintenanceJobType): string {
     remove_import_duplicates: 'Import duplicate cleanup',
     link_imported_history: 'Imported history linking',
     sync_server_locations: 'Server location sync',
+    backfill_tofa_profiles: 'tofa profile backfill',
   };
   return descriptions[type] || type;
 }
@@ -127,6 +129,8 @@ export interface MaintenanceJobData {
     fullRefresh?: boolean;
     /** For link_imported_history and sync_server_locations: 'auto' when the server enqueued it; missing means manual */
     trigger?: 'manual' | 'auto';
+    /** For backfill_tofa_profiles: the server whose plays to link */
+    serverId?: string;
   };
   /** backfill_library_snapshots that gave the lock to an import: its snapshots are written */
   backfillResume?: SnapshotBackfillResume;
@@ -428,6 +432,8 @@ async function processMaintenanceJob(job: Job<MaintenanceJobData>): Promise<Main
       return runImportedHistoryLinking(job, await importedHistoryLinkDeps(job.data.options));
     case 'sync_server_locations':
       return processSyncServerLocationsJob(job);
+    case 'backfill_tofa_profiles':
+      return processBackfillTofaProfilesJob(job);
     default:
       throw new Error(`Unknown maintenance job type: ${job.data.type}`);
   }
@@ -703,6 +709,67 @@ async function processSyncServerLocationsJob(
       details: '',
     }),
   });
+}
+
+/**
+ * Links a tofa server's plays stored without a profile to their profiles, once per server. The
+ * user sync queues it for a server not yet done.
+ */
+export async function processBackfillTofaProfilesJob(
+  job: Job<MaintenanceJobData>
+): Promise<MaintenanceJobResult> {
+  const serverId = job.data.options?.serverId;
+  if (!serverId) throw new UnrecoverableError('backfill_tofa_profiles needs a server');
+  const done = await getSetting('profileBackfillDoneServers');
+  if (done.includes(serverId)) {
+    const message = 'Profiles already linked on this server';
+    const now = new Date().toISOString();
+    activeJobProgress = {
+      type: 'backfill_tofa_profiles',
+      status: 'complete',
+      totalRecords: 0,
+      processedRecords: 0,
+      updatedRecords: 0,
+      skippedRecords: 0,
+      errorRecords: 0,
+      message,
+      startedAt: now,
+      completedAt: now,
+    };
+    const pubSubService = getPubSubService();
+    if (pubSubService) {
+      await pubSubService.publish(WS_EVENTS.MAINTENANCE_PROGRESS, activeJobProgress);
+    }
+    activeJobProgress = null;
+    return {
+      success: true,
+      type: 'backfill_tofa_profiles',
+      processed: 0,
+      updated: 0,
+      skipped: 0,
+      errors: 0,
+      durationMs: 0,
+      message,
+    };
+  }
+  const result = await runSessionMaintenanceWalk(job, {
+    type: 'backfill_tofa_profiles',
+    startMessage: 'Linking tofa plays to their profiles...',
+    progressMessage: (total) => `Linked ${total.toLocaleString()} plays to their profiles...`,
+    completeMessage: (total) =>
+      `Completed! Linked ${total.toLocaleString()} plays to their profiles`,
+    resultMessage: (total) => `Linked ${total} plays to their profiles`,
+    failurePrefix: 'Profile backfill skipped',
+    totalCountsUpdates: true,
+    writes: ['profile_id'],
+    walk: async (onBatch) => ({
+      total: await linkTofaPlayProfiles(serverId, onBatch),
+      failedRanges: [],
+      details: '',
+    }),
+  });
+  await setSetting('profileBackfillDoneServers', [...done, serverId]);
+  return result;
 }
 
 /**

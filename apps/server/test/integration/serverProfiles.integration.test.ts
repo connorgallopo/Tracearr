@@ -15,12 +15,14 @@ import {
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
 import { serverProfiles, sessions } from '../../src/db/schema.js';
+import { mergeUsers } from '../../src/services/mergeService.js';
 import { resolveProfiles, syncAccountProfiles } from '../../src/services/profiles.js';
 import { fakeTofaClient } from '../../src/test/mediaServerFakes.js';
 
 const MORGAN_ACCOUNT = 'b1e4c7a2-5d38-4f91-8a6c-2e7f0d3b9c14';
 const MORGAN = 'd2f6a1b8-3c47-4e59-9a0d-7b8c1e4f6a23';
 const ROBIN = 'd2f8a4c6-3b1e-4a97-8c5d-7e0b2f9a6c13';
+const CASEY = '6f3a9d1e-2b84-4c57-a0e6-9d4b7c2e1f83';
 
 async function addAccount(serverId: string, externalId?: string) {
   const user = await createTestUser();
@@ -30,6 +32,16 @@ async function addAccount(serverId: string, externalId?: string) {
 async function seed() {
   const server = await createTestServer({ type: 'tofa' });
   return { serverId: server.id, account: await addAccount(server.id, MORGAN_ACCOUNT) };
+}
+
+/** The fixture's lists, with the given account listing Casey */
+function listsWithCasey(caseysAccount: string) {
+  const listed = fakeTofaClient().getAccountProfiles;
+  return vi.fn(async (accountExternalId: string) =>
+    accountExternalId === caseysAccount
+      ? [{ id: CASEY, name: 'Casey', thumb: null, isPrimary: true, isChild: false }]
+      : listed(accountExternalId)
+  );
 }
 
 async function storeProfile(profile: typeof serverProfiles.$inferInsert) {
@@ -161,9 +173,7 @@ describe('syncAccountProfiles', () => {
     const play = await createStoppedSession({ serverId, serverUserId: account.id });
     await db.update(sessions).set({ profileId: gone.id }).where(eq(sessions.id, play.id));
 
-    await syncAccountProfiles(serverId, fakeTofaClient(), [
-      { serverUserId: account.id, externalId: MORGAN_ACCOUNT },
-    ]);
+    await syncAccountProfiles(serverId, fakeTofaClient(), [MORGAN_ACCOUNT]);
 
     const profiles = await db
       .select()
@@ -190,7 +200,7 @@ describe('syncAccountProfiles', () => {
     const kept = await storeProfile({
       serverId,
       serverUserId: failing.id,
-      externalId: '6f3a9d1e-2b84-4c57-a0e6-9d4b7c2e1f83',
+      externalId: CASEY,
       name: 'Casey',
     });
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -202,10 +212,7 @@ describe('syncAccountProfiles', () => {
       }),
     });
 
-    await syncAccountProfiles(serverId, client, [
-      { serverUserId: failing.id, externalId: failing.externalId },
-      { serverUserId: account.id, externalId: MORGAN_ACCOUNT },
-    ]);
+    await syncAccountProfiles(serverId, client, [failing.externalId, MORGAN_ACCOUNT]);
 
     expect(warn).toHaveBeenCalledOnce();
     expect(await storedProfile(kept.id)).toMatchObject({ name: 'Casey', removedAt: null });
@@ -214,5 +221,46 @@ describe('syncAccountProfiles', () => {
       .from(serverProfiles)
       .where(eq(serverProfiles.serverUserId, account.id));
     expect(synced.map((profile) => profile.externalId).sort()).toEqual([MORGAN, ROBIN].sort());
+  });
+
+  it("keeps the profiles a same-server merge folded in, reading the folded account's list too", async () => {
+    const { serverId, account } = await seed();
+    const folded = await addAccount(serverId);
+    const admin = await createTestUser({ role: 'owner' });
+    const client = fakeTofaClient({ getAccountProfiles: listsWithCasey(folded.externalId) });
+    await syncAccountProfiles(serverId, client, [MORGAN_ACCOUNT, folded.externalId]);
+
+    await mergeUsers(folded.userId, account.userId, admin.id, { confirmSameServerCombine: true });
+    await syncAccountProfiles(serverId, client, [MORGAN_ACCOUNT, folded.externalId]);
+
+    const profiles = await db
+      .select({ externalId: serverProfiles.externalId, removedAt: serverProfiles.removedAt })
+      .from(serverProfiles)
+      .where(eq(serverProfiles.serverUserId, account.id));
+    expect(profiles).toHaveLength(3);
+    expect(profiles.every((profile) => profile.removedAt === null)).toBe(true);
+  });
+
+  it('keeps a profile stored under one account and listed under another, whichever list is read first', async () => {
+    const { serverId, account } = await seed();
+    const lister = await addAccount(serverId);
+    const stored = await storeProfile({
+      serverId,
+      serverUserId: account.id,
+      externalId: CASEY,
+      name: 'Casey',
+    });
+    const client = fakeTofaClient({ getAccountProfiles: listsWithCasey(lister.externalId) });
+
+    for (const order of [
+      [MORGAN_ACCOUNT, lister.externalId],
+      [lister.externalId, MORGAN_ACCOUNT],
+    ]) {
+      await syncAccountProfiles(serverId, client, order);
+      expect(await storedProfile(stored.id)).toMatchObject({
+        serverUserId: account.id,
+        removedAt: null,
+      });
+    }
   });
 });

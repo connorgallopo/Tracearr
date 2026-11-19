@@ -21,6 +21,8 @@ export interface DownloadSignal {
   deviceId?: string | null;
   /** Known before enrichment: a Plex static transcode, an Emby sync item's file */
   delivered?: DownloadEnrichment['delivered'];
+  /** The server_profiles row of the profile that downloaded, where one account holds several (tofa) */
+  profileId?: string | null;
 }
 
 export interface RecordedDownload {
@@ -80,6 +82,9 @@ export async function recordDownload(signal: DownloadSignal): Promise<RecordedDo
         signal.serverUserId
           ? eq(mediaDownloads.serverUserId, signal.serverUserId)
           : isNull(mediaDownloads.serverUserId),
+        signal.profileId
+          ? eq(mediaDownloads.profileId, signal.profileId)
+          : isNull(mediaDownloads.profileId),
         signal.ratingKey
           ? eq(mediaDownloads.ratingKey, signal.ratingKey)
           : and(isNull(mediaDownloads.ratingKey), eq(mediaDownloads.title, signal.title)),
@@ -116,6 +121,7 @@ export async function insertDownload(
     .values({
       serverId: signal.serverId,
       serverUserId: signal.serverUserId,
+      profileId: signal.profileId,
       libraryItemId,
       ratingKey: signal.ratingKey,
       title: signal.title,

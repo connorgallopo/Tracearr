@@ -43,11 +43,16 @@ vi.mock('../userMapping.js', async (importActual) => ({
 }));
 vi.mock('../batchProcessor.js', () => ({ flushInsertBatch: vi.fn() }));
 vi.mock('../../sync.js', () => ({ syncServer: vi.fn() }));
+vi.mock('../../profiles.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../profiles.js')>()),
+  resolveProfiles: vi.fn(),
+}));
 
 import { db } from '../../../db/client.js';
 import { flushInsertBatch } from '../batchProcessor.js';
 import { syncServer } from '../../sync.js';
 import { createUserMapping } from '../userMapping.js';
+import { resolveProfiles } from '../../profiles.js';
 import { HttpClientError } from '../../../utils/http.js';
 import { importTofaHistory } from '../tofaHistory.js';
 
@@ -61,6 +66,7 @@ const SERVER = {
 };
 const [newer, older] = tofa.watchHistoryPages;
 const SERVER_USER = 'd7c1e5a9-0b3f-4e62-8a14-5f9c2b6d8e30';
+const ROBIN = 'd2f8a4c6-3b1e-4a97-8c5d-7e0b2f9a6c13';
 
 /** The server row, then the plays already in Tracearr for each page in turn */
 function rows(...known: { sessionKey: string; externalSessionId: string | null }[][]) {
@@ -82,6 +88,7 @@ beforeEach(() => {
     errors: [],
   });
   getWatchHistoryPage.mockResolvedValueOnce(newer).mockResolvedValueOnce(older);
+  vi.mocked(resolveProfiles).mockResolvedValue(new Map([[ROBIN, 'profile-robin']]));
 });
 
 afterEach(() => {
@@ -244,5 +251,26 @@ describe('importTofaHistory', () => {
 
     const inserted = vi.mocked(flushInsertBatch).mock.calls.flatMap(([batch]) => batch);
     expect(inserted.map((row) => row.profileName)).toEqual(['Robin', 'Robin', null]);
+  });
+
+  it('links each play to the profile its row names, adding a missing profile but renaming none', async () => {
+    rows([], []);
+    getWatchHistoryPage.mockReset();
+    getWatchHistoryPage.mockResolvedValueOnce(newer).mockResolvedValueOnce(
+      older && {
+        ...older,
+        items: older.items.map((row) => ({ ...row, profile_id: null, profile_name: null })),
+      }
+    );
+
+    await importTofaHistory(SERVER.id);
+
+    const robin = { externalId: ROBIN, serverUserId: SERVER_USER, name: 'Robin' };
+    expect(vi.mocked(resolveProfiles).mock.calls).toEqual([
+      [SERVER.id, [robin, robin], 'insertMissing'],
+      [SERVER.id, [], 'insertMissing'],
+    ]);
+    const inserted = vi.mocked(flushInsertBatch).mock.calls.flatMap(([batch]) => batch);
+    expect(inserted.map((row) => row.profileId)).toEqual(['profile-robin', 'profile-robin', null]);
   });
 });

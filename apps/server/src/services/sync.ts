@@ -14,6 +14,8 @@ import * as schema from '../db/schema.js';
 import { servers, serverUsers, serverUserLinks } from '../db/schema.js';
 import { revokeSessionsForServerUsers } from '../lib/revoke.js';
 import { clearScope } from '../lib/scope.js';
+import { getHeavyOpsStatus } from '../jobs/heavyOpsLock.js';
+import { maybeEnqueueMaintenanceJob } from '../jobs/maintenanceQueue.js';
 import { publishServersChanged } from '../jobs/poller/database.js';
 import {
   createMediaServerClient,
@@ -31,6 +33,7 @@ import {
 import { readServerFacts } from './mediaServer/byServerType.js';
 import type { TofaLinkedAccount } from './mediaServer/tofa/parser.js';
 import { syncAccountProfiles } from './profiles.js';
+import { getSetting } from './settings.js';
 import { ensureServerIdentifier } from './serverIdentity.js';
 import { ServerHistoricalError } from './liveServers.js';
 import { NotFoundError } from '../utils/errors.js';
@@ -351,19 +354,28 @@ async function syncTofaUsers(
 ): Promise<UserSyncResult> {
   try {
     const client = new TofaClient({ url: serverUrl, token, id: serverId });
-    const result = await syncServerUsers(serverId, await client.getUsers());
+    const users = await client.getUsers();
+    const result = await syncServerUsers(serverId, users);
     try {
       await saveAccountLinks(serverId, await client.getAccountLinks());
     } catch (err) {
       // The links only feed merge suggestions; the ones already saved stay until the next sync
       console.warn('[Sync] tofa account links failed:', err);
     }
-    // A removed account is gone from the server, so it has no list to read
-    const accounts = await db
-      .select({ serverUserId: serverUsers.id, externalId: serverUsers.externalId })
-      .from(serverUsers)
-      .where(and(eq(serverUsers.serverId, serverId), isNull(serverUsers.removedAt)));
-    await syncAccountProfiles(serverId, client, accounts);
+    await syncAccountProfiles(
+      serverId,
+      client,
+      users.map((user) => user.id)
+    );
+    try {
+      const backfilled = await getSetting('profileBackfillDoneServers');
+      if (!backfilled.includes(serverId) && !(await getHeavyOpsStatus())) {
+        await maybeEnqueueMaintenanceJob('backfill_tofa_profiles', 'system', { serverId });
+      }
+    } catch (err) {
+      // The next sync queues it again
+      console.warn('[Sync] tofa profile backfill not queued:', err);
+    }
     return result;
   } catch (err) {
     return failedUserSync('tofa', err);

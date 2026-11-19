@@ -51,6 +51,7 @@ import {
   FingerprintPattern,
   Link2,
   MapPin,
+  UsersRound,
   type LucideIcon,
 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -134,6 +135,7 @@ const JOB_ICONS = {
   remove_import_duplicates: CopyMinus,
   link_imported_history: Link2,
   sync_server_locations: MapPin,
+  backfill_tofa_profiles: UsersRound,
 } satisfies Partial<Record<MaintenanceJobType, LucideIcon>>;
 
 const CATEGORY_CONFIG = {

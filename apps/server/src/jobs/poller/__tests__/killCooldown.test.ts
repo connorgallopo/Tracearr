@@ -92,6 +92,7 @@ function jellyfinPlay(overrides: Partial<ProcessedSession> = {}): ProcessedSessi
   return {
     sessionKey: 'jf-session-abc',
     ratingKey: 'item-777',
+    profileExternalId: null,
     externalUserId: 'jf-user-1',
     username: 'alice',
     userThumb: '',

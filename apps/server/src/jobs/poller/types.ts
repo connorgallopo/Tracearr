@@ -106,7 +106,7 @@ export interface ProcessedSession extends StreamDetailFields {
   /** The profile that played, where one account holds several (tofa) */
   profileName?: string | null;
   /** The server's id for that profile */
-  profileExternalId?: string | null;
+  profileExternalId: string | null;
   /** The profile's server_profiles row, once a poll has resolved it */
   profileId?: string | null;
 

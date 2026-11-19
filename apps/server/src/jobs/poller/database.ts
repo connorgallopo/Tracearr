@@ -443,6 +443,36 @@ export async function getServerUserIdByExternalId(
 }
 
 /**
+ * The account each external id resolves to, by its own external id or one a same-server merge
+ * folded into it, as getServerUserIdByExternalId does. Ids no account holds are left out.
+ */
+export async function getServerUserIdsByExternalId(
+  serverId: string,
+  externalIds: string[]
+): Promise<Map<string, string>> {
+  if (externalIds.length === 0) return new Map();
+  const rows = await db
+    .select({ externalId: serverUsers.externalId, serverUserId: serverUsers.id })
+    .from(serverUsers)
+    .where(and(eq(serverUsers.serverId, serverId), inArray(serverUsers.externalId, externalIds)))
+    .unionAll(
+      db
+        .select({
+          externalId: serverUserExternalAliases.externalId,
+          serverUserId: serverUserExternalAliases.serverUserId,
+        })
+        .from(serverUserExternalAliases)
+        .where(
+          and(
+            eq(serverUserExternalAliases.serverId, serverId),
+            inArray(serverUserExternalAliases.externalId, externalIds)
+          )
+        )
+    );
+  return new Map(rows.map((row) => [row.externalId, row.serverUserId]));
+}
+
+/**
  * Create an account for each unknown session user, with a Tracearr user behind each, in one
  * transaction so a failed account insert leaves no orphan user. Like user sync, the new user has
  * no display name, so the person is named by users.username.

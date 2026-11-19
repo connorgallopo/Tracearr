@@ -95,6 +95,8 @@ const INTERNAL_DEFAULTS = {
   identityBackfillAutoAttempts: 0 as number,
   // The passes version the last finished identity walk ran; below the code's, the next sync tail queues one.
   identityPassesVersion: 0 as number,
+  // tofa servers whose plays stored without a profile have been linked to their profiles once.
+  profileBackfillDoneServers: [] as string[],
 };
 
 type InternalSettings = typeof INTERNAL_DEFAULTS;

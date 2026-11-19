@@ -2,7 +2,8 @@
  * tofa Watch History Import Service
  *
  * Pages tofa's own record of finished plays from the newest back to the oldest and inserts
- * the plays Tracearr did not capture itself.
+ * the plays Tracearr did not capture itself. The same record links plays stored without a
+ * profile to the profile that played them.
  */
 
 import {
@@ -12,10 +13,15 @@ import {
   type TofaImportResult,
 } from '@tracearr/shared';
 import { UnrecoverableError } from 'bullmq';
-import { and, eq, gte, inArray, lte, or } from 'drizzle-orm';
+import { and, asc, eq, gte, inArray, isNull, lt, lte, or, sql, type SQL } from 'drizzle-orm';
 import { db } from '../../db/client.js';
-import { servers, sessions } from '../../db/schema.js';
-import { batchGetLibraryItemIdentity, type SessionIdentity } from '../../jobs/poller/database.js';
+import { serverProfiles, servers, sessions } from '../../db/schema.js';
+import { getSessionChunkRanges, uncapDecompressionForTx } from '../../db/timescale.js';
+import {
+  batchGetLibraryItemIdentity,
+  getServerUserIdsByExternalId,
+  type SessionIdentity,
+} from '../../jobs/poller/database.js';
 import { enqueueServerLocationSyncIfBehind } from '../../jobs/maintenanceQueue.js';
 import { normalizeClient } from '../../utils/platformNormalizer.js';
 import type { PubSubService } from '../cache.js';
@@ -26,6 +32,7 @@ import { serverWatchedThreshold } from '../mediaServer/byServerType.js';
 import { TofaClient } from '../mediaServer/tofa/client.js';
 import { playMethodDecisions, tofaPosterPath } from '../mediaServer/tofa/parser.js';
 import type { TofaWatchHistoryRow } from '../mediaServer/tofa/types.js';
+import { profileIdOf, profileSightings, resolveProfiles } from '../profiles.js';
 import { markImportedServerLocations } from '../serverLocations.js';
 import { refreshImportAggregates } from './aggregates.js';
 import { flushInsertBatch } from './batchProcessor.js';
@@ -50,6 +57,7 @@ interface TofaHistoryContext {
   geo: ImportGeo;
   identity?: SessionIdentity;
   profileName: string | null;
+  profileId: string | null;
 }
 
 /** An episode plays under the episode's id, everything else under the media's */
@@ -136,6 +144,7 @@ function transformTofaHistoryRow(
     geoAsnOrganization: ctx.geo.asnOrganization,
     isLocal: ipAddress ? geoipService.isPrivateIP(ipAddress) : null,
     profileName: ctx.profileName,
+    profileId: ctx.profileId,
     playerName: (row.device_name ?? clientName).slice(0, 255) || null,
     device: normalized.device.slice(0, 255),
     deviceId: row.device_id ?? null,
@@ -150,34 +159,84 @@ function transformTofaHistoryRow(
 }
 
 /**
- * The keys of the page's plays already in Tracearr: a play it captured carries tofa's session
- * id as its session key, and a play an earlier import brought in carries the history id.
+ * The plays in Tracearr that history rows record: a play it captured carries tofa's session id
+ * as its session key, and a play an earlier import brought in carries the history id.
  */
-async function knownPlays(serverId: string, rows: TofaWatchHistoryRow[]): Promise<Set<string>> {
+function playsOf(serverId: string, rows: TofaWatchHistoryRow[]): SQL | undefined {
   const sessionIds = rows.flatMap((row) => (row.session_id ? [row.session_id] : []));
   const starts = rows.map((row) => Date.parse(row.started_at));
+  return and(
+    eq(sessions.serverId, serverId),
+    gte(sessions.startedAt, new Date(Math.min(...starts) - CAPTURED_START_SLACK_MS)),
+    lte(sessions.startedAt, new Date(Math.max(...starts) + CAPTURED_START_SLACK_MS)),
+    or(
+      inArray(
+        sessions.externalSessionId,
+        rows.map((row) => row.id)
+      ),
+      sessionIds.length > 0 ? inArray(sessions.sessionKey, sessionIds) : undefined
+    )
+  );
+}
+
+/** The keys of the page's plays already in Tracearr */
+async function knownPlays(serverId: string, rows: TofaWatchHistoryRow[]): Promise<Set<string>> {
   const found = await db
     .select({ sessionKey: sessions.sessionKey, externalSessionId: sessions.externalSessionId })
     .from(sessions)
-    .where(
-      and(
-        eq(sessions.serverId, serverId),
-        gte(sessions.startedAt, new Date(Math.min(...starts) - CAPTURED_START_SLACK_MS)),
-        lte(sessions.startedAt, new Date(Math.max(...starts) + CAPTURED_START_SLACK_MS)),
-        or(
-          inArray(
-            sessions.externalSessionId,
-            rows.map((row) => row.id)
-          ),
-          sessionIds.length > 0 ? inArray(sessions.sessionKey, sessionIds) : undefined
-        )
-      )
-    );
+    .where(playsOf(serverId, rows));
   return new Set(
     found.flatMap((s) =>
       s.externalSessionId ? [s.sessionKey, s.externalSessionId] : [s.sessionKey]
     )
   );
+}
+
+async function historyServer(serverId: string) {
+  const [server] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
+  if (!server) throw new UnrecoverableError(`Server not found: ${serverId}`);
+  if (server.historicalAt) throw new ServerHistoricalError(serverId);
+  if (SERVER_PROFILES[server.type].serverHistoryImport !== 'tofa') {
+    throw new UnrecoverableError(
+      `${server.type} servers keep no watch history of their own to import`
+    );
+  }
+  return {
+    server,
+    client: new TofaClient({ url: server.url, token: server.token, id: server.id }),
+  };
+}
+
+/**
+ * tofa's history from the newest play back to the oldest, a page at a time, each play once.
+ * tofa pages by start time alone and takes no tie-breaker, so each page starts just after the
+ * oldest play of the last and leaves out the plays that page already held.
+ */
+async function* watchHistoryPages(
+  client: TofaClient,
+  beforeFetch?: () => void
+): AsyncGenerator<TofaWatchHistoryRow[]> {
+  let before: string | null = null;
+  let lastPage = new Set<string>();
+  for (;;) {
+    beforeFetch?.();
+    const page = await client.getWatchHistoryPage(before, PAGE_SIZE);
+    const oldest = page.items.at(-1);
+    const items = page.items.filter((row) => !lastPage.has(row.id));
+    if (!oldest) return;
+    if (items.length === 0) {
+      // A page of plays that all started in one millisecond cannot be paged past
+      console.warn(
+        '[TofaHistory] Stopped before the oldest plays: a full page started at',
+        oldest.started_at
+      );
+      return;
+    }
+    yield items;
+    if (!page.has_more) return;
+    lastPage = new Set(page.items.map((row) => row.id));
+    before = new Date(Date.parse(oldest.started_at) + 1).toISOString();
+  }
 }
 
 /** Syncs the server's users first, so the import never relies on a sync that ran before it. */
@@ -207,44 +266,22 @@ export async function importTofaHistory(
   publishProgress(progress);
   const skippedUserTracker = createSkippedUserTracker();
 
-  const [server] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
-  if (!server) throw new UnrecoverableError(`Server not found: ${serverId}`);
-  if (server.historicalAt) throw new ServerHistoricalError(serverId);
-  if (SERVER_PROFILES[server.type].serverHistoryImport !== 'tofa') {
-    throw new UnrecoverableError(
-      `${server.type} servers keep no watch history of their own to import`
-    );
-  }
+  const { server, client } = await historyServer(serverId);
 
   await syncImportUsers(serverId);
 
-  const client = new TofaClient({ url: server.url, token: server.token, id: server.id });
   const userMap = await createUserMapping(serverId);
   const thresholds = new Map<string, Promise<number>>();
   const geoCache = new Map<string, ImportGeo>();
   let minImportDate: Date | null = null;
   let maxImportDate: Date | null = null;
-  let before: string | null = null;
-  let lastPage = new Set<string>();
-
-  for (;;) {
+  const publishFetching = () => {
     progress.status = 'fetching';
     progress.message = `Fetching plays: ${progress.fetchedRecords} so far`;
     publishProgress(progress);
+  };
 
-    const page = await client.getWatchHistoryPage(before, PAGE_SIZE);
-    const oldest = page.items.at(-1);
-    const items = page.items.filter((row) => !lastPage.has(row.id));
-    if (!oldest) break;
-    if (items.length === 0) {
-      // tofa pages history by start time alone, so a page of plays that all started in one
-      // millisecond cannot be paged past
-      console.warn(
-        '[TofaHistory] Stopped before the oldest plays: a full page started at',
-        oldest.started_at
-      );
-      break;
-    }
+  for await (const items of watchHistoryPages(client, publishFetching)) {
     progress.fetchedRecords += items.length;
 
     progress.status = 'processing';
@@ -252,6 +289,11 @@ export async function importTofaHistory(
     const identityByKey = await batchGetLibraryItemIdentity(
       serverId,
       items.flatMap((row) => historyItem(row).ratingKey ?? [])
+    );
+    const profileIds = await resolveProfiles(
+      serverId,
+      profileSightings(items, userMap),
+      'insertMissing'
     );
     const insertBatch: (typeof sessions.$inferInsert)[] = [];
 
@@ -297,6 +339,7 @@ export async function importTofaHistory(
             geo,
             identity: ratingKey ? identityByKey.get(ratingKey) : undefined,
             profileName: row.profile_name ?? null,
+            profileId: profileIdOf(profileIds, row),
           })
         );
 
@@ -313,12 +356,6 @@ export async function importTofaHistory(
     await flushInsertBatch(insertBatch);
     progress.message = `Processing: ${progress.processedRecords} plays`;
     publishProgress(progress);
-
-    if (!page.has_more) break;
-    // Plays can share a start time, and tofa takes no tie-breaker, so the next page starts just
-    // after the oldest play and the plays this page already held are left out of it
-    lastPage = new Set(page.items.map((row) => row.id));
-    before = new Date(Date.parse(oldest.started_at) + 1).toISOString();
   }
 
   progress.message = 'Refreshing aggregates...';
@@ -359,4 +396,108 @@ export async function importTofaHistory(
           }))
         : undefined,
   };
+}
+
+/**
+ * Links a server's plays stored without a profile to the profile that played them: by the
+ * history row that records each play, then, for plays tofa no longer lists, by a stored profile
+ * name that only one of the account's profiles has. Profiles the history names that tofa no
+ * longer lists are added marked removed, so their plays link too. Paging stops at the oldest
+ * unlinked play, so a profile named only on history pages older than that is not stored.
+ * Returns the plays linked.
+ */
+export async function linkTofaPlayProfiles(
+  serverId: string,
+  onBatch: (linked: number) => Promise<void>
+): Promise<number> {
+  const { client } = await historyServer(serverId);
+  const [oldestUnlinked] = await db
+    .select({ startedAt: sessions.startedAt })
+    .from(sessions)
+    .where(and(eq(sessions.serverId, serverId), isNull(sessions.profileId)))
+    .orderBy(asc(sessions.startedAt))
+    .limit(1);
+  if (!oldestUnlinked) return 0;
+
+  let linked = 0;
+  for await (const rows of watchHistoryPages(client)) {
+    const newest = Math.max(...rows.map((row) => Date.parse(row.started_at)));
+    if (newest + CAPTURED_START_SLACK_MS < oldestUnlinked.startedAt.getTime()) break;
+    // Through merge aliases too: a folded account's plays sit on the account it was folded into
+    const accountOf = await getServerUserIdsByExternalId(
+      serverId,
+      rows.map((row) => row.user_id)
+    );
+    const profileIds = await resolveProfiles(
+      serverId,
+      profileSightings(rows, accountOf),
+      'insertRemoved'
+    );
+    const plays = rows.flatMap((row) => {
+      const profileId = profileIdOf(profileIds, row);
+      const serverUserId = accountOf.get(row.user_id);
+      return profileId && serverUserId ? [{ row, profileId, serverUserId }] : [];
+    });
+    linked += await db.transaction(async (tx) => {
+      await uncapDecompressionForTx(tx);
+      let written = 0;
+      for (const [profileId, played] of Map.groupBy(plays, (play) => play.profileId)) {
+        const { rowCount } = await tx
+          .update(sessions)
+          .set({ profileId })
+          .where(
+            and(
+              playsOf(
+                serverId,
+                played.map((play) => play.row)
+              ),
+              inArray(sessions.serverUserId, [...new Set(played.map((play) => play.serverUserId))]),
+              isNull(sessions.profileId)
+            )
+          );
+        written += rowCount ?? 0;
+      }
+      return written;
+    });
+    await onBatch(linked);
+  }
+
+  const uniqueNames = db
+    .select({
+      id: sql<string>`(array_agg(${serverProfiles.id}))[1]`.as('named_profile_id'),
+      serverUserId: serverProfiles.serverUserId,
+      name: serverProfiles.name,
+    })
+    .from(serverProfiles)
+    .where(eq(serverProfiles.serverId, serverId))
+    .groupBy(serverProfiles.serverUserId, serverProfiles.name)
+    .having(sql`count(*) = 1`)
+    .as('unique_names');
+  // A chunk at a time, so no statement decompresses more than one chunk of the server's plays
+  const chunks = await getSessionChunkRanges();
+  const windows =
+    chunks.length > 0 ? chunks.filter((chunk) => chunk.end > oldestUnlinked.startedAt) : [null];
+  for (const window of windows) {
+    linked += await db.transaction(async (tx) => {
+      await uncapDecompressionForTx(tx);
+      const { rowCount } = await tx
+        .update(sessions)
+        .set({ profileId: sql`${uniqueNames.id}` })
+        .from(uniqueNames)
+        .where(
+          and(
+            eq(sessions.serverId, serverId),
+            isNull(sessions.profileId),
+            eq(sessions.serverUserId, uniqueNames.serverUserId),
+            eq(sessions.profileName, uniqueNames.name),
+            ...(window
+              ? [gte(sessions.startedAt, window.start), lt(sessions.startedAt, window.end)]
+              : [])
+          )
+        );
+      return rowCount ?? 0;
+    });
+    await onBatch(linked);
+  }
+  return linked;
 }

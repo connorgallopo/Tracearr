@@ -24,12 +24,23 @@ vi.mock('../../mediaServer/index.js', async (importOriginal) => ({
     getDownloadsAfter = getDownloadsAfter;
   },
 }));
-vi.mock('../../../jobs/poller/database.js', () => ({ getServerUserIdByExternalId: vi.fn() }));
+vi.mock('../../../jobs/poller/database.js', () => ({
+  getServerUserIdByExternalId: vi.fn(),
+  getServerUserIdsByExternalId: vi.fn(),
+}));
 vi.mock('../recorder.js', () => ({ recordDownload: vi.fn() }));
+vi.mock('../../profiles.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../profiles.js')>()),
+  resolveProfiles: vi.fn(),
+}));
 
 import { db } from '../../../db/client.js';
-import { getServerUserIdByExternalId } from '../../../jobs/poller/database.js';
+import {
+  getServerUserIdByExternalId,
+  getServerUserIdsByExternalId,
+} from '../../../jobs/poller/database.js';
 import { recordDownload } from '../recorder.js';
+import { resolveProfiles } from '../../profiles.js';
 import { pollAllDownloads, pollServerDownloads, pollServerSyncJobs } from '../activityLogPoll.js';
 import tofa from '../../../test/mediaServerResponses/tofa.json' with { type: 'json' };
 import { parseTofaMedia } from '../../mediaServer/tofa/parser.js';
@@ -367,15 +378,30 @@ describe('pollServerSyncJobs', () => {
 });
 
 describe('pollAllDownloads on a tofa server', () => {
-  it('records each offline download once, by the episode its file holds, and keeps its time as the cursor', async () => {
-    const store = mockRedis();
+  const [download] = tofa.downloads.items;
+  if (!download) throw new Error('fixture has no download');
+  const MORGAN = 'd2f6a1b8-3c47-4e59-9a0d-7b8c1e4f6a23';
+
+  beforeEach(() => {
     vi.mocked(db.select).mockImplementation(
       () =>
         queryChain(vi.fn, [
           { id: SERVER, type: 'tofa', name: 'tofa', url: 'u', token: 't' },
         ]) as never
     );
-    const [download] = tofa.downloads.items;
+    vi.mocked(getServerUserIdsByExternalId).mockResolvedValue(
+      new Map([[download.user_id, 'su-1']])
+    );
+    vi.mocked(resolveProfiles).mockResolvedValue(
+      new Map([
+        [download.profile_id, 'profile-robin'],
+        [MORGAN, 'profile-morgan'],
+      ])
+    );
+  });
+
+  it('records each offline download once, by the episode its file holds, and keeps its time as the cursor', async () => {
+    const store = mockRedis();
     const show = tofa.mediaBatch[1];
     if (!show) throw new Error('fixture has no show');
     getDownloadsAfter.mockResolvedValue(
@@ -391,16 +417,46 @@ describe('pollAllDownloads on a tofa server', () => {
     expect(recordDownload).toHaveBeenCalledWith({
       serverId: SERVER,
       serverUserId: 'su-1',
+      profileId: 'profile-robin',
       ratingKey: tofa.mediaBatch[1]?.files[0]?.episode_id,
-      title: `${download?.title} - ${download?.episode_title}`,
+      title: `${download.title} - ${download.episode_title}`,
       app: null,
-      device: download?.device_name,
+      device: download.device_name,
       source: 'tofa',
       seenAt: new Date('2025-03-02T10:00:00Z'),
-      partId: download?.media_file_id,
-      deviceId: download?.device_id,
+      partId: download.media_file_id,
+      deviceId: download.device_id,
     });
-    expect(getServerUserIdByExternalId).toHaveBeenCalledWith(SERVER, download?.user_id);
+    expect(getServerUserIdsByExternalId).toHaveBeenCalledWith(SERVER, [download.user_id]);
     expect(store._store.get(CURSOR_KEY)).toBe(String(Date.parse('2025-03-02T10:00:00Z')));
+  });
+
+  it("resolves the list's profiles in one call, adding none it would rename, and records each download under its own", async () => {
+    mockRedis();
+    const morgans = {
+      ...download,
+      id: 'download-morgan',
+      created_at: '2025-03-02T11:00:00.000000Z',
+      profile_id: MORGAN,
+      profile_name: 'Morgan',
+    };
+    getDownloadsAfter.mockResolvedValue(
+      [download, morgans].map((d) => ({ download: d, media: undefined }))
+    );
+
+    await pollAllDownloads();
+
+    expect(resolveProfiles).toHaveBeenCalledExactlyOnceWith(
+      SERVER,
+      [
+        { externalId: download.profile_id, serverUserId: 'su-1', name: 'Robin' },
+        { externalId: MORGAN, serverUserId: 'su-1', name: 'Morgan' },
+      ],
+      'insertMissing'
+    );
+    expect(vi.mocked(recordDownload).mock.calls.map(([signal]) => signal.profileId)).toEqual([
+      'profile-robin',
+      'profile-morgan',
+    ]);
   });
 });

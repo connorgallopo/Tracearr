@@ -11,7 +11,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { eq, sql } from 'drizzle-orm';
+import { eq, inArray, sql } from 'drizzle-orm';
 import Fastify from 'fastify';
 import sensible from '@fastify/sensible';
 import { DEFAULT_NEWSLETTER_SECTIONS } from '@tracearr/shared';
@@ -57,6 +57,7 @@ import {
   userMergeAudits,
   terminationLogs,
   dismissals,
+  serverProfiles,
 } from '../../src/db/schema.js';
 import {
   dismissMergeSuggestion,
@@ -149,6 +150,38 @@ async function mergeSignInPlexAccountIntoJellyfinUser() {
 
   const result = await mergeUsers(source.id, target.id, admin.id);
   return { admin, target, targetSu, sourceSu, result };
+}
+
+/** An account's profiles, each with one play linked to it */
+async function profilesWithPlays(serverId: string, serverUserId: string, count: number) {
+  const profileIds: string[] = [];
+  for (let i = 0; i < count; i++) {
+    const [profile] = await db
+      .insert(serverProfiles)
+      .values({ serverId, serverUserId, externalId: randomUUID(), name: `Profile ${i}` })
+      .returning({ id: serverProfiles.id });
+    if (!profile) throw new Error('the profile was not stored');
+    const play = await createTestSession({ serverId, serverUserId });
+    await db.update(sessions).set({ profileId: profile.id }).where(eq(sessions.id, play.id));
+    profileIds.push(profile.id);
+  }
+  return profileIds;
+}
+
+/** Where each profile and each play linked to one sits */
+async function profileOwners(profileIds: string[]) {
+  const profiles = await db
+    .select({ serverUserId: serverProfiles.serverUserId })
+    .from(serverProfiles)
+    .where(inArray(serverProfiles.id, profileIds));
+  const plays = await db
+    .select({ serverUserId: sessions.serverUserId })
+    .from(sessions)
+    .where(inArray(sessions.profileId, profileIds));
+  return {
+    profiles: profiles.map((profile) => profile.serverUserId),
+    plays: plays.map((play) => play.serverUserId),
+  };
 }
 
 /** What a merge wrote while merges could pin the target's name: the name, and the audit's record of it. */
@@ -412,6 +445,26 @@ describe('mergeUsers', () => {
       .from(sessions)
       .where(eq(sessions.id, sourceSession.id));
     expect(carriedSession?.serverUserId).toBe(targetSu.id);
+  });
+
+  it('carries every profile of a combined tofa account onto the target, each with its plays', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'tofa' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    const targetSu = await createTestServerUser({ userId: target.id, serverId: server.id });
+    const sourceSu = await createTestServerUser({ userId: source.id, serverId: server.id });
+    const profileIds = [
+      ...(await profilesWithPlays(server.id, targetSu.id, 2)),
+      ...(await profilesWithPlays(server.id, sourceSu.id, 3)),
+    ];
+
+    await mergeUsers(source.id, target.id, admin.id, { confirmSameServerCombine: true });
+
+    expect(await profileOwners(profileIds)).toEqual({
+      profiles: Array(5).fill(targetSu.id),
+      plays: Array(5).fill(targetSu.id),
+    });
   });
 
   it('refuses to absorb a login-capable identity', async () => {
@@ -722,6 +775,30 @@ describe('splitServerUser', () => {
       .from(userMergeAudits)
       .where(eq(userMergeAudits.id, mergeResult.auditId));
     expect(audit?.undoneAt).not.toBeNull();
+  });
+
+  it("hands a split tofa account's profiles and their plays back with it", async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const plex = await createTestServer({ type: 'plex' });
+    const tofa = await createTestServer({ type: 'tofa' });
+    const target = await createTestUser({ role: 'member' });
+    const source = await createTestUser({ role: 'member' });
+    await createTestServerUser({ userId: target.id, serverId: plex.id });
+    const tofaSu = await createTestServerUser({ userId: source.id, serverId: tofa.id });
+    const profileIds = await profilesWithPlays(tofa.id, tofaSu.id, 2);
+
+    await mergeUsers(source.id, target.id, admin.id);
+    const { newUserId } = await splitServerUser(tofaSu.id, admin.id);
+
+    const [split] = await db
+      .select({ userId: serverUsers.userId })
+      .from(serverUsers)
+      .where(eq(serverUsers.id, tofaSu.id));
+    expect(split?.userId).toBe(newUserId);
+    expect(await profileOwners(profileIds)).toEqual({
+      profiles: [tofaSu.id, tofaSu.id],
+      plays: [tofaSu.id, tofaSu.id],
+    });
   });
 
   it('signs out the identity the account was split from', async () => {

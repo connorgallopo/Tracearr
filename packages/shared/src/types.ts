@@ -2287,7 +2287,8 @@ export type MaintenanceJobType =
   | 'backfill_session_identity'
   | 'remove_import_duplicates'
   | 'link_imported_history'
-  | 'sync_server_locations';
+  | 'sync_server_locations'
+  | 'backfill_tofa_profiles';
 
 export type MaintenanceJobStatus = 'idle' | 'waiting' | 'running' | 'complete' | 'error';
 

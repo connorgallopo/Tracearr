@@ -55,6 +55,7 @@ import {
   newsletterSendRecipients,
   terminationLogs,
   mediaDownloads,
+  serverProfiles,
   authAccounts,
   userMergeAudits,
   dismissals,
@@ -70,6 +71,7 @@ import { getAuth } from '../lib/auth.js';
 import { assertOwnerKeepsALoginAfter } from '../lib/authGuards.js';
 import { upsertTofaAccount } from '../lib/memberLogin.js';
 import { refreshUserSessionSnapshots, revokeSessionsForUsers } from '../lib/revoke.js';
+import { lockProfilesInOrder } from './profiles.js';
 import {
   recomputeIdentityAggregates,
   ServerUserNotFoundError,
@@ -376,6 +378,11 @@ async function combineServerUsers(
     .update(mediaDownloads)
     .set({ serverUserId: targetServerUserId })
     .where(eq(mediaDownloads.serverUserId, sourceServerUserId));
+  await lockProfilesInOrder(tx, eq(serverProfiles.serverUserId, sourceServerUserId));
+  await tx
+    .update(serverProfiles)
+    .set({ serverUserId: targetServerUserId, updatedAt: new Date() })
+    .where(eq(serverProfiles.serverUserId, sourceServerUserId));
 
   // Per-user rule overrides: primary wins on name conflicts, the rest move over.
   // Conflicting source rules are dropped rather than kept as duplicates; their
