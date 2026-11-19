@@ -43,6 +43,7 @@ import type { CacheService, PubSubService, TerminationCooldown } from '../../ser
 import { geoipService } from '../../services/geoip.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
 import { serverWatchedThreshold } from '../../services/mediaServer/byServerType.js';
+import { resolveProfiles } from '../../services/profiles.js';
 import {
   RELAYED_SESSION_GEO,
   resolveSessionGeo,
@@ -1070,8 +1071,7 @@ async function processServerSessions(
     // First pass: identify server users and resolve from cache or mark for creation
     const sessionServerUserIds: (string | null)[] = [];
 
-    for (let i = 0; i < processedSessions.length; i++) {
-      const processed = processedSessions[i]!;
+    for (const [i, processed] of processedSessions.entries()) {
       const existingServerUser = serverUserByExternalId.get(processed.externalUserId);
 
       if (existingServerUser) {
@@ -1116,8 +1116,7 @@ async function processServerSessions(
 
     if (serverUsersToCreate.length > 0) {
       const created = await createSessionServerUsers(server, serverUsersToCreate);
-      for (let i = 0; i < serverUsersToCreate.length; i++) {
-        const serverUserToCreate = serverUsersToCreate[i]!;
+      for (const [i, serverUserToCreate] of serverUsersToCreate.entries()) {
         const newServerUser = created[i];
         if (newServerUser) {
           sessionServerUserIds[serverUserToCreate.sessionIndex] = newServerUser.id;
@@ -1127,13 +1126,29 @@ async function processServerSessions(
       }
     }
 
+    // Set before any play goes pending or is written, so either one carries its profile
+    const profileIds = await resolveProfiles(
+      server.id,
+      processedSessions.flatMap((processed, i) => {
+        const serverUserId = sessionServerUserIds[i];
+        return processed.profileExternalId && processed.profileName && serverUserId
+          ? [{ externalId: processed.profileExternalId, serverUserId, name: processed.profileName }]
+          : [];
+      }),
+      'refresh'
+    );
+    for (const processed of processedSessions) {
+      processed.profileId = processed.profileExternalId
+        ? (profileIds.get(processed.profileExternalId) ?? null)
+        : null;
+    }
+
     // OPTIMIZATION: Batch load recent sessions for rule evaluation (new sessions only)
     // and batch the active-session lookup for already-tracked sessions.
     const serverUsersWithNewSessions = new Set<string>();
     const sessionKeysToCheck: string[] = [];
     const compositeIdentitiesToCheck: { serverUserId: string; ratingKey: string }[] = [];
-    for (let i = 0; i < processedSessions.length; i++) {
-      const processed = processedSessions[i]!;
+    for (const [i, processed] of processedSessions.entries()) {
       const serverUserId = sessionServerUserIds[i];
       // serverUserId must match what pollServers uses from cachedSessions
       const sessionKey = buildCompositeKey({
@@ -1277,8 +1292,7 @@ async function processServerSessions(
     };
 
     // Process each session
-    for (let i = 0; i < processedSessions.length; i++) {
-      const processed = processedSessions[i]!;
+    for (const [i, processed] of processedSessions.entries()) {
       const serverUserId = sessionServerUserIds[i];
       const sessionKey = buildCompositeKey({
         serverType: server.type,

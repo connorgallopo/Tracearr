@@ -11,11 +11,15 @@
  * that ran longer than the max in-scope duration loses resume chaining, an
  * accepted tradeoff.
  *
+ * Both chain lookups (STEP 1's quality change and STEP 2's resume) also match the
+ * play's profile, so two profiles of one account never chain into one play.
+ *
  * Run with: pnpm --filter @tracearr/server test:integration -- resumeDetectionChunkBound
  */
 
 import { randomUUID } from 'node:crypto';
 import { describe, it, expect } from 'vitest';
+import { eq } from 'drizzle-orm';
 import { DEFAULT_STREAM_DETAILS, type ServerType } from '@tracearr/shared';
 import {
   createTestUser,
@@ -23,6 +27,8 @@ import {
   createTestServerUser,
   createStoppedSession,
 } from '@tracearr/test-utils/factories';
+import { db } from '../../src/db/client.js';
+import { serverProfiles, sessions } from '../../src/db/schema.js';
 import { createSessionWithRulesAtomic } from '../../src/jobs/poller/sessionLifecycle.js';
 import type { SessionCreationInput } from '../../src/jobs/poller/types.js';
 
@@ -234,5 +240,93 @@ describe('resume detection respects the TimescaleDB chunk bound without losing r
     const { insertedSession } = await createSessionWithRulesAtomic(input);
 
     expect(insertedSession.referenceId).toBeNull();
+  });
+});
+
+describe('chaining keeps the profiles of one account apart', () => {
+  async function setupProfiles() {
+    const server = await createTestServer({ type: 'tofa' });
+    const user = await createTestUser();
+    const serverUser = await createTestServerUser({ serverId: server.id, userId: user.id });
+    const [morgan, robin] = await db
+      .insert(serverProfiles)
+      .values(
+        ['Morgan', 'Robin'].map((name) => ({
+          serverId: server.id,
+          serverUserId: serverUser.id,
+          externalId: randomUUID(),
+          name,
+        }))
+      )
+      .returning({ id: serverProfiles.id });
+    if (!morgan || !robin) throw new Error('the profiles were not stored');
+    return { server, serverUser, morgan: morgan.id, robin: robin.id };
+  }
+
+  async function stoppedPlay(
+    serverId: string,
+    serverUserId: string,
+    ratingKey: string,
+    profileId: string
+  ) {
+    const play = await createStoppedSession({
+      serverId,
+      serverUserId,
+      ratingKey,
+      startedAt: new Date(Date.now() - 60 * 60 * 1000),
+      stoppedAt: new Date(Date.now() - 30 * 60 * 1000),
+      progressMs: 1_000_000,
+      watched: false,
+    });
+    await db.update(sessions).set({ profileId }).where(eq(sessions.id, play.id));
+    return play;
+  }
+
+  it('keeps two profiles playing the same title on one device as two plays', async () => {
+    const { server, serverUser, morgan, robin } = await setupProfiles();
+    const ratingKey = `rk-${randomUUID()}`;
+
+    const first = await createSessionWithRulesAtomic(
+      buildCreationInput({ ratingKey, profileId: morgan }, server, serverUser)
+    );
+    const second = await createSessionWithRulesAtomic(
+      buildCreationInput({ ratingKey, profileId: robin }, server, serverUser)
+    );
+
+    expect(second.qualityChange).toBeNull();
+    expect(second.insertedSession.referenceId).toBeNull();
+    const [firstRow] = await db
+      .select({ stoppedAt: sessions.stoppedAt })
+      .from(sessions)
+      .where(eq(sessions.id, first.insertedSession.id));
+    expect(firstRow?.stoppedAt).toBeNull();
+  });
+
+  it('does not link a resume by another profile of the account', async () => {
+    const { server, serverUser, morgan, robin } = await setupProfiles();
+    const ratingKey = `rk-${randomUUID()}`;
+    await stoppedPlay(server.id, serverUser.id, ratingKey, morgan);
+
+    const { insertedSession } = await createSessionWithRulesAtomic(
+      buildCreationInput({ ratingKey, progressMs: 1_200_000, profileId: robin }, server, serverUser)
+    );
+
+    expect(insertedSession.referenceId).toBeNull();
+  });
+
+  it('links a resume by the same profile, recording the profile on the play', async () => {
+    const { server, serverUser, morgan } = await setupProfiles();
+    const ratingKey = `rk-${randomUUID()}`;
+    const previous = await stoppedPlay(server.id, serverUser.id, ratingKey, morgan);
+
+    const { insertedSession } = await createSessionWithRulesAtomic(
+      buildCreationInput(
+        { ratingKey, progressMs: 1_200_000, profileId: morgan },
+        server,
+        serverUser
+      )
+    );
+
+    expect(insertedSession).toMatchObject({ referenceId: previous.id, profileId: morgan });
   });
 });

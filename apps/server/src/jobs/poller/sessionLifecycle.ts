@@ -130,6 +130,7 @@ export interface BuildActiveSessionInput {
     progressMs: number;
     serverVersionKey?: string | null;
     profileName?: string | null;
+    profileId?: string | null;
     ipAddress: string;
     playerName: string;
     deviceId: string;
@@ -254,7 +255,7 @@ export function buildActiveSession(input: BuildActiveSessionInput): ActiveSessio
     geoAsnNumber: geo.asnNumber,
     geoAsnOrganization: geo.asnOrganization,
     isLocal: geo.isLocal,
-    profileId: null,
+    profileId: processed.profileId ?? null,
     profileName: processed.profileName ?? null,
     profileRemoved: false,
     playerName: processed.playerName,
@@ -366,7 +367,7 @@ export function buildPendingActiveSession(pendingData: PendingSessionData): Acti
     geoAsnNumber: geo.asnNumber,
     geoAsnOrganization: geo.asnOrganization,
     isLocal: withLocalFlag(geo, processed.ipAddress).isLocal,
-    profileId: null,
+    profileId: processed.profileId ?? null,
     profileName: processed.profileName ?? null,
     profileRemoved: false,
     playerName: processed.playerName,
@@ -699,6 +700,7 @@ export async function createSessionWithRulesAtomic(
 
   let referenceId: string | null = null;
   let qualityChange: QualityChangeResult | null = null;
+  const profileId = processed.profileId ?? null;
 
   // STEP 1: Check for quality change (active session with same user+device+ratingKey)
   if (processed.ratingKey) {
@@ -717,6 +719,7 @@ export async function createSessionWithRulesAtomic(
           eq(sessions.serverUserId, serverUser.id),
           eq(sessions.ratingKey, processed.ratingKey),
           deviceCondition,
+          sql`${sessions.profileId} IS NOT DISTINCT FROM ${profileId}`,
           isNull(sessions.stoppedAt),
           gte(sessions.startedAt, chunkBound)
         )
@@ -784,6 +787,7 @@ export async function createSessionWithRulesAtomic(
         and(
           eq(sessions.serverUserId, serverUser.id),
           eq(sessions.ratingKey, processed.ratingKey),
+          sql`${sessions.profileId} IS NOT DISTINCT FROM ${profileId}`,
           gte(sessions.stoppedAt, oneDayAgo),
           gte(sessions.startedAt, chunkBound),
           eq(sessions.watched, false)
@@ -883,6 +887,7 @@ export async function createSessionWithRulesAtomic(
               geoAsnNumber: geo.asnNumber,
               geoAsnOrganization: geo.asnOrganization,
               isLocal: geo.isLocal,
+              profileId,
               profileName: processed.profileName ?? null,
               playerName: processed.playerName,
               deviceId: processed.deviceId || null,

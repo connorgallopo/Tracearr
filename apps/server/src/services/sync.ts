@@ -30,6 +30,7 @@ import {
 } from './userService.js';
 import { readServerFacts } from './mediaServer/byServerType.js';
 import type { TofaLinkedAccount } from './mediaServer/tofa/parser.js';
+import { syncAccountProfiles } from './profiles.js';
 import { ensureServerIdentifier } from './serverIdentity.js';
 import { ServerHistoricalError } from './liveServers.js';
 import { NotFoundError } from '../utils/errors.js';
@@ -357,6 +358,12 @@ async function syncTofaUsers(
       // The links only feed merge suggestions; the ones already saved stay until the next sync
       console.warn('[Sync] tofa account links failed:', err);
     }
+    // A removed account is gone from the server, so it has no list to read
+    const accounts = await db
+      .select({ serverUserId: serverUsers.id, externalId: serverUsers.externalId })
+      .from(serverUsers)
+      .where(and(eq(serverUsers.serverId, serverId), isNull(serverUsers.removedAt)));
+    await syncAccountProfiles(serverId, client, accounts);
     return result;
   } catch (err) {
     return failedUserSync('tofa', err);
