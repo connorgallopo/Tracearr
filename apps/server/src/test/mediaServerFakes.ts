@@ -93,6 +93,7 @@ export function fakePlexClient(overrides: Overrides = {}): IMediaServerClient {
     serverType: 'plex',
     getSessions: vi.fn(async (sessionKey?: string) => plexSessions(sessionKey)),
     getUsers: vi.fn(async () => plexParser.parseUsersResponse(plex.accounts)),
+    getAccountProfiles: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     getLibraries: vi.fn(async () => plexParser.parseLibrariesResponse(plex.sections)),
     testConnection: vi.fn(async () => true),
     getServerIdentity: vi.fn(async () => plex.identity.MediaContainer.machineIdentifier),
@@ -182,6 +183,7 @@ function fakeJellyfinEmbyClient(
     serverType,
     getSessions: vi.fn(async () => parseSessions(responses.sessions)),
     getUsers: vi.fn(async () => parseUsersResponse(responses.users)),
+    getAccountProfiles: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     getLibraries: vi.fn(async () => parseLibrariesResponse(responses.libraries)),
     testConnection: vi.fn(async () => true),
     getServerIdentity: vi.fn(async () => responses.systemInfo.Id),
@@ -274,6 +276,11 @@ export function fakeTofaClient(overrides: Overrides = {}): IMediaServerClient {
     serverType: 'tofa',
     getSessions: vi.fn(async () => tofaSessions()),
     getUsers: vi.fn(async () => tofaParser.parseUsers(tofa.users, tofa.cloudUsers, tofa.profiles)),
+    getAccountProfiles: vi.fn(async (accountExternalId: string) =>
+      tofaParser.parseProfiles(
+        tofa.userProfiles.filter((profile) => profile.user_id === accountExternalId)
+      )
+    ),
     getLibraries: vi.fn(async () => tofaParser.parseLibraries(tofa.libraries)),
     testConnection: vi.fn(async () => true),
     getServerIdentity: vi.fn(async () => tofa.systemInfo.server_id),

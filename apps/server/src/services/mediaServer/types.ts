@@ -44,6 +44,8 @@ export interface MediaSession {
     thumb?: string;
     /** The profile that plays, where one account holds several (tofa) */
     profileName?: string;
+    /** The server's id for that profile */
+    profileId?: string;
   };
 
   /** Media metadata */
@@ -225,6 +227,16 @@ export interface MediaUser {
   joinedAt?: Date;
   /** tofa only: the cloud account that signs in as this user, null when none may */
   cloudIdentityId?: string | null;
+}
+
+/** One of the profiles a server account plays under; a flag is null where the server does not say */
+export interface MediaProfile {
+  /** The server's profile id */
+  id: string;
+  name: string;
+  thumb: string | null;
+  isPrimary: boolean | null;
+  isChild: boolean | null;
 }
 
 // ============================================================================
@@ -559,6 +571,12 @@ export interface IMediaServerClient {
    * Get all users with access to this server
    */
   getUsers(): Promise<MediaUser[]>;
+
+  /**
+   * The profiles an account plays under, by the account's id on the server. Servers whose
+   * accounts have no profiles answer NOT_NEEDED.
+   */
+  getAccountProfiles(accountExternalId: string): Promise<MediaProfile[] | NotNeeded>;
 
   /**
    * Get all libraries on this server

@@ -121,6 +121,28 @@ describe('TofaClient', () => {
     expect(users.every((u) => u.thumb === undefined)).toBe(true);
   });
 
+  it("reads an account's profiles with their pictures, a kids profile as a child", async () => {
+    const accountId = 'b1e4c7a2-5d38-4f91-8a6c-2e7f0d3b9c14';
+    serve({ [`/users/${accountId}/profiles`]: tofa.userProfiles });
+
+    expect(await client().getAccountProfiles(accountId)).toEqual([
+      {
+        id: 'd2f6a1b8-3c47-4e59-9a0d-7b8c1e4f6a23',
+        name: 'Morgan',
+        thumb: '/api/v1/profiles/avatars/astronaut.png',
+        isPrimary: true,
+        isChild: false,
+      },
+      {
+        id: 'd2f8a4c6-3b1e-4a97-8c5d-7e0b2f9a6c13',
+        name: 'Robin',
+        thumb: 'https://api.tofa.tv/v1/avatars/00000000-0000-4000-8000-0000000000a1',
+        isPrimary: false,
+        isChild: true,
+      },
+    ]);
+  });
+
   it('names a tv library a show library', async () => {
     serve({ '/libraries': tofa.libraries });
 

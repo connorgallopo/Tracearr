@@ -538,7 +538,11 @@ export interface Session extends StreamDetailFields {
   // A local network session; its geo fields hold its server's location when one is set
   isLocal: boolean;
   /** The profile that played, where one account holds several (tofa); null elsewhere */
+  profileId: string | null;
+  /** The profile's name to show */
   profileName: string | null;
+  /** The server no longer lists the profile; its plays keep the last name it had */
+  profileRemoved: boolean;
   playerName: string | null; // Friendly device name
   deviceId: string | null; // Unique device identifier (machineIdentifier)
   product: string | null; // Product/app name (e.g., "Plex for iOS")

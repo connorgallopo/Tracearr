@@ -70,6 +70,7 @@ export interface TofaPlaybackSession {
   session_id: string;
   user_id: string;
   username?: string | null;
+  profile_id?: string | null;
   profile_name?: string | null;
   media_id?: string | null;
   media_file_id: string;
@@ -133,6 +134,7 @@ export interface TofaLiveViewer {
   programme_title: string | null;
   user_id: string;
   user_name: string | null;
+  profile_id: string | null;
   profile_name: string | null;
   device_name: string | null;
   client_name: string | null;
@@ -321,6 +323,7 @@ export interface TofaProfile {
   user_id: string;
   name: string;
   is_primary?: boolean;
+  is_kids?: boolean;
   /** `preset:<id>` for one of the server's bundled avatars */
   avatar_ref?: string | null;
   /** The uploaded photo, a full URL on tofa's side; null until the person uploads one */
@@ -337,6 +340,8 @@ export interface TofaDownload {
   id: string;
   created_at: string;
   user_id: string;
+  profile_id?: string | null;
+  profile_name?: string | null;
   device_id: string;
   device_name: string | null;
   media_id: string;

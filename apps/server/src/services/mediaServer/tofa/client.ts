@@ -24,6 +24,7 @@ import {
   type MediaUser,
   type MediaLibrary,
   type MediaLibraryItem,
+  type MediaProfile,
   type MediaServerConfig,
   type DownloadSourceDescription,
   type DownloadSourceRequest,
@@ -42,6 +43,7 @@ import {
   parseTofaShowChildren,
   parseAccountLinks,
   parseDiscoveryPoster,
+  parseProfiles,
   parseUsers,
   type TofaLinkedAccount,
 } from './parser.js';
@@ -332,6 +334,12 @@ export class TofaClient implements IMediaServerClient {
       }),
     ]);
     return parseUsers(users, cloudUsers, profiles);
+  }
+
+  async getAccountProfiles(accountExternalId: string): Promise<MediaProfile[]> {
+    return parseProfiles(
+      await this.request<TofaProfile[]>(`/users/${encodeURIComponent(accountExternalId)}/profiles`)
+    );
   }
 
   async getAccountLinks(): Promise<TofaLinkedAccount[]> {

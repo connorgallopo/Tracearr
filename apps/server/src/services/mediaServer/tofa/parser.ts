@@ -28,6 +28,7 @@ import type {
   MediaItemVersion,
   MediaLibrary,
   MediaLibraryItem,
+  MediaProfile,
   MediaSession,
   MediaUser,
 } from '../types.js';
@@ -90,6 +91,16 @@ function profilePicture(profile: TofaProfile): string | null {
   if (profile.avatar_image_url) return profile.avatar_image_url;
   const preset = profile.avatar_ref?.match(/^preset:([\w-]+)$/)?.[1];
   return preset ? `${PRESET_AVATAR_PATH}${preset}.png` : null;
+}
+
+export function parseProfiles(profiles: TofaProfile[]): MediaProfile[] {
+  return profiles.map((profile) => ({
+    id: profile.id,
+    name: profile.name,
+    thumb: profilePicture(profile),
+    isPrimary: profile.is_primary ?? null,
+    isChild: profile.is_kids ?? null,
+  }));
 }
 
 /** Whether a picture is one profilePicture could have given */
@@ -532,6 +543,7 @@ export function parseTofaSession(
       id: row.user_id,
       username: row.username ?? '',
       profileName: row.profile_name ?? undefined,
+      profileId: row.profile_id ?? undefined,
     },
     ...describePlay(row, nowPlaying, media, viewer),
     playback: {
@@ -595,6 +607,7 @@ export function parseTofaLiveSession(live: TofaLiveNowPlayingSession): MediaSess
       id: viewer.user_id,
       username: viewer.user_name ?? '',
       profileName: viewer.profile_name ?? undefined,
+      profileId: viewer.profile_id ?? undefined,
     },
     media: {
       title: viewer.programme_title ?? viewer.channel_name,

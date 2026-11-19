@@ -415,6 +415,37 @@ export const serverUserExternalAliases = pgTable(
   ]
 );
 
+/**
+ * The profiles one server account plays under (tofa). Plays count toward the account and
+ * carry the profile that played. A profile the server stops listing keeps its row, with
+ * its removal time set, so its plays keep their link.
+ */
+export const serverProfiles = pgTable(
+  'server_profiles',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    serverId: uuid('server_id')
+      .notNull()
+      .references(() => servers.id, { onDelete: 'cascade' }),
+    serverUserId: uuid('server_user_id')
+      .notNull()
+      .references(() => serverUsers.id, { onDelete: 'cascade' }),
+    externalId: text('external_id').notNull(),
+    name: text('name').notNull(),
+    thumbUrl: text('thumb_url'),
+    // Null where the server does not say
+    isPrimary: boolean('is_primary'),
+    isChild: boolean('is_child'),
+    removedAt: timestamp('removed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('server_profiles_server_external_unique').on(table.serverId, table.externalId),
+    index('server_profiles_server_user_idx').on(table.serverUserId),
+  ]
+);
+
 // Session history (will be converted to hypertable)
 export const sessions = pgTable(
   'sessions',
@@ -482,7 +513,9 @@ export const sessions = pgTable(
     geoAsnOrganization: varchar('geo_asn_organization', { length: 255 }),
     // From the IP at insert; null on rows the location sync has not classified yet
     isLocal: boolean('is_local'),
-    // tofa only: the profile that played, where one account holds several. Null for every other server.
+    // The profile that played, where one account holds several (tofa). Null for every other server.
+    profileId: uuid('profile_id').references(() => serverProfiles.id),
+    // The profile's name at play time, shown only when profileId is null
     profileName: text('profile_name'),
     playerName: varchar('player_name', { length: 255 }), // Player title/friendly name
     deviceId: varchar('device_id', { length: 255 }), // Machine identifier (unique device UUID)
@@ -1169,6 +1202,7 @@ export const mediaDownloads = pgTable(
       .notNull()
       .references(() => servers.id, { onDelete: 'cascade' }),
     serverUserId: uuid('server_user_id').references(() => serverUsers.id, { onDelete: 'cascade' }),
+    profileId: uuid('profile_id').references(() => serverProfiles.id),
     libraryItemId: uuid('library_item_id').references(() => libraryItems.id, {
       onDelete: 'set null',
     }),
@@ -1397,9 +1431,22 @@ export const serverUsersRelations = relations(serverUsers, ({ one, many }) => ({
     fields: [serverUsers.serverId],
     references: [servers.id],
   }),
+  profiles: many(serverProfiles),
   sessions: many(sessions),
   automations: many(automations),
   automationRuns: many(automationRuns),
+}));
+
+export const serverProfilesRelations = relations(serverProfiles, ({ one, many }) => ({
+  server: one(servers, {
+    fields: [serverProfiles.serverId],
+    references: [servers.id],
+  }),
+  serverUser: one(serverUsers, {
+    fields: [serverProfiles.serverUserId],
+    references: [serverUsers.id],
+  }),
+  sessions: many(sessions),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one, many }) => ({
@@ -1410,6 +1457,10 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   serverUser: one(serverUsers, {
     fields: [sessions.serverUserId],
     references: [serverUsers.id],
+  }),
+  profile: one(serverProfiles, {
+    fields: [sessions.profileId],
+    references: [serverProfiles.id],
   }),
   automationRuns: many(automationRuns),
 }));

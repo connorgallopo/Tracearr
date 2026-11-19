@@ -367,6 +367,11 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
     return parseUsersResponse(data);
   }
 
+  // Plex Home users are accounts of their own, not profiles of one account
+  async getAccountProfiles(): Promise<NotNeeded> {
+    return NOT_NEEDED;
+  }
+
   /**
    * Get all libraries on this server
    */

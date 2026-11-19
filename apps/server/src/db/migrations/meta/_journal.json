@@ -932,6 +932,13 @@
       "when": 1794798793266,
       "tag": "0132_backfill_person_picture",
       "breakpoints": true
+    },
+    {
+      "idx": 133,
+      "version": "7",
+      "when": 1795053922176,
+      "tag": "0133_first_talisman",
+      "breakpoints": true
     }
   ]
 }

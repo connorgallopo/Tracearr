@@ -42,6 +42,8 @@ export interface ServerProfile {
   guideImageHosts: readonly string[];
   /** Where a link to one item opens: the vendor's hosted web app, or the server's own address, which members must be able to reach. */
   itemLinks: 'hostedApp' | 'serverAddress';
+  /** One account plays under several profiles, and each play names the profile that played. */
+  hasProfiles: boolean;
 }
 
 export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
@@ -66,6 +68,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     builtInRequests: null,
     guideImageHosts: ['plex.tmsimg.com'],
     itemLinks: 'hostedApp',
+    hasProfiles: false,
   },
   jellyfin: {
     displayName: 'Jellyfin',
@@ -88,6 +91,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     builtInRequests: null,
     guideImageHosts: [],
     itemLinks: 'serverAddress',
+    hasProfiles: false,
   },
   emby: {
     displayName: 'Emby',
@@ -110,6 +114,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     builtInRequests: null,
     guideImageHosts: [],
     itemLinks: 'serverAddress',
+    hasProfiles: false,
   },
   tofa: {
     displayName: 'tofa',
@@ -132,6 +137,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     builtInRequests: 'tofa',
     guideImageHosts: ['api.tofa.tv'],
     itemLinks: 'hostedApp',
+    hasProfiles: true,
   },
 };
 

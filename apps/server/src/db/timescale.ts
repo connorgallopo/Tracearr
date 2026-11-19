@@ -780,6 +780,14 @@ async function createPartialIndexes(): Promise<void> {
     ON sessions (started_at DESC, artist_name, album_name)
     WHERE media_type = 'track'
   `);
+
+  // Backs the profile foreign key check and the profile filter; only servers with
+  // profiles fill profile_id, so the index holds none of the other servers' rows
+  await db.execute(sql`
+    CREATE INDEX IF NOT EXISTS idx_sessions_profile_partial
+    ON sessions (profile_id)
+    WHERE profile_id IS NOT NULL
+  `);
 }
 
 /**

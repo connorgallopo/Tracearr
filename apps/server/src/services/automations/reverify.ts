@@ -145,7 +145,11 @@ export async function reverifyKillCondition(
   if (!targetFound) {
     return { outcome: 'skipped_already_stopped' };
   }
-  const targetRow = { ...targetFound, isLocal: isLocalSession(targetFound) };
+  const targetRow = {
+    ...targetFound,
+    isLocal: isLocalSession(targetFound),
+    profileRemoved: false,
+  };
 
   if (targetRow.server.historicalAt) {
     return { outcome: 'skipped_condition_cleared', skipReason: 'server_historical' };
@@ -193,7 +197,11 @@ export async function reverifyKillCondition(
     const triggerFound = await readSessionRow(triggeringSessionId, triggeringStartedAt, (where) =>
       db.query.sessions.findFirst({ where, with: { server: true, serverUser: true } })
     );
-    const triggerRow = triggerFound && { ...triggerFound, isLocal: isLocalSession(triggerFound) };
+    const triggerRow = triggerFound && {
+      ...triggerFound,
+      isLocal: isLocalSession(triggerFound),
+      profileRemoved: false,
+    };
 
     if (triggerRow && !triggerRow.stoppedAt) {
       contextSession = triggerRow;
