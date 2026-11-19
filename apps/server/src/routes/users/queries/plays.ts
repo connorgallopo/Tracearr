@@ -1,10 +1,16 @@
 /** Per-user play reads: totals, per-account counts and the recent plays page. */
 
-import { sql, type SQL } from 'drizzle-orm';
+import { and, sql, type SQL } from 'drizzle-orm';
 import type { db as defaultDb } from '../../../db/client.js';
 import { sessions } from '../../../db/schema.js';
 import { uuidArraySql } from '../../../utils/sqlArrays.js';
-import { firstSegmentJoin, groupedPlaysCte } from '../../../db/sessions/groupedPlays.js';
+import { profileFilterSql } from '../../../db/sessions/conditions.js';
+import {
+  firstSegmentJoin,
+  groupedPlaysCte,
+  PROFILE_COLUMNS,
+  PROFILE_JOIN,
+} from '../../../db/sessions/groupedPlays.js';
 import { localSessionSql, PLAY_COUNT, RAW_WATCH_TIME } from '../../../db/sessions/rules.js';
 
 // Accept either the default db or a transaction context
@@ -54,11 +60,12 @@ export async function userSessionCounts(
   return counts;
 }
 
-/** Plays (not raw rows) and watch time across the accounts. */
+/** Plays (not raw rows) and watch time across the accounts, or only these profiles of theirs. */
 export async function userPlayTotals(
   dbOrTx: DbOrTx,
   serverUserIds: string[],
-  window: StartedAtWindow
+  window: StartedAtWindow,
+  profileIds?: string[]
 ): Promise<{ totalSessions: number; totalWatchTime: number }> {
   const [row] = await dbOrTx
     .select({
@@ -66,7 +73,12 @@ export async function userPlayTotals(
       totalWatchTime: RAW_WATCH_TIME,
     })
     .from(sessions)
-    .where(accountsInWindow(serverUserIds, window));
+    .where(
+      and(
+        accountsInWindow(serverUserIds, window),
+        profileIds && profileFilterSql(profileIds, 'sessions')
+      )
+    );
   return {
     totalSessions: row?.totalSessions ?? 0,
     totalWatchTime: Number(row?.totalWatchTime ?? 0),
@@ -110,6 +122,9 @@ interface UserPlaySqlRow {
   geo_asn_number: number | null;
   geo_asn_organization: string | null;
   is_local: boolean;
+  profile_id: string | null;
+  profile_name: string | null;
+  profile_removed: boolean;
   player_name: string | null;
   device_id: string | null;
   product: string | null;
@@ -162,6 +177,9 @@ function mapUserPlayRow(row: UserPlaySqlRow) {
     geoAsnNumber: row.geo_asn_number,
     geoAsnOrganization: row.geo_asn_organization,
     isLocal: row.is_local === true,
+    profileId: row.profile_id,
+    profileName: row.profile_name,
+    profileRemoved: row.profile_removed,
     playerName: row.player_name,
     deviceId: row.device_id,
     product: row.product,
@@ -175,17 +193,23 @@ function mapUserPlayRow(row: UserPlaySqlRow) {
 
 export type UserPlayRow = ReturnType<typeof mapUserPlayRow>;
 
-/** The accounts' plays newest first, pause/resume chains collapsed to one row. */
+/**
+ * The accounts' plays newest first, or only these profiles' plays, pause/resume chains
+ * collapsed to one row.
+ */
 export async function userRecentPlays(
   dbOrTx: DbOrTx,
   serverUserIds: string[],
   window: StartedAtWindow,
-  page: { limit: number; offset?: number }
+  page: { limit: number; offset?: number },
+  profileIds?: string[]
 ): Promise<UserPlayRow[]> {
   const bounds = [sql`s.started_at >= ${window.start}`, sql`s.started_at <= ${window.end}`];
+  const where = [serverUserIdAnyFragment(serverUserIds, 's.server_user_id'), ...bounds];
+  if (profileIds) where.push(profileFilterSql(profileIds));
   const result = await dbOrTx.execute(sql`
     WITH grouped_sessions AS (${groupedPlaysCte({
-      where: [serverUserIdAnyFragment(serverUserIds, 's.server_user_id'), ...bounds],
+      where,
       orderLimit: sql`ORDER BY MIN(s.started_at) DESC LIMIT ${page.limit} OFFSET ${page.offset ?? 0}`,
     })})
     SELECT
@@ -200,11 +224,13 @@ export async function userRecentPlays(
       s.geo_continent, s.geo_postal, s.geo_lat, s.geo_lon,
       s.geo_asn_number, s.geo_asn_organization,
       ${localSessionSql('s')} AS is_local,
+      ${PROFILE_COLUMNS},
       s.player_name, s.device_id, s.product, s.device, s.platform,
       s.quality, s.is_transcode, s.bitrate, s.last_paused_at
     FROM grouped_sessions gs
     ${firstSegmentJoin({ alias: 'gs', boundsFrom: 'grouped_sessions' }, bounds)}
     JOIN servers sv ON sv.id = s.server_id
+    ${PROFILE_JOIN}
     ORDER BY gs.started_at DESC
   `);
   return (result.rows as unknown as UserPlaySqlRow[]).map(mapUserPlayRow);

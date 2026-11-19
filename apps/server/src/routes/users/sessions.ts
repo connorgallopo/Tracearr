@@ -5,7 +5,7 @@
  */
 
 import type { FastifyPluginAsync } from 'fastify';
-import { userIdParamSchema, identityScopedPaginationSchema } from '@tracearr/shared';
+import { userIdParamSchema, userSessionsQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import {
   resolveIdentityScopedServerUserIds,
@@ -20,7 +20,7 @@ export const sessionsRoutes: FastifyPluginAsync = async (app) => {
    * GET /:id/sessions - Get user's session history (grouped by play)
    *
    * scope=identity expands the result to every account under the same
-   * person that the caller can access.
+   * person that the caller can access. profileIds keeps only those profiles' plays.
    */
   app.get('/:id/sessions', readSessions, async (request, reply) => {
     const params = userIdParamSchema.safeParse(request.params);
@@ -28,13 +28,13 @@ export const sessionsRoutes: FastifyPluginAsync = async (app) => {
       return reply.badRequest('Invalid user ID');
     }
 
-    const query = identityScopedPaginationSchema.safeParse(request.query);
+    const query = userSessionsQuerySchema.safeParse(request.query);
     if (!query.success) {
       return reply.badRequest('Invalid query parameters');
     }
 
     const { id } = params.data;
-    const { page, pageSize, scope } = query.data;
+    const { page, pageSize, scope, profileIds } = query.data;
     const authUser = request.user;
     const offset = (page - 1) * pageSize;
 
@@ -47,11 +47,14 @@ export const sessionsRoutes: FastifyPluginAsync = async (app) => {
     }
 
     const window = userHistoryWindow();
-    const { totalSessions: total } = await userPlayTotals(db, scoped.ids, window);
-    const sessionData = await userRecentPlays(db, scoped.ids, window, {
-      limit: pageSize,
-      offset,
-    });
+    const { totalSessions: total } = await userPlayTotals(db, scoped.ids, window, profileIds);
+    const sessionData = await userRecentPlays(
+      db,
+      scoped.ids,
+      window,
+      { limit: pageSize, offset },
+      profileIds
+    );
 
     return {
       data: sessionData,

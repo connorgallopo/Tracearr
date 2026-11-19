@@ -5,7 +5,7 @@ import { randomUUID } from 'node:crypto';
 import type { SQL } from 'drizzle-orm';
 import type { AuthUser } from '@tracearr/shared';
 import type * as QueriesModule from '../queries/index.js';
-import { queryChain, renderSql } from '../../../test/helpers.js';
+import { queryChain, renderCall, renderSql } from '../../../test/helpers.js';
 
 vi.mock('../../../db/client.js', () => ({
   db: { select: vi.fn(), execute: vi.fn() },
@@ -69,6 +69,31 @@ describe('GET /users/:id/sessions', () => {
     const [row] = response.json().data;
     expect(row.mediaId).toBe(mediaId);
     expect(row.showMediaId).toBe(showMediaId);
+  });
+
+  it("counts and pages only the profiles' plays, on their accounts", async () => {
+    const serverUserId = randomUUID();
+    const profileId = randomUUID();
+    app = await buildTestApp();
+    vi.mocked(resolveIdentityScopedServerUserIds).mockResolvedValue({
+      serverUser: { id: serverUserId, serverId: randomUUID(), userId: randomUUID() },
+      ids: [serverUserId],
+    });
+    const totals = queryChain(vi.fn, [{ totalSessions: 0, totalWatchTime: 0 }]);
+    vi.mocked(db.select).mockReturnValue(totals);
+    vi.mocked(db.execute).mockResolvedValue({ rows: [] } as never);
+
+    await app.inject({
+      method: 'GET',
+      url: `/users/${serverUserId}/sessions?profileIds=${profileId}`,
+    });
+
+    const page = renderSql(vi.mocked(db.execute).mock.calls[0]?.[0] as SQL);
+    const pair = (alias: string) =>
+      `${alias}.profile_id = ANY($#::uuid[]) AND ${alias}.server_user_id IN (SELECT server_user_id FROM server_profiles WHERE id = ANY($#::uuid[]))`;
+    expect(renderCall(totals).text.replace(/\$\d+/g, '$#')).toContain(pair('sessions'));
+    expect(page.sql.replace(/\$\d+/g, '$#')).toContain(pair('s'));
+    expect(page.params).toContainEqual([profileId]);
   });
 
   it('bounds the join back to sessions by the page window', async () => {

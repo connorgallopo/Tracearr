@@ -1,4 +1,4 @@
-import { sql, type SQL } from 'drizzle-orm';
+import { and, inArray, sql, type SQL } from 'drizzle-orm';
 import countries from 'i18n-iso-countries';
 import countriesEn from 'i18n-iso-countries/langs/en.json' with { type: 'json' };
 import type {
@@ -7,8 +7,9 @@ import type {
   HistoryFilterOptions,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { servers } from '../../db/schema.js';
+import { serverProfiles, servers } from '../../db/schema.js';
 import { startedAtRange } from '../../db/sessions/conditions.js';
+import { profileOptions } from '../../services/profiles.js';
 import { buildMultiServerFragment, serverIdCondition } from '../../utils/serverFiltering.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 import { compareNames } from '../../utils/collation.js';
@@ -28,6 +29,7 @@ export function emptyFilterOptions(
     countries: [],
     cities: [],
     users: [],
+    profiles: [],
   };
   return includeAllCountries ? { ...empty, servers: [] } : empty;
 }
@@ -67,6 +69,7 @@ export async function queryFilterOptions(params: {
     citiesResult,
     usersResult,
     serversResult,
+    profiles,
   ] = await Promise.all([
     // Platforms
     db.execute(sql`
@@ -154,6 +157,13 @@ export async function queryFilterOptions(params: {
       .select({ id: servers.id, name: servers.name, type: servers.type })
       .from(servers)
       .orderBy(...serverOrderBy()),
+    profileOptions(
+      db,
+      and(
+        resolvedIds && inArray(serverProfiles.serverId, resolvedIds),
+        scopeSessionsRaw(scope, sql`${serverProfiles.serverUserId}`)
+      )
+    ),
   ]);
 
   // Transform users result
@@ -218,6 +228,7 @@ export async function queryFilterOptions(params: {
       countries: allCountries,
       cities: citiesResult.rows as unknown as HistoryFilterOptions['cities'],
       users: usersData,
+      profiles,
       servers: serversData,
     };
 
@@ -232,6 +243,7 @@ export async function queryFilterOptions(params: {
     countries: countriesResult.rows as unknown as HistoryFilterOptions['countries'],
     cities: citiesResult.rows as unknown as HistoryFilterOptions['cities'],
     users: usersData,
+    profiles,
     servers: serversData,
   };
 

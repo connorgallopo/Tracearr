@@ -24,6 +24,7 @@ import { db } from '../../db/client.js';
 import { resolveServerIds, buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { scopeSessionsRaw } from '../../lib/scope.js';
 import { representativeAccountOrderSql } from '../../utils/representativeAccount.js';
+import { profileFilterSql } from '../../db/sessions/conditions.js';
 import { localSessionSql } from '../../db/sessions/rules.js';
 import { resolveDateRange } from './utils.js';
 
@@ -58,6 +59,7 @@ function locationFilters(query: LocationStatsQueryInput, request: FastifyRequest
     endDate,
     serverUserId,
     serverUserIds,
+    profileIds,
     serverId: legacyServerId,
     serverIds: rawServerIds,
     mediaType,
@@ -68,13 +70,14 @@ function locationFilters(query: LocationStatsQueryInput, request: FastifyRequest
     strict: false,
   });
   const serverFragment = buildMultiServerFragment(resolvedIds, 's.server_id');
-  const userFragment = buildUserFilterFragment(serverUserId, serverUserIds as string[] | undefined);
+  const userFragment = buildUserFilterFragment(serverUserId, serverUserIds);
 
-  // Mirrors buildHistoryFilterConditions in routes/sessions.ts so a location's count equals
+  // Mirrors buildHistoryFilterConditions in routes/sessions/history.ts so a location's count equals
   // History's play count for the same filters.
   const scoped = scopeSessionsRaw(request.scope, sql`s.server_user_id`);
   const baseConditions: SQL[] = [sql`s.geo_country IS NOT NULL`];
   if (scoped) baseConditions.push(scoped);
+  if (profileIds) baseConditions.push(profileFilterSql(profileIds));
   if (dateRange.start) {
     baseConditions.push(sql`s.started_at >= ${dateRange.start}`);
   }
@@ -296,6 +299,7 @@ export const locationsRoutes: FastifyPluginAsync = async (app) => {
    * - startDate/endDate: For custom period, endDate exclusive
    * - serverUserId: Filter to a specific account
    * - serverUserIds: Filter to a person's full set of accounts (takes precedence)
+   * - profileIds: Filter to the plays of these profiles
    * - serverId: Legacy single-server filter (kept for back-compat)
    * - serverIds: Repeatable multi-server filter
    * - mediaType: Filter by movie/episode/track

@@ -36,3 +36,13 @@ export function startedAtRange(startDate: Date | undefined, endDate: Date | unde
   if (endDate) range.push(sql`s.started_at < ${endDate}`);
   return range;
 }
+
+/**
+ * Plays by any of the profiles over the given alias. The profiles' accounts are matched as well,
+ * so the read keeps to the account indexes and compressed segments.
+ */
+export function profileFilterSql(profileIds: string[], alias = 's'): SQL {
+  const a = sql.raw(alias);
+  const ids = sql`${sql.param(profileIds)}::uuid[]`;
+  return sql`(${a}.profile_id = ANY(${ids}) AND ${a}.server_user_id IN (SELECT server_user_id FROM server_profiles WHERE id = ANY(${ids})))`;
+}

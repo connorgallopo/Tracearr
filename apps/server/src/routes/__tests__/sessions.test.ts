@@ -512,19 +512,7 @@ describe('Session Routes', () => {
         bitrate: 20000,
       };
 
-      mockDb.select.mockReturnValue({
-        from: vi.fn().mockReturnValue({
-          innerJoin: vi.fn().mockReturnValue({
-            innerJoin: vi.fn().mockReturnValue({
-              leftJoin: vi.fn().mockReturnValue({
-                where: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockResolvedValue([dbSession]),
-                }),
-              }),
-            }),
-          }),
-        }),
-      });
+      mockDb.select.mockReturnValue(queryChain(vi.fn, [dbSession]));
 
       const response = await app.inject({
         method: 'GET',
@@ -543,22 +531,9 @@ describe('Session Routes', () => {
       const showMediaId = randomUUID();
       app = await buildTestApp(createOwnerUser([serverId]));
 
-      const limit = vi
-        .fn()
-        .mockResolvedValue([
-          { id: sessionId, serverId, mediaType: 'episode', mediaId, showMediaId },
-        ]);
-      mockDb.select.mockReturnValue({
-        from: vi.fn().mockReturnValue({
-          innerJoin: vi.fn().mockReturnValue({
-            innerJoin: vi.fn().mockReturnValue({
-              leftJoin: vi.fn().mockReturnValue({
-                where: vi.fn().mockReturnValue({ limit }),
-              }),
-            }),
-          }),
-        }),
-      });
+      mockDb.select.mockReturnValue(
+        queryChain(vi.fn, [{ id: sessionId, serverId, mediaType: 'episode', mediaId, showMediaId }])
+      );
 
       const response = await app.inject({ method: 'GET', url: `/sessions/${sessionId}` });
 
@@ -579,19 +554,7 @@ describe('Session Routes', () => {
 
       app = await buildTestApp(ownerUser, redisMock);
 
-      mockDb.select.mockReturnValue({
-        from: vi.fn().mockReturnValue({
-          innerJoin: vi.fn().mockReturnValue({
-            innerJoin: vi.fn().mockReturnValue({
-              leftJoin: vi.fn().mockReturnValue({
-                where: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockResolvedValue([]),
-                }),
-              }),
-            }),
-          }),
-        }),
-      });
+      mockDb.select.mockReturnValue(queryChain(vi.fn, []));
 
       const response = await app.inject({
         method: 'GET',
@@ -670,19 +633,7 @@ describe('Session Routes', () => {
         bitrate: 20000,
       };
 
-      mockDb.select.mockReturnValue({
-        from: vi.fn().mockReturnValue({
-          innerJoin: vi.fn().mockReturnValue({
-            innerJoin: vi.fn().mockReturnValue({
-              leftJoin: vi.fn().mockReturnValue({
-                where: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockResolvedValue([dbSession]),
-                }),
-              }),
-            }),
-          }),
-        }),
-      });
+      mockDb.select.mockReturnValue(queryChain(vi.fn, [dbSession]));
 
       const response = await app.inject({
         method: 'GET',
@@ -707,19 +658,7 @@ describe('Session Routes', () => {
       app = await buildTestApp(adminUser, redisMock);
 
       // Should fall through to DB since server access denied
-      mockDb.select.mockReturnValue({
-        from: vi.fn().mockReturnValue({
-          innerJoin: vi.fn().mockReturnValue({
-            innerJoin: vi.fn().mockReturnValue({
-              leftJoin: vi.fn().mockReturnValue({
-                where: vi.fn().mockReturnValue({
-                  limit: vi.fn().mockResolvedValue([]),
-                }),
-              }),
-            }),
-          }),
-        }),
-      });
+      mockDb.select.mockReturnValue(queryChain(vi.fn, []));
 
       const response = await app.inject({
         method: 'GET',
@@ -1086,6 +1025,18 @@ describe('Session Routes', () => {
       expect(response.statusCode).toBe(400);
     });
 
+    it('rejects a profile id that is not a uuid before running any query', async () => {
+      app = await buildTestApp(createOwnerUser());
+
+      const response = await app.inject({
+        method: 'GET',
+        url: `/sessions/history?profileIds=${randomUUID()},abc`,
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(mockDb.execute).not.toHaveBeenCalled();
+    });
+
     it('rejects a malformed cursor before running any query', async () => {
       const ownerUser = createOwnerUser();
       app = await buildTestApp(ownerUser);
@@ -1188,6 +1139,22 @@ describe('Session Routes', () => {
       await app.inject({ method: 'GET', url: '/sessions/history?network=remote' });
 
       expect(sentSql(1).sql).toContain('NOT (s.is_local IS TRUE');
+    });
+
+    it("filters to the profiles' plays and their accounts in both statements", async () => {
+      app = await buildTestApp(createOwnerUser());
+      const profileId = randomUUID();
+      mockStartedAtPage([createMockHistoryRow()]);
+
+      await app.inject({ method: 'GET', url: `/sessions/history?profileIds=${profileId}` });
+
+      for (const call of [1, 2]) {
+        const { sql: query, params } = sentSql(call);
+        expect(query).toMatch(
+          /s\.profile_id = ANY\(\$\d+::uuid\[\]\) AND s\.server_user_id IN \(SELECT server_user_id FROM server_profiles WHERE id = ANY\(\$\d+::uuid\[\]\)\)/
+        );
+        expect(params).toContainEqual([profileId]);
+      }
     });
 
     it('returns the flag on each history row', async () => {

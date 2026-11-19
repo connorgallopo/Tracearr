@@ -20,6 +20,7 @@ import { db } from '../../db/client.js';
 import { serverUsers, servers } from '../../db/schema.js';
 import { countedSessionSql, countedViewersSql, localSessionSql } from '../../db/sessions/rules.js';
 import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
+import { compareNames } from '../../utils/collation.js';
 import { likePattern } from '../../utils/listQuery.js';
 import { personNameSql, representativeAccountOrderSql } from '../../utils/representativeAccount.js';
 import {
@@ -167,6 +168,41 @@ export function buildIdentityPlaysSql(input: IdentityScope & DateRange): SQL {
   `;
 }
 
+/**
+ * Plays and watch time per profile, each chain counted once for every profile with a segment in
+ * it, as the History profile filter reads segments. Chains recorded before profiles split them can
+ * hold two profiles, so only for those can the profiles' plays add up to more than the account's.
+ * A profile with no counted play, or a segment with no profile, adds no row.
+ */
+function identityProfilePlaysSql(input: IdentityScope & DateRange): SQL {
+  return sql`
+    WITH profile_chains AS (
+      SELECT
+        s.profile_id,
+        BOOL_OR(${countedSessionSql('s')}) AS counted,
+        SUM(CASE WHEN ${countedSessionSql('s')} THEN s.duration_ms ELSE 0 END) AS watched_ms
+      FROM sessions s
+      WHERE ${identitySessionsWhere(input, input)}
+      GROUP BY ${CHAIN_S}, s.profile_id
+    )
+    SELECT
+      sp.id AS profile_id,
+      sp.name,
+      sp.removed_at IS NOT NULL AS removed,
+      COUNT(*) FILTER (WHERE counted)::int AS plays,
+      COALESCE(SUM(watched_ms), 0)::bigint AS watch_ms
+    FROM profile_chains pc
+    JOIN server_profiles sp ON sp.id = pc.profile_id
+    -- Checked once before the read, so accounts with no profile never read their sessions here
+    WHERE EXISTS (
+      SELECT 1 FROM server_profiles
+      WHERE ${serverUserIdAnyFragment(input.serverUserIds, 'server_user_id')}
+    )
+    GROUP BY sp.id
+    HAVING BOOL_OR(counted)
+  `;
+}
+
 // A merged copy's finishes and plays land on the canonical title, as in me.ts.
 function identityMostFinishedSql(input: IdentityScope & DateRange) {
   return sql`
@@ -223,6 +259,14 @@ function identityTopGenresSql(input: IdentityScope & DateRange) {
   `;
 }
 
+type ProfilePlaysRow = {
+  profile_id: string;
+  name: string;
+  removed: boolean;
+  plays: number;
+  watch_ms: string | number;
+};
+
 interface IdentityPlaysRow {
   plays: number;
   watch_ms: string | number;
@@ -257,6 +301,7 @@ export async function queryIdentityRangeStats(input: {
   const [
     totals,
     priorTotals,
+    profiles,
     mostFinished,
     topGenres,
     sessionTotals,
@@ -272,6 +317,7 @@ export async function queryIdentityRangeStats(input: {
   ] = await Promise.all([
     db.execute(buildIdentityPlaysSql(current)),
     prior ? db.execute(buildIdentityPlaysSql({ ...scope, ...prior })) : null,
+    db.execute<ProfilePlaysRow>(identityProfilePlaysSql(current)),
     db.execute(identityMostFinishedSql(current)),
     db.execute(identityTopGenresSql(current)),
     db.execute(sql`
@@ -412,6 +458,20 @@ export async function queryIdentityRangeStats(input: {
       track: t?.track ?? 0,
       other: t?.other ?? 0,
     },
+    profiles: profiles.rows
+      .map((row) => ({
+        profileId: row.profile_id,
+        name: row.name,
+        removed: row.removed,
+        plays: row.plays,
+        watchMs: Number(row.watch_ms),
+      }))
+      .sort(
+        (a, b) =>
+          b.plays - a.plays ||
+          compareNames(a.name, b.name) ||
+          a.profileId.localeCompare(b.profileId)
+      ),
     topGenres: topGenres.rows as UserRangeStats['topGenres'],
     mostFinished: (
       mostFinished.rows as {

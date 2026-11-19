@@ -6,6 +6,7 @@
  * This endpoint combines:
  * - User details
  * - Session stats and recent sessions
+ * - The identity's profiles
  * - Locations
  * - Devices
  * - Violations
@@ -16,10 +17,11 @@
  */
 
 import type { FastifyPluginAsync } from 'fastify';
-import { eq, and, desc, isNull, sql } from 'drizzle-orm';
+import { eq, and, desc, inArray, isNull, sql } from 'drizzle-orm';
 import { userIdParamSchema, identityScopeQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import {
+  serverProfiles,
   serverUsers,
   servers,
   users,
@@ -29,6 +31,7 @@ import {
   userMergeAudits,
 } from '../../db/schema.js';
 import { runSession, violationAliasConditions } from '../../services/automations/aliasFilter.js';
+import { profileOptions } from '../../services/profiles.js';
 import { hasServerAccess } from '../../utils/serverFiltering.js';
 import { serverOrderBy } from '../../utils/serverOrder.js';
 import {
@@ -172,6 +175,8 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
         limit: sessionsLimit,
       });
 
+      const profiles = await profileOptions(tx, inArray(serverProfiles.serverUserId, identityIds));
+
       // 4. Get locations
       const locations = await queryUserLocations(tx, scopedIds, window);
 
@@ -273,6 +278,7 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
           total: stats.totalSessions,
           hasMore: stats.totalSessions > sessionsLimit,
         },
+        profiles,
         locations,
         devices,
         violations: {

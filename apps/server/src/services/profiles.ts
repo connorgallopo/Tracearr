@@ -1,13 +1,15 @@
 /**
  * Fills server_profiles from the profiles plays name and from each account's profile list
- * in the user sync.
+ * in the user sync, and lists them for the profile filters.
  */
 
 import { and, eq, inArray, isNull, notInArray, sql, type SQL } from 'drizzle-orm';
+import type { ProfileFilterOption } from '@tracearr/shared';
 import { db, type Executor } from '../db/client.js';
 import { serverProfiles } from '../db/schema.js';
 import { getServerUserIdsByExternalId } from '../jobs/poller/database.js';
 import { NOT_NEEDED, type IMediaServerClient, type MediaProfile } from './mediaServer/types.js';
+import { compareNames } from '../utils/collation.js';
 import { createLogger } from '../utils/logger.js';
 
 const log = createLogger('profiles');
@@ -232,4 +234,21 @@ export async function syncAccountProfiles(
       error: err,
     });
   }
+}
+
+/** The profiles `where` selects, removed ones included, in name order */
+export async function profileOptions(
+  executor: Executor,
+  where: SQL | undefined
+): Promise<ProfileFilterOption[]> {
+  const rows = await executor
+    .select({
+      id: serverProfiles.id,
+      name: serverProfiles.name,
+      serverUserId: serverProfiles.serverUserId,
+      removed: sql<boolean>`${serverProfiles.removedAt} IS NOT NULL`,
+    })
+    .from(serverProfiles)
+    .where(where);
+  return rows.sort((a, b) => compareNames(a.name, b.name) || a.id.localeCompare(b.id));
 }

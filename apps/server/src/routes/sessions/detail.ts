@@ -1,10 +1,10 @@
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '../../db/client.js';
-import { sessions, serverUsers, servers, users } from '../../db/schema.js';
+import { sessions, serverProfiles, serverUsers, servers, users } from '../../db/schema.js';
 import { personNameColumn } from '../../utils/representativeAccount.js';
 import { isLocalSession, readSessionRow } from '../../db/sessions/index.js';
 
-/** One session joined to its account, identity and server, or undefined when there is none. */
+/** One session with its account, identity, server and profile, or undefined when there is none. */
 export async function fetchSessionDetailRow(
   id: string,
   startedAt: Parameters<typeof readSessionRow>[1]
@@ -51,7 +51,9 @@ export async function fetchSessionDetailRow(
         geoAsnNumber: sessions.geoAsnNumber,
         geoAsnOrganization: sessions.geoAsnOrganization,
         isLocal: sessions.isLocal,
-        profileName: sessions.profileName,
+        profileId: serverProfiles.id,
+        profileName: sql<string | null>`COALESCE(${serverProfiles.name}, ${sessions.profileName})`,
+        profileRemoved: sql<boolean>`${serverProfiles.removedAt} IS NOT NULL`,
         playerName: sessions.playerName,
         deviceId: sessions.deviceId,
         product: sessions.product,
@@ -81,6 +83,7 @@ export async function fetchSessionDetailRow(
       .innerJoin(serverUsers, eq(sessions.serverUserId, serverUsers.id))
       .innerJoin(servers, eq(sessions.serverId, servers.id))
       .leftJoin(users, eq(serverUsers.userId, users.id))
+      .leftJoin(serverProfiles, eq(serverProfiles.id, sessions.profileId))
       .where(where)
       .limit(1)
       .then((rows) => rows[0])
@@ -137,7 +140,9 @@ export function mapSessionDetail(row: SessionDetailRow) {
     geoAsnNumber: row.geoAsnNumber,
     geoAsnOrganization: row.geoAsnOrganization,
     isLocal: isLocalSession(row),
+    profileId: row.profileId,
     profileName: row.profileName,
+    profileRemoved: row.profileRemoved,
     playerName: row.playerName,
     deviceId: row.deviceId,
     product: row.product,

@@ -134,6 +134,48 @@ describe('GET /users/:id/full violations panel', () => {
     expect(response.json().identity.serverUsers.map((su: any) => su.sessionCount)).toEqual([0, 4]);
   });
 
+  it('lists the profiles of every account of the identity, whatever the scope', async () => {
+    const serverUserId = randomUUID();
+    const siblingId = randomUUID();
+    const serverId = randomUUID();
+    app = await buildTestApp({
+      userId: randomUUID(),
+      username: 'owner',
+      role: 'owner',
+      serverIds: [serverId],
+    });
+
+    let selectCall = 0;
+    const tx = {
+      select: vi.fn(() => {
+        selectCall++;
+        const rows =
+          selectCall === 1
+            ? [{ id: serverUserId, serverId, userId: randomUUID() }]
+            : selectCall === 2
+              ? [
+                  { id: serverUserId, serverId },
+                  { id: siblingId, serverId },
+                ]
+              : [];
+        const chain = queryChain(vi.fn, rows);
+        chains.push(chain);
+        return chain;
+      }),
+      execute: vi.fn(async () => ({ rows: [] })),
+    };
+    vi.mocked((db as any).transaction).mockImplementation(async (callback: any) => callback(tx));
+
+    const response = await app.inject({ method: 'GET', url: `/users/${serverUserId}/full` });
+
+    expect(response.statusCode).toBe(200);
+    const profileChain = chains.find((chain) =>
+      renderCall(chain).text.startsWith('server_profiles.server_user_id in')
+    );
+    expect(renderCall(profileChain).params).toEqual([serverUserId, siblingId]);
+    expect(response.json().profiles).toEqual([]);
+  });
+
   it("carries the identity contact email and the Tracearr user's username in the identity block", async () => {
     const serverUserId = randomUUID();
     const serverId = randomUUID();

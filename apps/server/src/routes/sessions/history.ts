@@ -15,6 +15,9 @@ import {
   localSessionSql,
   playCountQuery,
   playSegmentsLateral,
+  profileFilterSql,
+  PROFILE_COLUMNS,
+  PROFILE_JOIN,
   startedAtRange,
   whereClause,
 } from '../../db/sessions/index.js';
@@ -44,6 +47,7 @@ export function buildHistoryFilterConditions(
 ): HistoryFilterResult {
   const {
     serverUserIds,
+    profileIds,
     serverId,
     serverIds: rawServerIds,
     state,
@@ -79,21 +83,20 @@ export function buildHistoryFilterConditions(
   if (!conditions) return null;
 
   if (serverUserIds && serverUserIds.length > 0) {
-    const ids = serverUserIds as string[];
-    if (ids.length === 1) {
-      conditions.push(sql`s.server_user_id = ${ids[0]}`);
+    if (serverUserIds.length === 1) {
+      conditions.push(sql`s.server_user_id = ${serverUserIds[0]}`);
     } else {
-      const userIdList = ids.map((id) => sql`${id}`);
+      const userIdList = serverUserIds.map((id) => sql`${id}`);
       conditions.push(sql`s.server_user_id IN (${sql.join(userIdList, sql`, `)})`);
     }
   }
+  if (profileIds) conditions.push(profileFilterSql(profileIds));
   if (state) conditions.push(sql`s.state = ${state}`);
   if (mediaTypes && mediaTypes.length > 0) {
-    const types = mediaTypes as string[];
-    if (types.length === 1) {
-      conditions.push(sql`s.media_type = ${types[0]}`);
+    if (mediaTypes.length === 1) {
+      conditions.push(sql`s.media_type = ${mediaTypes[0]}`);
     } else {
-      const mediaTypeList = types.map((t) => sql`${t}`);
+      const mediaTypeList = mediaTypes.map((t) => sql`${t}`);
       conditions.push(sql`s.media_type IN (${sql.join(mediaTypeList, sql`, `)})`);
     }
   } else {
@@ -123,11 +126,10 @@ export function buildHistoryFilterConditions(
   }
 
   if (platforms && platforms.length > 0) {
-    const plats = platforms as string[];
-    if (plats.length === 1) {
-      conditions.push(sql`s.platform = ${plats[0]}`);
+    if (platforms.length === 1) {
+      conditions.push(sql`s.platform = ${platforms[0]}`);
     } else {
-      const platformList = plats.map((p) => sql`${p}`);
+      const platformList = platforms.map((p) => sql`${p}`);
       conditions.push(sql`s.platform IN (${sql.join(platformList, sql`, `)})`);
     }
   }
@@ -137,11 +139,10 @@ export function buildHistoryFilterConditions(
 
   if (ipAddress) conditions.push(sql`s.ip_address = ${ipAddress}`);
   if (geoCountries && geoCountries.length > 0) {
-    const countries = geoCountries as string[];
-    if (countries.length === 1) {
-      conditions.push(sql`s.geo_country = ${countries[0]}`);
+    if (geoCountries.length === 1) {
+      conditions.push(sql`s.geo_country = ${geoCountries[0]}`);
     } else {
-      const countryList = countries.map((c) => sql`${c}`);
+      const countryList = geoCountries.map((c) => sql`${c}`);
       conditions.push(sql`s.geo_country IN (${sql.join(countryList, sql`, `)})`);
     }
   }
@@ -237,7 +238,7 @@ const HISTORY_ROW_COLUMNS = sql`
     s.geo_asn_number,
     s.geo_asn_organization,
     ${localSessionSql('s')} AS is_local,
-    s.profile_name,
+    ${PROFILE_COLUMNS},
     s.player_name,
     s.device_id,
     s.product,
@@ -263,6 +264,14 @@ const HISTORY_ROW_COLUMNS = sql`
     s.subtitle_info
 `;
 
+/** The joins HISTORY_ROW_COLUMNS reads beyond the first segment s. */
+const HISTORY_ROW_JOINS = sql`
+      JOIN server_users su ON su.id = s.server_user_id
+      JOIN servers sv ON sv.id = s.server_id
+      LEFT JOIN users u ON u.id = su.user_id
+      ${PROFILE_JOIN}
+`;
+
 /** One page of plays grouped by reference_id, newest first, for GET /sessions. */
 export async function fetchSessionPage(
   conditions: SQL[],
@@ -277,9 +286,7 @@ export async function fetchSessionPage(
       SELECT ${HISTORY_ROW_COLUMNS}
       FROM grouped_sessions gs
       ${firstSegmentJoin({ alias: 'gs', boundsFrom: 'grouped_sessions' }, startedAtRange(startDate, endDate))}
-      JOIN server_users su ON su.id = s.server_user_id
-      JOIN servers sv ON sv.id = s.server_id
-      LEFT JOIN users u ON u.id = su.user_id
+      ${HISTORY_ROW_JOINS}
       ORDER BY gs.started_at DESC
     `);
   return result.rows as unknown as HistoryRow[];
@@ -446,9 +453,7 @@ async function fetchStartedAtHistoryPage(params: HistoryPageParams): Promise<His
       FROM grouped_sessions gs
       JOIN history_page_ids hp ON hp.play_id = gs.play_id
       ${firstSegmentJoin({ alias: 'gs', bounds: { min: lo, max: hi } }, startedAtRange(startDate, endDate))}
-      JOIN server_users su ON su.id = s.server_user_id
-      JOIN servers sv ON sv.id = s.server_id
-      LEFT JOIN users u ON u.id = su.user_id
+      ${HISTORY_ROW_JOINS}
       ${playSegmentsLateral('gs', startDate, lo)}
       ORDER BY hp.rn
     `);
@@ -498,9 +503,7 @@ export async function fetchSortedHistoryPage(params: HistoryPageParams): Promise
       FROM grouped_sessions gs
       JOIN history_page_ids hp ON hp.play_id = gs.play_id
       ${firstSegmentJoin({ alias: 'gs', boundsFrom: 'history_page_ids' }, startedAtRange(startDate, endDate))}
-      JOIN server_users su ON su.id = s.server_user_id
-      JOIN servers sv ON sv.id = s.server_id
-      LEFT JOIN users u ON u.id = su.user_id
+      ${HISTORY_ROW_JOINS}
       ${playSegmentsLateral('gs', startDate)}
       ORDER BY hp.rn
     `);

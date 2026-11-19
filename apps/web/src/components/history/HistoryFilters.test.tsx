@@ -35,6 +35,7 @@ const filterOptions: HistoryFilterOptions = {
   countries: [],
   cities: [],
   users: [mergedPerson, soloPerson],
+  profiles: [],
 };
 
 function renderBar(

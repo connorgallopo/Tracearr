@@ -51,7 +51,9 @@ export interface HistoryRow {
   geo_asn_number: number | null;
   geo_asn_organization: string | null;
   is_local: boolean;
+  profile_id: string | null;
   profile_name: string | null;
+  profile_removed: boolean;
   player_name: string | null;
   device_id: string | null;
   product: string | null;
@@ -135,7 +137,9 @@ export function mapHistoryRow(row: HistoryRow) {
     geoAsnNumber: row.geo_asn_number,
     geoAsnOrganization: row.geo_asn_organization,
     isLocal: row.is_local === true,
+    profileId: row.profile_id,
     profileName: row.profile_name,
+    profileRemoved: row.profile_removed,
     playerName: row.player_name,
     deviceId: row.device_id,
     product: row.product,

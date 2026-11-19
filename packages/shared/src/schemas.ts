@@ -7,6 +7,7 @@ import { LOGIN_ACCESS, isValidTimezone } from './constants.js';
 import { listDateBoundSchema, listSortSchema } from './listQuery.js';
 import { PLAYBACK_DECISIONS } from './playbackDecision.js';
 import { SERVER_TYPES, assertNever } from './serverTypes.js';
+import { MEDIA_TYPES as STORED_MEDIA_TYPES } from './types.js';
 
 // ============================================================================
 // Shared Enum Constants
@@ -439,10 +440,12 @@ export const sessionQuerySchema = paginationSchema.extend({
  * Supports cursor-based pagination for efficient infinite scroll and
  * all available session fields for filtering.
  */
-const commaSeparatedArray = (schema: z.ZodType) =>
+const commaSeparatedArray = <T extends z.ZodType>(schema: T) =>
   z
-    .union([schema.array(), z.string().transform((s) => (s ? s.split(',') : []))])
-    .optional()
+    .preprocess(
+      (value) => (typeof value === 'string' ? (value ? value.split(',') : []) : value),
+      schema.array().optional()
+    )
     .transform((arr) => (arr && arr.length > 0 ? arr : undefined));
 
 export const historyQuerySchema = z.object({
@@ -452,14 +455,15 @@ export const historyQuerySchema = z.object({
 
   // User filter - supports multi-select (comma-separated UUIDs in query string)
   serverUserIds: commaSeparatedArray(uuidSchema),
+  profileIds: commaSeparatedArray(uuidSchema),
 
   // Server filter - serverIds takes precedence over serverId when both are provided
   serverId: uuidSchema.optional(),
   serverIds: serverIdsQuerySchema,
   state: z.enum(['playing', 'paused', 'stopped']).optional(),
 
-  // Media type filter - supports multi-select
-  mediaTypes: commaSeparatedArray(mediaTypeSchema),
+  // Media type filter - supports multi-select, over every type a session is stored with
+  mediaTypes: commaSeparatedArray(z.enum(STORED_MEDIA_TYPES)),
 
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),
@@ -502,6 +506,10 @@ export const historyAggregatesQuerySchema = historyQuerySchema.omit({
   pageSize: true,
   orderBy: true,
   orderDir: true,
+});
+
+export const userSessionsQuerySchema = identityScopedPaginationSchema.extend({
+  profileIds: commaSeparatedArray(uuidSchema),
 });
 
 // Filter options query - scoping params for /sessions/filter-options dropdowns
@@ -824,6 +832,7 @@ export const locationStatsQuerySchema = z
     // Additive multi-account filter: when set, takes precedence over serverUserId so a
     // merged person's full history (all their server accounts) can be filtered at once.
     serverUserIds: commaSeparatedArray(uuidSchema),
+    profileIds: commaSeparatedArray(uuidSchema),
     serverId: uuidSchema.optional(),
     serverIds: serverIdsQuerySchema,
     mediaType: mediaTypeSchema.optional(),

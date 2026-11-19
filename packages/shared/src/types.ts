@@ -227,6 +227,8 @@ export interface ServerUserFullDetail {
     total: number;
     hasMore: boolean;
   };
+  /** The profiles of the identity's accounts, removed ones included */
+  profiles: ProfileFilterOption[];
   locations: UserLocation[];
   devices: UserDevice[];
   violations: {
@@ -537,9 +539,12 @@ export interface Session extends StreamDetailFields {
   geoAsnOrganization: string | null;
   // A local network session; its geo fields hold its server's location when one is set
   isLocal: boolean;
-  /** The profile that played, where one account holds several (tofa); null elsewhere */
+  /**
+   * Tracearr's server_profiles id for the profile that played, where one account holds several
+   * (tofa); null elsewhere. The server's own id for it is MediaSession.user.profileId.
+   */
   profileId: string | null;
-  /** The profile's name to show */
+  /** The name to show for the profile: its current name, else the name stored with the play */
   profileName: string | null;
   /** The server no longer lists the profile; its plays keep the last name it had */
   profileRemoved: boolean;
@@ -962,6 +967,8 @@ export interface UserRangeStats {
   serverPeakHour: number | null;
   personPeakHour: number | null;
   mediaTypeSplit: { movie: number; episode: number; track: number; other: number };
+  /** Plays and watch time per profile, for the profiles with a play in the range */
+  profiles: { profileId: string; name: string; removed: boolean; plays: number; watchMs: number }[];
   /** Top 6 */
   topGenres: { genre: string; plays: number }[];
   /** Top 5 */
@@ -1737,6 +1744,16 @@ export interface UserFilterOption {
 }
 
 /**
+ * Profile option for the profile filter, grouped by its account in the dropdown.
+ */
+export interface ProfileFilterOption {
+  id: string;
+  name: string;
+  serverUserId: string;
+  removed: boolean;
+}
+
+/**
  * Server option for server filter dropdown.
  */
 export interface ServerFilterOption {
@@ -1772,6 +1789,8 @@ export interface HistoryFilterOptions {
   cities: FilterOptionItem[];
   /** Available users (with avatar info) */
   users: UserFilterOption[];
+  /** Profiles on the selected servers, removed ones included */
+  profiles: ProfileFilterOption[];
   /** Available servers (optional, included when requested) */
   servers?: ServerFilterOption[];
 }

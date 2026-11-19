@@ -357,7 +357,7 @@ export const REDIS_KEYS = {
   },
   // Filter options caching
   FILTER_OPTIONS: (userId: string, scopeHash: string) =>
-    `${_redisPrefix}tracearr:filter-options:v2:${userId}:${scopeHash}`,
+    `${_redisPrefix}tracearr:filter-options:v3:${userId}:${scopeHash}`,
   // History totals for one filter set
   HISTORY_AGGREGATES: (scopeHash: string) =>
     `${_redisPrefix}tracearr:history-aggregates:v2:${scopeHash}`,
