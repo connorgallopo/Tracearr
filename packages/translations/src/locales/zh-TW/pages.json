@@ -297,6 +297,7 @@
     "overallTrust": "",
     "serverScope": "",
     "allServers": "",
+    "allProfiles": "",
     "title": "",
     "editIdentity": "",
     "editIdentityDescription": "",
@@ -400,6 +401,7 @@
       "clearUsers": "",
       "clearPlatforms": "",
       "clearCountries": "",
+      "clearProfiles": "",
       "clearFilters": "",
       "selected_other": ""
     },

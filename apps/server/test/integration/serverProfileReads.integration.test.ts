@@ -58,7 +58,7 @@ async function seedAccount() {
     serverId: server.id,
     externalId: MORGAN_ACCOUNT,
   });
-  return { serverId: server.id, account };
+  return { serverId: server.id, serverName: server.name, account };
 }
 
 async function storeProfile(profile: typeof serverProfiles.$inferInsert) {
@@ -181,8 +181,8 @@ describe('the profile filter', () => {
     expect(map.json<{ summary: { totalStreams: number } }>().summary.totalStreams).toBe(2);
   });
 
-  it("offers the selected servers' profiles, removed ones included", async () => {
-    const { serverId, account } = await seedAccount();
+  it("offers the selected servers' profiles, removed ones included, named by their account", async () => {
+    const { serverId, serverName, account } = await seedAccount();
     const elsewhere = await seedAccount();
     const robin = await storeProfile({
       serverId,
@@ -207,8 +207,22 @@ describe('the profile filter', () => {
     const response = await get(`/sessions/filter-options?serverIds=${serverId}`);
 
     expect(response.json<HistoryFilterOptions>().profiles).toEqual([
-      { id: robin.id, name: 'Robin', serverUserId: account.id, removed: false },
-      { id: sam.id, name: 'Sam', serverUserId: account.id, removed: true },
+      {
+        id: robin.id,
+        name: 'Robin',
+        serverUserId: account.id,
+        accountUsername: account.username,
+        serverName,
+        removed: false,
+      },
+      {
+        id: sam.id,
+        name: 'Sam',
+        serverUserId: account.id,
+        accountUsername: account.username,
+        serverName,
+        removed: true,
+      },
     ]);
   });
 });

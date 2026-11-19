@@ -43,6 +43,8 @@ import { playbackBadge } from '@/lib/playbackBadge';
 import { formatDate, formatDuration } from '@/lib/dateFormat';
 import { getAvatarUrl } from '@/components/users/utils';
 import { LocalBadge } from '@/components/sessions/LocalBadge';
+import { NameWithProfile } from '@/components/sessions/NameWithProfile';
+import { useProfileLabel } from '@/components/sessions/useProfileLabel';
 import { TIER_COLORS } from '@/components/charts/EngagementChart';
 import {
   PLAYBACK_DECISION_LABEL_KEYS,
@@ -128,6 +130,7 @@ interface Props {
   sortDir?: SortDirection;
   onSortChange?: (column: SortableColumn) => void;
   isMultiServer?: boolean;
+  showProfile?: boolean;
 }
 
 const STATE_ICON_CONFIG = {
@@ -183,6 +186,7 @@ interface HistoryTableRowProps {
   onClick?: () => void;
   columnVisibility: ColumnVisibility;
   isMultiServer?: boolean;
+  showProfile?: boolean;
   style?: React.CSSProperties;
   'data-index'?: number;
 }
@@ -191,7 +195,15 @@ interface HistoryTableRowProps {
 export const HistoryTableRow = memo(
   forwardRef<HTMLTableRowElement, HistoryTableRowProps>(
     (
-      { session, onClick, columnVisibility, isMultiServer = false, style, 'data-index': dataIndex },
+      {
+        session,
+        onClick,
+        columnVisibility,
+        isMultiServer = false,
+        showProfile = false,
+        style,
+        'data-index': dataIndex,
+      },
       ref
     ) => {
       const { title: primary, subtitle: secondary } = getMediaDisplay(session);
@@ -200,6 +212,7 @@ export const HistoryTableRow = memo(
       const playedAt = new Date(session.lastStartedAt ?? session.startedAt);
       const colorMap = useServerColorMap();
       const { t } = useTranslation(['common', 'pages']);
+      const profileLabel = useProfileLabel();
       const verbKeys = verbKeysFor(session.mediaType);
       const verbs = { watched: t(verbKeys.watched), watchTime: t(verbKeys.watchTime) };
       const serverColor = isMultiServer ? (colorMap.get(session.serverId) ?? null) : null;
@@ -266,11 +279,24 @@ export const HistoryTableRow = memo(
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <span className="block truncate text-sm">
-                    {session.user.identityName ?? session.user.username}
-                  </span>
+                  <NameWithProfile
+                    name={session.user.identityName ?? session.user.username}
+                    profileName={session.profileName}
+                    profileRemoved={session.profileRemoved}
+                    className="block text-sm"
+                  />
                 </div>
               </Link>
+            </TableCell>
+          )}
+
+          {showProfile && (
+            <TableCell className={COLUMN_WIDTHS.profile}>
+              {session.profileName && (
+                <span className="block truncate text-sm">
+                  {profileLabel({ name: session.profileName, removed: session.profileRemoved })}
+                </span>
+              )}
             </TableCell>
           )}
 
@@ -507,9 +533,11 @@ HistoryTableRow.displayName = 'HistoryTableRow';
 function SkeletonRow({
   columnVisibility,
   isMultiServer = false,
+  showProfile = false,
 }: {
   columnVisibility: ColumnVisibility;
   isMultiServer?: boolean;
+  showProfile?: boolean;
 }) {
   return (
     <TableRow style={{ display: 'table', width: '100%', tableLayout: 'fixed' }}>
@@ -530,6 +558,11 @@ function SkeletonRow({
             <Skeleton className="h-6 w-6 rounded-full" />
             <Skeleton className="h-4 w-20" />
           </div>
+        </TableCell>
+      )}
+      {showProfile && (
+        <TableCell>
+          <Skeleton className="h-4 w-16" />
         </TableCell>
       )}
       {columnVisibility.content && (
@@ -588,6 +621,7 @@ function SkeletonRow({
 const COLUMN_WIDTHS = {
   date: 'w-[140px]',
   user: 'w-[150px]',
+  profile: 'w-[130px]',
   // an explicit share, or fixed layout hands this column every spare pixel
   content: 'w-[26%]',
   server: 'w-[150px]',
@@ -609,10 +643,12 @@ function getVisibleColumnCount(columnVisibility: ColumnVisibility, isMultiServer
 function HistoryTableHeader({
   columnVisibility,
   isMultiServer,
+  showProfile,
   sort,
 }: {
   columnVisibility: ColumnVisibility;
   isMultiServer: boolean;
+  showProfile: boolean;
   /** The loaded table sorts by date, content and duration; loading and empty states do not. */
   sort?: Pick<Props, 'sortBy' | 'sortDir' | 'onSortChange'>;
 }) {
@@ -640,6 +676,7 @@ function HistoryTableHeader({
       <tr>
         {columnVisibility.date && head('date', t('labels.date'), 'startedAt')}
         {columnVisibility.user && head('user', t('labels.user'))}
+        {showProfile && head('profile', t('labels.profile'))}
         {columnVisibility.content && head('content', t('labels.content'), 'mediaTitle')}
         {isMultiServer && columnVisibility.server && head('server', t('labels.server'))}
         {columnVisibility.platform && head('platform', t('labels.platform'))}
@@ -667,9 +704,11 @@ export function HistoryTable({
   sortDir,
   onSortChange,
   isMultiServer = false,
+  showProfile = false,
 }: Props) {
   const { t } = useTranslation(['common', 'pages']);
-  const visibleColumnCount = getVisibleColumnCount(columnVisibility, isMultiServer);
+  const visibleColumnCount =
+    getVisibleColumnCount(columnVisibility, isMultiServer) + (showProfile ? 1 : 0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const rowVirtualizer = useVirtualizer({
@@ -704,13 +743,18 @@ export function HistoryTable({
         style={{ maxHeight: DATA_TABLE_VIEWPORT_MAX_HEIGHT }}
       >
         <table className="w-full caption-bottom text-sm">
-          <HistoryTableHeader columnVisibility={columnVisibility} isMultiServer={isMultiServer} />
+          <HistoryTableHeader
+            columnVisibility={columnVisibility}
+            isMultiServer={isMultiServer}
+            showProfile={showProfile}
+          />
           <tbody>
             {Array.from({ length: 10 }).map((_, i) => (
               <SkeletonRow
                 key={i}
                 columnVisibility={columnVisibility}
                 isMultiServer={isMultiServer}
+                showProfile={showProfile}
               />
             ))}
           </tbody>
@@ -727,7 +771,11 @@ export function HistoryTable({
         style={{ maxHeight: DATA_TABLE_VIEWPORT_MAX_HEIGHT }}
       >
         <table className="w-full caption-bottom text-sm">
-          <HistoryTableHeader columnVisibility={columnVisibility} isMultiServer={isMultiServer} />
+          <HistoryTableHeader
+            columnVisibility={columnVisibility}
+            isMultiServer={isMultiServer}
+            showProfile={showProfile}
+          />
           <tbody>
             <tr>
               <td colSpan={visibleColumnCount} className="h-32 text-center">
@@ -757,6 +805,7 @@ export function HistoryTable({
         <HistoryTableHeader
           columnVisibility={columnVisibility}
           isMultiServer={isMultiServer}
+          showProfile={showProfile}
           sort={{ sortBy, sortDir, onSortChange }}
         />
         <tbody
@@ -787,6 +836,7 @@ export function HistoryTable({
                 onClick={onSessionClick ? () => onSessionClick(session) : undefined}
                 columnVisibility={columnVisibility}
                 isMultiServer={isMultiServer}
+                showProfile={showProfile}
               />
             );
           })}
@@ -802,6 +852,7 @@ export function HistoryTable({
                 key={`loading-${i}`}
                 columnVisibility={columnVisibility}
                 isMultiServer={isMultiServer}
+                showProfile={showProfile}
               />
             ))}
           </tbody>

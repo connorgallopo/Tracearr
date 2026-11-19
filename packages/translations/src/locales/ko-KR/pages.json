@@ -297,6 +297,7 @@
     "overallTrust": "전반적인 신뢰",
     "serverScope": "서버",
     "allServers": "모든 서버",
+    "allProfiles": "",
     "title": "사용자 세부정보",
     "editIdentity": "이름 및 연락처 이메일 편집",
     "editIdentityDescription": "두 정보는 모든 위치에서 이 사용자에게 적용됩니다. @{{username}}을 표시하려면 이름을 비워 두세요.",
@@ -400,6 +401,7 @@
       "clearUsers": "",
       "clearPlatforms": "",
       "clearCountries": "",
+      "clearProfiles": "",
       "clearFilters": "",
       "selected_other": ""
     },

@@ -117,6 +117,7 @@ const fullData = {
     stats: { totalSessions: 12, totalWatchTime: 0 },
   },
   sessions: { data: ['s1', 's2', 's3', 's4', 's5', 's6'].map(session), total: 12, hasMore: true },
+  profiles: [],
   locations: [],
   devices: [],
   violations: { data: [], total: 3, hasMore: false },
@@ -146,6 +147,7 @@ const rangeStats = {
   serverPeakHour: 21,
   personPeakHour: 22,
   mediaTypeSplit: { movie: 2, episode: 8, track: 0, other: 0 },
+  profiles: [],
   topGenres: [{ genre: 'Drama', plays: 6 }],
   mostFinished: [
     {

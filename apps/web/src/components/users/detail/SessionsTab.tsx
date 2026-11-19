@@ -1,6 +1,20 @@
 import { useMemo, useState } from 'react';
-import type { ServerUserDetail, Session, SessionWithDetails } from '@tracearr/shared';
+import { useTranslation } from 'react-i18next';
+import type {
+  ProfileFilterOption,
+  ServerUserDetail,
+  Session,
+  SessionWithDetails,
+} from '@tracearr/shared';
 import { DataTablePager } from '@/components/ui/data-table';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { useProfileLabel } from '@/components/sessions/useProfileLabel';
 import { HistoryTable } from '@/components/history/HistoryTable';
 import type { ColumnVisibility } from '@/components/history/HistoryFilters';
 import { useUserSessions } from '@/hooks/queries';
@@ -16,6 +30,7 @@ interface UserSessionsTableProps {
   personName: string;
   isLoading?: boolean;
   showServer: boolean;
+  showProfile: boolean;
   onSessionClick: (session: SessionWithDetails) => void;
 }
 
@@ -26,6 +41,7 @@ export function UserSessionsTable({
   personName,
   isLoading,
   showServer,
+  showProfile,
   onSessionClick,
 }: UserSessionsTableProps) {
   const { servers } = useServer();
@@ -74,6 +90,7 @@ export function UserSessionsTable({
       isLoading={isLoading}
       onSessionClick={onSessionClick}
       columnVisibility={columnVisibility}
+      showProfile={showProfile}
     />
   );
 }
@@ -83,31 +100,68 @@ interface SessionsTabProps {
   scope: 'identity' | undefined;
   user: UserSessionsTableProps['user'];
   personName: string;
+  /** The profiles of the accounts in view */
+  profiles: ProfileFilterOption[];
   showServer: boolean;
   onSessionClick: (session: SessionWithDetails) => void;
 }
+
+const ALL_PROFILES = 'all';
 
 export function SessionsTab({
   userId,
   scope,
   user,
   personName,
+  profiles,
   showServer,
   onSessionClick,
 }: SessionsTabProps) {
+  const { t } = useTranslation(['pages', 'common']);
+  const profileLabel = useProfileLabel();
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useUserSessions(userId, { page, pageSize: PAGE_SIZE, scope });
+  const [profileId, setProfileId] = useState(ALL_PROFILES);
+  const { data, isLoading } = useUserSessions(userId, {
+    page,
+    pageSize: PAGE_SIZE,
+    scope,
+    profileIds: profileId === ALL_PROFILES ? undefined : [profileId],
+  });
   const pageCount = Math.ceil((data?.total ?? 0) / PAGE_SIZE);
   const labels = usePagerLabels(page, pageCount);
 
   return (
     <div className="space-y-4">
+      {profiles.length > 1 && (
+        <div className="flex justify-end">
+          <Select
+            value={profileId}
+            onValueChange={(value) => {
+              setProfileId(value);
+              setPage(1);
+            }}
+          >
+            <SelectTrigger aria-label={t('common:labels.profiles')} className="w-44">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_PROFILES}>{t('pages:userDetail.allProfiles')}</SelectItem>
+              {profiles.map((profile) => (
+                <SelectItem key={profile.id} value={profile.id}>
+                  {profileLabel(profile)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       <UserSessionsTable
         sessions={data?.data ?? []}
         user={user}
         personName={personName}
         isLoading={isLoading}
         showServer={showServer}
+        showProfile={profiles.length > 0}
         onSessionClick={onSessionClick}
       />
       <DataTablePager

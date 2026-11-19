@@ -162,7 +162,10 @@
     "viewers": "Zuschauer",
     "watchHours": "Wiedergabezeit",
     "completion": "",
-    "serverLegend": "Server Legende"
+    "serverLegend": "Server Legende",
+    "profile": "",
+    "profiles": "",
+    "profileRemoved": ""
   },
   "search": {
     "searchUsers": "Suche Benutzer...",

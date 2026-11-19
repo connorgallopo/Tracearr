@@ -23,6 +23,7 @@ import { useServer } from '@/hooks/useServer';
 import { ServerColorAccent } from '@/components/server';
 import { TerminateSessionDialog } from './TerminateSessionDialog';
 import { LocalBadge } from './LocalBadge';
+import { NameWithProfile } from './NameWithProfile';
 import { MediaPageLink } from '@/components/media/MediaPageLink';
 import {
   PLAYBACK_DECISION_LABEL_KEYS,
@@ -166,9 +167,12 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
                     {displayName.slice(0, 2).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <span className="truncate text-sm font-medium" title={displayName}>
-                  {displayName}
-                </span>
+                <NameWithProfile
+                  name={displayName}
+                  profileName={session.profileName}
+                  profileRemoved={session.profileRemoved}
+                  className="text-sm font-medium"
+                />
               </div>
 
               <div className="flex shrink-0 items-center gap-1.5">

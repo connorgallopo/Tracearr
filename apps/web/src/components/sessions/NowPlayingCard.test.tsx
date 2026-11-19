@@ -165,6 +165,11 @@ describe('NowPlayingCard stop button', () => {
     expect(screen.queryByTitle('pages:terminateStream.title')).not.toBeInTheDocument();
   });
 
+  it('names the profile that is playing after the account', () => {
+    renderCard({ profileName: 'Robin', profileRemoved: false });
+    expect(screen.getByTitle('alice · Robin')).toHaveTextContent('alice · Robin');
+  });
+
   it('offers the stop for live TV on tofa', () => {
     renderCard({
       canTerminate: true,

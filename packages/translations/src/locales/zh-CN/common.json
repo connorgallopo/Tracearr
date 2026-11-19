@@ -162,7 +162,10 @@
     "viewers": "观看人数",
     "watchHours": "观看小时数",
     "completion": "完成度",
-    "serverLegend": "服务器图例"
+    "serverLegend": "服务器图例",
+    "profile": "",
+    "profiles": "",
+    "profileRemoved": ""
   },
   "search": {
     "searchUsers": "搜索用户……",

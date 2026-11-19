@@ -162,7 +162,10 @@
     "viewers": "Viewers",
     "watchHours": "Watch Hours",
     "completion": "Completion",
-    "serverLegend": "Server legend"
+    "serverLegend": "Server legend",
+    "profile": "Profile",
+    "profiles": "Profiles",
+    "profileRemoved": "{{name}} (removed)"
   },
   "search": {
     "searchUsers": "Search users...",

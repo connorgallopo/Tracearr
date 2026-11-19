@@ -344,6 +344,7 @@ function appendHistoryFilterParams(
 ): void {
   if (params.serverUserIds?.length)
     searchParams.set('serverUserIds', params.serverUserIds.join(','));
+  if (params.profileIds?.length) searchParams.set('profileIds', params.profileIds.join(','));
   if (params.serverIds?.length) {
     for (const id of params.serverIds) {
       searchParams.append('serverIds', id);
@@ -1018,7 +1019,10 @@ class ApiClient {
       if (scope) params.set('scope', scope);
       return this.request<UserRangeStats>(`/users/${id}/stats?${params.toString()}`);
     },
-    sessions: (id: string, params?: { page?: number; pageSize?: number; scope?: 'identity' }) => {
+    sessions: (
+      id: string,
+      params?: { page?: number; pageSize?: number; scope?: 'identity'; profileIds?: string[] }
+    ) => {
       return this.request<PaginatedResponse<Session>>(
         `/users/${id}/sessions?${listSearchParams(params ?? {})}`
       );

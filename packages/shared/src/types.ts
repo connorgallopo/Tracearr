@@ -1750,6 +1750,9 @@ export interface ProfileFilterOption {
   id: string;
   name: string;
   serverUserId: string;
+  /** The account's username on its server */
+  accountUsername: string;
+  serverName: string;
   removed: boolean;
 }
 

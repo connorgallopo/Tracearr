@@ -7,9 +7,8 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { HistoryTable } from './HistoryTable';
 import { DEFAULT_COLUMN_VISIBILITY } from './HistoryFilters';
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
-}));
+const { t } = vi.hoisted(() => ({ t: vi.fn((key: string) => key) }));
+vi.mock('react-i18next', () => ({ useTranslation: () => ({ t }) }));
 
 vi.mock('@/hooks/useServerColorMap', () => ({ useServerColorMap: () => new Map() }));
 
@@ -31,7 +30,10 @@ vi.mock('@tanstack/react-virtual', () => ({
 function renderTable(
   overrides: Partial<SessionWithDetails>,
   onSessionClick?: (session: SessionWithDetails) => void,
-  sort?: Pick<ComponentProps<typeof HistoryTable>, 'sortBy' | 'sortDir' | 'onSortChange'>
+  options?: Pick<
+    ComponentProps<typeof HistoryTable>,
+    'sortBy' | 'sortDir' | 'onSortChange' | 'showProfile'
+  >
 ) {
   const session = {
     id: 'session-1',
@@ -59,7 +61,7 @@ function renderTable(
           sessions={[session]}
           onSessionClick={onSessionClick}
           columnVisibility={{ ...DEFAULT_COLUMN_VISIBILITY, progress: true }}
-          {...sort}
+          {...options}
         />
       </TooltipProvider>
     </MemoryRouter>
@@ -103,6 +105,20 @@ describe('HistoryTable', () => {
 
     renderTable({ segmentCount: 1 });
     expect(screen.queryByLabelText('count.segment')).not.toBeInTheDocument();
+  });
+
+  it('marks a profile the server no longer lists in the user cell', () => {
+    renderTable({ profileName: 'Sam', profileRemoved: true });
+
+    expect(screen.getByTitle('alice · labels.profileRemoved')).toBeInTheDocument();
+    expect(t).toHaveBeenCalledWith('labels.profileRemoved', { name: 'Sam' });
+  });
+
+  it('gives the profile its own column when asked', () => {
+    renderTable({ profileName: 'Robin', profileRemoved: false }, undefined, { showProfile: true });
+
+    expect(screen.getByRole('columnheader', { name: 'labels.profile' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'Robin' })).toBeInTheDocument();
   });
 
   it('sorts the data table from its date header', () => {

@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import type { ServerUserFullDetail, UserRangeStats } from '@tracearr/shared';
 import type { PlaysComparison } from '@/components/charts/PlaysChart';
+import type { TimeRangePeriod } from '@/components/ui/time-range-picker';
 import { OverviewTab } from './OverviewTab';
 
 const { charted } = vi.hoisted(() => ({ charted: [] as PlaysComparison[][] }));
@@ -22,6 +23,29 @@ vi.mock('./WhereCard', () => ({ WhereCard: () => null }));
 vi.mock('./MostFinishedCard', () => ({ MostFinishedCard: () => null }));
 vi.mock('./SessionsTab', () => ({ UserSessionsTable: () => null }));
 
+const detail = {
+  user: { identityName: null },
+  identity: { username: 'alice' },
+  sessions: { data: [], total: 0 },
+  devices: [],
+  locations: [],
+} as unknown as ServerUserFullDetail;
+
+function renderTab(stats: UserRangeStats, period: TimeRangePeriod = 'week') {
+  return render(
+    <OverviewTab
+      stats={stats}
+      isLoading={false}
+      period={period}
+      detail={detail}
+      showServer={false}
+      showProfile={false}
+      onSessionClick={vi.fn()}
+      onShowSessions={vi.fn()}
+    />
+  );
+}
+
 describe('OverviewTab', () => {
   it('lays the prior range over the current buckets and adds the server average', () => {
     const stats = {
@@ -34,27 +58,10 @@ describe('OverviewTab', () => {
         { date: '2026-09-30', count: 6 },
       ],
       serverAvgPlaysByDay: [{ date: '2026-10-01', count: 0.5 }],
-    } as UserRangeStats;
+      profiles: [],
+    } as unknown as UserRangeStats;
 
-    render(
-      <OverviewTab
-        stats={stats}
-        isLoading={false}
-        period="week"
-        detail={
-          {
-            user: { identityName: null },
-            identity: { username: 'alice' },
-            sessions: { data: [], total: 0 },
-            devices: [],
-            locations: [],
-          } as unknown as ServerUserFullDetail
-        }
-        showServer={false}
-        onSessionClick={vi.fn()}
-        onShowSessions={vi.fn()}
-      />
-    );
+    renderTab(stats);
 
     const [prior, average] = charted[charted.length - 1] ?? [];
     expect(prior).toMatchObject({
@@ -81,27 +88,10 @@ describe('OverviewTab', () => {
         '2026-08-31',
       ].map(week),
       serverAvgPlaysByDay: [],
+      profiles: [],
     } as unknown as UserRangeStats;
 
-    render(
-      <OverviewTab
-        stats={stats}
-        isLoading={false}
-        period="custom"
-        detail={
-          {
-            user: { identityName: null },
-            identity: { username: 'alice' },
-            sessions: { data: [], total: 0 },
-            devices: [],
-            locations: [],
-          } as unknown as ServerUserFullDetail
-        }
-        showServer={false}
-        onSessionClick={vi.fn()}
-        onShowSessions={vi.fn()}
-      />
-    );
+    renderTab(stats, 'custom');
 
     const [prior] = charted[charted.length - 1] ?? [];
     expect(prior?.data.map((point) => point.date)).toEqual([
@@ -111,5 +101,33 @@ describe('OverviewTab', () => {
       '2026-09-21',
       '2026-09-28',
     ]);
+  });
+
+  it('splits plays by profile only once a second profile has played', () => {
+    const robin = {
+      profileId: 'p-robin',
+      name: 'Robin',
+      removed: false,
+      plays: 3,
+      watchMs: 5_400_000,
+    };
+    const sam = { profileId: 'p-sam', name: 'Sam', removed: true, plays: 1, watchMs: 600_000 };
+    const withProfiles = (profiles: UserRangeStats['profiles']) =>
+      ({
+        playsByDay: [],
+        priorPlaysByDay: [],
+        serverAvgPlaysByDay: [],
+        profiles,
+      }) as unknown as UserRangeStats;
+
+    const { unmount } = renderTab(withProfiles([robin]));
+    expect(screen.queryByText('labels.profiles')).not.toBeInTheDocument();
+    unmount();
+
+    renderTab(withProfiles([robin, sam]));
+    expect(screen.getByText('labels.profiles')).toBeInTheDocument();
+    expect(screen.getByText('Robin')).toBeInTheDocument();
+    expect(screen.getByText(/1h 30m/)).toBeInTheDocument();
+    expect(screen.getByText('labels.profileRemoved')).toBeInTheDocument();
   });
 });

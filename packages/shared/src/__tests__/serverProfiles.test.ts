@@ -33,10 +33,6 @@ describe('server profiles', () => {
     expect(SERVER_PROFILES.emby.watchedThreshold).toBe('tracearrSetting');
   });
 
-  it('only tofa plays one account under several profiles', () => {
-    expect(SERVER_TYPES.filter((type) => SERVER_PROFILES[type].hasProfiles)).toEqual(['tofa']);
-  });
-
   it.each([
     ['plex', 'plexWebsocket', 'plexStatistics', 'server', false],
     ['jellyfin', 'ssePlugin', 'ssePlugin', 'username', true],

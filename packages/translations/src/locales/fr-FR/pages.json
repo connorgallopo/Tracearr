@@ -315,6 +315,7 @@
     "overallTrust": "Confiance globale",
     "serverScope": "Serveur",
     "allServers": "Tous les serveurs",
+    "allProfiles": "",
     "title": "Détail de l'utilisateur",
     "editIdentity": "",
     "editIdentityDescription": "",
@@ -421,6 +422,7 @@
       "clearUsers": "",
       "clearPlatforms": "",
       "clearCountries": "",
+      "clearProfiles": "",
       "clearFilters": "",
       "selected_one": "",
       "selected_other": ""

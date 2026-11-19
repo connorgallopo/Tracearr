@@ -75,11 +75,11 @@ function parseFiltersFromUrl(
 ): HistoryFilters {
   const filters: HistoryFilters = {};
 
-  const userIds = searchParams.get('userIds');
-  if (userIds) {
-    const parsed = userIds.split(',').filter(Boolean);
-    if (parsed.length > 0) filters.serverUserIds = parsed;
-  }
+  const userIds = parseCommaSeparated<string>(searchParams.get('userIds'));
+  if (userIds) filters.serverUserIds = userIds;
+
+  const profileIds = parseCommaSeparated<string>(searchParams.get('profileIds'));
+  if (profileIds) filters.profileIds = profileIds;
 
   // serverIds=a,b is the canonical param; legacy serverId=X is back-compat
   const serverIdsParam = searchParams.get('serverIds');
@@ -159,6 +159,7 @@ function filtersToUrlParams(filters: HistoryFilters, current: URLSearchParams): 
   const params = new URLSearchParams();
 
   if (filters.serverUserIds?.length) params.set('userIds', filters.serverUserIds.join(','));
+  if (filters.profileIds?.length) params.set('profileIds', filters.profileIds.join(','));
   if (filters.serverIds?.length) params.set('serverIds', filters.serverIds.join(','));
   if (filters.mediaTypes?.length) params.set('mediaTypes', filters.mediaTypes.join(','));
   if (filters.state) params.set('state', filters.state);

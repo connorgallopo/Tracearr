@@ -315,6 +315,7 @@
     "overallTrust": "Algemeen vertrouwen",
     "serverScope": "",
     "allServers": "Alle servers",
+    "allProfiles": "",
     "title": "Gebruiker details",
     "editIdentity": "",
     "editIdentityDescription": "",
@@ -421,6 +422,7 @@
       "clearUsers": "",
       "clearPlatforms": "",
       "clearCountries": "",
+      "clearProfiles": "",
       "clearFilters": "",
       "selected_one": "",
       "selected_other": ""

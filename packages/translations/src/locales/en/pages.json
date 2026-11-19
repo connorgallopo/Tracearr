@@ -315,6 +315,7 @@
     "overallTrust": "Overall Trust",
     "serverScope": "Server",
     "allServers": "All servers",
+    "allProfiles": "All profiles",
     "title": "User Details",
     "editIdentity": "Edit name and contact email",
     "editIdentityDescription": "Both apply to this person everywhere. Leave the name empty to show @{{username}}.",
@@ -423,6 +424,7 @@
       "clearUsers": "Clear all users",
       "clearPlatforms": "Clear all platforms",
       "clearCountries": "Clear all countries",
+      "clearProfiles": "Clear all profiles",
       "clearFilters": "Clear all filters"
     },
     "detail": {

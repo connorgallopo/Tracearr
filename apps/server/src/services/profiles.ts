@@ -6,7 +6,7 @@
 import { and, eq, inArray, isNull, notInArray, sql, type SQL } from 'drizzle-orm';
 import type { ProfileFilterOption } from '@tracearr/shared';
 import { db, type Executor } from '../db/client.js';
-import { serverProfiles } from '../db/schema.js';
+import { serverProfiles, servers, serverUsers } from '../db/schema.js';
 import { getServerUserIdsByExternalId } from '../jobs/poller/database.js';
 import { NOT_NEEDED, type IMediaServerClient, type MediaProfile } from './mediaServer/types.js';
 import { compareNames } from '../utils/collation.js';
@@ -246,9 +246,13 @@ export async function profileOptions(
       id: serverProfiles.id,
       name: serverProfiles.name,
       serverUserId: serverProfiles.serverUserId,
+      accountUsername: serverUsers.username,
+      serverName: servers.name,
       removed: sql<boolean>`${serverProfiles.removedAt} IS NOT NULL`,
     })
     .from(serverProfiles)
+    .innerJoin(serverUsers, eq(serverUsers.id, serverProfiles.serverUserId))
+    .innerJoin(servers, eq(servers.id, serverProfiles.serverId))
     .where(where);
   return rows.sort((a, b) => compareNames(a.name, b.name) || a.id.localeCompare(b.id));
 }

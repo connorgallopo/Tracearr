@@ -9,6 +9,7 @@ import { api } from '@/lib/api';
 
 export interface HistoryFilters {
   serverUserIds?: string[];
+  profileIds?: string[];
   serverIds?: string[];
   state?: 'playing' | 'paused' | 'stopped';
   mediaTypes?: ('movie' | 'episode' | 'track' | 'live' | 'trailer')[];

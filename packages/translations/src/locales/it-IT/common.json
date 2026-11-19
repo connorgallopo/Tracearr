@@ -162,7 +162,10 @@
     "viewers": "",
     "watchHours": "",
     "completion": "",
-    "serverLegend": ""
+    "serverLegend": "",
+    "profile": "",
+    "profiles": "",
+    "profileRemoved": ""
   },
   "search": {
     "searchUsers": "Cerca utenti...",

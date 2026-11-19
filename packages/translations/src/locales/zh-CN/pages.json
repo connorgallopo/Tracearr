@@ -297,6 +297,7 @@
     "overallTrust": "总体信任度",
     "serverScope": "服务器",
     "allServers": "所有服务器",
+    "allProfiles": "",
     "title": "用户详情",
     "editIdentity": "编辑姓名和联系人电子邮件",
     "editIdentityDescription": "两者在所有位置都适用于此人。将名称留空则显示 @{{username}}。",
@@ -400,6 +401,7 @@
       "clearUsers": "清除所有用户",
       "clearPlatforms": "清除所有平台",
       "clearCountries": "清除所有国家/地区",
+      "clearProfiles": "",
       "clearFilters": "清除所有筛选条件",
       "selected_other": "已选择 {{count}} 项"
     },

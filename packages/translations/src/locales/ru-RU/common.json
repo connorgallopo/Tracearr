@@ -162,7 +162,10 @@
     "viewers": "Зрители",
     "watchHours": "Часы просмотра",
     "completion": "Досмотрено",
-    "serverLegend": "Легенда серверов"
+    "serverLegend": "Легенда серверов",
+    "profile": "",
+    "profiles": "",
+    "profileRemoved": ""
   },
   "search": {
     "searchUsers": "Поиск пользователей...",

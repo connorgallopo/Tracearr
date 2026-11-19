@@ -153,6 +153,9 @@ export function UserDetail() {
   const isMergedIdentity = identity.serverUsers.length > 1;
   // The server column only earns its place once the view spans more than one server.
   const showServer = isAllScope && isMergedIdentity;
+  const profilesInView = identityScope
+    ? fullData.profiles
+    : fullData.profiles.filter((profile) => profile.serverUserId === effectiveId);
   const removed = isSpecificServerScope
     ? user.removedAt
       ? { removed: true as const, removedAt: user.removedAt }
@@ -228,6 +231,7 @@ export function UserDetail() {
             period={timeRange.period}
             detail={fullData}
             showServer={showServer}
+            showProfile={profilesInView.length > 0}
             onSessionClick={handleSessionClick}
             onShowSessions={() => handleTabChange('sessions')}
           />
@@ -239,6 +243,7 @@ export function UserDetail() {
             scope={identityScope}
             user={user}
             personName={user.identityName ?? identity.username}
+            profiles={profilesInView}
             showServer={showServer}
             onSessionClick={handleSessionClick}
           />

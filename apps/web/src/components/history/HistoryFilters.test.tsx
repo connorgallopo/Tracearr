@@ -38,6 +38,28 @@ const filterOptions: HistoryFilterOptions = {
   profiles: [],
 };
 
+const withProfiles: HistoryFilterOptions = {
+  ...filterOptions,
+  profiles: [
+    {
+      id: 'p-robin',
+      name: 'Robin',
+      serverUserId: 'su-secondary',
+      accountUsername: 'alice_tofa',
+      serverName: 'Den',
+      removed: false,
+    },
+    {
+      id: 'p-sam',
+      name: 'Sam',
+      serverUserId: 'su-secondary',
+      accountUsername: 'alice_tofa',
+      serverName: 'Den',
+      removed: true,
+    },
+  ],
+};
+
 function renderBar(
   filters: HistoryFilters,
   overrides: Partial<HistoryFilters> = {},
@@ -148,6 +170,40 @@ describe('HistoryFiltersBar', () => {
     );
   });
 
+  it('lists profiles under their account and filters to the one picked', async () => {
+    const onFiltersChange = vi.fn();
+    render(
+      <HistoryFiltersBar
+        filters={{}}
+        onFiltersChange={onFiltersChange}
+        timeRange={{ period: 'month' }}
+        onTimeRangeChange={vi.fn()}
+        filterOptions={withProfiles}
+        columnVisibility={DEFAULT_COLUMN_VISIBILITY}
+        onColumnVisibilityChange={vi.fn()}
+      />
+    );
+
+    await userEvent.click(screen.getByRole('button', { name: /filters/i }));
+    await userEvent.click(await screen.findByText('Profiles'));
+    const account = await screen.findByRole('group', { name: 'alice_tofa · Den' });
+    expect(within(account).getByRole('menuitemcheckbox', { name: 'Sam (removed)' })).toBeVisible();
+    await userEvent.click(within(account).getByRole('menuitemcheckbox', { name: 'Robin' }));
+
+    expect(onFiltersChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ profileIds: ['p-robin'] })
+    );
+  });
+
+  it('has no Profiles filter when no account holds profiles', async () => {
+    renderBar({});
+
+    await userEvent.click(screen.getByRole('button', { name: /filters/i }));
+
+    expect(await screen.findByText('Users')).toBeInTheDocument();
+    expect(screen.queryByText('Profiles')).not.toBeInTheDocument();
+  });
+
   const renderMemberBar = () =>
     render(
       <HistoryFiltersBar
@@ -155,19 +211,20 @@ describe('HistoryFiltersBar', () => {
         onFiltersChange={vi.fn()}
         timeRange={{ period: 'month' }}
         onTimeRangeChange={vi.fn()}
-        filterOptions={filterOptions}
+        filterOptions={withProfiles}
         columnVisibility={DEFAULT_COLUMN_VISIBILITY}
         onColumnVisibilityChange={vi.fn()}
         isMember
       />
     );
 
-  it('has no Users filter for a member', async () => {
+  it('has no Users or Profiles filter for a member', async () => {
     renderMemberBar();
 
     await userEvent.click(screen.getByRole('button', { name: /Filters/ }));
 
     expect(screen.queryByText('Users')).not.toBeInTheDocument();
+    expect(screen.queryByText('Profiles')).not.toBeInTheDocument();
     expect(screen.getByText('Platforms')).toBeInTheDocument();
   });
 

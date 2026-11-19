@@ -63,7 +63,7 @@ export function useUserRangeStats(
 
 export function useUserSessions(
   id: string,
-  params: { page?: number; pageSize?: number; scope?: 'identity' } = {}
+  params: { page?: number; pageSize?: number; scope?: 'identity'; profileIds?: string[] } = {}
 ) {
   return useQuery({
     queryKey: ['users', 'sessions', id, params],

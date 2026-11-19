@@ -50,6 +50,7 @@ import { playbackBadge } from '@/lib/playbackBadge';
 import { DATE_TIME_OPTIONS, formatDate, formatDuration } from '@/lib/dateFormat';
 import { getAvatarUrl } from '@/components/users/utils';
 import { LocalBadge } from '@/components/sessions/LocalBadge';
+import { NameWithProfile } from '@/components/sessions/NameWithProfile';
 import { MediaPageLink } from '@/components/media/MediaPageLink';
 import { StreamDetailsPanel } from './StreamDetailsPanel';
 
@@ -344,9 +345,12 @@ function SessionContent({
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-medium">
-                  {session.user.identityName ?? session.user.username}
-                </p>
+                <NameWithProfile
+                  name={session.user.identityName ?? session.user.username}
+                  profileName={session.profileName}
+                  profileRemoved={session.profileRemoved}
+                  className="block font-medium"
+                />
                 {canOpenUser && (
                   <p className="text-muted-foreground text-xs">{t('actions.viewProfile')}</p>
                 )}
