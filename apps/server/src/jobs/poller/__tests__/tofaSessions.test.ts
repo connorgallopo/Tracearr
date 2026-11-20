@@ -735,6 +735,7 @@ describe('tofa sessions in the poller', () => {
     });
 
     it('resolves every profile a poll names in one statement, each pending play carrying its own', async () => {
+      const robinThumb = '/api/v1/profiles/avatars/kaiju.png';
       mockDb.execute.mockResolvedValueOnce({
         rows: [
           {
@@ -742,12 +743,18 @@ describe('tofa sessions in the poller', () => {
             external_id: morgan.id,
             server_user_id: 'server-user-1',
             name: morgan.name,
+            thumb_url: null,
+            is_primary: true,
+            removed: false,
           },
           {
             id: 'profile-robin',
             external_id: robin.id,
             server_user_id: 'server-user-1',
             name: robin.name,
+            thumb_url: robinThumb,
+            is_primary: false,
+            removed: false,
           },
         ],
       });
@@ -774,8 +781,16 @@ describe('tofa sessions in the poller', () => {
         ([, , data]) => data.processed
       );
       expect(pending).toEqual([
-        expect.objectContaining({ profileName: 'Morgan', profileId: 'profile-morgan' }),
-        expect.objectContaining({ profileName: 'Robin', profileId: 'profile-robin' }),
+        expect.objectContaining({
+          profileName: 'Morgan',
+          profileId: 'profile-morgan',
+          nonMainProfile: undefined,
+        }),
+        expect.objectContaining({
+          profileName: 'Robin',
+          profileId: 'profile-robin',
+          nonMainProfile: { name: 'Robin', thumbUrl: robinThumb, removed: false },
+        }),
       ]);
     });
 

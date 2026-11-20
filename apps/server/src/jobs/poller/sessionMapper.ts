@@ -293,7 +293,6 @@ export function mapSessionRow(s: typeof sessions.$inferSelect): Session {
     isLocal: isLocalSession(s),
     profileId: s.profileId,
     profileName: s.profileName,
-    profileRemoved: false,
     playerName: s.playerName,
     deviceId: s.deviceId,
     product: s.product,

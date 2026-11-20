@@ -54,10 +54,18 @@ describe('SessionDetailSheet', () => {
     auth.user.role = 'owner';
   });
 
-  it('names the profile that played after the person', () => {
-    renderSheet({ profileName: 'Robin', profileRemoved: false });
+  it('shows no profile field for a main profile, which plays as the account', () => {
+    renderSheet({ profileId: 'p-morgan', profileName: 'Morgan' });
 
-    expect(screen.getByRole('link', { name: /alice/ })).toHaveTextContent('alice · Robin');
+    expect(screen.queryByText('labels.profile')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Morgan/)).not.toBeInTheDocument();
+  });
+
+  it('gives a non-main profile its own field', () => {
+    renderSheet({ nonMainProfile: { name: 'Robin', thumbUrl: null, removed: false } });
+
+    expect(screen.getByText('labels.profile').nextSibling).toHaveTextContent('Robin');
+    expect(screen.getByRole('link', { name: /alice/ })).not.toHaveTextContent('Robin');
   });
 
   it('shows no progress percentage for a play without a total', () => {

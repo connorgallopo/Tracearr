@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useProfileLabel } from '@/components/sessions/useProfileLabel';
+import { useProfileOptionLabel } from '@/components/sessions/useProfileLabel';
 import { HistoryTable } from '@/components/history/HistoryTable';
 import type { ColumnVisibility } from '@/components/history/HistoryFilters';
 import { useUserSessions } from '@/hooks/queries';
@@ -30,7 +30,8 @@ interface UserSessionsTableProps {
   personName: string;
   isLoading?: boolean;
   showServer: boolean;
-  showProfile: boolean;
+  /** The profiles that name the rows in a Profile column; none leaves the column out */
+  profiles: ProfileFilterOption[];
   onSessionClick: (session: SessionWithDetails) => void;
 }
 
@@ -41,10 +42,11 @@ export function UserSessionsTable({
   personName,
   isLoading,
   showServer,
-  showProfile,
+  profiles,
   onSessionClick,
 }: UserSessionsTableProps) {
   const { servers } = useServer();
+  const profileOptionLabel = useProfileOptionLabel();
 
   const rows = useMemo<SessionWithDetails[]>(
     () =>
@@ -84,13 +86,21 @@ export function UserSessionsTable({
     [showServer]
   );
 
+  const profileNames = useMemo(
+    () =>
+      profiles.length > 0
+        ? new Map(profiles.map((profile) => [profile.id, profileOptionLabel(profile)]))
+        : undefined,
+    [profiles, profileOptionLabel]
+  );
+
   return (
     <HistoryTable
       sessions={rows}
       isLoading={isLoading}
       onSessionClick={onSessionClick}
       columnVisibility={columnVisibility}
-      showProfile={showProfile}
+      profileNames={profileNames}
     />
   );
 }
@@ -100,7 +110,7 @@ interface SessionsTabProps {
   scope: 'identity' | undefined;
   user: UserSessionsTableProps['user'];
   personName: string;
-  /** The profiles of the accounts in view */
+  /** The profiles of the accounts in view, or none when none of them is shown */
   profiles: ProfileFilterOption[];
   showServer: boolean;
   onSessionClick: (session: SessionWithDetails) => void;
@@ -118,7 +128,7 @@ export function SessionsTab({
   onSessionClick,
 }: SessionsTabProps) {
   const { t } = useTranslation(['pages', 'common']);
-  const profileLabel = useProfileLabel();
+  const profileOptionLabel = useProfileOptionLabel();
   const [page, setPage] = useState(1);
   const [profileId, setProfileId] = useState(ALL_PROFILES);
   const { data, isLoading } = useUserSessions(userId, {
@@ -132,7 +142,7 @@ export function SessionsTab({
 
   return (
     <div className="space-y-4">
-      {profiles.length > 1 && (
+      {profiles.length > 0 && (
         <div className="flex justify-end">
           <Select
             value={profileId}
@@ -148,7 +158,7 @@ export function SessionsTab({
               <SelectItem value={ALL_PROFILES}>{t('pages:userDetail.allProfiles')}</SelectItem>
               {profiles.map((profile) => (
                 <SelectItem key={profile.id} value={profile.id}>
-                  {profileLabel(profile)}
+                  {profileOptionLabel(profile)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -161,7 +171,7 @@ export function SessionsTab({
         personName={personName}
         isLoading={isLoading}
         showServer={showServer}
-        showProfile={profiles.length > 0}
+        profiles={profiles}
         onSessionClick={onSessionClick}
       />
       <DataTablePager

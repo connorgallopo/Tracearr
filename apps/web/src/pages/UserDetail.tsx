@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
@@ -114,6 +114,15 @@ export function UserDetail() {
     pageSize: DOWNLOADS_PAGE_SIZE,
     scope: identityScope,
   });
+  const allProfiles = fullData?.profiles;
+  const profilesInView = useMemo(() => {
+    if (!allProfiles) return [];
+    const accountProfiles = identityScope
+      ? allProfiles
+      : allProfiles.filter((profile) => profile.serverUserId === effectiveId);
+    // A main profile shows as its account, so profiles show only once one besides it is in view
+    return accountProfiles.some((profile) => !profile.main) ? accountProfiles : [];
+  }, [allProfiles, identityScope, effectiveId]);
 
   if (isLoading) {
     return (
@@ -153,9 +162,6 @@ export function UserDetail() {
   const isMergedIdentity = identity.serverUsers.length > 1;
   // The server column only earns its place once the view spans more than one server.
   const showServer = isAllScope && isMergedIdentity;
-  const profilesInView = identityScope
-    ? fullData.profiles
-    : fullData.profiles.filter((profile) => profile.serverUserId === effectiveId);
   const removed = isSpecificServerScope
     ? user.removedAt
       ? { removed: true as const, removedAt: user.removedAt }
@@ -231,7 +237,7 @@ export function UserDetail() {
             period={timeRange.period}
             detail={fullData}
             showServer={showServer}
-            showProfile={profilesInView.length > 0}
+            profiles={profilesInView}
             onSessionClick={handleSessionClick}
             onShowSessions={() => handleTabChange('sessions')}
           />

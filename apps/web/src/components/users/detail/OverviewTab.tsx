@@ -1,6 +1,11 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { ServerUserFullDetail, SessionWithDetails, UserRangeStats } from '@tracearr/shared';
+import type {
+  ProfileFilterOption,
+  ServerUserFullDetail,
+  SessionWithDetails,
+  UserRangeStats,
+} from '@tracearr/shared';
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { TimeRangePeriod } from '@/components/ui/time-range-picker';
@@ -21,7 +26,8 @@ interface OverviewTabProps {
   period: TimeRangePeriod;
   detail: ServerUserFullDetail;
   showServer: boolean;
-  showProfile: boolean;
+  /** The profiles of the accounts in view, or none when none of them is shown */
+  profiles: ProfileFilterOption[];
   onSessionClick: (session: SessionWithDetails) => void;
   onShowSessions: () => void;
 }
@@ -32,7 +38,7 @@ export function OverviewTab({
   period,
   detail,
   showServer,
-  showProfile,
+  profiles,
   onSessionClick,
   onShowSessions,
 }: OverviewTabProps) {
@@ -100,7 +106,7 @@ export function OverviewTab({
           allLocations={detail.locations}
           totalSessions={detail.sessions.total}
         />
-        {showProfileSplit && <ProfilesCard profiles={stats.profiles} />}
+        {showProfileSplit && <ProfilesCard profiles={stats.profiles} options={detail.profiles} />}
       </div>
 
       <Card>
@@ -118,7 +124,7 @@ export function OverviewTab({
             user={detail.user}
             personName={detail.user.identityName ?? detail.identity.username}
             showServer={showServer}
-            showProfile={showProfile}
+            profiles={profiles}
             onSessionClick={onSessionClick}
           />
         </CardContent>

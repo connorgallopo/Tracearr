@@ -32,7 +32,7 @@ function renderTable(
   onSessionClick?: (session: SessionWithDetails) => void,
   options?: Pick<
     ComponentProps<typeof HistoryTable>,
-    'sortBy' | 'sortDir' | 'onSortChange' | 'showProfile'
+    'sortBy' | 'sortDir' | 'onSortChange' | 'profileNames'
   >
 ) {
   const session = {
@@ -107,25 +107,35 @@ describe('HistoryTable', () => {
     expect(screen.queryByLabelText('count.segment')).not.toBeInTheDocument();
   });
 
-  it('marks a profile the server no longer lists in the user cell', () => {
-    renderTable({ profileName: 'Sam', profileRemoved: true });
-
-    expect(screen.getByTitle('alice · labels.profileRemoved')).toBeInTheDocument();
-    expect(t).toHaveBeenCalledWith('labels.profileRemoved', { name: 'Sam' });
-  });
-
-  it('gives the profile its own column when asked', () => {
-    renderTable({ profileName: 'Robin', profileRemoved: false }, undefined, { showProfile: true });
+  it('names the profile in its own column when given the names', () => {
+    renderTable({ profileId: 'p-robin' }, undefined, {
+      profileNames: new Map([['p-robin', 'Robin']]),
+    });
 
     expect(screen.getByRole('columnheader', { name: 'labels.profile' })).toBeInTheDocument();
     expect(screen.getByRole('cell', { name: 'Robin' })).toBeInTheDocument();
   });
 
+  it('names a play whose profile has no row by the name it stored', () => {
+    renderTable({ profileId: null, profileName: 'Kids' }, undefined, { profileNames: new Map() });
+
+    expect(screen.getByRole('cell', { name: 'Kids' })).toBeInTheDocument();
+  });
+
   it('shows the missing-value marker for a play with no profile', () => {
-    renderTable({ profileName: null }, undefined, { showProfile: true });
+    renderTable({ profileId: null }, undefined, { profileNames: new Map() });
     const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
     const cells = screen.getAllByRole('cell');
     expect(cells[headers.indexOf('labels.profile')]).toHaveTextContent(/^\u2014$/);
+  });
+
+  it('mutes a removed profile over the account avatar and says so in its title', () => {
+    renderTable({ nonMainProfile: { name: 'Sam', thumbUrl: null, removed: true } });
+
+    const profile = screen.getByRole('img', { name: 'labels.profileRemoved' });
+    expect(profile).toHaveAttribute('title', 'labels.profileRemoved');
+    expect(t).toHaveBeenCalledWith('labels.profileRemoved', { name: 'Sam' });
+    expect(screen.getByRole('link', { name: /alice/ })).not.toHaveTextContent('Sam');
   });
 
   it('sorts the data table from its date header', () => {

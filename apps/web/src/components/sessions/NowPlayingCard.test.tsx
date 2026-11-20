@@ -145,6 +145,24 @@ describe('NowPlayingCard title links', () => {
   });
 });
 
+describe('NowPlayingCard profile', () => {
+  it('puts a non-main profile over the account avatar, by its initial when it has no photo', () => {
+    renderCard({ nonMainProfile: { name: 'Robin', thumbUrl: null, removed: false } });
+
+    const profile = screen.getByRole('img', { name: 'Robin' });
+    expect(profile).toHaveAttribute('title', 'Robin');
+    expect(profile).toHaveTextContent(/^R$/);
+    expect(screen.getByTitle('alice')).toHaveTextContent(/^alice$/);
+  });
+
+  it('shows nothing of a main profile, which plays as the account', () => {
+    renderCard({ profileId: 'p-morgan', profileName: 'Morgan' });
+
+    expect(screen.queryByRole('img', { name: 'Morgan' })).not.toBeInTheDocument();
+    expect(screen.queryByText(/Morgan/)).not.toBeInTheDocument();
+  });
+});
+
 describe('NowPlayingCard stop button', () => {
   beforeEach(() => {
     auth.role = 'owner';
@@ -163,11 +181,6 @@ describe('NowPlayingCard stop button', () => {
       screen.getByRole('button', { name: 'settings:servers.cannotStopStreams' })
     ).toBeDisabled();
     expect(screen.queryByTitle('pages:terminateStream.title')).not.toBeInTheDocument();
-  });
-
-  it('names the profile that is playing after the account', () => {
-    renderCard({ profileName: 'Robin', profileRemoved: false });
-    expect(screen.getByTitle('alice · Robin')).toHaveTextContent('alice · Robin');
   });
 
   it('offers the stop for live TV on tofa', () => {

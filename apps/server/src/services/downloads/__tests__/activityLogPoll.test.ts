@@ -394,8 +394,8 @@ describe('pollAllDownloads on a tofa server', () => {
     );
     vi.mocked(resolveProfiles).mockResolvedValue(
       new Map([
-        [download.profile_id, 'profile-robin'],
-        [MORGAN, 'profile-morgan'],
+        [download.profile_id, { id: 'profile-robin' }],
+        [MORGAN, { id: 'profile-morgan' }],
       ])
     );
   });

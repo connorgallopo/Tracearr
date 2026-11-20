@@ -69,13 +69,13 @@ describe('resolveProfiles', () => {
       removedAt: new Date('2026-11-01T00:00:00Z'),
     });
 
-    const ids = await resolveProfiles(
+    const resolved = await resolveProfiles(
       serverId,
       [{ externalId: ROBIN, serverUserId: account.id, name: 'Robbie' }],
       'refresh'
     );
 
-    expect(ids).toEqual(new Map([[ROBIN, stored.id]]));
+    expect(resolved).toEqual(new Map([[ROBIN, { id: stored.id }]]));
     expect(await storedProfile(stored.id)).toMatchObject({ name: 'Robbie', removedAt: null });
   });
 
@@ -90,7 +90,7 @@ describe('resolveProfiles', () => {
       removedAt,
     });
 
-    const ids = await resolveProfiles(
+    const resolved = await resolveProfiles(
       serverId,
       [
         { externalId: ROBIN, serverUserId: account.id, name: 'Robbie' },
@@ -106,10 +106,10 @@ describe('resolveProfiles', () => {
     expect(added).toEqual([
       expect.objectContaining({ serverId, serverUserId: account.id, name: 'Morgan' }),
     ]);
-    expect(ids).toEqual(
+    expect(resolved).toEqual(
       new Map([
-        [ROBIN, stored.id],
-        [MORGAN, added[0]?.id],
+        [ROBIN, { id: stored.id }],
+        [MORGAN, { id: added[0]?.id }],
       ])
     );
     expect(await storedProfile(stored.id)).toMatchObject({ name: 'Robin', removedAt });
@@ -125,30 +125,34 @@ describe('resolveProfiles', () => {
     });
     const before = await storedProfile(stored.id);
 
-    const ids = await resolveProfiles(
+    const resolved = await resolveProfiles(
       serverId,
       [{ externalId: ROBIN, serverUserId: account.id, name: 'Robin' }],
       'refresh'
     );
 
-    expect(ids).toEqual(new Map([[ROBIN, stored.id]]));
+    expect(resolved).toEqual(new Map([[ROBIN, { id: stored.id }]]));
     expect(await storedProfile(stored.id)).toEqual(before);
   });
 
   it('sends no statement for a profile a live poll stored as sighted, and writes a rename', async () => {
     const { serverId, account } = await seed();
+    const thumbUrl = '/api/v1/profiles/avatars/kaiju.png';
     const stored = await createTestServerProfile({
       serverId,
       serverUserId: account.id,
       externalId: ROBIN,
       name: 'Robin',
+      thumbUrl,
+      isPrimary: false,
     });
     const sighting = { externalId: ROBIN, serverUserId: account.id, name: 'Robin' };
     await resolveProfiles(serverId, [sighting], 'refresh');
     const execute = vi.spyOn(db, 'execute');
 
-    const ids = await resolveProfiles(serverId, [sighting], 'refresh');
-    expect(ids).toEqual(new Map([[ROBIN, stored.id]]));
+    const resolved = await resolveProfiles(serverId, [sighting], 'refresh');
+    const nonMainProfile = { name: 'Robin', thumbUrl, removed: false };
+    expect(resolved).toEqual(new Map([[ROBIN, { id: stored.id, nonMainProfile }]]));
     expect(execute).not.toHaveBeenCalled();
 
     await resolveProfiles(serverId, [{ ...sighting, name: 'Robbie' }], 'refresh');
@@ -188,9 +192,9 @@ describe('resolveProfiles', () => {
     const sighting = { externalId: ROBIN, serverUserId: other.id, name: 'Robin' };
 
     await resolveProfiles(serverId, [sighting], 'refresh');
-    const ids = await resolveProfiles(serverId, [sighting], 'refresh');
+    const resolved = await resolveProfiles(serverId, [sighting], 'refresh');
 
-    expect(ids).toEqual(new Map([[ROBIN, stored.id]]));
+    expect(resolved).toEqual(new Map([[ROBIN, { id: stored.id }]]));
     expect(await storedProfile(stored.id)).toMatchObject({ serverUserId: account.id });
     expect(warn).toHaveBeenCalledOnce();
     expect(execute).toHaveBeenCalledOnce();
@@ -199,7 +203,7 @@ describe('resolveProfiles', () => {
   it('finds a profile another transaction stores while the write waits on it', async () => {
     const { serverId, account } = await seed();
     const sighting = { externalId: ROBIN, serverUserId: account.id, name: 'Robin' };
-    let resolved: Promise<Map<string, string>> | undefined;
+    let resolved: ReturnType<typeof resolveProfiles> | undefined;
 
     const stored = await db.transaction(async (tx) => {
       const [row] = await tx
@@ -218,7 +222,7 @@ describe('resolveProfiles', () => {
       return row;
     });
 
-    expect(await resolved).toEqual(new Map([[ROBIN, stored?.id]]));
+    expect(await resolved).toEqual(new Map([[ROBIN, { id: stored?.id }]]));
   });
 });
 

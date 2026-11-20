@@ -1224,14 +1224,20 @@ describe('Session Routes', () => {
       const stored = { profile_id: profileId, profile_name: 'Robin' };
       mockStartedAtPage([createMockHistoryRow(stored), createMockHistoryRow(stored)]);
       mockDb.select.mockReturnValue(
-        queryChain(vi.fn, [{ id: profileId, name: 'Robbie', removedAt: null }])
+        queryChain(vi.fn, [
+          { id: profileId, name: 'Robbie', thumbUrl: null, isPrimary: false, removedAt: null },
+        ])
       );
       const response = await app.inject({ method: 'GET', url: '/sessions/history' });
 
       expect(mockDb.select).toHaveBeenCalledTimes(1);
-      expect(response.json().data.map((row: { profileName: string }) => row.profileName)).toEqual([
-        'Robbie',
-        'Robbie',
+      const shown = {
+        profileName: 'Robbie',
+        nonMainProfile: { name: 'Robbie', thumbUrl: null, removed: false },
+      };
+      expect(response.json().data).toEqual([
+        expect.objectContaining(shown),
+        expect.objectContaining(shown),
       ]);
     });
   });

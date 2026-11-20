@@ -8,17 +8,8 @@ vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
 }));
 vi.mock('@/components/history/HistoryTable', () => ({
-  HistoryTable: ({
-    sessions,
-    showProfile,
-  }: {
-    sessions: { id: string }[];
-    showProfile: boolean;
-  }) => (
-    <p>
-      {sessions.map((session) => session.id).join(',')}
-      {showProfile && ' with the profile column'}
-    </p>
+  HistoryTable: ({ sessions }: { sessions: { id: string }[] }) => (
+    <p>{sessions.map((session) => session.id).join(',')}</p>
   ),
 }));
 vi.mock('@/hooks/useServer', () => ({ useServer: () => ({ servers: [] }) }));
@@ -32,6 +23,7 @@ const robin: ProfileFilterOption = {
   serverUserId: 'su-1',
   accountUsername: 'alice',
   serverName: 'Den',
+  main: false,
   removed: false,
 };
 
@@ -85,17 +77,5 @@ describe('SessionsTab', () => {
       scope: 'identity',
       profileIds: ['p-robin'],
     });
-  });
-
-  it('names the profile on each row, without a pick, for an account with one profile', () => {
-    vi.mocked(useUserSessions).mockReturnValue({
-      data: { data: [{ id: 's-1', serverId: 'server-1' }], total: 1 },
-      isLoading: false,
-    } as unknown as ReturnType<typeof useUserSessions>);
-
-    renderTab([robin]);
-
-    expect(screen.getByText('s-1 with the profile column')).toBeInTheDocument();
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 });

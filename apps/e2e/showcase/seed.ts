@@ -1069,7 +1069,6 @@ function toActiveSession(entry: ActiveRow): ActiveSession {
     isLocal: false,
     profileId: null,
     profileName: null,
-    profileRemoved: false,
     playerName: row.device.playerName,
     deviceId: row.deviceId,
     product: row.device.product,

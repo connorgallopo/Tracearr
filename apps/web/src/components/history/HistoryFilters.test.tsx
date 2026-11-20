@@ -2,7 +2,7 @@ import { beforeAll, describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { initI18n } from '@tracearr/translations';
-import type { HistoryFilterOptions } from '@tracearr/shared';
+import type { HistoryFilterOptions, ProfileFilterOption } from '@tracearr/shared';
 import { HistoryFiltersBar, DEFAULT_COLUMN_VISIBILITY } from './HistoryFilters';
 import type { HistoryFilters } from '@/hooks/queries/useHistory';
 
@@ -38,25 +38,31 @@ const filterOptions: HistoryFilterOptions = {
   profiles: [],
 };
 
+const alicesMain: ProfileFilterOption = {
+  id: 'p-morgan',
+  name: 'Morgan',
+  serverUserId: 'su-secondary',
+  accountUsername: 'alice_tofa',
+  serverName: 'Den',
+  main: true,
+  removed: false,
+};
+
+const bobsMain: ProfileFilterOption = {
+  ...alicesMain,
+  id: 'p-casey',
+  name: 'Casey',
+  serverUserId: 'su-solo',
+  accountUsername: 'bob_tofa',
+};
+
 const withProfiles: HistoryFilterOptions = {
   ...filterOptions,
   profiles: [
-    {
-      id: 'p-robin',
-      name: 'Robin',
-      serverUserId: 'su-secondary',
-      accountUsername: 'alice_tofa',
-      serverName: 'Den',
-      removed: false,
-    },
-    {
-      id: 'p-sam',
-      name: 'Sam',
-      serverUserId: 'su-secondary',
-      accountUsername: 'alice_tofa',
-      serverName: 'Den',
-      removed: true,
-    },
+    bobsMain,
+    alicesMain,
+    { ...alicesMain, id: 'p-robin', name: 'Robin', main: false },
+    { ...alicesMain, id: 'p-sam', name: 'Sam', main: false, removed: true },
   ],
 };
 
@@ -170,13 +176,15 @@ describe('HistoryFiltersBar', () => {
     );
   });
 
-  it('lists profiles under their account and filters to the one picked', async () => {
+  it('lists an account with a non-main profile, its main one as the account, and filters to the one picked', async () => {
     const { onFiltersChange } = renderBar({}, {}, { options: withProfiles });
 
     await userEvent.click(screen.getByRole('button', { name: /filters/i }));
     await userEvent.click(await screen.findByText('Profiles'));
-    const account = await screen.findByRole('group', { name: 'alice_tofa · Den' });
+    const account = await screen.findByRole('group', { name: 'alice_tofa' });
+    expect(within(account).getByRole('menuitemcheckbox', { name: 'alice_tofa' })).toBeVisible();
     expect(within(account).getByRole('menuitemcheckbox', { name: 'Sam (removed)' })).toBeVisible();
+    expect(screen.queryByRole('group', { name: 'bob_tofa' })).not.toBeInTheDocument();
     await userEvent.click(within(account).getByRole('menuitemcheckbox', { name: 'Robin' }));
 
     expect(onFiltersChange).toHaveBeenLastCalledWith(
@@ -184,8 +192,8 @@ describe('HistoryFiltersBar', () => {
     );
   });
 
-  it('has no Profiles filter when no account holds profiles', async () => {
-    renderBar({});
+  it('has no Profiles filter when every account has only its main profile', async () => {
+    renderBar({}, {}, { options: { ...filterOptions, profiles: [alicesMain, bobsMain] } });
 
     await userEvent.click(screen.getByRole('button', { name: /filters/i }));
 

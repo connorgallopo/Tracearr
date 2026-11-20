@@ -115,15 +115,12 @@ export interface ReverifyKillConditionResult {
   skipReason?: string;
 }
 
-/**
- * A session with its server and account, in the shape the engine evaluates. profileRemoved stays
- * false as on the poller's sessions: no condition reads it, so the re-check reads no profile.
- */
+/** A session with its server and account, in the shape the engine evaluates */
 async function readContextSession(id: string, startedAt: string | undefined) {
   const found = await readSessionRow(id, startedAt, (where) =>
     db.query.sessions.findFirst({ where, with: { server: true, serverUser: true } })
   );
-  return found && { ...found, isLocal: isLocalSession(found), profileRemoved: false };
+  return found && { ...found, isLocal: isLocalSession(found) };
 }
 
 /**

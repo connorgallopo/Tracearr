@@ -303,7 +303,7 @@ export async function importTofaHistory(
       serverId,
       items.flatMap((row) => historyItem(row).ratingKey ?? [])
     );
-    const profileIds = await resolveProfiles(
+    const profiles = await resolveProfiles(
       serverId,
       profileSightings(items, userMap),
       'insertMissing'
@@ -352,7 +352,7 @@ export async function importTofaHistory(
             geo,
             identity: ratingKey ? identityByKey.get(ratingKey) : undefined,
             profileName: row.profile_name ?? null,
-            profileId: profileIdOf(profileIds, row),
+            profileId: profileIdOf(profiles, row),
           })
         );
 
@@ -441,13 +441,13 @@ export async function linkTofaPlayProfiles(
       serverId,
       rows.map((row) => row.user_id)
     );
-    const profileIds = await resolveProfiles(
+    const profiles = await resolveProfiles(
       serverId,
       profileSightings(rows, accountOf),
       'insertRemoved'
     );
     const plays = rows.flatMap((row) => {
-      const profileId = profileIdOf(profileIds, row);
+      const profileId = profileIdOf(profiles, row);
       const serverUserId = accountOf.get(row.user_id);
       return profileId && serverUserId ? [{ row, profileId, serverUserId }] : [];
     });

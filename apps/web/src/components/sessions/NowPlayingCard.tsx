@@ -23,7 +23,7 @@ import { useServer } from '@/hooks/useServer';
 import { ServerColorAccent } from '@/components/server';
 import { TerminateSessionDialog } from './TerminateSessionDialog';
 import { LocalBadge } from './LocalBadge';
-import { NameWithProfile } from './NameWithProfile';
+import { AvatarWithProfile } from './AvatarWithProfile';
 import { MediaPageLink } from '@/components/media/MediaPageLink';
 import {
   PLAYBACK_DECISION_LABEL_KEYS,
@@ -161,18 +161,17 @@ export function NowPlayingCard({ session, onClick }: NowPlayingCardProps) {
             {/* Top row: User and badges */}
             <div className="flex items-start justify-between gap-2">
               <div className="flex min-w-0 items-center gap-2">
-                <Avatar className="border-background h-7 w-7 shrink-0 border-2 shadow">
-                  <AvatarImage src={avatarUrl} alt={displayName} />
-                  <AvatarFallback className="text-xs">
-                    {displayName.slice(0, 2).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <NameWithProfile
-                  name={displayName}
-                  profileName={session.profileName}
-                  profileRemoved={session.profileRemoved}
-                  className="text-sm font-medium"
-                />
+                <AvatarWithProfile serverId={session.serverId} profile={session.nonMainProfile}>
+                  <Avatar className="border-background h-7 w-7 shrink-0 border-2 shadow">
+                    <AvatarImage src={avatarUrl} alt={displayName} />
+                    <AvatarFallback className="text-xs">
+                      {displayName.slice(0, 2).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </AvatarWithProfile>
+                <span className="truncate text-sm font-medium" title={displayName}>
+                  {displayName}
+                </span>
               </div>
 
               <div className="flex shrink-0 items-center gap-1.5">

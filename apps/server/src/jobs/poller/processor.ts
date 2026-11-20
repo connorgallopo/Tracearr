@@ -43,7 +43,7 @@ import type { CacheService, PubSubService, TerminationCooldown } from '../../ser
 import { geoipService } from '../../services/geoip.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
 import { serverWatchedThreshold } from '../../services/mediaServer/byServerType.js';
-import { resolveProfiles } from '../../services/profiles.js';
+import { resolveProfiles, type ResolvedProfile } from '../../services/profiles.js';
 import {
   RELAYED_SESSION_GEO,
   resolveSessionGeo,
@@ -1128,7 +1128,7 @@ async function processServerSessions(
 
     // Set before any play goes pending or is written, so either one carries its profile. A
     // profile is optional data, so a failed write stores the plays with the profile name only.
-    const profileIds = await resolveProfiles(
+    const profiles = await resolveProfiles(
       server.id,
       processedSessions.flatMap((processed, i) => {
         const serverUserId = sessionServerUserIds[i];
@@ -1139,12 +1139,14 @@ async function processServerSessions(
       'refresh'
     ).catch((error: unknown) => {
       console.error(`[Poller] Failed to resolve profiles on ${server.name}:`, error);
-      return new Map<string, string>();
+      return new Map<string, ResolvedProfile>();
     });
     for (const processed of processedSessions) {
-      processed.profileId = processed.profileExternalId
-        ? (profileIds.get(processed.profileExternalId) ?? null)
-        : null;
+      const profile = processed.profileExternalId
+        ? profiles.get(processed.profileExternalId)
+        : undefined;
+      processed.profileId = profile?.id ?? null;
+      processed.nonMainProfile = profile?.nonMainProfile;
     }
 
     // OPTIMIZATION: Batch load recent sessions for rule evaluation (new sessions only)

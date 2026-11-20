@@ -45,7 +45,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TimeRangePicker, type TimeRangeValue } from '@/components/ui/time-range-picker';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useProfileLabel } from '@/components/sessions/useProfileLabel';
+import { useProfileOptionLabel } from '@/components/sessions/useProfileLabel';
 import type { HistoryFilters } from '@/hooks/queries/useHistory';
 import { PLAYBACK_DECISION_ICONS } from '@/lib/playbackBadge';
 import {
@@ -141,7 +141,7 @@ export function HistoryFiltersBar({
   isMember = false,
 }: Props) {
   const { t } = useTranslation(['common', 'pages', 'nav']);
-  const profileLabel = useProfileLabel();
+  const profileOptionLabel = useProfileOptionLabel();
   const [searchInput, setSearchInput] = useState(filters.search ?? '');
 
   // Sync search input with filters
@@ -197,7 +197,7 @@ export function HistoryFiltersBar({
       const profileNames =
         filterOptions?.profiles
           .filter((profile) => filters.profileIds?.includes(profile.id))
-          .map(profileLabel) ?? [];
+          .map(profileOptionLabel) ?? [];
       active.push({
         key: 'profileIds',
         label: t('common:labels.profiles'),
@@ -279,7 +279,14 @@ export function HistoryFiltersBar({
     }
 
     return active;
-  }, [filters, filterOptions?.users, filterOptions?.profiles, profileLabel, mediaTypeLabels, t]);
+  }, [
+    filters,
+    filterOptions?.users,
+    filterOptions?.profiles,
+    profileOptionLabel,
+    mediaTypeLabels,
+    t,
+  ]);
 
   // Debounced search effect
   useEffect(() => {
@@ -335,7 +342,7 @@ export function HistoryFiltersBar({
   const profileGroups = useMemo(() => {
     const groups = new Map<
       string,
-      { serverUserId: string; account: string; profiles: ProfileFilterOption[] }
+      { serverUserId: string; account: string; server: string; profiles: ProfileFilterOption[] }
     >();
     for (const profile of filterOptions?.profiles ?? []) {
       const group = groups.get(profile.serverUserId);
@@ -344,13 +351,18 @@ export function HistoryFiltersBar({
       } else {
         groups.set(profile.serverUserId, {
           serverUserId: profile.serverUserId,
-          account: `${profile.accountUsername} · ${profile.serverName}`,
+          account: profile.accountUsername,
+          server: profile.serverName,
           profiles: [profile],
         });
       }
     }
-    return [...groups.values()].sort((a, b) => a.account.localeCompare(b.account));
+    // A main profile shows as its account, so only an account with another profile is offered
+    return [...groups.values()]
+      .filter((group) => group.profiles.some((profile) => !profile.main))
+      .sort((a, b) => a.account.localeCompare(b.account) || a.server.localeCompare(b.server));
   }, [filterOptions?.profiles]);
+  const profileServersDiffer = new Set(profileGroups.map((group) => group.server)).size > 1;
 
   return (
     <div className="space-y-3">
@@ -457,7 +469,7 @@ export function HistoryFiltersBar({
               </DropdownMenuSub>
             )}
 
-            {/* Profile filter - multi-select, for servers whose accounts hold several profiles */}
+            {/* Profile filter - multi-select, for accounts with a profile besides their main one */}
             {!isMember && profileGroups.length > 0 && (
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>
@@ -481,10 +493,11 @@ export function HistoryFiltersBar({
                           <DropdownMenuSeparator />
                         </>
                       ) : null}
-                      {profileGroups.map(({ serverUserId, account, profiles }) => (
+                      {profileGroups.map(({ serverUserId, account, server, profiles }) => (
                         <DropdownMenuGroup key={serverUserId} aria-label={account}>
-                          <DropdownMenuLabel className="text-muted-foreground truncate text-xs">
-                            {account}
+                          <DropdownMenuLabel className="text-muted-foreground flex justify-between gap-2 text-xs">
+                            <span className="truncate">{account}</span>
+                            {profileServersDiffer && <span className="shrink-0">{server}</span>}
                           </DropdownMenuLabel>
                           {profiles.map((profile) => (
                             <DropdownMenuCheckboxItem
@@ -498,7 +511,7 @@ export function HistoryFiltersBar({
                               }
                               onSelect={(e) => e.preventDefault()}
                             >
-                              <span className="truncate">{profileLabel(profile)}</span>
+                              <span className="truncate">{profileOptionLabel(profile)}</span>
                             </DropdownMenuCheckboxItem>
                           ))}
                         </DropdownMenuGroup>

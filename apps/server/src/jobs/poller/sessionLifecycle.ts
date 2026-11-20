@@ -13,6 +13,7 @@ import {
   TIME_MS,
   type ActiveSession,
   type EngineAutomation,
+  type NonMainProfile,
   type Session,
   type StreamDetailFields,
   type ServerType,
@@ -132,6 +133,7 @@ export interface BuildActiveSessionInput {
     serverVersionKey?: string | null;
     profileName?: string | null;
     profileId: string | null;
+    nonMainProfile?: NonMainProfile;
     ipAddress: string;
     playerName: string;
     deviceId: string;
@@ -258,7 +260,7 @@ export function buildActiveSession(input: BuildActiveSessionInput): ActiveSessio
     isLocal: geo.isLocal,
     profileId: processed.profileId,
     profileName: processed.profileName ?? null,
-    profileRemoved: false,
+    nonMainProfile: processed.nonMainProfile,
     playerName: processed.playerName,
     deviceId: processed.deviceId || null,
     product: processed.product || null,
@@ -370,7 +372,7 @@ export function buildPendingActiveSession(pendingData: PendingSessionData): Acti
     isLocal: withLocalFlag(geo, processed.ipAddress).isLocal,
     profileId: processed.profileId,
     profileName: processed.profileName ?? null,
-    profileRemoved: false,
+    nonMainProfile: processed.nonMainProfile,
     playerName: processed.playerName,
     deviceId: processed.deviceId || null,
     product: processed.product || null,

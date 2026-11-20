@@ -9,7 +9,7 @@
 import { randomUUID } from 'node:crypto';
 import { describe, it, expect, afterEach } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import type { HistoryFilterOptions, HistorySessionResponse } from '@tracearr/shared';
+import type { HistoryFilterOptions, HistorySessionResponse, Session } from '@tracearr/shared';
 import {
   createStoppedSession,
   createTestServer,
@@ -82,11 +82,7 @@ async function historyRows() {
 
 async function detail(sessionId: string) {
   const response = await get(`/sessions/${sessionId}`);
-  return response.json<{
-    profileId: string | null;
-    profileName: string | null;
-    profileRemoved: boolean;
-  }>();
+  return response.json<Pick<Session, 'profileId' | 'profileName' | 'nonMainProfile'>>();
 }
 
 describe('the profile shown on a play', () => {
@@ -106,7 +102,7 @@ describe('the profile shown on a play', () => {
       'refresh'
     );
 
-    const shown = { profileId: robin.id, profileName: 'Robbie', profileRemoved: false };
+    const shown = { profileId: robin.id, profileName: 'Robbie' };
     expect(await historyRows()).toEqual([expect.objectContaining(shown)]);
     expect(await detail(playId)).toMatchObject(shown);
   });
@@ -118,12 +114,17 @@ describe('the profile shown on a play', () => {
       serverUserId: account.id,
       externalId: randomUUID(),
       name: 'Sam',
+      isPrimary: false,
     });
     const playId = await play(serverId, account.id, sam);
 
     await syncAccountProfiles(serverId, fakeTofaClient(), [MORGAN_ACCOUNT]);
 
-    const shown = { profileId: sam.id, profileName: 'Sam', profileRemoved: true };
+    const shown = {
+      profileId: sam.id,
+      profileName: 'Sam',
+      nonMainProfile: { name: 'Sam', thumbUrl: null, removed: true },
+    };
     expect(await historyRows()).toEqual([expect.objectContaining(shown)]);
     expect(await detail(playId)).toMatchObject(shown);
   });
@@ -132,9 +133,39 @@ describe('the profile shown on a play', () => {
     const { serverId, account } = await seedAccount();
     const playId = await play(serverId, account.id, { id: null, name: 'Kids' });
 
-    const shown = { profileId: null, profileName: 'Kids', profileRemoved: false };
+    const shown = { profileId: null, profileName: 'Kids' };
     expect(await historyRows()).toEqual([expect.objectContaining(shown)]);
     expect(await detail(playId)).toMatchObject(shown);
+  });
+
+  it('shows a non-main profile with its picture, and leaves a main one, said or not, to the account', async () => {
+    const { serverId, account } = await seedAccount();
+    const profile = (name: string, isPrimary: boolean | null, thumbUrl: string | null = null) =>
+      createTestServerProfile({
+        serverId,
+        serverUserId: account.id,
+        externalId: randomUUID(),
+        name,
+        isPrimary,
+        thumbUrl,
+      });
+    const thumbUrl = '/api/v1/profiles/avatars/kaiju.png';
+    const morganPlay = await play(serverId, account.id, await profile('Morgan', true));
+    const unsaidPlay = await play(serverId, account.id, await profile('Casey', null));
+    const robinPlay = await play(serverId, account.id, await profile('Robin', false, thumbUrl));
+
+    const rows = await historyRows();
+
+    expect(new Map(rows.map((row) => [row.id, row.nonMainProfile]))).toEqual(
+      new Map([
+        [morganPlay, undefined],
+        [unsaidPlay, undefined],
+        [robinPlay, { name: 'Robin', thumbUrl, removed: false }],
+      ])
+    );
+    expect(await detail(robinPlay)).toMatchObject({
+      nonMainProfile: { name: 'Robin', thumbUrl, removed: false },
+    });
   });
 });
 
@@ -167,7 +198,7 @@ describe('the profile filter', () => {
     expect(rows.map((row) => row.id).toSorted()).toEqual(robinPlays.toSorted());
   });
 
-  it("offers the selected servers' profiles, removed ones included, named by their account", async () => {
+  it("offers the selected servers' profiles, removed ones included, named by their account and marked main", async () => {
     const { serverId, serverName, account } = await seedAccount();
     const elsewhere = await seedAccount();
     const robin = await createTestServerProfile({
@@ -181,6 +212,7 @@ describe('the profile filter', () => {
       serverUserId: account.id,
       externalId: randomUUID(),
       name: 'Sam',
+      isPrimary: false,
       removedAt: new Date('2026-11-01T00:00:00Z'),
     });
     await createTestServerProfile({
@@ -199,6 +231,7 @@ describe('the profile filter', () => {
         serverUserId: account.id,
         accountUsername: account.username,
         serverName,
+        main: true,
         removed: false,
       },
       {
@@ -207,6 +240,7 @@ describe('the profile filter', () => {
         serverUserId: account.id,
         accountUsername: account.username,
         serverName,
+        main: false,
         removed: true,
       },
     ]);

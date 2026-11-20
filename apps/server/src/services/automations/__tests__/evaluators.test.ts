@@ -91,7 +91,6 @@ function createMockSession(overrides: Partial<Session> = {}): Session {
     isLocal: false,
     profileId: null,
     profileName: null,
-    profileRemoved: false,
     playerName: 'Player 1',
     deviceId: 'device-1',
     product: 'Plex Web',

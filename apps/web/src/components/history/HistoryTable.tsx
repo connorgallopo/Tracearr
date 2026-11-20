@@ -43,8 +43,7 @@ import { playbackBadge } from '@/lib/playbackBadge';
 import { formatDate, formatDuration } from '@/lib/dateFormat';
 import { getAvatarUrl } from '@/components/users/utils';
 import { LocalBadge } from '@/components/sessions/LocalBadge';
-import { NameWithProfile } from '@/components/sessions/NameWithProfile';
-import { useProfileLabel } from '@/components/sessions/useProfileLabel';
+import { AvatarWithProfile } from '@/components/sessions/AvatarWithProfile';
 import { TIER_COLORS } from '@/components/charts/EngagementChart';
 import {
   PLAYBACK_DECISION_LABEL_KEYS,
@@ -130,7 +129,8 @@ interface Props {
   sortDir?: SortDirection;
   onSortChange?: (column: SortableColumn) => void;
   isMultiServer?: boolean;
-  showProfile?: boolean;
+  /** The names a Profile column shows, by profile id; the column shows only when given */
+  profileNames?: ReadonlyMap<string, string>;
 }
 
 const STATE_ICON_CONFIG = {
@@ -190,7 +190,7 @@ interface HistoryTableRowProps {
   onClick?: () => void;
   columnVisibility: ColumnVisibility;
   isMultiServer?: boolean;
-  showProfile?: boolean;
+  profileNames?: ReadonlyMap<string, string>;
   style?: React.CSSProperties;
   'data-index'?: number;
 }
@@ -204,7 +204,7 @@ export const HistoryTableRow = memo(
         onClick,
         columnVisibility,
         isMultiServer = false,
-        showProfile = false,
+        profileNames,
         style,
         'data-index': dataIndex,
       },
@@ -216,7 +216,10 @@ export const HistoryTableRow = memo(
       const playedAt = new Date(session.lastStartedAt ?? session.startedAt);
       const colorMap = useServerColorMap();
       const { t } = useTranslation(['common', 'pages']);
-      const profileLabel = useProfileLabel();
+      // A play whose profile has no row keeps the name it stored
+      const profileName = session.profileId
+        ? profileNames?.get(session.profileId)
+        : session.profileName;
       const verbKeys = verbKeysFor(session.mediaType);
       const verbs = { watched: t(verbKeys.watched), watchTime: t(verbKeys.watchTime) };
       const serverColor = isMultiServer ? (colorMap.get(session.serverId) ?? null) : null;
@@ -273,33 +276,30 @@ export const HistoryTableRow = memo(
                 onClick={(e) => e.stopPropagation()}
                 className="flex items-center gap-2 hover:underline"
               >
-                <Avatar className="h-6 w-6">
-                  <AvatarImage
-                    src={getAvatarUrl(session.serverId, session.user.thumbUrl, 24) ?? undefined}
-                  />
-                  <AvatarFallback className="text-xs">
-                    {(session.user.identityName ?? session.user.username)?.[0]?.toUpperCase() ??
-                      '?'}
-                  </AvatarFallback>
-                </Avatar>
+                <AvatarWithProfile serverId={session.serverId} profile={session.nonMainProfile}>
+                  <Avatar className="h-6 w-6">
+                    <AvatarImage
+                      src={getAvatarUrl(session.serverId, session.user.thumbUrl, 24) ?? undefined}
+                    />
+                    <AvatarFallback className="text-xs">
+                      {(session.user.identityName ?? session.user.username)?.[0]?.toUpperCase() ??
+                        '?'}
+                    </AvatarFallback>
+                  </Avatar>
+                </AvatarWithProfile>
                 <div className="min-w-0 flex-1">
-                  <NameWithProfile
-                    name={session.user.identityName ?? session.user.username}
-                    profileName={session.profileName}
-                    profileRemoved={session.profileRemoved}
-                    className="block text-sm"
-                  />
+                  <span className="block truncate text-sm">
+                    {session.user.identityName ?? session.user.username}
+                  </span>
                 </div>
               </Link>
             </TableCell>
           )}
 
-          {showProfile && (
+          {profileNames && (
             <TableCell className={COLUMN_WIDTHS.profile}>
-              {session.profileName ? (
-                <span className="block truncate text-sm">
-                  {profileLabel({ name: session.profileName, removed: session.profileRemoved })}
-                </span>
+              {profileName ? (
+                <span className="block truncate text-sm">{profileName}</span>
               ) : (
                 <NoValue />
               )}
@@ -710,9 +710,10 @@ export function HistoryTable({
   sortDir,
   onSortChange,
   isMultiServer = false,
-  showProfile = false,
+  profileNames,
 }: Props) {
   const { t } = useTranslation(['common', 'pages']);
+  const showProfile = profileNames !== undefined;
   const visibleColumnCount =
     getVisibleColumnCount(columnVisibility, isMultiServer) + (showProfile ? 1 : 0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -842,7 +843,7 @@ export function HistoryTable({
                 onClick={onSessionClick ? () => onSessionClick(session) : undefined}
                 columnVisibility={columnVisibility}
                 isMultiServer={isMultiServer}
-                showProfile={showProfile}
+                profileNames={profileNames}
               />
             );
           })}

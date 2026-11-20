@@ -10,6 +10,7 @@ import type {
   SessionState,
   EngineAutomation,
   ActiveSession,
+  NonMainProfile,
   StreamDetailFields,
   ServerType,
 } from '@tracearr/shared';
@@ -109,6 +110,8 @@ export interface ProcessedSession extends StreamDetailFields {
   profileExternalId: string | null;
   /** The profile's server_profiles row; null until a poll resolves it */
   profileId: string | null;
+  /** The resolved profile as screens show it, when it is not its account's main profile */
+  nonMainProfile?: NonMainProfile;
 
   // User identification from media server
   /** External user ID from Plex/Jellyfin for lookup */

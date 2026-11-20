@@ -38,6 +38,7 @@ export type {
   SessionState,
   MediaType,
   Session,
+  NonMainProfile,
   SessionSegment,
   SessionWithDetails,
   ActiveSession,

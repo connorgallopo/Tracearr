@@ -50,7 +50,7 @@ import { playbackBadge } from '@/lib/playbackBadge';
 import { DATE_TIME_OPTIONS, formatDate, formatDuration } from '@/lib/dateFormat';
 import { getAvatarUrl } from '@/components/users/utils';
 import { LocalBadge } from '@/components/sessions/LocalBadge';
-import { NameWithProfile } from '@/components/sessions/NameWithProfile';
+import { useProfileLabel } from '@/components/sessions/useProfileLabel';
 import { MediaPageLink } from '@/components/media/MediaPageLink';
 import { StreamDetailsPanel } from './StreamDetailsPanel';
 
@@ -226,6 +226,7 @@ function SessionContent({
   onNavigate: () => void;
 }) {
   const { t } = useTranslation(['common', 'pages']);
+  const profileLabel = useProfileLabel();
   const viewer = useAuth().user;
   const canOpenUser = !!viewer && isStaff(viewer.role);
   const [locationOpen, setLocationOpen] = useState(false);
@@ -345,12 +346,9 @@ function SessionContent({
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <NameWithProfile
-                  name={session.user.identityName ?? session.user.username}
-                  profileName={session.profileName}
-                  profileRemoved={session.profileRemoved}
-                  className="block font-medium"
-                />
+                <p className="truncate font-medium">
+                  {session.user.identityName ?? session.user.username}
+                </p>
                 {canOpenUser && (
                   <p className="text-muted-foreground text-xs">{t('actions.viewProfile')}</p>
                 )}
@@ -372,17 +370,25 @@ function SessionContent({
 
         {/* Server */}
         <Section icon={Server} title={t('labels.server')}>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">{t('labels.server')}</span>
-            <span className="flex items-center gap-1.5">
-              <span
-                className="size-2 shrink-0 rounded-full"
-                style={{ backgroundColor: SERVER_TYPE_BRAND_COLORS[session.server.type] }}
-              />
-              <span>{SERVER_PROFILES[session.server.type].displayName}</span>
-              <span className="text-muted-foreground">·</span>
-              {session.server.name}
-            </span>
+          <div className="space-y-1.5 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-muted-foreground">{t('labels.server')}</span>
+              <span className="flex items-center gap-1.5">
+                <span
+                  className="size-2 shrink-0 rounded-full"
+                  style={{ backgroundColor: SERVER_TYPE_BRAND_COLORS[session.server.type] }}
+                />
+                <span>{SERVER_PROFILES[session.server.type].displayName}</span>
+                <span className="text-muted-foreground">·</span>
+                {session.server.name}
+              </span>
+            </div>
+            {session.nonMainProfile && (
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">{t('labels.profile')}</span>
+                <span className="truncate">{profileLabel(session.nonMainProfile)}</span>
+              </div>
+            )}
           </div>
         </Section>
 

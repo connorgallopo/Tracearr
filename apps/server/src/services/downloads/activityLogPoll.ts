@@ -241,7 +241,7 @@ async function pollTofa(server: ServerRow): Promise<void> {
       server.id,
       rows.map((download) => download.user_id)
     );
-    const profileIds = await resolveProfiles(
+    const profiles = await resolveProfiles(
       server.id,
       profileSightings(rows, accountOf),
       'insertMissing'
@@ -252,7 +252,7 @@ async function pollTofa(server: ServerRow): Promise<void> {
       for (const { download, media } of downloads) {
         const serverUserId = accountOf.get(download.user_id) ?? null;
         await recordDownload(
-          tofaSignal(server, download, media, serverUserId, profileIdOf(profileIds, download))
+          tofaSignal(server, download, media, serverUserId, profileIdOf(profiles, download))
         ).catch((error: unknown) => {
           console.error(
             `[Downloads] Download ${download.id} on ${server.name} not recorded:`,

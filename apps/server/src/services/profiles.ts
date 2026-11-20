@@ -4,7 +4,12 @@
  */
 
 import { and, eq, inArray, isNotNull, isNull, notInArray, sql, type SQL } from 'drizzle-orm';
-import { someServerHasProfiles, type ProfileFilterOption } from '@tracearr/shared';
+import {
+  someServerHasProfiles,
+  type NonMainProfile,
+  type ProfileFilterOption,
+  type Session,
+} from '@tracearr/shared';
 import { db, type Executor } from '../db/client.js';
 import { serverProfiles, servers, serverUsers } from '../db/schema.js';
 import { getServerTypes, getServerUserIdsByExternalId } from '../jobs/poller/database.js';
@@ -46,11 +51,19 @@ type StoredProfileRow = {
   external_id: string;
   server_user_id: string;
   name: string;
+  thumb_url: string | null;
+  is_primary: boolean | null;
+  removed: boolean;
 };
 
-/** A profile as a live poll last wrote it: its row, the account the poll saw it under, its name */
-interface PolledProfile {
+/** A sighted profile's stored row, and how screens show it */
+export interface ResolvedProfile {
   id: string;
+  nonMainProfile?: NonMainProfile;
+}
+
+/** A profile as a live poll last wrote it, with the account the poll saw it under and its name */
+interface PolledProfile extends ResolvedProfile {
   serverUserId: string;
   name: string;
 }
@@ -67,6 +80,23 @@ const warnedProfileIds = new Set<string>();
 export function forgetPolledProfiles(serverId?: string): void {
   if (serverId === undefined) livePolledProfiles.clear();
   else livePolledProfiles.delete(serverId);
+}
+
+// A profile the server says nothing about counts as its account's main one
+function isMainProfile(isPrimary: boolean | null): boolean {
+  return isPrimary !== false;
+}
+
+/** The profile as screens show it; nothing for a main profile, which shows as its account */
+function nonMainProfileOf(profile: {
+  name: string;
+  thumbUrl: string | null;
+  isPrimary: boolean | null;
+  removed: boolean;
+}): NonMainProfile | undefined {
+  return isMainProfile(profile.isPrimary)
+    ? undefined
+    : { name: profile.name, thumbUrl: profile.thumbUrl, removed: profile.removed };
 }
 
 // Code unit order, the order of COLLATE "C" for these ids, so it matches lockProfilesInOrder
@@ -102,15 +132,15 @@ export function profileSightings(
 
 /** The server_profiles id of the profile a row names, from what resolveProfiles returned */
 export function profileIdOf(
-  profileIds: ReadonlyMap<string, string>,
+  profiles: ReadonlyMap<string, ResolvedProfile>,
   row: Pick<ProfileNamingRow, 'profile_id'>
 ): string | null {
-  return row.profile_id ? (profileIds.get(row.profile_id) ?? null) : null;
+  return row.profile_id ? (profiles.get(row.profile_id)?.id ?? null) : null;
 }
 
 /**
- * The server_profiles id of each sighted profile, by the server's profile id, inserting the
- * ones not stored yet. Live plays `refresh` the name and clear a removal; plays from the
+ * The stored row of each sighted profile, by the server's profile id, inserting the ones not
+ * stored yet. Live plays `refresh` the name and clear a removal; plays from the
  * past only `insertMissing`, so an old name never overwrites the current one. A profile only
  * the past names, after the user sync stored every profile the server lists, is one the server
  * no longer has: `insertRemoved` stores it marked removed. A live sighting a live poll already
@@ -120,24 +150,24 @@ export async function resolveProfiles(
   serverId: string,
   sightings: ProfileSighting[],
   mode: SightingMode
-): Promise<Map<string, string>> {
+): Promise<Map<string, ResolvedProfile>> {
   if (sightings.length === 0) return new Map();
   const polled =
     mode === 'refresh'
       ? (livePolledProfiles.get(serverId) ?? new Map<string, PolledProfile>())
       : undefined;
   if (polled) livePolledProfiles.set(serverId, polled);
-  const profileIds = new Map<string, string>();
+  const resolved = new Map<string, ResolvedProfile>();
   const toWrite: ProfileSighting[] = [];
   for (const sighting of new Map(sightings.map((seen) => [seen.externalId, seen])).values()) {
     const profile = polled?.get(sighting.externalId);
     if (profile?.serverUserId === sighting.serverUserId && profile.name === sighting.name) {
-      profileIds.set(sighting.externalId, profile.id);
+      resolved.set(sighting.externalId, { id: profile.id, nonMainProfile: profile.nonMainProfile });
     } else {
       toWrite.push(sighting);
     }
   }
-  if (toWrite.length === 0) return profileIds;
+  if (toWrite.length === 0) return resolved;
 
   const incoming = sql.join(
     toWrite
@@ -158,11 +188,13 @@ export async function resolveProfiles(
         SELECT ${serverId}::uuid, server_user_id, external_id, name, ${WRITE_BY_MODE[mode].removedAt}
         FROM incoming
         ON CONFLICT (server_id, external_id) ${WRITE_BY_MODE[mode].onConflict}
-        RETURNING id, external_id, server_user_id, name
+        RETURNING id, external_id, server_user_id, name, thumb_url, is_primary,
+          removed_at IS NOT NULL AS removed
       )
-      SELECT id, external_id, server_user_id, name FROM written
+      SELECT id, external_id, server_user_id, name, thumb_url, is_primary, removed FROM written
       UNION ALL
-      SELECT p.id, p.external_id, p.server_user_id, p.name
+      SELECT p.id, p.external_id, p.server_user_id, p.name, p.thumb_url, p.is_primary,
+        p.removed_at IS NOT NULL
       FROM server_profiles p
       JOIN incoming i ON i.external_id = p.external_id
       WHERE p.server_id = ${serverId}
@@ -176,7 +208,9 @@ export async function resolveProfiles(
   const unread = toWrite.filter((sighting) => !rowOf.has(sighting.externalId));
   if (unread.length > 0) {
     const { rows: committed } = await db.execute<StoredProfileRow>(sql`
-      SELECT id, external_id, server_user_id, name FROM server_profiles
+      SELECT id, external_id, server_user_id, name, thumb_url, is_primary,
+        removed_at IS NOT NULL AS removed
+      FROM server_profiles
       WHERE server_id = ${serverId}
         AND external_id = ANY(${sql.param(unread.map((sighting) => sighting.externalId))}::text[])
     `);
@@ -186,10 +220,19 @@ export async function resolveProfiles(
   for (const sighting of toWrite) {
     const row = rowOf.get(sighting.externalId);
     if (!row) continue;
-    profileIds.set(sighting.externalId, row.id);
+    const profile = {
+      id: row.id,
+      nonMainProfile: nonMainProfileOf({
+        name: row.name,
+        thumbUrl: row.thumb_url,
+        isPrimary: row.is_primary,
+        removed: row.removed,
+      }),
+    };
+    resolved.set(sighting.externalId, profile);
     // Every row a refresh returns is stored under that name and not removed
     polled?.set(sighting.externalId, {
-      id: row.id,
+      ...profile,
       serverUserId: sighting.serverUserId,
       name: row.name,
     });
@@ -201,7 +244,7 @@ export async function resolveProfiles(
       playedServerUserId: sighting.serverUserId,
     });
   }
-  return profileIds;
+  return resolved;
 }
 
 /**
@@ -326,8 +369,11 @@ export async function moveProfilesToAccount(
     .where(eq(serverProfiles.serverUserId, sourceServerUserId));
 }
 
-/** The current name of each profile and whether the server still lists it, by server_profiles id */
-export type CurrentProfiles = ReadonlyMap<string, { name: string; removed: boolean }>;
+/** By server_profiles id: each profile's current name, and how screens show it */
+export type CurrentProfiles = ReadonlyMap<
+  string,
+  { name: string; nonMainProfile?: NonMainProfile }
+>;
 
 /** The profiles the ids name, read by primary key, with no query when every id is null */
 export async function readCurrentProfiles(
@@ -340,11 +386,21 @@ export async function readCurrentProfiles(
     .select({
       id: serverProfiles.id,
       name: serverProfiles.name,
+      thumbUrl: serverProfiles.thumbUrl,
+      isPrimary: serverProfiles.isPrimary,
       removedAt: serverProfiles.removedAt,
     })
     .from(serverProfiles)
     .where(sql`${serverProfiles.id} = ANY(${sql.param(ids)}::uuid[])`);
-  return new Map(rows.map((row) => [row.id, { name: row.name, removed: row.removedAt !== null }]));
+  return new Map(
+    rows.map((row) => [
+      row.id,
+      {
+        name: row.name,
+        nonMainProfile: nonMainProfileOf({ ...row, removed: row.removedAt !== null }),
+      },
+    ])
+  );
 }
 
 /** The profile a play shows: its profile's current name, else the name the play stored */
@@ -352,11 +408,11 @@ export function shownProfile(
   profiles: CurrentProfiles,
   profileId: string | null,
   storedName: string | null
-): { profileId: string | null; profileName: string | null; profileRemoved: boolean } {
+): Pick<Session, 'profileId' | 'profileName' | 'nonMainProfile'> {
   const profile = profileId === null ? undefined : profiles.get(profileId);
   return profile
-    ? { profileId, profileName: profile.name, profileRemoved: profile.removed }
-    : { profileId: null, profileName: storedName, profileRemoved: false };
+    ? { profileId, profileName: profile.name, nonMainProfile: profile.nonMainProfile }
+    : { profileId: null, profileName: storedName };
 }
 
 /** The profiles `where` selects, removed ones included, in name order */
@@ -371,13 +427,16 @@ export async function profileOptions(
       serverUserId: serverProfiles.serverUserId,
       accountUsername: serverUsers.username,
       serverName: servers.name,
+      isPrimary: serverProfiles.isPrimary,
       removed: sql<boolean>`${serverProfiles.removedAt} IS NOT NULL`,
     })
     .from(serverProfiles)
     .innerJoin(serverUsers, eq(serverUsers.id, serverProfiles.serverUserId))
     .innerJoin(servers, eq(servers.id, serverProfiles.serverId))
     .where(where);
-  return rows.sort((a, b) => compareNames(a.name, b.name) || a.id.localeCompare(b.id));
+  return rows
+    .map(({ isPrimary, ...option }) => ({ ...option, main: isMainProfile(isPrimary) }))
+    .sort((a, b) => compareNames(a.name, b.name) || a.id.localeCompare(b.id));
 }
 
 /** Whether any of the servers, or any server at all when none are named, keeps profiles */

@@ -488,6 +488,14 @@ export const DEFAULT_STREAM_DETAILS: StreamDetailFields = {
   subtitleInfo: null,
 };
 
+/** A profile other than its account's main one, as screens show it */
+export interface NonMainProfile {
+  name: string;
+  thumbUrl: string | null;
+  /** The server no longer lists the profile; its plays keep the last name it had */
+  removed: boolean;
+}
+
 export interface Session extends StreamDetailFields {
   id: string;
   serverId: string;
@@ -544,10 +552,14 @@ export interface Session extends StreamDetailFields {
    * (tofa); null elsewhere. The server's own id for it is MediaSession.user.profileId.
    */
   profileId: string | null;
-  /** The name to show for the profile: its current name, else the name stored with the play */
+  /** The profile's current name, else the name stored with the play */
   profileName: string | null;
-  /** The server no longer lists the profile; its plays keep the last name it had */
-  profileRemoved: boolean;
+  /**
+   * The profile that played, when it is not its account's main profile. A main profile shows as
+   * the account, so it is never set for one. Set by History, session detail, the user page and
+   * now playing; absent elsewhere.
+   */
+  nonMainProfile?: NonMainProfile;
   playerName: string | null; // Friendly device name
   deviceId: string | null; // Unique device identifier (machineIdentifier)
   product: string | null; // Product/app name (e.g., "Plex for iOS")
@@ -1753,6 +1765,8 @@ export interface ProfileFilterOption {
   /** The account's username on its server */
   accountUsername: string;
   serverName: string;
+  /** The account's main profile, which shows as the account */
+  main: boolean;
   removed: boolean;
 }
 

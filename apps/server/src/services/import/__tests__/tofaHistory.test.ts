@@ -88,7 +88,7 @@ beforeEach(() => {
     errors: [],
   });
   getWatchHistoryPage.mockResolvedValueOnce(newer).mockResolvedValueOnce(older);
-  vi.mocked(resolveProfiles).mockResolvedValue(new Map([[ROBIN, 'profile-robin']]));
+  vi.mocked(resolveProfiles).mockResolvedValue(new Map([[ROBIN, { id: 'profile-robin' }]]));
 });
 
 afterEach(() => {

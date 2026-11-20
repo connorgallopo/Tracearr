@@ -29,6 +29,26 @@ const detail = {
   sessions: { data: [], total: 0 },
   devices: [],
   locations: [],
+  profiles: [
+    {
+      id: 'p-robin',
+      name: 'Robin',
+      serverUserId: 'su-1',
+      accountUsername: 'alice_tofa',
+      serverName: 'Den',
+      main: true,
+      removed: false,
+    },
+    {
+      id: 'p-sam',
+      name: 'Sam',
+      serverUserId: 'su-1',
+      accountUsername: 'alice_tofa',
+      serverName: 'Den',
+      main: false,
+      removed: true,
+    },
+  ],
 } as unknown as ServerUserFullDetail;
 
 function renderTab(stats: UserRangeStats, period: TimeRangePeriod = 'week') {
@@ -39,7 +59,7 @@ function renderTab(stats: UserRangeStats, period: TimeRangePeriod = 'week') {
       period={period}
       detail={detail}
       showServer={false}
-      showProfile={false}
+      profiles={[]}
       onSessionClick={vi.fn()}
       onShowSessions={vi.fn()}
     />
@@ -103,7 +123,7 @@ describe('OverviewTab', () => {
     ]);
   });
 
-  it('splits plays by profile only once a second profile has played', () => {
+  it('splits plays by profile once a second profile has played, the main one named as its account', () => {
     const robin = {
       profileId: 'p-robin',
       name: 'Robin',
@@ -126,8 +146,9 @@ describe('OverviewTab', () => {
 
     renderTab(withProfiles([robin, sam]));
     expect(screen.getByText('labels.profiles')).toBeInTheDocument();
-    expect(screen.getByText('Robin')).toBeInTheDocument();
-    expect(screen.getByText(/1h 30m/)).toBeInTheDocument();
+    expect(screen.getByText('alice_tofa')).toBeInTheDocument();
+    expect(screen.queryByText('Robin')).not.toBeInTheDocument();
+    expect(screen.getByText('1h 30m')).toBeInTheDocument();
     expect(screen.getByText('labels.profileRemoved')).toBeInTheDocument();
   });
 });
