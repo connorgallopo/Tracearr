@@ -136,6 +136,7 @@ vi.mock('../../../services/sseManager.js', () => ({ sseManager: mockSseManager }
 vi.mock('../../notificationQueue.js', () => ({ enqueueNotification: mockEnqueueNotification }));
 vi.mock('../database.js', () => ({
   onActiveAutomationsRefill: vi.fn(),
+  onServersCacheInvalidated: vi.fn(),
   getActiveAutomations: vi.fn().mockResolvedValue([]),
   batchGetIdentityServerUserIds: vi.fn().mockResolvedValue(new Map()),
   batchGetLibraryItemIdentity: vi.fn().mockResolvedValue(new Map()),

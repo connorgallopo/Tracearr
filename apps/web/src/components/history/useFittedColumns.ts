@@ -1,8 +1,11 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { ColumnVisibility, HistoryColumnId } from './HistoryFilters';
-import { getTableMinWidth, getVisibleColumns } from './historyColumns';
-
-export const NARROW_HIDDEN_COLUMNS: readonly HistoryColumnId[] = ['quality', 'progress'];
+import {
+  NARROW_HIDDEN_COLUMNS,
+  getTableMinWidth,
+  getVisibleColumns,
+  type ColumnVisibility,
+  type HistoryColumnId,
+} from './historyColumns';
 const NO_CHOSEN_COLUMNS: readonly HistoryColumnId[] = [];
 
 /**

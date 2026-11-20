@@ -53,8 +53,12 @@ import {
   type MediaType,
   type EngagementTier,
 } from '@tracearr/shared';
-import type { ColumnVisibility } from './HistoryFilters';
-import { COLUMN_WIDTHS, getTableMinWidth, getVisibleColumns } from './historyColumns';
+import {
+  COLUMN_WIDTHS,
+  getTableMinWidth,
+  getVisibleColumns,
+  type ColumnVisibility,
+} from './historyColumns';
 import { ServerColumnCell } from '@/components/server';
 import { useServerColorMap } from '@/hooks/useServerColorMap';
 

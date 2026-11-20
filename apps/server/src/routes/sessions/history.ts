@@ -15,6 +15,7 @@ import {
   localSessionSql,
   playCountQuery,
   playSegmentsLateral,
+  profileColumnsSql,
   profileFilterSql,
   startedAtRange,
   whereClause,
@@ -193,10 +194,7 @@ export function buildCacheFingerprint(params: Record<string, unknown>): string {
   return createHash('sha256').update(raw).digest('hex').slice(0, 16);
 }
 
-/**
- * The columns mapHistoryRow reads, over plays gs joined to their first segment s. Servers
- * without profiles leave profile_id null, so it is not read from their compressed chunks.
- */
+/** The columns mapHistoryRow reads, over plays gs joined to their first segment s. */
 function historyRowColumns(hasProfiles: boolean): SQL {
   return sql`
     gs.play_id as id,
@@ -241,8 +239,7 @@ function historyRowColumns(hasProfiles: boolean): SQL {
     s.geo_asn_number,
     s.geo_asn_organization,
     ${localSessionSql('s')} AS is_local,
-    ${hasProfiles ? sql`s.profile_id` : sql`NULL::uuid AS profile_id`},
-    s.profile_name,
+    ${profileColumnsSql(hasProfiles)},
     s.player_name,
     s.device_id,
     s.product,
@@ -315,7 +312,6 @@ export interface HistoryPageParams {
   cursor: { time: Date; id: string; key: string | number | null } | null;
   startDate?: Date;
   endDate?: Date;
-  /** Whether any server in scope has profiles */
   hasProfiles: boolean;
 }
 

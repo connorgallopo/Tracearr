@@ -5,6 +5,7 @@ import { servers } from '../../db/schema.js';
 import { getRedis } from '../../lib/redisShared.js';
 import { liveServerCondition, type ServerRow } from '../liveServers.js';
 import { createJellyfinEmbyClient, isJellyfinEmby, TofaClient } from '../mediaServer/index.js';
+import { parseProfileNaming } from '../mediaServer/tofa/parser.js';
 import type { TofaMedia, TofaDownload } from '../mediaServer/tofa/types.js';
 import {
   getServerUserIdByExternalId,
@@ -243,7 +244,7 @@ async function pollTofa(server: ServerRow): Promise<void> {
     );
     const profiles = await resolveProfiles(
       server.id,
-      profileSightings(rows, accountOf),
+      profileSightings(rows.map(parseProfileNaming), (accountId) => accountOf.get(accountId)),
       'insertMissing'
     );
 
@@ -252,7 +253,13 @@ async function pollTofa(server: ServerRow): Promise<void> {
       for (const { download, media } of downloads) {
         const serverUserId = accountOf.get(download.user_id) ?? null;
         await recordDownload(
-          tofaSignal(server, download, media, serverUserId, profileIdOf(profiles, download))
+          tofaSignal(
+            server,
+            download,
+            media,
+            serverUserId,
+            profileIdOf(profiles, download.profile_id)
+          )
         ).catch((error: unknown) => {
           console.error(
             `[Downloads] Download ${download.id} on ${server.name} not recorded:`,

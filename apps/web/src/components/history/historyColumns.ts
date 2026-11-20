@@ -1,4 +1,23 @@
-import { HISTORY_COLUMNS, type ColumnVisibility } from './HistoryFilters';
+// Column definitions for visibility toggle
+export const HISTORY_COLUMNS = [
+  { id: 'date', labelKey: 'common:labels.date', defaultVisible: true },
+  { id: 'user', labelKey: 'common:labels.user', defaultVisible: true },
+  { id: 'content', labelKey: 'common:labels.content', defaultVisible: true },
+  { id: 'server', labelKey: 'common:labels.server', defaultVisible: true },
+  { id: 'platform', labelKey: 'common:labels.platform', defaultVisible: true },
+  { id: 'location', labelKey: 'common:labels.location', defaultVisible: true },
+  { id: 'ip', labelKey: 'common:labels.ipAddress', defaultVisible: false },
+  { id: 'quality', labelKey: 'common:labels.quality', defaultVisible: true },
+  { id: 'duration', labelKey: 'pages:history.columns.duration', defaultVisible: true },
+  { id: 'progress', labelKey: 'pages:history.columns.progress', defaultVisible: true },
+] as const;
+
+export type HistoryColumnId = (typeof HISTORY_COLUMNS)[number]['id'];
+export type ColumnVisibility = Record<HistoryColumnId, boolean>;
+
+export const DEFAULT_COLUMN_VISIBILITY: ColumnVisibility = Object.fromEntries(
+  HISTORY_COLUMNS.map((col) => [col.id, col.defaultVisible])
+) as ColumnVisibility;
 
 export const COLUMN_WIDTHS = {
   date: 140,
@@ -15,6 +34,8 @@ export const COLUMN_WIDTHS = {
   duration: 120,
   progress: 110,
 } as const;
+
+export const NARROW_HIDDEN_COLUMNS: readonly HistoryColumnId[] = ['quality', 'progress'];
 
 type HistoryTableColumn = keyof typeof COLUMN_WIDTHS;
 

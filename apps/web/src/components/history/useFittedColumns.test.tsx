@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { HistoryTable } from './HistoryTable';
-import { DEFAULT_COLUMN_VISIBILITY, type HistoryColumnId } from './HistoryFilters';
+import { DEFAULT_COLUMN_VISIBILITY, type HistoryColumnId } from './historyColumns';
 import { useFittedColumns } from './useFittedColumns';
 
 vi.mock('react-i18next', () => ({ useTranslation: () => ({ t: (key: string) => key }) }));

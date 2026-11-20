@@ -4,7 +4,7 @@ import { MemoryRouter, useLocation } from 'react-router';
 import { History } from './History';
 import type { HistoryFilters } from '@/hooks/queries';
 import type { TimeRangeValue } from '@/components/ui/time-range-picker';
-import type { ColumnVisibility, HistoryColumnId } from '@/components/history/HistoryFilters';
+import type { ColumnVisibility, HistoryColumnId } from '@/components/history/historyColumns';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -50,8 +50,7 @@ const bar = vi.hoisted(() => ({
   },
 }));
 
-vi.mock('@/components/history/HistoryFilters', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/components/history/HistoryFilters')>()),
+vi.mock('@/components/history/HistoryFilters', () => ({
   HistoryFiltersBar: (props: NonNullable<typeof bar.props>) => {
     bar.props = props;
     return null;

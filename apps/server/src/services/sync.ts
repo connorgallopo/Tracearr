@@ -14,8 +14,7 @@ import * as schema from '../db/schema.js';
 import { servers, serverUsers, serverUserLinks } from '../db/schema.js';
 import { revokeSessionsForServerUsers } from '../lib/revoke.js';
 import { clearScope } from '../lib/scope.js';
-import { getHeavyOpsStatus } from '../jobs/heavyOpsLock.js';
-import { maybeEnqueueMaintenanceJob } from '../jobs/maintenanceQueue.js';
+import { enqueueTofaProfileBackfillIfNeeded } from '../jobs/maintenanceQueue.js';
 import { publishServersChanged } from '../jobs/poller/database.js';
 import {
   createMediaServerClient,
@@ -33,7 +32,6 @@ import {
 import { readServerFacts } from './mediaServer/byServerType.js';
 import type { TofaLinkedAccount } from './mediaServer/tofa/parser.js';
 import { syncAccountProfiles } from './profiles.js';
-import { getSettings } from './settings.js';
 import { ensureServerIdentifier } from './serverIdentity.js';
 import { ServerHistoricalError } from './liveServers.js';
 import { NotFoundError } from '../utils/errors.js';
@@ -347,8 +345,6 @@ async function syncMediaServerUsers(
   }
 }
 
-const MAX_AUTO_PROFILE_BACKFILL_RUNS = 5;
-
 async function syncTofaUsers(
   serverId: string,
   serverUrl: string,
@@ -372,23 +368,7 @@ async function syncTofaUsers(
     // The backfill stores the profiles only history names as removed, so it needs every list saved
     if (profilesSynced) {
       try {
-        const { profileBackfillDoneServers, profileBackfillFailedRuns } = await getSettings([
-          'profileBackfillDoneServers',
-          'profileBackfillFailedRuns',
-        ]);
-        if (
-          !profileBackfillDoneServers.includes(serverId) &&
-          (profileBackfillFailedRuns[serverId] ?? 0) < MAX_AUTO_PROFILE_BACKFILL_RUNS &&
-          !(await getHeavyOpsStatus())
-        ) {
-          // One attempt, so the cap counts syncs that queued it, not BullMQ retries
-          await maybeEnqueueMaintenanceJob(
-            'backfill_tofa_profiles',
-            'system',
-            { serverId },
-            { attempts: 1 }
-          );
-        }
+        await enqueueTofaProfileBackfillIfNeeded(serverId);
       } catch (err) {
         // The next sync queues it again
         console.warn('[Sync] tofa profile backfill not queued:', err);

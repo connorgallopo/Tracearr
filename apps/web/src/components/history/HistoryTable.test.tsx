@@ -5,7 +5,7 @@ import type { ComponentProps } from 'react';
 import type { SessionWithDetails } from '@tracearr/shared';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { HistoryTable } from './HistoryTable';
-import { DEFAULT_COLUMN_VISIBILITY } from './HistoryFilters';
+import { DEFAULT_COLUMN_VISIBILITY } from './historyColumns';
 
 const { t } = vi.hoisted(() => ({ t: vi.fn((key: string) => key) }));
 vi.mock('react-i18next', () => ({ useTranslation: () => ({ t }) }));

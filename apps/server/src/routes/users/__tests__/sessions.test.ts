@@ -5,25 +5,15 @@ import { randomUUID } from 'node:crypto';
 import type { SQL } from 'drizzle-orm';
 import type { AuthUser } from '@tracearr/shared';
 import type * as QueriesModule from '../queries/index.js';
-import { queryChain, renderCall, renderSql } from '../../../test/helpers.js';
+import { PROFILE_TEST_SERVERS, queryChain, renderCall, renderSql } from '../../../test/helpers.js';
 
 vi.mock('../../../db/client.js', () => ({
   db: { select: vi.fn(), execute: vi.fn() },
 }));
 
-const { PLEX_SERVER, TOFA_SERVER } = vi.hoisted(() => ({
-  PLEX_SERVER: crypto.randomUUID(),
-  TOFA_SERVER: crypto.randomUUID(),
-}));
-vi.mock('../../../jobs/poller/database.js', () => ({
-  getServerTypes: vi.fn(
-    async () =>
-      new Map([
-        [PLEX_SERVER, 'plex'],
-        [TOFA_SERVER, 'tofa'],
-      ])
-  ),
-}));
+vi.mock('../../../jobs/poller/database.js', async (importOriginal) =>
+  (await import('../../../test/helpers.js')).withProfileTestServerTypes(importOriginal)
+);
 
 vi.mock('../queries/index.js', async (importActual) => ({
   ...(await importActual<typeof QueriesModule>()),
@@ -34,6 +24,8 @@ import { db } from '../../../db/client.js';
 import { resolveIdentityScopedServerUserIds } from '../queries/index.js';
 import { sessionsRoutes } from '../sessions.js';
 import { permissionGuard } from '../../../lib/scope.js';
+
+const { plex: PLEX_SERVER, tofa: TOFA_SERVER } = PROFILE_TEST_SERVERS;
 
 async function buildTestApp(): Promise<FastifyInstance> {
   const authUser: AuthUser = {

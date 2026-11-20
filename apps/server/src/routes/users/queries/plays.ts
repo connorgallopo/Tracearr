@@ -6,7 +6,12 @@ import { sessions } from '../../../db/schema.js';
 import { uuidArraySql } from '../../../utils/sqlArrays.js';
 import { profileFilterSql } from '../../../db/sessions/conditions.js';
 import { firstSegmentJoin, groupedPlaysCte } from '../../../db/sessions/groupedPlays.js';
-import { localSessionSql, PLAY_COUNT, RAW_WATCH_TIME } from '../../../db/sessions/rules.js';
+import {
+  localSessionSql,
+  PLAY_COUNT,
+  profileColumnsSql,
+  RAW_WATCH_TIME,
+} from '../../../db/sessions/rules.js';
 import {
   readCurrentProfiles,
   shownProfile,
@@ -200,10 +205,6 @@ export async function userRecentPlays(
   const where = [serverUserIdAnyFragment(serverUserIds, 's.server_user_id'), ...bounds];
   const byProfile = profileFilterSql(options.profileIds);
   if (byProfile) where.push(byProfile);
-  // Servers without profiles leave the columns null, so skip reading them from compressed chunks
-  const profileColumns = options.hasProfiles
-    ? sql`s.profile_id, s.profile_name`
-    : sql`NULL::uuid AS profile_id, NULL::text AS profile_name`;
   const result = await dbOrTx.execute(sql`
     WITH grouped_sessions AS (${groupedPlaysCte({
       where,
@@ -221,7 +222,7 @@ export async function userRecentPlays(
       s.geo_continent, s.geo_postal, s.geo_lat, s.geo_lon,
       s.geo_asn_number, s.geo_asn_organization,
       ${localSessionSql('s')} AS is_local,
-      ${profileColumns},
+      ${profileColumnsSql(options.hasProfiles)},
       s.player_name, s.device_id, s.product, s.device, s.platform,
       s.quality, s.is_transcode, s.bitrate, s.last_paused_at
     FROM grouped_sessions gs

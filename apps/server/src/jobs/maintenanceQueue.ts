@@ -38,6 +38,7 @@ import {
   extendHeavyOpsLock,
   isImportWaiting,
   startHeavyOpsLockHeartbeat,
+  getHeavyOpsStatus,
   HEAVY_OPS_WAIT_INTERVAL_MS,
   type HeavyOpsLockHolder,
 } from './heavyOpsLock.js';
@@ -56,8 +57,7 @@ import {
   resolutionRankSql,
 } from '../utils/resolutionBuckets.js';
 import { getCacheService, getPubSubService } from '../services/cache.js';
-import { linkTofaPlayProfiles } from '../services/import/tofaHistory.js';
-import { getSetting, setSetting } from '../services/settings.js';
+import { getSetting, getSettings, setSetting } from '../services/settings.js';
 import { recomputeAllIdentityDates } from '../services/userService.js';
 import {
   rebuildTimescaleViews,
@@ -83,6 +83,7 @@ import {
   type ImportedHistoryLinkDeps,
 } from './importedHistoryLinking.js';
 import { runServerLocationSyncWalk } from './serverLocationSync.js';
+import { linkTofaPlayProfiles } from './tofaProfileBackfill.js';
 import {
   PROGRESS_COLUMNS,
   walkFixImportedProgress,
@@ -711,6 +712,38 @@ async function processSyncServerLocationsJob(
   });
 }
 
+/** Publishes a job that found nothing to do as complete and returns its empty result */
+async function completeWithNothingToDo(
+  type: MaintenanceJobType,
+  message: string
+): Promise<MaintenanceJobResult> {
+  const now = new Date().toISOString();
+  activeJobProgress = {
+    type,
+    status: 'complete',
+    totalRecords: 0,
+    processedRecords: 0,
+    updatedRecords: 0,
+    skippedRecords: 0,
+    errorRecords: 0,
+    message,
+    startedAt: now,
+    completedAt: now,
+  };
+  await getPubSubService()?.publish(WS_EVENTS.MAINTENANCE_PROGRESS, activeJobProgress);
+  activeJobProgress = null;
+  return {
+    success: true,
+    type,
+    processed: 0,
+    updated: 0,
+    skipped: 0,
+    errors: 0,
+    durationMs: 0,
+    message,
+  };
+}
+
 /**
  * Links a tofa server's plays stored without a profile to their profiles, once per server. The
  * user sync queues it for a server not yet done.
@@ -721,36 +754,12 @@ export async function processBackfillTofaProfilesJob(
   const serverId = job.data.options?.serverId;
   if (!serverId) throw new UnrecoverableError('backfill_tofa_profiles needs a server');
   const done = await getSetting('profileBackfillDoneServers');
+  // Two syncs can each queue the job before the first run marks the server done
   if (done.includes(serverId)) {
-    const message = 'Profiles already linked on this server';
-    const now = new Date().toISOString();
-    activeJobProgress = {
-      type: 'backfill_tofa_profiles',
-      status: 'complete',
-      totalRecords: 0,
-      processedRecords: 0,
-      updatedRecords: 0,
-      skippedRecords: 0,
-      errorRecords: 0,
-      message,
-      startedAt: now,
-      completedAt: now,
-    };
-    const pubSubService = getPubSubService();
-    if (pubSubService) {
-      await pubSubService.publish(WS_EVENTS.MAINTENANCE_PROGRESS, activeJobProgress);
-    }
-    activeJobProgress = null;
-    return {
-      success: true,
-      type: 'backfill_tofa_profiles',
-      processed: 0,
-      updated: 0,
-      skipped: 0,
-      errors: 0,
-      durationMs: 0,
-      message,
-    };
+    return completeWithNothingToDo(
+      'backfill_tofa_profiles',
+      'Profiles already linked on this server'
+    );
   }
   let result: MaintenanceJobResult;
   try {
@@ -2398,6 +2407,33 @@ export async function enqueueServerLocationSyncIfBehind(): Promise<boolean> {
     { attempts: 1 }
   );
   return jobId !== null;
+}
+
+const MAX_AUTO_PROFILE_BACKFILL_RUNS = 5;
+
+/**
+ * Queues the tofa profile backfill for a server not yet done, unless it has failed the capped
+ * number of runs or a heavy job holds the lock.
+ */
+export async function enqueueTofaProfileBackfillIfNeeded(serverId: string): Promise<void> {
+  const { profileBackfillDoneServers, profileBackfillFailedRuns } = await getSettings([
+    'profileBackfillDoneServers',
+    'profileBackfillFailedRuns',
+  ]);
+  if (
+    profileBackfillDoneServers.includes(serverId) ||
+    (profileBackfillFailedRuns[serverId] ?? 0) >= MAX_AUTO_PROFILE_BACKFILL_RUNS ||
+    (await getHeavyOpsStatus())
+  ) {
+    return;
+  }
+  // One attempt, so the cap counts syncs that queued it, not BullMQ retries
+  await maybeEnqueueMaintenanceJob(
+    'backfill_tofa_profiles',
+    'system',
+    { serverId },
+    { attempts: 1 }
+  );
 }
 
 function checkServerLocationSync(): Promise<void> {

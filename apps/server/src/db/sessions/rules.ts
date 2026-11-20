@@ -40,6 +40,16 @@ export function localSessionSql(alias: string): SQL {
   return sql`(${a}.is_local IS TRUE OR (${a}.is_local IS NULL AND (${a}.geo_country IS NOT DISTINCT FROM ${LOCAL_LABEL} OR (lower(${a}.geo_city) IS NOT DISTINCT FROM 'local' AND ${a}.geo_lat IS NULL))))`;
 }
 
+/**
+ * The play's profile_id and profile_name over s. Only servers with profiles store either, so
+ * when none in the read's scope has them both are null and never read from compressed chunks.
+ */
+export function profileColumnsSql(hasProfiles: boolean): SQL {
+  return hasProfiles
+    ? sql`s.profile_id, s.profile_name`
+    : sql`NULL::uuid AS profile_id, NULL::text AS profile_name`;
+}
+
 // Count unique plays: COALESCE(reference_id, id) collapses pause/resume chains into one play
 export function playCountSql(alias = ''): SQL {
   const col = alias ? `${alias}.` : '';

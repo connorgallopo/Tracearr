@@ -32,6 +32,7 @@ import type {
   MediaSession,
   MediaUser,
 } from '../types.js';
+import type { ProfileNaming } from '../../profiles.js';
 import type {
   TofaApiKey,
   TofaAccountLink,
@@ -223,6 +224,19 @@ function addedDate(
 ): Date {
   const times = files.map((file) => fileAddedAt(file, releasedOf(file)));
   return new Date(times.length > 0 ? Math.min(...times) : fallback ? Date.parse(fallback) : 0);
+}
+
+/** The account and profile a history or download row names */
+export function parseProfileNaming(row: {
+  user_id: string;
+  profile_id?: string | null;
+  profile_name?: string | null;
+}): ProfileNaming {
+  return {
+    accountExternalId: row.user_id,
+    profileExternalId: row.profile_id,
+    profileName: row.profile_name,
+  };
 }
 
 /** Artwork goes through the image proxy, which reads it from the server with the API key */

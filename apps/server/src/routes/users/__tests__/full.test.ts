@@ -87,54 +87,7 @@ describe('GET /users/:id/full violations panel', () => {
     }
   });
 
-  it('counts sessions for the identity in one grouped read instead of a count per row', async () => {
-    const serverUserId = randomUUID();
-    const siblingId = randomUUID();
-    const serverId = randomUUID();
-    app = await buildTestApp({
-      userId: randomUUID(),
-      username: 'owner',
-      role: 'owner',
-      serverIds: [serverId],
-    });
-
-    let selectCall = 0;
-    const tx = {
-      select: vi.fn(() => {
-        selectCall++;
-        const rows =
-          selectCall === 1
-            ? [{ id: serverUserId, serverId, userId: randomUUID() }]
-            : selectCall === 2
-              ? [
-                  { id: serverUserId, serverId, serverType: 'plex' },
-                  { id: siblingId, serverId, serverType: 'plex' },
-                ]
-              : selectCall === 3
-                ? [{ serverUserId: siblingId, count: 4 }]
-                : [];
-        const chain = queryChain(vi.fn, rows);
-        chains.push(chain);
-        return chain;
-      }),
-      execute: vi.fn(async () => ({ rows: [] })),
-    };
-    vi.mocked((db as any).transaction).mockImplementation(async (callback: any) => callback(tx));
-
-    const response = await app.inject({ method: 'GET', url: `/users/${serverUserId}/full` });
-
-    expect(response.statusCode).toBe(200);
-    const countChain = chains[2];
-    expect(renderCall(countChain).text).toBe(
-      `sessions.server_user_id = ANY(ARRAY['${serverUserId}'::uuid,'${siblingId}'::uuid]) AND sessions.started_at >= $1 AND sessions.started_at <= $2`
-    );
-    expect(countChain.groupBy).toHaveBeenCalledTimes(1);
-    expect(renderedWheres(chains).join(' ')).not.toContain('select count(*)::int from');
-    expect(response.json().user.sessionCount).toBe(0);
-    expect(response.json().identity.serverUsers.map((su: any) => su.sessionCount)).toEqual([0, 4]);
-  });
-
-  async function fullWithAccountsOn(siblingServerType: ServerType) {
+  async function fullWithAccountsOn(siblingServerType: ServerType, siblingSessionCount = 0) {
     const serverUserId = randomUUID();
     const siblingId = randomUUID();
     const serverId = randomUUID();
@@ -157,7 +110,9 @@ describe('GET /users/:id/full violations panel', () => {
                   { id: serverUserId, serverId, serverType: 'plex' },
                   { id: siblingId, serverId, serverType: siblingServerType },
                 ]
-              : [];
+              : selectCall === 3 && siblingSessionCount > 0
+                ? [{ serverUserId: siblingId, count: siblingSessionCount }]
+                : [];
         const chain = queryChain(vi.fn, rows);
         chains.push(chain);
         return chain;
@@ -173,6 +128,22 @@ describe('GET /users/:id/full violations panel', () => {
     );
     return { response, profileChain, ids: [serverUserId, siblingId] };
   }
+
+  it('counts sessions for the identity in one grouped read instead of a count per row', async () => {
+    const {
+      response,
+      ids: [serverUserId, siblingId],
+    } = await fullWithAccountsOn('plex', 4);
+
+    const countChain = chains[2];
+    expect(renderCall(countChain).text).toBe(
+      `sessions.server_user_id = ANY(ARRAY['${serverUserId}'::uuid,'${siblingId}'::uuid]) AND sessions.started_at >= $1 AND sessions.started_at <= $2`
+    );
+    expect(countChain.groupBy).toHaveBeenCalledTimes(1);
+    expect(renderedWheres(chains).join(' ')).not.toContain('select count(*)::int from');
+    expect(response.json().user.sessionCount).toBe(0);
+    expect(response.json().identity.serverUsers.map((su: any) => su.sessionCount)).toEqual([0, 4]);
+  });
 
   it('lists the profiles of every account of the identity, whatever the scope', async () => {
     const { response, profileChain, ids } = await fullWithAccountsOn('tofa');

@@ -17,7 +17,7 @@ import {
 import { useProfileOptionLabel } from '@/components/sessions/useProfileLabel';
 import { HistoryTable } from '@/components/history/HistoryTable';
 import { useFittedColumns } from '@/components/history/useFittedColumns';
-import type { ColumnVisibility } from '@/components/history/HistoryFilters';
+import type { ColumnVisibility } from '@/components/history/historyColumns';
 import { useUserSessions } from '@/hooks/queries';
 import { useServer } from '@/hooks/useServer';
 import { usePagerLabels } from './usePagerLabels';

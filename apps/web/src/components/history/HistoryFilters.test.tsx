@@ -3,7 +3,8 @@ import { cleanup, render, screen, waitFor, within } from '@testing-library/react
 import userEvent from '@testing-library/user-event';
 import { initI18n } from '@tracearr/translations';
 import type { HistoryFilterOptions, ProfileFilterOption } from '@tracearr/shared';
-import { HistoryFiltersBar, DEFAULT_COLUMN_VISIBILITY } from './HistoryFilters';
+import { HistoryFiltersBar } from './HistoryFilters';
+import { DEFAULT_COLUMN_VISIBILITY } from './historyColumns';
 import type { HistoryFilters } from '@/hooks/queries/useHistory';
 
 beforeAll(async () => {

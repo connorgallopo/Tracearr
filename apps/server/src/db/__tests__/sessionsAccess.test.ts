@@ -40,6 +40,7 @@ const ALLOWLIST: Record<string, string> = {
   'jobs/sessionIdentityBackfill.ts': IMPORTS,
   'jobs/sessionNormalize.ts': IMPORTS,
   'jobs/sseProcessor.ts': HOT_PATH,
+  'jobs/tofaProfileBackfill.ts': IMPORTS,
   'routes/automations.ts': BOUNDED_CALLBACK,
   'routes/debug.ts': ADMIN,
   'routes/library/patterns.ts': STATS,

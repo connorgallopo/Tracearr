@@ -43,7 +43,12 @@ import type { CacheService, PubSubService, TerminationCooldown } from '../../ser
 import { geoipService } from '../../services/geoip.js';
 import { createMediaServerClient } from '../../services/mediaServer/index.js';
 import { serverWatchedThreshold } from '../../services/mediaServer/byServerType.js';
-import { resolveProfiles, type ResolvedProfile } from '../../services/profiles.js';
+import {
+  profileSightings,
+  registerProfileCacheInvalidation,
+  resolveProfiles,
+  type ResolvedProfile,
+} from '../../services/profiles.js';
 import {
   RELAYED_SESSION_GEO,
   resolveSessionGeo,
@@ -1130,12 +1135,14 @@ async function processServerSessions(
     // profile is optional data, so a failed write stores the plays with the profile name only.
     const profiles = await resolveProfiles(
       server.id,
-      processedSessions.flatMap((processed, i) => {
-        const serverUserId = sessionServerUserIds[i];
-        return processed.profileExternalId && processed.profileName && serverUserId
-          ? [{ externalId: processed.profileExternalId, serverUserId, name: processed.profileName }]
-          : [];
-      }),
+      profileSightings(
+        processedSessions.map((processed) => ({
+          accountExternalId: processed.externalUserId,
+          profileExternalId: processed.profileExternalId,
+          profileName: processed.profileName,
+        })),
+        (accountId) => serverUserByExternalId.get(accountId)?.id
+      ),
       'refresh'
     ).catch((error: unknown) => {
       console.error(`[Poller] Failed to resolve profiles on ${server.name}:`, error);
@@ -2513,6 +2520,7 @@ export function initializePoller(cache: CacheService, pubSub: PubSubService): vo
   registerRuleSubscribers();
   setPauseWakeDeps({ pubSubService });
   registerPauseWakeSubscriptions();
+  registerProfileCacheInvalidation();
 }
 
 /**

@@ -1,6 +1,7 @@
 /**
- * Fills server_profiles from the profiles plays name and from each account's profile list
- * in the user sync, and lists them for the profile filters.
+ * Every write to server_profiles: the profiles plays name, each account's profile list from the
+ * user sync, and the move a merge makes. Also how stored profiles show on plays and in the
+ * profile filters, and whether a scope has a server with profiles at all.
  */
 
 import { and, eq, inArray, isNotNull, isNull, notInArray, sql, type SQL } from 'drizzle-orm';
@@ -12,7 +13,11 @@ import {
 } from '@tracearr/shared';
 import { db, type Executor } from '../db/client.js';
 import { serverProfiles, servers, serverUsers } from '../db/schema.js';
-import { getServerTypes, getServerUserIdsByExternalId } from '../jobs/poller/database.js';
+import {
+  getServerTypes,
+  getServerUserIdsByExternalId,
+  onServersCacheInvalidated,
+} from '../jobs/poller/database.js';
 import { NOT_NEEDED, type IMediaServerClient, type MediaProfile } from './mediaServer/types.js';
 import { compareNames } from '../utils/collation.js';
 import { createLogger } from '../utils/logger.js';
@@ -20,17 +25,17 @@ import { createLogger } from '../utils/logger.js';
 const log = createLogger('profiles');
 
 /** A profile as a play names it, under the account that played */
-export interface ProfileSighting {
+interface ProfileSighting {
   externalId: string;
   serverUserId: string;
   name: string;
 }
 
-/** A row from a server that names its account by the server's user id, as tofa's history and downloads do */
-interface ProfileNamingRow {
-  user_id: string;
-  profile_id?: string | null;
-  profile_name?: string | null;
+/** The server's ids for the account and profile a play names, and the profile's name */
+export interface ProfileNaming {
+  accountExternalId: string;
+  profileExternalId?: string | null;
+  profileName?: string | null;
 }
 
 type SightingMode = 'refresh' | 'insertMissing' | 'insertRemoved';
@@ -82,8 +87,13 @@ export function forgetPolledProfiles(serverId?: string): void {
   else livePolledProfiles.delete(serverId);
 }
 
+export function registerProfileCacheInvalidation(): void {
+  // A deleted server takes its profiles with it, and a restore replaces every profile row
+  onServersCacheInvalidated(() => forgetPolledProfiles());
+}
+
 // A profile the server says nothing about counts as its account's main one
-function isMainProfile(isPrimary: boolean | null): boolean {
+export function isMainProfile(isPrimary: boolean | null): boolean {
   return isPrimary !== false;
 }
 
@@ -117,25 +127,25 @@ async function lockProfilesInOrder(tx: Executor, where: SQL): Promise<void> {
     .for('update');
 }
 
-/** The profile each row names, under its account, for the rows whose account Tracearr knows */
+/** The profile each play names, under its account, for the plays whose account Tracearr knows */
 export function profileSightings(
-  rows: ProfileNamingRow[],
-  accountOf: ReadonlyMap<string, string>
+  plays: ProfileNaming[],
+  serverUserIdOf: (accountExternalId: string) => string | undefined
 ): ProfileSighting[] {
-  return rows.flatMap((row) => {
-    const serverUserId = accountOf.get(row.user_id);
-    return row.profile_id && row.profile_name && serverUserId
-      ? [{ externalId: row.profile_id, serverUserId, name: row.profile_name }]
+  return plays.flatMap((play) => {
+    const serverUserId = serverUserIdOf(play.accountExternalId);
+    return play.profileExternalId && play.profileName && serverUserId
+      ? [{ externalId: play.profileExternalId, serverUserId, name: play.profileName }]
       : [];
   });
 }
 
-/** The server_profiles id of the profile a row names, from what resolveProfiles returned */
+/** The server_profiles id of the profile a play names, from what resolveProfiles returned */
 export function profileIdOf(
   profiles: ReadonlyMap<string, ResolvedProfile>,
-  row: Pick<ProfileNamingRow, 'profile_id'>
+  profileExternalId: string | null | undefined
 ): string | null {
-  return row.profile_id ? (profiles.get(row.profile_id)?.id ?? null) : null;
+  return profileExternalId ? (profiles.get(profileExternalId)?.id ?? null) : null;
 }
 
 /**
@@ -252,8 +262,7 @@ export async function resolveProfiles(
  * list names any more. An account's lists are its own and those of the external ids a
  * same-server merge folded into it, and an account the user sync marked removed lists nothing.
  * An account with a list that could not be read keeps the profiles it had, and the other
- * accounts still sync. tofa's user sync is the only caller today; Silo's is the expected second.
- * True when every list was read and saved.
+ * accounts still sync. True when every list was read and saved.
  */
 export async function syncAccountProfiles(
   serverId: string,
@@ -356,7 +365,6 @@ export async function syncAccountProfiles(
   }
 }
 
-/** Moves an account's profiles onto the account a same-server merge folds it into */
 export async function moveProfilesToAccount(
   tx: Executor,
   sourceServerUserId: string,

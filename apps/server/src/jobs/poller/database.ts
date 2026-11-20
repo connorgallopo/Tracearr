@@ -42,7 +42,6 @@ import {
 import { emailForSessionUser } from '../../services/mediaServer/byServerType.js';
 import { automationsLogger, createLogger } from '../../utils/logger.js';
 import { getPubSubService } from '../../services/cache.js';
-import { forgetPolledProfiles } from '../../services/profiles.js';
 import { mapSessionRow } from './sessionMapper.js';
 
 /** Library item types that group playable items; a session is never linked to one. */
@@ -587,12 +586,18 @@ const serversLogger = createLogger('servers');
 // A server's type never changes, so types are kept past the servers cache's expiry until it is invalidated.
 let serverTypesCache: ReadonlyMap<string, ServerType> | null = null;
 
+const serversInvalidatedListeners: (() => void)[] = [];
+
+/** Called on every servers-cache invalidation on this instance; listeners must not throw. */
+export function onServersCacheInvalidated(listener: () => void): void {
+  serversInvalidatedListeners.push(listener);
+}
+
 /** Invalidate the servers cache. Call from every server create/update/delete path. */
 export function invalidateServersCache(): void {
   serversCache = null;
   serverTypesCache = null;
-  // A deleted server takes its profiles with it, and a restore replaces every profile row
-  forgetPolledProfiles();
+  for (const listener of serversInvalidatedListeners) listener();
 }
 
 /** Drop this instance's servers cache and tell the others to do the same. */

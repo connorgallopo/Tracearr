@@ -7,14 +7,15 @@ import { useEffect, useMemo, useCallback, useState, useRef } from 'react';
 import { useSearchParams, useParams, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
+import { HistoryFiltersBar } from '@/components/history/HistoryFilters';
 import {
-  HistoryFiltersBar,
   DEFAULT_COLUMN_VISIBILITY,
+  NARROW_HIDDEN_COLUMNS,
   type ColumnVisibility,
   type HistoryColumnId,
-} from '@/components/history/HistoryFilters';
+} from '@/components/history/historyColumns';
 import { HistoryTable, type SortableColumn } from '@/components/history/HistoryTable';
-import { NARROW_HIDDEN_COLUMNS, useFittedColumns } from '@/components/history/useFittedColumns';
+import { useFittedColumns } from '@/components/history/useFittedColumns';
 import { HistoryAggregates } from '@/components/history/HistoryAggregates';
 import { SessionDetailSheet } from '@/components/history/SessionDetailSheet';
 import { ErrorState, InlineErrorState } from '@/components/library/ErrorState';

@@ -47,6 +47,7 @@ vi.mock('../../../services/sseManager.js', () => ({
 vi.mock('../../notificationQueue.js', () => ({ enqueueNotification: vi.fn() }));
 vi.mock('../database.js', () => ({
   onActiveAutomationsRefill: vi.fn(),
+  onServersCacheInvalidated: vi.fn(),
   getCachedServers: () => mockDbSelect().from(servers),
   getActiveAutomations: vi.fn().mockResolvedValue([]),
   batchGetIdentityServerUserIds: vi.fn().mockResolvedValue(new Map()),

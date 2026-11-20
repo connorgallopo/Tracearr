@@ -261,6 +261,7 @@ describe("the user page's profile split", () => {
       serverUserId: account.id,
       externalId: randomUUID(),
       name: 'Morgan',
+      isPrimary: false,
     });
     await play(serverId, account.id, robin, { durationMs: 600_000 });
     await play(serverId, account.id, robin, { durationMs: 300_000 });
@@ -273,9 +274,10 @@ describe("the user page's profile split", () => {
       window: resolveIdentityWindow({ period: 'week' }),
     });
 
+    const shown = { removed: false, accountUsername: account.username };
     expect(stats.profiles).toEqual([
-      { profileId: robin.id, name: 'Robin', removed: false, plays: 2, watchMs: 900_000 },
-      { profileId: morgan.id, name: 'Morgan', removed: false, plays: 1, watchMs: 1_200_000 },
+      { ...shown, profileId: robin.id, name: 'Robin', main: true, plays: 2, watchMs: 900_000 },
+      { ...shown, profileId: morgan.id, name: 'Morgan', main: false, plays: 1, watchMs: 1_200_000 },
     ]);
     expect(stats.profiles.reduce((sum, profile) => sum + profile.plays, 0)).toBe(stats.plays);
     expect(stats.profiles.reduce((sum, profile) => sum + profile.watchMs, 0)).toBe(stats.watchMs);
@@ -307,8 +309,8 @@ describe("the user page's profile split", () => {
 
     expect(stats).toMatchObject({ plays: 1, watchMs: 600_000 });
     expect(stats.profiles).toEqual([
-      { profileId: morgan.id, name: 'Morgan', removed: false, plays: 1, watchMs: 200_000 },
-      { profileId: robin.id, name: 'Robin', removed: false, plays: 1, watchMs: 400_000 },
+      expect.objectContaining({ profileId: morgan.id, plays: 1, watchMs: 200_000 }),
+      expect.objectContaining({ profileId: robin.id, plays: 1, watchMs: 400_000 }),
     ]);
   });
 });

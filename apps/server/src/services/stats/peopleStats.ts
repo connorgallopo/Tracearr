@@ -40,6 +40,7 @@ import {
   type DateRange,
   type StatsPeriod,
 } from '../../routes/stats/utils.js';
+import { isMainProfile } from '../profiles.js';
 import { getRequestsAnalytics } from '../requests/analytics.js';
 import {
   FINISHED_SQL,
@@ -189,17 +190,20 @@ function identityProfilePlaysSql(input: IdentityScope & DateRange): SQL {
       sp.id AS profile_id,
       sp.name,
       sp.removed_at IS NOT NULL AS removed,
+      sp.is_primary,
+      su.username AS account_username,
       COUNT(*) FILTER (WHERE counted)::int AS plays,
       COALESCE(SUM(watched_ms), 0)::bigint AS watch_ms
     FROM profile_chains pc
     JOIN server_profiles sp ON sp.id = pc.profile_id
+    JOIN server_users su ON su.id = sp.server_user_id
     -- Uncorrelated, so Postgres runs it once as a one-time filter and skips the sessions read
     -- when no account has a profile
     WHERE EXISTS (
       SELECT 1 FROM server_profiles
       WHERE ${serverUserIdAnyFragment(input.serverUserIds, 'server_user_id')}
     )
-    GROUP BY sp.id
+    GROUP BY sp.id, su.username
     HAVING BOOL_OR(counted)
   `;
 }
@@ -264,6 +268,8 @@ type ProfilePlaysRow = {
   profile_id: string;
   name: string;
   removed: boolean;
+  is_primary: boolean | null;
+  account_username: string;
   plays: number;
   watch_ms: string | number;
 };
@@ -281,7 +287,6 @@ interface IdentityPlaysRow {
 
 export async function queryIdentityRangeStats(input: {
   serverUserIds: string[];
-  /** Whether any of the accounts is on a server with profiles */
   hasProfiles: boolean;
   resolvedServerIds: string[] | undefined;
   window: PeopleWindow;
@@ -467,6 +472,8 @@ export async function queryIdentityRangeStats(input: {
             profileId: row.profile_id,
             name: row.name,
             removed: row.removed,
+            main: isMainProfile(row.is_primary),
+            accountUsername: row.account_username,
             plays: row.plays,
             watchMs: Number(row.watch_ms),
           }))

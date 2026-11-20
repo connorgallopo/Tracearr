@@ -7,7 +7,7 @@ import { LOGIN_ACCESS, isValidTimezone } from './constants.js';
 import { listDateBoundSchema, listSortSchema } from './listQuery.js';
 import { PLAYBACK_DECISIONS } from './playbackDecision.js';
 import { SERVER_TYPES, assertNever } from './serverTypes.js';
-import { MEDIA_TYPES as STORED_MEDIA_TYPES } from './types.js';
+import { MEDIA_TYPES } from './types.js';
 
 // ============================================================================
 // Shared Enum Constants
@@ -15,9 +15,9 @@ import { MEDIA_TYPES as STORED_MEDIA_TYPES } from './types.js';
 
 export const serverTypeSchema = z.enum(SERVER_TYPES);
 
-/** Media types for content filtering */
-const MEDIA_TYPES = ['movie', 'episode', 'track', 'live'] as const;
-export const mediaTypeSchema = z.enum(MEDIA_TYPES);
+/** The media types a single-type filter takes */
+const SINGLE_MEDIA_TYPE_FILTERS = ['movie', 'episode', 'track', 'live'] as const;
+export const mediaTypeSchema = z.enum(SINGLE_MEDIA_TYPE_FILTERS);
 export type MediaType = z.infer<typeof mediaTypeSchema>;
 
 /** Time periods for statistics queries */
@@ -463,7 +463,7 @@ export const historyQuerySchema = z.object({
   state: z.enum(['playing', 'paused', 'stopped']).optional(),
 
   // Media type filter - supports multi-select, over every type a session is stored with
-  mediaTypes: commaSeparatedArray(z.enum(STORED_MEDIA_TYPES)),
+  mediaTypes: commaSeparatedArray(z.enum(MEDIA_TYPES)),
 
   startDate: z.coerce.date().optional(),
   endDate: z.coerce.date().optional(),

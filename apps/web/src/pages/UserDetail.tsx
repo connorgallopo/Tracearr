@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SessionDetailSheet } from '@/components/history/SessionDetailSheet';
+import { showsProfiles } from '@/components/sessions/useProfileLabel';
 import { UserRequestsCard } from '@/components/requests/UserRequestsCard';
 import { EditTrustScoreDialog } from '@/components/users/EditTrustScoreDialog';
 import { EditUserIdentityDialog } from '@/components/users/EditUserIdentityDialog';
@@ -120,8 +121,7 @@ export function UserDetail() {
     const accountProfiles = identityScope
       ? allProfiles
       : allProfiles.filter((profile) => profile.serverUserId === effectiveId);
-    // A main profile shows as its account, so profiles show only once one besides it is in view
-    return accountProfiles.some((profile) => !profile.main) ? accountProfiles : [];
+    return showsProfiles(accountProfiles) ? accountProfiles : [];
   }, [allProfiles, identityScope, effectiveId]);
 
   if (isLoading) {

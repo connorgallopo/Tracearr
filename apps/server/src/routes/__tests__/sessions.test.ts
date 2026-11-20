@@ -16,7 +16,7 @@ import { randomUUID } from 'node:crypto';
 import type { SQL } from 'drizzle-orm';
 import type { AuthUser } from '@tracearr/shared';
 import { createMockActiveSession } from '../../test/fixtures.js';
-import { queryChain, renderSql } from '../../test/helpers.js';
+import { PROFILE_TEST_SERVERS, queryChain, renderSql } from '../../test/helpers.js';
 
 // Mock the database module before importing routes
 vi.mock('../../db/client.js', () => ({
@@ -43,26 +43,17 @@ vi.mock('../../services/termination.js', () => ({
   terminateSession: vi.fn(),
 }));
 
-const { PLEX_SERVER, TOFA_SERVER } = vi.hoisted(() => ({
-  PLEX_SERVER: crypto.randomUUID(),
-  TOFA_SERVER: crypto.randomUUID(),
-}));
-vi.mock('../../jobs/poller/database.js', async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  getServerTypes: vi.fn(
-    async () =>
-      new Map([
-        [PLEX_SERVER, 'plex'],
-        [TOFA_SERVER, 'tofa'],
-      ])
-  ),
-}));
+vi.mock('../../jobs/poller/database.js', async (importOriginal) =>
+  (await import('../../test/helpers.js')).withProfileTestServerTypes(importOriginal)
+);
 
 // Import the mocked db and the routes
 import { db } from '../../db/client.js';
 import { terminateSession } from '../../services/termination.js';
 import { sessionRoutes } from '../sessions/index.js';
 import { permissionGuard } from '../../lib/scope.js';
+
+const { plex: PLEX_SERVER } = PROFILE_TEST_SERVERS;
 
 /**
  * Build a test Fastify instance with mocked auth and redis

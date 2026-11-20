@@ -45,7 +45,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { TimeRangePicker, type TimeRangeValue } from '@/components/ui/time-range-picker';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useProfileOptionLabel } from '@/components/sessions/useProfileLabel';
+import { showsProfiles, useProfileOptionLabel } from '@/components/sessions/useProfileLabel';
 import type { HistoryFilters } from '@/hooks/queries/useHistory';
 import { PLAYBACK_DECISION_ICONS } from '@/lib/playbackBadge';
 import {
@@ -54,28 +54,7 @@ import {
   type HistoryFilterOptions,
   type ProfileFilterOption,
 } from '@tracearr/shared';
-
-// Column definitions for visibility toggle
-export const HISTORY_COLUMNS = [
-  { id: 'date', labelKey: 'common:labels.date', defaultVisible: true },
-  { id: 'user', labelKey: 'common:labels.user', defaultVisible: true },
-  { id: 'content', labelKey: 'common:labels.content', defaultVisible: true },
-  { id: 'server', labelKey: 'common:labels.server', defaultVisible: true },
-  { id: 'platform', labelKey: 'common:labels.platform', defaultVisible: true },
-  { id: 'location', labelKey: 'common:labels.location', defaultVisible: true },
-  { id: 'ip', labelKey: 'common:labels.ipAddress', defaultVisible: false },
-  { id: 'quality', labelKey: 'common:labels.quality', defaultVisible: true },
-  { id: 'duration', labelKey: 'pages:history.columns.duration', defaultVisible: true },
-  { id: 'progress', labelKey: 'pages:history.columns.progress', defaultVisible: true },
-] as const;
-
-export type HistoryColumnId = (typeof HISTORY_COLUMNS)[number]['id'];
-export type ColumnVisibility = Record<HistoryColumnId, boolean>;
-
-// Default visibility state
-export const DEFAULT_COLUMN_VISIBILITY: ColumnVisibility = Object.fromEntries(
-  HISTORY_COLUMNS.map((col) => [col.id, col.defaultVisible])
-) as ColumnVisibility;
+import { HISTORY_COLUMNS, type ColumnVisibility, type HistoryColumnId } from './historyColumns';
 
 interface Props {
   filters: HistoryFilters;
@@ -84,7 +63,6 @@ interface Props {
   onTimeRangeChange: (timeRange: TimeRangeValue) => void;
   filterOptions?: HistoryFilterOptions;
   isFetching?: boolean;
-  /** The columns the table shows */
   columnVisibility: ColumnVisibility;
   onColumnToggle: (column: HistoryColumnId, shown: boolean) => void;
   isMultiServer?: boolean;
@@ -350,9 +328,8 @@ export function HistoryFiltersBar({
         });
       }
     }
-    // A main profile shows as its account, so only an account with another profile is offered
     return [...groups.values()]
-      .filter((group) => group.profiles.some((profile) => !profile.main))
+      .filter((group) => showsProfiles(group.profiles))
       .sort((a, b) => a.account.localeCompare(b.account) || a.server.localeCompare(b.server));
   }, [filterOptions?.profiles]);
   const profileServersDiffer = new Set(profileGroups.map((group) => group.server)).size > 1;

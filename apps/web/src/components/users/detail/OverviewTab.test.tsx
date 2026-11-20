@@ -29,26 +29,6 @@ const detail = {
   sessions: { data: [], total: 0 },
   devices: [],
   locations: [],
-  profiles: [
-    {
-      id: 'p-robin',
-      name: 'Robin',
-      serverUserId: 'su-1',
-      accountUsername: 'alice_tofa',
-      serverName: 'Den',
-      main: true,
-      removed: false,
-    },
-    {
-      id: 'p-sam',
-      name: 'Sam',
-      serverUserId: 'su-1',
-      accountUsername: 'alice_tofa',
-      serverName: 'Den',
-      main: false,
-      removed: true,
-    },
-  ],
 } as unknown as ServerUserFullDetail;
 
 function renderTab(stats: UserRangeStats, period: TimeRangePeriod = 'week') {
@@ -128,10 +108,20 @@ describe('OverviewTab', () => {
       profileId: 'p-robin',
       name: 'Robin',
       removed: false,
+      main: true,
+      accountUsername: 'alice_tofa',
       plays: 3,
       watchMs: 5_400_000,
     };
-    const sam = { profileId: 'p-sam', name: 'Sam', removed: true, plays: 1, watchMs: 600_000 };
+    const sam = {
+      profileId: 'p-sam',
+      name: 'Sam',
+      removed: true,
+      main: false,
+      accountUsername: 'alice_tofa',
+      plays: 1,
+      watchMs: 600_000,
+    };
     const withProfiles = (profiles: UserRangeStats['profiles']) =>
       ({
         playsByDay: [],

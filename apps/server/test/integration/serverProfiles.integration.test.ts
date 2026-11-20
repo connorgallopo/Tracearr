@@ -16,8 +16,13 @@ import {
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
 import { serverProfiles, sessions } from '../../src/db/schema.js';
+import { invalidateServersCache } from '../../src/jobs/poller/database.js';
 import { mergeUsers } from '../../src/services/mergeService.js';
-import { resolveProfiles, syncAccountProfiles } from '../../src/services/profiles.js';
+import {
+  registerProfileCacheInvalidation,
+  resolveProfiles,
+  syncAccountProfiles,
+} from '../../src/services/profiles.js';
 import { fakeTofaClient } from '../../src/test/mediaServerFakes.js';
 
 const MORGAN_ACCOUNT = 'b1e4c7a2-5d38-4f91-8a6c-2e7f0d3b9c14';
@@ -158,6 +163,25 @@ describe('resolveProfiles', () => {
     await resolveProfiles(serverId, [{ ...sighting, name: 'Robbie' }], 'refresh');
     expect(execute).toHaveBeenCalledOnce();
     expect(await storedProfile(stored.id)).toMatchObject({ name: 'Robbie' });
+  });
+
+  it('writes a sighted profile again once the servers cache is invalidated', async () => {
+    registerProfileCacheInvalidation();
+    const { serverId, account } = await seed();
+    await createTestServerProfile({
+      serverId,
+      serverUserId: account.id,
+      externalId: ROBIN,
+      name: 'Robin',
+    });
+    const sighting = { externalId: ROBIN, serverUserId: account.id, name: 'Robin' };
+    await resolveProfiles(serverId, [sighting], 'refresh');
+    const execute = vi.spyOn(db, 'execute');
+
+    invalidateServersCache();
+    await resolveProfiles(serverId, [sighting], 'refresh');
+
+    expect(execute).toHaveBeenCalledOnce();
   });
 
   it('clears a removal the user sync made when a live play names the profile again', async () => {

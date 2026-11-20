@@ -556,8 +556,7 @@ export interface Session extends StreamDetailFields {
   profileName: string | null;
   /**
    * The profile that played, when it is not its account's main profile. A main profile shows as
-   * the account, so it is never set for one. Set by History, session detail, the user page and
-   * now playing; absent elsewhere.
+   * the account, so it is never set for one.
    */
   nonMainProfile?: NonMainProfile;
   playerName: string | null; // Friendly device name
@@ -980,7 +979,16 @@ export interface UserRangeStats {
   personPeakHour: number | null;
   mediaTypeSplit: { movie: number; episode: number; track: number; other: number };
   /** Plays and watch time per profile, for the profiles with a play in the range */
-  profiles: { profileId: string; name: string; removed: boolean; plays: number; watchMs: number }[];
+  profiles: {
+    profileId: string;
+    name: string;
+    removed: boolean;
+    /** The account's main profile, which shows as the account */
+    main: boolean;
+    accountUsername: string;
+    plays: number;
+    watchMs: number;
+  }[];
   /** Top 6 */
   topGenres: { genre: string; plays: number }[];
   /** Top 5 */
@@ -1762,7 +1770,6 @@ export interface ProfileFilterOption {
   id: string;
   name: string;
   serverUserId: string;
-  /** The account's username on its server */
   accountUsername: string;
   serverName: string;
   /** The account's main profile, which shows as the account */
