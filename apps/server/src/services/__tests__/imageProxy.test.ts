@@ -560,7 +560,7 @@ describe('proxyImage cache-miss pipeline', () => {
     it("fetches a tofa request's poster from its server's image cache with the key", async () => {
       const serverId = randomUUID();
       mockServiceOrigin(
-        { id: 'svc', type: 'tofa', url: 'http://tofa.local:33333', serverId, enabled: true },
+        { id: 'svc', type: 'server', url: 'http://tofa.local:33333', serverId, enabled: true },
         { id: serverId, type: 'tofa', url: 'http://tofa.local:33333', token: 'tofa-key' },
         { id: 'req' }
       );
@@ -581,7 +581,7 @@ describe('proxyImage cache-miss pipeline', () => {
       const serverId = randomUUID();
       const imagePath = 'https://api.tofa.tv/v1/metadata/assets/tmdb/title/0d/42/abc.jpg';
       mockServiceOrigin(
-        { id: 'svc', type: 'tofa', url: 'http://tofa.local:33333', serverId, enabled: true },
+        { id: 'svc', type: 'server', url: 'http://tofa.local:33333', serverId, enabled: true },
         { id: serverId, type: 'tofa', url: 'http://tofa.local:33333', token: 'tofa-key' },
         { id: 'req' }
       );

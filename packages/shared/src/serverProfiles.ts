@@ -36,8 +36,8 @@ export interface ServerProfile {
   serverHistoryImport: 'tofa' | null;
   /** Which rule counts a play as watched: Tracearr's own setting, or the completion percent the server reports. */
   watchedThreshold: 'tracearrSetting' | 'serverRule';
-  /** The request service the server's own requests are mirrored through, created and removed with the server; null when it has none. */
-  builtInRequests: 'tofa' | null;
+  /** The server keeps requests of its own, mirrored through a request service created and removed with the server. */
+  builtInRequests: boolean;
   /** Hosts outside the server that its program guide links live TV art from. */
   guideImageHosts: readonly string[];
   /** Where a link to one item opens: the vendor's hosted web app, or the server's own address, which members must be able to reach. */
@@ -65,7 +65,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     importsTautulliHistory: true,
     serverHistoryImport: null,
     watchedThreshold: 'tracearrSetting',
-    builtInRequests: null,
+    builtInRequests: false,
     guideImageHosts: ['plex.tmsimg.com'],
     itemLinks: 'hostedApp',
     hasProfiles: false,
@@ -88,7 +88,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     importsTautulliHistory: false,
     serverHistoryImport: null,
     watchedThreshold: 'tracearrSetting',
-    builtInRequests: null,
+    builtInRequests: false,
     guideImageHosts: [],
     itemLinks: 'serverAddress',
     hasProfiles: false,
@@ -111,7 +111,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     importsTautulliHistory: false,
     serverHistoryImport: null,
     watchedThreshold: 'tracearrSetting',
-    builtInRequests: null,
+    builtInRequests: false,
     guideImageHosts: [],
     itemLinks: 'serverAddress',
     hasProfiles: false,
@@ -134,7 +134,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     importsTautulliHistory: false,
     serverHistoryImport: 'tofa',
     watchedThreshold: 'serverRule',
-    builtInRequests: 'tofa',
+    builtInRequests: true,
     guideImageHosts: ['api.tofa.tv'],
     itemLinks: 'hostedApp',
     hasProfiles: true,

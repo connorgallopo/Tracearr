@@ -10,6 +10,7 @@ import type {
   MediaRequestStatus,
   RequestSeason,
   RequestServiceType,
+  ServerType,
   UserRequestEntry,
   UserRequestsResponse,
   WatchedState,
@@ -63,6 +64,7 @@ interface RequestBaseRow {
 
 interface MediaRequestSqlRow extends RequestBaseRow {
   service_type: RequestServiceType;
+  server_type: ServerType;
   remote_username: string;
   server_user_id: string | null;
   user_server_id: string | null;
@@ -169,6 +171,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
       mr.is_4k,
       mr.is_auto_request,
       rs.type AS service_type,
+      sv.type AS server_type,
       mr.remote_username,
       mr.server_user_id,
       su.user_id AS lens_user_id,
@@ -179,6 +182,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
       pic.server_id AS thumb_server_id
     FROM media_requests mr
     JOIN request_services rs ON rs.id = mr.service_id
+    JOIN servers sv ON sv.id = rs.server_id
     LEFT JOIN server_users su ON su.id = mr.server_user_id
     LEFT JOIN users u ON u.id = su.user_id
     ${personPictureJoinSql()}
@@ -192,6 +196,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
   return rows.map((row) => ({
     ...baseEntry(row, states.get(row.id) ?? UNWATCHED_LENSES, showOthers),
     serviceType: row.service_type,
+    serverType: row.server_type,
     requester: row.server_user_id
       ? {
           serverUserId: row.server_user_id,

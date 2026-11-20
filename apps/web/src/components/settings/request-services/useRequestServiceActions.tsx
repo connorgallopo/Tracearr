@@ -56,7 +56,7 @@ export function useRequestServiceActions(
 
   if (service === undefined) {
     // A server with its own requests always has its service; it is never linked to Seerr
-    const linkable = !!requestService && SERVER_PROFILES[server.type].builtInRequests === null;
+    const linkable = !!requestService && !SERVER_PROFILES[server.type].builtInRequests;
     return {
       fact: linkable && (
         <Button
@@ -79,7 +79,7 @@ export function useRequestServiceActions(
   const parts: ReactNode[] = [
     !builtIn && (
       <span key="name" className="inline-flex items-center gap-1">
-        <RequestServiceIcon type={service.type} className="h-3 w-3" />
+        <RequestServiceIcon type={service.type} serverType={server.type} className="h-3 w-3" />
         {service.name}
         {service.version !== null && <VersionText version={service.version} />}
       </span>
@@ -96,7 +96,7 @@ export function useRequestServiceActions(
         <ExternalLink className="h-3 w-3" aria-hidden="true" />
       </a>
     ),
-    // A tofa run that finds requests turned off stamps lastSyncAt with that failing run
+    // A built-in service's run that finds requests turned off stamps lastSyncAt with that failing run
     !(builtIn && service.lastSyncError !== null) &&
       (service.lastSyncAt === null
         ? t('requests.neverSynced')

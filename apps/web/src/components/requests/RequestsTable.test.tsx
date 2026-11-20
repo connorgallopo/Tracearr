@@ -21,6 +21,7 @@ function makeMediaEntry(overrides: Partial<MediaRequestEntry> = {}): MediaReques
     id: 'r1',
     serverId: 's1',
     serviceType: 'seerr',
+    serverType: 'plex',
     status: 'completed',
     requestedAt: '2026-01-01T00:00:00.000Z',
     availableAt: '2026-01-02T00:00:00.000Z',

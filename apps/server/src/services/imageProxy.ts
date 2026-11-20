@@ -623,7 +623,7 @@ function serverOrigin(
   return server && !server.historicalAt ? { kind: 'server', server, requestServiceId } : null;
 }
 
-/** tofa's requests are its server's own, so their art comes from that server with its key */
+/** A server's own requests take their art from that server with its key */
 async function requestServiceOrigin(service: {
   id: string;
   type: RequestServiceType;
@@ -631,7 +631,7 @@ async function requestServiceOrigin(service: {
   serverId: string;
 }): Promise<ImageOrigin | null> {
   switch (service.type) {
-    case 'tofa':
+    case 'server':
       return serverOrigin(await selectServer(service.serverId), service.id);
     case 'seerr':
       return { kind: 'seerr', url: service.url, requestServiceId: service.id };

@@ -471,7 +471,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         updatedAt: servers.updatedAt,
       });
       if (
-        SERVER_PROFILES[server.type].builtInRequests !== null &&
+        SERVER_PROFILES[server.type].builtInRequests &&
         (newName !== undefined || newUrl !== undefined)
       ) {
         await followServerOnBuiltInRequestService(tx, id);

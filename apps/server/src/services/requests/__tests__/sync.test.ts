@@ -341,7 +341,7 @@ describe('runRequestSync for tofa', () => {
       return { rows: [], rowCount: 0 };
     });
     store.getRequestService.mockResolvedValue(
-      serviceRow({ type: 'tofa', url: 'http://tofa.local:33333', config: null })
+      serviceRow({ type: 'server', url: 'http://tofa.local:33333', config: null })
     );
   });
 
@@ -430,7 +430,7 @@ describe('runRequestSync for tofa', () => {
 
     store.getRequestService.mockResolvedValue(
       serviceRow({
-        type: 'tofa',
+        type: 'server',
         url: 'http://tofa.local:33333',
         config: null,
         takesRequests: false,

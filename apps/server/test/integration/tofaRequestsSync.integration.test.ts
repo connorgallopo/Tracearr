@@ -61,7 +61,7 @@ describe('tofa request sync', () => {
     expect(await addBuiltInRequestServices(db, ['tofa'])).toEqual([]);
     const server = await db.execute(sql`SELECT name, url FROM servers WHERE id = ${serverId}`);
     expect((await builtIn()).rows).toEqual([
-      { id: serviceId, type: 'tofa', ...server.rows[0], config: null, remote_server_id: null },
+      { id: serviceId, type: 'server', ...server.rows[0], config: null, remote_server_id: null },
     ]);
 
     await db.execute(

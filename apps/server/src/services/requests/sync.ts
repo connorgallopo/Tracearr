@@ -393,7 +393,7 @@ export async function runRequestSync(
     switch (row.type) {
       case 'seerr':
         return await syncSeerr(row, mode, deps);
-      case 'tofa':
+      case 'server':
         return await syncTofa(row, mode, deps);
       default:
         return assertNever(row.type);
