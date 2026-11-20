@@ -84,8 +84,9 @@ interface Props {
   onTimeRangeChange: (timeRange: TimeRangeValue) => void;
   filterOptions?: HistoryFilterOptions;
   isFetching?: boolean;
+  /** The columns the table shows */
   columnVisibility: ColumnVisibility;
-  onColumnVisibilityChange: (visibility: ColumnVisibility) => void;
+  onColumnToggle: (column: HistoryColumnId, shown: boolean) => void;
   isMultiServer?: boolean;
   /** Every row is the member's own, so there is no one to filter by. */
   isMember?: boolean;
@@ -136,7 +137,7 @@ export function HistoryFiltersBar({
   filterOptions,
   isFetching,
   columnVisibility,
-  onColumnVisibilityChange,
+  onColumnToggle,
   isMultiServer = false,
   isMember = false,
 }: Props) {
@@ -314,20 +315,12 @@ export function HistoryFiltersBar({
     onFiltersChange({});
   }, [onFiltersChange]);
 
-  // Toggle column visibility
-  const toggleColumn = useCallback(
-    (columnId: HistoryColumnId) => {
-      onColumnVisibilityChange({
-        ...columnVisibility,
-        [columnId]: !columnVisibility[columnId],
-      });
-    },
-    [columnVisibility, onColumnVisibilityChange]
-  );
-
   const hasActiveFilters = activeFilters.length > 0 || filters.search;
   const activeFilterCount = activeFilters.length + (filters.search ? 1 : 0);
-  const hiddenColumnCount = Object.values(columnVisibility).filter((v) => !v).length;
+  const menuColumns = HISTORY_COLUMNS.filter(
+    (column) => (column.id !== 'server' || isMultiServer) && (column.id !== 'user' || !isMember)
+  );
+  const shownColumnCount = menuColumns.filter((column) => columnVisibility[column.id]).length;
 
   // Sort users alphabetically (case-insensitive)
   const sortedUsers = useMemo(() => {
@@ -738,22 +731,20 @@ export function HistoryFiltersBar({
             <Button variant="outline" size="sm" className="h-8 gap-1.5">
               <Columns3 className="h-4 w-4" />
               {t('pages:history.filters.columns')}
-              {hiddenColumnCount > 0 && (
+              {shownColumnCount < menuColumns.length && (
                 <Badge variant="secondary" className="ml-1 h-5 px-1.5">
-                  {HISTORY_COLUMNS.length - hiddenColumnCount}
+                  {shownColumnCount}
                 </Badge>
               )}
               <ChevronDown className="h-3.5 w-3.5 opacity-50" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            {HISTORY_COLUMNS.filter(
-              (col) => (col.id !== 'server' || isMultiServer) && (col.id !== 'user' || !isMember)
-            ).map((column) => (
+            {menuColumns.map((column) => (
               <DropdownMenuCheckboxItem
                 key={column.id}
                 checked={columnVisibility[column.id]}
-                onCheckedChange={() => toggleColumn(column.id)}
+                onCheckedChange={(checked) => onColumnToggle(column.id, checked)}
               >
                 {t(column.labelKey)}
               </DropdownMenuCheckboxItem>

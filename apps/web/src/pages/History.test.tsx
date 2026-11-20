@@ -1,9 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { afterEach, describe, it, expect, vi, beforeEach } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { MemoryRouter, useLocation } from 'react-router';
 import { History } from './History';
 import type { HistoryFilters } from '@/hooks/queries';
 import type { TimeRangeValue } from '@/components/ui/time-range-picker';
+import type { ColumnVisibility, HistoryColumnId } from '@/components/history/HistoryFilters';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -44,15 +45,17 @@ const bar = vi.hoisted(() => ({
     filters: HistoryFilters;
     onFiltersChange: (filters: HistoryFilters) => void;
     onTimeRangeChange: (range: TimeRangeValue) => void;
+    columnVisibility: ColumnVisibility;
+    onColumnToggle: (column: HistoryColumnId, shown: boolean) => void;
   },
 }));
 
-vi.mock('@/components/history/HistoryFilters', () => ({
+vi.mock('@/components/history/HistoryFilters', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/components/history/HistoryFilters')>()),
   HistoryFiltersBar: (props: NonNullable<typeof bar.props>) => {
     bar.props = props;
     return null;
   },
-  DEFAULT_COLUMN_VISIBILITY: {},
 }));
 const table = vi.hoisted(() => ({
   onSortChange: null as null | ((column: 'startedAt' | 'durationMs' | 'mediaTitle') => void),
@@ -250,5 +253,68 @@ describe('History aggregates', () => {
     } finally {
       vi.useRealTimers();
     }
+  });
+});
+
+describe('History column choices', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const tableWidth = (width: number) =>
+    vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(width);
+  const shownProgress = () => bar.props?.columnVisibility.progress;
+
+  it('lets a column turned on at a wide width drop out once the table is narrow', () => {
+    localStorage.setItem('tracearr-history-columns', JSON.stringify({ progress: false }));
+    tableWidth(2000);
+    const { unmount } = renderAt('/history');
+    act(() => bar.props?.onColumnToggle('progress', true));
+    expect(shownProgress()).toBe(true);
+    unmount();
+
+    tableWidth(1000);
+    renderAt('/history');
+    expect(shownProgress()).toBe(false);
+  });
+
+  it('keeps a column turned on while the table is narrow', () => {
+    tableWidth(1000);
+    const { unmount } = renderAt('/history');
+    expect(shownProgress()).toBe(false);
+    act(() => bar.props?.onColumnToggle('progress', true));
+    expect(shownProgress()).toBe(true);
+    unmount();
+
+    renderAt('/history');
+    expect(shownProgress()).toBe(true);
+  });
+
+  it('keeps a column the table only fits without, when it is turned on', () => {
+    localStorage.setItem(
+      'tracearr-history-columns',
+      JSON.stringify({ quality: false, progress: false })
+    );
+    tableWidth(1050);
+    renderAt('/history');
+    act(() => bar.props?.onColumnToggle('progress', true));
+
+    expect(shownProgress()).toBe(true);
+  });
+
+  it('hands a kept column back to the narrow rule when unchecked, so a wide table still shows it', () => {
+    tableWidth(1000);
+    const { unmount } = renderAt('/history');
+    act(() => bar.props?.onColumnToggle('progress', true));
+    act(() => bar.props?.onColumnToggle('progress', false));
+    expect(shownProgress()).toBe(false);
+    unmount();
+
+    tableWidth(2000);
+    renderAt('/history');
+    expect(shownProgress()).toBe(true);
   });
 });

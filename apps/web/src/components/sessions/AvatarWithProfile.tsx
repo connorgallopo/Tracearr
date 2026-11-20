@@ -1,11 +1,24 @@
 import type { ReactNode } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
 import type { NonMainProfile } from '@tracearr/shared';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getAvatarUrl } from '@/components/users/utils';
 import { cn } from '@/lib/utils';
 import { useProfileLabel } from './useProfileLabel';
 
-interface AvatarWithProfileProps {
+// Two-letter initials reach toward the avatar's bottom-right corner, so beside them the
+// badge is smaller and its inner edge stays clear of the letters
+const profileBadgeVariants = cva('ring-background @container absolute ring-2', {
+  variants: {
+    initials: {
+      one: '-right-[20%] -bottom-[20%] size-[56%]',
+      two: '-right-[15%] -bottom-[15%] size-[44%]',
+    },
+  },
+  defaultVariants: { initials: 'one' },
+});
+
+interface AvatarWithProfileProps extends VariantProps<typeof profileBadgeVariants> {
   serverId: string;
   profile: NonMainProfile | undefined;
   /** The account's avatar */
@@ -13,7 +26,12 @@ interface AvatarWithProfileProps {
 }
 
 /** The account's avatar, with the profile that played over its bottom-right when it is not the main one */
-export function AvatarWithProfile({ serverId, profile, children }: AvatarWithProfileProps) {
+export function AvatarWithProfile({
+  serverId,
+  profile,
+  initials,
+  children,
+}: AvatarWithProfileProps) {
   const profileLabel = useProfileLabel();
   if (!profile) return children;
 
@@ -26,7 +44,7 @@ export function AvatarWithProfile({ serverId, profile, children }: AvatarWithPro
         aria-label={label}
         title={label}
         className={cn(
-          'ring-background @container absolute -right-[20%] -bottom-[20%] size-[56%] ring-2',
+          profileBadgeVariants({ initials }),
           profile.removed && 'opacity-50 grayscale'
         )}
       >

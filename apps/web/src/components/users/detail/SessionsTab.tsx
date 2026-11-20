@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select';
 import { useProfileOptionLabel } from '@/components/sessions/useProfileLabel';
 import { HistoryTable } from '@/components/history/HistoryTable';
+import { useFittedColumns } from '@/components/history/useFittedColumns';
 import type { ColumnVisibility } from '@/components/history/HistoryFilters';
 import { useUserSessions } from '@/hooks/queries';
 import { useServer } from '@/hooks/useServer';
@@ -70,7 +71,7 @@ export function UserSessionsTable({
     [sessions, user, personName, servers]
   );
 
-  const columnVisibility = useMemo<ColumnVisibility>(
+  const wantedVisibility = useMemo<ColumnVisibility>(
     () => ({
       date: true,
       user: false,
@@ -93,15 +94,20 @@ export function UserSessionsTable({
         : undefined,
     [profiles, profileOptionLabel]
   );
+  const { fitRef, columnVisibility } = useFittedColumns(wantedVisibility, {
+    showProfile: profileNames !== undefined,
+  });
 
   return (
-    <HistoryTable
-      sessions={rows}
-      isLoading={isLoading}
-      onSessionClick={onSessionClick}
-      columnVisibility={columnVisibility}
-      profileNames={profileNames}
-    />
+    <div ref={fitRef}>
+      <HistoryTable
+        sessions={rows}
+        isLoading={isLoading}
+        onSessionClick={onSessionClick}
+        columnVisibility={columnVisibility}
+        profileNames={profileNames}
+      />
+    </div>
   );
 }
 

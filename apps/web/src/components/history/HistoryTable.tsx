@@ -53,7 +53,8 @@ import {
   type MediaType,
   type EngagementTier,
 } from '@tracearr/shared';
-import { HISTORY_COLUMNS, type ColumnVisibility } from './HistoryFilters';
+import type { ColumnVisibility } from './HistoryFilters';
+import { COLUMN_WIDTHS, getTableMinWidth, getVisibleColumns } from './historyColumns';
 import { ServerColumnCell } from '@/components/server';
 import { useServerColorMap } from '@/hooks/useServerColorMap';
 
@@ -149,7 +150,7 @@ function StateIcon({ state }: { state: SessionState }) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <Icon className={cn('h-4 w-4', color)} />
+        <Icon className={cn('size-4 shrink-0', color)} />
       </TooltipTrigger>
       <TooltipContent>{label}</TooltipContent>
     </Tooltip>
@@ -621,45 +622,6 @@ function SkeletonRow({
         </TableCell>
       )}
     </TableRow>
-  );
-}
-
-const COLUMN_WIDTHS = {
-  date: 140,
-  user: 150,
-  profile: 130,
-  // an explicit share, or fixed layout hands this column every spare pixel
-  content: '26%',
-  server: 150,
-  platform: 130,
-  location: 170,
-  ip: 130,
-  quality: 140,
-  duration: 100,
-  progress: 110,
-} as const;
-
-type HistoryTableColumn = keyof typeof COLUMN_WIDTHS;
-
-// Fixed layout shrinks the content share to whatever the other columns leave, so the
-// table keeps at least this much for it and scrolls sideways instead.
-const CONTENT_MIN_WIDTH = 280;
-
-function getVisibleColumns(
-  columnVisibility: ColumnVisibility,
-  isMultiServer: boolean,
-  showProfile: boolean
-): HistoryTableColumn[] {
-  const columns: HistoryTableColumn[] = HISTORY_COLUMNS.map((column) => column.id).filter(
-    (id) => columnVisibility[id] && (id !== 'server' || isMultiServer)
-  );
-  return showProfile ? [...columns, 'profile'] : columns;
-}
-
-function getTableMinWidth(columns: HistoryTableColumn[]): number {
-  return columns.reduce(
-    (sum, column) => sum + (column === 'content' ? CONTENT_MIN_WIDTH : COLUMN_WIDTHS[column]),
-    0
   );
 }
 

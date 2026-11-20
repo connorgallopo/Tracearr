@@ -80,7 +80,7 @@ function renderBar(
       onTimeRangeChange={vi.fn()}
       filterOptions={bar.options ?? filterOptions}
       columnVisibility={DEFAULT_COLUMN_VISIBILITY}
-      onColumnVisibilityChange={vi.fn()}
+      onColumnToggle={vi.fn()}
       isFetching={bar.isFetching}
     />
   );
@@ -221,7 +221,7 @@ describe('HistoryFiltersBar', () => {
     expect(screen.queryByText('Profiles')).not.toBeInTheDocument();
   });
 
-  const renderMemberBar = () =>
+  const renderMemberBar = (columnVisibility = DEFAULT_COLUMN_VISIBILITY) =>
     render(
       <HistoryFiltersBar
         filters={{}}
@@ -229,8 +229,8 @@ describe('HistoryFiltersBar', () => {
         timeRange={{ period: 'month' }}
         onTimeRangeChange={vi.fn()}
         filterOptions={withProfiles}
-        columnVisibility={DEFAULT_COLUMN_VISIBILITY}
-        onColumnVisibilityChange={vi.fn()}
+        columnVisibility={columnVisibility}
+        onColumnToggle={vi.fn()}
         isMember
       />
     );
@@ -243,6 +243,24 @@ describe('HistoryFiltersBar', () => {
     expect(screen.queryByText('Users')).not.toBeInTheDocument();
     expect(screen.queryByText('Profiles')).not.toBeInTheDocument();
     expect(screen.getByText('Platforms')).toBeInTheDocument();
+  });
+
+  it('counts the checked columns the menu lists on the Columns badge, leaving out Server on one server', async () => {
+    renderBar({});
+    const columns = screen.getByRole('button', { name: /Columns/ });
+
+    await userEvent.click(columns);
+    const items = screen.getAllByRole('menuitemcheckbox');
+    const checked = items.filter((item) => item.getAttribute('aria-checked') === 'true');
+
+    expect(items.map((item) => item.textContent)).not.toContain('Server');
+    expect(columns).toHaveTextContent(new RegExp(`Columns${checked.length}$`));
+  });
+
+  it('shows no Columns badge for a member with every listed column on', () => {
+    renderMemberBar({ ...DEFAULT_COLUMN_VISIBILITY, ip: true, user: false });
+
+    expect(screen.getByRole('button', { name: /Columns/ })).toHaveTextContent(/^Columns$/);
   });
 
   it('has no User column toggle for a member', async () => {

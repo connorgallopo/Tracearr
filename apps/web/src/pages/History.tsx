@@ -11,8 +11,10 @@ import {
   HistoryFiltersBar,
   DEFAULT_COLUMN_VISIBILITY,
   type ColumnVisibility,
+  type HistoryColumnId,
 } from '@/components/history/HistoryFilters';
 import { HistoryTable, type SortableColumn } from '@/components/history/HistoryTable';
+import { NARROW_HIDDEN_COLUMNS, useFittedColumns } from '@/components/history/useFittedColumns';
 import { HistoryAggregates } from '@/components/history/HistoryAggregates';
 import { SessionDetailSheet } from '@/components/history/SessionDetailSheet';
 import { ErrorState, InlineErrorState } from '@/components/library/ErrorState';
@@ -53,6 +55,35 @@ function saveColumnVisibility(visibility: ColumnVisibility): void {
   } catch {
     // Ignore storage errors
   }
+}
+
+// Columns the user turned on while the table was too narrow for them, which stay shown
+const CHOSEN_COLUMNS_KEY = 'tracearr-history-columns-chosen';
+
+function isNarrowHiddenColumn(value: unknown): value is HistoryColumnId {
+  return NARROW_HIDDEN_COLUMNS.some((column) => column === value);
+}
+
+function loadChosenColumns(): HistoryColumnId[] {
+  try {
+    const stored: unknown = JSON.parse(localStorage.getItem(CHOSEN_COLUMNS_KEY) ?? '[]');
+    if (Array.isArray(stored)) return stored.filter(isNarrowHiddenColumn);
+  } catch {
+    // Ignore parse errors
+  }
+  return [];
+}
+
+function saveChosenColumns(columns: HistoryColumnId[]): void {
+  try {
+    localStorage.setItem(CHOSEN_COLUMNS_KEY, JSON.stringify(columns));
+  } catch {
+    // Ignore storage errors
+  }
+}
+
+function columnsForViewer(visibility: ColumnVisibility, isMember: boolean): ColumnVisibility {
+  return isMember ? { ...visibility, user: false } : visibility;
 }
 
 function parseCommaSeparated<T extends string>(
@@ -211,10 +242,19 @@ export function History() {
     }
   }, [linkedSession]);
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>(loadColumnVisibility);
-  const tableVisibility = useMemo(
-    () => (isMember ? { ...columnVisibility, user: false } : columnVisibility),
+  const [chosenColumns, setChosenColumns] = useState(loadChosenColumns);
+  const wantedVisibility = useMemo(
+    () => columnsForViewer(columnVisibility, isMember),
     [isMember, columnVisibility]
   );
+  const {
+    fitRef,
+    columnVisibility: tableVisibility,
+    fits,
+  } = useFittedColumns(wantedVisibility, {
+    isMultiServer,
+    chosen: chosenColumns,
+  });
 
   // A preset window is computed from now, so it is keyed on the range alone: a sort or
   // filter change must not shift it and refetch the aggregates.
@@ -282,11 +322,27 @@ export function History() {
     [searchParams, setSearchParams]
   );
 
-  // Handle column visibility changes - save to local storage
-  const handleColumnVisibilityChange = useCallback((newVisibility: ColumnVisibility) => {
-    setColumnVisibility(newVisibility);
-    saveColumnVisibility(newVisibility);
+  const updateChosenColumns = useCallback((chosen: HistoryColumnId[]) => {
+    setChosenColumns(chosen);
+    saveChosenColumns(chosen);
   }, []);
+
+  const handleColumnToggle = useCallback(
+    (column: HistoryColumnId, shown: boolean) => {
+      if (!shown && chosenColumns.includes(column)) {
+        updateChosenColumns(chosenColumns.filter((chosenColumn) => chosenColumn !== column));
+        // The narrow table hides it again, and wider ones still show it
+        if (!fits(wantedVisibility)) return;
+      }
+      const visibility = { ...columnVisibility, [column]: shown };
+      setColumnVisibility(visibility);
+      saveColumnVisibility(visibility);
+      if (shown && isNarrowHiddenColumn(column) && !fits(columnsForViewer(visibility, isMember))) {
+        updateChosenColumns([...chosenColumns, column]);
+      }
+    },
+    [columnVisibility, chosenColumns, wantedVisibility, isMember, fits, updateChosenColumns]
+  );
 
   // Handle session click - open detail sheet
   const handleSessionClick = useCallback((session: SessionWithDetails) => {
@@ -342,8 +398,8 @@ export function History() {
             onTimeRangeChange={setRange}
             filterOptions={filterOptions}
             isFetching={isFetching || filterOptionsLoading}
-            columnVisibility={columnVisibility}
-            onColumnVisibilityChange={handleColumnVisibilityChange}
+            columnVisibility={tableVisibility}
+            onColumnToggle={handleColumnToggle}
             isMultiServer={isMultiServer}
             isMember={isMember}
           />
@@ -353,7 +409,7 @@ export function History() {
       {/* Sessions Table */}
       {/* Card owns the vertical padding now, so a flush table zeroes both axes */}
       <Card className={sessionsIsError ? undefined : 'py-0'}>
-        <CardContent className={sessionsIsError ? undefined : 'px-0'}>
+        <CardContent ref={fitRef} className={sessionsIsError ? undefined : 'px-0'}>
           {sessionsIsError ? (
             <ErrorState
               title={t('common:errors.somethingWentWrong')}

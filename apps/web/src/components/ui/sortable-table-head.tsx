@@ -42,13 +42,15 @@ export function SortableTableHead<T extends string>({
       className={cn('px-0', className)}
       {...props}
     >
+      {/* A label longer than its column truncates, so the header stays inside a fixed-layout column */}
       <Button
         variant="ghost"
         size="sm"
-        className={cn(tableHeadTextClasses, 'hover:text-foreground h-8')}
+        className={cn(tableHeadTextClasses, 'hover:text-foreground h-8 max-w-full')}
+        title={typeof children === 'string' ? children : undefined}
         onClick={() => onSort(field)}
       >
-        {children}
+        <span className="truncate">{children}</span>
         {active ? (
           sortOrder === 'asc' ? (
             <ArrowUp />
