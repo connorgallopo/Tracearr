@@ -36,6 +36,7 @@ export function mapTofaRequest(row: TofaRequest): MappedRequest {
     remoteUsername: row.requested_by_name ?? row.requested_by,
     remotePlexId: null,
     remoteJellyfinUserId: null,
+    remoteProfileId: null,
     status,
     seasons:
       row.media_type === 'tv'

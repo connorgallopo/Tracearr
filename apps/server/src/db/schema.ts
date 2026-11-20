@@ -997,6 +997,8 @@ export const mediaRequests = pgTable(
     serverUserId: uuid('server_user_id').references(() => serverUsers.id, {
       onDelete: 'set null',
     }),
+    // A profile on the request's own server; tofa and Seerr requests name none
+    profileId: uuid('profile_id').references(() => serverProfiles.id, { onDelete: 'set null' }),
     remoteUserId: text('remote_user_id').notNull(),
     remoteUsername: text('remote_username').notNull(),
     remotePlexId: varchar('remote_plex_id', { length: 64 }),

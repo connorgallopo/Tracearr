@@ -122,6 +122,37 @@ describe('tofa request sync', () => {
     expect((await mirror(serviceId)).every((r) => r.deleted_at !== null)).toBe(true);
   });
 
+  it('links a request to its profile once the profile is stored', async () => {
+    const { serverId, serviceId, requesterId } = await seed();
+    const [first] = tofa.requests;
+    if (!first) throw new Error('fixture has no requests');
+    const sync = () =>
+      runRequestSync(serviceId, 'full', {
+        serverClientFor: () =>
+          fakeTofaClient({
+            getRequests: async () => ({
+              requestsOn: true,
+              version: null,
+              requests: [{ ...mapTofaRequest(first), remoteProfileId: 'p-kid' }],
+            }),
+          }),
+      });
+    const profileId = async () =>
+      (await db.execute(sql`SELECT profile_id FROM media_requests WHERE service_id = ${serviceId}`))
+        .rows[0]?.profile_id;
+
+    await sync();
+    expect(await profileId()).toBeNull();
+
+    const stored = await db.execute(sql`
+      INSERT INTO server_profiles (server_id, server_user_id, external_id, name)
+      VALUES (${serverId}, ${requesterId}, 'p-kid', 'Kid')
+      RETURNING id
+    `);
+    await sync();
+    expect(await profileId()).toBe(stored.rows[0]?.id);
+  });
+
   it('offers Requests for a tofa server only while tofa has its requests on', async () => {
     const { serviceId } = await seed();
     await runRequestSync(serviceId, 'full', {

@@ -787,8 +787,10 @@ export interface IMediaServerClient {
   checkFilesExist(ratingKeys: string[]): Promise<Map<string, Map<string, boolean>> | NotNeeded>;
 
   /**
-   * Every request the server keeps of its own, or its answer that requests are turned off
-   * there. Servers without requests of their own answer NOT_NEEDED.
+   * Every request the server keeps of its own, walking all pages where the server pages
+   * them, or its answer that requests are turned off there. The request sync marks any
+   * request missing from the list as deleted. Servers without requests of their own answer
+   * NOT_NEEDED.
    */
   getRequests(): Promise<ServerRequests | NotNeeded>;
 

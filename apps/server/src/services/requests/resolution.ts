@@ -13,11 +13,13 @@ export type ResolutionInput = Pick<
   | 'remoteUserId'
   | 'remotePlexId'
   | 'remoteJellyfinUserId'
+  | 'remoteProfileId'
 >;
 
 export interface Resolved {
   mediaId: string | null;
   serverUserId: string | null;
+  profileId: string | null;
   title: string | null;
   year: number | null;
 }
@@ -127,7 +129,8 @@ function requesterIdentity(serverType: ServerType) {
   }
 }
 
-async function requesters(
+async function idsByKey(
+  table: SQL,
   serverId: string,
   column: SQL,
   keys: string[]
@@ -135,7 +138,7 @@ async function requesters(
   const out = new Map<string, string>();
   if (keys.length === 0) return out;
   const result = await db.execute(sql`
-    SELECT ${column} AS key, id FROM server_users
+    SELECT ${column} AS key, id FROM ${table}
     WHERE server_id = ${serverId} AND ${column} = ANY(${sql.param(keys)}::text[])
   `);
   for (const row of result.rows as { key: string; id: string }[]) out.set(row.key, row.id);
@@ -157,10 +160,19 @@ export async function resolveRequests(
     uniqueNumbers(shows.map((r) => r.tmdbId))
   );
   const keyHits = await byRatingKey(serverId, uniqueStrings(rows.map((r) => r.ratingKey)));
-  const userHits = await requesters(
+  const userHits = await idsByKey(
+    sql`server_users`,
     serverId,
     requester.column,
     uniqueStrings(rows.map(requester.key))
+  );
+  // A request names its profile only by the server's id for it, so a profile not stored yet
+  // stays unlinked until a later sync. Removed profiles keep their rows and still match.
+  const profileHits = await idsByKey(
+    sql`server_profiles`,
+    serverId,
+    sql`external_id`,
+    uniqueStrings(rows.map((r) => r.remoteProfileId))
   );
 
   const out = new Map<string, Resolved>();
@@ -178,6 +190,7 @@ export async function resolveRequests(
     out.set(row.remoteId, {
       mediaId: hit?.id ?? null,
       serverUserId: key ? (userHits.get(key) ?? null) : null,
+      profileId: row.remoteProfileId ? (profileHits.get(row.remoteProfileId) ?? null) : null,
       title: hit?.title ?? null,
       year: hit?.year ?? null,
     });

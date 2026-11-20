@@ -10,12 +10,16 @@ export type MappedRequest = Omit<
   | 'serviceId'
   | 'mediaId'
   | 'serverUserId'
+  | 'profileId'
   | 'year'
   | 'syncedAt'
   | 'createdAt'
   | 'updatedAt'
   | 'deletedAt'
->;
+> & {
+  /** The server's own id for the profile that asked */
+  remoteProfileId: string | null;
+};
 
 const STATUS_BY_CODE: Record<number, MediaRequestStatus> = {
   1: 'pending',
@@ -90,6 +94,7 @@ export function mapSeerrRequest(row: SeerrRequest): MappedRequest {
     remoteUsername: row.requestedBy.displayName,
     remotePlexId: row.requestedBy.plexId != null ? String(row.requestedBy.plexId) : null,
     remoteJellyfinUserId: row.requestedBy.jellyfinUserId ?? null,
+    remoteProfileId: null,
     status,
     seasons,
     is4k: row.is4k,

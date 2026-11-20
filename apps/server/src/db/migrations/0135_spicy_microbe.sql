@@ -1,0 +1,2 @@
+ALTER TABLE "media_requests" ADD COLUMN "profile_id" uuid;--> statement-breakpoint
+ALTER TABLE "media_requests" ADD CONSTRAINT "media_requests_profile_id_server_profiles_id_fk" FOREIGN KEY ("profile_id") REFERENCES "public"."server_profiles"("id") ON DELETE set null ON UPDATE no action;

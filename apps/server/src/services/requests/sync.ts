@@ -173,7 +173,7 @@ async function upsertBatch(
       ${serviceId}, ${r.remoteId}, ${r.remoteMediaId}, ${r.mediaType},
       ${match?.title ?? lookup?.title ?? r.title}, ${match?.year ?? lookup?.year ?? null},
       ${r.tmdbId}, ${r.tvdbId}, ${r.imdbId}, ${r.ratingKey}, ${lookup?.posterPath ?? r.posterPath ?? null},
-      ${match?.mediaId ?? null}::uuid, ${match?.serverUserId ?? null}::uuid,
+      ${match?.mediaId ?? null}::uuid, ${match?.serverUserId ?? null}::uuid, ${match?.profileId ?? null}::uuid,
       ${r.remoteUserId}, ${r.remoteUsername}, ${r.remotePlexId}, ${r.remoteJellyfinUserId},
       ${r.status}, ${r.seasons === null ? null : JSON.stringify(r.seasons)}::jsonb, ${r.is4k}, ${r.isAutoRequest},
       ${r.requestedAt}, ${r.availableAt}, ${r.remoteUpdatedAt}, ${now}
@@ -182,7 +182,7 @@ async function upsertBatch(
   await db.execute(sql`
     INSERT INTO media_requests (
       service_id, remote_id, remote_media_id, media_type, title, year,
-      tmdb_id, tvdb_id, imdb_id, rating_key, poster_path, media_id, server_user_id,
+      tmdb_id, tvdb_id, imdb_id, rating_key, poster_path, media_id, server_user_id, profile_id,
       remote_user_id, remote_username, remote_plex_id, remote_jellyfin_user_id,
       status, seasons, is_4k, is_auto_request, requested_at, available_at, remote_updated_at, synced_at
     ) VALUES ${sql.join(values, sql`, `)}
@@ -196,6 +196,7 @@ async function upsertBatch(
       poster_path = COALESCE(EXCLUDED.poster_path, media_requests.poster_path),
       media_id = COALESCE(EXCLUDED.media_id, media_requests.media_id),
       server_user_id = COALESCE(EXCLUDED.server_user_id, media_requests.server_user_id),
+      profile_id = COALESCE(EXCLUDED.profile_id, media_requests.profile_id),
       remote_user_id = EXCLUDED.remote_user_id, remote_username = EXCLUDED.remote_username,
       remote_plex_id = EXCLUDED.remote_plex_id, remote_jellyfin_user_id = EXCLUDED.remote_jellyfin_user_id,
       -- A request counted as landed only because its media was available stays
@@ -326,8 +327,8 @@ async function syncSeerr(
 }
 
 /**
- * A server lists every request it keeps in one answer and keeps no trace of a deleted one, so
- * every run lists them all and marks the rest deleted.
+ * A server keeps no trace of a deleted request, so every run takes the full list and marks the
+ * rest deleted. The client's getRequests must return every request the server holds.
  */
 async function syncBuiltIn(
   row: RequestServiceRow,
