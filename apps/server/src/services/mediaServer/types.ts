@@ -15,6 +15,7 @@ import {
   type TranscodeInfo,
   type SubtitleInfo,
 } from '@tracearr/shared';
+import type { MappedRequest } from '../requests/mapping.js';
 
 // ============================================================================
 // Session Types
@@ -528,6 +529,11 @@ export interface LibraryChangeFeed {
   revision: number;
 }
 
+/** A server's own requests, mapped, or its answer that requests are turned off there */
+export type ServerRequests =
+  | { requestsOn: true; version: string | null; requests: MappedRequest[] }
+  | { requestsOn: false; version: string | null };
+
 /** The server no longer holds every change since the cursor, so only a full scan is complete */
 export class FullSyncRequiredError extends Error {}
 
@@ -779,6 +785,21 @@ export interface IMediaServerClient {
    * @returns Rating key -> version key -> whether the file exists
    */
   checkFilesExist(ratingKeys: string[]): Promise<Map<string, Map<string, boolean>> | NotNeeded>;
+
+  /**
+   * Every request the server keeps of its own, or its answer that requests are turned off
+   * there. Servers without requests of their own answer NOT_NEEDED.
+   */
+  getRequests(): Promise<ServerRequests | NotNeeded>;
+
+  /**
+   * The poster the server serves for a requested title, held in its library or not. Servers
+   * without requests of their own answer NOT_NEEDED.
+   */
+  getRequestPosterPath(
+    mediaType: 'movie' | 'tv',
+    tmdbId: number
+  ): Promise<string | null | NotNeeded>;
 }
 
 /**

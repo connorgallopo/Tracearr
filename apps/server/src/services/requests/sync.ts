@@ -1,7 +1,8 @@
 import { sql } from 'drizzle-orm';
 import { assertNever, type ServerType } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import { TofaClient } from '../mediaServer/tofa/client.js';
+import { createMediaServerClient } from '../mediaServer/index.js';
+import { NOT_NEEDED, type IMediaServerClient } from '../mediaServer/types.js';
 import { mapWithConcurrency } from '../../utils/concurrency.js';
 import { createLogger } from '../../utils/logger.js';
 import { seerrPosterPath } from '../imageProxy.js';
@@ -13,7 +14,7 @@ import {
   type SeerrRequest,
   type SeerrTitleLookup,
 } from './seerrClient.js';
-import { liveServerConnection, serverTypeById } from './serverLookup.js';
+import { liveServerConnection, serverTypeById, type LiveServer } from './serverLookup.js';
 import {
   getRequestService,
   markRequestServiceReencrypt,
@@ -24,7 +25,6 @@ import {
   type MirroredRequest,
   type RequestServiceRow,
 } from './store.js';
-import { mapTofaRequest } from './tofaRequests.js';
 
 const logger = createLogger('request-sync');
 
@@ -46,14 +46,9 @@ export interface SeerrClientLike {
   tv(tmdbId: number): Promise<SeerrTitleLookup>;
 }
 
-export type TofaRequestSource = Pick<
-  TofaClient,
-  'systemInfo' | 'getRequests' | 'getRequestPosterPath'
->;
-
 export interface SyncDeps {
   clientFor?: (row: RequestServiceRow, apiKey: string) => SeerrClientLike;
-  tofaClientFor?: (server: { url: string; token: string }) => TofaRequestSource;
+  serverClientFor?: (server: LiveServer) => IMediaServerClient;
 }
 
 export interface SyncRunResult {
@@ -142,8 +137,8 @@ async function lookupSeerrMedia(
   return out;
 }
 
-async function lookupTofaPosters(
-  client: TofaRequestSource,
+async function lookupServerPosters(
+  client: IMediaServerClient,
   rows: MappedRequest[]
 ): Promise<Lookups> {
   const out: Lookups = new Map();
@@ -154,6 +149,7 @@ async function lookupTofaPosters(
         row.mediaType === 'show' ? 'tv' : 'movie',
         row.tmdbId
       );
+      if (posterPath === NOT_NEEDED) return;
       out.set(row.remoteId, { title: null, year: null, posterPath });
     } catch (error) {
       logger.warn('poster lookup failed', { remoteId: row.remoteId, error });
@@ -176,7 +172,7 @@ async function upsertBatch(
     return sql`(
       ${serviceId}, ${r.remoteId}, ${r.remoteMediaId}, ${r.mediaType},
       ${match?.title ?? lookup?.title ?? r.title}, ${match?.year ?? lookup?.year ?? null},
-      ${r.tmdbId}, ${r.tvdbId}, ${r.imdbId}, ${r.ratingKey}, ${lookup?.posterPath ?? null},
+      ${r.tmdbId}, ${r.tvdbId}, ${r.imdbId}, ${r.ratingKey}, ${lookup?.posterPath ?? r.posterPath ?? null},
       ${match?.mediaId ?? null}::uuid, ${match?.serverUserId ?? null}::uuid,
       ${r.remoteUserId}, ${r.remoteUsername}, ${r.remotePlexId}, ${r.remoteJellyfinUserId},
       ${r.status}, ${r.seasons === null ? null : JSON.stringify(r.seasons)}::jsonb, ${r.is4k}, ${r.isAutoRequest},
@@ -330,10 +326,10 @@ async function syncSeerr(
 }
 
 /**
- * tofa lists every request in one response and keeps no trace of a deleted one, so every run
- * lists them all and marks the rest deleted.
+ * A server lists every request it keeps in one answer and keeps no trace of a deleted one, so
+ * every run lists them all and marks the rest deleted.
  */
-async function syncTofa(
+async function syncBuiltIn(
   row: RequestServiceRow,
   mode: SyncMode,
   deps: SyncDeps
@@ -341,35 +337,42 @@ async function syncTofa(
   const server = await liveServerConnection(row.serverId);
   if (!server) return SKIPPED;
 
-  const client = deps.tofaClientFor ? deps.tofaClientFor(server) : new TofaClient(server);
+  const client = (deps.serverClientFor ?? createMediaServerClient)(server);
   const startedAt = new Date();
-  const info = await client.systemInfo();
-  if (!info.requests_available) {
+  const listing = await client.getRequests();
+  if (listing === NOT_NEEDED) {
+    logger.warn('built-in request service on a server without requests of its own', {
+      serviceId: row.id,
+      serverId: server.id,
+    });
+    return SKIPPED;
+  }
+  if (!listing.requestsOn) {
     await recordSyncResult(row.id, {
-      version: info.version,
+      version: listing.version,
       lastSyncAt: startedAt,
-      lastSyncError: 'Requests are turned off on this tofa server',
+      lastSyncError: 'Requests are turned off on this server',
       takesRequests: false,
     });
     if (row.takesRequests) await publishRequestsChanged(row.id);
     return SKIPPED;
   }
 
-  const mapped = (await client.getRequests()).map(mapTofaRequest);
+  const { requests } = listing;
   const mirrored = await mirroredRequests(row.id);
-  const upserted = await upsertAll(row, 'tofa', mapped, (page, resolved) =>
-    lookupTofaPosters(
+  const upserted = await upsertAll(row, server.type, requests, (page, resolved) =>
+    lookupServerPosters(
       client,
-      page.filter((r) => wantsPoster(r, resolved, mirrored, mode))
+      page.filter((r) => r.posterPath == null && wantsPoster(r, resolved, mirrored, mode))
     )
   );
   const markedDeleted = await markMissingDeleted(
     row.id,
-    mapped.map((r) => r.remoteId)
+    requests.map((r) => r.remoteId)
   );
 
   await recordSyncResult(row.id, {
-    version: info.version,
+    version: listing.version,
     lastSyncAt: startedAt,
     ...(mode === 'full' ? { lastFullSyncAt: startedAt } : {}),
     lastSyncError: null,
@@ -394,7 +397,7 @@ export async function runRequestSync(
       case 'seerr':
         return await syncSeerr(row, mode, deps);
       case 'server':
-        return await syncTofa(row, mode, deps);
+        return await syncBuiltIn(row, mode, deps);
       default:
         return assertNever(row.type);
     }

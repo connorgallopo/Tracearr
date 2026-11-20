@@ -172,7 +172,7 @@ describe('useRequestServiceActions', () => {
       service({
         type: 'server',
         version: null,
-        lastSyncError: 'Requests are turned off on this tofa server',
+        lastSyncError: 'Requests are turned off on this server',
       }),
       tofa
     );
@@ -180,7 +180,7 @@ describe('useRequestServiceActions', () => {
     expect(screen.getByText('requests.syncFailed')).toBeInTheDocument();
     expect(screen.queryByText(/requests\.syncedAgo/)).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Requests are turned off on this tofa server' })
+      screen.getByRole('button', { name: 'Requests are turned off on this server' })
     ).toBeInTheDocument();
   });
 

@@ -10,8 +10,8 @@ import * as plexParser from '../services/mediaServer/plex/parser.js';
 import { parseSessionsResponse as parseJellyfinSessions } from '../services/mediaServer/jellyfin/parser.js';
 import { parseSessionsResponse as parseEmbySessions } from '../services/mediaServer/emby/parser.js';
 import * as tofaParser from '../services/mediaServer/tofa/parser.js';
+import { mapTofaRequest } from '../services/mediaServer/tofa/requests.js';
 import type { TofaLibraryFiles, TofaMediaPage } from '../services/mediaServer/tofa/types.js';
-import type { TofaRequestSource } from '../services/requests/sync.js';
 import {
   parseLibrariesResponse,
   parseLibraryItemsResponse,
@@ -24,6 +24,7 @@ import {
   type MediaLibraryItem,
   type MediaSession,
   type NotNeeded,
+  type ServerRequests,
   type SyncCursor,
 } from '../services/mediaServer/types.js';
 import { normalizeClient } from '../utils/platformNormalizer.js';
@@ -145,6 +146,8 @@ export function fakePlexClient(overrides: Overrides = {}): IMediaServerClient {
           )
         )
     ),
+    getRequests: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getRequestPosterPath: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     ...overrides,
   };
 }
@@ -234,6 +237,8 @@ function fakeJellyfinEmbyClient(
     getLibraryAlbums: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     getLibraryAlbumsSince: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     checkFilesExist: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getRequests: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getRequestPosterPath: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     ...overrides,
   };
 }
@@ -353,17 +358,11 @@ export function fakeTofaClient(overrides: Overrides = {}): IMediaServerClient {
       }
       return existence;
     }),
-    ...overrides,
-  };
-}
-
-/** tofa's own requests, which only tofa has, so they sit outside IMediaServerClient */
-export function fakeTofaRequestSource(
-  overrides: Partial<TofaRequestSource> = {}
-): TofaRequestSource {
-  return {
-    systemInfo: vi.fn(async () => tofa.systemInfo),
-    getRequests: vi.fn(async () => tofa.requests),
+    getRequests: vi.fn(async (): Promise<ServerRequests> => ({
+      requestsOn: true,
+      version: tofa.systemInfo.version,
+      requests: tofa.requests.map(mapTofaRequest),
+    })),
     getRequestPosterPath: vi.fn(async () => null),
     ...overrides,
   };

@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest';
-import tofa from '../../../test/mediaServerResponses/tofa.json' with { type: 'json' };
-import { mapTofaRequest, mapTofaRequestStatus } from '../tofaRequests.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import tofa from '../../../../test/mediaServerResponses/tofa.json' with { type: 'json' };
+import { TofaClient } from '../client.js';
+import { mapTofaRequest, mapTofaRequestStatus } from '../requests.js';
 
 const byTitle = (title: string) => {
   const row = tofa.requests.find((r) => r.title === title);
@@ -69,5 +70,27 @@ describe('mapTofaRequest', () => {
     expect(mapTofaRequest(byTitle('Lantern Field')).availableAt).toEqual(
       new Date('2025-03-14T09:30:00.000Z')
     );
+  });
+});
+
+describe('TofaClient.getRequests', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('reports requests turned off from system info without listing them', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (url: string) =>
+        url.endsWith('/system/info')
+          ? Response.json({ ...tofa.systemInfo, requests_available: false })
+          : Response.json({ requests: tofa.requests })
+      )
+    );
+
+    await expect(
+      new TofaClient({ url: 'http://tofa.local:33333', token: 'k' }).getRequests()
+    ).resolves.toEqual({ requestsOn: false, version: tofa.systemInfo.version });
+    expect(fetch).toHaveBeenCalledTimes(1);
   });
 });

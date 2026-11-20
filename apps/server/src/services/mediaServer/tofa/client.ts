@@ -29,6 +29,7 @@ import {
   type DownloadSourceDescription,
   type DownloadSourceRequest,
   type NotNeeded,
+  type ServerRequests,
   type SyncCursor,
 } from '../types.js';
 import { lookupTofaMedia } from './mediaLookup.js';
@@ -47,6 +48,7 @@ import {
   parseUsers,
   type TofaLinkedAccount,
 } from './parser.js';
+import { mapTofaRequest } from './requests.js';
 import type {
   TofaApiKey,
   TofaCloudUser,
@@ -476,8 +478,14 @@ export class TofaClient implements IMediaServerClient {
     });
   }
 
+  async getRequests(): Promise<ServerRequests> {
+    const { requests_available, version } = await this.systemInfo();
+    if (!requests_available) return { requestsOn: false, version };
+    return { requestsOn: true, version, requests: (await this.listRequests()).map(mapTofaRequest) };
+  }
+
   /** Every request on the server; tofa pages none of them */
-  async getRequests(): Promise<TofaRequest[]> {
+  private async listRequests(): Promise<TofaRequest[]> {
     return (await this.request<{ requests: TofaRequest[] }>('/requests')).requests;
   }
 

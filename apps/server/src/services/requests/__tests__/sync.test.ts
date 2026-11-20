@@ -20,11 +20,19 @@ vi.mock('../store.js', () => store);
 vi.mock('../resolution.js', () => resolution);
 vi.mock('../serverLookup.js', () => ({
   serverTypeById: vi.fn(async () => 'plex'),
-  liveServerConnection: vi.fn(async () => ({ url: 'http://tofa.local:33333', token: 'key' })),
+  liveServerConnection: vi.fn(async () => ({
+    id: 'srv',
+    type: 'tofa',
+    url: 'http://tofa.local:33333',
+    token: 'key',
+  })),
 }));
 
 import { TofaClient } from '../../mediaServer/tofa/client.js';
-import { fakeTofaRequestSource } from '../../../test/mediaServerFakes.js';
+import { mapTofaRequest } from '../../mediaServer/tofa/requests.js';
+import { NOT_NEEDED, type NotNeeded, type ServerRequests } from '../../mediaServer/types.js';
+import type { TofaRequest } from '../../mediaServer/tofa/types.js';
+import { fakeTofaClient } from '../../../test/mediaServerFakes.js';
 import tofa from '../../../test/mediaServerResponses/tofa.json' with { type: 'json' };
 import { PAGE_SIZE, runRequestSync } from '../sync.js';
 
@@ -328,7 +336,13 @@ describe('runRequestSync', () => {
   });
 });
 
-describe('runRequestSync for tofa', () => {
+const listing = (requests: TofaRequest[]): ServerRequests => ({
+  requestsOn: true,
+  version: null,
+  requests: requests.map(mapTofaRequest),
+});
+
+describe("runRequestSync for a server's own requests", () => {
   let statements: string[];
 
   beforeEach(() => {
@@ -337,7 +351,12 @@ describe('runRequestSync for tofa', () => {
     resolution.resolveRequests.mockResolvedValue(new Map());
     store.mirroredRequests.mockResolvedValue(new Map());
     mockDb.execute.mockImplementation(async (query: unknown) => {
-      statements.push(JSON.stringify(query));
+      // JSON drops a symbol, so one reaching a query shows up as its name
+      statements.push(
+        JSON.stringify(query, (_, value: unknown) =>
+          typeof value === 'symbol' ? String(value) : value
+        )
+      );
       return { rows: [], rowCount: 0 };
     });
     store.getRequestService.mockResolvedValue(
@@ -353,12 +372,12 @@ describe('runRequestSync for tofa', () => {
   it('lists every request on each scheduled run, so a status change lands without a socket frame', async () => {
     const [waiting] = tofa.requests;
     if (!waiting) throw new Error('fixture has no requests');
-    const source = fakeTofaRequestSource({ getRequests: vi.fn(async () => [waiting]) });
-    await runRequestSync('svc', 'incremental', { tofaClientFor: () => source });
+    const client = fakeTofaClient({ getRequests: vi.fn(async () => listing([waiting])) });
+    await runRequestSync('svc', 'incremental', { serverClientFor: () => client });
 
-    source.getRequests = vi.fn(async () => [{ ...waiting, status: 'available' }]);
+    client.getRequests = vi.fn(async () => listing([{ ...waiting, status: 'available' }]));
     statements = [];
-    const result = await runRequestSync('svc', 'incremental', { tofaClientFor: () => source });
+    const result = await runRequestSync('svc', 'incremental', { serverClientFor: () => client });
 
     expect(result).toEqual({ skipped: false, upserted: 1, markedDeleted: 0 });
     const upsert = statements.find((q) => q.includes('INSERT INTO media_requests'));
@@ -372,15 +391,15 @@ describe('runRequestSync for tofa', () => {
     resolution.resolveRequests.mockResolvedValue(
       new Map([[inLibrary.id, { mediaId: 'm-1', serverUserId: null, title: 'T', year: 2020 }]])
     );
-    const source = fakeTofaRequestSource({
-      getRequests: vi.fn(async () => [show, inLibrary]),
+    const client = fakeTofaClient({
+      getRequests: vi.fn(async () => listing([show, inLibrary])),
       getRequestPosterPath: vi.fn(async () => '/cache/images/posters/abc.jpg'),
     });
 
-    await runRequestSync('svc', 'incremental', { tofaClientFor: () => source });
+    await runRequestSync('svc', 'incremental', { serverClientFor: () => client });
 
-    expect(source.getRequestPosterPath).toHaveBeenCalledTimes(1);
-    expect(source.getRequestPosterPath).toHaveBeenCalledWith('tv', show.tmdb_id);
+    expect(client.getRequestPosterPath).toHaveBeenCalledTimes(1);
+    expect(client.getRequestPosterPath).toHaveBeenCalledWith('tv', show.tmdb_id);
     const upsert = statements.find((q) => q.includes('INSERT INTO media_requests'));
     expect(upsert).toContain('"/cache/images/posters/abc.jpg"');
   });
@@ -391,36 +410,78 @@ describe('runRequestSync for tofa', () => {
     store.mirroredRequests.mockResolvedValue(
       new Map([[waiting.id, { titled: true, postered: false }]])
     );
-    const source = fakeTofaRequestSource({ getRequests: vi.fn(async () => [waiting]) });
+    const client = fakeTofaClient({ getRequests: vi.fn(async () => listing([waiting])) });
 
-    await runRequestSync('svc', 'incremental', { tofaClientFor: () => source });
-    expect(source.getRequestPosterPath).not.toHaveBeenCalled();
+    await runRequestSync('svc', 'incremental', { serverClientFor: () => client });
+    expect(client.getRequestPosterPath).not.toHaveBeenCalled();
 
-    await runRequestSync('svc', 'full', { tofaClientFor: () => source });
-    expect(source.getRequestPosterPath).toHaveBeenCalledTimes(1);
+    await runRequestSync('svc', 'full', { serverClientFor: () => client });
+    expect(client.getRequestPosterPath).toHaveBeenCalledTimes(1);
   });
 
-  it('reports requests turned off and leaves the mirror alone', async () => {
-    const source = fakeTofaRequestSource({
-      systemInfo: vi.fn(async () => ({ ...tofa.systemInfo, requests_available: false })),
+  it('stores the poster a request carries without asking the server for one', async () => {
+    const [row] = tofa.requests.map(mapTofaRequest);
+    if (!row) throw new Error('fixture has no requests');
+    const client = fakeTofaClient({
+      getRequests: vi.fn(async () => ({
+        requestsOn: true,
+        version: null,
+        requests: [{ ...row, posterPath: '/api/v2/admin/requests/9/poster' }],
+      })),
     });
 
-    const result = await runRequestSync('svc', 'full', { tofaClientFor: () => source });
+    await runRequestSync('svc', 'full', { serverClientFor: () => client });
 
-    expect(result.skipped).toBe(true);
-    expect(source.getRequests).not.toHaveBeenCalled();
-    expect(statements).toEqual([]);
-    expect(store.recordSyncResult).toHaveBeenCalledWith(
-      'svc',
-      expect.objectContaining({ lastSyncError: 'Requests are turned off on this tofa server' })
+    expect(client.getRequestPosterPath).not.toHaveBeenCalled();
+    expect(statements.find((q) => q.includes('INSERT INTO media_requests'))).toContain(
+      '"/api/v2/admin/requests/9/poster"'
     );
   });
 
-  it('records whether tofa takes requests, and tells the web when that changes', async () => {
-    const off = fakeTofaRequestSource({
-      systemInfo: vi.fn(async () => ({ ...tofa.systemInfo, requests_available: false })),
+  it('stores no poster when the server has no poster lookup', async () => {
+    const [waiting] = tofa.requests;
+    if (!waiting) throw new Error('fixture has no requests');
+    const client = fakeTofaClient({
+      getRequests: vi.fn(async () => listing([waiting])),
+      getRequestPosterPath: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     });
-    await runRequestSync('svc', 'full', { tofaClientFor: () => off });
+
+    const result = await runRequestSync('svc', 'incremental', { serverClientFor: () => client });
+
+    expect(client.getRequestPosterPath).toHaveBeenCalledTimes(1);
+    expect(result.upserted).toBe(1);
+    const upsert = statements.find((q) => q.includes('INSERT INTO media_requests'));
+    expect(upsert).toContain('COALESCE(EXCLUDED.poster_path, media_requests.poster_path)');
+    expect(upsert).not.toContain('"/');
+    expect(upsert).not.toContain('Symbol(');
+  });
+
+  it('reports requests turned off and leaves the mirror alone', async () => {
+    const client = fakeTofaClient({
+      getRequests: vi.fn(async (): Promise<ServerRequests> => ({
+        requestsOn: false,
+        version: '1.4.0',
+      })),
+    });
+
+    const result = await runRequestSync('svc', 'full', { serverClientFor: () => client });
+
+    expect(result.skipped).toBe(true);
+    expect(statements).toEqual([]);
+    expect(store.recordSyncResult).toHaveBeenCalledWith(
+      'svc',
+      expect.objectContaining({ lastSyncError: 'Requests are turned off on this server' })
+    );
+  });
+
+  it('records whether the server takes requests, and tells the web when that changes', async () => {
+    const off = fakeTofaClient({
+      getRequests: vi.fn(async (): Promise<ServerRequests> => ({
+        requestsOn: false,
+        version: '1.4.0',
+      })),
+    });
+    await runRequestSync('svc', 'full', { serverClientFor: () => off });
 
     expect(store.recordSyncResult).toHaveBeenLastCalledWith(
       'svc',
@@ -436,8 +497,8 @@ describe('runRequestSync for tofa', () => {
         takesRequests: false,
       })
     );
-    const on = fakeTofaRequestSource({ getRequests: vi.fn(async () => []) });
-    await runRequestSync('svc', 'full', { tofaClientFor: () => on });
+    const on = fakeTofaClient({ getRequests: vi.fn(async () => listing([])) });
+    await runRequestSync('svc', 'full', { serverClientFor: () => on });
 
     expect(store.recordSyncResult).toHaveBeenLastCalledWith(
       'svc',
@@ -466,7 +527,7 @@ describe('runRequestSync for tofa', () => {
     );
 
     await expect(
-      runRequestSync('svc', 'incremental', { tofaClientFor: (server) => new TofaClient(server) })
+      runRequestSync('svc', 'incremental', { serverClientFor: (server) => new TofaClient(server) })
     ).rejects.toThrow();
 
     expect(statements).toEqual([]);
