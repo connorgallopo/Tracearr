@@ -1,5 +1,5 @@
 import { beforeAll, describe, it, expect, vi } from 'vitest';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { initI18n } from '@tracearr/translations';
 import type { HistoryFilterOptions, ProfileFilterOption } from '@tracearr/shared';
@@ -190,6 +190,26 @@ describe('HistoryFiltersBar', () => {
     expect(onFiltersChange).toHaveBeenLastCalledWith(
       expect.objectContaining({ profileIds: ['p-robin'] })
     );
+  });
+
+  it('heads the profiles by account only when more than one account is listed', async () => {
+    const openProfiles = async () => {
+      await userEvent.click(screen.getByRole('button', { name: /filters/i }));
+      await userEvent.click(await screen.findByText('Profiles'));
+      return screen.findByRole('group', { name: 'alice_tofa' });
+    };
+
+    renderBar({}, {}, { options: withProfiles });
+    expect(within(await openProfiles()).getAllByText('alice_tofa')).toHaveLength(1);
+    cleanup();
+
+    const bobsKids = { ...bobsMain, id: 'p-kids', name: 'Kids', main: false };
+    renderBar(
+      {},
+      {},
+      { options: { ...withProfiles, profiles: [...withProfiles.profiles, bobsKids] } }
+    );
+    expect(within(await openProfiles()).getAllByText('alice_tofa')).toHaveLength(2);
   });
 
   it('has no Profiles filter when every account has only its main profile', async () => {

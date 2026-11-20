@@ -8,9 +8,10 @@ interface ProfilesCardProps {
   profiles: UserRangeStats['profiles'];
   /** The identity's profile options, which name a main profile by its account */
   options: ProfileFilterOption[];
+  className?: string;
 }
 
-export function ProfilesCard({ profiles, options }: ProfilesCardProps) {
+export function ProfilesCard({ profiles, options, className }: ProfilesCardProps) {
   const { t } = useTranslation('common');
   const profileLabel = useProfileLabel();
   const profileOptionLabel = useProfileOptionLabel();
@@ -18,7 +19,7 @@ export function ProfilesCard({ profiles, options }: ProfilesCardProps) {
   const topPlays = Math.max(...profiles.map((profile) => profile.plays));
 
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader>
         <CardTitle>{t('labels.profiles')}</CardTitle>
       </CardHeader>

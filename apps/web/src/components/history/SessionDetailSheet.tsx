@@ -3,7 +3,7 @@
  * Uses condensed info sections matching the app's design patterns.
  */
 
-import { lazy, memo, Suspense, useState } from 'react';
+import { lazy, memo, Suspense, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router';
@@ -654,11 +654,19 @@ function SessionContent({
 }
 
 export function SessionDetailSheet({ session, open, onOpenChange }: Props) {
+  const contentRef = useRef<HTMLDivElement>(null);
   if (!session) return null;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="w-full overflow-y-auto sm:max-w-[500px]">
+      <SheetContent
+        ref={contentRef}
+        onOpenAutoFocus={(event) => {
+          event.preventDefault();
+          contentRef.current?.focus();
+        }}
+        className="w-full overflow-y-auto outline-none sm:max-w-[500px]"
+      >
         <SessionContent session={session} onNavigate={() => onOpenChange(false)} />
       </SheetContent>
     </Sheet>

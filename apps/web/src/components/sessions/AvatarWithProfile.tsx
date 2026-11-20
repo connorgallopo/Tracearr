@@ -26,12 +26,12 @@ export function AvatarWithProfile({ serverId, profile, children }: AvatarWithPro
         aria-label={label}
         title={label}
         className={cn(
-          'ring-background absolute -right-0.5 -bottom-0.5 size-[40%] ring-2',
+          'ring-background @container absolute -right-[20%] -bottom-[20%] size-[56%] ring-2',
           profile.removed && 'opacity-50 grayscale'
         )}
       >
         <AvatarImage src={getAvatarUrl(serverId, profile.thumbUrl, 24) ?? undefined} alt="" />
-        <AvatarFallback className="text-[0.5rem] leading-none">
+        <AvatarFallback className="text-[70cqi] leading-none">
           {profile.name[0]?.toUpperCase() ?? '?'}
         </AvatarFallback>
       </Avatar>

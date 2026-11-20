@@ -106,7 +106,13 @@ export function OverviewTab({
           allLocations={detail.locations}
           totalSessions={detail.sessions.total}
         />
-        {showProfileSplit && <ProfilesCard profiles={stats.profiles} options={detail.profiles} />}
+        {showProfileSplit && (
+          <ProfilesCard
+            profiles={stats.profiles}
+            options={detail.profiles}
+            className="self-start"
+          />
+        )}
       </div>
 
       <Card>

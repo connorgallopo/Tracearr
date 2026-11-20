@@ -482,7 +482,7 @@ export function HistoryFiltersBar({
                   ) : null}
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent className="p-0">
-                  <ScrollArea className="h-[250px]">
+                  <ScrollArea className="[&>[data-slot=scroll-area-viewport]]:max-h-[250px]">
                     <div className="p-1">
                       {filters.profileIds?.length ? (
                         <>
@@ -495,10 +495,12 @@ export function HistoryFiltersBar({
                       ) : null}
                       {profileGroups.map(({ serverUserId, account, server, profiles }) => (
                         <DropdownMenuGroup key={serverUserId} aria-label={account}>
-                          <DropdownMenuLabel className="text-muted-foreground flex justify-between gap-2 text-xs">
-                            <span className="truncate">{account}</span>
-                            {profileServersDiffer && <span className="shrink-0">{server}</span>}
-                          </DropdownMenuLabel>
+                          {profileGroups.length > 1 && (
+                            <DropdownMenuLabel className="text-muted-foreground flex justify-between gap-2 text-xs">
+                              <span className="truncate">{account}</span>
+                              {profileServersDiffer && <span className="shrink-0">{server}</span>}
+                            </DropdownMenuLabel>
+                          )}
                           {profiles.map((profile) => (
                             <DropdownMenuCheckboxItem
                               key={profile.id}

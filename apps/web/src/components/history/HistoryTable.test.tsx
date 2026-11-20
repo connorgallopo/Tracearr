@@ -32,7 +32,7 @@ function renderTable(
   onSessionClick?: (session: SessionWithDetails) => void,
   options?: Pick<
     ComponentProps<typeof HistoryTable>,
-    'sortBy' | 'sortDir' | 'onSortChange' | 'profileNames'
+    'sortBy' | 'sortDir' | 'onSortChange' | 'profileNames' | 'isMultiServer'
   >
 ) {
   const session = {
@@ -136,6 +136,17 @@ describe('HistoryTable', () => {
     expect(profile).toHaveAttribute('title', 'labels.profileRemoved');
     expect(t).toHaveBeenCalledWith('labels.profileRemoved', { name: 'Sam' });
     expect(screen.getByRole('link', { name: /alice/ })).not.toHaveTextContent('Sam');
+  });
+
+  it('keeps room for the content column past the fixed columns, so a narrow window scrolls', () => {
+    renderTable({}, undefined, { isMultiServer: true, profileNames: new Map() });
+
+    const fixedWidth = screen
+      .getAllByRole('columnheader')
+      .filter((header) => header.style.width.endsWith('px'))
+      .reduce((sum, header) => sum + parseFloat(header.style.width), 0);
+    const tableMinWidth = parseFloat(screen.getByRole('table').style.minWidth);
+    expect(tableMinWidth - fixedWidth).toBeGreaterThanOrEqual(280);
   });
 
   it('sorts the data table from its date header', () => {

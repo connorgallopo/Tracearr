@@ -138,6 +138,13 @@ describe('SessionDetailSheet', () => {
     expect(screen.getByText(/Pilot/).closest('a')).toBeNull();
   });
 
+  it('focuses the sheet on open rather than its first control, the IP address toggle', () => {
+    renderSheet({ ipAddress: '73.25.14.11' });
+
+    expect(screen.getByRole('dialog')).toHaveFocus();
+    expect(screen.getByRole('button', { name: /labels.ipAddress/ })).not.toHaveFocus();
+  });
+
   it('closes the sheet when a title link is followed', () => {
     const onOpenChange = vi.fn();
     renderSheet({ mediaId: 'movie-1' }, onOpenChange);
