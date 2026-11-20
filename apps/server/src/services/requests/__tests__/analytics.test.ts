@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const { mockDb } = vi.hoisted(() => ({
+const { mockDb, profiles } = vi.hoisted(() => ({
   mockDb: { execute: vi.fn() },
+  profiles: { readCurrentProfiles: vi.fn() },
 }));
 
 vi.mock('../../../db/client.js', () => ({ db: mockDb }));
+vi.mock('../../profiles.js', () => profiles);
 
 import type { SQL } from 'drizzle-orm';
 import { renderSql } from '../../../test/helpers.js';
@@ -58,6 +60,25 @@ function mockQueries(
 describe('getRequestsAnalytics', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    profiles.readCurrentProfiles.mockResolvedValue(new Map());
+  });
+
+  it("shows the profile that asked on its outcome row when it is not the account's main one", async () => {
+    mockQueries([row({ profile_id: 'sp-kid' })]);
+    profiles.readCurrentProfiles.mockResolvedValue(
+      new Map([
+        ['sp-kid', { name: 'Kid', nonMainProfile: { name: 'Kid', thumbUrl: null, removed: true } }],
+      ])
+    );
+
+    const result = await getRequestsAnalytics(undefined, 'all', true);
+
+    expect(profiles.readCurrentProfiles).toHaveBeenCalledWith(mockDb, ['sp-kid']);
+    expect(result.unplayed[0]?.nonMainProfile).toEqual({
+      name: 'Kid',
+      thumbUrl: null,
+      removed: true,
+    });
   });
 
   it('leaves a request Seerr calls available but Tracearr never matched out of the landed set', async () => {

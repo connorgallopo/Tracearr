@@ -1,15 +1,18 @@
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isStaff, type RequestRequester } from '@tracearr/shared';
+import { isStaff, type NonMainProfile, type RequestRequester } from '@tracearr/shared';
 import { UserCell } from '@/components/users/UserCell';
 import { useAuth } from '@/hooks/useAuth';
 
 /** A requester with no account on the linked server has only the name Seerr knows, shown muted and unlinked. */
 export function RequesterCell({
   requester,
+  profile,
   trailing,
 }: {
   requester: RequestRequester;
+  /** The profile that asked, when it is not the account's main one */
+  profile?: NonMainProfile;
   trailing?: ReactNode;
 }) {
   const { t } = useTranslation('pages');
@@ -35,6 +38,7 @@ export function RequesterCell({
       serverId={requester.thumbServerId}
       link={!!user && isStaff(user.role)}
       trailing={trailing}
+      profileBadge={profile && { serverId: requester.serverId, profile }}
     />
   );
 }

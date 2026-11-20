@@ -1,12 +1,18 @@
 import { sql } from 'drizzle-orm';
-import { assertNever, type ServerType } from '@tracearr/shared';
+import { assertNever } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { createMediaServerClient } from '../mediaServer/index.js';
 import { NOT_NEEDED, type IMediaServerClient } from '../mediaServer/types.js';
 import { mapWithConcurrency } from '../../utils/concurrency.js';
 import { createLogger } from '../../utils/logger.js';
 import { seerrPosterPath } from '../imageProxy.js';
-import { mapSeerrRequest, type MappedRequest } from './mapping.js';
+import {
+  BUILT_IN_REQUESTER,
+  mapSeerrRequest,
+  seerrRequesterIdentity,
+  type MappedRequest,
+  type RequesterIdentity,
+} from './mapping.js';
 import { resolveRequests, type Resolved } from './resolution.js';
 import {
   SeerrClient,
@@ -237,14 +243,14 @@ async function clearPosters(serviceId: string): Promise<number> {
 
 async function upsertAll(
   row: RequestServiceRow,
-  serverType: ServerType,
+  requester: RequesterIdentity,
   mapped: MappedRequest[],
   lookupsFor: (page: MappedRequest[], resolved: Map<string, Resolved>) => Promise<Lookups>
 ): Promise<number> {
   let upserted = 0;
   for (let i = 0; i < mapped.length; i += PAGE_SIZE) {
     const page = mapped.slice(i, i + PAGE_SIZE);
-    const resolved = await resolveRequests(row.serverId, serverType, page);
+    const resolved = await resolveRequests(row.serverId, requester, page);
     const lookups = await lookupsFor(page, resolved);
     await upsertBatch(row.id, page, resolved, lookups);
     upserted += page.length;
@@ -285,16 +291,20 @@ async function syncSeerr(
     !cacheImages && [...mirrored.values()].some((stored) => stored.postered)
       ? await clearPosters(row.id)
       : 0;
-  const upserted = await upsertAll(row, serverType, mapped, (page, resolved) =>
-    lookupSeerrMedia(
-      client,
-      page.filter(
-        (r) =>
-          (!resolved.get(r.remoteId)?.title && !mirrored.get(r.remoteId)?.titled) ||
-          (cacheImages && wantsPoster(r, resolved, mirrored, mode))
-      ),
-      cacheImages
-    )
+  const upserted = await upsertAll(
+    row,
+    seerrRequesterIdentity(serverType),
+    mapped,
+    (page, resolved) =>
+      lookupSeerrMedia(
+        client,
+        page.filter(
+          (r) =>
+            (!resolved.get(r.remoteId)?.title && !mirrored.get(r.remoteId)?.titled) ||
+            (cacheImages && wantsPoster(r, resolved, mirrored, mode))
+        ),
+        cacheImages
+      )
   );
   // A walk shorter than the service's own count means rows were missed: the
   // result window shifted under the paging, or the first page came back
@@ -361,7 +371,7 @@ async function syncBuiltIn(
 
   const { requests } = listing;
   const mirrored = await mirroredRequests(row.id);
-  const upserted = await upsertAll(row, server.type, requests, (page, resolved) =>
+  const upserted = await upsertAll(row, BUILT_IN_REQUESTER, requests, (page, resolved) =>
     lookupServerPosters(
       client,
       page.filter((r) => r.posterPath == null && wantsPoster(r, resolved, mirrored, mode))

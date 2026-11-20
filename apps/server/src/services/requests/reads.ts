@@ -23,6 +23,7 @@ import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { buildPosterOrderFragment } from '../../routes/library/catalog.js';
 import { buildPosterUrl } from '../imageProxy.js';
 import { getSetting } from '../settings.js';
+import { readCurrentProfiles } from '../profiles.js';
 import {
   UNWATCHED_LENSES,
   watchedStatesFor,
@@ -65,6 +66,7 @@ interface RequestBaseRow {
 interface MediaRequestSqlRow extends RequestBaseRow {
   service_type: RequestServiceType;
   server_type: ServerType;
+  profile_id: string | null;
   remote_username: string;
   server_user_id: string | null;
   user_server_id: string | null;
@@ -172,6 +174,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
       mr.is_auto_request,
       rs.type AS service_type,
       sv.type AS server_type,
+      mr.profile_id,
       mr.remote_username,
       mr.server_user_id,
       su.user_id AS lens_user_id,
@@ -191,7 +194,13 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
   `);
 
   const rows = result.rows as unknown as MediaRequestSqlRow[];
-  const states = await watchedStatesFor(rows.map(toLensRow), serverIds);
+  const [states, profiles] = await Promise.all([
+    watchedStatesFor(rows.map(toLensRow), serverIds),
+    readCurrentProfiles(
+      db,
+      rows.map((row) => row.profile_id)
+    ),
+  ]);
 
   return rows.map((row) => ({
     ...baseEntry(row, states.get(row.id) ?? UNWATCHED_LENSES, showOthers),
@@ -216,6 +225,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
           thumb: null,
           thumbServerId: null,
         },
+    nonMainProfile: row.profile_id ? profiles.get(row.profile_id)?.nonMainProfile : undefined,
   }));
 }
 

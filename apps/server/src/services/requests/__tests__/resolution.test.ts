@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { mockExecute } = vi.hoisted(() => ({ mockExecute: vi.fn() }));
 vi.mock('../../../db/client.js', () => ({ db: { execute: mockExecute } }));
 
+import { BUILT_IN_REQUESTER, seerrRequesterIdentity } from '../mapping.js';
 import { resolveRequests, type ResolutionInput } from '../resolution.js';
 
 function rows(list: Record<string, unknown>[]) {
@@ -66,7 +67,7 @@ describe('resolveRequests', () => {
       requester: [{ key: '1577033', id: 'su-1' }],
     });
 
-    const result = await resolveRequests('srv', 'plex', [
+    const result = await resolveRequests('srv', seerrRequesterIdentity('plex'), [
       { ...base, remoteId: '1', tmdbId: 10, remotePlexId: '1577033' },
       {
         ...base,
@@ -106,7 +107,7 @@ describe('resolveRequests', () => {
     routeByQuery({
       ratingKey: [{ rating_key: '206250', media_id: 'm-9', title: 'Late', year: 2026 }],
     });
-    const result = await resolveRequests('srv', 'plex', [
+    const result = await resolveRequests('srv', seerrRequesterIdentity('plex'), [
       { ...base, remoteId: '7', tmdbId: 1, ratingKey: '206250' },
     ]);
     expect(result.get('7')?.mediaId).toBe('m-9');
@@ -117,17 +118,17 @@ describe('resolveRequests', () => {
     routeByQuery({
       requester: [{ key: 'jf-abc', id: 'su-7' }],
     });
-    const result = await resolveRequests('srv', 'jellyfin', [
+    const result = await resolveRequests('srv', seerrRequesterIdentity('jellyfin'), [
       { ...base, remoteJellyfinUserId: 'jf-abc' },
     ]);
     expect(result.get('1')?.serverUserId).toBe('su-7');
   });
 
-  it('matches a tofa requester by the tofa user id stored as the external id', async () => {
+  it("matches a server's own requester by its user id stored as the external id", async () => {
     routeByQuery({
       requester: [{ key: 'b1e4c7a2-5d38-4f91-8a6c-2e7f0d3b9c14', id: 'su-9' }],
     });
-    const result = await resolveRequests('srv', 'tofa', [
+    const result = await resolveRequests('srv', BUILT_IN_REQUESTER, [
       {
         ...base,
         remoteId: '5a1d0000-4c2e-4f6a-9b3d-000000000001',
@@ -141,13 +142,17 @@ describe('resolveRequests', () => {
 
   it('links the stored profile a request names by the server profile id', async () => {
     routeByQuery({ profile: [{ key: 'p-kid', id: 'sp-1' }] });
-    const out = await resolveRequests('srv', 'tofa', [{ ...base, remoteProfileId: 'p-kid' }]);
+    const out = await resolveRequests('srv', BUILT_IN_REQUESTER, [
+      { ...base, remoteProfileId: 'p-kid' },
+    ]);
     expect(out.get(base.remoteId)?.profileId).toBe('sp-1');
   });
 
   it('issues no profile query when no request names a profile', async () => {
     routeByQuery();
-    await resolveRequests('srv', 'plex', [{ ...base, remoteProfileId: null }]);
+    await resolveRequests('srv', seerrRequesterIdentity('plex'), [
+      { ...base, remoteProfileId: null },
+    ]);
     expect(
       mockExecute.mock.calls.map(([q]) => sqlTextOf(q)).some((t) => t.includes('server_profiles'))
     ).toBe(false);
@@ -155,7 +160,7 @@ describe('resolveRequests', () => {
 
   it('skips a lookup entirely when its id set is empty', async () => {
     routeByQuery();
-    await resolveRequests('srv', 'plex', [base]);
+    await resolveRequests('srv', seerrRequesterIdentity('plex'), [base]);
     expect(mockExecute).not.toHaveBeenCalled();
   });
 });

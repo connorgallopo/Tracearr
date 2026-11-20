@@ -1,7 +1,6 @@
 import { sql, type SQL } from 'drizzle-orm';
-import { assertNever, type ServerType } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import type { MappedRequest } from './mapping.js';
+import type { MappedRequest, RequesterIdentity } from './mapping.js';
 
 export type ResolutionInput = Pick<
   MappedRequest,
@@ -102,33 +101,6 @@ async function byRatingKey(serverId: string, keys: string[]): Promise<Map<string
   return out;
 }
 
-/**
- * Seerr names a Plex requester by plex.tv account id, a Jellyfin or Emby requester by the
- * server's own user id. A tofa request names the tofa user it is for.
- */
-function requesterIdentity(serverType: ServerType) {
-  switch (serverType) {
-    case 'plex':
-      return {
-        column: sql`plex_account_id`,
-        key: (r: ResolutionInput) => r.remotePlexId,
-      };
-    case 'jellyfin':
-    case 'emby':
-      return {
-        column: sql`external_id`,
-        key: (r: ResolutionInput) => r.remoteJellyfinUserId,
-      };
-    case 'tofa':
-      return {
-        column: sql`external_id`,
-        key: (r: ResolutionInput) => r.remoteUserId,
-      };
-    default:
-      return assertNever(serverType);
-  }
-}
-
 async function idsByKey(
   table: SQL,
   serverId: string,
@@ -147,12 +119,11 @@ async function idsByKey(
 
 export async function resolveRequests(
   serverId: string,
-  serverType: ServerType,
+  requester: RequesterIdentity,
   rows: ResolutionInput[]
 ): Promise<Map<string, Resolved>> {
   const movies = rows.filter((r) => r.mediaType === 'movie');
   const shows = rows.filter((r) => r.mediaType === 'show');
-  const requester = requesterIdentity(serverType);
 
   const movieHits = await moviesByTmdb(uniqueNumbers(movies.map((r) => r.tmdbId)));
   const showHits = await showsByIds(

@@ -284,4 +284,40 @@ describe('RequestsTable', () => {
     expect(screen.getByText('localbob')).toBeInTheDocument();
     expect(screen.queryByText('Not on this server')).not.toBeInTheDocument();
   });
+
+  it('shows a non-main profile over the requester avatar, grayed once removed', () => {
+    renderTable(
+      <RequestsTable
+        subject="media"
+        rows={[
+          makeMediaEntry({ nonMainProfile: { name: 'Kid', thumbUrl: null, removed: false } }),
+          makeMediaEntry({
+            id: 'r2',
+            nonMainProfile: { name: 'Old', thumbUrl: null, removed: true },
+          }),
+        ]}
+        isLoading={false}
+        isError={false}
+        onRetry={vi.fn()}
+        emptyTitle="No requests"
+      />
+    );
+    expect(screen.getByRole('img', { name: 'Kid' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Old/ })).toHaveClass('grayscale');
+  });
+
+  it('shows no profile badge for a request from the main profile', () => {
+    renderTable(
+      <RequestsTable
+        subject="media"
+        rows={[makeMediaEntry()]}
+        isLoading={false}
+        isError={false}
+        onRetry={vi.fn()}
+        emptyTitle="No requests"
+      />
+    );
+    expect(screen.getByText('Alice')).toBeInTheDocument();
+    expect(screen.queryAllByRole('img')).toHaveLength(0);
+  });
 });

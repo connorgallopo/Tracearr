@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { SeerrRequest, SeerrTitleLookup } from '../seerrClient.js';
+import type { MappedRequest, RequesterIdentity } from '../mapping.js';
 import type { SeerrClientLike } from '../sync.js';
 
 const { mockDb, store, resolution } = vi.hoisted(() => ({
@@ -383,6 +384,22 @@ describe("runRequestSync for a server's own requests", () => {
     const upsert = statements.find((q) => q.includes('INSERT INTO media_requests'));
     expect(upsert).toContain('"completed"');
     expect(statements.some((q) => q.includes('UPDATE media_requests SET deleted_at'))).toBe(true);
+  });
+
+  it("resolves requesters by the server's own user id, whatever the server type", async () => {
+    const [waiting] = tofa.requests;
+    if (!waiting) throw new Error('fixture has no requests');
+    const client = fakeTofaClient({ getRequests: vi.fn(async () => listing([waiting])) });
+    await runRequestSync('svc', 'full', { serverClientFor: () => client });
+
+    const call = resolution.resolveRequests.mock.calls[0] as
+      [string, RequesterIdentity, MappedRequest[]] | undefined;
+    const [serverId, identity, [row] = []] = call ?? [];
+    if (!identity || !row) throw new Error('resolveRequests was not called with a request');
+    expect(call).toHaveLength(3);
+    expect(serverId).toBe('srv');
+    expect(JSON.stringify(identity.column)).toContain('external_id');
+    expect(identity.key(row)).toBe(waiting.requested_by);
   });
 
   it('asks tofa for the poster of a request in no library and stores its image cache path', async () => {

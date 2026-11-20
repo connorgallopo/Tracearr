@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { serverIdsQuerySchema, uuidSchema } from './schemas.js';
-import type { ServerType, WatchedState } from './types.js';
+import type { NonMainProfile, ServerType, WatchedState } from './types.js';
 
 export const REQUEST_SERVICE_TYPES = ['seerr', 'server'] as const;
 export type RequestServiceType = (typeof REQUEST_SERVICE_TYPES)[number];
@@ -101,6 +101,8 @@ export interface MediaRequestEntry extends RequestEntryBase {
   /** The type of the server the service belongs to */
   serverType: ServerType;
   requester: RequestRequester;
+  /** The profile that asked, when it is not the account's main one */
+  nonMainProfile?: NonMainProfile;
 }
 
 export interface UserRequestEntry extends RequestEntryBase {
@@ -172,6 +174,8 @@ export interface RequestOutcomeRow {
   seasons: RequestSeason[] | null;
   fileSizeBytes: number;
   requester: RequestRequester;
+  /** The profile that asked, when it is not the account's main one */
+  nonMainProfile?: NonMainProfile;
 }
 
 export const REQUEST_UNPLAYED_SORTS = ['fileSizeBytes', 'waitMs', 'requestedAt', 'title'] as const;

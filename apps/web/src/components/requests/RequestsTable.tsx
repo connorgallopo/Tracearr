@@ -88,6 +88,7 @@ function MediaLeadingCell({ row }: { row: MediaRequestEntry }) {
   return (
     <RequesterCell
       requester={row.requester}
+      profile={row.nonMainProfile}
       trailing={<RequestFlags is4k={row.is4k} isAutoRequest={row.isAutoRequest} />}
     />
   );

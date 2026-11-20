@@ -3,14 +3,16 @@ import { renderSql } from '../../../test/helpers.js';
 import type { MediaScope } from '../../library/mediaDetailService.js';
 import type { SQL } from 'drizzle-orm';
 
-const { mockDb, watched } = vi.hoisted(() => ({
+const { mockDb, watched, profiles } = vi.hoisted(() => ({
   mockDb: { execute: vi.fn() },
   watched: { resolveWatchedStates: vi.fn(), fetchEpisodeCounts: vi.fn() },
+  profiles: { readCurrentProfiles: vi.fn() },
 }));
 
 vi.mock('../../../db/client.js', () => ({ db: mockDb }));
 vi.mock('../../library/mediaWatchedService.js', () => watched);
 vi.mock('../../settings.js', () => ({ getSetting: vi.fn(async () => null) }));
+vi.mock('../../profiles.js', () => profiles);
 
 import { buildPosterUrl } from '../../imageProxy.js';
 import { listMediaRequests, listUserRequests } from '../reads.js';
@@ -66,6 +68,7 @@ describe('listMediaRequests', () => {
     vi.clearAllMocks();
     watched.fetchEpisodeCounts.mockResolvedValue(new Map());
     watched.resolveWatchedStates.mockResolvedValue(new Map());
+    profiles.readCurrentProfiles.mockResolvedValue(new Map());
   });
 
   it('narrows a season scope to requests covering that season number', async () => {
@@ -217,6 +220,33 @@ describe('listMediaRequests', () => {
     });
 
     expect(entries[0]?.waitMs).toBeNull();
+  });
+
+  it("returns the profile that asked when it is not the account's main one", async () => {
+    mockDb.execute.mockResolvedValue({
+      rows: [mediaRow({ profile_id: 'sp-kid' }), mediaRow({ id: 'req-2', profile_id: 'sp-main' })],
+    });
+    profiles.readCurrentProfiles.mockResolvedValue(
+      new Map([
+        [
+          'sp-kid',
+          { name: 'Kid', nonMainProfile: { name: 'Kid', thumbUrl: null, removed: false } },
+        ],
+        ['sp-main', { name: 'Ana' }],
+      ])
+    );
+
+    const entries = await listMediaRequests({
+      scope: showScope(),
+      serverIds: undefined,
+      rowScope: 'all',
+    });
+
+    expect(profiles.readCurrentProfiles).toHaveBeenCalledTimes(1);
+    expect(profiles.readCurrentProfiles).toHaveBeenCalledWith(mockDb, ['sp-kid', 'sp-main']);
+    expect(lastSql()).toContain('mr.profile_id');
+    expect(entries[0]?.nonMainProfile).toEqual({ name: 'Kid', thumbUrl: null, removed: false });
+    expect(entries[1]?.nonMainProfile).toBeUndefined();
   });
 });
 
