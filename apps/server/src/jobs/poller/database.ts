@@ -42,6 +42,7 @@ import {
 import { emailForSessionUser } from '../../services/mediaServer/byServerType.js';
 import { automationsLogger, createLogger } from '../../utils/logger.js';
 import { getPubSubService } from '../../services/cache.js';
+import { forgetPolledProfiles } from '../../services/profiles.js';
 import { mapSessionRow } from './sessionMapper.js';
 
 /** Library item types that group playable items; a session is never linked to one. */
@@ -583,34 +584,15 @@ let serversCache: { data: (typeof servers.$inferSelect)[]; expiresAt: number } |
 // The servers cache is the poller's, not the engine's.
 const serversLogger = createLogger('servers');
 
-/** A profile as a live poll last stored it: its row, the account it is stored under, its name */
-export interface StoredProfile {
-  id: string;
-  serverUserId: string;
-  name: string;
-}
-
-// Per server, by the server's profile id. A sighting that matches its entry is not written, so a
-// server's entries are forgotten whenever its profiles are written other than by a live poll.
-const storedProfilesByServer = new Map<string, Map<string, StoredProfile>>();
-
-/** This server's profiles as live polls last wrote them; resolveProfiles adds to it */
-export function storedProfilesOf(serverId: string): Map<string, StoredProfile> {
-  const stored = storedProfilesByServer.get(serverId) ?? new Map<string, StoredProfile>();
-  storedProfilesByServer.set(serverId, stored);
-  return stored;
-}
-
-/** Forget a server's stored profiles after a profile write that did not come from a live poll */
-export function forgetStoredProfiles(serverId: string): void {
-  storedProfilesByServer.delete(serverId);
-}
+// A server's type never changes, so types are kept past the servers cache's expiry until it is invalidated.
+let serverTypesCache: ReadonlyMap<string, ServerType> | null = null;
 
 /** Invalidate the servers cache. Call from every server create/update/delete path. */
 export function invalidateServersCache(): void {
   serversCache = null;
+  serverTypesCache = null;
   // A deleted server takes its profiles with it, and a restore replaces every profile row
-  storedProfilesByServer.clear();
+  forgetPolledProfiles();
 }
 
 /** Drop this instance's servers cache and tell the others to do the same. */
@@ -620,7 +602,7 @@ export async function publishServersChanged(): Promise<void> {
     ?.publish(WS_EVENTS.SERVERS_CHANGED, {})
     .catch((error: unknown) => {
       serversLogger.warn(
-        'servers:changed publish failed; other instances fall back to the cache TTL',
+        'servers:changed publish failed; other instances keep their servers until the cache TTL and their server types until one they have not seen is asked for',
         {
           error,
         }
@@ -641,6 +623,17 @@ export async function getCachedServers(): Promise<(typeof servers.$inferSelect)[
   const rows = await db.select().from(servers);
   serversCache = { data: rows, expiresAt: now + SERVERS_CACHE_TTL_MS };
   return rows;
+}
+
+/** Each server's type, reading the servers cache only for a server not seen since the last invalidation */
+export async function getServerTypes(
+  serverIds: string[] = []
+): Promise<ReadonlyMap<string, ServerType>> {
+  const known = serverTypesCache;
+  if (known && serverIds.every((serverId) => known.has(serverId))) return known;
+  const types = new Map((await getCachedServers()).map((server) => [server.id, server.type]));
+  serverTypesCache = types;
+  return types;
 }
 
 // A row the boot migration never stamped matches no trigger, so warn once per id rather than per tick.

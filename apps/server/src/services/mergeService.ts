@@ -55,7 +55,6 @@ import {
   newsletterSendRecipients,
   terminationLogs,
   mediaDownloads,
-  serverProfiles,
   authAccounts,
   userMergeAudits,
   dismissals,
@@ -66,12 +65,12 @@ import {
   safeFullRefreshAggregate,
   uncapDecompressionForTx,
 } from '../db/timescale.js';
-import { forgetStoredProfiles, invalidateAutomationsCache } from '../jobs/poller/database.js';
+import { invalidateAutomationsCache } from '../jobs/poller/database.js';
 import { getAuth } from '../lib/auth.js';
 import { assertOwnerKeepsALoginAfter } from '../lib/authGuards.js';
 import { upsertTofaAccount } from '../lib/memberLogin.js';
 import { refreshUserSessionSnapshots, revokeSessionsForUsers } from '../lib/revoke.js';
-import { lockProfilesInOrder } from './profiles.js';
+import { forgetPolledProfiles, moveProfilesToAccount } from './profiles.js';
 import {
   recomputeIdentityAggregates,
   ServerUserNotFoundError,
@@ -378,11 +377,7 @@ async function combineServerUsers(
     .update(mediaDownloads)
     .set({ serverUserId: targetServerUserId })
     .where(eq(mediaDownloads.serverUserId, sourceServerUserId));
-  await lockProfilesInOrder(tx, eq(serverProfiles.serverUserId, sourceServerUserId));
-  await tx
-    .update(serverProfiles)
-    .set({ serverUserId: targetServerUserId, updatedAt: new Date() })
-    .where(eq(serverProfiles.serverUserId, sourceServerUserId));
+  await moveProfilesToAccount(tx, sourceServerUserId, targetServerUserId);
 
   // Per-user rule overrides: primary wins on name conflicts, the rest move over.
   // Conflicting source rules are dropped rather than kept as duplicates; their
@@ -661,7 +656,7 @@ export async function mergeUsers(
   });
 
   invalidateAutomationsCache();
-  for (const combine of result.combinedServerUsers) forgetStoredProfiles(combine.serverId);
+  for (const combine of result.combinedServerUsers) forgetPolledProfiles(combine.serverId);
 
   // recomputeIdentityAggregates wrote the target's columns with raw SQL,
   // which any live session's cached Redis snapshot never sees on its own

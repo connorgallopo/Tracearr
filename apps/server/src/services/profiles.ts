@@ -3,15 +3,11 @@
  * in the user sync, and lists them for the profile filters.
  */
 
-import { and, eq, inArray, isNull, notInArray, sql, type SQL } from 'drizzle-orm';
-import type { ProfileFilterOption } from '@tracearr/shared';
+import { and, eq, inArray, isNotNull, isNull, notInArray, sql, type SQL } from 'drizzle-orm';
+import { someServerHasProfiles, type ProfileFilterOption } from '@tracearr/shared';
 import { db, type Executor } from '../db/client.js';
 import { serverProfiles, servers, serverUsers } from '../db/schema.js';
-import {
-  forgetStoredProfiles,
-  getServerUserIdsByExternalId,
-  storedProfilesOf,
-} from '../jobs/poller/database.js';
+import { getServerTypes, getServerUserIdsByExternalId } from '../jobs/poller/database.js';
 import { NOT_NEEDED, type IMediaServerClient, type MediaProfile } from './mediaServer/types.js';
 import { compareNames } from '../utils/collation.js';
 import { createLogger } from '../utils/logger.js';
@@ -34,7 +30,7 @@ interface ProfileNamingRow {
 
 type SightingMode = 'refresh' | 'insertMissing' | 'insertRemoved';
 
-const WRITE: Record<SightingMode, { removedAt: SQL; onConflict: SQL }> = {
+const WRITE_BY_MODE: Record<SightingMode, { removedAt: SQL; onConflict: SQL }> = {
   refresh: {
     removedAt: sql`NULL`,
     onConflict: sql`DO UPDATE SET name = excluded.name, removed_at = NULL, updated_at = now()
@@ -45,8 +41,33 @@ const WRITE: Record<SightingMode, { removedAt: SQL; onConflict: SQL }> = {
   insertRemoved: { removedAt: sql`now()`, onConflict: sql`DO NOTHING` },
 };
 
+type StoredProfileRow = {
+  id: string;
+  external_id: string;
+  server_user_id: string;
+  name: string;
+};
+
+/** A profile as a live poll last wrote it: its row, the account the poll saw it under, its name */
+interface PolledProfile {
+  id: string;
+  serverUserId: string;
+  name: string;
+}
+
+// Per server, by the server's profile id. A sighting that matches its entry sends no statement,
+// so an entry is only ever a row a refresh returned, and a server's entries are forgotten
+// whenever its profiles are written other than by a live poll.
+const livePolledProfiles = new Map<string, Map<string, PolledProfile>>();
+
 // A profile stays on its stored account, so every poll would repeat the warning.
 const warnedProfileIds = new Set<string>();
+
+/** Forget what live polls wrote, for one server or for all, after any other write to its profiles */
+export function forgetPolledProfiles(serverId?: string): void {
+  if (serverId === undefined) livePolledProfiles.clear();
+  else livePolledProfiles.delete(serverId);
+}
 
 // Code unit order, the order of COLLATE "C" for these ids, so it matches lockProfilesInOrder
 function byExternalId(a: { externalId: string }, b: { externalId: string }): number {
@@ -57,7 +78,7 @@ function byExternalId(a: { externalId: string }, b: { externalId: string }): num
  * Locks the stored profiles a transaction is about to write, in the order resolveProfiles writes
  * them, so a poll and that transaction never wait on each other in a cycle over stored profiles.
  */
-export async function lockProfilesInOrder(tx: Executor, where: SQL): Promise<void> {
+async function lockProfilesInOrder(tx: Executor, where: SQL): Promise<void> {
   await tx
     .select({ id: serverProfiles.id })
     .from(serverProfiles)
@@ -92,30 +113,34 @@ export function profileIdOf(
  * ones not stored yet. Live plays `refresh` the name and clear a removal; plays from the
  * past only `insertMissing`, so an old name never overwrites the current one. A profile only
  * the past names, after the user sync stored every profile the server lists, is one the server
- * no longer has: `insertRemoved` stores it marked removed. A live sighting of a profile a live
- * poll already stored under the same account and name sends no statement.
+ * no longer has: `insertRemoved` stores it marked removed. A live sighting a live poll already
+ * wrote under the same account and name sends no statement.
  */
 export async function resolveProfiles(
   serverId: string,
   sightings: ProfileSighting[],
   mode: SightingMode
 ): Promise<Map<string, string>> {
-  const sightingOf = new Map(sightings.map((sighting) => [sighting.externalId, sighting]));
-  if (sightingOf.size === 0) return new Map();
-
-  const stored = mode === 'refresh' ? storedProfilesOf(serverId) : undefined;
+  if (sightings.length === 0) return new Map();
+  const polled =
+    mode === 'refresh'
+      ? (livePolledProfiles.get(serverId) ?? new Map<string, PolledProfile>())
+      : undefined;
+  if (polled) livePolledProfiles.set(serverId, polled);
   const profileIds = new Map<string, string>();
-  for (const sighting of sightingOf.values()) {
-    const profile = stored?.get(sighting.externalId);
+  const toWrite: ProfileSighting[] = [];
+  for (const sighting of new Map(sightings.map((seen) => [seen.externalId, seen])).values()) {
+    const profile = polled?.get(sighting.externalId);
     if (profile?.serverUserId === sighting.serverUserId && profile.name === sighting.name) {
       profileIds.set(sighting.externalId, profile.id);
-      sightingOf.delete(sighting.externalId);
+    } else {
+      toWrite.push(sighting);
     }
   }
-  if (sightingOf.size === 0) return profileIds;
+  if (toWrite.length === 0) return profileIds;
 
   const incoming = sql.join(
-    [...sightingOf.values()]
+    toWrite
       .toSorted(byExternalId)
       .map(
         (sighting) =>
@@ -125,19 +150,14 @@ export async function resolveProfiles(
   );
   // A conflict the update skips returns no row from the insert, so stored rows it left alone
   // are read back from the statement's snapshot.
-  const { rows } = await db.execute<{
-    id: string;
-    external_id: string;
-    server_user_id: string;
-    name: string;
-  }>(
+  const { rows } = await db.execute<StoredProfileRow>(
     sql`
       WITH incoming (external_id, server_user_id, name) AS (VALUES ${incoming}),
       written AS (
         INSERT INTO server_profiles (server_id, server_user_id, external_id, name, removed_at)
-        SELECT ${serverId}::uuid, server_user_id, external_id, name, ${WRITE[mode].removedAt}
+        SELECT ${serverId}::uuid, server_user_id, external_id, name, ${WRITE_BY_MODE[mode].removedAt}
         FROM incoming
-        ON CONFLICT (server_id, external_id) ${WRITE[mode].onConflict}
+        ON CONFLICT (server_id, external_id) ${WRITE_BY_MODE[mode].onConflict}
         RETURNING id, external_id, server_user_id, name
       )
       SELECT id, external_id, server_user_id, name FROM written
@@ -149,18 +169,36 @@ export async function resolveProfiles(
         AND NOT EXISTS (SELECT 1 FROM written w WHERE w.external_id = p.external_id)
     `
   );
+  const rowOf = new Map(rows.map((row) => [row.external_id, row]));
 
-  for (const row of rows) {
-    profileIds.set(row.external_id, row.id);
+  // A profile another transaction committed while the statement ran conflicts without being in
+  // the statement's snapshot, so only a new statement can read it.
+  const unread = toWrite.filter((sighting) => !rowOf.has(sighting.externalId));
+  if (unread.length > 0) {
+    const { rows: committed } = await db.execute<StoredProfileRow>(sql`
+      SELECT id, external_id, server_user_id, name FROM server_profiles
+      WHERE server_id = ${serverId}
+        AND external_id = ANY(${sql.param(unread.map((sighting) => sighting.externalId))}::text[])
+    `);
+    for (const row of committed) rowOf.set(row.external_id, row);
+  }
+
+  for (const sighting of toWrite) {
+    const row = rowOf.get(sighting.externalId);
+    if (!row) continue;
+    profileIds.set(sighting.externalId, row.id);
     // Every row a refresh returns is stored under that name and not removed
-    stored?.set(row.external_id, { id: row.id, serverUserId: row.server_user_id, name: row.name });
-    const seenUnder = sightingOf.get(row.external_id)?.serverUserId;
-    if (seenUnder === row.server_user_id || warnedProfileIds.has(row.id)) continue;
+    polled?.set(sighting.externalId, {
+      id: row.id,
+      serverUserId: sighting.serverUserId,
+      name: row.name,
+    });
+    if (row.server_user_id === sighting.serverUserId || warnedProfileIds.has(row.id)) continue;
     warnedProfileIds.add(row.id);
     log.warn('Profile played under another account; it stays linked to its stored account', {
       profileId: row.id,
       storedServerUserId: row.server_user_id,
-      playedServerUserId: seenUnder,
+      playedServerUserId: sighting.serverUserId,
     });
   }
   return profileIds;
@@ -169,34 +207,46 @@ export async function resolveProfiles(
 /**
  * Saves the profile lists of the accounts the server reports, and marks removed the profiles no
  * list names any more. An account's lists are its own and those of the external ids a
- * same-server merge folded into it. An account with a list that could not be read keeps the
- * profiles it had, and the other accounts still sync.
+ * same-server merge folded into it, and an account the user sync marked removed lists nothing.
+ * An account with a list that could not be read keeps the profiles it had, and the other
+ * accounts still sync. tofa's user sync is the only caller today; Silo's is the expected second.
+ * True when every list was read and saved.
  */
 export async function syncAccountProfiles(
   serverId: string,
   client: IMediaServerClient,
   reportedExternalIds: string[]
-): Promise<void> {
+): Promise<boolean> {
   const accountOf = await getServerUserIdsByExternalId(serverId, reportedExternalIds);
 
   const listed = new Map<string, MediaProfile[]>();
+  let everyListRead = true;
   for (const [serverUserId, accounts] of Map.groupBy(accountOf, ([, account]) => account)) {
     try {
       const profiles: MediaProfile[] = [];
       for (const [externalId] of accounts) {
         const list = await client.getAccountProfiles(externalId);
-        if (list === NOT_NEEDED) return;
+        if (list === NOT_NEEDED) return false;
         profiles.push(...list);
       }
       listed.set(serverUserId, profiles);
     } catch (err) {
+      everyListRead = false;
       log.warn('Profile list unread for an account; it keeps the profiles it had', {
         serverUserId,
         error: err,
       });
     }
   }
-  if (listed.size === 0) return;
+  const reported = new Set(accountOf.values());
+  const removedAccounts = await db
+    .select({ id: serverUsers.id })
+    .from(serverUsers)
+    .where(and(eq(serverUsers.serverId, serverId), isNotNull(serverUsers.removedAt)));
+  for (const account of removedAccounts) {
+    if (!reported.has(account.id)) listed.set(account.id, []);
+  }
+  if (listed.size === 0) return everyListRead;
 
   const rows = new Map<string, typeof serverProfiles.$inferInsert>();
   for (const [serverUserId, profiles] of listed) {
@@ -252,13 +302,28 @@ export async function syncAccountProfiles(
           )
         );
     });
-    forgetStoredProfiles(serverId);
+    forgetPolledProfiles(serverId);
+    return everyListRead;
   } catch (err) {
     log.warn('Profile sync failed; every account keeps the profiles it had', {
       serverId,
       error: err,
     });
+    return false;
   }
+}
+
+/** Moves an account's profiles onto the account a same-server merge folds it into */
+export async function moveProfilesToAccount(
+  tx: Executor,
+  sourceServerUserId: string,
+  targetServerUserId: string
+): Promise<void> {
+  await lockProfilesInOrder(tx, eq(serverProfiles.serverUserId, sourceServerUserId));
+  await tx
+    .update(serverProfiles)
+    .set({ serverUserId: targetServerUserId, updatedAt: new Date() })
+    .where(eq(serverProfiles.serverUserId, sourceServerUserId));
 }
 
 /** The current name of each profile and whether the server still lists it, by server_profiles id */
@@ -313,4 +378,12 @@ export async function profileOptions(
     .innerJoin(servers, eq(servers.id, serverProfiles.serverId))
     .where(where);
   return rows.sort((a, b) => compareNames(a.name, b.name) || a.id.localeCompare(b.id));
+}
+
+/** Whether any of the servers, or any server at all when none are named, keeps profiles */
+export async function serversHaveProfiles(serverIds: string[] | undefined): Promise<boolean> {
+  const typeOf = await getServerTypes(serverIds);
+  return someServerHasProfiles(
+    serverIds ? serverIds.flatMap((serverId) => typeOf.get(serverId) ?? []) : [...typeOf.values()]
+  );
 }

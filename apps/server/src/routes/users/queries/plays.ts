@@ -1,7 +1,6 @@
 /** Per-user play reads: totals, per-account counts and the recent plays page. */
 
 import { and, sql, type SQL } from 'drizzle-orm';
-import { SERVER_PROFILES, type ServerType } from '@tracearr/shared';
 import type { db as defaultDb } from '../../../db/client.js';
 import { sessions } from '../../../db/schema.js';
 import { uuidArraySql } from '../../../utils/sqlArrays.js';
@@ -74,12 +73,7 @@ export async function userPlayTotals(
       totalWatchTime: RAW_WATCH_TIME,
     })
     .from(sessions)
-    .where(
-      and(
-        accountsInWindow(serverUserIds, window),
-        profileIds && profileFilterSql(profileIds, 'sessions')
-      )
-    );
+    .where(and(accountsInWindow(serverUserIds, window), profileFilterSql(profileIds, 'sessions')));
   return {
     totalSessions: row?.totalSessions ?? 0,
     totalWatchTime: Number(row?.totalWatchTime ?? 0),
@@ -193,21 +187,21 @@ export type UserPlayRow = ReturnType<typeof mapUserPlayRow>;
 
 /**
  * The accounts' plays newest first, or only these profiles' plays, pause/resume chains
- * collapsed to one row.
+ * collapsed to one row. hasProfiles says whether any of the accounts is on a server with profiles.
  */
 export async function userRecentPlays(
   dbOrTx: DbOrTx,
   serverUserIds: string[],
-  serverTypes: ServerType[],
   window: StartedAtWindow,
   page: { limit: number; offset?: number },
-  profileIds?: string[]
+  options: { hasProfiles: boolean; profileIds?: string[] }
 ): Promise<UserPlayRow[]> {
   const bounds = [sql`s.started_at >= ${window.start}`, sql`s.started_at <= ${window.end}`];
   const where = [serverUserIdAnyFragment(serverUserIds, 's.server_user_id'), ...bounds];
-  if (profileIds) where.push(profileFilterSql(profileIds));
+  const byProfile = profileFilterSql(options.profileIds);
+  if (byProfile) where.push(byProfile);
   // Servers without profiles leave the columns null, so skip reading them from compressed chunks
-  const profileColumns = serverTypes.some((type) => SERVER_PROFILES[type].hasProfiles)
+  const profileColumns = options.hasProfiles
     ? sql`s.profile_id, s.profile_name`
     : sql`NULL::uuid AS profile_id, NULL::text AS profile_name`;
   const result = await dbOrTx.execute(sql`

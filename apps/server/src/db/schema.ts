@@ -1433,22 +1433,9 @@ export const serverUsersRelations = relations(serverUsers, ({ one, many }) => ({
     fields: [serverUsers.serverId],
     references: [servers.id],
   }),
-  profiles: many(serverProfiles),
   sessions: many(sessions),
   automations: many(automations),
   automationRuns: many(automationRuns),
-}));
-
-export const serverProfilesRelations = relations(serverProfiles, ({ one, many }) => ({
-  server: one(servers, {
-    fields: [serverProfiles.serverId],
-    references: [servers.id],
-  }),
-  serverUser: one(serverUsers, {
-    fields: [serverProfiles.serverUserId],
-    references: [serverUsers.id],
-  }),
-  sessions: many(sessions),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one, many }) => ({
@@ -1459,10 +1446,6 @@ export const sessionsRelations = relations(sessions, ({ one, many }) => ({
   serverUser: one(serverUsers, {
     fields: [sessions.serverUserId],
     references: [serverUsers.id],
-  }),
-  profile: one(serverProfiles, {
-    fields: [sessions.profileId],
-    references: [serverProfiles.id],
   }),
   automationRuns: many(automationRuns),
 }));

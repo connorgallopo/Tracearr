@@ -6,13 +6,13 @@
  * Run with: pnpm --filter @tracearr/server test:integration tofaProfileBackfill
  */
 
-import { randomUUID } from 'node:crypto';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Job } from 'bullmq';
 import { eq, sql } from 'drizzle-orm';
 import {
   createStoppedSession,
   createTestServer,
+  createTestServerProfile,
   createTestServerUser,
   createTestUser,
 } from '@tracearr/test-utils/factories';
@@ -71,20 +71,6 @@ async function seed() {
   return { serverId: server.id, serverUserId: account.id };
 }
 
-async function storeProfile(
-  serverId: string,
-  serverUserId: string,
-  name: string,
-  externalId?: string
-) {
-  const [row] = await db
-    .insert(serverProfiles)
-    .values({ serverId, serverUserId, externalId: externalId ?? randomUUID(), name })
-    .returning({ id: serverProfiles.id });
-  if (!row) throw new Error('the profile was not stored');
-  return row.id;
-}
-
 async function storePlay(
   ids: { serverId: string; serverUserId: string },
   play: { profileName: string; startedAt?: string; sessionKey?: string; externalSessionId?: string }
@@ -94,11 +80,8 @@ async function storePlay(
     sessionKey: play.sessionKey,
     externalSessionId: play.externalSessionId ?? null,
     startedAt: new Date(play.startedAt ?? '2025-03-01T12:00:00Z'),
+    profileName: play.profileName,
   });
-  await db
-    .update(sessions)
-    .set({ profileName: play.profileName })
-    .where(eq(sessions.id, created.id));
   return created.id;
 }
 
@@ -121,8 +104,9 @@ describe('backfill_tofa_profiles', () => {
     { timeout: 120_000 },
     async () => {
       const ids = await seed();
-      const robin = await storeProfile(ids.serverId, ids.serverUserId, 'Robbie', ROBIN);
-      await storeProfile(ids.serverId, ids.serverUserId, 'Robin');
+      const robin = (await createTestServerProfile({ ...ids, name: 'Robbie', externalId: ROBIN }))
+        .id;
+      await createTestServerProfile({ ...ids, name: 'Robin' });
       const importedPlay = await storePlay(ids, {
         profileName: 'Robin',
         startedAt: imported.started_at,
@@ -167,9 +151,9 @@ describe('backfill_tofa_profiles', () => {
 
   it("links a play tofa no longer lists by a name only one of the account's profiles has, and leaves one two profiles share", async () => {
     const ids = await seed();
-    const morgan = await storeProfile(ids.serverId, ids.serverUserId, 'Morgan');
-    await storeProfile(ids.serverId, ids.serverUserId, 'Kids');
-    await storeProfile(ids.serverId, ids.serverUserId, 'Kids');
+    const morgan = (await createTestServerProfile({ ...ids, name: 'Morgan' })).id;
+    await createTestServerProfile({ ...ids, name: 'Kids' });
+    await createTestServerProfile({ ...ids, name: 'Kids' });
     const named = await storePlay(ids, { profileName: 'Morgan' });
     const shared = await storePlay(ids, { profileName: 'Kids' });
 
@@ -214,8 +198,8 @@ describe('backfill_tofa_profiles', () => {
 
   it('does nothing on a second run for the server', async () => {
     const ids = await seed();
-    await storeProfile(ids.serverId, ids.serverUserId, 'Kids');
-    await storeProfile(ids.serverId, ids.serverUserId, 'Kids', ROBIN);
+    await createTestServerProfile({ ...ids, name: 'Kids' });
+    await createTestServerProfile({ ...ids, name: 'Kids', externalId: ROBIN });
     const play = await storePlay(ids, {
       profileName: 'Kids',
       startedAt: imported.started_at,
@@ -232,7 +216,19 @@ describe('backfill_tofa_profiles', () => {
     expect(await getSetting('profileBackfillDoneServers')).toContain(ids.serverId);
   });
 
-  it('is queued by the user sync until the server is done', async () => {
+  it('counts a run that fails', async () => {
+    const ids = await seed();
+    await storePlay(ids, { profileName: 'Robin' });
+    getWatchHistoryPage.mockRejectedValue(new Error('tofa answered 503'));
+
+    await expect(processBackfillTofaProfilesJob(backfillJob(ids.serverId))).rejects.toThrow(
+      'tofa answered 503'
+    );
+
+    expect((await getSetting('profileBackfillFailedRuns'))[ids.serverId]).toBe(1);
+  });
+
+  it('is queued by the user sync until the server is done or has failed five runs', async () => {
     const ids = await seed();
     initMaintenanceQueue(process.env.REDIS_URL ?? '');
     const queued = async () => (await getAllActiveMaintenanceJobs()).map((job) => job.type);
@@ -241,6 +237,11 @@ describe('backfill_tofa_profiles', () => {
       expect(await queued()).toEqual(['backfill_tofa_profiles']);
 
       await obliterateMaintenanceQueue();
+      await setSetting('profileBackfillFailedRuns', { [ids.serverId]: 5 });
+      await syncServer(ids.serverId, { syncUsers: true, syncLibraries: false });
+      expect(await queued()).toEqual([]);
+
+      await setSetting('profileBackfillFailedRuns', {});
       await setSetting('profileBackfillDoneServers', [ids.serverId]);
       await syncServer(ids.serverId, { syncUsers: true, syncLibraries: false });
       expect(await queued()).toEqual([]);

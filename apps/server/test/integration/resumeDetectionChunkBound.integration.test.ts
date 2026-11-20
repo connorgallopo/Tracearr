@@ -22,13 +22,14 @@ import { describe, it, expect } from 'vitest';
 import { eq } from 'drizzle-orm';
 import { DEFAULT_STREAM_DETAILS, type ServerType } from '@tracearr/shared';
 import {
+  createTestServerProfile,
   createTestUser,
   createTestServer,
   createTestServerUser,
   createStoppedSession,
 } from '@tracearr/test-utils/factories';
 import { db } from '../../src/db/client.js';
-import { serverProfiles, sessions } from '../../src/db/schema.js';
+import { sessions } from '../../src/db/schema.js';
 import { createSessionWithRulesAtomic } from '../../src/jobs/poller/sessionLifecycle.js';
 import type { SessionCreationInput } from '../../src/jobs/poller/types.js';
 
@@ -248,18 +249,9 @@ describe('chaining keeps the profiles of one account apart', () => {
     const server = await createTestServer({ type: 'tofa' });
     const user = await createTestUser();
     const serverUser = await createTestServerUser({ serverId: server.id, userId: user.id });
-    const [morgan, robin] = await db
-      .insert(serverProfiles)
-      .values(
-        ['Morgan', 'Robin'].map((name) => ({
-          serverId: server.id,
-          serverUserId: serverUser.id,
-          externalId: randomUUID(),
-          name,
-        }))
-      )
-      .returning({ id: serverProfiles.id });
-    if (!morgan || !robin) throw new Error('the profiles were not stored');
+    const ids = { serverId: server.id, serverUserId: serverUser.id };
+    const morgan = await createTestServerProfile(ids);
+    const robin = await createTestServerProfile(ids);
     return { server, serverUser, morgan: morgan.id, robin: robin.id };
   }
 
@@ -269,7 +261,7 @@ describe('chaining keeps the profiles of one account apart', () => {
     ratingKey: string,
     profileId: string
   ) {
-    const play = await createStoppedSession({
+    return createStoppedSession({
       serverId,
       serverUserId,
       ratingKey,
@@ -277,9 +269,8 @@ describe('chaining keeps the profiles of one account apart', () => {
       stoppedAt: new Date(Date.now() - 30 * 60 * 1000),
       progressMs: 1_000_000,
       watched: false,
+      profileId,
     });
-    await db.update(sessions).set({ profileId }).where(eq(sessions.id, play.id));
-    return play;
   }
 
   it('keeps two profiles playing the same title on one device as two plays', async () => {

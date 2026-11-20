@@ -752,22 +752,37 @@ export async function processBackfillTofaProfilesJob(
       message,
     };
   }
-  const result = await runSessionMaintenanceWalk(job, {
-    type: 'backfill_tofa_profiles',
-    startMessage: 'Linking tofa plays to their profiles...',
-    progressMessage: (total) => `Linked ${total.toLocaleString()} plays to their profiles...`,
-    completeMessage: (total) =>
-      `Completed! Linked ${total.toLocaleString()} plays to their profiles`,
-    resultMessage: (total) => `Linked ${total} plays to their profiles`,
-    failurePrefix: 'Profile backfill skipped',
-    totalCountsUpdates: true,
-    writes: ['profile_id'],
-    walk: async (onBatch) => ({
-      total: await linkTofaPlayProfiles(serverId, onBatch),
-      failedRanges: [],
-      details: '',
-    }),
-  });
+  let result: MaintenanceJobResult;
+  try {
+    result = await runSessionMaintenanceWalk(job, {
+      type: 'backfill_tofa_profiles',
+      startMessage: 'Linking tofa plays to their profiles...',
+      progressMessage: (total) => `Linked ${total.toLocaleString()} plays to their profiles...`,
+      completeMessage: (total) =>
+        `Completed! Linked ${total.toLocaleString()} plays to their profiles`,
+      resultMessage: (total) => `Linked ${total} plays to their profiles`,
+      failurePrefix: 'Profile backfill skipped',
+      totalCountsUpdates: true,
+      writes: ['profile_id'],
+      walk: async (onBatch) => ({
+        total: await linkTofaPlayProfiles(serverId, onBatch),
+        failedRanges: [],
+        details: '',
+      }),
+    });
+  } catch (error) {
+    await getSetting('profileBackfillFailedRuns')
+      .then((failedRuns) =>
+        setSetting('profileBackfillFailedRuns', {
+          ...failedRuns,
+          [serverId]: (failedRuns[serverId] ?? 0) + 1,
+        })
+      )
+      .catch((err: unknown) =>
+        console.error('[Maintenance] Could not count the failed profile backfill:', err)
+      );
+    throw error;
+  }
   await setSetting('profileBackfillDoneServers', [...done, serverId]);
   return result;
 }

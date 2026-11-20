@@ -1126,7 +1126,8 @@ async function processServerSessions(
       }
     }
 
-    // Set before any play goes pending or is written, so either one carries its profile
+    // Set before any play goes pending or is written, so either one carries its profile. A
+    // profile is optional data, so a failed write stores the plays with the profile name only.
     const profileIds = await resolveProfiles(
       server.id,
       processedSessions.flatMap((processed, i) => {
@@ -1136,7 +1137,10 @@ async function processServerSessions(
           : [];
       }),
       'refresh'
-    );
+    ).catch((error: unknown) => {
+      console.error(`[Poller] Failed to resolve profiles on ${server.name}:`, error);
+      return new Map<string, string>();
+    });
     for (const processed of processedSessions) {
       processed.profileId = processed.profileExternalId
         ? (profileIds.get(processed.profileExternalId) ?? null)

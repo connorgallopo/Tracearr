@@ -43,6 +43,21 @@ vi.mock('../../services/termination.js', () => ({
   terminateSession: vi.fn(),
 }));
 
+const { PLEX_SERVER, TOFA_SERVER } = vi.hoisted(() => ({
+  PLEX_SERVER: crypto.randomUUID(),
+  TOFA_SERVER: crypto.randomUUID(),
+}));
+vi.mock('../../jobs/poller/database.js', async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  getServerTypes: vi.fn(
+    async () =>
+      new Map([
+        [PLEX_SERVER, 'plex'],
+        [TOFA_SERVER, 'tofa'],
+      ])
+  ),
+}));
+
 // Import the mocked db and the routes
 import { db } from '../../db/client.js';
 import { terminateSession } from '../../services/termination.js';
@@ -1182,6 +1197,21 @@ describe('Session Routes', () => {
       const [row] = JSON.parse(response.body).data;
       expect(row.mediaId).toBe(mediaId);
       expect(row.showMediaId).toBe(showMediaId);
+    });
+
+    it('reads profile_id only when a server in scope has profiles', async () => {
+      app = await buildTestApp(createOwnerUser());
+      const rowsSql = async (url: string) => {
+        mockDb.execute.mockClear();
+        mockStartedAtPage([createMockHistoryRow()]);
+        await app.inject({ method: 'GET', url });
+        return sentSql(2).sql;
+      };
+
+      expect(await rowsSql(`/sessions/history?serverIds=${PLEX_SERVER}`)).toContain(
+        'NULL::uuid AS profile_id'
+      );
+      expect(await rowsSql('/sessions/history')).toContain('s.profile_id,');
     });
 
     it("reads the page's profiles in one query, and none for a page without one", async () => {

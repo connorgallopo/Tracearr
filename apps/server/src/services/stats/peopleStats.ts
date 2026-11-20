@@ -8,14 +8,12 @@
 
 import { eq, sql, type SQL } from 'drizzle-orm';
 import {
-  SERVER_PROFILES,
   TIME_MS,
   type AuthUser,
   type PeopleRank,
   type PeopleResponse,
   type PeopleSummary,
   type PersonRow,
-  type ServerType,
   type UserRangeStats,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
@@ -184,7 +182,7 @@ function identityProfilePlaysSql(input: IdentityScope & DateRange): SQL {
         BOOL_OR(${countedSessionSql('s')}) AS counted,
         SUM(CASE WHEN ${countedSessionSql('s')} THEN s.duration_ms ELSE 0 END) AS watched_ms
       FROM sessions s
-      WHERE ${identitySessionsWhere(input, input)}
+      WHERE ${identitySessionsWhere(input, input)} AND s.profile_id IS NOT NULL
       GROUP BY ${CHAIN_S}, s.profile_id
     )
     SELECT
@@ -195,7 +193,8 @@ function identityProfilePlaysSql(input: IdentityScope & DateRange): SQL {
       COALESCE(SUM(watched_ms), 0)::bigint AS watch_ms
     FROM profile_chains pc
     JOIN server_profiles sp ON sp.id = pc.profile_id
-    -- Checked once before the read, so accounts with no profile never read their sessions here
+    -- Uncorrelated, so Postgres runs it once as a one-time filter and skips the sessions read
+    -- when no account has a profile
     WHERE EXISTS (
       SELECT 1 FROM server_profiles
       WHERE ${serverUserIdAnyFragment(input.serverUserIds, 'server_user_id')}
@@ -282,12 +281,12 @@ interface IdentityPlaysRow {
 
 export async function queryIdentityRangeStats(input: {
   serverUserIds: string[];
-  /** The types of the servers the accounts are on */
-  serverTypes: ServerType[];
+  /** Whether any of the accounts is on a server with profiles */
+  hasProfiles: boolean;
   resolvedServerIds: string[] | undefined;
   window: PeopleWindow;
 }): Promise<UserRangeStats> {
-  const { serverUserIds, serverTypes, resolvedServerIds, window } = input;
+  const { serverUserIds, hasProfiles, resolvedServerIds, window } = input;
   const { range, prior, timezone, now } = window;
   const scope = { serverUserIds, resolvedServerIds };
   const current = { ...scope, ...range };
@@ -321,9 +320,7 @@ export async function queryIdentityRangeStats(input: {
   ] = await Promise.all([
     db.execute(buildIdentityPlaysSql(current)),
     prior ? db.execute(buildIdentityPlaysSql({ ...scope, ...prior })) : null,
-    serverTypes.some((type) => SERVER_PROFILES[type].hasProfiles)
-      ? db.execute<ProfilePlaysRow>(identityProfilePlaysSql(current))
-      : null,
+    hasProfiles ? db.execute<ProfilePlaysRow>(identityProfilePlaysSql(current)) : null,
     db.execute(identityMostFinishedSql(current)),
     db.execute(identityTopGenresSql(current)),
     db.execute(sql`

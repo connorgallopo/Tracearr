@@ -63,7 +63,7 @@ const withProfiles: HistoryFilterOptions = {
 function renderBar(
   filters: HistoryFilters,
   overrides: Partial<HistoryFilters> = {},
-  isFetching?: boolean
+  bar: { isFetching?: boolean; options?: HistoryFilterOptions } = {}
 ) {
   const onFiltersChange = vi.fn();
   const view = render(
@@ -72,10 +72,10 @@ function renderBar(
       onFiltersChange={onFiltersChange}
       timeRange={{ period: 'month' }}
       onTimeRangeChange={vi.fn()}
-      filterOptions={filterOptions}
+      filterOptions={bar.options ?? filterOptions}
       columnVisibility={DEFAULT_COLUMN_VISIBILITY}
       onColumnVisibilityChange={vi.fn()}
-      isFetching={isFetching}
+      isFetching={bar.isFetching}
     />
   );
   return { onFiltersChange, container: view.container };
@@ -125,13 +125,13 @@ describe('HistoryFiltersBar', () => {
   });
 
   it('shows the refresh indicator while a background fetch is in flight', () => {
-    const { container } = renderBar({}, {}, true);
+    const { container } = renderBar({}, {}, { isFetching: true });
 
     expect(container.querySelector('.animate-spin')).toBeInTheDocument();
   });
 
   it('hides the refresh indicator once no fetch is in flight', () => {
-    const { container } = renderBar({}, {}, false);
+    const { container } = renderBar({}, {}, { isFetching: false });
 
     expect(container.querySelector('.animate-spin')).not.toBeInTheDocument();
   });
@@ -171,18 +171,7 @@ describe('HistoryFiltersBar', () => {
   });
 
   it('lists profiles under their account and filters to the one picked', async () => {
-    const onFiltersChange = vi.fn();
-    render(
-      <HistoryFiltersBar
-        filters={{}}
-        onFiltersChange={onFiltersChange}
-        timeRange={{ period: 'month' }}
-        onTimeRangeChange={vi.fn()}
-        filterOptions={withProfiles}
-        columnVisibility={DEFAULT_COLUMN_VISIBILITY}
-        onColumnVisibilityChange={vi.fn()}
-      />
-    );
+    const { onFiltersChange } = renderBar({}, {}, { options: withProfiles });
 
     await userEvent.click(screen.getByRole('button', { name: /filters/i }));
     await userEvent.click(await screen.findByText('Profiles'));

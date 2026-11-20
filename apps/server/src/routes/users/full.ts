@@ -18,7 +18,11 @@
 
 import type { FastifyPluginAsync } from 'fastify';
 import { eq, and, desc, inArray, isNull, sql } from 'drizzle-orm';
-import { SERVER_PROFILES, userIdParamSchema, identityScopeQuerySchema } from '@tracearr/shared';
+import {
+  someServerHasProfiles,
+  userIdParamSchema,
+  identityScopeQuerySchema,
+} from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import {
   serverProfiles,
@@ -174,15 +178,19 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
       const recentSessions = await userRecentPlays(
         tx,
         scopedIds,
-        identityServerUserRows
-          .filter((account) => scopedIds.includes(account.id))
-          .map((account) => account.serverType),
         window,
-        { limit: sessionsLimit }
+        { limit: sessionsLimit },
+        {
+          hasProfiles: someServerHasProfiles(
+            identityServerUserRows
+              .filter((account) => scopedIds.includes(account.id))
+              .map((account) => account.serverType)
+          ),
+        }
       );
 
-      const profiles = identityServerUserRows.some(
-        (account) => SERVER_PROFILES[account.serverType].hasProfiles
+      const profiles = someServerHasProfiles(
+        identityServerUserRows.map((account) => account.serverType)
       )
         ? await profileOptions(tx, inArray(serverProfiles.serverUserId, identityIds))
         : [];

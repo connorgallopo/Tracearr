@@ -82,9 +82,12 @@ export async function recordDownload(signal: DownloadSignal): Promise<RecordedDo
         signal.serverUserId
           ? eq(mediaDownloads.serverUserId, signal.serverUserId)
           : isNull(mediaDownloads.serverUserId),
-        signal.profileId
-          ? eq(mediaDownloads.profileId, signal.profileId)
-          : isNull(mediaDownloads.profileId),
+        // Only a server with profiles sends the field
+        signal.profileId === undefined
+          ? undefined
+          : signal.profileId
+            ? eq(mediaDownloads.profileId, signal.profileId)
+            : isNull(mediaDownloads.profileId),
         signal.ratingKey
           ? eq(mediaDownloads.ratingKey, signal.ratingKey)
           : and(isNull(mediaDownloads.ratingKey), eq(mediaDownloads.title, signal.title)),

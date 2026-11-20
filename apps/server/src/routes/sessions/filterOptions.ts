@@ -2,7 +2,7 @@ import { and, inArray, sql, type SQL } from 'drizzle-orm';
 import countries from 'i18n-iso-countries';
 import countriesEn from 'i18n-iso-countries/langs/en.json' with { type: 'json' };
 import {
-  SERVER_PROFILES,
+  someServerHasProfiles,
   type AutomationFilterOptions,
   type CountryOption,
   type HistoryFilterOptions,
@@ -23,16 +23,15 @@ countries.registerLocale(countriesEn);
 export function emptyFilterOptions(
   includeAllCountries: boolean | undefined
 ): HistoryFilterOptions | AutomationFilterOptions {
-  const empty: HistoryFilterOptions = {
+  const empty = {
     platforms: [],
     products: [],
     devices: [],
     countries: [],
     cities: [],
     users: [],
-    profiles: [],
   };
-  return includeAllCountries ? { ...empty, servers: [] } : empty;
+  return includeAllCountries ? { ...empty, servers: [] } : { ...empty, profiles: [] };
 }
 
 /**
@@ -161,11 +160,12 @@ export async function queryFilterOptions(params: {
     `),
     // Servers (for rules builder)
     serverList,
-    // The cheapest read here, so waiting on it adds no time to the slowest
+    // The cheapest read here, so waiting on it adds no time to the slowest. The rules builder
+    // targets no profile, so it reads none.
     serverList.then((rows) =>
-      rows.some(
-        (row) =>
-          SERVER_PROFILES[row.type].hasProfiles && (!resolvedIds || resolvedIds.includes(row.id))
+      !includeAllCountries &&
+      someServerHasProfiles(
+        rows.filter((row) => !resolvedIds || resolvedIds.includes(row.id)).map((row) => row.type)
       )
         ? profileOptions(
             db,
@@ -240,7 +240,6 @@ export async function queryFilterOptions(params: {
       countries: allCountries,
       cities: citiesResult.rows as unknown as HistoryFilterOptions['cities'],
       users: usersData,
-      profiles,
       servers: serversData,
     };
 

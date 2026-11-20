@@ -190,6 +190,7 @@ export function mapMediaSession(session: MediaSession, serverType: ServerType): 
     userThumb: session.user.thumb ?? '',
     profileName: session.user.profileName ?? null,
     profileExternalId: session.user.profileId ?? null,
+    profileId: null,
     mediaTitle: session.media.title,
     mediaType,
     // Enhanced media metadata

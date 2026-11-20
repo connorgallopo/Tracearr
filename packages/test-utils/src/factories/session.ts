@@ -50,6 +50,8 @@ export interface SessionData {
   geoLon?: number | null;
   geoAsnNumber?: number | null;
   geoAsnOrganization?: string | null;
+  profileId?: string | null;
+  profileName?: string | null;
   playerName?: string | null;
   deviceId?: string | null;
   product?: string | null;
@@ -123,6 +125,8 @@ export function buildSession(overrides: SessionData): Required<SessionData> {
     geoLon: overrides.geoLon ?? -74.006,
     geoAsnNumber: overrides.geoAsnNumber ?? 7922,
     geoAsnOrganization: overrides.geoAsnOrganization ?? 'Comcast Cable Communications, LLC',
+    profileId: overrides.profileId ?? null,
+    profileName: overrides.profileName ?? null,
     playerName: overrides.playerName ?? `Player ${index}`,
     deviceId: overrides.deviceId ?? `device-${index}`,
     product: overrides.product ?? 'Plex Web',
@@ -150,7 +154,7 @@ export async function createTestSession(data: SessionData): Promise<CreatedSessi
       started_at, stopped_at, last_seen_at, duration_ms, total_duration_ms, progress_ms,
       last_paused_at, paused_duration_ms, reference_id, watched, short_session,
       ip_address, geo_city, geo_region, geo_country, geo_lat, geo_lon,
-      geo_asn_number, geo_asn_organization,
+      geo_asn_number, geo_asn_organization, profile_id, profile_name,
       player_name, device_id, product, device, platform,
       quality, is_transcode, bitrate
     ) VALUES (
@@ -194,6 +198,8 @@ export async function createTestSession(data: SessionData): Promise<CreatedSessi
       ${fullData.geoLon ?? 'NULL'},
       ${fullData.geoAsnNumber ?? 'NULL'},
       ${fullData.geoAsnOrganization ? `'${fullData.geoAsnOrganization}'` : 'NULL'},
+      ${fullData.profileId ? `'${fullData.profileId}'` : 'NULL'},
+      ${fullData.profileName ? `'${fullData.profileName}'` : 'NULL'},
       ${fullData.playerName ? `'${fullData.playerName}'` : 'NULL'},
       ${fullData.deviceId ? `'${fullData.deviceId}'` : 'NULL'},
       ${fullData.product ? `'${fullData.product}'` : 'NULL'},

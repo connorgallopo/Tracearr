@@ -24,10 +24,13 @@ const { PLEX_SERVER, TOFA_SERVER } = vi.hoisted(() => ({
   TOFA_SERVER: crypto.randomUUID(),
 }));
 vi.mock('../../../jobs/poller/database.js', () => ({
-  getCachedServers: vi.fn(async () => [
-    { id: PLEX_SERVER, type: 'plex' },
-    { id: TOFA_SERVER, type: 'tofa' },
-  ]),
+  getServerTypes: vi.fn(
+    async () =>
+      new Map([
+        [PLEX_SERVER, 'plex'],
+        [TOFA_SERVER, 'tofa'],
+      ])
+  ),
 }));
 
 vi.mock('../../../services/stats/peopleStats.js', async (importActual) => ({
@@ -88,12 +91,12 @@ describe('GET /users/:id/stats', () => {
     expect(mockStats.mock.calls[1]?.[0].serverUserIds).toEqual([ANCHOR]);
   });
 
-  it("hands the service the type of each account's server", async () => {
+  it("tells the service whether any account's server has profiles", async () => {
     await app.inject({ url: `/users/${ANCHOR}/stats?scope=identity` });
-    expect(mockStats.mock.calls[0]?.[0].serverTypes).toEqual(['plex', 'tofa']);
+    expect(mockStats.mock.calls[0]?.[0].hasProfiles).toBe(true);
 
     await app.inject({ url: `/users/${ANCHOR}/stats` });
-    expect(mockStats.mock.calls[1]?.[0].serverTypes).toEqual(['plex']);
+    expect(mockStats.mock.calls[1]?.[0].hasProfiles).toBe(false);
   });
 
   it('rejects a custom range without dates with 400', async () => {

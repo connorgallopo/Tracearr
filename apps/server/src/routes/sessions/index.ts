@@ -35,7 +35,7 @@ import {
 import { hasServerAccess, resolveServerIds } from '../../utils/serverFiltering.js';
 import { terminateSession } from '../../services/termination.js';
 import { getCacheService } from '../../services/cache.js';
-import { readCurrentProfiles } from '../../services/profiles.js';
+import { readCurrentProfiles, serversHaveProfiles } from '../../services/profiles.js';
 import {
   assertInScope,
   memberCacheSegment,
@@ -96,7 +96,15 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     conditions.push(mediaType ? sql`s.media_type = ${mediaType}` : historyMediaTypeDefault());
 
     const sessionData = await mapHistoryRows(
-      await fetchSessionPage(conditions, { startDate, endDate, pageSize, offset })
+      await fetchSessionPage(conditions, {
+        startDate,
+        endDate,
+        pageSize,
+        offset,
+        hasProfiles: await serversHaveProfiles(
+          resolveServerIds(authUser, serverId, undefined, { strict: false })
+        ),
+      })
     );
 
     const total = await countPlays(conditions);
@@ -150,6 +158,9 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
       cursor: pageCursor,
       startDate: query.data.startDate,
       endDate: query.data.endDate,
+      hasProfiles: await serversHaveProfiles(
+        resolveServerIds(authUser, query.data.serverId, query.data.serverIds, { strict: false })
+      ),
     });
 
     const firstRow = rows[0];

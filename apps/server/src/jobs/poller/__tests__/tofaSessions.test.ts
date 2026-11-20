@@ -116,7 +116,6 @@ vi.mock('../database.js', () => ({
   batchGetRecentUserSessions: vi.fn().mockResolvedValue(new Map()),
   batchGetLibraryItemIdentity: vi.fn().mockResolvedValue(new Map()),
   widenRecentSessionsForMergedIdentities: vi.fn().mockResolvedValue(undefined),
-  storedProfilesOf: vi.fn(() => new Map()),
 }));
 vi.mock('../sessionLifecycle.js', () => ({
   batchFindActiveSessionsByComposite: vi.fn().mockResolvedValue(new Map()),

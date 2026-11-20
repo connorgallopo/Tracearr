@@ -88,7 +88,8 @@ export function buildHistoryFilterConditions(
       conditions.push(sql`s.server_user_id IN (${sql.join(userIdList, sql`, `)})`);
     }
   }
-  if (profileIds) conditions.push(profileFilterSql(profileIds));
+  const byProfile = profileFilterSql(profileIds);
+  if (byProfile) conditions.push(byProfile);
   if (state) conditions.push(sql`s.state = ${state}`);
   if (mediaTypes && mediaTypes.length > 0) {
     if (mediaTypes.length === 1) {
@@ -192,8 +193,12 @@ export function buildCacheFingerprint(params: Record<string, unknown>): string {
   return createHash('sha256').update(raw).digest('hex').slice(0, 16);
 }
 
-/** The columns mapHistoryRow reads, over plays gs joined to their first segment s. */
-const HISTORY_ROW_COLUMNS = sql`
+/**
+ * The columns mapHistoryRow reads, over plays gs joined to their first segment s. Servers
+ * without profiles leave profile_id null, so it is not read from their compressed chunks.
+ */
+function historyRowColumns(hasProfiles: boolean): SQL {
+  return sql`
     gs.play_id as id,
     gs.started_at,
     gs.last_started_at,
@@ -236,7 +241,7 @@ const HISTORY_ROW_COLUMNS = sql`
     s.geo_asn_number,
     s.geo_asn_organization,
     ${localSessionSql('s')} AS is_local,
-    s.profile_id,
+    ${hasProfiles ? sql`s.profile_id` : sql`NULL::uuid AS profile_id`},
     s.profile_name,
     s.player_name,
     s.device_id,
@@ -262,8 +267,9 @@ const HISTORY_ROW_COLUMNS = sql`
     s.transcode_info,
     s.subtitle_info
 `;
+}
 
-/** The joins HISTORY_ROW_COLUMNS reads beyond the first segment s. */
+/** The joins historyRowColumns reads beyond the first segment s. */
 const HISTORY_ROW_JOINS = sql`
       JOIN server_users su ON su.id = s.server_user_id
       JOIN servers sv ON sv.id = s.server_id
@@ -273,15 +279,21 @@ const HISTORY_ROW_JOINS = sql`
 /** One page of plays grouped by reference_id, newest first, for GET /sessions. */
 export async function fetchSessionPage(
   conditions: SQL[],
-  page: { startDate?: Date; endDate?: Date; pageSize: number; offset: number }
+  page: {
+    startDate?: Date;
+    endDate?: Date;
+    pageSize: number;
+    offset: number;
+    hasProfiles: boolean;
+  }
 ): Promise<HistoryRow[]> {
-  const { startDate, endDate, pageSize, offset } = page;
+  const { startDate, endDate, pageSize, offset, hasProfiles } = page;
   const result = await db.execute(sql`
       WITH grouped_sessions AS (${groupedPlaysCte({
         where: conditions,
         orderLimit: sql`ORDER BY MIN(s.started_at) DESC LIMIT ${pageSize} OFFSET ${offset}`,
       })})
-      SELECT ${HISTORY_ROW_COLUMNS}
+      SELECT ${historyRowColumns(hasProfiles)}
       FROM grouped_sessions gs
       ${firstSegmentJoin({ alias: 'gs', boundsFrom: 'grouped_sessions' }, startedAtRange(startDate, endDate))}
       ${HISTORY_ROW_JOINS}
@@ -303,6 +315,8 @@ export interface HistoryPageParams {
   cursor: { time: Date; id: string; key: string | number | null } | null;
   startDate?: Date;
   endDate?: Date;
+  /** Whether any server in scope has profiles */
+  hasProfiles: boolean;
 }
 
 type HistoryCursor = NonNullable<HistoryPageParams['cursor']>;
@@ -395,7 +409,7 @@ export async function fetchHistoryPage(params: HistoryPageParams): Promise<Histo
  * as constants, which lets the planner drop chunks it would otherwise plan for InitPlans.
  */
 async function fetchStartedAtHistoryPage(params: HistoryPageParams): Promise<HistoryRow[]> {
-  const { conditions, pageSize, startDate, endDate } = params;
+  const { conditions, pageSize, startDate, endDate, hasProfiles } = params;
   const { dir, orderByExpr, havingClause } = pageOrder(params);
 
   // started_utc keeps the microseconds a JS Date would drop.
@@ -444,7 +458,7 @@ async function fetchStartedAtHistoryPage(params: HistoryPageParams): Promise<His
           sql`s.started_at <= ${ceiling}`,
         ],
       })})
-      SELECT ${HISTORY_ROW_COLUMNS},
+      SELECT ${historyRowColumns(hasProfiles)},
         lat.segments,
         NULL AS sort_key,
         ${candidates.length}::int AS page_candidate_count
@@ -460,7 +474,7 @@ async function fetchStartedAtHistoryPage(params: HistoryPageParams): Promise<His
 
 /** A keyset page in one statement, for any sort. */
 export async function fetchSortedHistoryPage(params: HistoryPageParams): Promise<HistoryRow[]> {
-  const { conditions, pageSize, startDate, endDate } = params;
+  const { conditions, pageSize, startDate, endDate, hasProfiles } = params;
   const { sortKeyExpr, mediaJoin, orderByExpr, havingClause } = pageOrder(params);
 
   // Full per-play aggregation is scoped to this page's play ids and to started_at between
@@ -494,7 +508,7 @@ export async function fetchSortedHistoryPage(params: HistoryPageParams): Promise
         SELECT play_id, started_at, last_started_at, sort_key, rn FROM history_page WHERE rn <= ${pageSize}
       ),
       grouped_sessions AS (${groupedPlaysCte({ where: groupedConditions })})
-      SELECT ${HISTORY_ROW_COLUMNS},
+      SELECT ${historyRowColumns(hasProfiles)},
         lat.segments,
         hp.sort_key,
         (SELECT count(*) FROM history_page)::int as page_candidate_count

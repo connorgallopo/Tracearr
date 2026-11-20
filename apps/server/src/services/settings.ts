@@ -97,6 +97,8 @@ const INTERNAL_DEFAULTS = {
   identityPassesVersion: 0 as number,
   // tofa servers whose plays stored without a profile have been linked to their profiles once.
   profileBackfillDoneServers: [] as string[],
+  // Failed profile backfill runs per tofa server; the user sync stops queuing one at the cap.
+  profileBackfillFailedRuns: {} as Record<string, number>,
 };
 
 type InternalSettings = typeof INTERNAL_DEFAULTS;

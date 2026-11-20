@@ -176,7 +176,7 @@ describe('queryIdentityRangeStats', () => {
   it('computes bytes from bitrate and duration and transcodes from either decision', async () => {
     await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -192,7 +192,7 @@ describe('queryIdentityRangeStats', () => {
   it('sums both accounts of a merged identity and only the anchor at default scope', async () => {
     await queryIdentityRangeStats({
       serverUserIds: [A, B],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -206,7 +206,7 @@ describe('queryIdentityRangeStats', () => {
     vi.mocked(db.execute).mockClear();
     await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -216,7 +216,7 @@ describe('queryIdentityRangeStats', () => {
   it('splits plays by profile only when an account is on a server with profiles', async () => {
     const withoutProfiles = await queryIdentityRangeStats({
       serverUserIds: [A, B],
-      serverTypes: ['plex', 'jellyfin', 'emby'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -226,7 +226,7 @@ describe('queryIdentityRangeStats', () => {
     vi.mocked(db.execute).mockClear();
     await queryIdentityRangeStats({
       serverUserIds: [A, B],
-      serverTypes: ['plex', 'tofa'],
+      hasProfiles: true,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -236,7 +236,7 @@ describe('queryIdentityRangeStats', () => {
   it('counts every media type in the person and server series, while /plays keeps its filter', async () => {
     await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -266,7 +266,7 @@ describe('queryIdentityRangeStats', () => {
 
     const stats = await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: resolveIdentityWindow({ period: 'week' }, now),
     });
@@ -284,7 +284,7 @@ describe('queryIdentityRangeStats', () => {
     vi.useFakeTimers({ now });
     const stats = await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: resolveIdentityWindow({ period: 'week' }, now),
     });
@@ -296,7 +296,7 @@ describe('queryIdentityRangeStats', () => {
   it('divides the server average by people with a counted play, through server_users, not by accounts', async () => {
     await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -315,7 +315,7 @@ describe('queryIdentityRangeStats', () => {
         : { rows: [] }) as never);
     const stats = await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -327,7 +327,7 @@ describe('queryIdentityRangeStats', () => {
     vi.mocked(db.execute).mockResolvedValue({ rows: [] } as never);
     const empty = await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -337,7 +337,7 @@ describe('queryIdentityRangeStats', () => {
   it('returns a zero-filled prior series when the prior window has no rows', async () => {
     const stats = await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window: WEEK,
     });
@@ -367,7 +367,7 @@ describe('queryIdentityRangeStats', () => {
 
     const stats = await queryIdentityRangeStats({
       serverUserIds: [A],
-      serverTypes: ['plex'],
+      hasProfiles: false,
       resolvedServerIds: undefined,
       window,
     });

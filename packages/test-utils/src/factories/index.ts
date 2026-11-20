@@ -8,6 +8,7 @@
 import { resetUserCounter } from './user.js';
 import { resetServerCounter } from './server.js';
 import { resetServerUserCounter } from './serverUser.js';
+import { resetServerProfileCounter } from './serverProfile.js';
 import { resetSessionCounter } from './session.js';
 import { resetAutomationCounter } from './automation.js';
 import { resetLibraryItemCounter } from './libraryItem.js';
@@ -44,6 +45,14 @@ export {
   type ServerUserData,
   type CreatedServerUser,
 } from './serverUser.js';
+
+export {
+  buildServerProfile,
+  createTestServerProfile,
+  resetServerProfileCounter,
+  type ServerProfileData,
+  type CreatedServerProfile,
+} from './serverProfile.js';
 
 export {
   buildSession,
@@ -95,6 +104,7 @@ export function resetAllFactoryCounters(): void {
   resetUserCounter();
   resetServerCounter();
   resetServerUserCounter();
+  resetServerProfileCounter();
   resetSessionCounter();
   resetAutomationCounter();
   resetLibraryItemCounter();

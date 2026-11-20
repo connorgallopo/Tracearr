@@ -540,6 +540,9 @@ describe('chain lookups', () => {
 
     const tofa = await lookupWheres('tofa', 'profile-1');
     expect(tofa).toHaveLength(2);
-    for (const where of tofa) expect(where).toContain('sessions.profile_id IS NOT DISTINCT FROM');
+    for (const where of tofa) expect(where).toContain('sessions.profile_id =');
+
+    const unprofiled = await lookupWheres('tofa', null);
+    for (const where of unprofiled) expect(where).toContain('sessions.profile_id is null');
   });
 });

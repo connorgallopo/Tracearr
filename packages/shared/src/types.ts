@@ -1802,7 +1802,10 @@ export interface HistoryFilterOptions {
  * Extended filter options for rules builder.
  * Includes all countries with session indicators and servers.
  */
-export interface AutomationFilterOptions extends Omit<HistoryFilterOptions, 'countries'> {
+export interface AutomationFilterOptions extends Omit<
+  HistoryFilterOptions,
+  'countries' | 'profiles'
+> {
   /** All countries with session activity indicator */
   countries: CountryOption[];
   /** Available servers */

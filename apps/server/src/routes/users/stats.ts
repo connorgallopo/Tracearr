@@ -13,7 +13,8 @@ import {
   queryIdentityRangeStats,
   resolveIdentityWindow,
 } from '../../services/stats/peopleStats.js';
-import { resolveIdentityScopedServerUserIds, serverTypesOf } from './queries/index.js';
+import { serversHaveProfiles } from '../../services/profiles.js';
+import { resolveIdentityScopedServerUserIds } from './queries/index.js';
 
 export const statsRoutes: FastifyPluginAsync = async (app) => {
   const readUsers = { preHandler: [app.requirePermission('users', 'read')] };
@@ -46,7 +47,7 @@ export const statsRoutes: FastifyPluginAsync = async (app) => {
 
     return queryIdentityRangeStats({
       serverUserIds: scoped.ids,
-      serverTypes: await serverTypesOf(scoped.serverIds),
+      hasProfiles: await serversHaveProfiles(scoped.serverIds),
       resolvedServerIds: resolveServerIds(authUser, query.data.serverId, query.data.serverIds),
       window: resolveIdentityWindow(query.data),
     });

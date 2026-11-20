@@ -1,10 +1,9 @@
 /** Which server_users an identity-wide User page reads, under the caller's server access. */
 
-import type { AuthUser, ServerType } from '@tracearr/shared';
+import type { AuthUser } from '@tracearr/shared';
 import { and, eq, inArray, type SQL } from 'drizzle-orm';
 import type { db as defaultDb } from '../../../db/client.js';
 import { serverUsers } from '../../../db/schema.js';
-import { getCachedServers } from '../../../jobs/poller/database.js';
 import { buildServerAccessCondition, hasServerAccess } from '../../../utils/serverFiltering.js';
 import { assertInScope, type Scope } from '../../../lib/scope.js';
 
@@ -40,8 +39,8 @@ export function identityAccountsWhere(authUser: AuthUser, identityUserIds: strin
 /**
  * Resolve the set of server_user ids a per-account endpoint (anchored on
  * `:id`) should query against: just `[id]` by default, or every accessible
- * sibling account under the same identity when `scope=identity` is set, with
- * the server each account is on.
+ * sibling account under the same identity when `scope=identity` is set, and
+ * the servers those accounts are on.
  */
 export async function resolveIdentityScopedServerUserIds(
   dbOrTx: DbOrTx,
@@ -87,13 +86,7 @@ export async function resolveIdentityScopedServerUserIds(
     ? {
         serverUser,
         ids: accounts.map((account) => account.id),
-        serverIds: accounts.map((account) => account.serverId),
+        serverIds: [...new Set(accounts.map((account) => account.serverId))],
       }
     : { serverUser, ids: [id], serverIds: [serverUser.serverId] };
-}
-
-/** The type of each server, from the servers cache; a server no longer there drops out */
-export async function serverTypesOf(serverIds: string[]): Promise<ServerType[]> {
-  const typeOf = new Map((await getCachedServers()).map((row) => [row.id, row.type]));
-  return serverIds.flatMap((serverId) => typeOf.get(serverId) ?? []);
 }

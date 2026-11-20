@@ -122,13 +122,10 @@ describe('HistoryTable', () => {
   });
 
   it('shows the missing-value marker for a play with no profile', () => {
-    // The fixture has no location either, so both cells hold the table's missing-value marker
     renderTable({ profileName: null }, undefined, { showProfile: true });
     const headers = screen.getAllByRole('columnheader').map((header) => header.textContent);
     const cells = screen.getAllByRole('cell');
-    expect(cells[headers.indexOf('labels.profile')]?.innerHTML).toBe(
-      cells[headers.indexOf('labels.location')]?.innerHTML
-    );
+    expect(cells[headers.indexOf('labels.profile')]).toHaveTextContent(/^\u2014$/);
   });
 
   it('sorts the data table from its date header', () => {

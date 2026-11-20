@@ -301,8 +301,15 @@ describe('recordDownload', () => {
 
     const [unprofiled] = selects([], [{ id: 'lib-1' }]);
     insertReturning({ id: 'dl-7', firstSeenAt: T });
-    await recordDownload(signal());
+    await recordDownload(signal({ source: 'tofa', profileId: null }));
     expect(renderCall(unprofiled, 'where').text).toContain('media_downloads.profile_id is null');
+  });
+
+  it('adds no profile condition for a server without profiles', async () => {
+    const [collapse] = selects([], [{ id: 'lib-1' }]);
+    insertReturning({ id: 'dl-8', firstSeenAt: T });
+    await recordDownload(signal());
+    expect(renderCall(collapse, 'where').text).not.toContain('profile_id');
   });
 
   it('stores a signal with no serverUserId', async () => {

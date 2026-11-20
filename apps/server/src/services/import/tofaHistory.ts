@@ -13,7 +13,20 @@ import {
   type TofaImportResult,
 } from '@tracearr/shared';
 import { UnrecoverableError } from 'bullmq';
-import { and, asc, eq, gte, inArray, isNull, lt, lte, or, sql, type SQL } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  eq,
+  gte,
+  inArray,
+  isNotNull,
+  isNull,
+  lt,
+  lte,
+  or,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { serverProfiles, servers, sessions } from '../../db/schema.js';
 import { getSessionChunkRanges, uncapDecompressionForTx } from '../../db/timescale.js';
@@ -488,6 +501,7 @@ export async function linkTofaPlayProfiles(
           and(
             eq(sessions.serverId, serverId),
             isNull(sessions.profileId),
+            isNotNull(sessions.profileName),
             eq(sessions.serverUserId, uniqueNames.serverUserId),
             eq(sessions.profileName, uniqueNames.name),
             ...(window

@@ -71,6 +71,7 @@ function createMockBuildActiveSessionInput(
       albumName: null,
       trackNumber: null,
       discNumber: null,
+      profileId: null,
       ...overrides,
     },
     user: { id: 'user-1', username: 'testuser', thumbUrl: null, identityName: null },

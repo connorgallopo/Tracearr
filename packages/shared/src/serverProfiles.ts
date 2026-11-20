@@ -141,6 +141,11 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
   },
 };
 
+/** Whether any of the servers plays one account under several profiles, so profile reads have rows to find */
+export function someServerHasProfiles(types: readonly ServerType[]): boolean {
+  return types.some((type) => SERVER_PROFILES[type].hasProfiles);
+}
+
 /**
  * How long a server's live stats line may go without a sample before it breaks. A server that
  * slows down while nothing reads it is bridged across that slower interval, with room for a late

@@ -142,6 +142,7 @@ function createMockProcessedSession(overrides: Partial<ProcessedSession> = {}): 
     sessionKey: 'sk-42',
     ratingKey: 'rk-1',
     profileExternalId: null,
+    profileId: null,
     externalUserId: 'ext-1',
     username: 'userB',
     userThumb: '',

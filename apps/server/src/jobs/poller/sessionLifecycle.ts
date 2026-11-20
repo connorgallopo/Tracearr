@@ -131,7 +131,7 @@ export interface BuildActiveSessionInput {
     progressMs: number;
     serverVersionKey?: string | null;
     profileName?: string | null;
-    profileId?: string | null;
+    profileId: string | null;
     ipAddress: string;
     playerName: string;
     deviceId: string;
@@ -256,7 +256,7 @@ export function buildActiveSession(input: BuildActiveSessionInput): ActiveSessio
     geoAsnNumber: geo.asnNumber,
     geoAsnOrganization: geo.asnOrganization,
     isLocal: geo.isLocal,
-    profileId: processed.profileId ?? null,
+    profileId: processed.profileId,
     profileName: processed.profileName ?? null,
     profileRemoved: false,
     playerName: processed.playerName,
@@ -368,7 +368,7 @@ export function buildPendingActiveSession(pendingData: PendingSessionData): Acti
     geoAsnNumber: geo.asnNumber,
     geoAsnOrganization: geo.asnOrganization,
     isLocal: withLocalFlag(geo, processed.ipAddress).isLocal,
-    profileId: processed.profileId ?? null,
+    profileId: processed.profileId,
     profileName: processed.profileName ?? null,
     profileRemoved: false,
     playerName: processed.playerName,
@@ -701,10 +701,12 @@ export async function createSessionWithRulesAtomic(
 
   let referenceId: string | null = null;
   let qualityChange: QualityChangeResult | null = null;
-  const profileId = processed.profileId ?? null;
+  const { profileId } = processed;
   // Each profile of an account keeps its own chains; on other servers every profile_id is null
   const sameProfile = SERVER_PROFILES[server.type].hasProfiles
-    ? sql`${sessions.profileId} IS NOT DISTINCT FROM ${profileId}`
+    ? profileId
+      ? eq(sessions.profileId, profileId)
+      : isNull(sessions.profileId)
     : undefined;
 
   // STEP 1: Check for quality change (active session with same user+device+ratingKey)

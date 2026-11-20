@@ -19,6 +19,7 @@ import {
   createTestUser,
   createTestServer,
   createTestServerUser,
+  createTestServerProfile,
   createTestSession,
   createConcurrentStreamsAutomation,
   createGeoRestrictionAutomation,
@@ -156,13 +157,8 @@ async function mergeSignInPlexAccountIntoJellyfinUser() {
 async function profilesWithPlays(serverId: string, serverUserId: string, count: number) {
   const profileIds: string[] = [];
   for (let i = 0; i < count; i++) {
-    const [profile] = await db
-      .insert(serverProfiles)
-      .values({ serverId, serverUserId, externalId: randomUUID(), name: `Profile ${i}` })
-      .returning({ id: serverProfiles.id });
-    if (!profile) throw new Error('the profile was not stored');
-    const play = await createTestSession({ serverId, serverUserId });
-    await db.update(sessions).set({ profileId: profile.id }).where(eq(sessions.id, play.id));
+    const profile = await createTestServerProfile({ serverId, serverUserId });
+    await createTestSession({ serverId, serverUserId, profileId: profile.id });
     profileIds.push(profile.id);
   }
   return profileIds;

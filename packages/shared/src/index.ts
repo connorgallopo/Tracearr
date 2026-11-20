@@ -1020,6 +1020,7 @@ export {
   SERVER_PROFILES,
   liveStatsGapSeconds,
   ownerLinkProof,
+  someServerHasProfiles,
   type OwnerLinkProof,
   type ServerProfile,
 } from './serverProfiles.js';

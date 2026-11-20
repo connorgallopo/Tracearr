@@ -832,7 +832,6 @@ export const locationStatsQuerySchema = z
     // Additive multi-account filter: when set, takes precedence over serverUserId so a
     // merged person's full history (all their server accounts) can be filtered at once.
     serverUserIds: commaSeparatedArray(uuidSchema),
-    profileIds: commaSeparatedArray(uuidSchema),
     serverId: uuidSchema.optional(),
     serverIds: serverIdsQuerySchema,
     mediaType: mediaTypeSchema.optional(),

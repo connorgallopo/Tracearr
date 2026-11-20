@@ -16,10 +16,13 @@ const { PLEX_SERVER, TOFA_SERVER } = vi.hoisted(() => ({
   TOFA_SERVER: crypto.randomUUID(),
 }));
 vi.mock('../../../jobs/poller/database.js', () => ({
-  getCachedServers: vi.fn(async () => [
-    { id: PLEX_SERVER, type: 'plex' },
-    { id: TOFA_SERVER, type: 'tofa' },
-  ]),
+  getServerTypes: vi.fn(
+    async () =>
+      new Map([
+        [PLEX_SERVER, 'plex'],
+        [TOFA_SERVER, 'tofa'],
+      ])
+  ),
 }));
 
 vi.mock('../queries/index.js', async (importActual) => ({
