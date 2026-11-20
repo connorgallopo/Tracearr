@@ -10,11 +10,24 @@ import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { AuthUser } from '@tracearr/shared';
 import type * as PeopleStatsModule from '../../../services/stats/peopleStats.js';
+import type * as QueriesModule from '../queries/index.js';
 
 vi.mock('../../../db/client.js', () => ({ db: {} }));
 
-vi.mock('../queries/index.js', () => ({
+vi.mock('../queries/index.js', async (importActual) => ({
+  ...(await importActual<typeof QueriesModule>()),
   resolveIdentityScopedServerUserIds: vi.fn(),
+}));
+
+const { PLEX_SERVER, TOFA_SERVER } = vi.hoisted(() => ({
+  PLEX_SERVER: crypto.randomUUID(),
+  TOFA_SERVER: crypto.randomUUID(),
+}));
+vi.mock('../../../jobs/poller/database.js', () => ({
+  getCachedServers: vi.fn(async () => [
+    { id: PLEX_SERVER, type: 'plex' },
+    { id: TOFA_SERVER, type: 'tofa' },
+  ]),
 }));
 
 vi.mock('../../../services/stats/peopleStats.js', async (importActual) => ({
@@ -54,8 +67,9 @@ describe('GET /users/:id/stats', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
     mockResolve.mockImplementation(async (_db, _user, id, scope) => ({
-      serverUser: { id, serverId: randomUUID(), userId: randomUUID() },
+      serverUser: { id, serverId: PLEX_SERVER, userId: randomUUID() },
       ids: scope === 'identity' ? [id, SIBLING] : [id],
+      serverIds: scope === 'identity' ? [PLEX_SERVER, TOFA_SERVER] : [PLEX_SERVER],
     }));
     app = await buildTestApp(owner());
   });
@@ -72,6 +86,14 @@ describe('GET /users/:id/stats', () => {
 
     await app.inject({ url: `/users/${ANCHOR}/stats` });
     expect(mockStats.mock.calls[1]?.[0].serverUserIds).toEqual([ANCHOR]);
+  });
+
+  it("hands the service the type of each account's server", async () => {
+    await app.inject({ url: `/users/${ANCHOR}/stats?scope=identity` });
+    expect(mockStats.mock.calls[0]?.[0].serverTypes).toEqual(['plex', 'tofa']);
+
+    await app.inject({ url: `/users/${ANCHOR}/stats` });
+    expect(mockStats.mock.calls[1]?.[0].serverTypes).toEqual(['plex']);
   });
 
   it('rejects a custom range without dates with 400', async () => {

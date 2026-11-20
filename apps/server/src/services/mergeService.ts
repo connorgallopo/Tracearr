@@ -66,7 +66,7 @@ import {
   safeFullRefreshAggregate,
   uncapDecompressionForTx,
 } from '../db/timescale.js';
-import { invalidateAutomationsCache } from '../jobs/poller/database.js';
+import { forgetStoredProfiles, invalidateAutomationsCache } from '../jobs/poller/database.js';
 import { getAuth } from '../lib/auth.js';
 import { assertOwnerKeepsALoginAfter } from '../lib/authGuards.js';
 import { upsertTofaAccount } from '../lib/memberLogin.js';
@@ -661,6 +661,7 @@ export async function mergeUsers(
   });
 
   invalidateAutomationsCache();
+  for (const combine of result.combinedServerUsers) forgetStoredProfiles(combine.serverId);
 
   // recomputeIdentityAggregates wrote the target's columns with raw SQL,
   // which any live session's cached Redis snapshot never sees on its own

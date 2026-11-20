@@ -9,6 +9,7 @@ import { userIdParamSchema, userSessionsQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import {
   resolveIdentityScopedServerUserIds,
+  serverTypesOf,
   userHistoryWindow,
   userPlayTotals,
   userRecentPlays,
@@ -51,6 +52,7 @@ export const sessionsRoutes: FastifyPluginAsync = async (app) => {
     const sessionData = await userRecentPlays(
       db,
       scoped.ids,
+      await serverTypesOf(scoped.serverIds),
       window,
       { limit: pageSize, offset },
       profileIds

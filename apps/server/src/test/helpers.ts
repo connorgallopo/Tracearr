@@ -43,6 +43,7 @@ const QUERY_CHAIN_METHODS = [
   'set',
   'values',
   'returning',
+  'execute',
 ];
 
 // Chainable Drizzle stub that records every builder argument and resolves to `result`.

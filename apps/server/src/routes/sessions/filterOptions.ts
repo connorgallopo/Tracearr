@@ -1,10 +1,11 @@
 import { and, inArray, sql, type SQL } from 'drizzle-orm';
 import countries from 'i18n-iso-countries';
 import countriesEn from 'i18n-iso-countries/langs/en.json' with { type: 'json' };
-import type {
-  AutomationFilterOptions,
-  CountryOption,
-  HistoryFilterOptions,
+import {
+  SERVER_PROFILES,
+  type AutomationFilterOptions,
+  type CountryOption,
+  type HistoryFilterOptions,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { serverProfiles, servers } from '../../db/schema.js';
@@ -59,6 +60,12 @@ export async function queryFilterOptions(params: {
     const allConditions = [...serverConditions, extraCondition];
     return sql`WHERE ${sql.join(allConditions, sql` AND `)}`;
   };
+
+  const serverList = db
+    .select({ id: servers.id, name: servers.name, type: servers.type })
+    .from(servers)
+    .orderBy(...serverOrderBy())
+    .execute();
 
   // Query all filter options in parallel
   const [
@@ -153,16 +160,21 @@ export async function queryFilterOptions(params: {
       LEFT JOIN users u ON u.id = su.user_id
     `),
     // Servers (for rules builder)
-    db
-      .select({ id: servers.id, name: servers.name, type: servers.type })
-      .from(servers)
-      .orderBy(...serverOrderBy()),
-    profileOptions(
-      db,
-      and(
-        resolvedIds && inArray(serverProfiles.serverId, resolvedIds),
-        scopeSessionsRaw(scope, sql`${serverProfiles.serverUserId}`)
+    serverList,
+    // The cheapest read here, so waiting on it adds no time to the slowest
+    serverList.then((rows) =>
+      rows.some(
+        (row) =>
+          SERVER_PROFILES[row.type].hasProfiles && (!resolvedIds || resolvedIds.includes(row.id))
       )
+        ? profileOptions(
+            db,
+            and(
+              resolvedIds && inArray(serverProfiles.serverId, resolvedIds),
+              scopeSessionsRaw(scope, sql`${serverProfiles.serverUserId}`)
+            )
+          )
+        : []
     ),
   ]);
 

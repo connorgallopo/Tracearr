@@ -12,7 +12,7 @@ import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { SQL } from 'drizzle-orm';
-import type { AuthUser } from '@tracearr/shared';
+import type { AuthUser, ServerType } from '@tracearr/shared';
 import { queryChain, renderCall, renderSql, renderedWheres } from '../../../test/helpers.js';
 
 vi.mock('../../../db/client.js', () => ({
@@ -107,8 +107,8 @@ describe('GET /users/:id/full violations panel', () => {
             ? [{ id: serverUserId, serverId, userId: randomUUID() }]
             : selectCall === 2
               ? [
-                  { id: serverUserId, serverId },
-                  { id: siblingId, serverId },
+                  { id: serverUserId, serverId, serverType: 'plex' },
+                  { id: siblingId, serverId, serverType: 'plex' },
                 ]
               : selectCall === 3
                 ? [{ serverUserId: siblingId, count: 4 }]
@@ -134,7 +134,7 @@ describe('GET /users/:id/full violations panel', () => {
     expect(response.json().identity.serverUsers.map((su: any) => su.sessionCount)).toEqual([0, 4]);
   });
 
-  it('lists the profiles of every account of the identity, whatever the scope', async () => {
+  async function fullWithAccountsOn(siblingServerType: ServerType) {
     const serverUserId = randomUUID();
     const siblingId = randomUUID();
     const serverId = randomUUID();
@@ -154,8 +154,8 @@ describe('GET /users/:id/full violations panel', () => {
             ? [{ id: serverUserId, serverId, userId: randomUUID() }]
             : selectCall === 2
               ? [
-                  { id: serverUserId, serverId },
-                  { id: siblingId, serverId },
+                  { id: serverUserId, serverId, serverType: 'plex' },
+                  { id: siblingId, serverId, serverType: siblingServerType },
                 ]
               : [];
         const chain = queryChain(vi.fn, rows);
@@ -167,12 +167,24 @@ describe('GET /users/:id/full violations panel', () => {
     vi.mocked((db as any).transaction).mockImplementation(async (callback: any) => callback(tx));
 
     const response = await app.inject({ method: 'GET', url: `/users/${serverUserId}/full` });
-
     expect(response.statusCode).toBe(200);
     const profileChain = chains.find((chain) =>
       renderCall(chain).text.startsWith('server_profiles.server_user_id in')
     );
-    expect(renderCall(profileChain).params).toEqual([serverUserId, siblingId]);
+    return { response, profileChain, ids: [serverUserId, siblingId] };
+  }
+
+  it('lists the profiles of every account of the identity, whatever the scope', async () => {
+    const { response, profileChain, ids } = await fullWithAccountsOn('tofa');
+
+    expect(renderCall(profileChain).params).toEqual(ids);
+    expect(response.json().profiles).toEqual([]);
+  });
+
+  it('reads no profiles when no account of the identity is on a server with profiles', async () => {
+    const { response, profileChain } = await fullWithAccountsOn('jellyfin');
+
+    expect(profileChain).toBeUndefined();
     expect(response.json().profiles).toEqual([]);
   });
 

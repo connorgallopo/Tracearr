@@ -16,8 +16,6 @@ import {
   playCountQuery,
   playSegmentsLateral,
   profileFilterSql,
-  PROFILE_COLUMNS,
-  PROFILE_JOIN,
   startedAtRange,
   whereClause,
 } from '../../db/sessions/index.js';
@@ -238,7 +236,8 @@ const HISTORY_ROW_COLUMNS = sql`
     s.geo_asn_number,
     s.geo_asn_organization,
     ${localSessionSql('s')} AS is_local,
-    ${PROFILE_COLUMNS},
+    s.profile_id,
+    s.profile_name,
     s.player_name,
     s.device_id,
     s.product,
@@ -269,7 +268,6 @@ const HISTORY_ROW_JOINS = sql`
       JOIN server_users su ON su.id = s.server_user_id
       JOIN servers sv ON sv.id = s.server_id
       LEFT JOIN users u ON u.id = su.user_id
-      ${PROFILE_JOIN}
 `;
 
 /** One page of plays grouped by reference_id, newest first, for GET /sessions. */

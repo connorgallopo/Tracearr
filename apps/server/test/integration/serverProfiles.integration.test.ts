@@ -140,6 +140,45 @@ describe('resolveProfiles', () => {
     expect(await storedProfile(stored.id)).toEqual(before);
   });
 
+  it('sends no statement for a profile a live poll stored as sighted, and writes a rename', async () => {
+    const { serverId, account } = await seed();
+    const stored = await storeProfile({
+      serverId,
+      serverUserId: account.id,
+      externalId: ROBIN,
+      name: 'Robin',
+    });
+    const sighting = { externalId: ROBIN, serverUserId: account.id, name: 'Robin' };
+    await resolveProfiles(serverId, [sighting], 'refresh');
+    const execute = vi.spyOn(db, 'execute');
+
+    const ids = await resolveProfiles(serverId, [sighting], 'refresh');
+    expect(ids).toEqual(new Map([[ROBIN, stored.id]]));
+    expect(execute).not.toHaveBeenCalled();
+
+    await resolveProfiles(serverId, [{ ...sighting, name: 'Robbie' }], 'refresh');
+    expect(execute).toHaveBeenCalledOnce();
+    expect(await storedProfile(stored.id)).toMatchObject({ name: 'Robbie' });
+  });
+
+  it('clears a removal the user sync made when a live play names the profile again', async () => {
+    const { serverId, account } = await seed();
+    const casey = await storeProfile({
+      serverId,
+      serverUserId: account.id,
+      externalId: CASEY,
+      name: 'Casey',
+    });
+    const sighting = { externalId: CASEY, serverUserId: account.id, name: 'Casey' };
+    await resolveProfiles(serverId, [sighting], 'refresh');
+    await syncAccountProfiles(serverId, fakeTofaClient(), [MORGAN_ACCOUNT]);
+    expect(await storedProfile(casey.id)).toMatchObject({ removedAt: expect.any(Date) });
+
+    await resolveProfiles(serverId, [sighting], 'refresh');
+
+    expect(await storedProfile(casey.id)).toMatchObject({ removedAt: null });
+  });
+
   it('keeps a profile on its stored account when another account plays it, warning once', async () => {
     const { serverId, account } = await seed();
     const other = await addAccount(serverId);

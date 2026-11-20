@@ -12,7 +12,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { EngineAutomation } from '@tracearr/shared';
+import type { EngineAutomation, ServerType } from '@tracearr/shared';
 import {
   createSessionWithRulesAtomic,
   handleMediaChangeAtomic,
@@ -20,6 +20,7 @@ import {
 } from '../sessionLifecycle.js';
 import type { ProcessedSession, SessionCreationInput } from '../types.js';
 import { getWatchedThreshold } from '../../../services/settings.js';
+import { queryChain, renderedWheres } from '../../../test/helpers.js';
 
 // Mock the db module
 vi.mock('../../../db/client.js', () => ({
@@ -391,6 +392,24 @@ describe('stopSessionAtomic session.stopped dispatch', () => {
   });
 });
 
+const serverUser = {
+  id: 'su-1',
+  userId: 'u-1',
+  username: 'connor',
+  thumbUrl: null,
+  identityName: null,
+  trustScore: 100,
+  lastActivityAt: null,
+  createdAt: new Date('2026-01-01'),
+  identityServerUserIds: ['su-1'],
+};
+const ruleContext = {
+  geo: {} as SessionCreationInput['geo'],
+  activeAutomations: [] as EngineAutomation[],
+  activeSessions: [],
+  recentSessions: [],
+};
+
 describe('a continuation stop is not a stream ending', () => {
   const existingRow = {
     id: 'session-1',
@@ -410,23 +429,6 @@ describe('a continuation stop is not a stream ending', () => {
 
   const processed = { ratingKey: 'rk-2', deviceId: 'device-1', progressMs: 0 } as ProcessedSession;
   const server = { id: 'server-1', name: 'Test Plex', type: 'plex' as const };
-  const serverUser = {
-    id: 'su-1',
-    userId: 'u-1',
-    username: 'connor',
-    thumbUrl: null,
-    identityName: null,
-    trustScore: 100,
-    lastActivityAt: null,
-    createdAt: new Date('2026-01-01'),
-    identityServerUserIds: ['su-1'],
-  };
-  const ruleContext = {
-    geo: {} as SessionCreationInput['geo'],
-    activeAutomations: [] as EngineAutomation[],
-    activeSessions: [],
-    recentSessions: [],
-  };
 
   /** The create path is driven only as far as the stop: the step after it throws on purpose. */
   function mockDb(rows: unknown[][]) {
@@ -496,5 +498,48 @@ describe('a continuation stop is not a stream ending', () => {
       expect.any(Date),
       'media_change'
     );
+  });
+});
+
+describe('chain lookups', () => {
+  /** The WHERE of the quality-change and resume lookups for a play on a server of this type */
+  async function lookupWheres(type: ServerType, profileId: string | null): Promise<string[]> {
+    const { db } = await import('../../../db/client.js');
+    const chains: ReturnType<typeof queryChain>[] = [];
+    vi.mocked(db.select).mockImplementation(() => {
+      const chain = queryChain(vi.fn, []);
+      chains.push(chain);
+      return chain;
+    });
+    vi.mocked(db.transaction).mockRejectedValue(new Error('past the lookups'));
+
+    await expect(
+      createSessionWithRulesAtomic({
+        processed: {
+          ratingKey: 'rk-1',
+          deviceId: 'device-1',
+          progressMs: 0,
+          profileId,
+        } as ProcessedSession,
+        server: { id: 'server-1', name: 'Server', type },
+        serverUser,
+        ...ruleContext,
+      })
+    ).rejects.toThrow('past the lookups');
+    return renderedWheres(chains);
+  }
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('match the profile only on a server with profiles', async () => {
+    const plex = await lookupWheres('plex', null);
+    expect(plex).toHaveLength(2);
+    for (const where of plex) expect(where).not.toContain('profile_id');
+
+    const tofa = await lookupWheres('tofa', 'profile-1');
+    expect(tofa).toHaveLength(2);
+    for (const where of tofa) expect(where).toContain('sessions.profile_id IS NOT DISTINCT FROM');
   });
 });

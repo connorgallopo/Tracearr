@@ -8,12 +8,14 @@
 
 import { eq, sql, type SQL } from 'drizzle-orm';
 import {
+  SERVER_PROFILES,
   TIME_MS,
   type AuthUser,
   type PeopleRank,
   type PeopleResponse,
   type PeopleSummary,
   type PersonRow,
+  type ServerType,
   type UserRangeStats,
 } from '@tracearr/shared';
 import { db } from '../../db/client.js';
@@ -280,10 +282,12 @@ interface IdentityPlaysRow {
 
 export async function queryIdentityRangeStats(input: {
   serverUserIds: string[];
+  /** The types of the servers the accounts are on */
+  serverTypes: ServerType[];
   resolvedServerIds: string[] | undefined;
   window: PeopleWindow;
 }): Promise<UserRangeStats> {
-  const { serverUserIds, resolvedServerIds, window } = input;
+  const { serverUserIds, serverTypes, resolvedServerIds, window } = input;
   const { range, prior, timezone, now } = window;
   const scope = { serverUserIds, resolvedServerIds };
   const current = { ...scope, ...range };
@@ -317,7 +321,9 @@ export async function queryIdentityRangeStats(input: {
   ] = await Promise.all([
     db.execute(buildIdentityPlaysSql(current)),
     prior ? db.execute(buildIdentityPlaysSql({ ...scope, ...prior })) : null,
-    db.execute<ProfilePlaysRow>(identityProfilePlaysSql(current)),
+    serverTypes.some((type) => SERVER_PROFILES[type].hasProfiles)
+      ? db.execute<ProfilePlaysRow>(identityProfilePlaysSql(current))
+      : null,
     db.execute(identityMostFinishedSql(current)),
     db.execute(identityTopGenresSql(current)),
     db.execute(sql`
@@ -458,20 +464,22 @@ export async function queryIdentityRangeStats(input: {
       track: t?.track ?? 0,
       other: t?.other ?? 0,
     },
-    profiles: profiles.rows
-      .map((row) => ({
-        profileId: row.profile_id,
-        name: row.name,
-        removed: row.removed,
-        plays: row.plays,
-        watchMs: Number(row.watch_ms),
-      }))
-      .sort(
-        (a, b) =>
-          b.plays - a.plays ||
-          compareNames(a.name, b.name) ||
-          a.profileId.localeCompare(b.profileId)
-      ),
+    profiles: profiles
+      ? profiles.rows
+          .map((row) => ({
+            profileId: row.profile_id,
+            name: row.name,
+            removed: row.removed,
+            plays: row.plays,
+            watchMs: Number(row.watch_ms),
+          }))
+          .sort(
+            (a, b) =>
+              b.plays - a.plays ||
+              compareNames(a.name, b.name) ||
+              a.profileId.localeCompare(b.profileId)
+          )
+      : [],
     topGenres: topGenres.rows as UserRangeStats['topGenres'],
     mostFinished: (
       mostFinished.rows as {

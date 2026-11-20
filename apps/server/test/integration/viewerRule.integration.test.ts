@@ -268,6 +268,7 @@ describe('one viewer rule', () => {
 
     const stats = await queryIdentityRangeStats({
       serverUserIds: [viewer],
+      serverTypes: [server.type],
       resolvedServerIds: undefined,
       window: resolveIdentityWindow({ period: 'week' }),
     });

@@ -514,7 +514,9 @@ export const sessions = pgTable(
     // From the IP at insert; null on rows the location sync has not classified yet
     isLocal: boolean('is_local'),
     // The profile that played, where one account holds several (tofa). Null for every other server.
-    profileId: uuid('profile_id').references(() => serverProfiles.id),
+    // No foreign key: a profile is deleted only with its stored account or server, and reads fall
+    // back to the stored name, so a key would cost every insert without protecting a read.
+    profileId: uuid('profile_id'),
     // The profile's name at play time, shown only when profileId is null
     profileName: text('profile_name'),
     playerName: varchar('player_name', { length: 255 }), // Player title/friendly name

@@ -44,7 +44,6 @@ const KEPT_SESSIONS_INDEXES = [
   'idx_sessions_device_tracking',
   'idx_sessions_media_type_ended',
   'idx_sessions_time_play_id',
-  'idx_sessions_profile_partial',
 ];
 
 async function indexNames(tables: string[]): Promise<string[]> {

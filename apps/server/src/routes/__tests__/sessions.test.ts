@@ -1183,6 +1183,27 @@ describe('Session Routes', () => {
       expect(row.mediaId).toBe(mediaId);
       expect(row.showMediaId).toBe(showMediaId);
     });
+
+    it("reads the page's profiles in one query, and none for a page without one", async () => {
+      app = await buildTestApp(createOwnerUser());
+      mockStartedAtPage([createMockHistoryRow({ profile_id: null, profile_name: null })]);
+      await app.inject({ method: 'GET', url: '/sessions/history' });
+      expect(mockDb.select).not.toHaveBeenCalled();
+
+      const profileId = randomUUID();
+      const stored = { profile_id: profileId, profile_name: 'Robin' };
+      mockStartedAtPage([createMockHistoryRow(stored), createMockHistoryRow(stored)]);
+      mockDb.select.mockReturnValue(
+        queryChain(vi.fn, [{ id: profileId, name: 'Robbie', removedAt: null }])
+      );
+      const response = await app.inject({ method: 'GET', url: '/sessions/history' });
+
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+      expect(response.json().data.map((row: { profileName: string }) => row.profileName)).toEqual([
+        'Robbie',
+        'Robbie',
+      ]);
+    });
   });
 
   describe('GET /sessions/history/aggregates', () => {
@@ -1292,6 +1313,21 @@ describe('Session Routes', () => {
       const [first, second] = mockGetFilterOptions.mock.calls;
       expect(first).toEqual([ownerUser.userId, expect.any(String)]);
       expect(second).toEqual(first);
+    });
+
+    it('reads profiles only when a selected server has profiles', async () => {
+      const plex = { id: randomUUID(), name: 'Plex', type: 'plex' };
+      const tofa = { id: randomUUID(), name: 'tofa', type: 'tofa' };
+      mockGetFilterOptions.mockResolvedValue(null);
+      mockDb.execute.mockResolvedValue({ rows: [] });
+      mockDb.select.mockImplementation(() => queryChain(vi.fn, [plex, tofa]));
+      app = await buildTestApp(createOwnerUser([plex.id, tofa.id]));
+
+      await app.inject({ method: 'GET', url: `/sessions/filter-options?serverIds=${plex.id}` });
+      expect(mockDb.select).toHaveBeenCalledTimes(1);
+
+      await app.inject({ method: 'GET', url: `/sessions/filter-options?serverIds=${tofa.id}` });
+      expect(mockDb.select).toHaveBeenCalledTimes(3);
     });
   });
 });

@@ -1,5 +1,5 @@
 {
-  "id": "e29d29c9-5c84-4de4-a328-3643628eb2e0",
+  "id": "3d77539d-7477-4c5b-925d-ab65b707e43d",
   "prevId": "437e924c-727c-4e7a-8aef-7d3961c57b89",
   "version": "7",
   "dialect": "postgresql",
@@ -6958,19 +6958,6 @@
             "id"
           ],
           "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "sessions_profile_id_server_profiles_id_fk": {
-          "name": "sessions_profile_id_server_profiles_id_fk",
-          "tableFrom": "sessions",
-          "tableTo": "server_profiles",
-          "columnsFrom": [
-            "profile_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },

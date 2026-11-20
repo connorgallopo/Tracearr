@@ -103,19 +103,6 @@ export function playSegmentsLateral(alias: string, startDate: Date | undefined, 
   `;
 }
 
-/**
- * The profile of the session s, read through PROFILE_JOIN: its server_profiles id, its current
- * name (the name the session stored when it has no profile row) and whether the server still
- * lists it. Join after a page's LIMIT, so only the page's rows are joined.
- */
-export const PROFILE_COLUMNS = sql`
-  sp.id AS profile_id,
-  COALESCE(sp.name, s.profile_name) AS profile_name,
-  sp.removed_at IS NOT NULL AS profile_removed
-`;
-
-export const PROFILE_JOIN = sql`LEFT JOIN server_profiles sp ON sp.id = s.profile_id`;
-
 export function playCountQuery(where: SQL[]): SQL {
   return sql`
     SELECT COUNT(DISTINCT COALESCE(s.reference_id, s.id))::int as count

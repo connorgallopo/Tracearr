@@ -1,17 +1,18 @@
 /** Per-user play reads: totals, per-account counts and the recent plays page. */
 
 import { and, sql, type SQL } from 'drizzle-orm';
+import { SERVER_PROFILES, type ServerType } from '@tracearr/shared';
 import type { db as defaultDb } from '../../../db/client.js';
 import { sessions } from '../../../db/schema.js';
 import { uuidArraySql } from '../../../utils/sqlArrays.js';
 import { profileFilterSql } from '../../../db/sessions/conditions.js';
-import {
-  firstSegmentJoin,
-  groupedPlaysCte,
-  PROFILE_COLUMNS,
-  PROFILE_JOIN,
-} from '../../../db/sessions/groupedPlays.js';
+import { firstSegmentJoin, groupedPlaysCte } from '../../../db/sessions/groupedPlays.js';
 import { localSessionSql, PLAY_COUNT, RAW_WATCH_TIME } from '../../../db/sessions/rules.js';
+import {
+  readCurrentProfiles,
+  shownProfile,
+  type CurrentProfiles,
+} from '../../../services/profiles.js';
 
 // Accept either the default db or a transaction context
 type DbOrTx = typeof defaultDb;
@@ -124,7 +125,6 @@ interface UserPlaySqlRow {
   is_local: boolean;
   profile_id: string | null;
   profile_name: string | null;
-  profile_removed: boolean;
   player_name: string | null;
   device_id: string | null;
   product: string | null;
@@ -137,7 +137,7 @@ interface UserPlaySqlRow {
   paused_duration_ms: string | null;
 }
 
-function mapUserPlayRow(row: UserPlaySqlRow) {
+function mapUserPlayRow(row: UserPlaySqlRow, profiles: CurrentProfiles) {
   return {
     id: row.id,
     serverId: row.server_id,
@@ -177,9 +177,7 @@ function mapUserPlayRow(row: UserPlaySqlRow) {
     geoAsnNumber: row.geo_asn_number,
     geoAsnOrganization: row.geo_asn_organization,
     isLocal: row.is_local === true,
-    profileId: row.profile_id,
-    profileName: row.profile_name,
-    profileRemoved: row.profile_removed,
+    ...shownProfile(profiles, row.profile_id, row.profile_name),
     playerName: row.player_name,
     deviceId: row.device_id,
     product: row.product,
@@ -200,6 +198,7 @@ export type UserPlayRow = ReturnType<typeof mapUserPlayRow>;
 export async function userRecentPlays(
   dbOrTx: DbOrTx,
   serverUserIds: string[],
+  serverTypes: ServerType[],
   window: StartedAtWindow,
   page: { limit: number; offset?: number },
   profileIds?: string[]
@@ -207,6 +206,10 @@ export async function userRecentPlays(
   const bounds = [sql`s.started_at >= ${window.start}`, sql`s.started_at <= ${window.end}`];
   const where = [serverUserIdAnyFragment(serverUserIds, 's.server_user_id'), ...bounds];
   if (profileIds) where.push(profileFilterSql(profileIds));
+  // Servers without profiles leave the columns null, so skip reading them from compressed chunks
+  const profileColumns = serverTypes.some((type) => SERVER_PROFILES[type].hasProfiles)
+    ? sql`s.profile_id, s.profile_name`
+    : sql`NULL::uuid AS profile_id, NULL::text AS profile_name`;
   const result = await dbOrTx.execute(sql`
     WITH grouped_sessions AS (${groupedPlaysCte({
       where,
@@ -224,14 +227,18 @@ export async function userRecentPlays(
       s.geo_continent, s.geo_postal, s.geo_lat, s.geo_lon,
       s.geo_asn_number, s.geo_asn_organization,
       ${localSessionSql('s')} AS is_local,
-      ${PROFILE_COLUMNS},
+      ${profileColumns},
       s.player_name, s.device_id, s.product, s.device, s.platform,
       s.quality, s.is_transcode, s.bitrate, s.last_paused_at
     FROM grouped_sessions gs
     ${firstSegmentJoin({ alias: 'gs', boundsFrom: 'grouped_sessions' }, bounds)}
     JOIN servers sv ON sv.id = s.server_id
-    ${PROFILE_JOIN}
     ORDER BY gs.started_at DESC
   `);
-  return (result.rows as unknown as UserPlaySqlRow[]).map(mapUserPlayRow);
+  const rows = result.rows as unknown as UserPlaySqlRow[];
+  const profiles = await readCurrentProfiles(
+    dbOrTx,
+    rows.map((row) => row.profile_id)
+  );
+  return rows.map((row) => mapUserPlayRow(row, profiles));
 }

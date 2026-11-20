@@ -181,6 +181,10 @@ function MediaTypeIcon({ type }: { type: MediaType }) {
   );
 }
 
+function NoValue() {
+  return <span className="text-muted-foreground">—</span>;
+}
+
 interface HistoryTableRowProps {
   session: SessionWithDetails;
   onClick?: () => void;
@@ -292,10 +296,12 @@ export const HistoryTableRow = memo(
 
           {showProfile && (
             <TableCell className={COLUMN_WIDTHS.profile}>
-              {session.profileName && (
+              {session.profileName ? (
                 <span className="block truncate text-sm">
                   {profileLabel({ name: session.profileName, removed: session.profileRemoved })}
                 </span>
+              ) : (
+                <NoValue />
               )}
             </TableCell>
           )}
@@ -420,7 +426,7 @@ export const HistoryTableRow = memo(
                   </TooltipContent>
                 </Tooltip>
               ) : (
-                <span className="text-muted-foreground">—</span>
+                <NoValue />
               )}
             </TableCell>
           )}

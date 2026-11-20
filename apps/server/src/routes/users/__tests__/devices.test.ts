@@ -48,6 +48,7 @@ describe('GET /users/:id/devices download counts', () => {
     vi.mocked(resolveIdentityScopedServerUserIds).mockResolvedValue({
       serverUser: { id, serverId: randomUUID(), userId: randomUUID() },
       ids: [id],
+      serverIds: [randomUUID()],
     });
     vi.mocked(db.execute)
       .mockResolvedValueOnce({

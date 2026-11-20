@@ -1,4 +1,10 @@
 import type { ServerType } from '@tracearr/shared';
+import { db } from '../../db/client.js';
+import {
+  readCurrentProfiles,
+  shownProfile,
+  type CurrentProfiles,
+} from '../../services/profiles.js';
 
 export interface HistoryRow {
   id: string;
@@ -53,7 +59,6 @@ export interface HistoryRow {
   is_local: boolean;
   profile_id: string | null;
   profile_name: string | null;
-  profile_removed: boolean;
   player_name: string | null;
   device_id: string | null;
   product: string | null;
@@ -81,7 +86,7 @@ export interface HistoryRow {
   page_candidate_count?: number;
 }
 
-export function mapHistoryRow(row: HistoryRow) {
+function mapHistoryRow(row: HistoryRow, profiles: CurrentProfiles) {
   return {
     id: row.id,
     serverId: row.server_id,
@@ -137,9 +142,7 @@ export function mapHistoryRow(row: HistoryRow) {
     geoAsnNumber: row.geo_asn_number,
     geoAsnOrganization: row.geo_asn_organization,
     isLocal: row.is_local === true,
-    profileId: row.profile_id,
-    profileName: row.profile_name,
-    profileRemoved: row.profile_removed,
+    ...shownProfile(profiles, row.profile_id, row.profile_name),
     playerName: row.player_name,
     deviceId: row.device_id,
     product: row.product,
@@ -165,4 +168,13 @@ export function mapHistoryRow(row: HistoryRow) {
     transcodeInfo: row.transcode_info,
     subtitleInfo: row.subtitle_info,
   };
+}
+
+/** A page of history rows in the wire shape, each showing its profile's current name */
+export async function mapHistoryRows(rows: HistoryRow[]) {
+  const profiles = await readCurrentProfiles(
+    db,
+    rows.map((row) => row.profile_id)
+  );
+  return rows.map((row) => mapHistoryRow(row, profiles));
 }

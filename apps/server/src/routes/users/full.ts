@@ -18,7 +18,7 @@
 
 import type { FastifyPluginAsync } from 'fastify';
 import { eq, and, desc, inArray, isNull, sql } from 'drizzle-orm';
-import { userIdParamSchema, identityScopeQuerySchema } from '@tracearr/shared';
+import { SERVER_PROFILES, userIdParamSchema, identityScopeQuerySchema } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import {
   serverProfiles,
@@ -171,11 +171,21 @@ export const fullRoutes: FastifyPluginAsync = async (app) => {
       const stats = await userPlayTotals(tx, scopedIds, window);
 
       // 3. Get recent sessions grouped by play (collapse pause/resume chains)
-      const recentSessions = await userRecentPlays(tx, scopedIds, window, {
-        limit: sessionsLimit,
-      });
+      const recentSessions = await userRecentPlays(
+        tx,
+        scopedIds,
+        identityServerUserRows
+          .filter((account) => scopedIds.includes(account.id))
+          .map((account) => account.serverType),
+        window,
+        { limit: sessionsLimit }
+      );
 
-      const profiles = await profileOptions(tx, inArray(serverProfiles.serverUserId, identityIds));
+      const profiles = identityServerUserRows.some(
+        (account) => SERVER_PROFILES[account.serverType].hasProfiles
+      )
+        ? await profileOptions(tx, inArray(serverProfiles.serverUserId, identityIds))
+        : [];
 
       // 4. Get locations
       const locations = await queryUserLocations(tx, scopedIds, window);

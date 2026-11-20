@@ -116,6 +116,7 @@ vi.mock('../database.js', () => ({
   batchGetRecentUserSessions: vi.fn().mockResolvedValue(new Map()),
   batchGetLibraryItemIdentity: vi.fn().mockResolvedValue(new Map()),
   widenRecentSessionsForMergedIdentities: vi.fn().mockResolvedValue(undefined),
+  storedProfilesOf: vi.fn(() => new Map()),
 }));
 vi.mock('../sessionLifecycle.js', () => ({
   batchFindActiveSessionsByComposite: vi.fn().mockResolvedValue(new Map()),
@@ -737,8 +738,18 @@ describe('tofa sessions in the poller', () => {
     it('resolves every profile a poll names in one statement, each pending play carrying its own', async () => {
       mockDb.execute.mockResolvedValueOnce({
         rows: [
-          { id: 'profile-morgan', external_id: morgan.id, server_user_id: 'server-user-1' },
-          { id: 'profile-robin', external_id: robin.id, server_user_id: 'server-user-1' },
+          {
+            id: 'profile-morgan',
+            external_id: morgan.id,
+            server_user_id: 'server-user-1',
+            name: morgan.name,
+          },
+          {
+            id: 'profile-robin',
+            external_id: robin.id,
+            server_user_id: 'server-user-1',
+            name: robin.name,
+          },
         ],
       });
       const robinRow = {

@@ -7,7 +7,11 @@ import { and, eq, inArray, isNull, notInArray, sql, type SQL } from 'drizzle-orm
 import type { ProfileFilterOption } from '@tracearr/shared';
 import { db, type Executor } from '../db/client.js';
 import { serverProfiles, servers, serverUsers } from '../db/schema.js';
-import { getServerUserIdsByExternalId } from '../jobs/poller/database.js';
+import {
+  forgetStoredProfiles,
+  getServerUserIdsByExternalId,
+  storedProfilesOf,
+} from '../jobs/poller/database.js';
 import { NOT_NEEDED, type IMediaServerClient, type MediaProfile } from './mediaServer/types.js';
 import { compareNames } from '../utils/collation.js';
 import { createLogger } from '../utils/logger.js';
@@ -88,7 +92,8 @@ export function profileIdOf(
  * ones not stored yet. Live plays `refresh` the name and clear a removal; plays from the
  * past only `insertMissing`, so an old name never overwrites the current one. A profile only
  * the past names, after the user sync stored every profile the server lists, is one the server
- * no longer has: `insertRemoved` stores it marked removed.
+ * no longer has: `insertRemoved` stores it marked removed. A live sighting of a profile a live
+ * poll already stored under the same account and name sends no statement.
  */
 export async function resolveProfiles(
   serverId: string,
@@ -97,6 +102,17 @@ export async function resolveProfiles(
 ): Promise<Map<string, string>> {
   const sightingOf = new Map(sightings.map((sighting) => [sighting.externalId, sighting]));
   if (sightingOf.size === 0) return new Map();
+
+  const stored = mode === 'refresh' ? storedProfilesOf(serverId) : undefined;
+  const profileIds = new Map<string, string>();
+  for (const sighting of sightingOf.values()) {
+    const profile = stored?.get(sighting.externalId);
+    if (profile?.serverUserId === sighting.serverUserId && profile.name === sighting.name) {
+      profileIds.set(sighting.externalId, profile.id);
+      sightingOf.delete(sighting.externalId);
+    }
+  }
+  if (sightingOf.size === 0) return profileIds;
 
   const incoming = sql.join(
     [...sightingOf.values()]
@@ -109,7 +125,12 @@ export async function resolveProfiles(
   );
   // A conflict the update skips returns no row from the insert, so stored rows it left alone
   // are read back from the statement's snapshot.
-  const { rows } = await db.execute<{ id: string; external_id: string; server_user_id: string }>(
+  const { rows } = await db.execute<{
+    id: string;
+    external_id: string;
+    server_user_id: string;
+    name: string;
+  }>(
     sql`
       WITH incoming (external_id, server_user_id, name) AS (VALUES ${incoming}),
       written AS (
@@ -117,11 +138,11 @@ export async function resolveProfiles(
         SELECT ${serverId}::uuid, server_user_id, external_id, name, ${WRITE[mode].removedAt}
         FROM incoming
         ON CONFLICT (server_id, external_id) ${WRITE[mode].onConflict}
-        RETURNING id, external_id, server_user_id
+        RETURNING id, external_id, server_user_id, name
       )
-      SELECT id, external_id, server_user_id FROM written
+      SELECT id, external_id, server_user_id, name FROM written
       UNION ALL
-      SELECT p.id, p.external_id, p.server_user_id
+      SELECT p.id, p.external_id, p.server_user_id, p.name
       FROM server_profiles p
       JOIN incoming i ON i.external_id = p.external_id
       WHERE p.server_id = ${serverId}
@@ -130,6 +151,9 @@ export async function resolveProfiles(
   );
 
   for (const row of rows) {
+    profileIds.set(row.external_id, row.id);
+    // Every row a refresh returns is stored under that name and not removed
+    stored?.set(row.external_id, { id: row.id, serverUserId: row.server_user_id, name: row.name });
     const seenUnder = sightingOf.get(row.external_id)?.serverUserId;
     if (seenUnder === row.server_user_id || warnedProfileIds.has(row.id)) continue;
     warnedProfileIds.add(row.id);
@@ -139,7 +163,7 @@ export async function resolveProfiles(
       playedServerUserId: seenUnder,
     });
   }
-  return new Map(rows.map((row) => [row.external_id, row.id]));
+  return profileIds;
 }
 
 /**
@@ -228,12 +252,46 @@ export async function syncAccountProfiles(
           )
         );
     });
+    forgetStoredProfiles(serverId);
   } catch (err) {
     log.warn('Profile sync failed; every account keeps the profiles it had', {
       serverId,
       error: err,
     });
   }
+}
+
+/** The current name of each profile and whether the server still lists it, by server_profiles id */
+export type CurrentProfiles = ReadonlyMap<string, { name: string; removed: boolean }>;
+
+/** The profiles the ids name, read by primary key, with no query when every id is null */
+export async function readCurrentProfiles(
+  executor: Executor,
+  profileIds: (string | null)[]
+): Promise<CurrentProfiles> {
+  const ids = [...new Set(profileIds.filter((id) => id != null))];
+  if (ids.length === 0) return new Map();
+  const rows = await executor
+    .select({
+      id: serverProfiles.id,
+      name: serverProfiles.name,
+      removedAt: serverProfiles.removedAt,
+    })
+    .from(serverProfiles)
+    .where(sql`${serverProfiles.id} = ANY(${sql.param(ids)}::uuid[])`);
+  return new Map(rows.map((row) => [row.id, { name: row.name, removed: row.removedAt !== null }]));
+}
+
+/** The profile a play shows: its profile's current name, else the name the play stored */
+export function shownProfile(
+  profiles: CurrentProfiles,
+  profileId: string | null,
+  storedName: string | null
+): { profileId: string | null; profileName: string | null; profileRemoved: boolean } {
+  const profile = profileId === null ? undefined : profiles.get(profileId);
+  return profile
+    ? { profileId, profileName: profile.name, profileRemoved: profile.removed }
+    : { profileId: null, profileName: storedName, profileRemoved: false };
 }
 
 /** The profiles `where` selects, removed ones included, in name order */

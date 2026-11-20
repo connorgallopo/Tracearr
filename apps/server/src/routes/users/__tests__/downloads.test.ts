@@ -54,6 +54,7 @@ describe('GET /users/:id/downloads', () => {
     mockResolve.mockResolvedValue({
       serverUser: { id, serverId: randomUUID(), userId: randomUUID() },
       ids: [id],
+      serverIds: [randomUUID()],
     });
     mockQuery.mockResolvedValue({ data: [], total: 0 });
   });
@@ -98,6 +99,7 @@ describe('GET /users/:id/downloads', () => {
     mockResolve.mockResolvedValue({
       serverUser: { id, serverId: randomUUID(), userId: randomUUID() },
       ids: [id, sibling],
+      serverIds: [randomUUID(), randomUUID()],
     });
     app = await buildTestApp(owner());
     const response = await app.inject({ url: `/users/${id}/downloads?scope=identity` });

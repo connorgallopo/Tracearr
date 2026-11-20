@@ -248,6 +248,7 @@ describe("the user page's profile split", () => {
 
     const stats = await queryIdentityRangeStats({
       serverUserIds: [account.id],
+      serverTypes: ['tofa'],
       resolvedServerIds: undefined,
       window: resolveIdentityWindow({ period: 'week' }),
     });
@@ -279,6 +280,7 @@ describe("the user page's profile split", () => {
 
     const stats = await queryIdentityRangeStats({
       serverUserIds: [account.id],
+      serverTypes: ['tofa'],
       resolvedServerIds: undefined,
       window: resolveIdentityWindow({ period: 'week' }),
     });

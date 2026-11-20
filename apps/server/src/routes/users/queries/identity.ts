@@ -1,9 +1,10 @@
 /** Which server_users an identity-wide User page reads, under the caller's server access. */
 
-import type { AuthUser } from '@tracearr/shared';
+import type { AuthUser, ServerType } from '@tracearr/shared';
 import { and, eq, inArray, type SQL } from 'drizzle-orm';
 import type { db as defaultDb } from '../../../db/client.js';
 import { serverUsers } from '../../../db/schema.js';
+import { getCachedServers } from '../../../jobs/poller/database.js';
 import { buildServerAccessCondition, hasServerAccess } from '../../../utils/serverFiltering.js';
 import { assertInScope, type Scope } from '../../../lib/scope.js';
 
@@ -11,26 +12,10 @@ import { assertInScope, type Scope } from '../../../lib/scope.js';
 type DbOrTx = typeof defaultDb;
 
 /**
- * All server_user ids belonging to a person's identity that the caller can
- * access. Always scoped by the caller's accessible servers (owners see every
- * sibling account, everyone else only their own accessible servers) so an
- * identity-wide query can never surface accounts on servers the caller
- * doesn't have access to.
- */
-export async function resolveAccessibleServerUserIdsForIdentity(
-  dbOrTx: DbOrTx,
-  authUser: AuthUser,
-  identityUserId: string
-): Promise<string[]> {
-  return resolveAccessibleServerUserIdsForIdentities(dbOrTx, authUser, [identityUserId]);
-}
-
-/**
- * Batched version of resolveAccessibleServerUserIdsForIdentity - the union of
- * every accessible server_user id across all given identities in a single
- * query. An identity with no accessible account under the caller's server
- * access contributes nothing to the union (fail-closed), same as the
- * singular resolver.
+ * The union of every accessible server_user id across all given identities in
+ * a single query. Always scoped by the caller's accessible servers (owners see
+ * every sibling account, everyone else only their own accessible servers), so
+ * an identity with no accessible account contributes nothing (fail-closed).
  */
 export async function resolveAccessibleServerUserIdsForIdentities(
   dbOrTx: DbOrTx,
@@ -55,7 +40,8 @@ export function identityAccountsWhere(authUser: AuthUser, identityUserIds: strin
 /**
  * Resolve the set of server_user ids a per-account endpoint (anchored on
  * `:id`) should query against: just `[id]` by default, or every accessible
- * sibling account under the same identity when `scope=identity` is set.
+ * sibling account under the same identity when `scope=identity` is set, with
+ * the server each account is on.
  */
 export async function resolveIdentityScopedServerUserIds(
   dbOrTx: DbOrTx,
@@ -66,7 +52,11 @@ export async function resolveIdentityScopedServerUserIds(
 ): Promise<
   | { error: 'notFound' }
   | { error: 'forbidden' }
-  | { serverUser: { id: string; serverId: string; userId: string }; ids: string[] }
+  | {
+      serverUser: { id: string; serverId: string; userId: string };
+      ids: string[];
+      serverIds: string[];
+    }
 > {
   const rows = await dbOrTx
     .select({ id: serverUsers.id, serverId: serverUsers.serverId, userId: serverUsers.userId })
@@ -82,13 +72,28 @@ export async function resolveIdentityScopedServerUserIds(
     return { error: 'forbidden' };
   }
   if (scope !== 'identity') {
-    return { serverUser, ids: [id] };
+    return { serverUser, ids: [id], serverIds: [serverUser.serverId] };
   }
 
-  const ids = (
-    await resolveAccessibleServerUserIdsForIdentity(dbOrTx, authUser, serverUser.userId)
-  ).filter((accountId) => assertInScope(rowScope, accountId));
+  const accounts = (
+    await dbOrTx
+      .select({ id: serverUsers.id, serverId: serverUsers.serverId })
+      .from(serverUsers)
+      .where(identityAccountsWhere(authUser, [serverUser.userId]))
+  ).filter((account) => assertInScope(rowScope, account.id));
   // The anchor account is always part of its own identity and already passed
   // the access check above, so this can't come back empty in practice.
-  return { serverUser, ids: ids.length > 0 ? ids : [id] };
+  return accounts.length > 0
+    ? {
+        serverUser,
+        ids: accounts.map((account) => account.id),
+        serverIds: accounts.map((account) => account.serverId),
+      }
+    : { serverUser, ids: [id], serverIds: [serverUser.serverId] };
+}
+
+/** The type of each server, from the servers cache; a server no longer there drops out */
+export async function serverTypesOf(serverIds: string[]): Promise<ServerType[]> {
+  const typeOf = new Map((await getCachedServers()).map((row) => [row.id, row.type]));
+  return serverIds.flatMap((serverId) => typeOf.get(serverId) ?? []);
 }

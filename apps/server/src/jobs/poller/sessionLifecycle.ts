@@ -8,6 +8,7 @@
 import {
   isPlacedLocal,
   LOCAL_NETWORK_COUNTRY,
+  SERVER_PROFILES,
   SESSION_WRITE_RETRY,
   TIME_MS,
   type ActiveSession,
@@ -701,6 +702,10 @@ export async function createSessionWithRulesAtomic(
   let referenceId: string | null = null;
   let qualityChange: QualityChangeResult | null = null;
   const profileId = processed.profileId ?? null;
+  // Each profile of an account keeps its own chains; on other servers every profile_id is null
+  const sameProfile = SERVER_PROFILES[server.type].hasProfiles
+    ? sql`${sessions.profileId} IS NOT DISTINCT FROM ${profileId}`
+    : undefined;
 
   // STEP 1: Check for quality change (active session with same user+device+ratingKey)
   if (processed.ratingKey) {
@@ -719,7 +724,7 @@ export async function createSessionWithRulesAtomic(
           eq(sessions.serverUserId, serverUser.id),
           eq(sessions.ratingKey, processed.ratingKey),
           deviceCondition,
-          sql`${sessions.profileId} IS NOT DISTINCT FROM ${profileId}`,
+          sameProfile,
           isNull(sessions.stoppedAt),
           gte(sessions.startedAt, chunkBound)
         )
@@ -787,7 +792,7 @@ export async function createSessionWithRulesAtomic(
         and(
           eq(sessions.serverUserId, serverUser.id),
           eq(sessions.ratingKey, processed.ratingKey),
-          sql`${sessions.profileId} IS NOT DISTINCT FROM ${profileId}`,
+          sameProfile,
           gte(sessions.stoppedAt, oneDayAgo),
           gte(sessions.startedAt, chunkBound),
           eq(sessions.watched, false)

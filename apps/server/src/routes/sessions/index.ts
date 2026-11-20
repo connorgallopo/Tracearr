@@ -35,6 +35,7 @@ import {
 import { hasServerAccess, resolveServerIds } from '../../utils/serverFiltering.js';
 import { terminateSession } from '../../services/termination.js';
 import { getCacheService } from '../../services/cache.js';
+import { readCurrentProfiles } from '../../services/profiles.js';
 import {
   assertInScope,
   memberCacheSegment,
@@ -52,7 +53,7 @@ import {
   fetchSessionPage,
   parseHistoryCursor,
 } from './history.js';
-import { mapHistoryRow } from './historyRow.js';
+import { mapHistoryRows } from './historyRow.js';
 
 export const sessionRoutes: FastifyPluginAsync = async (app) => {
   const readSessions = { preHandler: [app.requirePermission('sessions', 'read')] };
@@ -94,9 +95,9 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
     if (state) conditions.push(sql`s.state = ${state}`);
     conditions.push(mediaType ? sql`s.media_type = ${mediaType}` : historyMediaTypeDefault());
 
-    const sessionData = (
+    const sessionData = await mapHistoryRows(
       await fetchSessionPage(conditions, { startDate, endDate, pageSize, offset })
-    ).map(mapHistoryRow);
+    );
 
     const total = await countPlays(conditions);
 
@@ -158,7 +159,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
       return { data: [], hasMore: false } satisfies HistorySessionResponse;
     }
 
-    const sessionData = rows.map(mapHistoryRow);
+    const sessionData = await mapHistoryRows(rows);
 
     // Generate next cursor
     const lastSession = sessionData[sessionData.length - 1];
@@ -387,7 +388,7 @@ export const sessionRoutes: FastifyPluginAsync = async (app) => {
       return reply.forbidden('You do not have access to this session');
     }
 
-    return mapSessionDetail(row);
+    return mapSessionDetail(row, await readCurrentProfiles(db, [row.profileId]));
   });
 
   /**

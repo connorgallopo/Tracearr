@@ -115,6 +115,7 @@ describe('User Requests Route', () => {
     vi.mocked(resolveIdentityScopedServerUserIds).mockResolvedValue({
       serverUser: { id: SERVER_USER_ID, serverId: SERVER_ID, userId: authUser.userId },
       ids: [SERVER_USER_ID],
+      serverIds: [SERVER_ID],
     });
 
     const response = await app.inject({
@@ -136,6 +137,7 @@ describe('User Requests Route', () => {
     vi.mocked(resolveIdentityScopedServerUserIds).mockResolvedValue({
       serverUser: { id: SERVER_USER_ID, serverId: SERVER_ID, userId: authUser.userId },
       ids: [SERVER_USER_ID],
+      serverIds: [SERVER_ID],
     });
     vi.mocked(listUserRequests).mockResolvedValue({ ...emptyResponse, data: [entry], total: 1 });
 
@@ -152,6 +154,7 @@ describe('User Requests Route', () => {
     vi.mocked(resolveIdentityScopedServerUserIds).mockResolvedValue({
       serverUser: { id: SERVER_USER_ID, serverId: SERVER_ID, userId: authUser.userId },
       ids: [SERVER_USER_ID, OTHER_SERVER_USER_ID],
+      serverIds: [SERVER_ID, SERVER_ID],
     });
 
     const response = await app.inject({
