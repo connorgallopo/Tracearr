@@ -14,6 +14,7 @@ import {
 } from '../../../utils/http.js';
 import { createLogger } from '../../../utils/logger.js';
 import { assertSafeProbeUrl, probeRefusal } from '../../../utils/ssrf.js';
+import { newestBy } from '../shared/parserUtils.js';
 import {
   FullSyncRequiredError,
   INCREMENTAL_CAP_RATIO,
@@ -189,13 +190,11 @@ function cursorRevision(cursor: SyncCursor): number {
  * no device id is never folded into another.
  */
 function newestPerDeviceAndFile(rows: TofaPlaybackSession[]): TofaPlaybackSession[] {
-  const newest = new Map<string, TofaPlaybackSession>();
-  for (const row of rows) {
-    const key = `${row.user_id}:${row.device_id ?? row.session_id}:${row.media_file_id}`;
-    const kept = newest.get(key);
-    if (!kept || Date.parse(row.created_at) > Date.parse(kept.created_at)) newest.set(key, row);
-  }
-  return [...newest.values()];
+  return newestBy(
+    rows,
+    (row) => `${row.user_id}:${row.device_id ?? row.session_id}:${row.media_file_id}`,
+    (row) => Date.parse(row.created_at)
+  );
 }
 
 export class TofaClient implements IMediaServerClient {

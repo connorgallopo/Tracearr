@@ -141,7 +141,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
   },
   silo: {
     displayName: 'Silo',
-    sessionIdentity: 'sessionKey',
+    sessionIdentity: 'composite',
     terminatesBy: 'sessionKey',
     liveEvents: 'siloSocket',
     hostStats: 'siloResources',

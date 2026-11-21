@@ -13,6 +13,7 @@ import {
 } from '../../../utils/http.js';
 import { createLogger } from '../../../utils/logger.js';
 import { probeRefusal } from '../../../utils/ssrf.js';
+import { newestBy } from '../shared/parserUtils.js';
 import {
   NOT_NEEDED,
   cursorDate,
@@ -60,6 +61,10 @@ const STOP_REASON_MAX = 1024;
 const DEVICE_NAMES_KEPT_MS = 10 * 60 * 1000;
 const DEVICE_RETRY_MS = 60 * 1000;
 const PROBE_SESSION_ID = '00000000-0000-4000-8000-000000000000';
+const RATE_LIMIT_RETRIES = 3;
+const RATE_LIMIT_WAIT_DEFAULT_MS = 1000;
+const RATE_LIMIT_WAIT_MAX_MS = 10_000;
+const RATE_LIMIT_WAIT_BUDGET_MS = 10_000;
 
 export const SILO_STOP_REFUSED = 'this Silo API key cannot stop streams';
 
@@ -130,6 +135,60 @@ function sweepPosterUrls(): void {
   }
 }
 
+function rateLimitWaitMs(retryAfter: string | undefined): number {
+  const seconds = retryAfter ? Number(retryAfter) : NaN;
+  const waitMs =
+    Number.isFinite(seconds) && seconds >= 0 ? seconds * 1000 : RATE_LIMIT_WAIT_DEFAULT_MS;
+  return Math.min(waitMs, RATE_LIMIT_WAIT_MAX_MS);
+}
+
+/** Silo answers 429 once a key sends about 30 requests in a second, which a listing walk does */
+async function fetchSilo<T>(url: string, options: HttpRequestOptions): Promise<T> {
+  let waitedMs = 0;
+  for (let retries = 0; ; retries++) {
+    try {
+      return await fetchJson<T>(url, { ...options, service: 'silo' });
+    } catch (error) {
+      if (!isHttpStatus(error, 429) || retries === RATE_LIMIT_RETRIES) throw error;
+      const waitMs = rateLimitWaitMs(error.retryAfter);
+      if (waitedMs + waitMs > RATE_LIMIT_WAIT_BUDGET_MS) throw error;
+      waitedMs += waitMs;
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+    }
+  }
+}
+
+/** Keyed the way Tracearr tracks a Silo play */
+const playKey = (row: SiloSession) =>
+  `${row.user_id}:${row.device_id || row.session_id}:${row.media_item_id ?? ''}`;
+const startedAt = (row: SiloSession) => Date.parse(row.started_at);
+
+// ponytail: entries of a server no longer polled are never swept; sweep on server removal if that matters
+/** The latest start seen per server URL and play key, while anything is listed under the key */
+const latestStarts = new Map<string, number>();
+
+/**
+ * A player that starts an item again gets a new session while its paused one stays listed, and
+ * still listed after the new one ends. So of the sessions one account holds on a device for an
+ * item, only the latest started is playing, and one that started before a session seen earlier
+ * is a leftover.
+ */
+function playingSessions(serverUrl: string, rows: SiloSession[]): SiloSession[] {
+  const prefix = `${serverUrl} `;
+  const listed = new Set<string>();
+  const playing = newestBy(rows, playKey, startedAt).filter((row) => {
+    const key = prefix + playKey(row);
+    listed.add(key);
+    if (startedAt(row) < (latestStarts.get(key) ?? -Infinity)) return false;
+    latestStarts.set(key, startedAt(row));
+    return true;
+  });
+  for (const key of latestStarts.keys()) {
+    if (key.startsWith(prefix) && !listed.has(key)) latestStarts.delete(key);
+  }
+  return playing;
+}
+
 const errorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
@@ -161,18 +220,16 @@ export class SiloClient implements IMediaServerClient {
   }
 
   private request<T>(path: string, init: HttpRequestOptions = {}): Promise<T> {
-    return fetchJson<T>(`${this.url}${API_PATH}${path}`, {
+    return fetchSilo<T>(`${this.url}${API_PATH}${path}`, {
       ...init,
       headers: jsonHeaders(this.token),
-      service: 'silo',
     });
   }
 
   /** Silo answers these without a key */
   private publicRequest<T>(path: string): Promise<T> {
-    return fetchJson<T>(`${this.url}${API_PATH}${path}`, {
+    return fetchSilo<T>(`${this.url}${API_PATH}${path}`, {
       headers: jsonHeaders(),
-      service: 'silo',
       timeout: TIMEOUT_MS,
     });
   }
@@ -201,9 +258,10 @@ export class SiloClient implements IMediaServerClient {
   }
 
   async getSessions(sessionKey?: string): Promise<MediaSession[]> {
-    const rows = (await this.listAll<SiloSession>('/admin/sessions', TIMEOUT_MS)).filter(
-      (row) => sessionKey === undefined || row.session_id === sessionKey
-    );
+    const rows = playingSessions(
+      this.url,
+      await this.listAll<SiloSession>('/admin/sessions', TIMEOUT_MS)
+    ).filter((row) => sessionKey === undefined || row.session_id === sessionKey);
     for (const row of rows) {
       if (row.media_item_id) rememberPosterUrl(this.url, row.media_item_id, row.poster_url);
     }
@@ -473,9 +531,8 @@ export class SiloClient implements IMediaServerClient {
 
     let info: SiloSystemInfo;
     try {
-      info = await fetchJson<SiloSystemInfo>(`${url}${API_PATH}/system/info`, {
+      info = await fetchSilo<SiloSystemInfo>(`${url}${API_PATH}/system/info`, {
         headers: jsonHeaders(),
-        service: 'silo',
         timeout: TIMEOUT_MS,
       });
     } catch (error) {

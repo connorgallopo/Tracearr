@@ -30,8 +30,14 @@ function serve(responses: Record<string, Answer>) {
   });
 }
 
-function httpError(statusCode: number): HttpClientError {
-  return new HttpClientError({ service: 'silo', statusCode, statusText: 'error', url: URL });
+function httpError(statusCode: number, retryAfter?: string): HttpClientError {
+  return new HttpClientError({
+    service: 'silo',
+    statusCode,
+    statusText: 'error',
+    url: URL,
+    retryAfter,
+  });
 }
 
 function client(url = URL) {
@@ -40,6 +46,27 @@ function client(url = URL) {
 
 const requested = (path: string) =>
   mockFetchJson.mock.calls.map(([url]) => url).filter((url) => url.includes(path));
+
+const RESTARTED = 'a613750c-52f6-4ef2-b2a8-616135598312';
+
+/** The fixture movie row as another session of the same account, device and item */
+const play = (sessionId: string, startedAt: string, fields: object = {}) => ({
+  ...silo.sessions.items[0],
+  session_id: sessionId,
+  started_at: startedAt,
+  is_paused: false,
+  ...fields,
+});
+const pausedPlay = play('74bb3687-6a17-4de1-819a-db80c7bac488', '2026-11-21T04:05:10.120Z', {
+  is_paused: true,
+});
+const restartedPlay = play(RESTARTED, '2026-11-21T04:05:13.480Z');
+
+async function poll(url: string, items: object[]) {
+  serve({ '/admin/sessions': { items }, '/admin/devices': silo.devices });
+  const sessions = await client(url).getSessions();
+  return sessions.map((s) => [s.sessionKey, s.playback.state]);
+}
 
 const verifyAnswers = (): Record<string, Answer> => ({
   '/system/info': silo.systemInfo,
@@ -142,6 +169,50 @@ describe('SiloClient', () => {
     expect(second).toContain('cursor=c2');
   });
 
+  it('waits the Retry-After seconds on a 429, then reads the page again', async () => {
+    vi.useFakeTimers();
+    let reads = 0;
+    serve({
+      '/admin/users': () => {
+        reads++;
+        if (reads === 1) throw httpError(429, '1');
+        return silo.users;
+      },
+    });
+
+    const users = client().getUsers();
+    await vi.advanceTimersByTimeAsync(999);
+    expect(mockFetchJson).toHaveBeenCalledTimes(1);
+    await vi.advanceTimersByTimeAsync(1);
+
+    expect((await users).map((user) => user.id)).toEqual(['1', '34']);
+    expect(mockFetchJson).toHaveBeenCalledTimes(2);
+  });
+
+  it('fails on the fourth 429 in a row', async () => {
+    vi.useFakeTimers();
+    serve({ '/admin/users': httpError(429, '1') });
+
+    const users = client().getUsers();
+    const failed = expect(users).rejects.toMatchObject({ statusCode: 429 });
+    await vi.advanceTimersByTimeAsync(3000);
+
+    await failed;
+    expect(mockFetchJson).toHaveBeenCalledTimes(4);
+  });
+
+  it('fails a 429 whose wait would take the waits of one call past ten seconds', async () => {
+    vi.useFakeTimers();
+    serve({ '/admin/users': httpError(429, '6') });
+
+    const users = client().getUsers();
+    const failed = expect(users).rejects.toMatchObject({ statusCode: 429 });
+    await vi.advanceTimersByTimeAsync(6000);
+
+    await failed;
+    expect(mockFetchJson).toHaveBeenCalledTimes(2);
+  });
+
   it('names players from the device list, read again only after ten minutes or for an unknown device', async () => {
     vi.useFakeTimers({ now: new Date('2026-11-20T12:00:00Z') });
     const url = 'http://silo-devices.local:8090';
@@ -165,6 +236,44 @@ describe('SiloClient', () => {
     vi.advanceTimersByTime(11 * 60_000);
     await client(url).getSessions();
     expect(requested('/admin/devices')).toHaveLength(3);
+  });
+
+  it('lists only the latest started session an account holds on a device for an item', async () => {
+    for (const items of [
+      [pausedPlay, restartedPlay],
+      [restartedPlay, pausedPlay],
+    ]) {
+      expect(await poll('http://silo-restart.local:8090', items)).toEqual([[RESTARTED, 'playing']]);
+    }
+  });
+
+  it('drops a paused leftover after the session that replaced it ends, and plays a later start', async () => {
+    const url = 'http://silo-leftover.local:8090';
+    const later = play('5d1c0f7e-2b8a-4c39-9e61-0a4f7b3c8d12', '2026-11-21T04:20:00.000Z');
+
+    expect(await poll(url, [pausedPlay, restartedPlay])).toEqual([[RESTARTED, 'playing']]);
+    expect(await poll(url, [pausedPlay])).toEqual([]);
+    expect(await poll(url, [])).toEqual([]);
+    expect(await poll(url, [later])).toEqual([[later.session_id, 'playing']]);
+  });
+
+  it('never folds a session without a device id into another, nor one account on two devices', async () => {
+    const noDevice = [
+      play('9a3e5c71-0f2d-4b86-a1c4-7e9d2b6f5a03', '2026-11-21T04:05:10.120Z', { device_id: '' }),
+      play('c8f1d2e4-6b7a-4935-8d0c-1e2f3a4b5c6d', '2026-11-21T04:05:13.480Z', { device_id: '' }),
+    ];
+    const twoDevices = [
+      play('1b2c3d4e-5f60-4718-89ab-cdef01234567', '2026-11-21T04:05:10.120Z', {
+        device_id: 'device-one',
+      }),
+      play('7e6d5c4b-3a29-4180-9f7e-6d5c4b3a2918', '2026-11-21T04:05:13.480Z', {
+        device_id: 'device-two',
+      }),
+    ];
+
+    for (const items of [noDevice, twoDevices]) {
+      expect(await poll('http://silo-devices-apart.local:8090', items)).toHaveLength(2);
+    }
   });
 
   it('lists sessions with client names when the device list cannot be read', async () => {

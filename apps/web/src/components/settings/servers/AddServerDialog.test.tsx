@@ -259,7 +259,7 @@ describe('AddServerDialog', () => {
     }
   });
 
-  it('adds a Silo server through the server list with the pasted key', async () => {
+  it('adds a Silo server through the server type list with the pasted key', async () => {
     vi.mocked(api.servers.create).mockResolvedValueOnce({ id: 'silo-1', type: 'silo' } as never);
     const onAdded = vi.fn();
     render(<AddServerFromList onAdded={onAdded} />, {

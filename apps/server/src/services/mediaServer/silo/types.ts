@@ -58,6 +58,7 @@ export interface SiloSubtitle {
 
 export interface SiloSession {
   session_id: string;
+  started_at: string;
   user_id: string;
   username: string;
   profile_id: string;

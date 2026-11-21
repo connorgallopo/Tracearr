@@ -461,7 +461,7 @@ export async function findActiveSession(
   return rows[0] || null;
 }
 
-/** Find an active session by composite identity (JF/Emby). */
+/** Find an active session by composite identity (JF, Emby, Silo). */
 export async function findActiveSessionByComposite(
   identity: CompositeSessionIdentity
 ): Promise<typeof sessions.$inferSelect | null> {
