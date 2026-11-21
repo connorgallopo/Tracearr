@@ -150,6 +150,9 @@ export interface SiloSocketFrame {
   event?: string;
   channels?: string[];
   data?: unknown;
+  /** On an error frame */
+  code?: string;
+  message?: string;
 }
 
 /** The data of a catalog.item.changed (change) or catalog.library.changed (reason) event */

@@ -16,8 +16,8 @@ const PING_CHANNEL = 'undici:websocket:ping';
 
 export abstract class SocketEventSource<Frame extends object> extends EventEmitter {
   private readonly serverId: string;
-  private readonly serverName: string;
-  private readonly logPrefix: string;
+  protected readonly serverName: string;
+  protected readonly logPrefix: string;
   private readonly idleTimeoutMs: number;
 
   private socket: WebSocket | null = null;
