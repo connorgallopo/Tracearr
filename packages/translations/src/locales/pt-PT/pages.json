@@ -81,7 +81,7 @@
     "connectHint": "",
     "connectedTitle": "",
     "connectedDescription": "",
-    "importTitle": "",
+    "importTitle": "Importar histórico do relógio",
     "importDescription": "",
     "goToDashboard": "",
     "codeExpired": "",
@@ -167,7 +167,7 @@
       },
       "rewatcher": {
         "label": "",
-        "desc": ""
+        "desc": "Voltar aos seus favoritos."
       },
       "sampler": {
         "label": "",
