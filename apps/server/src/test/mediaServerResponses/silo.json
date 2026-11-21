@@ -1,0 +1,800 @@
+{
+  "systemInfo": {
+    "server_version": "28dd1484",
+    "api_major": 2,
+    "contract_digest": "e46b277c286b44ab5d0c0b5bb292e7d9c675a3cf4235ef6ac8e2b51716b1445c",
+    "links": {
+      "openapi": "/api/v2/openapi.json",
+      "capabilities": "/api/v2/capabilities",
+      "identity": "/api/v2/system/identity"
+    },
+    "request_origin": "http://silo.local:8090"
+  },
+  "identity": {
+    "server_id": "6a0f3e1c-9b7d-4c52-8e14-2d5f7a9b0c31"
+  },
+  "users": {
+    "items": [
+      {
+        "id": "1",
+        "username": "silo-owner",
+        "email": "owner@example.com",
+        "role": "admin",
+        "permissions": [],
+        "enabled": true,
+        "library_ids": null,
+        "max_playback_quality": null,
+        "max_streams": null,
+        "max_transcodes": null,
+        "max_remote_stream_bitrate_kbps": null,
+        "max_local_stream_bitrate_kbps": null,
+        "transcode_allowed": null,
+        "audio_transcode_allowed": null,
+        "max_profiles": null,
+        "download_allowed": null,
+        "download_transcode_allowed": null,
+        "requests_allowed": null,
+        "access_group_id": null,
+        "password_login": true,
+        "password_change_required": false,
+        "is_owner": true,
+        "break_glass": true,
+        "effective_policy": {
+          "library_ids": null,
+          "max_playback_quality": "",
+          "max_streams": 0,
+          "max_transcodes": 0,
+          "max_remote_stream_bitrate_kbps": 0,
+          "max_local_stream_bitrate_kbps": 0,
+          "max_profiles": 5,
+          "transcode_allowed": true,
+          "audio_transcode_allowed": true,
+          "download_allowed": true,
+          "download_transcode_allowed": true,
+          "requests_allowed": true,
+          "permissions": []
+        },
+        "created_at": "2026-11-19T00:54:17.543Z",
+        "updated_at": "2026-11-19T00:54:17.543Z",
+        "last_active_at": "2026-11-21T02:06:10.413Z"
+      },
+      {
+        "id": "34",
+        "username": "viewer",
+        "email": "viewer@example.com",
+        "role": "user",
+        "permissions": [
+          "marker_edit"
+        ],
+        "enabled": true,
+        "library_ids": [
+          "1",
+          "2"
+        ],
+        "max_playback_quality": null,
+        "max_streams": null,
+        "max_transcodes": null,
+        "max_remote_stream_bitrate_kbps": null,
+        "max_local_stream_bitrate_kbps": null,
+        "transcode_allowed": null,
+        "audio_transcode_allowed": null,
+        "max_profiles": null,
+        "download_allowed": null,
+        "download_transcode_allowed": null,
+        "requests_allowed": null,
+        "access_group_id": "1",
+        "password_login": true,
+        "password_change_required": false,
+        "is_owner": false,
+        "break_glass": false,
+        "effective_policy": {
+          "library_ids": [
+            "1",
+            "2"
+          ],
+          "max_playback_quality": "",
+          "max_streams": 5,
+          "max_transcodes": 5,
+          "max_remote_stream_bitrate_kbps": 0,
+          "max_local_stream_bitrate_kbps": 0,
+          "max_profiles": 5,
+          "transcode_allowed": true,
+          "audio_transcode_allowed": true,
+          "download_allowed": true,
+          "download_transcode_allowed": false,
+          "requests_allowed": true,
+          "permissions": [
+            "marker_edit"
+          ]
+        },
+        "created_at": "2026-11-19T01:12:31.344Z",
+        "updated_at": "2026-11-19T01:12:31.344Z",
+        "last_active_at": "2026-11-20T18:35:36.063Z"
+      }
+    ],
+    "page": {
+      "has_more": false
+    }
+  },
+  "devices": {
+    "items": [
+      {
+        "user_id": "1",
+        "username": "silo-owner",
+        "email": "owner@example.com",
+        "device_id": "687aadc1-a475-43ed-925f-2686bbabe78c",
+        "device_name": "Firefox on macOS",
+        "device_platform": "macOS Web",
+        "override_count": 0,
+        "profile_count": 1,
+        "profiles": [
+          {
+            "profile_id": "8581c93e-0798-41e4-ba29-cb7cf3acced0",
+            "profile_name": "silo-owner",
+            "override_count": 0,
+            "last_updated": "2026-11-20T14:56:14.539Z"
+          }
+        ],
+        "last_updated": "2026-11-20T14:56:14.539Z"
+      },
+      {
+        "user_id": "1",
+        "username": "silo-owner",
+        "email": "owner@example.com",
+        "device_id": "4f98f687-2530-48a0-a496-cf48909a23ed",
+        "device_name": "Firefox on macOS",
+        "device_platform": "macOS Web",
+        "override_count": 1,
+        "profile_count": 1,
+        "profiles": [
+          {
+            "profile_id": "8581c93e-0798-41e4-ba29-cb7cf3acced0",
+            "profile_name": "silo-owner",
+            "override_count": 1,
+            "last_updated": "2026-11-19T23:29:16.142Z"
+          }
+        ],
+        "last_updated": "2026-11-19T23:29:16.142Z"
+      },
+      {
+        "user_id": "1",
+        "username": "silo-owner",
+        "email": "owner@example.com",
+        "device_id": "aef454b9-44e6-412f-913b-3e3a5eb0dbee",
+        "device_name": "iPhone",
+        "device_platform": "iOS",
+        "override_count": 0,
+        "profile_count": 1,
+        "profiles": [
+          {
+            "profile_id": "8581c93e-0798-41e4-ba29-cb7cf3acced0",
+            "profile_name": "silo-owner",
+            "override_count": 0,
+            "last_updated": "2026-11-19T23:02:15.825Z"
+          }
+        ],
+        "last_updated": "2026-11-19T23:02:15.825Z"
+      },
+      {
+        "user_id": "34",
+        "username": "viewer",
+        "email": "viewer@example.com",
+        "device_id": "4f98f687-2530-48a0-a496-cf48909a23ed",
+        "device_name": "Firefox on macOS",
+        "device_platform": "macOS Web",
+        "override_count": 0,
+        "profile_count": 1,
+        "profiles": [
+          {
+            "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+            "profile_name": "Viewer",
+            "override_count": 0,
+            "last_updated": "2026-11-19T01:15:27.809Z"
+          }
+        ],
+        "last_updated": "2026-11-19T01:15:27.809Z"
+      },
+      {
+        "user_id": "34",
+        "username": "viewer",
+        "email": "viewer@example.com",
+        "device_id": "aef454b9-44e6-412f-913b-3e3a5eb0dbee",
+        "device_name": "iPhone",
+        "device_platform": "iOS",
+        "override_count": 0,
+        "profile_count": 2,
+        "profiles": [
+          {
+            "profile_id": "2770043c-2cab-4bb2-a860-6991aa254f29",
+            "profile_name": "Kid",
+            "override_count": 0,
+            "last_updated": "2026-11-19T01:14:48.513Z"
+          },
+          {
+            "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+            "profile_name": "Viewer",
+            "override_count": 0,
+            "last_updated": "2026-11-19T01:13:46.904Z"
+          }
+        ],
+        "last_updated": "2026-11-19T01:14:48.513Z"
+      }
+    ],
+    "page": {
+      "has_more": false
+    }
+  },
+  "profiles": {
+    "1": {
+      "items": [
+        {
+          "id": "8581c93e-0798-41e4-ba29-cb7cf3acced0",
+          "name": "silo-owner",
+          "avatar": "",
+          "avatar_source": "none",
+          "has_pin": false,
+          "is_primary": true,
+          "is_child": false,
+          "last_seen_at": "2026-11-20T14:56:14.539Z"
+        }
+      ],
+      "page": {
+        "has_more": false
+      }
+    },
+    "34": {
+      "items": [
+        {
+          "id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+          "name": "Viewer",
+          "avatar": "",
+          "avatar_source": "none",
+          "has_pin": false,
+          "is_primary": true,
+          "is_child": false,
+          "last_seen_at": "2026-11-19T01:15:27.809Z"
+        },
+        {
+          "id": "2770043c-2cab-4bb2-a860-6991aa254f29",
+          "name": "Kid",
+          "avatar": "",
+          "avatar_source": "none",
+          "has_pin": false,
+          "is_primary": false,
+          "is_child": false,
+          "last_seen_at": "2026-11-19T01:14:48.513Z"
+        }
+      ],
+      "page": {
+        "has_more": false
+      }
+    }
+  },
+  "libraries": {
+    "items": [
+      {
+        "id": "1",
+        "name": "Movies",
+        "type": "movies",
+        "sort_order": 1,
+        "box_sets_enabled": false
+      },
+      {
+        "id": "2",
+        "name": "TV",
+        "type": "series",
+        "sort_order": 2,
+        "box_sets_enabled": false
+      },
+      {
+        "id": "3",
+        "name": "Books",
+        "type": "mixed",
+        "sort_order": 3,
+        "box_sets_enabled": false
+      }
+    ]
+  },
+  "catalog": {
+    "1": {
+      "items": [
+        {
+          "content_id": "movie-imdb-tt0038650",
+          "type": "movie",
+          "title": "It's a Wonderful Life",
+          "year": 1946,
+          "status": "matched",
+          "imdb_id": "tt0038650",
+          "tmdb_id": "1585",
+          "library_ids": [
+            "1"
+          ],
+          "added_at": "2026-11-19T00:57:21.708Z",
+          "versions": [
+            {
+              "file_id": "615",
+              "library_id": "1",
+              "resolution": "2160p",
+              "codec_video": "hevc",
+              "dynamic_range": "dolby_vision",
+              "codec_audio": "flac",
+              "audio_channels": 2,
+              "atmos": false,
+              "container": "mkv",
+              "bitrate_kbps": 51176,
+              "file_size": 50104359697
+            }
+          ],
+          "genres": [
+            "Drama",
+            "Family",
+            "Fantasy"
+          ],
+          "content_rating": "PG",
+          "studios": [
+            "Liberty Films"
+          ],
+          "rating_tmdb": 8.279,
+          "release_date": "1946-12-20",
+          "poster_url": "/api/v2/artwork/tmdb/movies/1585/poster/w300.c13b52d2fad9fb7f5692cf54221568d61d7178b76361b3cc530f6c9ed10e3bbd.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
+        },
+        {
+          "content_id": "movie-imdb-tt0042332",
+          "type": "movie",
+          "title": "Cinderella",
+          "year": 1950,
+          "status": "matched",
+          "imdb_id": "tt0042332",
+          "tmdb_id": "11224",
+          "library_ids": [
+            "1"
+          ],
+          "added_at": "2026-11-19T00:56:47.022Z",
+          "versions": [
+            {
+              "file_id": "265",
+              "library_id": "1",
+              "resolution": "2160p",
+              "codec_video": "hevc",
+              "dynamic_range": "dolby_vision",
+              "codec_audio": "dts",
+              "audio_channels": 6,
+              "atmos": false,
+              "container": "mkv",
+              "bitrate_kbps": 95378,
+              "file_size": 53267869202
+            }
+          ],
+          "genres": [
+            "Family",
+            "Fantasy",
+            "Animation",
+            "Romance"
+          ],
+          "content_rating": "G",
+          "studios": [
+            "Walt Disney Productions"
+          ],
+          "rating_tmdb": 7.1,
+          "release_date": "1950-02-22",
+          "poster_url": "/api/v2/artwork/tmdb/movies/11224/poster/w300.930176b82fc64555923a9b0f129e872aa6eef06204023dd1737c0f2347786ef9.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
+        },
+        {
+          "content_id": "movie-imdb-tt0047396",
+          "type": "movie",
+          "title": "Rear Window",
+          "year": 1954,
+          "status": "matched",
+          "imdb_id": "tt0047396",
+          "tmdb_id": "567",
+          "library_ids": [
+            "1"
+          ],
+          "added_at": "2026-11-19T00:57:58.424Z",
+          "versions": [
+            {
+              "file_id": "981",
+              "library_id": "1",
+              "resolution": "2160p",
+              "codec_video": "hevc",
+              "dynamic_range": "hdr10",
+              "codec_audio": "dts",
+              "audio_channels": 2,
+              "atmos": false,
+              "container": "mkv",
+              "bitrate_kbps": 93664,
+              "file_size": 78998486110
+            }
+          ],
+          "genres": [
+            "Thriller",
+            "Mystery",
+            "Drama"
+          ],
+          "content_rating": "PG",
+          "studios": [
+            "Alfred J. Hitchcock Productions"
+          ],
+          "rating_tmdb": 8.332,
+          "release_date": "1954-08-01",
+          "poster_url": "/api/v2/artwork/tmdb/movies/567/poster/w300.a76f77e38cfb4ed88f13cb0463f3449f05bb6f6203bc1f7c3ae3d88bf473c860.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
+        }
+      ],
+      "page": {
+        "has_more": false
+      }
+    },
+    "2": {
+      "items": [
+        {
+          "content_id": "episode-imdb-tt0052520-1-1",
+          "type": "episode",
+          "title": "Where Is Everybody?",
+          "year": 1959,
+          "tmdb_id": "374331",
+          "tvdb_id": "119249",
+          "series_id": "series-imdb-tt0052520",
+          "series_title": "The Twilight Zone",
+          "season_number": 1,
+          "episode_number": 1,
+          "library_ids": [
+            "2"
+          ],
+          "added_at": "2026-11-19T01:06:08.996Z",
+          "versions": [
+            {
+              "file_id": "9271",
+              "library_id": "2",
+              "resolution": "1080p",
+              "codec_video": "h264",
+              "dynamic_range": "sdr",
+              "codec_audio": "eac3",
+              "audio_channels": 6,
+              "atmos": false,
+              "container": "mkv",
+              "bitrate_kbps": 7160,
+              "file_size": 2980818841
+            }
+          ],
+          "air_date": "1959-10-02",
+          "poster_url": "/api/v2/artwork/tvdb/series/73587/poster/w300.22e49aae7e616c02a5d401f861ed5d6a8774edfcdadd186393b7efe7463bd417.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
+        },
+        {
+          "content_id": "episode-imdb-tt0052520-1-12",
+          "type": "episode",
+          "title": "What You Need",
+          "year": 1959,
+          "tmdb_id": "374505",
+          "tvdb_id": "119260",
+          "series_id": "series-imdb-tt0052520",
+          "series_title": "The Twilight Zone",
+          "season_number": 1,
+          "episode_number": 12,
+          "library_ids": [
+            "2"
+          ],
+          "added_at": "2026-11-19T01:06:09.150Z",
+          "versions": [
+            {
+              "file_id": "9278",
+              "library_id": "2",
+              "resolution": "480p",
+              "codec_video": "mpeg4",
+              "dynamic_range": "sdr",
+              "codec_audio": "mp3",
+              "audio_channels": 1,
+              "atmos": false,
+              "container": "avi",
+              "bitrate_kbps": 924,
+              "file_size": 173227468
+            }
+          ],
+          "air_date": "1959-12-25",
+          "poster_url": "/api/v2/artwork/tvdb/series/73587/poster/w300.22e49aae7e616c02a5d401f861ed5d6a8774edfcdadd186393b7efe7463bd417.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
+        },
+        {
+          "content_id": "episode-imdb-tt0103359-1-1",
+          "type": "episode",
+          "title": "The Cat and the Claw (1)",
+          "year": 1992,
+          "tmdb_id": "146380",
+          "tvdb_id": "184996",
+          "series_id": "series-imdb-tt0103359",
+          "series_title": "Batman: The Animated Series",
+          "season_number": 1,
+          "episode_number": 1,
+          "library_ids": [
+            "2"
+          ],
+          "added_at": "2026-11-19T01:01:40.707Z",
+          "versions": [
+            {
+              "file_id": "3693",
+              "library_id": "2",
+              "resolution": "1080p",
+              "codec_video": "h264",
+              "dynamic_range": "sdr",
+              "codec_audio": "eac3",
+              "audio_channels": 2,
+              "atmos": false,
+              "container": "mkv",
+              "bitrate_kbps": 6744,
+              "file_size": 1128076134
+            }
+          ],
+          "air_date": "1992-09-05",
+          "poster_url": "/api/v2/artwork/tvdb/series/76168/poster/w300.02eb317bc60b7d78c46be2a407c3d5ede821a7185ecbaef77a1c67dcc72c16e6.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
+        },
+        {
+          "content_id": "series-imdb-tt0052520",
+          "type": "series",
+          "title": "The Twilight Zone",
+          "year": 1959,
+          "status": "matched",
+          "imdb_id": "tt0052520",
+          "tmdb_id": "6357",
+          "tvdb_id": "73587",
+          "library_ids": [
+            "2"
+          ],
+          "added_at": "2026-11-19T01:06:20.788Z",
+          "versions": [],
+          "genres": [
+            "Science Fiction",
+            "Horror",
+            "Fantasy",
+            "Drama",
+            "Suspense",
+            "Thriller",
+            "Mystery"
+          ],
+          "content_rating": "TV-PG",
+          "studios": [
+            "Cayuga Productions",
+            "CBS"
+          ],
+          "networks": [
+            "CBS"
+          ],
+          "rating_tmdb": 8.513,
+          "first_air_date": "1959-10-02",
+          "last_air_date": "1964-06-19",
+          "poster_url": "/api/v2/artwork/tvdb/series/73587/poster/w300.22e49aae7e616c02a5d401f861ed5d6a8774edfcdadd186393b7efe7463bd417.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
+        },
+        {
+          "content_id": "series-imdb-tt0103359",
+          "type": "series",
+          "title": "Batman: The Animated Series",
+          "year": 1992,
+          "status": "matched",
+          "imdb_id": "tt0103359",
+          "tmdb_id": "2098",
+          "tvdb_id": "76168",
+          "library_ids": [
+            "2"
+          ],
+          "added_at": "2026-11-19T01:02:42.225Z",
+          "versions": [],
+          "genres": [
+            "Science Fiction",
+            "Family",
+            "Crime",
+            "Animation",
+            "Adventure",
+            "Action",
+            "Thriller",
+            "Mystery"
+          ],
+          "content_rating": "TV-PG",
+          "studios": [
+            "DC",
+            "Warner Bros. Television"
+          ],
+          "networks": [
+            "FOX",
+            "Fox Kids"
+          ],
+          "rating_tmdb": 8.592,
+          "first_air_date": "1992-09-05",
+          "last_air_date": "1995-09-15",
+          "poster_url": "/api/v2/artwork/tvdb/series/76168/poster/w300.02eb317bc60b7d78c46be2a407c3d5ede821a7185ecbaef77a1c67dcc72c16e6.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
+        }
+      ],
+      "page": {
+        "has_more": false
+      }
+    }
+  },
+  "episodePoster": {
+    "items": [
+      {
+        "content_id": "episode-imdb-tt0052520-1-1",
+        "type": "episode",
+        "title": "Where Is Everybody?",
+        "year": 1959,
+        "tmdb_id": "374331",
+        "tvdb_id": "119249",
+        "series_id": "series-imdb-tt0052520",
+        "series_title": "The Twilight Zone",
+        "season_number": 1,
+        "episode_number": 1,
+        "library_ids": [
+          "2"
+        ],
+        "added_at": "2026-11-19T01:06:08.996Z",
+        "versions": [
+          {
+            "file_id": "9271",
+            "library_id": "2",
+            "resolution": "1080p",
+            "codec_video": "h264",
+            "dynamic_range": "sdr",
+            "codec_audio": "eac3",
+            "audio_channels": 6,
+            "atmos": false,
+            "container": "mkv",
+            "bitrate_kbps": 7160,
+            "file_size": 2980818841
+          }
+        ],
+        "air_date": "1959-10-02",
+        "poster_url": "/api/v2/artwork/tvdb/series/73587/poster/w300.22e49aae7e616c02a5d401f861ed5d6a8774edfcdadd186393b7efe7463bd417.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
+      }
+    ],
+    "page": {
+      "has_more": false
+    }
+  },
+  "sessions": {
+    "items": [
+      {
+        "session_id": "2e64135f-a235-4b3c-b722-ab103395de87",
+        "user_id": "1",
+        "username": "silo-owner",
+        "profile_id": "8581c93e-0798-41e4-ba29-cb7cf3acced0",
+        "profile_name": "silo-owner",
+        "media_file_id": "1404",
+        "requested_media_file_id": "1404",
+        "media_item_id": "movie-imdb-tt33764258",
+        "media_title": "The Odyssey",
+        "media_type": "movie",
+        "poster_url": "/api/v2/artwork/tmdb/movies/1368337/poster/w300.200475196580003a17cdfe2a5f5452208ae0a2c2ece48fba60ca08333146727b.webp?exp=1795147200&sig=Zml4dHVyZS1zaWduYXR1cg",
+        "play_method": "remux",
+        "reporting_node": "f0239f7f96a7",
+        "node_display_name": "Local server",
+        "file_duration": 10355,
+        "started_at": "2026-11-19T22:21:52.895Z",
+        "updated_at": "2026-11-19T22:21:52.977Z",
+        "position_seconds": 2568.5064159999997,
+        "is_paused": false,
+        "has_playback_control": false,
+        "client_ip": "192.168.1.50",
+        "stream_location": "local",
+        "client_name": "Silo Web",
+        "client_version": "0.0.1",
+        "client_label": "Silo Web 0.0.1",
+        "client_user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:160.0) Gecko/20100101 Firefox/160.0",
+        "device_id": "4f98f687-2530-48a0-a496-cf48909a23ed",
+        "device_platform": "macOS Web",
+        "audio_track_index": 0,
+        "transcode_audio": true,
+        "stream_bitrate_kbps": 68232,
+        "target_audio_codec": "aac",
+        "target_audio_channels": 2,
+        "target_bitrate_kbps": null,
+        "output_container": "fmp4",
+        "output_protocol": "http",
+        "source_container": "mkv",
+        "source_bitrate_kbps": 68232,
+        "source_video_codec": "hevc",
+        "source_video_resolution": "2160p",
+        "source_video_height": 2160,
+        "source_audio_codec": "dts",
+        "source_audio_channels": 6,
+        "source_audio_language": "en",
+        "source_audio_title": "Original 5.1 Surround Mix",
+        "source_audio_layout": "5.1(side)",
+        "requested_video_codec": "hevc",
+        "requested_video_resolution": "2160p",
+        "video_decision": "remux",
+        "audio_decision": "transcode",
+        "effective_play_method": "direct_stream",
+        "adaptation_reasons": [
+          "dynamic_range_unsupported",
+          "audio_codec_unsupported",
+          "container_unsupported"
+        ],
+        "routing_network_provider": "",
+        "routing_workload": "remux",
+        "routing_execution": "api",
+        "routing_egress": "api",
+        "subtitle": {
+          "track_id": "file:1404:subtitle:0",
+          "language": "en-US",
+          "codec": "subrip",
+          "format": "vtt",
+          "source": "embedded",
+          "delivery": "sidecar",
+          "forced": false,
+          "hearing_impaired": false
+        },
+        "lifecycle_seq": 35
+      },
+      {
+        "session_id": "f3ce3512-e1a7-4855-a9f7-e5c022248eea",
+        "user_id": "1",
+        "username": "silo-owner",
+        "profile_id": "8581c93e-0798-41e4-ba29-cb7cf3acced0",
+        "profile_name": "silo-owner",
+        "media_file_id": "5925",
+        "requested_media_file_id": "5925",
+        "media_item_id": "episode-imdb-tt31510819-1-1",
+        "media_title": "Stick or Twist",
+        "media_type": "episode",
+        "series_title": "MobLand",
+        "season_number": 1,
+        "episode_number": 1,
+        "poster_url": "/api/v2/artwork/tvdb/series/446831/poster/w300.8ca719eb62703cb1e5f46090e8d20cc8c7b9941173d0992d0e6b54b8a8b1b8a6.webp?exp=1795147200&sig=Zml4dHVyZS1zaWduYXR1cg",
+        "play_method": "transcode",
+        "reporting_node": "f0239f7f96a7",
+        "node_display_name": "Local server",
+        "file_duration": 3558,
+        "started_at": "2026-11-19T23:01:46.858Z",
+        "updated_at": "2026-11-19T23:01:47.486Z",
+        "position_seconds": 0,
+        "is_paused": false,
+        "has_playback_control": false,
+        "client_ip": "203.0.113.24",
+        "stream_location": "remote",
+        "client_name": "Silo iPhone",
+        "client_version": "1.1.0",
+        "client_build": "74",
+        "client_channel": "release",
+        "client_label": "Silo iPhone 1.1.0",
+        "client_label_full": "Silo iPhone 1.1.0 (build 74)",
+        "client_user_agent": "Silo/74 CFNetwork/3896.300.71.2.4 Darwin/27.3.0",
+        "device_id": "aef454b9-44e6-412f-913b-3e3a5eb0dbee",
+        "device_platform": "iOS",
+        "audio_track_index": 0,
+        "transcode_audio": true,
+        "stream_bitrate_kbps": 2000,
+        "target_resolution": "720p",
+        "target_video_codec": "h264",
+        "target_audio_codec": "aac",
+        "target_audio_channels": 6,
+        "target_bitrate_kbps": 2000,
+        "transcode_hw_accel": "qsv",
+        "tone_map_mode": "hardware",
+        "output_container": "mpegts",
+        "output_protocol": "hls",
+        "source_container": "mkv",
+        "source_bitrate_kbps": 14608,
+        "source_video_codec": "hevc",
+        "source_video_resolution": "2160p",
+        "source_video_height": 2160,
+        "source_audio_codec": "eac3",
+        "source_audio_channels": 6,
+        "source_audio_language": "en",
+        "source_audio_title": "ATSC A/52B (AC-3, E-AC-3)",
+        "source_audio_layout": "5.1(side)",
+        "requested_video_codec": "hevc",
+        "requested_video_resolution": "2160p",
+        "video_decision": "transcode",
+        "audio_decision": "transcode",
+        "effective_play_method": "transcode",
+        "adaptation_reasons": [
+          "quality_selected"
+        ],
+        "routing_network_provider": "",
+        "routing_workload": "video_transcode",
+        "routing_execution": "api",
+        "routing_egress": "api",
+        "subtitle": null,
+        "lifecycle_seq": 43
+      }
+    ],
+    "page": {
+      "has_more": false
+    }
+  }
+}
