@@ -32,13 +32,11 @@ vi.mock('../../utils/crypto.js', () => ({
   decrypt: vi.fn((token: string) => token.replace('encrypted_', '')),
 }));
 
-const { mockTofaIdentity } = vi.hoisted(() => ({ mockTofaIdentity: vi.fn() }));
+const { mockServerIdentity } = vi.hoisted(() => ({ mockServerIdentity: vi.fn() }));
 
 vi.mock('../../services/mediaServer/index.js', () => ({
   verifyServerAdmin: vi.fn(),
-  TofaClient: class {
-    getServerIdentity = mockTofaIdentity;
-  },
+  createMediaServerClient: () => ({ getServerIdentity: mockServerIdentity }),
   PlexClient: {
     getAccountInfo: vi.fn(),
     AdminVerifyError: {
@@ -608,7 +606,7 @@ describe('Server Routes', () => {
             : { version: '0.13.2' }
         )
       );
-      mockTofaIdentity.mockResolvedValueOnce('tofa-server-1');
+      mockServerIdentity.mockResolvedValueOnce('tofa-server-1');
       let selectCall = 0;
       vi.mocked(db.select).mockImplementation(() => {
         selectCall++;
@@ -650,7 +648,7 @@ describe('Server Routes', () => {
             : { version: '0.13.2' }
         )
       );
-      mockTofaIdentity.mockResolvedValueOnce('tofa-server-1');
+      mockServerIdentity.mockResolvedValueOnce('tofa-server-1');
       const byUrl = vi
         .fn()
         .mockResolvedValueOnce([])
@@ -669,6 +667,91 @@ describe('Server Routes', () => {
           type: 'tofa',
           url: 'http://192.168.1.20:33333',
           token: 'tofa_3b9e1c7a5d2f8e4b',
+        },
+      });
+
+      expect(response.statusCode).toBe(409);
+      expect(response.json().message).toBe('This server is already connected');
+      expect(db.insert).not.toHaveBeenCalled();
+    });
+
+    it('adds a Silo server by a pasted key and stores the identity it reports', async () => {
+      app = await buildTestApp(ownerUser);
+      mockServerIdentity.mockResolvedValueOnce('6a0f3e1c-9b7d-4c52-8e14-2d5f7a9b0c31');
+      let selectCall = 0;
+      vi.mocked(db.select).mockImplementation(() => {
+        selectCall++;
+        const chain = {
+          from: vi.fn().mockReturnThis(),
+          where: vi.fn().mockReturnThis(),
+          limit: vi.fn().mockResolvedValue([]),
+        };
+        if (selectCall === 3) {
+          chain.from = vi.fn().mockResolvedValue([]);
+        }
+        return chain as never;
+      });
+      const insert = mockDbInsert([{ ...mockServer, id: randomUUID(), type: 'silo' }]);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/servers',
+        payload: { name: 'Silo', type: 'silo', url: 'http://silo.local:8090', token: 'silo-key' },
+      });
+
+      expect(response.statusCode).toBe(201);
+      expect(verifyServerAdmin).toHaveBeenCalledWith('silo', 'silo-key', 'http://silo.local:8090');
+      expect(insert.values).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'silo',
+          machineIdentifier: '6a0f3e1c-9b7d-4c52-8e14-2d5f7a9b0c31',
+        })
+      );
+    });
+
+    it('refuses a Silo key without the scopes Tracearr needs', async () => {
+      app = await buildTestApp(ownerUser);
+      const message =
+        'This Silo API key lacks a scope Tracearr needs. Create a key with admin:monitor:read, admin:sessions:control and libraries:read.';
+      vi.mocked(verifyServerAdmin).mockResolvedValueOnce({
+        success: false,
+        code: 'MISSING_SCOPES',
+        message,
+      });
+      mockDbSelectLimit([]);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/servers',
+        payload: { name: 'Silo', type: 'silo', url: 'http://silo.local:8090', token: 'silo-key' },
+      });
+
+      expect(response.statusCode).toBe(403);
+      expect(response.json().message).toBe(message);
+      expect(db.insert).not.toHaveBeenCalled();
+    });
+
+    it('refuses a Silo server already connected at another address', async () => {
+      app = await buildTestApp(ownerUser);
+      mockServerIdentity.mockResolvedValueOnce('6a0f3e1c-9b7d-4c52-8e14-2d5f7a9b0c31');
+      const byUrl = vi
+        .fn()
+        .mockResolvedValueOnce([])
+        .mockResolvedValueOnce([{ id: mockServer.id }]);
+      vi.mocked(db.select).mockReturnValue({
+        from: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        limit: byUrl,
+      } as never);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/servers',
+        payload: {
+          name: 'Silo',
+          type: 'silo',
+          url: 'http://192.168.1.20:8090',
+          token: 'silo-key',
         },
       });
 

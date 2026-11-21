@@ -1,5 +1,5 @@
 /**
- * Server management routes - CRUD for Plex/Jellyfin/Emby/tofa servers
+ * Server management routes - CRUD for media servers
  */
 
 import type { FastifyPluginAsync, FastifyReply } from 'fastify';
@@ -29,7 +29,7 @@ import { revokeUnlessStillIn } from '../lib/revoke.js';
 import {
   PlexClient,
   JellyfinClient,
-  TofaClient,
+  createMediaServerClient,
   verifyServerAdmin,
 } from '../services/mediaServer/index.js';
 import { readServerFacts } from '../services/mediaServer/byServerType.js';
@@ -60,7 +60,8 @@ async function ownerLockout(change: ServerAccountChange): Promise<string | null>
   }
 }
 
-// Plex never reports INVALID_KEY, so one mapping serves all three server types.
+// One mapping serves every server type: Plex never reports INVALID_KEY, and the codes no
+// mapping names (NOT_ADMIN, Silo's MISSING_SCOPES) answer 403 with the server's message.
 function replyAdminCheckFailure(reply: FastifyReply, check: { code: string; message: string }) {
   if (check.code === JellyfinClient.AdminVerifyError.CONNECTION_FAILED) {
     return reply.serviceUnavailable(check.message);
@@ -209,13 +210,18 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         }
         break;
       case 'tofa':
-        // Stored now, so tofa cloud's Add server already knows the server is connected.
+      case 'silo':
+        // Stored now because tofa cloud's Add server reads it, and either server may already
+        // be connected at another address; both report the same identity at every address.
         try {
-          machineIdentifier = await new TofaClient({ url, token }).getServerIdentity();
+          machineIdentifier = await createMediaServerClient({
+            type,
+            url,
+            token,
+          }).getServerIdentity();
         } catch {
-          app.log.debug('Could not read the tofa server identity at creation time');
+          app.log.debug({ type }, 'Could not read the server identity at creation time');
         }
-        // tofa cloud may have connected the same server at another address
         if (machineIdentifier) {
           const [connected] = await db
             .select({ id: servers.id })
@@ -227,7 +233,6 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         break;
       case 'jellyfin':
       case 'emby':
-      case 'silo':
         break;
       default:
         assertNever(type);

@@ -10,9 +10,10 @@ import type {
   TofaImportProgress,
   TofaImportResult,
 } from '@tracearr/shared';
+import { resources } from '@tracearr/translations';
 import { api } from '@/lib/api';
 import { AddServerDialog } from './AddServerDialog';
-import type { AddServerForm } from './useAddServer';
+import { useAddServer, type AddServerForm } from './useAddServer';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -27,12 +28,16 @@ const servers = [
 
 vi.mock('@/hooks/queries', () => ({
   usePlexAccounts: () => ({ data: { accounts: [], clientIdentifier: 'client-1' } }),
-  useServers: () => ({ data: servers, isLoading: false }),
+  useServers: () => ({ data: servers, isLoading: false, refetch: vi.fn() }),
   useSettings: () => ({ data: {}, isLoading: false }),
   useUpdateSettings: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
 vi.mock('@/hooks/useSocket', () => ({ useSocket: () => ({ socket: null }) }));
+
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'owner' }, refetch: vi.fn() }),
+}));
 
 vi.mock('@/lib/api', () => {
   const importer = () => ({
@@ -42,6 +47,7 @@ vi.mock('@/lib/api', () => {
   });
   return {
     api: {
+      servers: { create: vi.fn() },
       import: {
         tautulli: importer(),
         jellystat: importer(),
@@ -127,6 +133,11 @@ function renderImportStep(id: string, type: ServerType) {
     ),
   });
   return dialog;
+}
+
+function AddServerFromList({ onAdded }: { onAdded: (server: { id: string }) => void }) {
+  const form = useAddServer({ onAdded });
+  return <AddServerDialog open onOpenChange={vi.fn()} form={form} />;
 }
 
 describe('AddServerDialog', () => {
@@ -227,6 +238,50 @@ describe('AddServerDialog', () => {
     expect(screen.getByText('servers.apiKeyHelpTofa')).toBeInTheDocument();
     expect(screen.queryByLabelText('servers.publicUrl')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'servers.connectServer' })).toBeInTheDocument();
+  });
+
+  it('asks Silo for its address, public address, name and an API key with the scopes it needs', () => {
+    render(<AddServerDialog {...props({ serverType: 'silo' })} />);
+
+    expect(screen.getByLabelText('servers.serverUrl')).toHaveAttribute(
+      'placeholder',
+      'servers.serverUrlPlaceholderSilo'
+    );
+    expect(screen.getByLabelText('servers.publicUrl')).toBeInTheDocument();
+    expect(screen.getByLabelText('servers.serverName')).toBeInTheDocument();
+    expect(screen.getByLabelText('common:labels.apiKey')).toBeInTheDocument();
+    expect(screen.getByText('servers.apiKeyHelpSilo')).toBeInTheDocument();
+
+    const english = resources.en.settings.servers;
+    expect(english.serverUrlPlaceholderSilo).toBe('http://192.168.1.100:8090');
+    for (const scope of ['admin:monitor:read', 'admin:sessions:control', 'libraries:read']) {
+      expect(english.apiKeyHelpSilo).toContain(scope);
+    }
+  });
+
+  it('adds a Silo server through the server list with the pasted key', async () => {
+    vi.mocked(api.servers.create).mockResolvedValueOnce({ id: 'silo-1', type: 'silo' } as never);
+    const onAdded = vi.fn();
+    render(<AddServerFromList onAdded={onAdded} />, {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
+      ),
+    });
+
+    await userEvent.click(screen.getByRole('combobox', { name: 'servers.serverType' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Silo' }));
+    await userEvent.type(screen.getByLabelText('servers.serverUrl'), 'http://192.168.1.30:8090');
+    await userEvent.type(screen.getByLabelText('servers.serverName'), 'Basement');
+    await userEvent.type(screen.getByLabelText('common:labels.apiKey'), 'silo-key');
+    await userEvent.click(screen.getByRole('button', { name: 'servers.connectServer' }));
+
+    await waitFor(() => expect(onAdded).toHaveBeenCalledWith({ id: 'silo-1', type: 'silo' }));
+    expect(api.servers.create).toHaveBeenCalledWith({
+      name: 'Basement',
+      type: 'silo',
+      url: 'http://192.168.1.30:8090',
+      token: 'silo-key',
+    });
   });
 
   it('says a connected key cannot stop streams and offers only to close', () => {
