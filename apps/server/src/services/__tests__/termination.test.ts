@@ -52,6 +52,7 @@ import {
   fakeEmbyClient,
   fakeJellyfinClient,
   fakePlexClient,
+  fakeSiloClient,
   fakeTofaClient,
 } from '../../test/mediaServerFakes.js';
 
@@ -60,6 +61,7 @@ const fakeClients = {
   jellyfin: fakeJellyfinClient,
   emby: fakeEmbyClient,
   tofa: fakeTofaClient,
+  silo: fakeSiloClient,
 };
 
 // Type for the mock session findFirst function (returns partial session for tests)

@@ -380,6 +380,26 @@ async function syncTofaUsers(
   }
 }
 
+async function syncSiloUsers(
+  serverId: string,
+  serverUrl: string,
+  token: string
+): Promise<UserSyncResult> {
+  try {
+    const client = createMediaServerClient({ type: 'silo', url: serverUrl, token, id: serverId });
+    const users = await client.getUsers();
+    const result = await syncServerUsers(serverId, users);
+    await syncAccountProfiles(
+      serverId,
+      client,
+      users.map((user) => user.id)
+    );
+    return result;
+  } catch (err) {
+    return failedUserSync('Silo', err);
+  }
+}
+
 /** Replaces the saved links of a server's users with the ones it reports now. */
 async function saveAccountLinks(serverId: string, links: TofaLinkedAccount[]): Promise<void> {
   const accounts = await db
@@ -498,6 +518,9 @@ export async function syncServer(
         userResult = { ...users, errors: [...users.errors, ...factErrors] };
         break;
       }
+      case 'silo':
+        userResult = await syncSiloUsers(serverId, serverUrl, token);
+        break;
       default:
         return assertNever(server.type);
     }

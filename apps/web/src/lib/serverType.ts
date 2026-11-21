@@ -5,10 +5,10 @@ export function isJellyfinEmby(type: ServerType): type is JellyfinEmbyServerType
     case 'plex':
       return false;
     case 'jellyfin':
-      return true;
     case 'emby':
       return true;
     case 'tofa':
+    case 'silo':
       return false;
     default:
       return assertNever(type);
@@ -16,7 +16,7 @@ export function isJellyfinEmby(type: ServerType): type is JellyfinEmbyServerType
 }
 
 /** Servers Tracearr reaches with a URL and an API key, whichever way the key was made. */
-export type ApiKeyServerType = Extract<ServerType, 'jellyfin' | 'emby' | 'tofa'>;
+export type ApiKeyServerType = Extract<ServerType, 'jellyfin' | 'emby' | 'tofa' | 'silo'>;
 
 export function holdsApiKey(type: ServerType): type is ApiKeyServerType {
   switch (type) {
@@ -25,6 +25,7 @@ export function holdsApiKey(type: ServerType): type is ApiKeyServerType {
     case 'jellyfin':
     case 'emby':
     case 'tofa':
+    case 'silo':
       return true;
     default:
       return assertNever(type);
@@ -38,6 +39,7 @@ export function addsByApiKey(type: ServerType): boolean {
       return false;
     case 'jellyfin':
     case 'emby':
+    case 'silo':
       return true;
     case 'tofa':
       return false;

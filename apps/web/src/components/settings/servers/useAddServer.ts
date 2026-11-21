@@ -24,9 +24,9 @@ export type AddedServer = Pick<Server, 'id' | 'type'>;
 
 /**
  * The add-server form: a Plex server picked from a linked account, a tofa server picked after
- * signing in to tofa, or a Jellyfin, Emby or tofa server by URL and API key. onAdded runs once a
- * server is in, before the form resets; when the caller has to say first that its key cannot stop
- * streams, it runs on continueAdded instead.
+ * signing in to tofa, or a Jellyfin, Emby, tofa or Silo server by URL and API key. onAdded runs
+ * once a server is in, before the form resets; when the caller has to say first that its key
+ * cannot stop streams, it runs on continueAdded instead.
  */
 export function useAddServer({
   initialType,
@@ -231,6 +231,7 @@ export function useAddServer({
           break;
         }
         case 'tofa':
+        case 'silo':
           server = await api.servers.create({
             name: serverName,
             type: serverType,

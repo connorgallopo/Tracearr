@@ -208,6 +208,7 @@ export const createServerSchema = z
         case 'jellyfin':
         case 'emby':
         case 'tofa':
+        case 'silo':
           return true;
         default:
           return assertNever(data.type);

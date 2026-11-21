@@ -18,6 +18,7 @@ import {
   cursorDate,
   type DownloadSourceDescription,
   type DownloadSourceRequest,
+  type IMediaServerClient,
   type MediaLibrary,
   type MediaLibraryItem,
   type MediaProfile,
@@ -104,7 +105,8 @@ function pageOf(
   return { items: page, totalCount: items.length, rawCount: page.length };
 }
 
-export class SiloClient {
+export class SiloClient implements IMediaServerClient {
+  public readonly serverType = 'silo' as const;
   readonly url: string;
   private readonly token: string;
   /**
@@ -169,7 +171,10 @@ export class SiloClient {
     );
   }
 
-  /** Read again after ten minutes, or sooner when a session names a device the list did not */
+  /**
+   * Read again after ten minutes, or sooner when a session names a device the list did not, but
+   * not within a minute of a failed read
+   */
   private async deviceNames(rows: SiloSession[]): Promise<Map<string, string>> {
     const held = deviceNames.get(this.url);
     const wanted = rows.flatMap((row) => (row.device_id ? [row.device_id] : []));

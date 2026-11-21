@@ -92,6 +92,7 @@ export function canTerminate(
       return !!session.plexSessionId;
     case 'jellyfin':
     case 'emby':
+    case 'silo':
       return true;
     case 'tofa':
       return !session.sessionKey.startsWith(LIVE_VIEWER_PREFIX);

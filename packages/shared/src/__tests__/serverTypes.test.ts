@@ -3,8 +3,8 @@ import { SERVER_TYPES, assertNever, isServerType } from '../index.js';
 import { createServerSchema, serverTypeSchema } from '../schemas.js';
 
 describe('server types', () => {
-  it('keeps the four server types in order', () => {
-    expect(SERVER_TYPES).toEqual(['plex', 'jellyfin', 'emby', 'tofa']);
+  it('keeps the five server types in order', () => {
+    expect(SERVER_TYPES).toEqual(['plex', 'jellyfin', 'emby', 'tofa', 'silo']);
     expect(serverTypeSchema.options).toEqual([...SERVER_TYPES]);
   });
 
@@ -22,6 +22,7 @@ describe('server types', () => {
     ['jellyfin', true],
     ['emby', true],
     ['tofa', true],
+    ['silo', true],
   ] as const)('a %s server accepts a public address: %s', (type, accepted) => {
     const server = { name: 'Den', type, url: 'http://10.0.0.2:8096', token: 'key' };
     expect(createServerSchema.safeParse(server).success).toBe(true);

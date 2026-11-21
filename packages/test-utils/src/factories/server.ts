@@ -26,6 +26,7 @@ const DEFAULT_PORTS: Record<ServerType, number> = {
   jellyfin: 8096,
   emby: 8920,
   tofa: 33333,
+  silo: 8090,
 };
 
 let serverCounter = 0;

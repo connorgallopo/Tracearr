@@ -140,8 +140,10 @@ export function seerrRequesterIdentity(serverType: ServerType): RequesterIdentit
     case 'jellyfin':
     case 'emby':
       return { column: sql`external_id`, key: (r) => r.remoteJellyfinUserId };
-    // request_services is unique per server, so no server with its own requests links to Seerr
+    // A Seerr service links only to the server whose id Seerr reports, and Seerr connects only to
+    // Plex, Jellyfin and Emby, so no Seerr service names a tofa or Silo server
     case 'tofa':
+    case 'silo':
       return BUILT_IN_REQUESTER;
     default:
       return assertNever(serverType);

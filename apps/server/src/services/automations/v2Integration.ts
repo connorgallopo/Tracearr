@@ -216,6 +216,8 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
         }
         case 'tofa':
           throw new Error(TOFA_MESSAGE_UNAVAILABLE);
+        case 'silo':
+          throw new Error('Tracearr sends no messages to Silo players');
         default:
           return assertNever(session.server.type);
       }

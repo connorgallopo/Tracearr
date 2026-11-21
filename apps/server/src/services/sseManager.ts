@@ -314,6 +314,9 @@ export class SSEManager extends EventEmitter {
             await eventSource.connect();
             break;
           }
+          // No socket is opened to Silo, so the connection stays in fallback and the poller covers it
+          case 'silo':
+            break;
           default:
             assertNever(serverType);
         }
@@ -841,6 +844,7 @@ export class SSEManager extends EventEmitter {
     switch (liveEvents) {
       case 'plexWebsocket':
       case 'tofaSocket':
+      case 'siloSocket':
         // Also emit the legacy SSEConnectionStatus event
         this.emit('connection:status', status);
         if (this.cacheService) {

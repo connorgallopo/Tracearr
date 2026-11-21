@@ -216,6 +216,9 @@ async function mediaAccountIsAWayIn(
     case 'jellyfin':
     case 'emby':
       break;
+    // Members cannot sign in through Silo, so no media account names it
+    case 'silo':
+      return false;
     default:
       return assertNever(type);
   }

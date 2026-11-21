@@ -685,6 +685,7 @@ async function findOpenRowForSameContent(
     case 'jellyfin':
     case 'emby':
     case 'tofa':
+    case 'silo':
       return undefined;
     default:
       return assertNever(serverType);
@@ -700,6 +701,7 @@ function fillsInMediaLater(serverType: ServerType): boolean {
     case 'plex':
     case 'jellyfin':
     case 'emby':
+    case 'silo':
       return false;
     case 'tofa':
       return true;
@@ -741,8 +743,8 @@ function noSessionChanges(success: boolean): ServerProcessingResult {
 
 /**
  * Issue #57: Plex keeps a sessionKey across items (e.g. "Play Next Episode"), so a
- * tracked session can change media. JF/Emby key sessions by item. Whether tofa moves a
- * session to the next item is unknown, so a new item under its session id is a new play.
+ * tracked session can change media. JF/Emby key sessions by item. Whether tofa or Silo moves
+ * a session to the next item is unknown, so a new item under its session id is a new play.
  * Normalize '' to null: a row stored during a metadata blip carries an empty
  * ratingKey, which detectMediaChange would otherwise read as a real key and treat
  * the arrival of the true key as a media change.
@@ -755,6 +757,7 @@ function isMediaChange(
   switch (serverType) {
     case 'plex':
     case 'tofa':
+    case 'silo':
       return detectMediaChange(existingRatingKey || null, ratingKey || null);
     case 'jellyfin':
     case 'emby':

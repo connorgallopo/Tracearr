@@ -80,6 +80,8 @@ export function buildMediaServerItemUrl({
       const url = `${TOFA_APP_BASE}/media/${encodeURIComponent(page)}`;
       return query.size > 0 ? `${url}?${query.toString()}` : url;
     }
+    case 'silo':
+      return null;
     default:
       return assertNever(serverType);
   }

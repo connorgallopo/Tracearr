@@ -1,7 +1,8 @@
 /**
  * Media-server versions: what a server reports about itself, what its vendor ships,
  * and which of the two is newer. Every feed is public and read without a token; tofa
- * publishes none, so its servers are asked through their own update check instead.
+ * publishes none, so its servers are asked through their own update check instead. Silo
+ * reports a build hash, which is no version, so its servers have none.
  */
 
 import { assertNever, type ServerType, type JellyfinEmbyServerType } from '@tracearr/shared';
@@ -23,10 +24,11 @@ export const SERVER_RELEASE_PAGES: Record<ServerType, string> = {
   jellyfin: 'https://github.com/jellyfin/jellyfin/releases/latest',
   emby: 'https://github.com/MediaBrowser/Emby.Releases/releases/latest',
   tofa: 'https://docs.tofa.tv/keep-your-server-updated.html',
+  silo: 'https://github.com/Silo-Server/silo-server/releases',
 };
 
 /** Server types whose vendor publishes a release feed. */
-export type FeedServerType = Exclude<ServerType, 'tofa'>;
+export type FeedServerType = Exclude<ServerType, 'tofa' | 'silo'>;
 
 const FEED_TIMEOUT_MS = 10_000;
 // Two to four parts. `compareVersions` only reads three- and four-part versions, so a
@@ -46,6 +48,7 @@ function versionDigits(type: ServerType, version: string): string {
       return version.replace(/^v/, '');
     case 'emby':
     case 'tofa':
+    case 'silo':
       return version;
     default:
       return assertNever(type);

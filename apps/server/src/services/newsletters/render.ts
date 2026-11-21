@@ -83,7 +83,7 @@ export function substitutePosterRefs(
   });
 }
 
-/** Plex and tofa route through their hosted apps; a Jellyfin or Emby link opens on the server itself and needs an address members can reach. */
+/** Plex and tofa route through their hosted apps; a Jellyfin, Emby or Silo link opens on the server itself and needs an address members can reach. */
 function itemLinkBase(type: ServerType, server: ServerLink): string | null {
   switch (type) {
     case 'plex':
@@ -91,6 +91,7 @@ function itemLinkBase(type: ServerType, server: ServerLink): string | null {
       return server.url;
     case 'jellyfin':
     case 'emby':
+    case 'silo':
       return memberFacingUrl(server);
     default:
       return assertNever(type);

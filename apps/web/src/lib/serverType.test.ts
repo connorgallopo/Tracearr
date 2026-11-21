@@ -8,6 +8,7 @@ describe('isJellyfinEmby', () => {
     ['jellyfin', true],
     ['emby', true],
     ['tofa', false],
+    ['silo', false],
   ] as const)('%s is %s', (type, expected) => {
     expect(isJellyfinEmby(type)).toBe(expected);
   });
@@ -25,6 +26,7 @@ describe('holdsApiKey', () => {
     ['jellyfin', true],
     ['emby', true],
     ['tofa', true],
+    ['silo', true],
   ] as const)('%s is %s', (type, expected) => {
     expect(holdsApiKey(type)).toBe(expected);
   });

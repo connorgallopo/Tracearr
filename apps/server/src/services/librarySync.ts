@@ -1524,6 +1524,7 @@ export class LibrarySyncService {
       case 'plex':
       case 'jellyfin':
       case 'emby':
+      case 'silo':
         return { kind: 'date', since: lastSyncedAt };
       case 'tofa': {
         const revision = await redisClient?.get(

@@ -19,11 +19,12 @@ describe('server profiles', () => {
       'Jellyfin',
       'Emby',
       'tofa',
+      'Silo',
     ]);
   });
 
   it('bridges tofa across its idle samples and breaks the others after 15 seconds', () => {
-    expect(SERVER_TYPES.map(liveStatsGapSeconds)).toEqual([15, 15, 15, 35]);
+    expect(SERVER_TYPES.map(liveStatsGapSeconds)).toEqual([15, 15, 15, 35, 15]);
   });
 
   it('only tofa counts a play as watched by its own rule', () => {
@@ -33,8 +34,20 @@ describe('server profiles', () => {
     expect(SERVER_PROFILES.emby.watchedThreshold).toBe('tracearrSetting');
   });
 
-  it('only tofa plays one account under several profiles', () => {
-    expect(SERVER_TYPES.filter((type) => SERVER_PROFILES[type].hasProfiles)).toEqual(['tofa']);
+  it('tofa and Silo play one account under several profiles', () => {
+    expect(SERVER_TYPES.filter((type) => SERVER_PROFILES[type].hasProfiles)).toEqual([
+      'tofa',
+      'silo',
+    ]);
+  });
+
+  it('keeps Silo requests off and adds no Silo history yet', () => {
+    expect(SERVER_PROFILES.silo).toMatchObject({
+      builtInRequests: false,
+      serverHistoryImport: null,
+      hasProfiles: true,
+      itemLinks: 'serverAddress',
+    });
   });
 
   it.each([
@@ -42,6 +55,7 @@ describe('server profiles', () => {
     ['jellyfin', 'ssePlugin', 'ssePlugin', 'username', true],
     ['emby', 'ssePlugin', 'ssePlugin', 'username', true],
     ['tofa', 'tofaSocket', 'tofaMetrics', 'server', true],
+    ['silo', 'siloSocket', 'siloResources', 'server', true],
   ] as const)('%s', (type, liveEvents, hostStats, emailSource, playerName) => {
     expect(SERVER_PROFILES[type]).toMatchObject({
       liveEvents,
@@ -56,6 +70,7 @@ describe('server profiles', () => {
     ['jellyfin', 'sessionKey', true, false],
     ['emby', 'sessionKey', true, false],
     ['tofa', 'sessionKey', false, false],
+    ['silo', 'sessionKey', false, false],
   ] as const)(
     '%s terminates, identifies its install and links history',
     (type, terminatesBy, userIds, links) => {
@@ -72,6 +87,7 @@ describe('server profiles', () => {
     ['jellyfin', 'apiKey', 'serverPassword', false, false, false, null],
     ['emby', 'apiKey', 'serverPassword', false, false, false, null],
     ['tofa', 'tofaCloud', 'tofaCloud', false, false, false, 'tofa'],
+    ['silo', 'apiKey', 'unavailable', false, false, false, null],
   ] as const)(
     '%s adds, signs in, reports bandwidth and bitrates, and imports history',
     (type, addServerAuth, memberSignIn, bandwidth, trackBitrates, tautulli, serverHistory) => {

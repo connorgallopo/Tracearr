@@ -238,7 +238,9 @@ export async function getServerLiveStats(redis: Redis, server: ServerRow) {
   switch (hostStats) {
     case 'plexStatistics':
       return getPlexLiveStats(redis, server);
+    // Nothing writes Silo samples, so a Silo server reads none and shows no host card
     case 'ssePlugin':
+    case 'siloResources':
       return {
         statistics: await getPluginServerStats(redis, server.id),
         bandwidth: [],

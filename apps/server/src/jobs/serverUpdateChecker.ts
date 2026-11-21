@@ -77,7 +77,10 @@ async function tofaUpdateVersion(server: CheckedServer): Promise<string | null> 
   }
 }
 
-/** A vendor feed is read once per type however many servers share it; tofa asks each server. */
+/**
+ * A vendor feed is read once per type however many servers share it; tofa asks each server.
+ * Silo reports a build hash and publishes no feed Tracearr reads, so it has no latest version.
+ */
 function latestVersionOf(
   server: CheckedServer,
   feeds: Map<FeedServerType, Promise<string | null>>
@@ -89,6 +92,8 @@ function latestVersionOf(
       return feeds.getOrInsertComputed(server.type, latestVersionFor);
     case 'tofa':
       return tofaUpdateVersion(server);
+    case 'silo':
+      return Promise.resolve(null);
     default:
       return assertNever(server.type);
   }

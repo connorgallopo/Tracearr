@@ -114,7 +114,7 @@ describe('FirstRun', () => {
   it('waits for a server choice before moving on', () => {
     render(<FirstRun claimCode={undefined} onSignedIn={vi.fn()} />);
 
-    expect(screen.getAllByRole('radio')).toHaveLength(4);
+    expect(screen.getAllByRole('radio')).toHaveLength(5);
     expect(screen.getByRole('button', { name: 'common:actions.continue' })).toBeDisabled();
     expect(backButton()).toBeNull();
   });

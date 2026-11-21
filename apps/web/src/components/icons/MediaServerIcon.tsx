@@ -35,6 +35,8 @@ export function mediaServerIconPath(type: ServerType): string {
       return `${base}images/servers/emby.png`;
     case 'tofa':
       return `${base}images/servers/tofa.png`;
+    case 'silo':
+      return `${base}images/servers/silo.png`;
     default:
       return assertNever(type);
   }

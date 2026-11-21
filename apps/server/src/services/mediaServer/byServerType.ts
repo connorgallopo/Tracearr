@@ -29,6 +29,7 @@ export async function readServerFacts(
     case 'plex':
     case 'jellyfin':
     case 'emby':
+    case 'silo':
       return {};
     case 'tofa': {
       const client = new TofaClient({ url, token });
@@ -74,6 +75,7 @@ export function stopRefusal(session: {
     case 'plex':
     case 'jellyfin':
     case 'emby':
+    case 'silo':
       return null;
     case 'tofa':
       if (session.sessionKey.startsWith(LIVE_VIEWER_PREFIX)) {

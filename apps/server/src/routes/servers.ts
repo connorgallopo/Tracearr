@@ -227,6 +227,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         break;
       case 'jellyfin':
       case 'emby':
+      case 'silo':
         break;
       default:
         assertNever(type);
@@ -307,6 +308,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       case 'jellyfin':
       case 'emby':
       case 'tofa':
+      case 'silo':
         break;
       default:
         assertNever(server.type);
@@ -375,6 +377,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         case 'jellyfin':
         case 'emby':
         case 'tofa':
+        case 'silo':
           break;
         default:
           assertNever(server.type);

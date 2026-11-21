@@ -400,6 +400,8 @@ const IMAGE_PATH_ALLOWLIST: Record<ServerType, RegExp> = {
   // An artwork path, or the image cache path it redirects to with the size it was asked for,
   // or one of the avatars bundled with the server
   tofa: /^\/(api\/v1\/artwork\/[0-9a-f-]+\/poster|api\/v1\/profiles\/avatars\/[\w-]+\.png|cache\/images\/[a-z]+\/[^/?#]+(\?[wh]=\d+)?)$/,
+  // A signed artwork URL, or a signed item poster link that redirects to one
+  silo: /^\/api\/v2\/(artwork\/(?:[\w-]+\/)+[\w-]+\.[0-9a-f]+\.[a-z0-9]+|item-posters\/[\w.-]+)\?[\w=&-]+$/,
 };
 
 /** A guide image on a host the server's guide links art from, as an https address; null for anything else */
@@ -491,6 +493,10 @@ export function buildUpstreamRequest(
       }
       return { imageUrl: `${baseUrl}${imagePath}`, headers };
     }
+    // A signed URL names its own size, and Silo refuses one whose path or query was changed
+    case 'silo':
+      headers.Authorization = `Bearer ${server.token}`;
+      return { imageUrl: `${baseUrl}${imagePath}`, headers };
     default:
       return assertNever(server.type);
   }
@@ -518,7 +524,10 @@ function buildSeerrImageRequest(url: string, imagePath: string): UpstreamRequest
   return { imageUrl: `${baseUrl}${imagePath}`, headers: { Accept: 'image/*' } };
 }
 
-/** tofa answers an artwork path with a redirect into its own image cache, which needs the key too. */
+/**
+ * tofa answers an artwork path with a redirect into its own image cache, and Silo an item poster
+ * link with a redirect to its signed artwork; both targets need the key too.
+ */
 function followsImageRedirect(type: ServerType): boolean {
   switch (type) {
     case 'plex':
@@ -526,6 +535,7 @@ function followsImageRedirect(type: ServerType): boolean {
     case 'emby':
       return false;
     case 'tofa':
+    case 'silo':
       return true;
     default:
       return assertNever(type);

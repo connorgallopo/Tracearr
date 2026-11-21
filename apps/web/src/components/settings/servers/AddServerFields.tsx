@@ -25,23 +25,27 @@ const SERVER_URL_HELP = {
   jellyfin: 'servers.serverUrlHelpJellyfin',
   emby: 'servers.serverUrlHelpEmby',
   tofa: 'servers.serverUrlHelpTofa',
+  silo: 'servers.serverUrlHelpSilo',
 } as const satisfies Record<ApiKeyServerType, string>;
 
 export const API_KEY_HELP = {
   jellyfin: 'servers.apiKeyHelpJellyfin',
   emby: 'servers.apiKeyHelpEmby',
   tofa: 'servers.apiKeyHelpTofa',
+  silo: 'servers.apiKeyHelpSilo',
 } as const satisfies Record<ApiKeyServerType, string>;
 
 export const SERVER_URL_PLACEHOLDER = {
   jellyfin: 'servers.serverUrlPlaceholder',
   emby: 'servers.serverUrlPlaceholder',
   tofa: 'servers.serverUrlPlaceholderTofa',
+  silo: 'servers.serverUrlPlaceholderSilo',
 } as const satisfies Record<ApiKeyServerType, string>;
 
 export const PUBLIC_URL_PLACEHOLDER: Partial<Record<ApiKeyServerType, string>> = {
   jellyfin: 'https://jellyfin.example.com',
   emby: 'https://emby.example.com',
+  silo: 'https://silo.example.com',
 };
 
 function PlexAccountSelect({

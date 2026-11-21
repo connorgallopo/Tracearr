@@ -36,6 +36,7 @@ async function offersQuickConnect(type: ServerType, url: string): Promise<boolea
     case 'plex':
     case 'emby':
     case 'tofa':
+    case 'silo':
       return false;
     default:
       return assertNever(type);

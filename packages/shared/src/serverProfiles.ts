@@ -8,10 +8,10 @@ export interface ServerProfile {
   sessionIdentity: 'sessionKey' | 'composite';
   /** The id the server needs to stop a playback. */
   terminatesBy: 'plexSessionId' | 'sessionKey';
-  /** ssePlugin: needs the Tracearr SSE plugin installed on the server; without it the poller covers the server. */
-  liveEvents: 'plexWebsocket' | 'ssePlugin' | 'tofaSocket';
-  /** Where host CPU and memory come from: Plex's statistics endpoint, the SSE plugin's stats events, or tofa's metrics endpoint. */
-  hostStats: 'plexStatistics' | 'ssePlugin' | 'tofaMetrics';
+  /** ssePlugin: needs the Tracearr SSE plugin installed on the server; without it the poller covers the server. siloSocket: Silo's events socket. */
+  liveEvents: 'plexWebsocket' | 'ssePlugin' | 'tofaSocket' | 'siloSocket';
+  /** Where host CPU and memory come from: Plex's statistics endpoint, the SSE plugin's stats events, tofa's metrics endpoint, or Silo's resources endpoint. */
+  hostStats: 'plexStatistics' | 'ssePlugin' | 'tofaMetrics' | 'siloResources';
   /** Seconds between host samples while nothing is reading them; null when the server samples at one rate. */
   hostStatsIdleSeconds: number | null;
   /** username: the server reports no email, so an account's email is its username when that is an address. */
@@ -139,6 +139,29 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     itemLinks: 'hostedApp',
     hasProfiles: true,
   },
+  silo: {
+    displayName: 'Silo',
+    sessionIdentity: 'sessionKey',
+    terminatesBy: 'sessionKey',
+    liveEvents: 'siloSocket',
+    hostStats: 'siloResources',
+    hostStatsIdleSeconds: null,
+    emailSource: 'server',
+    userIdsIdentifyInstall: false,
+    playerNameCountsTowardDevice: true,
+    linksImportedHistory: false,
+    addServerAuth: 'apiKey',
+    memberSignIn: 'unavailable',
+    reportsBandwidth: false,
+    reportsTranscodeTrackBitrates: false,
+    importsTautulliHistory: false,
+    serverHistoryImport: null,
+    watchedThreshold: 'tracearrSetting',
+    builtInRequests: false,
+    guideImageHosts: [],
+    itemLinks: 'serverAddress',
+    hasProfiles: true,
+  },
 };
 
 /** Whether any of the servers plays one account under several profiles, so profile reads have rows to find */
@@ -158,8 +181,8 @@ export function liveStatsGapSeconds(serverType: ServerType): number {
 
 /**
  * How the owner proves an account on the server is theirs before it joins them: Plex links the
- * plex.tv account itself, Jellyfin and Emby take the account's username typed back, and tofa needs
- * a tofa sign-in as that account, since it also becomes the owner's tofa login.
+ * plex.tv account itself, Jellyfin, Emby and Silo take the account's username typed back, and
+ * tofa needs a tofa sign-in as that account, since it also becomes the owner's tofa login.
  */
 export type OwnerLinkProof = 'plexAccount' | 'typedUsername' | 'tofaSignIn';
 
@@ -169,6 +192,7 @@ export function ownerLinkProof(type: ServerType): OwnerLinkProof {
       return 'plexAccount';
     case 'jellyfin':
     case 'emby':
+    case 'silo':
       return 'typedUsername';
     case 'tofa':
       return 'tofaSignIn';

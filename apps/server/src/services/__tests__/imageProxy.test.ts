@@ -44,6 +44,7 @@ vi.mock('../imageCacheGuard.js', () => ({
 
 import { readFile, writeFile, rename, stat, unlink, mkdir } from 'node:fs/promises';
 import { SsrfBlockedError } from '../../utils/ssrf.js';
+import silo from '../../test/mediaServerResponses/silo.json' with { type: 'json' };
 import sharp from 'sharp';
 import { db } from '../../db/client.js';
 import { cacheWriteAllowed } from '../imageCacheGuard.js';
@@ -1094,6 +1095,24 @@ describe('buildUpstreamRequest', () => {
         buildUpstreamRequest(emby, `/Items/9/Images/Primary?tag=${hex}_1`)
       ).not.toThrow();
       expect(() => buildUpstreamRequest(emby, '/Items/9/Images/Primary')).not.toThrow();
+    });
+
+    it('fetches a Silo signed artwork URL with the key, and nothing else from Silo', () => {
+      const server = { ...baseServer, type: 'silo', url: 'http://silo.local:8090' } as never;
+      const artwork = silo.catalog['1'].items[0]?.poster_url ?? '';
+      const signed = {
+        imageUrl: `http://silo.local:8090${artwork}`,
+        headers: { Accept: 'image/*', Authorization: 'Bearer tok123' },
+      };
+      expect(buildUpstreamRequest(server, artwork)).toEqual(signed);
+      expect(buildUpstreamRequest(server, artwork, { width: 240, height: 360 })).toEqual(signed);
+      for (const path of [
+        '/content/movie-imdb-tt0038650/poster',
+        '/api/v2/admin/users',
+        '/api/v2/artwork/x',
+      ]) {
+        expect(() => buildUpstreamRequest(server, path)).toThrow(SsrfBlockedError);
+      }
     });
   });
 

@@ -274,10 +274,14 @@ async function pollTofa(server: ServerRow): Promise<void> {
   });
 }
 
-/** The polls that find a server's downloads; Plex reports its downloads on its socket instead. */
+/**
+ * The polls that find a server's downloads. Plex reports its downloads on its socket instead,
+ * and Tracearr reads no Silo downloads.
+ */
 function downloadPolls(server: ServerRow): Promise<void>[] {
   switch (server.type) {
     case 'plex':
+    case 'silo':
       return [];
     case 'jellyfin':
     case 'emby':
