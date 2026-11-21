@@ -9,7 +9,12 @@ vi.mock('../../../../utils/http.js', async (importActual) => {
 import { fetchJson, HttpClientError } from '../../../../utils/http.js';
 import silo from '../../../../test/mediaServerResponses/silo.json' with { type: 'json' };
 import { NOT_NEEDED } from '../../types.js';
-import { SILO_STOP_REFUSED, SiloClient } from '../client.js';
+import {
+  SILO_MESSAGE_STALE,
+  SILO_MESSAGE_UNDELIVERED,
+  SILO_STOP_REFUSED,
+  SiloClient,
+} from '../client.js';
 
 const mockFetchJson = vi.mocked(fetchJson);
 
@@ -30,13 +35,14 @@ function serve(responses: Record<string, Answer>) {
   });
 }
 
-function httpError(statusCode: number, retryAfter?: string): HttpClientError {
+function httpError(statusCode: number, retryAfter?: string, headers?: Headers): HttpClientError {
   return new HttpClientError({
     service: 'silo',
     statusCode,
     statusText: 'error',
     url: URL,
     retryAfter,
+    headers,
   });
 }
 
@@ -303,6 +309,151 @@ describe('SiloClient', () => {
     );
   });
 
+  it('mints a socket ticket with the key', async () => {
+    const ticket = {
+      ticket: 'ticket-1',
+      expires_in: 30,
+      max_connection_seconds: 14400,
+      protocol: 'silo.events.v2',
+    };
+    serve({ '/events/ws-ticket': ticket });
+
+    expect(await client().getSocketTicket()).toEqual(ticket);
+    const [url, init] = mockFetchJson.mock.calls[0] ?? [];
+    expect(url).toBe(`${URL}/api/v2/events/ws-ticket`);
+    expect(init).toMatchObject({ method: 'POST', headers: { Authorization: `Bearer ${KEY}` } });
+  });
+
+  it("sends a message once with a fresh command id, the time as its sequence, and Silo's length limits", async () => {
+    vi.useFakeTimers({ now: 1795282810496 });
+    serve({ '/admin/sessions/session-1/message': { status: 'applied' } });
+
+    await client().sendMessage('session-1', 'x'.repeat(3000), 'Tracearr');
+
+    expect(mockFetchJson).toHaveBeenCalledOnce();
+    const [url, init] = mockFetchJson.mock.calls[0] ?? [];
+    expect(url).toBe(`${URL}/api/v2/admin/sessions/session-1/message`);
+    expect(init?.method).toBe('POST');
+    const body = JSON.parse(String(init?.body));
+    expect(body.command_id).toHaveLength(36);
+    expect(body).toMatchObject({ sequence: 1795282810496, title: 'Tracearr' });
+    expect(body.message).toBe('x'.repeat(2048));
+  });
+
+  it('cuts a message and its title on characters, never inside an emoji', async () => {
+    serve({ '/admin/sessions/session-1/message': { status: 'applied' } });
+
+    await client().sendMessage(
+      'session-1',
+      `${'x'.repeat(2047)}\u{1F600}y`,
+      `${'t'.repeat(255)}\u{1F600}\u{1F600}`
+    );
+
+    const [, init] = mockFetchJson.mock.calls[0] ?? [];
+    const body = JSON.parse(String(init?.body));
+    expect(body.message).toBe(`${'x'.repeat(2047)}\u{1F600}`);
+    expect(body.title).toBe(`${'t'.repeat(255)}\u{1F600}`);
+  });
+
+  it('names why a message did not reach the player', async () => {
+    serve({ '/admin/sessions/session-1/message': httpError(409) });
+    await expect(client().sendMessage('session-1', 'hi')).rejects.toThrow(SILO_MESSAGE_UNDELIVERED);
+
+    serve({
+      '/admin/sessions/session-1/message': httpError(
+        409,
+        undefined,
+        new Headers({ 'X-Silo-Latest-Sequence': '1795282810497' })
+      ),
+    });
+    await expect(client().sendMessage('session-1', 'hi')).rejects.toThrow(SILO_MESSAGE_STALE);
+    expect(requested('/message')).toHaveLength(2);
+
+    serve({ '/admin/sessions/session-1/message': httpError(404) });
+    await expect(client().sendMessage('session-1', 'hi')).rejects.toThrow(
+      'Session not found (may have already ended)'
+    );
+
+    serve({ '/admin/sessions/session-1/message': httpError(500) });
+    await expect(client().sendMessage('session-1', 'hi')).rejects.toThrow(
+      'Failed to send the message: 500'
+    );
+  });
+
+  it('reads downloads created after a time, stopping at the first page that reaches back past it', async () => {
+    serve({
+      '/admin/downloads/entries': (url: string) =>
+        url.includes('cursor=c2')
+          ? { items: [], page: { has_more: false } }
+          : { ...silo.downloadEntries, page: { has_more: true, next_cursor: 'c2' } },
+    });
+    const downloadsClient = client('http://silo-downloads-after.local:8090');
+
+    const recent = await downloadsClient.getDownloadsAfter(new Date('2026-11-19T12:00:00Z'));
+
+    expect(recent.map((entry) => entry.title)).toEqual(['Pushpa 2 - The Rule', 'MobLand']);
+    expect(requested('/admin/downloads/entries')).toEqual([
+      'http://silo-downloads-after.local:8090/api/v2/admin/downloads/entries?limit=200',
+    ]);
+
+    await downloadsClient.getDownloadsAfter(new Date('2026-11-01T00:00:00Z'));
+    expect(requested('cursor=c2')).toHaveLength(1);
+  });
+
+  it("describes a download a device made twice by the newest one's address", async () => {
+    vi.useFakeTimers({ now: new Date('2026-11-21T18:00:00Z') });
+    const [newest] = silo.downloadEntries.items;
+    if (!newest) throw new Error('the fixture has no download entry');
+    const earlier = {
+      ...newest,
+      id: '153034427977439379',
+      created_at: '2026-11-21T09:00:00.000Z',
+      created_client_ip: '203.0.113.24',
+    };
+    serve({ '/admin/downloads/entries': { items: [newest, earlier], page: { has_more: false } } });
+    const downloadsClient = client('http://silo-downloads-twice.local:8090');
+    await downloadsClient.getDownloadsAfter(new Date('2026-11-01T00:00:00Z'));
+
+    const described = await downloadsClient.describeDownloadSource({
+      deviceId: newest.device_id,
+      itemKey: newest.content_id,
+      partId: null,
+      userId: newest.user_id,
+      app: null,
+      device: null,
+    });
+
+    expect(described.ipAddress).toBe('192.168.1.50');
+  });
+
+  it('describes a listed download without a request, and an unlisted one with no address', async () => {
+    vi.useFakeTimers({ now: new Date('2026-11-21T18:00:00Z') });
+    serve({ '/admin/downloads/entries': silo.downloadEntries });
+    const downloadsClient = client('http://silo-downloads-describe.local:8090');
+    await downloadsClient.getDownloadsAfter(new Date('2026-11-01T00:00:00Z'));
+    const request = {
+      deviceId: 'tracearr-check-device-3',
+      itemKey: 'movie-imdb-tt16539454',
+      partId: null,
+      userId: '34',
+      app: null,
+      device: null,
+    };
+
+    const listed = await downloadsClient.describeDownloadSource(request);
+    expect(listed.ipAddress).toBe('192.168.1.50');
+    expect(listed.delivered?.bytes).toBe(4456899079);
+    expect(mockFetchJson).toHaveBeenCalledOnce();
+
+    expect(
+      (await downloadsClient.describeDownloadSource({ ...request, deviceId: 'another-device' }))
+        .ipAddress
+    ).toBeNull();
+
+    vi.advanceTimersByTime(6 * 60_000);
+    expect((await downloadsClient.describeDownloadSource(request)).ipAddress).toBeNull();
+  });
+
   it('reads a library once a sync and pages items, episodes and seasons from it', async () => {
     serve({ '/admin/catalog/items': silo.catalog['2'] });
     const syncClient = client();
@@ -477,7 +628,9 @@ describe('SiloClient', () => {
     vi.useFakeTimers();
     serve({ '/admin/catalog/items': httpError(429, '1') });
 
-    const poster = client('http://silo-poster-busy.local:8090').getPosterUrl('movie-imdb-tt0038650');
+    const poster = client('http://silo-poster-busy.local:8090').getPosterUrl(
+      'movie-imdb-tt0038650'
+    );
     const failed = expect(poster).rejects.toMatchObject({ statusCode: 429 });
     await vi.advanceTimersByTimeAsync(2000);
 

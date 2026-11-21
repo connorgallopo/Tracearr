@@ -2,14 +2,19 @@ import { describe, it, expect } from 'vitest';
 import silo from '../../../../test/mediaServerResponses/silo.json' with { type: 'json' };
 import {
   parseSiloDeviceNames,
+  parseSiloDownloadSource,
   parseSiloLibraries,
   parseSiloLibraryListing,
   parseSiloPosterPath,
   parseSiloProfiles,
+  parseSiloResources,
   parseSiloSession,
   parseSiloUsers,
+  siloCpuCounter,
   siloPosterPath,
+  type SiloCpuCounter,
 } from '../parser.js';
+import type { SiloSystemResources } from '../types.js';
 
 const MOVIE_POSTER_HASH = '200475196580003a17cdfe2a5f5452208ae0a2c2ece48fba60ca08333146727b';
 const EPISODE_POSTER_HASH = '8ca719eb62703cb1e5f46090e8d20cc8c7b9941173d0992d0e6b54b8a8b1b8a6';
@@ -233,5 +238,119 @@ describe('siloPosterPath', () => {
     expect(parseSiloPosterPath('/content/../poster')).toBeNull();
     expect(parseSiloPosterPath('/content/a/poster?v=XYZ')).toBeNull();
     expect(parseSiloPosterPath('/api/v2/artwork/x')).toBeNull();
+  });
+});
+
+describe('parseSiloResources', () => {
+  const [first, second] = silo.resources.map((sample): SiloSystemResources => sample);
+  const counterOf = (body: SiloSystemResources | undefined): SiloCpuCounter => {
+    const counter = body && siloCpuCounter(body);
+    if (!counter) throw new Error('the fixture sample has no CPU counter');
+    return counter;
+  };
+  const withoutCgroup = (body: SiloSystemResources | undefined): SiloSystemResources => {
+    if (!body?.attribution) throw new Error('the fixture sample has no attribution');
+    const { cgroup_cpu: _cgroup, ...attribution } = body.attribution;
+    return { ...body, attribution };
+  };
+  const withScope = (body: SiloSystemResources, scope: string): SiloSystemResources => {
+    if (!body.attribution?.cgroup_cpu) throw new Error('the fixture sample has no cgroup counter');
+    return {
+      ...body,
+      attribution: {
+        ...body.attribution,
+        cgroup_cpu: { ...body.attribution.cgroup_cpu, scope },
+      },
+    };
+  };
+
+  it("charts host load from a resource sample, and Silo with its transcoders from the cgroup counter's rise", () => {
+    if (!second) throw new Error('the fixture has no second sample');
+    const point = parseSiloResources(second, counterOf(first));
+
+    expect(point?.at).toBe(Math.floor(Date.parse('2026-11-21T17:39:52.829Z') / 1000));
+    expect(point?.hostCpuUtilization).toBe(2);
+    expect(point?.hostMemoryUtilization).toBeCloseTo((1163 / 12288) * 100);
+    expect(point?.processCpuUtilization).toBeCloseTo(
+      ((1109.152491 - 1109.052426) / (10.001 * 16)) * 100
+    );
+    expect(point?.processMemoryUtilization).toBeCloseTo((384167936 / 12884901888) * 100);
+  });
+
+  it('adds no point for a first sample, the same sample again, or a counter that went back', () => {
+    if (!second) throw new Error('the fixture has no second sample');
+    const current = counterOf(second);
+
+    expect(parseSiloResources(second, undefined)).toBeNull();
+    expect(parseSiloResources(second, current)).toBeNull();
+    expect(
+      parseSiloResources(second, {
+        ...current,
+        sampledAt: current.sampledAt - 10_000,
+        cpuSeconds: current.cpuSeconds + 1,
+      })
+    ).toBeNull();
+  });
+
+  it('adds no point for a stale or unavailable sample, which is not zero load', () => {
+    if (!second) throw new Error('the fixture has no second sample');
+    const previous = counterOf(first);
+
+    for (const body of [
+      { ...second, stale: true },
+      { ...second, available: false },
+    ]) {
+      expect(parseSiloResources(body, previous)).toBeNull();
+      expect(siloCpuCounter(body)).toBeNull();
+    }
+  });
+
+  it("counts Silo's own process where it reports no cgroup", () => {
+    const point = parseSiloResources(withoutCgroup(second), counterOf(withoutCgroup(first)));
+
+    expect(point?.processCpuUtilization).toBeCloseTo(((225.29 - 225.25) / (10.001 * 16)) * 100);
+  });
+
+  it('adds no point across a sample whose cgroup read failed, since the two counters differ', () => {
+    if (!second) throw new Error('the fixture has no second sample');
+
+    expect(parseSiloResources(second, counterOf(withoutCgroup(first)))).toBeNull();
+    expect(parseSiloResources(withoutCgroup(second), counterOf(first))).toBeNull();
+  });
+
+  it('adds no point when the cgroup counter moved between the leaf and an ancestor', () => {
+    if (!second) throw new Error('the fixture has no second sample');
+
+    expect(parseSiloResources(withScope(second, 'ancestor'), counterOf(first))).toBeNull();
+  });
+});
+
+describe('parseSiloDownloadSource', () => {
+  const request = {
+    itemKey: 'episode-imdb-tt31510819-1-1',
+    partId: null,
+    deviceId: 'aef454b9-44e6-412f-913b-3e3a5eb0dbee',
+    userId: '1',
+    app: null,
+    device: 'Silo iPhone',
+  };
+
+  it('describes a download by the address it was created from, else its last, with what it sent', () => {
+    const mobland = parseSiloDownloadSource(request, nth(silo.downloadEntries.items, 1));
+
+    expect(mobland).toMatchObject({
+      version: null,
+      ipAddress: '203.0.113.24',
+      delivered: { bytes: 6497401574, bitrateKbps: null },
+      device: { playerName: 'iPhone' },
+    });
+    expect(parseSiloDownloadSource(request, nth(silo.downloadEntries.items, 2)).ipAddress).toBe(
+      '192.168.1.50'
+    );
+    expect(parseSiloDownloadSource(request, undefined)).toMatchObject({
+      ipAddress: null,
+      delivered: null,
+      device: { playerName: 'Silo iPhone' },
+    });
   });
 });

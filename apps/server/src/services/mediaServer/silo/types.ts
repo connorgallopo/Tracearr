@@ -138,4 +138,63 @@ export interface SiloCatalogItem {
 
 export interface SiloSocketTicket {
   ticket: string;
+  expires_in: number;
+  max_connection_seconds: number;
+  protocol: string;
+}
+
+/** A frame on the events socket */
+export interface SiloSocketFrame {
+  type?: string;
+  channel?: string;
+  event?: string;
+  channels?: string[];
+  data?: unknown;
+}
+
+/** The data of a catalog.item.changed (change) or catalog.library.changed (reason) event */
+export interface SiloCatalogChange {
+  library_id?: string;
+  content_id?: string;
+  change?: string;
+  reason?: string;
+}
+
+/** The data of a session.stopped event */
+export interface SiloSessionStopped {
+  session_id: string;
+  end_reason: string | null;
+  history?: { end_position_seconds: number } | null;
+}
+
+export interface SiloDownloadEntry {
+  id: string;
+  user_id: string;
+  profile_id: string;
+  device_id: string;
+  device_name: string;
+  content_id: string;
+  episode_id?: string;
+  title: string;
+  episode: { season_number: number; episode_number: number; title: string } | null;
+  file_size: number;
+  target_bitrate_kbps: number;
+  delivery_format: string;
+  created_at: string;
+  created_client_ip: string | null;
+  last_client_ip: string | null;
+}
+
+export interface SiloSystemResources {
+  available: boolean;
+  stale: boolean;
+  sampled_at?: string;
+  system?: { cpu_pct: number; cores: number; mem_used_mb: number; mem_total_mb: number };
+  attribution?: {
+    sample_interval_seconds: number;
+    process?: { cpu_seconds?: number; resident_bytes?: number };
+    /** scope: leaf or ancestor */
+    cgroup_cpu?: { usage_seconds?: number; scope?: string };
+    children?: { resident_bytes: number };
+  };
 }

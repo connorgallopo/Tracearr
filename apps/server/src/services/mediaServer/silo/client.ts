@@ -4,6 +4,7 @@
  * Talks to a Silo server through its /api/v2 REST API, called with an API key as a bearer token.
  */
 
+import { randomUUID } from 'node:crypto';
 import {
   fetchJson,
   HttpClientError,
@@ -30,6 +31,7 @@ import {
 } from '../types.js';
 import {
   parseSiloDeviceNames,
+  parseSiloDownloadSource,
   parseSiloLibraries,
   parseSiloLibraryListing,
   parseSiloProfiles,
@@ -40,6 +42,7 @@ import {
 import type {
   SiloCatalogItem,
   SiloDevice,
+  SiloDownloadEntry,
   SiloLibrary,
   SiloPage,
   SiloProfile,
@@ -47,6 +50,7 @@ import type {
   SiloSession,
   SiloSocketTicket,
   SiloSystemInfo,
+  SiloSystemResources,
   SiloUser,
 } from './types.js';
 
@@ -57,6 +61,8 @@ const TIMEOUT_MS = 10_000;
 const PAGE_LIMIT = 200;
 const CONTENT_IDS_PER_READ = 200;
 const STOP_REASON_MAX = 1024;
+const MESSAGE_MAX = 2048;
+const MESSAGE_TITLE_MAX = 256;
 const DEVICE_NAMES_KEPT_MS = 10 * 60 * 1000;
 const DEVICE_RETRY_MS = 60 * 1000;
 const PROBE_SESSION_ID = '00000000-0000-4000-8000-000000000000';
@@ -69,6 +75,13 @@ const POSTER_WAIT_BUDGET_MS = 2_000;
 const NO_POSTER_KEPT_MS = 5 * 60 * 1000;
 
 export const SILO_STOP_REFUSED = 'this Silo API key cannot stop streams';
+export const SILO_MESSAGE_UNDELIVERED =
+  'the Silo player has no live connection that can show a message';
+export const SILO_MESSAGE_STALE =
+  'Silo refused the message as older than the last command the player applied';
+/** Silo sets it on a 409 only when the command's sequence was stale */
+const LATEST_SEQUENCE_HEADER = 'X-Silo-Latest-Sequence';
+const SESSION_GONE = 'Session not found (may have already ended)';
 
 const MISSING_SCOPES_MESSAGE =
   'This Silo API key lacks a scope Tracearr needs. Create a key with admin:monitor:read, admin:sessions:control and libraries:read. An unscoped admin key does not work; Tracearr needs a key with exactly those three scopes.';
@@ -97,6 +110,13 @@ const deviceNames = new Map<
   string,
   { names: Map<string, string>; readAt: number; retryAt: number }
 >();
+
+/** Downloads a listing returned, by server URL, device and episode or movie, for describeDownloadSource */
+const listedDownloads = new Map<string, { entry: SiloDownloadEntry; expiresAt: number }>();
+const LISTED_DOWNLOADS_KEPT_MS = 5 * 60 * 1000;
+
+const listedDownloadKey = (url: string, deviceId: string | null, itemKey: string | null) =>
+  `${url} ${deviceId} ${itemKey}`;
 
 const POSTER_URL_MARGIN_MS = 10 * 60 * 1000;
 
@@ -171,6 +191,12 @@ async function fetchSilo<T>(
 const errorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
+/** Silo's length limits count characters, so an emoji is never cut in half */
+const cutTo = (text: string, max: number) => Array.from(text).slice(0, max).join('');
+
+const failureOf = (error: unknown) =>
+  error instanceof HttpClientError ? error.statusCode : errorMessage(error, 'unknown error');
+
 type LibraryPage = { items: MediaLibraryItem[]; totalCount: number; rawCount: number };
 
 function pageOf(
@@ -218,8 +244,12 @@ export class SiloClient implements IMediaServerClient {
     });
   }
 
-  /** Every page of a listing */
-  private async listAll<T>(path: string, timeout?: number): Promise<T[]> {
+  /** Every page of a listing, or the pages up to one readOn turns down */
+  private async listAll<T>(
+    path: string,
+    timeout?: number,
+    readOn: (page: T[]) => boolean = () => true
+  ): Promise<T[]> {
     const items: T[] = [];
     const separator = path.includes('?') ? '&' : '?';
     let cursor: string | undefined;
@@ -230,7 +260,7 @@ export class SiloClient implements IMediaServerClient {
         { timeout }
       );
       items.push(...page.items);
-      cursor = page.page?.has_more ? page.page.next_cursor : undefined;
+      cursor = page.page?.has_more && readOn(page.items) ? page.page.next_cursor : undefined;
     } while (cursor);
     return items;
   }
@@ -328,18 +358,79 @@ export class SiloClient implements IMediaServerClient {
     return (await this.systemInfo()).server_version;
   }
 
+  /** Reads nothing: a download is described from the listing that found it, while it is held */
   async describeDownloadSource(request: DownloadSourceRequest): Promise<DownloadSourceDescription> {
-    return {
-      version: null,
-      delivered: null,
-      device: {
-        deviceId: request.deviceId,
-        playerName: request.device,
-        product: request.app,
-        platform: null,
-      },
-      ipAddress: null,
-    };
+    const listed = listedDownloads.get(
+      listedDownloadKey(this.url, request.deviceId, request.itemKey)
+    );
+    return parseSiloDownloadSource(
+      request,
+      listed && listed.expiresAt > Date.now() ? listed.entry : undefined
+    );
+  }
+
+  /** Downloads created after a time, newest first; the pages stop at the first that reaches back past it */
+  async getDownloadsAfter(after: Date): Promise<SiloDownloadEntry[]> {
+    const now = Date.now();
+    for (const [key, { expiresAt }] of listedDownloads) {
+      if (expiresAt <= now) listedDownloads.delete(key);
+    }
+    const isNewer = (entry: SiloDownloadEntry) => Date.parse(entry.created_at) > after.getTime();
+    const entries = (
+      await this.listAll<SiloDownloadEntry>('/admin/downloads/entries', TIMEOUT_MS, (page) =>
+        page.every(isNewer)
+      )
+    ).filter(isNewer);
+    const held = new Set<string>();
+    for (const entry of entries) {
+      const key = listedDownloadKey(
+        this.url,
+        entry.device_id,
+        entry.episode_id ?? entry.content_id
+      );
+      if (held.has(key)) continue;
+      held.add(key);
+      listedDownloads.set(key, { entry, expiresAt: now + LISTED_DOWNLOADS_KEPT_MS });
+    }
+    return entries;
+  }
+
+  getSocketTicket(): Promise<SiloSocketTicket> {
+    return this.request<SiloSocketTicket>('/events/ws-ticket', {
+      method: 'POST',
+      timeout: TIMEOUT_MS,
+    });
+  }
+
+  getSystemResources(): Promise<SiloSystemResources> {
+    return this.request<SiloSystemResources>('/admin/system/resources', { timeout: TIMEOUT_MS });
+  }
+
+  /**
+   * Silo refuses a command whose sequence is below the session's latest, so the time is used, as
+   * Silo Web does. A 409 is not retried.
+   */
+  async sendMessage(sessionId: string, message: string, title?: string): Promise<void> {
+    try {
+      await this.request<unknown>(`/admin/sessions/${encodeURIComponent(sessionId)}/message`, {
+        method: 'POST',
+        body: JSON.stringify({
+          command_id: randomUUID(),
+          sequence: Date.now(),
+          message: cutTo(message, MESSAGE_MAX),
+          ...(title ? { title: cutTo(title, MESSAGE_TITLE_MAX) } : {}),
+        }),
+        timeout: TIMEOUT_MS,
+      });
+    } catch (error) {
+      if (isHttpStatus(error, 404)) throw new Error(SESSION_GONE);
+      if (isHttpStatus(error, 409)) {
+        throw new Error(
+          error.headers?.has(LATEST_SEQUENCE_HEADER) ? SILO_MESSAGE_STALE : SILO_MESSAGE_UNDELIVERED
+        );
+      }
+      throw new Error(`Failed to send the message: ${failureOf(error)}`);
+    }
   }
 
   async terminateSession(sessionId: string, reason?: string): Promise<boolean> {
@@ -352,12 +443,8 @@ export class SiloClient implements IMediaServerClient {
       return true;
     } catch (error) {
       if (isHttpStatus(error, 403)) throw new Error(SILO_STOP_REFUSED);
-      if (isHttpStatus(error, 404)) throw new Error('Session not found (may have already ended)');
-      throw new Error(
-        `Failed to stop the session: ${
-          error instanceof HttpClientError ? error.statusCode : errorMessage(error, 'unknown error')
-        }`
-      );
+      if (isHttpStatus(error, 404)) throw new Error(SESSION_GONE);
+      throw new Error(`Failed to stop the session: ${failureOf(error)}`);
     }
   }
 
@@ -549,7 +636,7 @@ export class SiloClient implements IMediaServerClient {
     const timeout = TIMEOUT_MS;
     try {
       await client.request<SiloPage<SiloSession>>('/admin/sessions?limit=1', { timeout });
-      await client.request<SiloSocketTicket>('/events/ws-ticket', { method: 'POST', timeout });
+      await client.getSocketTicket();
       await client.request<SiloPage<SiloLibrary>>('/user/libraries', { timeout });
       await client
         .request<unknown>(`/admin/sessions/${PROBE_SESSION_ID}/terminate`, {

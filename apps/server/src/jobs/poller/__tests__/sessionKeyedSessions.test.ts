@@ -1,7 +1,7 @@
 /**
- * tofa sessions through the poller: the session list read on a socket event, on a missed
- * frame, after a reconnect, and while the socket is down, and the profiles its plays name.
- * Silo, keyed by session id like tofa, runs through the same poller setup.
+ * Sessions through the poller for tofa and Silo, the servers that key a play by the server's
+ * own session id: the session list read on a socket event, on a missed frame, after a
+ * reconnect, and while the socket is down, and the profiles its plays name.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
@@ -209,25 +209,25 @@ function startPoller(): Record<string, ReturnType<typeof vi.fn>> {
   resetDbWriteThrottle();
   vi.spyOn(console, 'log').mockImplementation(() => {});
   const cacheService = {
-      getAllActiveSessions: vi.fn().mockResolvedValue([]),
-      getPendingSession: vi.fn().mockResolvedValue(null),
-      setPendingSession: vi.fn(),
-      addActiveSession: vi.fn(),
-      withSessionCreateLock: vi.fn().mockImplementation(async (_s, _k, op) => op()),
-      hasTerminationCooldown: vi.fn().mockResolvedValue(false),
-      getTerminationCooldownsComposite: vi.fn().mockResolvedValue(new Map()),
-      clearTerminationCooldownsComposite: vi.fn(),
-      setServerHealth: vi.fn().mockResolvedValue(true),
-      resetServerFailCount: vi.fn(),
-    };
-    initializePoller(
-      cacheService as unknown as Parameters<typeof initializePoller>[0],
-      { publish: vi.fn(), subscribe: vi.fn() } as unknown as Parameters<typeof initializePoller>[1]
-    );
+    getAllActiveSessions: vi.fn().mockResolvedValue([]),
+    getPendingSession: vi.fn().mockResolvedValue(null),
+    setPendingSession: vi.fn(),
+    addActiveSession: vi.fn(),
+    withSessionCreateLock: vi.fn().mockImplementation(async (_s, _k, op) => op()),
+    hasTerminationCooldown: vi.fn().mockResolvedValue(false),
+    getTerminationCooldownsComposite: vi.fn().mockResolvedValue(new Map()),
+    clearTerminationCooldownsComposite: vi.fn(),
+    setServerHealth: vi.fn().mockResolvedValue(true),
+    resetServerFailCount: vi.fn(),
+  };
+  initializePoller(
+    cacheService as unknown as Parameters<typeof initializePoller>[0],
+    { publish: vi.fn(), subscribe: vi.fn() } as unknown as Parameters<typeof initializePoller>[1]
+  );
   return cacheService;
 }
 
-describe('tofa sessions in the poller', () => {
+describe('tofa and Silo sessions in the poller', () => {
   let cacheService: Record<string, ReturnType<typeof vi.fn>>;
 
   beforeEach(() => {
@@ -931,8 +931,8 @@ describe('Silo sessions in the poller', () => {
       'paused',
       'playing',
     ]);
-    expect(rows.map((row) => terminationSessionId('silo', { plexSessionId: null, ...row }))).toEqual(
-      [leftover.session_id, restarted.session_id]
-    );
+    expect(
+      rows.map((row) => terminationSessionId('silo', { plexSessionId: null, ...row }))
+    ).toEqual([leftover.session_id, restarted.session_id]);
   });
 });

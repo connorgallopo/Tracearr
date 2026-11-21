@@ -63,14 +63,9 @@
         "username": "viewer",
         "email": "viewer@example.com",
         "role": "user",
-        "permissions": [
-          "marker_edit"
-        ],
+        "permissions": ["marker_edit"],
         "enabled": true,
-        "library_ids": [
-          "1",
-          "2"
-        ],
+        "library_ids": ["1", "2"],
         "max_playback_quality": null,
         "max_streams": null,
         "max_transcodes": null,
@@ -88,10 +83,7 @@
         "is_owner": false,
         "break_glass": false,
         "effective_policy": {
-          "library_ids": [
-            "1",
-            "2"
-          ],
+          "library_ids": ["1", "2"],
           "max_playback_quality": "",
           "max_streams": 5,
           "max_transcodes": 5,
@@ -103,9 +95,7 @@
           "download_allowed": true,
           "download_transcode_allowed": false,
           "requests_allowed": true,
-          "permissions": [
-            "marker_edit"
-          ]
+          "permissions": ["marker_edit"]
         },
         "created_at": "2026-11-19T01:12:31.344Z",
         "updated_at": "2026-11-19T01:12:31.344Z",
@@ -306,9 +296,7 @@
           "status": "matched",
           "imdb_id": "tt0038650",
           "tmdb_id": "1585",
-          "library_ids": [
-            "1"
-          ],
+          "library_ids": ["1"],
           "added_at": "2026-11-19T00:57:21.708Z",
           "versions": [
             {
@@ -325,15 +313,9 @@
               "file_size": 50104359697
             }
           ],
-          "genres": [
-            "Drama",
-            "Family",
-            "Fantasy"
-          ],
+          "genres": ["Drama", "Family", "Fantasy"],
           "content_rating": "PG",
-          "studios": [
-            "Liberty Films"
-          ],
+          "studios": ["Liberty Films"],
           "rating_tmdb": 8.279,
           "release_date": "1946-12-20",
           "poster_url": "/api/v2/artwork/tmdb/movies/1585/poster/w300.c13b52d2fad9fb7f5692cf54221568d61d7178b76361b3cc530f6c9ed10e3bbd.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
@@ -346,9 +328,7 @@
           "status": "matched",
           "imdb_id": "tt0042332",
           "tmdb_id": "11224",
-          "library_ids": [
-            "1"
-          ],
+          "library_ids": ["1"],
           "added_at": "2026-11-19T00:56:47.022Z",
           "versions": [
             {
@@ -365,16 +345,9 @@
               "file_size": 53267869202
             }
           ],
-          "genres": [
-            "Family",
-            "Fantasy",
-            "Animation",
-            "Romance"
-          ],
+          "genres": ["Family", "Fantasy", "Animation", "Romance"],
           "content_rating": "G",
-          "studios": [
-            "Walt Disney Productions"
-          ],
+          "studios": ["Walt Disney Productions"],
           "rating_tmdb": 7.1,
           "release_date": "1950-02-22",
           "poster_url": "/api/v2/artwork/tmdb/movies/11224/poster/w300.930176b82fc64555923a9b0f129e872aa6eef06204023dd1737c0f2347786ef9.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
@@ -387,9 +360,7 @@
           "status": "matched",
           "imdb_id": "tt0047396",
           "tmdb_id": "567",
-          "library_ids": [
-            "1"
-          ],
+          "library_ids": ["1"],
           "added_at": "2026-11-19T00:57:58.424Z",
           "versions": [
             {
@@ -406,15 +377,9 @@
               "file_size": 78998486110
             }
           ],
-          "genres": [
-            "Thriller",
-            "Mystery",
-            "Drama"
-          ],
+          "genres": ["Thriller", "Mystery", "Drama"],
           "content_rating": "PG",
-          "studios": [
-            "Alfred J. Hitchcock Productions"
-          ],
+          "studios": ["Alfred J. Hitchcock Productions"],
           "rating_tmdb": 8.332,
           "release_date": "1954-08-01",
           "poster_url": "/api/v2/artwork/tmdb/movies/567/poster/w300.a76f77e38cfb4ed88f13cb0463f3449f05bb6f6203bc1f7c3ae3d88bf473c860.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg"
@@ -437,9 +402,7 @@
           "series_title": "The Twilight Zone",
           "season_number": 1,
           "episode_number": 1,
-          "library_ids": [
-            "2"
-          ],
+          "library_ids": ["2"],
           "added_at": "2026-11-19T01:06:08.996Z",
           "versions": [
             {
@@ -470,9 +433,7 @@
           "series_title": "The Twilight Zone",
           "season_number": 1,
           "episode_number": 12,
-          "library_ids": [
-            "2"
-          ],
+          "library_ids": ["2"],
           "added_at": "2026-11-19T01:06:09.150Z",
           "versions": [
             {
@@ -503,9 +464,7 @@
           "series_title": "Batman: The Animated Series",
           "season_number": 1,
           "episode_number": 1,
-          "library_ids": [
-            "2"
-          ],
+          "library_ids": ["2"],
           "added_at": "2026-11-19T01:01:40.707Z",
           "versions": [
             {
@@ -534,9 +493,7 @@
           "imdb_id": "tt0052520",
           "tmdb_id": "6357",
           "tvdb_id": "73587",
-          "library_ids": [
-            "2"
-          ],
+          "library_ids": ["2"],
           "added_at": "2026-11-19T01:06:20.788Z",
           "versions": [],
           "genres": [
@@ -549,13 +506,8 @@
             "Mystery"
           ],
           "content_rating": "TV-PG",
-          "studios": [
-            "Cayuga Productions",
-            "CBS"
-          ],
-          "networks": [
-            "CBS"
-          ],
+          "studios": ["Cayuga Productions", "CBS"],
+          "networks": ["CBS"],
           "rating_tmdb": 8.513,
           "first_air_date": "1959-10-02",
           "last_air_date": "1964-06-19",
@@ -570,9 +522,7 @@
           "imdb_id": "tt0103359",
           "tmdb_id": "2098",
           "tvdb_id": "76168",
-          "library_ids": [
-            "2"
-          ],
+          "library_ids": ["2"],
           "added_at": "2026-11-19T01:02:42.225Z",
           "versions": [],
           "genres": [
@@ -586,14 +536,8 @@
             "Mystery"
           ],
           "content_rating": "TV-PG",
-          "studios": [
-            "DC",
-            "Warner Bros. Television"
-          ],
-          "networks": [
-            "FOX",
-            "Fox Kids"
-          ],
+          "studios": ["DC", "Warner Bros. Television"],
+          "networks": ["FOX", "Fox Kids"],
           "rating_tmdb": 8.592,
           "first_air_date": "1992-09-05",
           "last_air_date": "1995-09-15",
@@ -618,9 +562,7 @@
         "series_title": "The Twilight Zone",
         "season_number": 1,
         "episode_number": 1,
-        "library_ids": [
-          "2"
-        ],
+        "library_ids": ["2"],
         "added_at": "2026-11-19T01:06:08.996Z",
         "versions": [
           {
@@ -782,9 +724,7 @@
         "video_decision": "transcode",
         "audio_decision": "transcode",
         "effective_play_method": "transcode",
-        "adaptation_reasons": [
-          "quality_selected"
-        ],
+        "adaptation_reasons": ["quality_selected"],
         "routing_network_provider": "",
         "routing_workload": "video_transcode",
         "routing_execution": "api",
@@ -796,5 +736,801 @@
     "page": {
       "has_more": false
     }
-  }
+  },
+  "socket": {
+    "hello": {
+      "type": "hello",
+      "schema_version": 1,
+      "connection_id": "01M7ZK2XHAEXP49G6M4R858DB3",
+      "available_channels": ["catalog", "sessions", "downloads"],
+      "required_action": "none"
+    },
+    "subscribed": {
+      "type": "subscribed",
+      "channels": ["sessions", "downloads", "catalog"]
+    },
+    "snapshotSessions": {
+      "type": "snapshot",
+      "channel": "sessions",
+      "timestamp": "2026-11-21T17:39:54.027165827Z",
+      "data": null
+    },
+    "snapshotDownloads": {
+      "type": "snapshot",
+      "channel": "downloads",
+      "timestamp": "2026-11-21T17:39:54.027204578Z",
+      "data": null
+    },
+    "sessionStarted": {
+      "type": "event",
+      "channel": "sessions",
+      "event": "session.started",
+      "event_id": "playback-lifecycle:87",
+      "timestamp": "2026-11-21T17:39:54.369787623Z",
+      "data": {
+        "session_id": "6b60c113-c02d-4af0-97de-a04a22f60fce",
+        "seq": 87,
+        "at": "2026-11-21T17:39:54.364Z",
+        "state": "playing",
+        "session": {
+          "session_id": "6b60c113-c02d-4af0-97de-a04a22f60fce",
+          "user_id": "34",
+          "username": "viewer",
+          "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+          "profile_name": "Viewer",
+          "media_file_id": "972",
+          "requested_media_file_id": "972",
+          "media_item_id": "movie-imdb-tt16539454",
+          "media_title": "Pushpa 2 - The Rule",
+          "media_type": "movie",
+          "poster_url": "/api/v2/artwork/tmdb/movies/857598/poster/w300.4ef8d602f4378af9f410c5665469942b0e331b3a594779de3e0a7428359336ad.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg",
+          "play_method": "direct",
+          "reporting_node": "d50e32458eab",
+          "node_display_name": "Local server",
+          "file_duration": 13457,
+          "started_at": "2026-11-21T17:39:54.361Z",
+          "updated_at": "2026-11-21T17:39:54.364Z",
+          "position_seconds": 0,
+          "is_paused": false,
+          "has_playback_control": false,
+          "client_ip": "192.168.1.50",
+          "stream_location": "local",
+          "client_name": "Tracearr check",
+          "client_version": "1.0.0",
+          "client_label": "Tracearr check 1.0.0",
+          "client_user_agent": "Tracearr live check",
+          "device_id": "tracearr-check-device-3",
+          "device_platform": "Linux",
+          "audio_track_index": 0,
+          "transcode_audio": false,
+          "stream_bitrate_kbps": 2649,
+          "target_bitrate_kbps": null,
+          "output_container": "mp4",
+          "output_protocol": "http",
+          "source_container": "mp4",
+          "source_bitrate_kbps": 2649,
+          "source_video_codec": "h264",
+          "source_video_resolution": "1080p",
+          "source_video_height": 800,
+          "source_audio_codec": "aac",
+          "source_audio_channels": 6,
+          "source_audio_language": "und",
+          "source_audio_title": "AAC (Advanced Audio Coding)",
+          "source_audio_layout": "5.1",
+          "requested_video_codec": "h264",
+          "requested_video_resolution": "1080p",
+          "video_decision": "direct",
+          "audio_decision": "direct",
+          "effective_play_method": "direct",
+          "routing_network_provider": "",
+          "routing_workload": "direct_play",
+          "routing_execution": "none",
+          "routing_egress": "api",
+          "subtitle": null,
+          "lifecycle_seq": 87
+        }
+      }
+    },
+    "sessionsReplaced": {
+      "type": "event",
+      "channel": "sessions",
+      "event": "sessions.replaced",
+      "event_id": "01M7ZK2XW8QJ8NYJJ00PCH9BAW",
+      "timestamp": "2026-11-21T17:39:54.376291577Z",
+      "data": null
+    },
+    "sessionPaused": {
+      "type": "event",
+      "channel": "sessions",
+      "event": "session.paused",
+      "event_id": "playback-lifecycle:88",
+      "timestamp": "2026-11-21T17:39:59.916482921Z",
+      "data": {
+        "session_id": "6b60c113-c02d-4af0-97de-a04a22f60fce",
+        "seq": 88,
+        "at": "2026-11-21T17:39:59.908Z",
+        "state": "paused",
+        "session": {
+          "session_id": "6b60c113-c02d-4af0-97de-a04a22f60fce",
+          "user_id": "34",
+          "username": "viewer",
+          "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+          "profile_name": "Viewer",
+          "media_file_id": "972",
+          "requested_media_file_id": "972",
+          "media_item_id": "movie-imdb-tt16539454",
+          "media_title": "Pushpa 2 - The Rule",
+          "media_type": "movie",
+          "poster_url": "/api/v2/artwork/tmdb/movies/857598/poster/w300.4ef8d602f4378af9f410c5665469942b0e331b3a594779de3e0a7428359336ad.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg",
+          "play_method": "direct",
+          "reporting_node": "d50e32458eab",
+          "node_display_name": "Local server",
+          "file_duration": 13457,
+          "started_at": "2026-11-21T17:39:54.361Z",
+          "updated_at": "2026-11-21T17:39:54.364Z",
+          "position_seconds": 0,
+          "is_paused": true,
+          "has_playback_control": false,
+          "client_ip": "192.168.1.50",
+          "stream_location": "local",
+          "client_name": "Tracearr check",
+          "client_version": "1.0.0",
+          "client_label": "Tracearr check 1.0.0",
+          "client_user_agent": "Tracearr live check",
+          "device_id": "tracearr-check-device-3",
+          "device_platform": "Linux",
+          "audio_track_index": 0,
+          "transcode_audio": false,
+          "stream_bitrate_kbps": 2649,
+          "target_bitrate_kbps": null,
+          "output_container": "mp4",
+          "output_protocol": "http",
+          "source_container": "mp4",
+          "source_bitrate_kbps": 2649,
+          "source_video_codec": "h264",
+          "source_video_resolution": "1080p",
+          "source_video_height": 800,
+          "source_audio_codec": "aac",
+          "source_audio_channels": 6,
+          "source_audio_language": "und",
+          "source_audio_title": "AAC (Advanced Audio Coding)",
+          "source_audio_layout": "5.1",
+          "requested_video_codec": "h264",
+          "requested_video_resolution": "1080p",
+          "video_decision": "direct",
+          "audio_decision": "direct",
+          "effective_play_method": "direct",
+          "routing_network_provider": "",
+          "routing_workload": "direct_play",
+          "routing_execution": "none",
+          "routing_egress": "api",
+          "subtitle": null,
+          "lifecycle_seq": 88
+        }
+      }
+    },
+    "sessionResumed": {
+      "type": "event",
+      "channel": "sessions",
+      "event": "session.resumed",
+      "event_id": "playback-lifecycle:89",
+      "timestamp": "2026-11-21T17:40:03.964485976Z",
+      "data": {
+        "session_id": "6b60c113-c02d-4af0-97de-a04a22f60fce",
+        "seq": 89,
+        "at": "2026-11-21T17:40:03.947Z",
+        "state": "playing",
+        "session": {
+          "session_id": "6b60c113-c02d-4af0-97de-a04a22f60fce",
+          "user_id": "34",
+          "username": "viewer",
+          "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+          "profile_name": "Viewer",
+          "media_file_id": "972",
+          "requested_media_file_id": "972",
+          "media_item_id": "movie-imdb-tt16539454",
+          "media_title": "Pushpa 2 - The Rule",
+          "media_type": "movie",
+          "poster_url": "/api/v2/artwork/tmdb/movies/857598/poster/w300.4ef8d602f4378af9f410c5665469942b0e331b3a594779de3e0a7428359336ad.webp?exp=1795320000&sig=Zml4dHVyZS1zaWduYXR1cg",
+          "play_method": "direct",
+          "reporting_node": "d50e32458eab",
+          "node_display_name": "Local server",
+          "file_duration": 13457,
+          "started_at": "2026-11-21T17:39:54.361Z",
+          "updated_at": "2026-11-21T17:39:59.916Z",
+          "position_seconds": 8,
+          "is_paused": false,
+          "has_playback_control": false,
+          "client_ip": "192.168.1.50",
+          "stream_location": "local",
+          "client_name": "Tracearr check",
+          "client_version": "1.0.0",
+          "client_label": "Tracearr check 1.0.0",
+          "client_user_agent": "Tracearr live check",
+          "device_id": "tracearr-check-device-3",
+          "device_platform": "Linux",
+          "audio_track_index": 0,
+          "transcode_audio": false,
+          "stream_bitrate_kbps": 2649,
+          "target_bitrate_kbps": null,
+          "output_container": "mp4",
+          "output_protocol": "http",
+          "source_container": "mp4",
+          "source_bitrate_kbps": 2649,
+          "source_video_codec": "h264",
+          "source_video_resolution": "1080p",
+          "source_video_height": 800,
+          "source_audio_codec": "aac",
+          "source_audio_channels": 6,
+          "source_audio_language": "und",
+          "source_audio_title": "AAC (Advanced Audio Coding)",
+          "source_audio_layout": "5.1",
+          "requested_video_codec": "h264",
+          "requested_video_resolution": "1080p",
+          "video_decision": "direct",
+          "audio_decision": "direct",
+          "effective_play_method": "direct",
+          "routing_network_provider": "",
+          "routing_workload": "direct_play",
+          "routing_execution": "none",
+          "routing_egress": "api",
+          "subtitle": null,
+          "lifecycle_seq": 89
+        }
+      }
+    },
+    "sessionStoppedByUser": {
+      "type": "event",
+      "channel": "sessions",
+      "event": "session.stopped",
+      "event_id": "playback-lifecycle:92",
+      "timestamp": "2026-11-21T17:40:16.133163039Z",
+      "data": {
+        "session_id": "191209dd-2c10-4820-839e-6051db742d19",
+        "seq": 92,
+        "at": "2026-11-21T17:40:16.126Z",
+        "state": "stopped",
+        "end_reason": "stopped",
+        "history": {
+          "session_id": "191209dd-2c10-4820-839e-6051db742d19",
+          "user_id": "34",
+          "username": "viewer",
+          "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+          "profile_name": "Viewer",
+          "media_item_id": "movie-imdb-tt16539454",
+          "media_file_id": "972",
+          "media_title": "Pushpa 2 - The Rule",
+          "media_type": "movie",
+          "play_method": "direct",
+          "started_at": "2026-11-21T17:40:13.550Z",
+          "ended_at": "2026-11-21T17:40:16.126Z",
+          "end_position_seconds": 3,
+          "duration_seconds": 13457,
+          "completed": false,
+          "played_seconds": 3,
+          "series_title": "",
+          "season_number": null,
+          "episode_number": null,
+          "measured": true,
+          "start_position_seconds": 0,
+          "paused_seconds": 0,
+          "measured_since": "2026-11-21T17:40:13.550Z",
+          "measured_until": "2026-11-21T17:40:16.124Z",
+          "client_ip": "192.168.1.50",
+          "device_id": "tracearr-check-device-3",
+          "device_platform": "Linux",
+          "client_name": "Tracearr check",
+          "client_version": "1.0.0",
+          "video_decision": "direct",
+          "audio_decision": "direct",
+          "end_reason": "stopped",
+          "subtitle": null,
+          "lifecycle_seq": 92
+        }
+      }
+    },
+    "sessionTerminated": {
+      "type": "event",
+      "channel": "sessions",
+      "event": "session.stopped",
+      "event_id": "playback-lifecycle:94",
+      "timestamp": "2026-11-21T17:40:24.167454861Z",
+      "data": {
+        "session_id": "6b60c113-c02d-4af0-97de-a04a22f60fce",
+        "seq": 94,
+        "at": "2026-11-21T17:40:24.163Z",
+        "state": "stopped",
+        "end_reason": "terminated",
+        "history": {
+          "session_id": "6b60c113-c02d-4af0-97de-a04a22f60fce",
+          "user_id": "34",
+          "username": "viewer",
+          "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+          "profile_name": "Viewer",
+          "media_item_id": "movie-imdb-tt16539454",
+          "media_file_id": "972",
+          "media_title": "Pushpa 2 - The Rule",
+          "media_type": "movie",
+          "play_method": "direct",
+          "started_at": "2026-11-21T17:39:54.361Z",
+          "ended_at": "2026-11-21T17:40:24.163Z",
+          "end_position_seconds": 9,
+          "duration_seconds": 13457,
+          "completed": false,
+          "played_seconds": 8,
+          "series_title": "",
+          "season_number": null,
+          "episode_number": null,
+          "measured": true,
+          "start_position_seconds": 0,
+          "paused_seconds": 4.047909924,
+          "measured_since": "2026-11-21T17:39:54.362Z",
+          "measured_until": "2026-11-21T17:40:24.161Z",
+          "client_ip": "192.168.1.50",
+          "device_id": "tracearr-check-device-3",
+          "device_platform": "Linux",
+          "client_name": "Tracearr check",
+          "client_version": "1.0.0",
+          "video_decision": "direct",
+          "audio_decision": "direct",
+          "end_reason": "terminated",
+          "subtitle": null,
+          "lifecycle_seq": 94
+        }
+      }
+    },
+    "downloadCreated": {
+      "type": "event",
+      "channel": "downloads",
+      "event": "download.changed",
+      "event_id": "download-change:3",
+      "timestamp": "2026-11-21T17:40:27.486562541Z",
+      "data": {
+        "download_id": "153034427977439380",
+        "user_id": "34",
+        "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+        "device_id": "tracearr-check-device-3",
+        "content_id": "movie-imdb-tt16539454",
+        "status": "ready",
+        "change": "created",
+        "at": "2026-11-21T17:40:27.186Z"
+      }
+    },
+    "downloadRemoved": {
+      "type": "event",
+      "channel": "downloads",
+      "event": "download.changed",
+      "event_id": "download-change:4",
+      "timestamp": "2026-11-21T17:40:30.489156057Z",
+      "data": {
+        "download_id": "153034427977439380",
+        "user_id": "34",
+        "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+        "device_id": "tracearr-check-device-3",
+        "content_id": "movie-imdb-tt16539454",
+        "status": "ready",
+        "change": "removed",
+        "at": "2026-11-21T17:40:29.650Z"
+      }
+    },
+    "accessChanged": {
+      "type": "access_changed"
+    },
+    "snapshotCatalog": {
+      "type": "snapshot",
+      "channel": "catalog",
+      "timestamp": "2026-11-21T17:40:39.182634154Z",
+      "data": null
+    },
+    "catalogLibraryDisabled": {
+      "type": "event",
+      "channel": "catalog",
+      "event": "catalog.library.changed",
+      "event_id": "01M7ZKT5Z85QVCW1WZTQ3G5VPH",
+      "timestamp": "2026-11-21T17:52:36.328000864Z",
+      "data": {
+        "library_id": "3",
+        "matched_files": 0,
+        "missing": 0,
+        "new": 0,
+        "reason": "library_disabled",
+        "retried_items": 0,
+        "still_unmatched_warnings": 0,
+        "updated": 0
+      }
+    },
+    "catalogLibraryEnabled": {
+      "type": "event",
+      "channel": "catalog",
+      "event": "catalog.library.changed",
+      "event_id": "01M7ZKT910TH96ATJ6VEB2KGT7",
+      "timestamp": "2026-11-21T17:52:39.456608194Z",
+      "data": {
+        "library_id": "3",
+        "matched_files": 0,
+        "missing": 0,
+        "new": 0,
+        "reason": "library_enabled",
+        "retried_items": 0,
+        "still_unmatched_warnings": 0,
+        "updated": 0
+      }
+    },
+    "libraryChanged": {
+      "type": "event",
+      "channel": "catalog",
+      "event": "library.changed",
+      "event_id": "01M7ZKT5Z85QVCW1WZTSD89HA0",
+      "timestamp": "2026-11-21T17:52:36.328108059Z",
+      "data": {
+        "library_id": "3",
+        "matched_files": 0,
+        "missing": 0,
+        "new": 0,
+        "reason": "library_disabled",
+        "retried_items": 0,
+        "still_unmatched_warnings": 0,
+        "updated": 0
+      }
+    }
+  },
+  "downloadEntries": {
+    "items": [
+      {
+        "id": "153034427977439380",
+        "profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+        "device_id": "tracearr-check-device-3",
+        "content_id": "movie-imdb-tt16539454",
+        "title": "Pushpa 2 - The Rule",
+        "media_type": "movie",
+        "episode": null,
+        "status": "ready",
+        "quality": "original",
+        "effective_quality": "original",
+        "delivery_format": "original",
+        "target_bitrate_kbps": 0,
+        "file_size": 4456899079,
+        "created_at": "2026-11-21T17:40:27.185Z",
+        "updated_at": "2026-11-21T17:40:27.185Z",
+        "completed_at": null,
+        "status_event_at": null,
+        "created_client_ip": "192.168.1.50",
+        "last_client_ip": "192.168.1.50",
+        "user_id": "34",
+        "username": "viewer",
+        "device_name": "Tracearr check"
+      },
+      {
+        "id": "152776912207382470",
+        "profile_id": "8581c93e-0798-41e4-ba29-cb7cf3acced0",
+        "device_id": "aef454b9-44e6-412f-913b-3e3a5eb0dbee",
+        "content_id": "series-imdb-tt31510819",
+        "episode_id": "episode-imdb-tt31510819-1-1",
+        "title": "MobLand",
+        "media_type": "series",
+        "episode": {
+          "season_number": 1,
+          "episode_number": 1,
+          "title": "Stick or Twist"
+        },
+        "status": "downloading",
+        "quality": "original",
+        "effective_quality": "original",
+        "delivery_format": "original",
+        "target_bitrate_kbps": 0,
+        "file_size": 6497401574,
+        "created_at": "2026-11-19T23:02:15.827Z",
+        "updated_at": "2026-11-19T23:02:16.332Z",
+        "completed_at": null,
+        "status_event_at": "2026-11-19T23:02:16.263Z",
+        "created_client_ip": "203.0.113.24",
+        "last_client_ip": "203.0.113.24",
+        "user_id": "1",
+        "username": "silo-owner",
+        "device_name": "iPhone"
+      },
+      {
+        "id": "152645721139489406",
+        "profile_id": "8581c93e-0798-41e4-ba29-cb7cf3acced0",
+        "device_id": "aef454b9-44e6-412f-913b-3e3a5eb0dbee",
+        "content_id": "series-imdb-tt14824792",
+        "episode_id": "episode-imdb-tt14824792-1-1",
+        "title": "ted",
+        "media_type": "series",
+        "episode": {
+          "season_number": 1,
+          "episode_number": 1,
+          "title": "Just Say Yes"
+        },
+        "status": "downloading",
+        "quality": "original",
+        "effective_quality": "original",
+        "delivery_format": "original",
+        "target_bitrate_kbps": 0,
+        "file_size": 5776735027,
+        "created_at": "2026-11-19T01:18:59.854Z",
+        "updated_at": "2026-11-19T23:00:16.938Z",
+        "completed_at": null,
+        "status_event_at": "2026-11-19T23:00:16.840Z",
+        "created_client_ip": null,
+        "last_client_ip": "192.168.1.50",
+        "user_id": "1",
+        "username": "silo-owner",
+        "device_name": "iPhone"
+      }
+    ],
+    "page": {
+      "has_more": false
+    }
+  },
+  "resources": [
+    {
+      "available": true,
+      "sampled_at": "2026-11-21T17:39:42.828Z",
+      "system": {
+        "cpu_pct": 3,
+        "load1": 0.31,
+        "cores": 16,
+        "mem_used_mb": 1158,
+        "mem_total_mb": 12288,
+        "disks": [
+          {
+            "role": "scratch",
+            "used_gb": 0.82,
+            "total_gb": 31.16,
+            "scratch": true
+          },
+          {
+            "role": "library-1",
+            "used_gb": 85932.23,
+            "total_gb": 105218.05
+          },
+          {
+            "role": "library-2",
+            "used_gb": 85932.23,
+            "total_gb": 105218.05
+          },
+          {
+            "role": "library-3",
+            "used_gb": 85932.23,
+            "total_gb": 105218.05
+          }
+        ],
+        "net_rx_bps": 201,
+        "net_tx_bps": 0
+      },
+      "gpu": [
+        {
+          "device": "/dev/dri/renderD128",
+          "vendor": "intel",
+          "sessions": 0,
+          "source": "unavailable"
+        }
+      ],
+      "stale": false,
+      "attribution": {
+        "instance_id": "b9e31506-02c2-4856-968d-a0e577f07d11",
+        "sample_interval_seconds": 5,
+        "sample_duration_seconds": 0.012065292,
+        "cpu": {
+          "scope": "host",
+          "source": "procfs",
+          "available": true
+        },
+        "memory": {
+          "scope": "cgroup",
+          "source": "cgroup_v2",
+          "available": true
+        },
+        "load": {
+          "scope": "host",
+          "source": "procfs",
+          "available": true
+        },
+        "network": {
+          "scope": "network_namespace",
+          "source": "procfs",
+          "available": true
+        },
+        "process": {
+          "resident_bytes": 375410688,
+          "virtual_bytes": 5212614656,
+          "cpu_seconds": 225.25,
+          "threads": 25,
+          "open_fds": 75,
+          "max_fds": 40960,
+          "read_bytes": 3187212288,
+          "write_bytes": 78315520,
+          "heap_live_bytes": 62559896,
+          "go_memory_bytes": 232712504,
+          "goroutines": 533
+        },
+        "cgroup_cpu": {
+          "version": "v2",
+          "scope": "leaf",
+          "usage_seconds": 1109.052426,
+          "throttled_seconds": 0,
+          "periods": 0,
+          "throttled_periods": 0
+        },
+        "cgroup_memory": {
+          "version": "v2",
+          "scope": "leaf",
+          "current_bytes": 1333981184,
+          "limit_bytes": 12884901888,
+          "working_set_bytes": 1215143936,
+          "swap_bytes": 0,
+          "high_events": 0,
+          "max_events": 0,
+          "oom_events": 0,
+          "oom_kills": 0
+        },
+        "children": {
+          "workload": "ffmpeg",
+          "sampled": 0,
+          "unavailable": 0,
+          "truncated": false,
+          "resident_bytes": 0,
+          "cpu_seconds": 0
+        },
+        "disks": [
+          {
+            "role": "scratch",
+            "inodes_used": 43341,
+            "inodes_total": 8169090
+          },
+          {
+            "role": "library-1",
+            "inodes_used": 10703,
+            "inodes_total": 3906581952
+          },
+          {
+            "role": "library-2",
+            "inodes_used": 10703,
+            "inodes_total": 3906581952
+          },
+          {
+            "role": "library-3",
+            "inodes_used": 10703,
+            "inodes_total": 3906581952
+          }
+        ],
+        "dropped_disk_roots": 0
+      }
+    },
+    {
+      "available": true,
+      "sampled_at": "2026-11-21T17:39:52.829Z",
+      "system": {
+        "cpu_pct": 2,
+        "load1": 0.26,
+        "cores": 16,
+        "mem_used_mb": 1163,
+        "mem_total_mb": 12288,
+        "disks": [
+          {
+            "role": "scratch",
+            "used_gb": 0.82,
+            "total_gb": 31.16,
+            "scratch": true
+          },
+          {
+            "role": "library-1",
+            "used_gb": 85932.23,
+            "total_gb": 105218.05
+          },
+          {
+            "role": "library-2",
+            "used_gb": 85932.23,
+            "total_gb": 105218.05
+          },
+          {
+            "role": "library-3",
+            "used_gb": 85932.23,
+            "total_gb": 105218.05
+          }
+        ],
+        "net_rx_bps": 1374,
+        "net_tx_bps": 2080
+      },
+      "gpu": [
+        {
+          "device": "/dev/dri/renderD128",
+          "vendor": "intel",
+          "sessions": 0,
+          "source": "unavailable"
+        }
+      ],
+      "stale": false,
+      "attribution": {
+        "instance_id": "b9e31506-02c2-4856-968d-a0e577f07d11",
+        "sample_interval_seconds": 5,
+        "sample_duration_seconds": 0.011759834,
+        "cpu": {
+          "scope": "host",
+          "source": "procfs",
+          "available": true
+        },
+        "memory": {
+          "scope": "cgroup",
+          "source": "cgroup_v2",
+          "available": true
+        },
+        "load": {
+          "scope": "host",
+          "source": "procfs",
+          "available": true
+        },
+        "network": {
+          "scope": "network_namespace",
+          "source": "procfs",
+          "available": true
+        },
+        "process": {
+          "resident_bytes": 384167936,
+          "virtual_bytes": 5212614656,
+          "cpu_seconds": 225.29,
+          "threads": 25,
+          "open_fds": 75,
+          "max_fds": 40960,
+          "read_bytes": 3232935936,
+          "write_bytes": 78315520,
+          "heap_live_bytes": 62559896,
+          "go_memory_bytes": 232712504,
+          "goroutines": 533
+        },
+        "cgroup_cpu": {
+          "version": "v2",
+          "scope": "leaf",
+          "usage_seconds": 1109.152491,
+          "throttled_seconds": 0,
+          "periods": 0,
+          "throttled_periods": 0
+        },
+        "cgroup_memory": {
+          "version": "v2",
+          "scope": "leaf",
+          "current_bytes": 1444536320,
+          "limit_bytes": 12884901888,
+          "working_set_bytes": 1220411392,
+          "swap_bytes": 0,
+          "high_events": 0,
+          "max_events": 0,
+          "oom_events": 0,
+          "oom_kills": 0
+        },
+        "children": {
+          "workload": "ffmpeg",
+          "sampled": 0,
+          "unavailable": 0,
+          "truncated": false,
+          "resident_bytes": 0,
+          "cpu_seconds": 0
+        },
+        "disks": [
+          {
+            "role": "scratch",
+            "inodes_used": 43341,
+            "inodes_total": 8169090
+          },
+          {
+            "role": "library-1",
+            "inodes_used": 10703,
+            "inodes_total": 3906581952
+          },
+          {
+            "role": "library-2",
+            "inodes_used": 10703,
+            "inodes_total": 3906581952
+          },
+          {
+            "role": "library-3",
+            "inodes_used": 10703,
+            "inodes_total": 3906581952
+          }
+        ],
+        "dropped_disk_roots": 0
+      }
+    }
+  ]
 }

@@ -4,12 +4,19 @@
  * Pure functions turning Silo /api/v2 responses into Tracearr's media server types.
  */
 
-import { normalizeDynamicRange, normalizeResolution, type SubtitleInfo } from '@tracearr/shared';
+import {
+  normalizeDynamicRange,
+  normalizeResolution,
+  type ServerResourceDataPoint,
+  type SubtitleInfo,
+} from '@tracearr/shared';
 import { sanitizeCodec } from '../../../utils/codecNormalizer.js';
 import { normalizeStreamDecisions } from '../../../utils/transcodeNormalizer.js';
 import { calculateProgress } from '../shared/parserUtils.js';
 import { rollupVersions } from '../shared/versionUtils.js';
 import type {
+  DownloadSourceDescription,
+  DownloadSourceRequest,
   MediaItemVersion,
   MediaLibrary,
   MediaLibraryItem,
@@ -21,10 +28,12 @@ import type {
   SiloCatalogItem,
   SiloCatalogVersion,
   SiloDevice,
+  SiloDownloadEntry,
   SiloLibrary,
   SiloProfile,
   SiloSession,
   SiloSubtitle,
+  SiloSystemResources,
   SiloUser,
 } from './types.js';
 
@@ -313,4 +322,94 @@ export function parseSiloLibraryListing(
   }
 
   return { items, episodes, seasons: [...seasons.values()] };
+}
+
+/** Silo's CPU seconds at one sample: the cgroup counter, which counts its transcoders, else the process's own */
+export interface SiloCpuCounter {
+  sampledAt: number;
+  cpuSeconds: number;
+  source: 'cgroup' | 'process';
+  /** The cgroup's scope, leaf or ancestor */
+  scope?: string;
+}
+
+/** Silo leaves the cgroup counter out of a sample whose cgroup read failed */
+export function siloCpuCounter(body: SiloSystemResources): SiloCpuCounter | null {
+  if (!body.available || body.stale || !body.sampled_at) return null;
+  const sampledAt = Date.parse(body.sampled_at);
+  const cgroup = body.attribution?.cgroup_cpu;
+  if (typeof cgroup?.usage_seconds === 'number') {
+    return { sampledAt, cpuSeconds: cgroup.usage_seconds, source: 'cgroup', scope: cgroup.scope };
+  }
+  const processSeconds = body.attribution?.process?.cpu_seconds;
+  return typeof processSeconds === 'number'
+    ? { sampledAt, cpuSeconds: processSeconds, source: 'process' }
+    : null;
+}
+
+/**
+ * One point per new Silo sample. Silo's CPU share is its counter's rise since the previous
+ * sample, so the first sample, the same sample read again, a counter that went back (Silo
+ * restarted) and a counter other than the previous one add none. mem_total_mb is MiB.
+ */
+export function parseSiloResources(
+  body: SiloSystemResources,
+  previous: SiloCpuCounter | undefined
+): Omit<ServerResourceDataPoint, 'timespan'> | null {
+  const counter = siloCpuCounter(body);
+  const { system } = body;
+  const residentBytes = body.attribution?.process?.resident_bytes;
+  if (
+    !counter ||
+    !system ||
+    residentBytes === undefined ||
+    !previous ||
+    counter.source !== previous.source ||
+    counter.scope !== previous.scope ||
+    counter.sampledAt <= previous.sampledAt ||
+    counter.cpuSeconds < previous.cpuSeconds
+  ) {
+    return null;
+  }
+  const elapsedSeconds = (counter.sampledAt - previous.sampledAt) / 1000;
+  const childrenBytes = body.attribution?.children?.resident_bytes ?? 0;
+  return {
+    at: Math.floor(counter.sampledAt / 1000),
+    hostCpuUtilization: system.cpu_pct,
+    hostMemoryUtilization: (system.mem_used_mb / system.mem_total_mb) * 100,
+    processCpuUtilization:
+      ((counter.cpuSeconds - previous.cpuSeconds) / (elapsedSeconds * system.cores)) * 100,
+    processMemoryUtilization:
+      ((residentBytes + childrenBytes) / (system.mem_total_mb * 1024 * 1024)) * 100,
+  };
+}
+
+/**
+ * A download as Silo listed it: what it sent, and the address it was created from, else its last.
+ * An entry names no file, so no version is described.
+ */
+export function parseSiloDownloadSource(
+  request: DownloadSourceRequest,
+  entry: SiloDownloadEntry | undefined
+): DownloadSourceDescription {
+  return {
+    version: null,
+    delivered: entry
+      ? {
+          bytes: entry.file_size || null,
+          videoCodec: null,
+          audioCodec: null,
+          container: null,
+          bitrateKbps: entry.target_bitrate_kbps || null,
+          resolution: null,
+        }
+      : null,
+    device: {
+      deviceId: request.deviceId,
+      playerName: entry?.device_name || request.device,
+      product: request.app,
+      platform: null,
+    },
+    ipAddress: entry ? (entry.created_client_ip ?? entry.last_client_ip) : null,
+  };
 }
