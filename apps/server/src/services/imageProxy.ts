@@ -495,9 +495,9 @@ export function buildUpstreamRequest(
       }
       return { imageUrl: `${baseUrl}${imagePath}`, headers };
     }
-    // A signed URL names its own size, and Silo refuses one whose path or query was changed
+    // A signed URL names its own size, and Silo refuses one whose path or query was changed. The
+    // signature is the only credential: a key sent along would spend the key's rate budget.
     case 'silo':
-      headers.Authorization = `Bearer ${server.token}`;
       return { imageUrl: `${baseUrl}${imagePath}`, headers };
     default:
       return assertNever(server.type);
@@ -527,8 +527,8 @@ function buildSeerrImageRequest(url: string, imagePath: string): UpstreamRequest
 }
 
 /**
- * tofa answers an artwork path with a redirect into its own image cache, and Silo an item poster
- * link with a redirect to its signed artwork; both targets need the key too.
+ * tofa answers an artwork path with a redirect into its own image cache, which needs the key too,
+ * and Silo an item poster link with a redirect to its signed artwork.
  */
 function followsImageRedirect(type: ServerType): boolean {
   switch (type) {
@@ -545,9 +545,9 @@ function followsImageRedirect(type: ServerType): boolean {
 }
 
 /**
- * A redirect is followed, with the key, only where the server's images live behind one and the
- * target passes the same path checks as the first request. Any other redirect is returned as
- * the failure it is, since following it would carry the key past those checks.
+ * A redirect is followed only where the server's images live behind one and the target passes
+ * the same path checks as the first request. Any other redirect is returned as the failure it
+ * is, since following it could carry a key past those checks.
  */
 async function fetchUpstreamImage(
   server: ServerRow,
@@ -755,6 +755,7 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
   // hiccup degrades to the old behavior instead of a broken image.
   const release = await acquireFetchSlot();
   let serverAnswered = false;
+  let rateLimited = false;
   try {
     // Inside the try so a blocked path degrades to the fallback image like any
     // other upstream failure, instead of escaping as a 500.
@@ -765,6 +766,7 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
       try {
         const response = await fetchFromOrigin(origin, candidate);
         serverAnswered = true;
+        if (response.status === 429) rateLimited = true;
 
         // Reject only clearly-non-image payloads (the Plex transcoder can
         // return an XML error page with a 200). Anything else - image/*,
@@ -818,7 +820,8 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
       failure: {
         reason: err instanceof Error ? err.message : String(err),
         itemFault:
-          serverAnswered || err instanceof SsrfBlockedError || err instanceof NoServerImageError,
+          !rateLimited &&
+          (serverAnswered || err instanceof SsrfBlockedError || err instanceof NoServerImageError),
       },
       data: getFallbackImage(fallback, width, height),
       contentType: 'image/svg+xml',

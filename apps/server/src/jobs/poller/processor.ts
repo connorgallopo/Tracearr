@@ -653,10 +653,11 @@ function placeSession(
 
 /**
  * Issue #121: Plex can reassign a playback's sessionKey, so an open row for the same
- * user and item means a new key is a duplicate. JF, Emby and Silo key sessions by user, device
+ * user and item means a new key is a duplicate. JF/Emby key sessions by user, device
  * and item, so their tracking key already covers this. A tofa player that reconnects gets
  * a new session id while the old one stays listed; the tofa client passes on only the
- * newest per device and file, and the confirm step stops the row it replaces.
+ * newest per device and file, and the confirm step stops the row it replaces. Silo lists and
+ * records each session id as its own session, so each is its own play here too.
  */
 async function findOpenRowForSameContent(
   serverType: ServerType,
@@ -743,8 +744,8 @@ function noSessionChanges(success: boolean): ServerProcessingResult {
 
 /**
  * Issue #57: Plex keeps a sessionKey across items (e.g. "Play Next Episode"), so a
- * tracked session can change media. JF, Emby and Silo key sessions by item. Whether tofa moves
- * a session to the next item is unknown, so a new item under its session id is a new play.
+ * tracked session can change media. JF/Emby key sessions by item. Whether tofa or Silo moves a
+ * session to the next item is unknown, so a new item under its session id is a new play.
  * Normalize '' to null: a row stored during a metadata blip carries an empty
  * ratingKey, which detectMediaChange would otherwise read as a real key and treat
  * the arrival of the true key as a media change.
@@ -757,10 +758,10 @@ function isMediaChange(
   switch (serverType) {
     case 'plex':
     case 'tofa':
+    case 'silo':
       return detectMediaChange(existingRatingKey || null, ratingKey || null);
     case 'jellyfin':
     case 'emby':
-    case 'silo':
       return false;
     default:
       return assertNever(serverType);
@@ -1609,7 +1610,7 @@ async function processServerSessions(
           // this play. Only reuse the row when its server user matches;
           // otherwise treat it as no match so the stale row falls to the
           // stale-sweep and this play creates fresh under the correct user. The
-          // composite (JF, Emby, Silo) key already includes userDetail.id, so this is a
+          // composite (JF/Emby) key already includes userDetail.id, so this is a
           // no-op there.
           const existingSession =
             existingRow && existingRow.serverUserId !== userDetail.id ? null : existingRow;
@@ -1917,8 +1918,8 @@ async function processServerSessions(
             existingSession.videoDecision !== processed.videoDecision ||
             existingSession.audioDecision !== processed.audioDecision;
 
-          // Only a composite-keyed row can carry another session id (a JF, Emby or Silo restart); a
-          // Plex row is matched by its sessionKey.
+          // Only a composite-keyed row can carry another session.Id (JF/Emby restart); a Plex row
+          // is matched by its sessionKey.
           if (existingSession.sessionKey !== processed.sessionKey) {
             console.log(
               `[Poller] [${server.type.toUpperCase()}] Session ${sessionKey} session.Id changed: ${existingSession.sessionKey} → ${processed.sessionKey}`

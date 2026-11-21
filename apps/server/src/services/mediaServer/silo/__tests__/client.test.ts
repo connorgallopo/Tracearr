@@ -47,8 +47,6 @@ function client(url = URL) {
 const requested = (path: string) =>
   mockFetchJson.mock.calls.map(([url]) => url).filter((url) => url.includes(path));
 
-const RESTARTED = 'a613750c-52f6-4ef2-b2a8-616135598312';
-
 /** The fixture movie row as another session of the same account, device and item */
 const play = (sessionId: string, startedAt: string, fields: object = {}) => ({
   ...silo.sessions.items[0],
@@ -60,7 +58,7 @@ const play = (sessionId: string, startedAt: string, fields: object = {}) => ({
 const pausedPlay = play('74bb3687-6a17-4de1-819a-db80c7bac488', '2026-11-21T04:05:10.120Z', {
   is_paused: true,
 });
-const restartedPlay = play(RESTARTED, '2026-11-21T04:05:13.480Z');
+const restartedPlay = play('a613750c-52f6-4ef2-b2a8-616135598312', '2026-11-21T04:05:13.480Z');
 
 async function poll(url: string, items: object[]) {
   serve({ '/admin/sessions': { items }, '/admin/devices': silo.devices });
@@ -238,41 +236,14 @@ describe('SiloClient', () => {
     expect(requested('/admin/devices')).toHaveLength(3);
   });
 
-  it('lists only the latest started session an account holds on a device for an item', async () => {
+  it('lists a paused leftover and the newer session on its device, as Silo lists them', async () => {
     for (const items of [
       [pausedPlay, restartedPlay],
       [restartedPlay, pausedPlay],
     ]) {
-      expect(await poll('http://silo-restart.local:8090', items)).toEqual([[RESTARTED, 'playing']]);
-    }
-  });
-
-  it('drops a paused leftover after the session that replaced it ends, and plays a later start', async () => {
-    const url = 'http://silo-leftover.local:8090';
-    const later = play('5d1c0f7e-2b8a-4c39-9e61-0a4f7b3c8d12', '2026-11-21T04:20:00.000Z');
-
-    expect(await poll(url, [pausedPlay, restartedPlay])).toEqual([[RESTARTED, 'playing']]);
-    expect(await poll(url, [pausedPlay])).toEqual([]);
-    expect(await poll(url, [])).toEqual([]);
-    expect(await poll(url, [later])).toEqual([[later.session_id, 'playing']]);
-  });
-
-  it('never folds a session without a device id into another, nor one account on two devices', async () => {
-    const noDevice = [
-      play('9a3e5c71-0f2d-4b86-a1c4-7e9d2b6f5a03', '2026-11-21T04:05:10.120Z', { device_id: '' }),
-      play('c8f1d2e4-6b7a-4935-8d0c-1e2f3a4b5c6d', '2026-11-21T04:05:13.480Z', { device_id: '' }),
-    ];
-    const twoDevices = [
-      play('1b2c3d4e-5f60-4718-89ab-cdef01234567', '2026-11-21T04:05:10.120Z', {
-        device_id: 'device-one',
-      }),
-      play('7e6d5c4b-3a29-4180-9f7e-6d5c4b3a2918', '2026-11-21T04:05:13.480Z', {
-        device_id: 'device-two',
-      }),
-    ];
-
-    for (const items of [noDevice, twoDevices]) {
-      expect(await poll('http://silo-devices-apart.local:8090', items)).toHaveLength(2);
+      expect(await poll('http://silo-restart.local:8090', items)).toEqual(
+        items.map((row) => [row.session_id, row.is_paused ? 'paused' : 'playing'])
+      );
     }
   });
 
@@ -369,6 +340,30 @@ describe('SiloClient', () => {
     expect(await syncClient.getLibraryRevision()).toBe(NOT_NEEDED);
   });
 
+  it('lists a season as added since the cursor only when its earliest episode was, dated by it', async () => {
+    const listed = silo.catalog['2'].items;
+    serve({
+      '/admin/catalog/items': (url: string) => {
+        const after = new globalThis.URL(url).searchParams.get('added_after');
+        return {
+          items: after ? listed.filter((item) => item.added_at >= after) : listed,
+          page: { has_more: false },
+        };
+      },
+    });
+    const since = (iso: string) => ({ kind: 'date' as const, since: new Date(iso) });
+    const seasonsSince = async (iso: string) =>
+      (await client().getLibrarySeasonsSince('2', since(iso))).items.map((season) => [
+        season.ratingKey,
+        season.addedAt.toISOString(),
+      ]);
+
+    expect(await seasonsSince('2026-11-19T01:06:09.000Z')).toEqual([]);
+    expect(await seasonsSince('2026-11-19T01:06:00.000Z')).toEqual([
+      ['series-imdb-tt0052520/season/1', '2026-11-19T01:06:08.996Z'],
+    ]);
+  });
+
   it('finds which items are still in a library, 200 ids a read, never a season', async () => {
     const [movie] = silo.catalog['1'].items;
     serve({
@@ -460,6 +455,36 @@ describe('SiloClient', () => {
     expect(requested('content_ids=')).toHaveLength(2);
   });
 
+  it('remembers for five minutes that the catalog lists no poster for an id', async () => {
+    vi.useFakeTimers({ now: new Date('2026-11-20T12:00:00Z') });
+    const [movie] = silo.catalog['1'].items;
+    let listed: object[] = [];
+    serve({ '/admin/catalog/items': () => ({ items: listed }) });
+    const posterClient = client('http://silo-poster-negative.local:8090');
+
+    expect(await posterClient.getPosterUrl('movie-imdb-tt0038650')).toBeNull();
+    listed = [movie ?? {}];
+    vi.advanceTimersByTime(5 * 60_000 - 1);
+    expect(await posterClient.getPosterUrl('movie-imdb-tt0038650')).toBeNull();
+    expect(requested('content_ids=')).toHaveLength(1);
+
+    vi.advanceTimersByTime(1);
+    expect(await posterClient.getPosterUrl('movie-imdb-tt0038650')).toBe(movie?.poster_url);
+    expect(requested('content_ids=')).toHaveLength(2);
+  });
+
+  it('waits at most two seconds on 429s for a poster, which holds an image fetch slot', async () => {
+    vi.useFakeTimers();
+    serve({ '/admin/catalog/items': httpError(429, '1') });
+
+    const poster = client('http://silo-poster-busy.local:8090').getPosterUrl('movie-imdb-tt0038650');
+    const failed = expect(poster).rejects.toMatchObject({ statusCode: 429 });
+    await vi.advanceTimersByTimeAsync(2000);
+
+    await failed;
+    expect(mockFetchJson).toHaveBeenCalledTimes(3);
+  });
+
   it('answers requests NOT_NEEDED', async () => {
     expect(await client().getRequests()).toBe(NOT_NEEDED);
     expect(await client().getRequestPosterPath()).toBe(NOT_NEEDED);
@@ -484,12 +509,26 @@ describe('SiloClient.verifyServerAdmin', () => {
       expect(await SiloClient.verifyServerAdmin(KEY, URL)).toEqual({
         success: false,
         code: SiloClient.AdminVerifyError.MISSING_SCOPES,
-        message: expect.stringContaining(
-          'admin:monitor:read, admin:sessions:control and libraries:read'
+        message: expect.stringMatching(
+          /admin:monitor:read, admin:sessions:control and libraries:read\. An unscoped admin key does not work/
         ),
       });
     }
   );
+
+  it('logs the build and contract the system info gives when a key is checked', async () => {
+    const url = 'http://silo-verify-contract.local:8090';
+    serve(verifyAnswers());
+
+    await SiloClient.verifyServerAdmin(KEY, url);
+
+    expect(console.info).toHaveBeenCalledWith(
+      expect.stringContaining(
+        `Silo at ${url}: build 28dd1484, contract ${silo.systemInfo.contract_digest}`
+      ),
+      ''
+    );
+  });
 
   it('tells an unreachable server and a non-Silo address from a rejected key', async () => {
     serve({ ...verifyAnswers(), '/system/info': new TypeError('fetch failed') });

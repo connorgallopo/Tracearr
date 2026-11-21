@@ -712,7 +712,7 @@ describe('Server Routes', () => {
     it('refuses a Silo key without the scopes Tracearr needs', async () => {
       app = await buildTestApp(ownerUser);
       const message =
-        'This Silo API key lacks a scope Tracearr needs. Create a key with admin:monitor:read, admin:sessions:control and libraries:read.';
+        'This Silo API key lacks a scope Tracearr needs. Create a key with admin:monitor:read, admin:sessions:control and libraries:read. An unscoped admin key does not work; Tracearr needs a key with exactly those three scopes.';
       vi.mocked(verifyServerAdmin).mockResolvedValueOnce({
         success: false,
         code: 'MISSING_SCOPES',

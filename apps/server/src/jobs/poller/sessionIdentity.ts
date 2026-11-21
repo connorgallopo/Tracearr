@@ -12,7 +12,7 @@ import type { BuildCompositeKeyInput } from './types.js';
 
 /**
  * Build a cache/tracking key for a session.
- * Plex and tofa: `serverId:sessionKey`. JF, Emby and Silo: `serverId:userId:deviceId:ratingKey`.
+ * Plex, tofa and Silo: `serverId:sessionKey`. JF/Emby: `serverId:userId:deviceId:ratingKey`.
  */
 export function buildCompositeKey(input: BuildCompositeKeyInput): string {
   const { serverType, serverId, externalUserId, deviceId, ratingKey, sessionKey } = input;

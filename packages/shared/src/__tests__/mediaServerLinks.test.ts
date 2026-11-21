@@ -92,6 +92,28 @@ describe('buildMediaServerItemUrl', () => {
     expect(buildMediaServerItemUrl({ ...episode, showRatingKey: null })).toBeNull();
   });
 
+  it('opens a Silo movie, show or episode at /item/<content id>, and a season at its show', () => {
+    const silo = (ratingKey: string, mediaType: string, showRatingKey?: string | null) =>
+      buildMediaServerItemUrl({
+        serverType: 'silo',
+        baseUrl: 'http://media.example.com:8090/',
+        ratingKey,
+        mediaType,
+        showRatingKey,
+      });
+    const root = 'http://media.example.com:8090/item';
+
+    expect(silo('movie-imdb-tt0038650', 'movie')).toBe(`${root}/movie-imdb-tt0038650`);
+    expect(silo('series-imdb-tt0052520', 'show')).toBe(`${root}/series-imdb-tt0052520`);
+    expect(silo('episode-imdb-tt0052520-1-12', 'episode', 'series-imdb-tt0052520')).toBe(
+      `${root}/episode-imdb-tt0052520-1-12`
+    );
+    expect(silo('series-imdb-tt0052520/season/1', 'season', 'series-imdb-tt0052520')).toBe(
+      `${root}/series-imdb-tt0052520`
+    );
+    expect(silo('series-imdb-tt0052520/season/1', 'season', null)).toBeNull();
+  });
+
   it('does not double the slash when the configured url has a trailing one', () => {
     expect(
       buildMediaServerItemUrl({

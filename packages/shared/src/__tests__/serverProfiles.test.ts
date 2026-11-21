@@ -6,12 +6,12 @@ describe('server profiles', () => {
     expect(Object.keys(SERVER_PROFILES).sort()).toEqual([...SERVER_TYPES].sort());
   });
 
-  it('plex and tofa identify sessions by session key, jellyfin, emby and silo by composite', () => {
+  it('plex, tofa and silo identify sessions by session key, jellyfin and emby by composite', () => {
     expect(SERVER_PROFILES.plex.sessionIdentity).toBe('sessionKey');
     expect(SERVER_PROFILES.jellyfin.sessionIdentity).toBe('composite');
     expect(SERVER_PROFILES.emby.sessionIdentity).toBe('composite');
     expect(SERVER_PROFILES.tofa.sessionIdentity).toBe('sessionKey');
-    expect(SERVER_PROFILES.silo.sessionIdentity).toBe('composite');
+    expect(SERVER_PROFILES.silo.sessionIdentity).toBe('sessionKey');
   });
 
   it('names each server the way the product writes it', () => {

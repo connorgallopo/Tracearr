@@ -525,7 +525,7 @@ describe('proxyImage cache-miss pipeline', () => {
       expect(result.contentType).toBe('image/webp');
       expect(fetchedUrls()).toEqual([`${siloUrl}${signed}`]);
       const [, init] = (fetchSpy.mock.calls as [string, RequestInit][])[0] ?? [];
-      expect(init?.headers).toMatchObject({ Authorization: 'Bearer silo-key' });
+      expect(init?.headers).not.toHaveProperty('Authorization');
       await vi.waitFor(() => expect(vi.mocked(db.update)).toHaveBeenCalledTimes(1));
     });
 
@@ -609,6 +609,31 @@ describe('proxyImage cache-miss pipeline', () => {
       expect(result.degraded).toBe(true);
       expect(result.failure?.itemFault).toBe(false);
       expect(fetchedUrls()).toEqual([catalogRead(contentId)]);
+    });
+
+    it('follows an item poster link to its signed artwork without the key', async () => {
+      const contentId = 'movie-imdb-tt0051201';
+      const link = `/api/v2/item-posters/${contentId}?exp=${Math.floor(Date.now() / 1000) + 3600}&sig=c2lnbmF0dXJl`;
+      const signed = signedPoster(1789);
+      rememberPosterUrl(siloUrl, contentId, link);
+      fetchSpy
+        .mockResolvedValueOnce(new Response(null, { status: 302, headers: { location: signed } }))
+        .mockResolvedValueOnce(
+          new Response(testImage, { status: 200, headers: { 'content-type': 'image/jpeg' } })
+        );
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: `/content/${contentId}/poster`,
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/webp');
+      expect(fetchedUrls()).toEqual([`${siloUrl}${link}`, `${siloUrl}${signed}`]);
+      for (const [, init] of fetchSpy.mock.calls as [string, RequestInit][]) {
+        expect(init.headers).not.toHaveProperty('Authorization');
+      }
     });
 
     it('fetches nothing for a stored path that is not a Silo poster path', async () => {
@@ -1227,12 +1252,12 @@ describe('buildUpstreamRequest', () => {
       expect(() => buildUpstreamRequest(emby, '/Items/9/Images/Primary')).not.toThrow();
     });
 
-    it('fetches a Silo signed artwork URL with the key, and nothing else from Silo', () => {
+    it('fetches a Silo signed artwork URL without the key, and nothing else from Silo', () => {
       const server = { ...baseServer, type: 'silo', url: 'http://silo.local:8090' } as never;
       const artwork = silo.catalog['1'].items[0]?.poster_url ?? '';
       const signed = {
         imageUrl: `http://silo.local:8090${artwork}`,
-        headers: { Accept: 'image/*', Authorization: 'Bearer tok123' },
+        headers: { Accept: 'image/*' },
       };
       expect(buildUpstreamRequest(server, artwork)).toEqual(signed);
       expect(buildUpstreamRequest(server, artwork, { width: 240, height: 360 })).toEqual(signed);
@@ -1364,6 +1389,21 @@ describe('resizedOnly (background warms)', () => {
     expect(result.degraded).toBe(true);
     expect(result.contentType).toBe('image/svg+xml');
     expect(result.failure).toEqual({ reason: 'HTTP 500 (no content-type)', itemFault: true });
+  });
+
+  it('blames the server, not the image, when it answers 429', async () => {
+    fetchSpy.mockResolvedValue(new Response(null, { status: 429 }));
+
+    const result = await proxyImage({
+      serverId: randomUUID(),
+      imagePath: '/library/metadata/6/thumb/1',
+      width: 360,
+      height: 540,
+      fallback: 'poster',
+      resizedOnly: true,
+    });
+
+    expect(result.failure).toEqual({ reason: 'HTTP 429 (no content-type)', itemFault: false });
   });
 
   it('blames the server, not the image, when it never answers', async () => {

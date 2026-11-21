@@ -13,7 +13,6 @@ import {
 } from '../../../utils/http.js';
 import { createLogger } from '../../../utils/logger.js';
 import { probeRefusal } from '../../../utils/ssrf.js';
-import { newestBy } from '../shared/parserUtils.js';
 import {
   NOT_NEEDED,
   cursorDate,
@@ -65,11 +64,14 @@ const RATE_LIMIT_RETRIES = 3;
 const RATE_LIMIT_WAIT_DEFAULT_MS = 1000;
 const RATE_LIMIT_WAIT_MAX_MS = 10_000;
 const RATE_LIMIT_WAIT_BUDGET_MS = 10_000;
+/** A poster lookup holds one of the image proxy's fetch slots while it waits */
+const POSTER_WAIT_BUDGET_MS = 2_000;
+const NO_POSTER_KEPT_MS = 5 * 60 * 1000;
 
 export const SILO_STOP_REFUSED = 'this Silo API key cannot stop streams';
 
 const MISSING_SCOPES_MESSAGE =
-  'This Silo API key lacks a scope Tracearr needs. Create a key with admin:monitor:read, admin:sessions:control and libraries:read.';
+  'This Silo API key lacks a scope Tracearr needs. Create a key with admin:monitor:read, admin:sessions:control and libraries:read. An unscoped admin key does not work; Tracearr needs a key with exactly those three scopes.';
 
 /** The build and contract each server's system info last gave, by server URL */
 const contracts = new Map<string, { version: string; digest: string }>();
@@ -100,8 +102,12 @@ const POSTER_URL_MARGIN_MS = 10 * 60 * 1000;
 
 // ponytail: one entry per movie, series and live session per Silo server, each kept about a day,
 // swept only on a listing walk or on read; add a size cap or a periodic sweep if memory matters
-/** Signed poster URLs by server URL and content id, each until shortly before it expires */
-const posterUrls = new Map<string, { url: string; expiresAt: number }>();
+/**
+ * Signed poster URLs by server URL and content id, each until shortly before it expires, or null
+ * for a while after the catalog listed no poster, since the image route is unauthenticated and
+ * every lookup spends the key's rate budget
+ */
+const posterUrls = new Map<string, { url: string | null; expiresAt: number }>();
 
 const posterKey = (serverUrl: string, contentId: string) =>
   `${serverUrl.replace(/\/$/, '')} ${contentId}`;
@@ -119,7 +125,7 @@ export function rememberPosterUrl(
   posterUrls.set(posterKey(serverUrl, contentId), { url: posterUrl, expiresAt });
 }
 
-function heldPosterUrl(serverUrl: string, contentId: string): string | undefined {
+function heldPosterUrl(serverUrl: string, contentId: string): string | null | undefined {
   const key = posterKey(serverUrl, contentId);
   const held = posterUrls.get(key);
   if (!held) return undefined;
@@ -143,7 +149,11 @@ function rateLimitWaitMs(retryAfter: string | undefined): number {
 }
 
 /** Silo answers 429 once a key sends about 30 requests in a second, which a listing walk does */
-async function fetchSilo<T>(url: string, options: HttpRequestOptions): Promise<T> {
+async function fetchSilo<T>(
+  url: string,
+  options: HttpRequestOptions,
+  waitBudgetMs = RATE_LIMIT_WAIT_BUDGET_MS
+): Promise<T> {
   let waitedMs = 0;
   for (let retries = 0; ; retries++) {
     try {
@@ -151,42 +161,11 @@ async function fetchSilo<T>(url: string, options: HttpRequestOptions): Promise<T
     } catch (error) {
       if (!isHttpStatus(error, 429) || retries === RATE_LIMIT_RETRIES) throw error;
       const waitMs = rateLimitWaitMs(error.retryAfter);
-      if (waitedMs + waitMs > RATE_LIMIT_WAIT_BUDGET_MS) throw error;
+      if (waitedMs + waitMs > waitBudgetMs) throw error;
       waitedMs += waitMs;
       await new Promise((resolve) => setTimeout(resolve, waitMs));
     }
   }
-}
-
-/** Keyed the way Tracearr tracks a Silo play */
-const playKey = (row: SiloSession) =>
-  `${row.user_id}:${row.device_id || row.session_id}:${row.media_item_id ?? ''}`;
-const startedAt = (row: SiloSession) => Date.parse(row.started_at);
-
-// ponytail: entries of a server no longer polled are never swept; sweep on server removal if that matters
-/** The latest start seen per server URL and play key, while anything is listed under the key */
-const latestStarts = new Map<string, number>();
-
-/**
- * A player that starts an item again gets a new session while its paused one stays listed, and
- * still listed after the new one ends. So of the sessions one account holds on a device for an
- * item, only the latest started is playing, and one that started before a session seen earlier
- * is a leftover.
- */
-function playingSessions(serverUrl: string, rows: SiloSession[]): SiloSession[] {
-  const prefix = `${serverUrl} `;
-  const listed = new Set<string>();
-  const playing = newestBy(rows, playKey, startedAt).filter((row) => {
-    const key = prefix + playKey(row);
-    listed.add(key);
-    if (startedAt(row) < (latestStarts.get(key) ?? -Infinity)) return false;
-    latestStarts.set(key, startedAt(row));
-    return true;
-  });
-  for (const key of latestStarts.keys()) {
-    if (key.startsWith(prefix) && !listed.has(key)) latestStarts.delete(key);
-  }
-  return playing;
 }
 
 const errorMessage = (error: unknown, fallback: string) =>
@@ -219,11 +198,16 @@ export class SiloClient implements IMediaServerClient {
     this.token = config.token;
   }
 
-  private request<T>(path: string, init: HttpRequestOptions = {}): Promise<T> {
-    return fetchSilo<T>(`${this.url}${API_PATH}${path}`, {
-      ...init,
-      headers: jsonHeaders(this.token),
-    });
+  private request<T>(
+    path: string,
+    init: HttpRequestOptions = {},
+    waitBudgetMs?: number
+  ): Promise<T> {
+    return fetchSilo<T>(
+      `${this.url}${API_PATH}${path}`,
+      { ...init, headers: jsonHeaders(this.token) },
+      waitBudgetMs
+    );
   }
 
   /** Silo answers these without a key */
@@ -258,10 +242,9 @@ export class SiloClient implements IMediaServerClient {
   }
 
   async getSessions(sessionKey?: string): Promise<MediaSession[]> {
-    const rows = playingSessions(
-      this.url,
-      await this.listAll<SiloSession>('/admin/sessions', TIMEOUT_MS)
-    ).filter((row) => sessionKey === undefined || row.session_id === sessionKey);
+    const rows = (await this.listAll<SiloSession>('/admin/sessions', TIMEOUT_MS)).filter(
+      (row) => sessionKey === undefined || row.session_id === sessionKey
+    );
     for (const row of rows) {
       if (row.media_item_id) rememberPosterUrl(this.url, row.media_item_id, row.poster_url);
     }
@@ -400,13 +383,20 @@ export class SiloClient implements IMediaServerClient {
   /** A signed poster URL for an item, or null when Silo lists no poster for it on its own API */
   async getPosterUrl(contentId: string): Promise<string | null> {
     const held = heldPosterUrl(this.url, contentId);
-    if (held) return held;
+    if (held !== undefined) return held;
     const { items } = await this.request<SiloPage<SiloCatalogItem>>(
       `/admin/catalog/items?content_ids=${encodeURIComponent(contentId)}`,
-      { timeout: TIMEOUT_MS }
+      { timeout: TIMEOUT_MS },
+      POSTER_WAIT_BUDGET_MS
     );
     const posterUrl = items.find((item) => item.content_id === contentId)?.poster_url;
-    if (!posterUrl?.startsWith('/api/v2/')) return null;
+    if (!posterUrl?.startsWith('/api/v2/')) {
+      posterUrls.set(posterKey(this.url, contentId), {
+        url: null,
+        expiresAt: Date.now() + NO_POSTER_KEPT_MS,
+      });
+      return null;
+    }
     rememberPosterUrl(this.url, contentId, posterUrl);
     return posterUrl;
   }
@@ -448,12 +438,18 @@ export class SiloClient implements IMediaServerClient {
     return { items: episodes, totalCount: episodes.length };
   }
 
+  /**
+   * A season is dated by its earliest episode, which only the whole listing knows: one built from
+   * the episodes added since would move an older season's date forward
+   */
   async getLibrarySeasonsSince(
     libraryId: string,
     since: SyncCursor
   ): Promise<{ items: MediaLibraryItem[]; totalCount: number }> {
-    const { seasons } = await this.listing(libraryId, cursorDate(since));
-    return { items: seasons, totalCount: seasons.length };
+    const after = cursorDate(since);
+    const { seasons } = await this.listing(libraryId);
+    const added = seasons.filter((season) => season.addedAt >= after);
+    return { items: added, totalCount: added.length };
   }
 
   // Silo lists changes by date
@@ -547,6 +543,7 @@ export class SiloClient implements IMediaServerClient {
         `${url} does not answer as a Silo server with API version 2.`
       );
     }
+    recordContract(url, info);
 
     const client = new SiloClient({ url, token });
     const timeout = TIMEOUT_MS;
