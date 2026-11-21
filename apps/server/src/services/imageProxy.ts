@@ -27,6 +27,8 @@ import { servers, libraryItems, mediaRequests, requestServices } from '../db/sch
 import { assertSafeProbeUrl, SsrfBlockedError } from '../utils/ssrf.js';
 import { cacheWriteAllowed, noteCacheWrite } from './imageCacheGuard.js';
 import { mediaBrowserTokenHeader } from './mediaServer/shared/baseMediaServerClient.js';
+import { SiloClient } from './mediaServer/silo/client.js';
+import { parseSiloPosterPath } from './mediaServer/silo/parser.js';
 
 // libvips defaults its thread pool to the core count, so one background
 // precache walk can own every core of a small box. Inputs are server-resized
@@ -566,17 +568,50 @@ async function fetchUpstreamImage(
   return fetch(next.imageUrl, { ...init, headers: next.headers });
 }
 
-/** A media server is asked for a resized image first, then the original; Seerr's cache has one size. */
-function upstreamRequests(
+/** The server has no image at the stored path, which is the item's fault, not the server's */
+class NoServerImageError extends Error {}
+
+/** Where a stored image path is fetched on its server: the path itself, or for Silo the signed URL its catalog gives the item now */
+async function resolveImagePath(server: ServerRow, imagePath: string): Promise<string | null> {
+  switch (server.type) {
+    case 'plex':
+    case 'jellyfin':
+    case 'emby':
+    case 'tofa':
+      return imagePath;
+    case 'silo': {
+      const contentId = parseSiloPosterPath(imagePath);
+      if (contentId === null) throw new SsrfBlockedError(`Not a Silo poster path: ${imagePath}`);
+      assertSafeProbeUrl(server.url);
+      return new SiloClient({ url: server.url, token: server.token, id: server.id }).getPosterUrl(
+        contentId
+      );
+    }
+    default:
+      return assertNever(server.type);
+  }
+}
+
+/**
+ * A media server is asked for a resized image first, then the original, unless both are the same
+ * request; Seerr's cache has one size.
+ */
+async function upstreamRequests(
   origin: ImageOrigin,
   imagePath: string,
   size: { width: number; height: number },
   resizedOnly: boolean
-): UpstreamRequest[] {
+): Promise<UpstreamRequest[]> {
   switch (origin.kind) {
     case 'server': {
-      const resized = buildUpstreamRequest(origin.server, imagePath, size);
-      return resizedOnly ? [resized] : [resized, buildUpstreamRequest(origin.server, imagePath)];
+      const path = await resolveImagePath(origin.server, imagePath);
+      if (path === null) {
+        throw new NoServerImageError(`${origin.server.name} lists no poster for ${imagePath}`);
+      }
+      const resized = buildUpstreamRequest(origin.server, path, size);
+      if (resizedOnly) return [resized];
+      const original = buildUpstreamRequest(origin.server, path);
+      return original.imageUrl === resized.imageUrl ? [resized] : [resized, original];
     }
     case 'seerr':
       return [buildSeerrImageRequest(origin.url, imagePath)];
@@ -714,8 +749,8 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
     };
   }
 
-  // Ask the media server for a pre-resized image first (all three types
-  // resize and cache server-side; a 240px poster is ~20-40KB against a
+  // Ask the media server for a pre-resized image first (Plex, Jellyfin, Emby
+  // and tofa resize and cache server-side; a 240px poster is ~20-40KB against a
   // multi-MB original). Fall back to the original path so a transcoder
   // hiccup degrades to the old behavior instead of a broken image.
   const release = await acquireFetchSlot();
@@ -723,7 +758,7 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
   try {
     // Inside the try so a blocked path degrades to the fallback image like any
     // other upstream failure, instead of escaping as a 500.
-    const candidates = upstreamRequests(origin, imagePath, { width, height }, resizedOnly);
+    const candidates = await upstreamRequests(origin, imagePath, { width, height }, resizedOnly);
     let imageBuffer: Buffer | null = null;
     let lastError: unknown = null;
     for (const candidate of candidates) {
@@ -782,7 +817,8 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
       degraded: true,
       failure: {
         reason: err instanceof Error ? err.message : String(err),
-        itemFault: serverAnswered || err instanceof SsrfBlockedError,
+        itemFault:
+          serverAnswered || err instanceof SsrfBlockedError || err instanceof NoServerImageError,
       },
       data: getFallbackImage(fallback, width, height),
       contentType: 'image/svg+xml',

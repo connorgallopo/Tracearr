@@ -283,6 +283,74 @@ describe('SiloClient', () => {
     expect(found.has('movie-200')).toBe(true);
   });
 
+  it('keeps a signed poster URL until ten minutes before it expires', async () => {
+    const exp = 1795320000;
+    vi.useFakeTimers({ now: (exp - 3600) * 1000 });
+    const url = 'http://silo-poster-expiry.local:8090';
+    const [movie] = silo.catalog['1'].items;
+    serve({
+      '/admin/catalog/items': (requestUrl: string) =>
+        requestUrl.includes('content_ids=') ? { items: [movie] } : silo.catalog['1'],
+    });
+    const syncClient = client(url);
+    await syncClient.getLibraryItems('1');
+
+    expect(await syncClient.getPosterUrl('movie-imdb-tt0038650')).toBe(movie?.poster_url);
+    expect(requested('content_ids=')).toHaveLength(0);
+
+    vi.setSystemTime((exp - 590) * 1000);
+    expect(await syncClient.getPosterUrl('movie-imdb-tt0038650')).toBe(movie?.poster_url);
+    expect(requested('content_ids=')).toEqual([
+      `${url}/api/v2/admin/catalog/items?content_ids=movie-imdb-tt0038650`,
+    ]);
+  });
+
+  it("files an episode's poster under its series, and a session's under its item", async () => {
+    vi.useFakeTimers({ now: (1795147200 - 3600) * 1000 });
+    const url = 'http://silo-poster-fill.local:8090';
+    serve({
+      '/admin/catalog/items': silo.catalog['2'],
+      '/admin/sessions': silo.sessions,
+      '/admin/devices': silo.devices,
+    });
+    const syncClient = client(url);
+
+    await syncClient.getLibraryLeaves('2');
+    expect(await syncClient.getPosterUrl('series-imdb-tt0103359')).toBe(
+      silo.catalog['2'].items.find((item) => item.content_id === 'series-imdb-tt0103359')
+        ?.poster_url
+    );
+    await syncClient.getSessions();
+    expect(await syncClient.getPosterUrl('episode-imdb-tt31510819-1-1')).toBe(
+      silo.sessions.items[1]?.poster_url
+    );
+
+    expect(requested('content_ids=')).toHaveLength(0);
+  });
+
+  it('answers no poster for an item the catalog does not list, or a poster URL outside /api/v2/', async () => {
+    const [movie] = silo.catalog['1'].items;
+    serve({
+      '/admin/catalog/items': (requestUrl: string) =>
+        requestUrl.includes('movie-public')
+          ? {
+              items: [
+                {
+                  ...movie,
+                  content_id: 'movie-public',
+                  poster_url: `https://silo.example${movie?.poster_url}`,
+                },
+              ],
+            }
+          : { items: [] },
+    });
+    const posterClient = client('http://silo-poster-none.local:8090');
+
+    expect(await posterClient.getPosterUrl('movie-gone')).toBeNull();
+    expect(await posterClient.getPosterUrl('movie-public')).toBeNull();
+    expect(requested('content_ids=')).toHaveLength(2);
+  });
+
   it('answers requests NOT_NEEDED', async () => {
     expect(await client().getRequests()).toBe(NOT_NEEDED);
     expect(await client().getRequestPosterPath()).toBe(NOT_NEEDED);

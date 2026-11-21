@@ -60,6 +60,7 @@ import {
   proxyAccountPicture,
   _resetImageOriginCacheForTests,
 } from '../imageProxy.js';
+import { rememberPosterUrl } from '../mediaServer/silo/client.js';
 
 const CACHE_DIR = join(process.cwd(), 'data', 'image-cache');
 
@@ -491,6 +492,135 @@ describe('proxyImage cache-miss pipeline', () => {
         `http://tofa.local:33333${artwork}?h=360`,
         `http://tofa.local:33333${artwork}`,
       ]);
+    });
+  });
+
+  describe('a Silo server', () => {
+    const siloUrl = 'http://silo.local:8090';
+    const catalogRead = (contentId: string) =>
+      `${siloUrl}/api/v2/admin/catalog/items?content_ids=${contentId}`;
+    const fetchedUrls = () => (fetchSpy.mock.calls as [string][]).map(([url]) => url);
+
+    /** A signed artwork URL that expires an hour from now */
+    function signedPoster(tmdbId: number): string {
+      const exp = Math.floor(Date.now() / 1000) + 3600;
+      return `/api/v2/artwork/tmdb/movies/${tmdbId}/poster/w300.c13b52d2fad9fb7f.webp?exp=${exp}&sig=c2lnbmF0dXJl`;
+    }
+
+    beforeEach(() => {
+      mockSelectChain([{ id: 'server-s', type: 'silo', url: siloUrl, token: 'silo-key' }]);
+    });
+
+    it('fetches a poster at the signed URL a library sync left, reading no catalog', async () => {
+      const signed = signedPoster(1585);
+      rememberPosterUrl(siloUrl, 'movie-imdb-tt0038650', signed);
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: '/content/movie-imdb-tt0038650/poster?v=c13b52d2fad9fb7f',
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/webp');
+      expect(fetchedUrls()).toEqual([`${siloUrl}${signed}`]);
+      const [, init] = (fetchSpy.mock.calls as [string, RequestInit][])[0] ?? [];
+      expect(init?.headers).toMatchObject({ Authorization: 'Bearer silo-key' });
+      await vi.waitFor(() => expect(vi.mocked(db.update)).toHaveBeenCalledTimes(1));
+    });
+
+    it('asks the catalog for a fresh signed URL on a miss', async () => {
+      const contentId = 'episode-imdb-tt31510819-1-1';
+      const signed = signedPoster(446831);
+      fetchSpy
+        .mockResolvedValueOnce(
+          Response.json({ items: [{ content_id: contentId, poster_url: signed }] })
+        )
+        .mockResolvedValueOnce(
+          new Response(testImage, { status: 200, headers: { 'content-type': 'image/jpeg' } })
+        );
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: `/content/${contentId}/poster?v=c13b52d2fad9fb7f`,
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/webp');
+      expect(fetchedUrls()).toEqual([catalogRead(contentId), `${siloUrl}${signed}`]);
+      await vi.waitFor(() => expect(vi.mocked(db.update)).toHaveBeenCalledTimes(1));
+    });
+
+    it("never sends the key to a poster URL outside the server's /api/v2/", async () => {
+      const contentId = 'movie-imdb-tt0042332';
+      fetchSpy.mockResolvedValueOnce(
+        Response.json({
+          items: [{ content_id: contentId, poster_url: 'https://image.tmdb.org/t/p/w300/a.jpg' }],
+        })
+      );
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: `/content/${contentId}/poster`,
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/svg+xml');
+      expect(fetchedUrls()).toEqual([catalogRead(contentId)]);
+    });
+
+    it('blames the item when the catalog no longer lists it', async () => {
+      const contentId = 'movie-imdb-tt0047396';
+      fetchSpy.mockResolvedValueOnce(Response.json({ items: [] }));
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: `/content/${contentId}/poster`,
+        width: 360,
+        height: 540,
+        resizedOnly: true,
+      });
+
+      expect(result.degraded).toBe(true);
+      expect(result.failure?.itemFault).toBe(true);
+      expect(fetchedUrls()).toEqual([catalogRead(contentId)]);
+    });
+
+    it.each([
+      ['answers 502', () => Promise.resolve(new Response('bad gateway', { status: 502 }))],
+      [
+        'times out',
+        () => Promise.reject(new DOMException('The operation was aborted', 'TimeoutError')),
+      ],
+    ])('blames the server when the catalog %s, and fetches no image', async (_, answer) => {
+      const contentId = 'movie-imdb-tt0050083';
+      fetchSpy.mockImplementationOnce(answer);
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: `/content/${contentId}/poster`,
+        width: 360,
+        height: 540,
+        resizedOnly: true,
+      });
+
+      expect(result.degraded).toBe(true);
+      expect(result.failure?.itemFault).toBe(false);
+      expect(fetchedUrls()).toEqual([catalogRead(contentId)]);
+    });
+
+    it('fetches nothing for a stored path that is not a Silo poster path', async () => {
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: '/content/../poster',
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/svg+xml');
+      expect(fetchSpy).not.toHaveBeenCalled();
     });
   });
 

@@ -91,6 +91,45 @@ const deviceNames = new Map<
   { names: Map<string, string>; readAt: number; retryAt: number }
 >();
 
+const POSTER_URL_MARGIN_MS = 10 * 60 * 1000;
+
+// ponytail: one entry per movie, series and live session per Silo server, each kept about a day,
+// swept only on a listing walk or on read; add a size cap or a periodic sweep if memory matters
+/** Signed poster URLs by server URL and content id, each until shortly before it expires */
+const posterUrls = new Map<string, { url: string; expiresAt: number }>();
+
+const posterKey = (serverUrl: string, contentId: string) =>
+  `${serverUrl.replace(/\/$/, '')} ${contentId}`;
+
+/** Remembers a signed poster URL for an item until ten minutes before its exp; anything but a root-relative /api/v2/ URL with exp is ignored */
+export function rememberPosterUrl(
+  serverUrl: string,
+  contentId: string,
+  posterUrl: string | null | undefined
+): void {
+  if (!posterUrl?.startsWith('/api/v2/')) return;
+  const exp = Number(new URL(posterUrl, 'http://silo').searchParams.get('exp'));
+  const expiresAt = exp * 1000 - POSTER_URL_MARGIN_MS;
+  if (!(expiresAt > Date.now())) return;
+  posterUrls.set(posterKey(serverUrl, contentId), { url: posterUrl, expiresAt });
+}
+
+function heldPosterUrl(serverUrl: string, contentId: string): string | undefined {
+  const key = posterKey(serverUrl, contentId);
+  const held = posterUrls.get(key);
+  if (!held) return undefined;
+  if (held.expiresAt > Date.now()) return held.url;
+  posterUrls.delete(key);
+  return undefined;
+}
+
+function sweepPosterUrls(): void {
+  const now = Date.now();
+  for (const [key, { expiresAt }] of posterUrls) {
+    if (expiresAt <= now) posterUrls.delete(key);
+  }
+}
+
 const errorMessage = (error: unknown, fallback: string) =>
   error instanceof Error ? error.message : fallback;
 
@@ -165,6 +204,9 @@ export class SiloClient implements IMediaServerClient {
     const rows = (await this.listAll<SiloSession>('/admin/sessions', TIMEOUT_MS)).filter(
       (row) => sessionKey === undefined || row.session_id === sessionKey
     );
+    for (const row of rows) {
+      if (row.media_item_id) rememberPosterUrl(this.url, row.media_item_id, row.poster_url);
+    }
     const names = await this.deviceNames(rows);
     return rows.map((row) =>
       parseSiloSession(row, row.device_id ? names.get(row.device_id) : undefined)
@@ -282,15 +324,33 @@ export class SiloClient implements IMediaServerClient {
     const since = addedAfter?.toISOString();
     return this.listings.getOrInsertComputed(
       since ? `${libraryId}:${since}` : libraryId,
-      async () =>
-        parseSiloLibraryListing(
-          await this.listAll<SiloCatalogItem>(
-            `/admin/catalog/items?library_id=${encodeURIComponent(libraryId)}` +
-              (since ? `&added_after=${encodeURIComponent(since)}` : '')
-          ),
-          libraryId
-        )
+      async () => {
+        const catalog = await this.listAll<SiloCatalogItem>(
+          `/admin/catalog/items?library_id=${encodeURIComponent(libraryId)}` +
+            (since ? `&added_after=${encodeURIComponent(since)}` : '')
+        );
+        sweepPosterUrls();
+        for (const item of catalog) {
+          const contentId = item.type === 'episode' ? item.series_id : item.content_id;
+          if (contentId) rememberPosterUrl(this.url, contentId, item.poster_url);
+        }
+        return parseSiloLibraryListing(catalog, libraryId);
+      }
     );
+  }
+
+  /** A signed poster URL for an item, or null when Silo lists no poster for it on its own API */
+  async getPosterUrl(contentId: string): Promise<string | null> {
+    const held = heldPosterUrl(this.url, contentId);
+    if (held) return held;
+    const { items } = await this.request<SiloPage<SiloCatalogItem>>(
+      `/admin/catalog/items?content_ids=${encodeURIComponent(contentId)}`,
+      { timeout: TIMEOUT_MS }
+    );
+    const posterUrl = items.find((item) => item.content_id === contentId)?.poster_url;
+    if (!posterUrl?.startsWith('/api/v2/')) return null;
+    rememberPosterUrl(this.url, contentId, posterUrl);
+    return posterUrl;
   }
 
   async getLibraryItems(
@@ -374,6 +434,7 @@ export class SiloClient implements IMediaServerClient {
         .map((id) => `content_ids=${encodeURIComponent(id)}`)
         .join('&');
       for (const item of await this.listAll<SiloCatalogItem>(`/admin/catalog/items?${query}`)) {
+        rememberPosterUrl(this.url, item.content_id, item.poster_url);
         if (item.library_ids.includes(library.id)) found.add(item.content_id);
       }
     }
