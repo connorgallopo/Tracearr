@@ -366,7 +366,7 @@ async function createOwner(
 
 async function removeServer(serverId: string): Promise<void> {
   try {
-    await deleteServer(serverId);
+    await deleteServer(serverId, getRedis());
   } catch {
     log.error('could not remove the server a failed tofa connect made', { serverId });
   }

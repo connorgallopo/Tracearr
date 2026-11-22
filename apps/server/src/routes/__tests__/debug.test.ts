@@ -48,12 +48,17 @@ vi.mock('../../services/notifications/destinationsMigration.js', () => ({
   seedBuiltinDestinations: vi.fn(),
 }));
 
+vi.mock('../../services/import/siloHistory.js', () => ({
+  clearHistoryCursor: vi.fn(),
+}));
+
 // Import mocked db and routes
 import { db } from '../../db/client.js';
 import { destinations } from '../../db/schema.js';
 import { getAuth } from '../../lib/auth.js';
 import { revokeMobileDeviceSession } from '../mobile.js';
 import { seedBuiltinDestinations } from '../../services/notifications/destinationsMigration.js';
+import { clearHistoryCursor } from '../../services/import/siloHistory.js';
 import { debugRoutes } from '../debug.js';
 import { permissionGuard } from '../../lib/scope.js';
 
@@ -394,6 +399,7 @@ describe('Debug Routes', () => {
       expect(body.success).toBe(true);
       expect(body.deleted.sessions).toBe(3);
       expect(body.deleted.violations).toBe(2);
+      expect(clearHistoryCursor).toHaveBeenCalledExactlyOnceWith(app.redis);
     });
 
     it('handles no sessions to delete', async () => {
@@ -481,6 +487,7 @@ describe('Debug Routes', () => {
       const body = response.json();
       expect(body.success).toBe(true);
       expect(body.deleted).toBe(2);
+      expect(clearHistoryCursor).toHaveBeenCalledExactlyOnceWith(app.redis);
     });
 
     it('handles no non-owner users', async () => {
@@ -515,6 +522,7 @@ describe('Debug Routes', () => {
       const body = response.json();
       expect(body.success).toBe(true);
       expect(body.deleted).toBe(2);
+      expect(clearHistoryCursor).toHaveBeenCalledExactlyOnceWith(app.redis);
     });
   });
 
@@ -630,6 +638,7 @@ describe('Debug Routes', () => {
       expect(db.delete).toHaveBeenCalledTimes(15);
       expect(db.delete).toHaveBeenCalledWith(destinations);
       expect(seedBuiltinDestinations).toHaveBeenCalledTimes(1);
+      expect(clearHistoryCursor).toHaveBeenCalledExactlyOnceWith(app.redis);
     });
 
     it('revokes every Better Auth session before deleting any row (ghost cookie rejected after reset)', async () => {

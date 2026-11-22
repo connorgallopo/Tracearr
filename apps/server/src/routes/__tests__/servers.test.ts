@@ -10,6 +10,7 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
+import type { Redis } from 'ioredis';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import { APIError } from 'better-auth/api';
@@ -120,9 +121,14 @@ vi.mock('../../jobs/importQueue.js', () => ({
   dropHeldImport: vi.fn().mockResolvedValue(undefined),
 }));
 
+vi.mock('../../services/import/siloHistory.js', () => ({
+  clearHistoryCursor: vi.fn().mockResolvedValue(undefined),
+}));
+
 import type { SQL } from 'drizzle-orm';
 import { db } from '../../db/client.js';
 import { dropHeldImport, holdServerHistoryImport } from '../../jobs/importQueue.js';
+import { clearHistoryCursor } from '../../services/import/siloHistory.js';
 import {
   enqueueLibrarySync,
   rebuildAutoSyncSchedules,
@@ -208,9 +214,10 @@ function mockDbUpdateReturning(result: unknown[]) {
   return chain;
 }
 
-async function buildTestApp(authUser: AuthUser): Promise<FastifyInstance> {
+async function buildTestApp(authUser: AuthUser, redis?: Redis): Promise<FastifyInstance> {
   const app = Fastify({ logger: false });
   await app.register(sensible);
+  if (redis) app.decorate('redis', redis);
 
   // Mock authenticate
   app.decorate('authenticate', async (request: unknown) => {
@@ -1558,7 +1565,8 @@ describe('Server Routes', () => {
 
   describe('DELETE /servers/:id', () => {
     it('deletes server for owner', async () => {
-      app = await buildTestApp(ownerUser);
+      const redis = { name: 'route redis' } as unknown as Redis;
+      app = await buildTestApp(ownerUser, redis);
 
       mockDbSelectLimit([mockServer]);
       mockDbDelete();
@@ -1571,6 +1579,7 @@ describe('Server Routes', () => {
       expect(response.statusCode).toBe(200);
       expect(response.json().success).toBe(true);
       expect(dropHeldImport).toHaveBeenCalledExactlyOnceWith(mockServer.id);
+      expect(clearHistoryCursor).toHaveBeenCalledExactlyOnceWith(redis, mockServer.id);
     });
 
     it("refuses to delete the server holding the owner's last way to sign in", async () => {

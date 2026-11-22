@@ -11,6 +11,7 @@ import {
   type ServerHistoryImportProgress,
   type ServerHistoryImportResult,
 } from '@tracearr/shared';
+import type { Redis } from 'ioredis';
 import type { sessions } from '../../db/schema.js';
 import { getRedis } from '../../lib/redisShared.js';
 import { normalizeClient } from '../../utils/platformNormalizer.js';
@@ -83,7 +84,10 @@ function transformSiloHistoryRow(
     row.video_decision,
     row.audio_decision
   );
-  const normalized = normalizeClient(row.client_name || row.device_platform || '', '', 'silo');
+  // The live poll names the client by the platform when the app sends no name; the insert
+  // normalization reads the device from product, so product carries the same value
+  const clientName = row.client_name || row.device_platform || '';
+  const normalized = normalizeClient(clientName, '', 'silo');
   const ipAddress = play.ipAddress;
 
   return {
@@ -137,7 +141,7 @@ function transformSiloHistoryRow(
     playerName: (deviceName || row.client_name || '').slice(0, 255) || null,
     device: normalized.device.slice(0, 255),
     deviceId: row.device_id,
-    product: row.client_name?.slice(0, 255) || null,
+    product: clientName.slice(0, 255) || null,
     platform: normalized.platform.slice(0, 100),
     quality: isTranscode ? 'Transcode' : 'Direct',
     isTranscode,
@@ -178,6 +182,24 @@ async function siloHistory(
     play: siloHistoryPlay,
     toSession: transformSiloHistoryRow,
   };
+}
+
+/**
+ * Forgets where a server's history import stopped, or every server's when none is named, so
+ * the next import reads all of the server's history again. Called when the plays it read are
+ * removed.
+ */
+export async function clearHistoryCursor(redis: Redis, serverId?: string): Promise<void> {
+  if (serverId !== undefined) {
+    await redis.del(REDIS_KEYS.SERVER_HISTORY_CURSOR(serverId));
+    return;
+  }
+  for await (const keys of redis.scanStream({
+    match: REDIS_KEYS.SERVER_HISTORY_CURSOR('*'),
+    count: 100,
+  }) as AsyncIterable<string[]>) {
+    if (keys.length > 0) await redis.del(...keys);
+  }
 }
 
 /**

@@ -1,5 +1,7 @@
+import { Readable } from 'node:stream';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { UnrecoverableError } from 'bullmq';
+import type { Redis } from 'ioredis';
 import { REDIS_KEYS, type ServerHistoryImportProgress } from '@tracearr/shared';
 import silo from '../../../test/mediaServerResponses/silo.json' with { type: 'json' };
 import { queryChain } from '../../../test/helpers.js';
@@ -7,7 +9,7 @@ import { queryChain } from '../../../test/helpers.js';
 const { getPlaybackHistoryPage, getDeviceNames, redis } = vi.hoisted(() => ({
   getPlaybackHistoryPage: vi.fn(),
   getDeviceNames: vi.fn(),
-  redis: { get: vi.fn(), set: vi.fn() },
+  redis: { get: vi.fn(), set: vi.fn(), del: vi.fn(), scanStream: vi.fn() },
 }));
 
 vi.mock('../../../db/client.js', () => ({ db: { select: vi.fn() } }));
@@ -52,7 +54,10 @@ vi.mock('../userMapping.js', async (importActual) => ({
   ...(await importActual<typeof import('../userMapping.js')>()),
   createUserMapping: vi.fn(),
 }));
-vi.mock('../batchProcessor.js', () => ({ flushInsertBatch: vi.fn() }));
+vi.mock('../batchProcessor.js', async (importActual) => ({
+  ...(await importActual<typeof import('../batchProcessor.js')>()),
+  flushInsertBatch: vi.fn(),
+}));
 vi.mock('../../sync.js', () => ({ syncServer: vi.fn() }));
 vi.mock('../../profiles.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../profiles.js')>()),
@@ -61,14 +66,15 @@ vi.mock('../../profiles.js', async (importOriginal) => ({
 }));
 
 import { db } from '../../../db/client.js';
-import { flushInsertBatch } from '../batchProcessor.js';
+import { flushInsertBatch, normalizeSessionFields } from '../batchProcessor.js';
 import { syncServer } from '../../sync.js';
 import { createUserMapping } from '../userMapping.js';
 import { resolveProfiles, storedProfileIds } from '../../profiles.js';
 import { getWatchedThreshold } from '../../settings.js';
-import { parseSiloDeviceNames } from '../../mediaServer/silo/parser.js';
+import { parseSiloDeviceNames, parseSiloSession } from '../../mediaServer/silo/parser.js';
+import { mapMediaSession } from '../../../jobs/poller/sessionMapper.js';
 import { normalizeClient } from '../../../utils/platformNormalizer.js';
-import { importSiloHistory } from '../siloHistory.js';
+import { clearHistoryCursor, importSiloHistory } from '../siloHistory.js';
 
 const SERVER = {
   id: '5c1d0000-3a1c-4d2e-9b5f-0000000000bb',
@@ -268,6 +274,23 @@ describe('importSiloHistory', () => {
     }
   });
 
+  it('stores the device a live play of the same app-less row stores', async () => {
+    rows([]);
+    const appless = { client_name: null, device_platform: 'iOS', device_id: 'unlisted-device' };
+    onePage([{ ...ZOOTOPIA, ...appless }]);
+    const [liveRow] = silo.sessions.items;
+    if (!liveRow) throw new Error('fixture has no live session');
+    const live = mapMediaSession(
+      parseSiloSession({ ...liveRow, ...appless, client_name: undefined }, undefined),
+      'silo'
+    );
+
+    await importSiloHistory(SERVER.id);
+
+    const [stored] = inserted().map(normalizeSessionFields);
+    expect(stored).toMatchObject({ device: live.device, platform: live.platform });
+  });
+
   it('links each play to the profile its row names, adding a missing one, and adds none named by its id', async () => {
     rows([]);
     const kid = historyRow('838e94ff');
@@ -400,5 +423,26 @@ describe('importSiloHistory', () => {
 
     await expect(importSiloHistory(SERVER.id)).rejects.toBeInstanceOf(UnrecoverableError);
     expect(syncServer).not.toHaveBeenCalled();
+  });
+});
+
+describe('clearHistoryCursor', () => {
+  it("forgets one server's history cursor", async () => {
+    await clearHistoryCursor(redis as unknown as Redis, SERVER.id);
+
+    expect(redis.del).toHaveBeenCalledExactlyOnceWith(REDIS_KEYS.SERVER_HISTORY_CURSOR(SERVER.id));
+  });
+
+  it("forgets every server's history cursor", async () => {
+    const keys = [REDIS_KEYS.SERVER_HISTORY_CURSOR('a'), REDIS_KEYS.SERVER_HISTORY_CURSOR('b')];
+    redis.scanStream.mockReturnValue(Readable.from([keys]));
+
+    await clearHistoryCursor(redis as unknown as Redis);
+
+    expect(redis.scanStream).toHaveBeenCalledWith({
+      match: REDIS_KEYS.SERVER_HISTORY_CURSOR('*'),
+      count: 100,
+    });
+    expect(redis.del).toHaveBeenCalledExactlyOnceWith(...keys);
   });
 });

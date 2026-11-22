@@ -104,12 +104,13 @@ function recordContract(url: string, info: SiloSystemInfo): void {
 }
 
 /**
- * Device names from each server's device list, by server URL. After a failed read the names
- * held stay in use, and the list is not read again before retryAt.
+ * Device names from each server's device list, by server URL, with the ids asked for that a read
+ * did not list. After a failed read the names held stay in use, and the list is not read again
+ * before retryAt.
  */
 const deviceNames = new Map<
   string,
-  { names: Map<string, string>; readAt: number; retryAt: number }
+  { names: Map<string, string>; unlisted: Set<string>; readAt: number; retryAt: number }
 >();
 
 /** Downloads a listing returned, by server URL, device and episode or movie, for describeDownloadSource */
@@ -288,8 +289,8 @@ export class SiloClient implements IMediaServerClient {
   }
 
   /**
-   * Device names by device id from /admin/devices. Read again after ten minutes, or sooner when
-   * an id is one the list did not name, but not within a minute of a failed read
+   * Device names by device id from /admin/devices. Read again after ten minutes, or sooner for an
+   * id no read was asked about, but not within a minute of a failed read
    */
   async getDeviceNames(deviceIds: string[]): Promise<Map<string, string>> {
     const held = deviceNames.get(this.url);
@@ -299,13 +300,16 @@ export class SiloClient implements IMediaServerClient {
       (held &&
         (now < held.retryAt ||
           (now - held.readAt < DEVICE_NAMES_KEPT_MS &&
-            deviceIds.every((id) => held.names.has(id)))))
+            deviceIds.every((id) => held.names.has(id) || held.unlisted.has(id)))))
     ) {
       return held?.names ?? new Map();
     }
     try {
       const names = parseSiloDeviceNames(await this.listAll<SiloDevice>('/admin/devices'));
-      deviceNames.set(this.url, { names, readAt: now, retryAt: 0 });
+      const unlisted = new Set(
+        [...(held?.unlisted ?? []), ...deviceIds].filter((id) => !names.has(id))
+      );
+      deviceNames.set(this.url, { names, unlisted, readAt: now, retryAt: 0 });
       return names;
     } catch (error) {
       log.warn('Silo devices could not be read, naming players by the names last read', {
@@ -314,6 +318,7 @@ export class SiloClient implements IMediaServerClient {
       const names = held?.names ?? new Map<string, string>();
       deviceNames.set(this.url, {
         names,
+        unlisted: held?.unlisted ?? new Set(),
         readAt: held?.readAt ?? 0,
         retryAt: now + DEVICE_RETRY_MS,
       });

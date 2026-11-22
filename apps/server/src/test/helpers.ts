@@ -3,6 +3,7 @@
  */
 
 import { randomUUID } from 'node:crypto';
+import { Readable } from 'node:stream';
 import Fastify, { type FastifyInstance } from 'fastify';
 import jwt from '@fastify/jwt';
 import cookie from '@fastify/cookie';
@@ -130,6 +131,10 @@ export function createMockRedis() {
     keys: async (pattern: string) => {
       const prefix = pattern.replace('*', '');
       return Array.from(store.keys()).filter((k) => k.startsWith(prefix));
+    },
+    scanStream: ({ match }: { match: string }) => {
+      const glob = new RegExp(`^${match.split('*').map(RegExp.escape).join('.*')}$`);
+      return Readable.from([Array.from(store.keys()).filter((k) => glob.test(k))]);
     },
     _store: store, // For test inspection
   };

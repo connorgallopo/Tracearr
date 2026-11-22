@@ -631,7 +631,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     const lockout = await ownerLockout({ kind: 'deleteServer', serverId: id });
     if (lockout) return reply.badRequest(lockout);
 
-    await deleteServer(id);
+    await deleteServer(id, app.redis);
     return { success: true };
   });
 

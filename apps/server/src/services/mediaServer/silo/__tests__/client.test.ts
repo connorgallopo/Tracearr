@@ -309,6 +309,28 @@ describe('SiloClient', () => {
     expect(names.has('tracearr-check-device-5')).toBe(false);
   });
 
+  it('reads the device list once for a device it does not name, until the names are read again', async () => {
+    vi.useFakeTimers({ now: new Date('2026-11-20T12:00:00Z') });
+    serve({ '/admin/devices': silo.devices });
+    const devices = client('http://silo-unlisted-device.local:8090');
+
+    await devices.getDeviceNames(['tracearr-check-device-5']);
+    await devices.getDeviceNames([
+      'tracearr-check-device-5',
+      'aef454b9-44e6-412f-913b-3e3a5eb0dbee',
+    ]);
+    expect(requested('/admin/devices')).toHaveLength(1);
+
+    await devices.getDeviceNames(['b0d6e3f1-new-device']);
+    expect(requested('/admin/devices')).toHaveLength(2);
+    await devices.getDeviceNames(['tracearr-check-device-5']);
+    expect(requested('/admin/devices')).toHaveLength(2);
+
+    vi.advanceTimersByTime(11 * 60_000);
+    await devices.getDeviceNames(['tracearr-check-device-5']);
+    expect(requested('/admin/devices')).toHaveLength(3);
+  });
+
   it('narrows the sessions to one session key', async () => {
     serve({ '/admin/sessions': silo.sessions, '/admin/devices': silo.devices });
 
