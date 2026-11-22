@@ -1149,7 +1149,7 @@ export const playbackReportingTestSchema = z.object({
   serverId: uuidSchema,
 });
 
-export const tofaImportSchema = z.object({
+export const serverHistoryImportSchema = z.object({
   serverId: uuidSchema,
 });
 

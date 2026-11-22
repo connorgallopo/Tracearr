@@ -12,7 +12,9 @@ const { calls, step } = vi.hoisted(() => {
 });
 
 vi.mock('../../db/client.js', () => ({ db: {} }));
-vi.mock('../../jobs/importQueue.js', () => ({ holdTofaImport: vi.fn(step('holdImport')) }));
+vi.mock('../../jobs/importQueue.js', () => ({
+  holdServerHistoryImport: vi.fn(step('holdImport')),
+}));
 vi.mock('../../jobs/poller/database.js', () => ({
   publishServersChanged: vi.fn(step('publishServersChanged')),
 }));
@@ -30,6 +32,7 @@ vi.mock('../settings.js', () => ({ rearmImportedHistoryLink: vi.fn(step('rearm')
 vi.mock('../sseManager.js', () => ({ sseManager: { refresh: vi.fn(step('sseRefresh')) } }));
 vi.mock('../sync.js', () => ({ syncServer: vi.fn() }));
 
+import { holdServerHistoryImport } from '../../jobs/importQueue.js';
 import { enqueueLibrarySync } from '../../jobs/librarySyncQueue.js';
 import { startAddedServer, syncReconnectedServer } from '../serverCreate.js';
 import { syncServer } from '../sync.js';
@@ -65,6 +68,7 @@ describe('startAddedServer', () => {
       'scheduleRequestSync',
       'requestSync',
     ]);
+    expect(holdServerHistoryImport).toHaveBeenCalledExactlyOnceWith('srv-1', 'tofa');
     expect(syncServer).toHaveBeenCalledWith('srv-1', { syncUsers: true, syncLibraries: false });
     expect(enqueueLibrarySync).toHaveBeenCalledWith('srv-1', 'event', { firstSync: true });
   });

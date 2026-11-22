@@ -1,7 +1,7 @@
-import { assertNever, pickServerColor, SERVER_PROFILES, type ServerType } from '@tracearr/shared';
+import { pickServerColor, SERVER_PROFILES, type ServerType } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, serverUsers } from '../db/schema.js';
-import { holdTofaImport } from '../jobs/importQueue.js';
+import { holdServerHistoryImport } from '../jobs/importQueue.js';
 import { publishServersChanged } from '../jobs/poller/database.js';
 import {
   enqueueLibrarySync,
@@ -87,19 +87,6 @@ export async function createServer(input: CreateServerInput) {
   });
 }
 
-/** The history the server keeps itself, held behind its first library sync. */
-async function holdServerHistoryImport(server: { id: string; type: ServerType }): Promise<void> {
-  const importer = SERVER_PROFILES[server.type].serverHistoryImport;
-  switch (importer) {
-    case 'tofa':
-      return holdTofaImport(server.id);
-    case null:
-      return;
-    default:
-      return assertNever(importer);
-  }
-}
-
 /**
  * Everything a server needs once its row is saved, for every way a server is added. A step that
  * fails is logged and never undoes the add; the steps that need it do not run.
@@ -120,7 +107,12 @@ export async function startAddedServer(
     );
   }
   // Held before the add answers, so an import the owner starts meanwhile finds it and is refused
-  await holdServerHistoryImport(server).catch(failedFor('Holding the history import'));
+  const importer = SERVER_PROFILES[server.type].serverHistoryImport;
+  if (importer !== null) {
+    await holdServerHistoryImport(server.id, importer).catch(
+      failedFor('Holding the history import')
+    );
+  }
   // Before the add answers too: a Tautulli, Jellystat or Playback Reporting import started
   // meanwhile waits
   await markFirstSyncOwed(server.id).catch(failedFor('Marking the first sync owed'));

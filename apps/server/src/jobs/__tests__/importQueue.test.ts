@@ -75,7 +75,7 @@ import {
   enqueueImport,
   enqueueJellystatImport,
   enqueuePlaybackReportingImport,
-  enqueueTofaImport,
+  enqueueServerHistoryImport,
   getAllActiveImports,
   getLatestImport,
   initImportQueue,
@@ -179,7 +179,7 @@ describe('import enqueues', () => {
       'playback-reporting',
       () => enqueuePlaybackReportingImport('srv-1', 'owner', 'UTC', false, false),
     ],
-    ['tofa', () => enqueueTofaImport('srv-1', 'owner')],
+    ['tofa', () => enqueueServerHistoryImport('srv-1', 'tofa', 'owner')],
   ] as const;
 
   it.each(starts)('adds a %s import with one deduplication key per server', async (type, start) => {
@@ -418,7 +418,7 @@ describe('import worker', () => {
 
     expect(await worker.processor?.(job)).toBe(result);
     expect(mockPublish).toHaveBeenCalledWith(
-      'import:tofa:progress',
+      'import:server-history:progress',
       expect.objectContaining({
         serverId: 'srv-1',
         status: 'complete',

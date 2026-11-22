@@ -52,7 +52,7 @@ import type {
   TautulliImportProgress,
   JellystatImportProgress,
   PlaybackReportingImportProgress,
-  TofaImportProgress,
+  ServerHistoryImportProgress,
   MaintenanceJobProgress,
   LibrarySyncProgress,
   NotificationToast,
@@ -1431,8 +1431,11 @@ async function initializePostListen(app: FastifyInstance) {
             data as PlaybackReportingImportProgress
           );
           break;
-        case WS_EVENTS.IMPORT_TOFA_PROGRESS:
-          broadcastToSessions('import:tofa:progress', data as TofaImportProgress);
+        case WS_EVENTS.IMPORT_SERVER_HISTORY_PROGRESS:
+          broadcastToSessions(
+            'import:server-history:progress',
+            data as ServerHistoryImportProgress
+          );
           break;
         case WS_EVENTS.MAINTENANCE_PROGRESS:
           broadcastToSessions('maintenance:progress', data as MaintenanceJobProgress);

@@ -121,8 +121,8 @@ export type {
   // Playback Reporting import
   PlaybackReportingImportProgress,
   PlaybackReportingImportResult,
-  TofaImportProgress,
-  TofaImportResult,
+  ServerHistoryImportProgress,
+  ServerHistoryImportResult,
   ImportRetry,
   LatestImportStatus,
   ImportWaitingForLibrarySync,
@@ -601,7 +601,7 @@ export {
   // Playback Reporting import
   playbackReportingImportSchema,
   playbackReportingTestSchema,
-  tofaImportSchema,
+  serverHistoryImportSchema,
   // Engagement tracking
   engagementTierSchema,
   userBehaviorTypeSchema,

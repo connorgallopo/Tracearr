@@ -90,7 +90,11 @@ describe('GET /tasks/running', () => {
     ]);
 
     expect(await runningTasks()).toEqual([
-      expect.objectContaining({ type: 'tofa_import', name: 'tofa Import', context: 'Den' }),
+      expect.objectContaining({
+        type: 'server_history_import',
+        name: 'tofa Import',
+        context: 'Den',
+      }),
     ]);
   });
 

@@ -24,6 +24,8 @@ import { getBullPrefix, queueConnectionOptions } from './queueConnection.js';
 import { isMaintenance } from '../serverState.js';
 import {
   REDIS_KEYS,
+  SERVER_HISTORY_IMPORTERS,
+  SERVER_PROFILES,
   assertNever,
   type TautulliImportProgress,
   type TautulliImportResult,
@@ -31,8 +33,9 @@ import {
   type JellystatImportResult,
   type PlaybackReportingImportProgress,
   type PlaybackReportingImportResult,
-  type TofaImportProgress,
-  type TofaImportResult,
+  type ServerHistoryImportProgress,
+  type ServerHistoryImportResult,
+  type ServerHistoryImporter,
 } from '@tracearr/shared';
 import {
   ImportInterruptedError,
@@ -50,7 +53,7 @@ import {
 } from '../services/import/jellystatUpload.js';
 import { importPlaybackReporting } from '../services/playbackReporting.js';
 import { importTofaHistory } from '../services/import/tofaHistory.js';
-import { getCacheService, getPubSubService } from '../services/cache.js';
+import { getCacheService, getPubSubService, type PubSubService } from '../services/cache.js';
 import { ServerHistoricalError } from '../services/liveServers.js';
 import { isHttpStatus } from '../utils/http.js';
 import { extendJobLock } from './lockUtils.js';
@@ -106,8 +109,8 @@ export interface PlaybackReportingImportJobData {
   heldForFirstSync?: true; // See addImportAfterFirstSync
 }
 
-export interface TofaImportJobData {
-  type: 'tofa';
+export interface ServerHistoryImportJobData {
+  type: ServerHistoryImporter;
   serverId: string;
   userId: string; // Audit trail - who initiated the import
 }
@@ -116,10 +119,16 @@ export type ImportJobData =
   | TautulliImportJobData
   | JellystatImportJobData
   | PlaybackReportingImportJobData
-  | TofaImportJobData;
+  | ServerHistoryImportJobData;
 
 export type ImportJobResult =
-  TautulliImportResult | JellystatImportResult | PlaybackReportingImportResult | TofaImportResult;
+  | TautulliImportResult
+  | JellystatImportResult
+  | PlaybackReportingImportResult
+  | ServerHistoryImportResult;
+
+const isServerHistoryImporter = (type: string): type is ServerHistoryImporter =>
+  (SERVER_HISTORY_IMPORTERS as readonly string[]).includes(type);
 
 // Queue configuration
 const QUEUE_NAME = 'imports';
@@ -206,7 +215,7 @@ export type ImportProgressPayload =
   | TautulliImportProgress
   | JellystatImportProgress
   | PlaybackReportingImportProgress
-  | TofaImportProgress;
+  | ServerHistoryImportProgress;
 
 function importProgressChannel(
   type: ImportJobData['type']
@@ -214,10 +223,10 @@ function importProgressChannel(
   | 'import:progress'
   | 'import:jellystat:progress'
   | 'import:playbackreporting:progress'
-  | 'import:tofa:progress' {
+  | 'import:server-history:progress' {
   if (type === 'jellystat') return 'import:jellystat:progress';
   if (type === 'playback-reporting') return 'import:playbackreporting:progress';
-  if (type === 'tofa') return 'import:tofa:progress';
+  if (isServerHistoryImporter(type)) return 'import:server-history:progress';
   return 'import:progress';
 }
 
@@ -252,7 +261,7 @@ function blankProgress(
         duplicateRecords: 0,
         unknownUserRecords: 0,
         activeRecords: 0,
-      } satisfies TofaImportProgress;
+      } satisfies ServerHistoryImportProgress;
     case 'playback-reporting':
       return {
         ...base,
@@ -395,8 +404,8 @@ export function startImportWorker(): void {
           ? 'Tautulli import'
           : job.data.type === 'jellystat'
             ? 'Jellystat import'
-            : job.data.type === 'tofa'
-              ? 'tofa history import'
+            : isServerHistoryImporter(job.data.type)
+              ? `${SERVER_PROFILES[job.data.type].displayName} history import`
               : 'Playback Reporting import';
       console.log(`[Import] Starting job ${job.id} for server ${job.data.serverId}`);
 
@@ -570,8 +579,8 @@ async function processImportJob(
   if (job.data.type === 'playback-reporting') {
     return processPlaybackReportingImportJob(job as Job<PlaybackReportingImportJobData>);
   }
-  if (job.data.type === 'tofa') {
-    return processTofaImportJob(job as Job<TofaImportJobData>);
+  if (isServerHistoryImporter(job.data.type)) {
+    return processServerHistoryImportJob(job as Job<ServerHistoryImportJobData>);
   }
   return processTautulliImportJob(job as Job<TautulliImportJobData>, signal);
 }
@@ -781,15 +790,32 @@ async function processPlaybackReportingImportJob(
   return result;
 }
 
-async function processTofaImportJob(job: Job<TofaImportJobData>): Promise<TofaImportResult> {
+export async function runServerHistoryImport(
+  importer: ServerHistoryImporter,
+  serverId: string,
+  pubSubService?: PubSubService,
+  onProgress?: (progress: ServerHistoryImportProgress) => Promise<void>
+): Promise<ServerHistoryImportResult> {
+  switch (importer) {
+    case 'tofa':
+      return importTofaHistory(serverId, pubSubService, onProgress);
+    default:
+      return assertNever(importer);
+  }
+}
+
+async function processServerHistoryImportJob(
+  job: Job<ServerHistoryImportJobData>
+): Promise<ServerHistoryImportResult> {
   const pubSubService = getPubSubService();
-  const result = await importTofaHistory(
+  const result = await runServerHistoryImport(
+    job.data.type,
     job.data.serverId,
     pubSubService ?? undefined,
     (progress) => job.updateProgress(progress)
   );
-  await pubSubService?.publish('import:tofa:progress', {
-    ...blankProgress('tofa', job.data.serverId, 'complete', result.message),
+  await pubSubService?.publish('import:server-history:progress', {
+    ...blankProgress(job.data.type, job.data.serverId, 'complete', result.message),
     importedRecords: result.imported,
     skippedRecords: result.skipped,
     duplicateRecords: result.duplicates,
@@ -1104,23 +1130,34 @@ export async function enqueuePlaybackReportingImport(
 }
 
 // ==========================================================================
-// tofa-Specific Functions
+// Server History Functions
 // ==========================================================================
 
-export async function getActiveTofaImportForServer(serverId: string): Promise<string | null> {
+export async function getActiveServerHistoryImport(serverId: string): Promise<string | null> {
   if (!importQueue) return null;
   const activeJobs = await importQueue.getJobs(['active', 'waiting', 'delayed']);
-  return activeJobs.find((j) => j.data.type === 'tofa' && j.data.serverId === serverId)?.id ?? null;
+  return (
+    activeJobs.find((j) => isServerHistoryImporter(j.data.type) && j.data.serverId === serverId)
+      ?.id ?? null
+  );
 }
 
-export async function enqueueTofaImport(serverId: string, userId: string): Promise<string> {
+export async function enqueueServerHistoryImport(
+  serverId: string,
+  importer: ServerHistoryImporter,
+  userId: string
+): Promise<string> {
   if (!importQueue) throw new Error('Import queue not initialized');
 
-  const existingJobId = await getActiveTofaImportForServer(serverId);
+  const existingJobId = await getActiveServerHistoryImport(serverId);
   if (existingJobId) throw importInProgress(serverId, existingJobId);
 
-  const jobId = await addImport(importQueue, 'tofa-import', { type: 'tofa', serverId, userId });
-  console.log(`[Import] Enqueued tofa history job ${jobId} for server ${serverId}`);
+  const jobId = await addImport(importQueue, `${importer}-import`, {
+    type: importer,
+    serverId,
+    userId,
+  });
+  console.log(`[Import] Enqueued ${importer} history job ${jobId} for server ${serverId}`);
   return jobId;
 }
 
@@ -1147,14 +1184,17 @@ async function heldImportsOf(serverId: string, held = isHeldImport): Promise<Job
  * ends, so its plays resolve against the library. Queued at once, an import asked for meanwhile
  * finds it and is refused.
  */
-export async function holdTofaImport(serverId: string): Promise<void> {
+export async function holdServerHistoryImport(
+  serverId: string,
+  importer: ServerHistoryImporter
+): Promise<void> {
   if (!importQueue) throw new Error('Import queue not initialized');
   await importQueue.add(
-    'tofa-import',
-    { type: 'tofa', serverId, userId: 'system' },
+    `${importer}-import`,
+    { type: importer, serverId, userId: 'system' },
     { jobId: heldImportId(serverId), delay: HELD_IMPORT_MAX_WAIT_MS }
   );
-  console.log(`[Import] Held tofa history import for server ${serverId}`);
+  console.log(`[Import] Held ${importer} history import for server ${serverId}`);
 }
 
 /** Runs the server's held imports now: a library sync of it completed. */

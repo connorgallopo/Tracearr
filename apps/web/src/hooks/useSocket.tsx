@@ -380,7 +380,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     newSocket.on(WS_EVENTS.IMPORT_PROGRESS, onImportProgress);
     newSocket.on(WS_EVENTS.IMPORT_JELLYSTAT_PROGRESS, onImportProgress);
     newSocket.on(WS_EVENTS.IMPORT_PLAYBACK_REPORTING_PROGRESS, onImportProgress);
-    newSocket.on(WS_EVENTS.IMPORT_TOFA_PROGRESS, onImportProgress);
+    newSocket.on(WS_EVENTS.IMPORT_SERVER_HISTORY_PROGRESS, onImportProgress);
 
     // Maintenance job progress - invalidate relevant caches when jobs complete
     newSocket.on(WS_EVENTS.MAINTENANCE_PROGRESS, (progress: MaintenanceJobProgress) => {

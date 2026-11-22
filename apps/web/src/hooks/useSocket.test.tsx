@@ -320,7 +320,7 @@ describe('SocketProvider', () => {
 
   it.each([
     ['Playback Reporting', WS_EVENTS.IMPORT_PLAYBACK_REPORTING_PROGRESS],
-    ['tofa', WS_EVENTS.IMPORT_TOFA_PROGRESS],
+    ['tofa', WS_EVENTS.IMPORT_SERVER_HISTORY_PROGRESS],
   ])('refetches sessions, stats and users when a %s import completes', (_name, event) => {
     const { invalidate } = setup();
 

@@ -1482,8 +1482,8 @@ export interface PlaybackReportingImportResult {
   }[];
 }
 
-// tofa watch history import types
-export interface TofaImportProgress {
+/** A server's own watch history import */
+export interface ServerHistoryImportProgress {
   serverId: string;
   status: 'idle' | 'waiting' | 'fetching' | 'processing' | 'retrying' | 'complete' | 'error';
   fetchedRecords: number;
@@ -1504,7 +1504,7 @@ export interface TofaImportProgress {
   retry?: ImportRetry;
 }
 
-export interface TofaImportResult {
+export interface ServerHistoryImportResult {
   /** Always true: a failed import throws */
   success: true;
   imported: number;
@@ -1583,7 +1583,7 @@ export interface ServerToClientEvents {
   'import:progress': (progress: TautulliImportProgress) => void;
   'import:jellystat:progress': (progress: JellystatImportProgress) => void;
   'import:playbackreporting:progress': (progress: PlaybackReportingImportProgress) => void;
-  'import:tofa:progress': (progress: TofaImportProgress) => void;
+  'import:server-history:progress': (progress: ServerHistoryImportProgress) => void;
   'maintenance:progress': (progress: MaintenanceJobProgress) => void;
   'library:sync:progress': (progress: LibrarySyncProgress) => void;
   'tasks:updated': (tasks: RunningTask[]) => void;
@@ -2373,7 +2373,7 @@ export type RunningTaskType =
   | 'tautulli_import'
   | 'jellystat_import'
   | 'playback_reporting_import'
-  | 'tofa_import'
+  | 'server_history_import'
   | 'image_precache'
   | 'maintenance';
 

@@ -4,7 +4,11 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
-import type { LatestImportStatus, TofaImportProgress, TofaImportResult } from '@tracearr/shared';
+import type {
+  LatestImportStatus,
+  ServerHistoryImportProgress,
+  ServerHistoryImportResult,
+} from '@tracearr/shared';
 import { Import, ImportSources } from './Import';
 
 vi.mock('react-i18next', () => ({
@@ -45,7 +49,7 @@ vi.mock('@/lib/api', () => ({
         start: vi.fn(),
         getActive: vi.fn().mockResolvedValue({ active: false, latest: null }),
       },
-      tofa: {
+      serverHistory: {
         start: vi.fn(),
         getActive: vi.fn().mockResolvedValue({ active: false, latest: null }),
       },
@@ -69,12 +73,14 @@ function renderImport() {
   return render(<Import />, { wrapper: Providers });
 }
 
-function withTofaImport(latest: LatestImportStatus<TofaImportProgress, TofaImportResult>) {
+function withServerHistoryImport(
+  latest: LatestImportStatus<ServerHistoryImportProgress, ServerHistoryImportResult>
+) {
   vi.mocked(useServers).mockReturnValue({
     data: [{ id: 'tofa-1', name: 'Den', type: 'tofa' }],
     isLoading: false,
   } as unknown as ReturnType<typeof useServers>);
-  vi.mocked(api.import.tofa.getActive).mockResolvedValue({ active: false, latest });
+  vi.mocked(api.import.serverHistory.getActive).mockResolvedValue({ active: false, latest });
 }
 
 function heldImport(percent: number) {
@@ -184,8 +190,11 @@ describe('Import', () => {
       data: [{ id: 'tofa-1', name: 'Den', type: 'tofa' }],
       isLoading: false,
     } as unknown as ReturnType<typeof useServers>);
-    vi.mocked(api.import.tofa.getActive).mockResolvedValue({ active: false, latest: null });
-    vi.mocked(api.import.tofa.start).mockResolvedValue({ status: 'queued', message: '' });
+    vi.mocked(api.import.serverHistory.getActive).mockResolvedValue({
+      active: false,
+      latest: null,
+    });
+    vi.mocked(api.import.serverHistory.start).mockResolvedValue({ status: 'queued', message: '' });
 
     renderImport();
 
@@ -196,7 +205,7 @@ describe('Import', () => {
     const region = screen.getByRole('status');
     expect(region).toBeEmptyDOMElement();
     await userEvent.click(screen.getByRole('button', { name: 'import.importTofaHistory' }));
-    expect(api.import.tofa.start).toHaveBeenCalledWith('tofa-1');
+    expect(api.import.serverHistory.start).toHaveBeenCalledWith('tofa-1');
     expect(region).toHaveTextContent('import.importing');
   });
 
@@ -325,7 +334,7 @@ describe('Import', () => {
   );
 
   it('counts a running tofa import as started and shows its progress', async () => {
-    withTofaImport({
+    withServerHistoryImport({
       state: 'running',
       progress: {
         serverId: 'tofa-1',
@@ -352,7 +361,7 @@ describe('Import', () => {
   });
 
   it('says a held tofa import waits for the library sync rather than importing', async () => {
-    withTofaImport({ state: 'waitingForLibrarySync', librarySync: null });
+    withServerHistoryImport({ state: 'waitingForLibrarySync', librarySync: null });
 
     renderImport();
 
@@ -363,7 +372,7 @@ describe('Import', () => {
   });
 
   it('shows a finished tofa import with its result and offers a second import', async () => {
-    withTofaImport({
+    withServerHistoryImport({
       state: 'complete',
       result: {
         success: true,
@@ -401,7 +410,7 @@ describe('Import', () => {
       label: 'import.startImport',
     },
     {
-      source: 'tofa',
+      source: 'serverHistory',
       server: { id: 'tofa-1', name: 'Den', type: 'tofa' },
       label: 'import.importTofaHistory',
     },
@@ -472,7 +481,7 @@ describe('Import', () => {
         tautulli: ['plex-1', false, false],
         jellystat: ['jf-1', expect.any(File), true, false],
         playbackReporting: ['jf-1', expect.any(String), true, false],
-        tofa: ['tofa-1'],
+        serverHistory: ['tofa-1'],
       }[entry.source];
       expect(api.import[entry.source].start).toHaveBeenCalledWith(...start);
     }
@@ -484,7 +493,7 @@ describe('Import', () => {
       on: (name: string, handler: (progress: unknown) => void) => handlers.set(name, handler),
       off: vi.fn(),
     };
-    withTofaImport({ state: 'running', progress: null });
+    withServerHistoryImport({ state: 'running', progress: null });
 
     renderImport();
     expect(await screen.findByText('import.importInProgressGeneric')).toBeInTheDocument();
@@ -492,7 +501,9 @@ describe('Import', () => {
     expect(region).toHaveTextContent('import.importing');
 
     const emit = (progress: object) =>
-      act(() => handlers.get('import:tofa:progress')?.({ serverId: 'tofa-1', ...progress }));
+      act(() =>
+        handlers.get('import:server-history:progress')?.({ serverId: 'tofa-1', ...progress })
+      );
     const page = (processed: number) => ({
       status: 'processing',
       message: `Processing: ${processed} plays`,
@@ -533,14 +544,17 @@ describe('Import', () => {
       ],
       isLoading: false,
     } as unknown as ReturnType<typeof useServers>);
-    vi.mocked(api.import.tofa.getActive).mockResolvedValue({ active: false, latest: null });
+    vi.mocked(api.import.serverHistory.getActive).mockResolvedValue({
+      active: false,
+      latest: null,
+    });
     const onStarted = vi.fn();
 
     render(<ImportSources serverType="tofa" onStarted={onStarted} />, { wrapper: Providers });
     expect(screen.getByRole('combobox', { name: 'import.targetServer' })).toHaveTextContent('Den');
 
     act(() =>
-      handlers.get('import:tofa:progress')?.({
+      handlers.get('import:server-history:progress')?.({
         serverId: 'tofa-2',
         status: 'processing',
         message: 'Processing: 50 plays',

@@ -5,7 +5,11 @@
  * the plays Tracearr did not capture itself.
  */
 
-import { SESSION_LIMITS, type TofaImportProgress, type TofaImportResult } from '@tracearr/shared';
+import {
+  SESSION_LIMITS,
+  type ServerHistoryImportProgress,
+  type ServerHistoryImportResult,
+} from '@tracearr/shared';
 import type { sessions } from '../../db/schema.js';
 import { normalizeClient } from '../../utils/platformNormalizer.js';
 import type { PubSubService } from '../cache.js';
@@ -158,7 +162,7 @@ async function tofaHistory(serverId: string): Promise<ServerHistory<TofaWatchHis
 export async function importTofaHistory(
   serverId: string,
   pubSubService?: PubSubService,
-  onProgress?: (progress: TofaImportProgress) => Promise<void>
-): Promise<TofaImportResult> {
+  onProgress?: (progress: ServerHistoryImportProgress) => Promise<void>
+): Promise<ServerHistoryImportResult> {
   return importServerHistory(serverId, () => tofaHistory(serverId), pubSubService, onProgress);
 }

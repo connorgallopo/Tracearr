@@ -6,9 +6,9 @@ import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type {
   LatestImportStatus,
+  ServerHistoryImportProgress,
+  ServerHistoryImportResult,
   ServerType,
-  TofaImportProgress,
-  TofaImportResult,
 } from '@tracearr/shared';
 import { resources } from '@tracearr/translations';
 import { api } from '@/lib/api';
@@ -52,7 +52,7 @@ vi.mock('@/lib/api', () => {
         tautulli: importer(),
         jellystat: importer(),
         playbackReporting: importer(),
-        tofa: importer(),
+        serverHistory: importer(),
       },
     },
   };
@@ -325,11 +325,11 @@ describe('AddServerDialog', () => {
   });
 
   it('shows a tofa server its held import waiting on the library sync, and no second import', async () => {
-    const waiting: LatestImportStatus<TofaImportProgress, TofaImportResult> = {
+    const waiting: LatestImportStatus<ServerHistoryImportProgress, ServerHistoryImportResult> = {
       state: 'waitingForLibrarySync',
       librarySync: { state: 'running', progress: 42 },
     };
-    vi.mocked(api.import.tofa.getActive).mockResolvedValueOnce({
+    vi.mocked(api.import.serverHistory.getActive).mockResolvedValueOnce({
       active: true,
       jobId: 'held-import-tofa-1',
       latest: waiting,
@@ -339,7 +339,7 @@ describe('AddServerDialog', () => {
     await waitFor(() =>
       expect(screen.getByRole('status')).toHaveTextContent('import.waitingForLibrarySyncPercent')
     );
-    expect(api.import.tofa.getActive).toHaveBeenCalledWith('tofa-1');
+    expect(api.import.serverHistory.getActive).toHaveBeenCalledWith('tofa-1');
     expect(screen.queryByRole('button', { name: 'import.importing' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'import.importTofaHistory' })).toBeNull();
     expect(screen.getByRole('button', { name: 'common:actions.close' })).toBeInTheDocument();

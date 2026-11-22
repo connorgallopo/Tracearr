@@ -45,7 +45,7 @@ function importTaskKind(type: ImportJobData['type']): { type: RunningTaskType; l
     case 'playback-reporting':
       return { type: 'playback_reporting_import', label: 'Playback Reporting' };
     case 'tofa':
-      return { type: 'tofa_import', label: SERVER_PROFILES.tofa.displayName };
+      return { type: 'server_history_import', label: SERVER_PROFILES[type].displayName };
     default:
       return assertNever(type);
   }

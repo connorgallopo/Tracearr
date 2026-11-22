@@ -9,8 +9,8 @@ import type {
   PlaybackReportingImportResult,
   TautulliImportProgress,
   TautulliImportResult,
-  TofaImportProgress,
-  TofaImportResult,
+  ServerHistoryImportProgress,
+  ServerHistoryImportResult,
   UpdateUserAccessInput,
   UserRole,
   ServerUserWithIdentity,
@@ -2300,12 +2300,15 @@ class ApiClient {
           method: 'DELETE',
         }),
     },
-    tofa: {
+    serverHistory: {
       start: (serverId: string) =>
-        this.request<{ status: string; jobId?: string; message: string }>('/import/tofa', {
-          method: 'POST',
-          body: JSON.stringify({ serverId }),
-        }),
+        this.request<{ status: string; jobId?: string; message: string }>(
+          '/import/server-history',
+          {
+            method: 'POST',
+            body: JSON.stringify({ serverId }),
+          }
+        ),
       getActive: (serverId: string) =>
         this.request<{
           active: boolean;
@@ -2313,8 +2316,8 @@ class ApiClient {
           state?: string;
           progress?: number | object;
           createdAt?: number;
-          latest: LatestImportStatus<TofaImportProgress, TofaImportResult> | null;
-        }>(`/import/tofa/active/${serverId}`),
+          latest: LatestImportStatus<ServerHistoryImportProgress, ServerHistoryImportResult> | null;
+        }>(`/import/server-history/active/${serverId}`),
     },
   };
 

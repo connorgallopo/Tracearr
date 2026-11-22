@@ -8,9 +8,10 @@
 
 import {
   SERVER_PROFILES,
+  WS_EVENTS,
   type ServerHistoryImporter,
-  type TofaImportProgress,
-  type TofaImportResult,
+  type ServerHistoryImportProgress,
+  type ServerHistoryImportResult,
 } from '@tracearr/shared';
 import { UnrecoverableError } from 'bullmq';
 import { and, eq, gte, inArray, lte, or, type SQL } from 'drizzle-orm';
@@ -71,6 +72,7 @@ export interface ServerHistory<Row> {
   /** Names the importer in logs and in the aggregate refresh */
   label: string;
   pages(beforeFetch: () => void): AsyncIterable<Row[]>;
+  /** Must not throw: it runs on every row before the per-row guard, so a throw fails the import */
   play(row: Row): HistoryPlay;
   toSession(
     row: Row,
@@ -134,9 +136,9 @@ export async function importServerHistory<Row>(
   serverId: string,
   open: () => Promise<ServerHistory<Row>>,
   pubSubService?: PubSubService,
-  onProgress?: (progress: TofaImportProgress) => Promise<void>
-): Promise<TofaImportResult> {
-  const progress: TofaImportProgress = {
+  onProgress?: (progress: ServerHistoryImportProgress) => Promise<void>
+): Promise<ServerHistoryImportResult> {
+  const progress: ServerHistoryImportProgress = {
     serverId,
     status: 'idle',
     fetchedRecords: 0,
@@ -149,9 +151,9 @@ export async function importServerHistory<Row>(
     errorRecords: 0,
     message: 'Starting import...',
   };
-  const publishProgress = createSimpleProgressPublisher<TofaImportProgress>(
+  const publishProgress = createSimpleProgressPublisher<ServerHistoryImportProgress>(
     pubSubService,
-    'import:tofa:progress',
+    WS_EVENTS.IMPORT_SERVER_HISTORY_PROGRESS,
     onProgress
   );
   publishProgress(progress);

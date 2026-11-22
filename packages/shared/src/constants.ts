@@ -48,7 +48,7 @@ export const WS_EVENTS = {
   IMPORT_PROGRESS: 'import:progress',
   IMPORT_JELLYSTAT_PROGRESS: 'import:jellystat:progress',
   IMPORT_PLAYBACK_REPORTING_PROGRESS: 'import:playbackreporting:progress',
-  IMPORT_TOFA_PROGRESS: 'import:tofa:progress',
+  IMPORT_SERVER_HISTORY_PROGRESS: 'import:server-history:progress',
   MAINTENANCE_PROGRESS: 'maintenance:progress',
   /** Library sync progress updates */
   LIBRARY_SYNC_PROGRESS: 'library:sync:progress',

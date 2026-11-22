@@ -116,13 +116,13 @@ vi.mock('../../jobs/requestSyncQueue.js', () => ({
 }));
 
 vi.mock('../../jobs/importQueue.js', () => ({
-  holdTofaImport: vi.fn().mockResolvedValue(undefined),
+  holdServerHistoryImport: vi.fn().mockResolvedValue(undefined),
   dropHeldImport: vi.fn().mockResolvedValue(undefined),
 }));
 
 import type { SQL } from 'drizzle-orm';
 import { db } from '../../db/client.js';
-import { dropHeldImport, holdTofaImport } from '../../jobs/importQueue.js';
+import { dropHeldImport, holdServerHistoryImport } from '../../jobs/importQueue.js';
 import {
   enqueueLibrarySync,
   rebuildAutoSyncSchedules,
@@ -811,7 +811,7 @@ describe('Server Routes', () => {
       await vi.waitFor(() => expect(enqueueRequestSync).toHaveBeenCalledWith(serviceId, 'full'));
       expect(scheduleRequestSync).toHaveBeenCalled();
       const { id } = response.json<{ id: string }>();
-      expect(holdTofaImport).toHaveBeenCalledExactlyOnceWith(id);
+      expect(holdServerHistoryImport).toHaveBeenCalledExactlyOnceWith(id, 'tofa');
       expect(enqueueLibrarySync).toHaveBeenCalledExactlyOnceWith(id, 'event', { firstSync: true });
       expect(dropHeldImport).not.toHaveBeenCalled();
     });
