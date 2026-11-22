@@ -314,6 +314,28 @@ describe('SSEManager.addServer', () => {
     await manager.addServer('plex-1', 'Plex Server', 'plex', 'http://plex.local', 'token');
     expect(manager.getStatus()).toHaveLength(1);
   });
+
+  it("adds a Silo server without waiting on its socket ticket, so the next server's start is not held", async () => {
+    vi.mocked(SiloEventSource).mockImplementationOnce(function () {
+      return {
+        on: vi.fn(),
+        connect: vi.fn(() => new Promise<void>(() => undefined)),
+        disconnect: vi.fn(),
+        removeAllListeners: vi.fn(),
+        retryFromFallback: vi.fn(),
+        getStatus: vi.fn(),
+      } as unknown as InstanceType<typeof SiloEventSource>;
+    });
+    await manager.initialize(cache, makePubSubService());
+
+    const added = manager
+      .addServer('silo-1', 'Silo', 'silo', 'http://silo.local:8090', 'token')
+      .then(() => 'added');
+    const held = new Promise((resolve) => setTimeout(() => resolve('held'), 50));
+
+    await expect(Promise.race([added, held])).resolves.toBe('added');
+    expect(manager.getStatus()).toHaveLength(1);
+  });
 });
 
 describe('SSEManager.removeServer', () => {

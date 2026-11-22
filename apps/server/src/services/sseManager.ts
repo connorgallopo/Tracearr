@@ -330,7 +330,8 @@ export class SSEManager extends EventEmitter {
 
             this.setupSiloEventHandlers(eventSource, serverId, serverName);
             connection.eventSource = eventSource;
-            await eventSource.connect();
+            // Never rejects; awaiting it would hold the next server's start behind a ticket request
+            void eventSource.connect();
             break;
           }
           default:

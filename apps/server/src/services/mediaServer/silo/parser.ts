@@ -324,63 +324,38 @@ export function parseSiloLibraryListing(
   return { items, episodes, seasons: [...seasons.values()] };
 }
 
-/** Silo's CPU seconds at one sample: the cgroup counter, which counts its transcoders, else the process's own */
-export interface SiloCpuCounter {
-  sampledAt: number;
-  cpuSeconds: number;
-  source: 'cgroup' | 'process';
-  /** The cgroup's scope, leaf or ancestor */
-  scope?: string;
-}
-
-/** Silo leaves the cgroup counter out of a sample whose cgroup read failed */
-export function siloCpuCounter(body: SiloSystemResources): SiloCpuCounter | null {
-  if (!body.available || body.stale || !body.sampled_at) return null;
-  const sampledAt = Date.parse(body.sampled_at);
-  const cgroup = body.attribution?.cgroup_cpu;
-  if (typeof cgroup?.usage_seconds === 'number') {
-    return { sampledAt, cpuSeconds: cgroup.usage_seconds, source: 'cgroup', scope: cgroup.scope };
-  }
-  const processSeconds = body.attribution?.process?.cpu_seconds;
-  return typeof processSeconds === 'number'
-    ? { sampledAt, cpuSeconds: processSeconds, source: 'process' }
-    : null;
-}
-
 /**
- * One point per new Silo sample. Silo's CPU share is its counter's rise since the previous
- * sample, so the first sample, the same sample read again, a counter that went back (Silo
- * restarted) and a counter other than the previous one add none. mem_total_mb is MiB.
+ * Silo's latest resource sample as its own dashboard shows it: the CPU busy share it measured
+ * over the last interval, memory used of total, and the Silo process's resident memory, which
+ * Silo keeps apart from its transcoders'. Silo shows no CPU share for its own process, so none
+ * is charted. A stale or unavailable sample is not zero load, and a reading Silo marks
+ * unavailable is left out. mem_total_mb is MiB.
  */
 export function parseSiloResources(
-  body: SiloSystemResources,
-  previous: SiloCpuCounter | undefined
+  body: SiloSystemResources
 ): Omit<ServerResourceDataPoint, 'timespan'> | null {
-  const counter = siloCpuCounter(body);
-  const { system } = body;
-  const residentBytes = body.attribution?.process?.resident_bytes;
+  const { system, attribution } = body;
+  const sampledAt = Date.parse(body.sampled_at ?? '');
+  const residentBytes = attribution?.process?.resident_bytes;
   if (
-    !counter ||
+    !body.available ||
+    body.stale ||
+    !Number.isFinite(sampledAt) ||
     !system ||
-    residentBytes === undefined ||
-    !previous ||
-    counter.source !== previous.source ||
-    counter.scope !== previous.scope ||
-    counter.sampledAt <= previous.sampledAt ||
-    counter.cpuSeconds < previous.cpuSeconds
+    !(system.mem_total_mb > 0) ||
+    residentBytes === undefined
   ) {
     return null;
   }
-  const elapsedSeconds = (counter.sampledAt - previous.sampledAt) / 1000;
-  const childrenBytes = body.attribution?.children?.resident_bytes ?? 0;
   return {
-    at: Math.floor(counter.sampledAt / 1000),
-    hostCpuUtilization: system.cpu_pct,
-    hostMemoryUtilization: (system.mem_used_mb / system.mem_total_mb) * 100,
-    processCpuUtilization:
-      ((counter.cpuSeconds - previous.cpuSeconds) / (elapsedSeconds * system.cores)) * 100,
-    processMemoryUtilization:
-      ((residentBytes + childrenBytes) / (system.mem_total_mb * 1024 * 1024)) * 100,
+    at: Math.floor(sampledAt / 1000),
+    hostCpuUtilization: attribution?.cpu?.available === false ? null : system.cpu_pct,
+    hostMemoryUtilization:
+      attribution?.memory?.available === false
+        ? null
+        : (system.mem_used_mb / system.mem_total_mb) * 100,
+    processCpuUtilization: null,
+    processMemoryUtilization: (residentBytes / (system.mem_total_mb * 1024 * 1024)) * 100,
   };
 }
 

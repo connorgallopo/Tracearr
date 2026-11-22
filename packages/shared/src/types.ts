@@ -1086,8 +1086,8 @@ export interface ServerResourceDataPoint {
   timespan: number;
   /** System-wide CPU utilization percentage; null when the source cannot see the host (non-Linux plugin hosts) */
   hostCpuUtilization: number | null;
-  /** Media server process CPU utilization percentage */
-  processCpuUtilization: number;
+  /** Media server process CPU utilization percentage; null when the server reports none for its process (Silo) */
+  processCpuUtilization: number | null;
   /** System-wide memory utilization percentage; null when the source cannot see the host */
   hostMemoryUtilization: number | null;
   /** Media server process memory utilization percentage */

@@ -10,9 +10,7 @@ import {
   parseSiloResources,
   parseSiloSession,
   parseSiloUsers,
-  siloCpuCounter,
   siloPosterPath,
-  type SiloCpuCounter,
 } from '../parser.js';
 import type { SiloSystemResources } from '../types.js';
 
@@ -242,86 +240,75 @@ describe('siloPosterPath', () => {
 });
 
 describe('parseSiloResources', () => {
-  const [first, second] = silo.resources.map((sample): SiloSystemResources => sample);
-  const counterOf = (body: SiloSystemResources | undefined): SiloCpuCounter => {
-    const counter = body && siloCpuCounter(body);
-    if (!counter) throw new Error('the fixture sample has no CPU counter');
-    return counter;
-  };
-  const withoutCgroup = (body: SiloSystemResources | undefined): SiloSystemResources => {
-    if (!body?.attribution) throw new Error('the fixture sample has no attribution');
-    const { cgroup_cpu: _cgroup, ...attribution } = body.attribution;
-    return { ...body, attribution };
-  };
-  const withScope = (body: SiloSystemResources, scope: string): SiloSystemResources => {
-    if (!body.attribution?.cgroup_cpu) throw new Error('the fixture sample has no cgroup counter');
-    return {
-      ...body,
+  const second = nth(silo.resources, 1);
+  const withSystem = (system: Partial<NonNullable<SiloSystemResources['system']>>) => ({
+    ...second,
+    system: { cpu_pct: 2, cores: 16, mem_used_mb: 1163, mem_total_mb: 12288, ...system },
+  });
+
+  it("charts a sample as Silo's dashboard shows it, from the first sample on", () => {
+    expect(parseSiloResources(second)).toEqual({
+      at: Math.floor(Date.parse('2026-11-21T17:39:52.829Z') / 1000),
+      hostCpuUtilization: 2,
+      hostMemoryUtilization: (1163 / 12288) * 100,
+      processCpuUtilization: null,
+      processMemoryUtilization: (384167936 / 12884901888) * 100,
+    });
+  });
+
+  it("charts no CPU share for Silo's process, whatever cgroup its counter covers", () => {
+    const ancestor = {
+      ...second,
       attribution: {
-        ...body.attribution,
-        cgroup_cpu: { ...body.attribution.cgroup_cpu, scope },
+        ...second.attribution,
+        cgroup_cpu: { version: 'v2', scope: 'ancestor', usage_seconds: 5000 },
       },
     };
-  };
 
-  it("charts host load from a resource sample, and Silo with its transcoders from the cgroup counter's rise", () => {
-    if (!second) throw new Error('the fixture has no second sample');
-    const point = parseSiloResources(second, counterOf(first));
+    expect(parseSiloResources(ancestor)?.processCpuUtilization).toBeNull();
+  });
 
-    expect(point?.at).toBe(Math.floor(Date.parse('2026-11-21T17:39:52.829Z') / 1000));
-    expect(point?.hostCpuUtilization).toBe(2);
-    expect(point?.hostMemoryUtilization).toBeCloseTo((1163 / 12288) * 100);
-    expect(point?.processCpuUtilization).toBeCloseTo(
-      ((1109.152491 - 1109.052426) / (10.001 * 16)) * 100
+  it("counts Silo's process memory without its transcoders', which Silo keeps apart", () => {
+    const transcoding = {
+      ...second,
+      attribution: {
+        ...second.attribution,
+        children: { workload: 'ffmpeg', resident_bytes: 1024 * 1024 * 1024, cpu_seconds: 3 },
+      },
+    };
+
+    expect(parseSiloResources(transcoding)?.processMemoryUtilization).toBeCloseTo(
+      (384167936 / 12884901888) * 100
     );
+  });
+
+  it('leaves out a reading Silo marks unavailable rather than charting it as zero', () => {
+    const point = parseSiloResources({
+      ...second,
+      attribution: {
+        sample_interval_seconds: 5,
+        process: { resident_bytes: 384167936 },
+        cpu: { available: false },
+        memory: { available: false },
+      },
+    });
+
+    expect(point?.hostCpuUtilization).toBeNull();
+    expect(point?.hostMemoryUtilization).toBeNull();
     expect(point?.processMemoryUtilization).toBeCloseTo((384167936 / 12884901888) * 100);
   });
 
-  it('adds no point for a first sample, the same sample again, or a counter that went back', () => {
-    if (!second) throw new Error('the fixture has no second sample');
-    const current = counterOf(second);
-
-    expect(parseSiloResources(second, undefined)).toBeNull();
-    expect(parseSiloResources(second, current)).toBeNull();
-    expect(
-      parseSiloResources(second, {
-        ...current,
-        sampledAt: current.sampledAt - 10_000,
-        cpuSeconds: current.cpuSeconds + 1,
-      })
-    ).toBeNull();
-  });
-
   it('adds no point for a stale or unavailable sample, which is not zero load', () => {
-    if (!second) throw new Error('the fixture has no second sample');
-    const previous = counterOf(first);
-
-    for (const body of [
-      { ...second, stale: true },
-      { ...second, available: false },
-    ]) {
-      expect(parseSiloResources(body, previous)).toBeNull();
-      expect(siloCpuCounter(body)).toBeNull();
-    }
+    expect(parseSiloResources({ ...second, stale: true })).toBeNull();
+    expect(parseSiloResources({ ...second, available: false })).toBeNull();
   });
 
-  it("counts Silo's own process where it reports no cgroup", () => {
-    const point = parseSiloResources(withoutCgroup(second), counterOf(withoutCgroup(first)));
-
-    expect(point?.processCpuUtilization).toBeCloseTo(((225.29 - 225.25) / (10.001 * 16)) * 100);
+  it('adds no point when Silo reports no memory total to measure against', () => {
+    expect(parseSiloResources(withSystem({ mem_total_mb: 0 }))).toBeNull();
   });
 
-  it('adds no point across a sample whose cgroup read failed, since the two counters differ', () => {
-    if (!second) throw new Error('the fixture has no second sample');
-
-    expect(parseSiloResources(second, counterOf(withoutCgroup(first)))).toBeNull();
-    expect(parseSiloResources(withoutCgroup(second), counterOf(first))).toBeNull();
-  });
-
-  it('adds no point when the cgroup counter moved between the leaf and an ancestor', () => {
-    if (!second) throw new Error('the fixture has no second sample');
-
-    expect(parseSiloResources(withScope(second, 'ancestor'), counterOf(first))).toBeNull();
+  it('still charts a sample that reports no core count, which nothing is divided by', () => {
+    expect(parseSiloResources(withSystem({ cores: 0 }))?.hostCpuUtilization).toBe(2);
   });
 });
 

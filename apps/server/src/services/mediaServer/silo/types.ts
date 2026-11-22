@@ -195,9 +195,9 @@ export interface SiloSystemResources {
   system?: { cpu_pct: number; cores: number; mem_used_mb: number; mem_total_mb: number };
   attribution?: {
     sample_interval_seconds: number;
-    process?: { cpu_seconds?: number; resident_bytes?: number };
-    /** scope: leaf or ancestor */
-    cgroup_cpu?: { usage_seconds?: number; scope?: string };
-    children?: { resident_bytes: number };
+    /** available: false when Silo could not take that reading this sample */
+    cpu?: { available: boolean };
+    memory?: { available: boolean };
+    process?: { resident_bytes?: number };
   };
 }
