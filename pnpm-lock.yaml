@@ -289,7 +289,7 @@ importers:
         version: 10.1.9
       '@fastify/rate-limit':
         specifier: ^11.2.2
-        version: 11.2.2
+        version: 11.3.0
       '@fastify/sensible':
         specifier: ^6.0.8
         version: 6.0.8
@@ -367,7 +367,7 @@ importers:
         version: 3.9.0
       undici:
         specifier: ^8.12.4
-        version: 8.13.0
+        version: 8.13.1
       unzipper:
         specifier: ^0.12.5
         version: 0.12.5
@@ -1270,8 +1270,8 @@ packages:
   '@fastify/deepmerge@3.2.4':
     resolution: {integrity: sha512-kc8GQq5gX9RRhw0rov3DMrN8wS8yRlxJRdDzsYwwdBV/wazuVgc/1K7CKL90tlvu3RlHan6Y0R0aE3nJtBz2eQ==}
 
-  '@fastify/error@4.2.1':
-    resolution: {integrity: sha512-MYBumuIwP+5MIpXSyKm6/o1Eigcoij186lWUssX3LH5U8KWqU0ktZhzC4CErIX9EJeQeRGI+zJZQWakBlFbUcg==}
+  '@fastify/error@4.3.0':
+    resolution: {integrity: sha512-mtIdc4R7HnUMOuUDQgnJkEF+Omr2p3JrSSJ44+RME/eAQ5TqdDy5MvXAjze/RyVHhJckuJKkXnMhKfPmFMKqyA==}
 
   '@fastify/fast-json-stringify-compiler@5.2.0':
     resolution: {integrity: sha512-LPTVA0w4oPITWHAvox9NgI1rDSrjUnjxX6QN5MCb9FY+HqvDsUmgLucbj9eQakqC8lYwO7UgkDPHEQLJNl9vtg==}
@@ -1294,8 +1294,8 @@ packages:
   '@fastify/proxy-addr@5.1.3':
     resolution: {integrity: sha512-ptgIgB+abBNTs5lsKNvFaKMCauPaTOE6ZIjxJr3FxCLehmYQQKYGg4srwwNICR9QQlFrYw59jWAo+i9GalVCaw==}
 
-  '@fastify/rate-limit@11.2.2':
-    resolution: {integrity: sha512-Ynxk9BU82Y5Ux7NOk9NqyZpTMdFes8EY8quXrN6ePDsbtG4G9Afb3l9mD8Vw2nv0hXg0iFjV+gkdABReFPlShw==}
+  '@fastify/rate-limit@11.3.0':
+    resolution: {integrity: sha512-n+gmOdTRReRA+UGI/cPAvG4bW4FCDLofInXNkTX42/rkMPy/8ii8LsLWHUU1KC+jJRdBtOD9Zs+Js8168eS/4A==}
 
   '@fastify/send@4.2.1':
     resolution: {integrity: sha512-zOB8L9z444PnGbd1Nd7gNXPz/7bnDR8Z4KNTNSwLVQuE3cTGsU9qUj1N4SjXKK0Tq4cauZYTwB+tqvlqosuKsw==}
@@ -4617,8 +4617,8 @@ packages:
     resolution: {integrity: sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==}
     engines: {node: '>=8.6.0'}
 
-  fast-json-stringify@7.3.6:
-    resolution: {integrity: sha512-hXCpiZTZGiER/Xree1Tb4PY1DREPUnlWTP5Df9hgtoDnUppulV7Km8lh1/NEBuqz4JnNGSXghnABudfZ/iwIzg==}
+  fast-json-stringify@7.3.7:
+    resolution: {integrity: sha512-g68ZQ66cTLWiYtgOYDtz47ZRUBHFg8ZZWcY//WY5ZR/ByLGNgigps2TxcgJHUqymu/DFGwhI+JNP/IVye92fsQ==}
 
   fast-jwt@6.3.7:
     resolution: {integrity: sha512-Z1yunvhXRD74kttxDTg5NAVq4XexFRVlv78/GzUlkEwt0BRwUCVju2uWJ8TAcy95VA7lXyX93R+AKgZCVPitnQ==}
@@ -6843,8 +6843,8 @@ packages:
   undici-types@8.9.0:
     resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
 
-  undici@8.13.0:
-    resolution: {integrity: sha512-mxbeyRlRhHUTWE1zf/FwDOXTKMhE1vMQRz/o2oOir/5fIWsB79TeZrByMkj019EdDuxPg03jprCjFLxLkmxTCQ==}
+  undici@8.13.1:
+    resolution: {integrity: sha512-Kt7EaPjh0s93lJH/PmW3d5rhkcpUa6fS3jqZ7+YGxNd9L7Xy/i827xe4C2uhhq+pJebM4tQOl5AgHmW11G5Skg==}
     engines: {node: '>=22.19.0'}
 
   unhead@3.4.3:
@@ -7666,7 +7666,7 @@ snapshots:
       open: 8.4.2
       picomatch: 4.0.7
       systeminformation: 5.33.23
-      undici: 8.13.0
+      undici: 8.13.1
       which: 4.0.0
       yocto-spinner: 1.2.2
 
@@ -7809,11 +7809,11 @@ snapshots:
 
   '@fastify/deepmerge@3.2.4': {}
 
-  '@fastify/error@4.2.1': {}
+  '@fastify/error@4.3.0': {}
 
   '@fastify/fast-json-stringify-compiler@5.2.0':
     dependencies:
-      fast-json-stringify: 7.3.6
+      fast-json-stringify: 7.3.7
 
   '@fastify/forwarded@3.1.2': {}
 
@@ -7824,7 +7824,7 @@ snapshots:
 
   '@fastify/jwt@10.2.8':
     dependencies:
-      '@fastify/error': 4.2.1
+      '@fastify/error': 4.3.0
       '@lukeed/ms': 2.0.2
       fast-jwt: 6.3.7
       fastify-plugin: 6.0.1
@@ -7838,7 +7838,7 @@ snapshots:
     dependencies:
       '@fastify/busboy': 3.2.6
       '@fastify/deepmerge': 3.2.4
-      '@fastify/error': 4.2.1
+      '@fastify/error': 4.3.0
       fastify-plugin: 6.0.1
       secure-json-parse: 4.1.1
 
@@ -7847,7 +7847,7 @@ snapshots:
       '@fastify/forwarded': 3.1.2
       ipaddr.js: 2.5.0
 
-  '@fastify/rate-limit@11.2.2':
+  '@fastify/rate-limit@11.3.0':
     dependencies:
       '@lukeed/ms': 2.0.2
       fastify-plugin: 6.0.1
@@ -7875,7 +7875,7 @@ snapshots:
   '@fastify/static@10.1.12':
     dependencies:
       '@fastify/accept-negotiator': 2.1.2
-      '@fastify/error': 4.2.1
+      '@fastify/error': 4.3.0
       '@fastify/send': 4.2.1
       content-disposition: 3.1.0
       fastify-plugin: 6.0.1
@@ -9530,7 +9530,7 @@ snapshots:
     dependencies:
       '@scalar/helpers': 0.19.0
       pathe: 2.0.3
-      undici: 8.13.0
+      undici: 8.13.1
       yaml: 2.9.1
 
   '@scalar/localization@0.2.15(typescript@7.0.2)':
@@ -9728,7 +9728,7 @@ snapshots:
       stringify-object: 5.0.0
       tsconfig-paths: 4.2.0
       type-fest: 4.41.0
-      undici: 8.13.0
+      undici: 8.13.1
       zod: 4.6.7
     transitivePeerDependencies:
       - supports-color
@@ -10471,7 +10471,7 @@ snapshots:
 
   avvio@9.3.1:
     dependencies:
-      '@fastify/error': 4.2.1
+      '@fastify/error': 4.3.0
       fastq: 1.20.3
 
   b4a@1.9.0: {}
@@ -11224,7 +11224,7 @@ snapshots:
       merge2: 1.4.1
       micromatch: 4.0.8
 
-  fast-json-stringify@7.3.6:
+  fast-json-stringify@7.3.7:
     dependencies:
       '@fastify/merge-json-schemas': 0.2.2
       ajv: 8.20.0
@@ -11260,12 +11260,12 @@ snapshots:
   fastify@5.12.8:
     dependencies:
       '@fastify/ajv-compiler': 4.0.8
-      '@fastify/error': 4.2.1
+      '@fastify/error': 4.3.0
       '@fastify/fast-json-stringify-compiler': 5.2.0
       '@fastify/proxy-addr': 5.1.3
       abstract-logging: 2.0.1
       avvio: 9.3.1
-      fast-json-stringify: 7.3.6
+      fast-json-stringify: 7.3.7
       find-my-way: 9.10.2
       light-my-request: 6.8.1
       pino: 10.4.0
@@ -11829,7 +11829,7 @@ snapshots:
       parse5-parser-stream: 8.1.1
       saxes: 6.0.0
       tough-cookie: 6.1.0
-      undici: 8.13.0
+      undici: 8.13.1
       w3c-xmlserializer: 6.0.0
       webidl-conversions: 8.0.1
       whatwg-mimetype: 5.0.0
@@ -13436,7 +13436,7 @@ snapshots:
       stringify-object: 5.0.0
       ts-morph: 26.0.0
       tsconfig-paths: 4.2.0
-      undici: 8.13.0
+      undici: 8.13.1
       validate-npm-package-name: 7.0.2
       zod: 4.6.7
     transitivePeerDependencies:
@@ -13879,7 +13879,7 @@ snapshots:
 
   undici-types@8.9.0: {}
 
-  undici@8.13.0: {}
+  undici@8.13.1: {}
 
   unhead@3.4.3(esbuild@0.28.2)(rolldown@1.2.19)(vite@8.3.8(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)):
     dependencies:
