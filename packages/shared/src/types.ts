@@ -351,6 +351,28 @@ export interface SetupStatus {
   memberLoginServers: { id: string; name: string; type: ServerType; quickConnect: boolean }[];
 }
 
+/** What a Silo sign-in code is for: adding a server, replacing its key, or linking the owner's own account */
+export type SiloPairPurpose = 'add-server' | 'rekey' | 'link';
+
+export interface SiloPairStart {
+  handle: string;
+  userCode: string;
+  /** verification_uri_complete, on the server's public URL origin when Tracearr has one */
+  link: string;
+  expiresIn: number;
+  interval: number;
+}
+
+export type SiloPairCheck =
+  | { status: 'pending'; opened: boolean }
+  | { status: 'expired' }
+  | { status: 'not-admin' }
+  | { status: 'needs-pin'; wrongPin: boolean }
+  | { status: 'pin-locked' }
+  | { status: 'added'; server: Server; canStopStreams: boolean }
+  | { status: 'rekeyed'; oldKeyLeft: boolean }
+  | { status: 'linked' };
+
 // Session types
 export type SessionState = 'playing' | 'paused' | 'stopped';
 

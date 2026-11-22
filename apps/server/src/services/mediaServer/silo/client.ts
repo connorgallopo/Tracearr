@@ -57,7 +57,7 @@ import type {
 
 const log = createLogger('silo-client');
 
-const API_PATH = '/api/v2';
+export const API_PATH = '/api/v2';
 const TIMEOUT_MS = 10_000;
 const PAGE_LIMIT = 200;
 const CONTENT_IDS_PER_READ = 200;
@@ -617,6 +617,26 @@ export class SiloClient implements IMediaServerClient {
     MISSING_SCOPES: 'MISSING_SCOPES',
   } as const;
 
+  /** Key-less /system/info: null for a Silo /api/v2 server, else the refusal message */
+  static async checkSiloServer(serverUrl: string): Promise<string | null> {
+    const url = serverUrl.replace(/\/$/, '');
+    const refusal = probeRefusal(url);
+    if (refusal) return refusal;
+
+    let info: SiloSystemInfo;
+    try {
+      info = await fetchSilo<SiloSystemInfo>(`${url}${API_PATH}/system/info`, {
+        headers: jsonHeaders(),
+        timeout: TIMEOUT_MS,
+      });
+    } catch (error) {
+      return `Cannot reach Silo server at ${url}. ${errorMessage(error, 'Unable to connect to server')}`;
+    }
+    if (info.api_major !== 2) return `${url} does not answer as a Silo server with API version 2.`;
+    recordContract(url, info);
+    return null;
+  }
+
   /**
    * The system info needs no key, so an unreachable server is told apart from a rejected key.
    * A key without admin:sessions:control or libraries:read still reads sessions and gets a socket
@@ -630,28 +650,8 @@ export class SiloClient implements IMediaServerClient {
     const url = serverUrl.replace(/\/$/, '');
     const fail = (code: string, message: string) => ({ success: false as const, code, message });
 
-    const refusal = probeRefusal(url);
+    const refusal = await SiloClient.checkSiloServer(url);
     if (refusal) return fail(SiloClient.AdminVerifyError.CONNECTION_FAILED, refusal);
-
-    let info: SiloSystemInfo;
-    try {
-      info = await fetchSilo<SiloSystemInfo>(`${url}${API_PATH}/system/info`, {
-        headers: jsonHeaders(),
-        timeout: TIMEOUT_MS,
-      });
-    } catch (error) {
-      return fail(
-        SiloClient.AdminVerifyError.CONNECTION_FAILED,
-        `Cannot reach Silo server at ${url}. ${errorMessage(error, 'Unable to connect to server')}`
-      );
-    }
-    if (info.api_major !== 2) {
-      return fail(
-        SiloClient.AdminVerifyError.CONNECTION_FAILED,
-        `${url} does not answer as a Silo server with API version 2.`
-      );
-    }
-    recordContract(url, info);
 
     const client = new SiloClient({ url, token });
     const timeout = TIMEOUT_MS;

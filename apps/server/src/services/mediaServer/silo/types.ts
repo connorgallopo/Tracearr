@@ -38,6 +38,13 @@ export interface SiloProfile {
   is_child: boolean;
 }
 
+/** An entry of GET /profiles, the signed-in account's own profiles */
+export interface SiloOwnProfile {
+  id: string;
+  is_primary: boolean;
+  has_pin: boolean;
+}
+
 export interface SiloDevice {
   device_id: string;
   device_name: string;
@@ -234,4 +241,46 @@ export interface SiloSystemResources {
     memory?: { available: boolean };
     process?: { resident_bytes?: number };
   };
+}
+
+export interface SiloDeviceLoginStart {
+  device_code: string;
+  user_code: string;
+  verification_uri_complete: string;
+  expires_in: number;
+  interval: number;
+}
+
+export interface SiloTokenPair {
+  access_token: string;
+  user: { id: string; username: string; email?: string; role: string };
+}
+
+export interface SiloDeviceLoginPoll {
+  status: 'pending' | 'approved' | 'denied' | 'consumed' | 'canceled' | 'expired';
+  opened: boolean;
+  expires_at?: string;
+  poll_after: number;
+  /** Only on approved, and only once */
+  tokens?: SiloTokenPair;
+}
+
+export interface SiloDeviceLoginCapability {
+  state: 'available' | 'disabled' | 'not_configured' | 'unsupported';
+  session_binding: boolean;
+}
+
+export interface SiloAuthProviders {
+  password_login: boolean;
+}
+
+export interface SiloProfileVerification {
+  valid: boolean;
+  /** Absent when the PIN did not match */
+  profile_token?: string;
+}
+
+export interface SiloCreatedKey {
+  id: string;
+  key: string;
 }

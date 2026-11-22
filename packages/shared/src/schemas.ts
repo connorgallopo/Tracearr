@@ -161,7 +161,10 @@ export const memberPasswordSignInSchema = z.object({
 
 export const quickConnectInitiateSchema = z.object({ serverId: z.uuid() });
 
-export const quickConnectCheckSchema = z.object({ handle: z.string().regex(/^[0-9a-f]{64}$/) });
+/** 32 random bytes, hex: the handle a browser holds for a sign-in request Tracearr keeps server-side */
+const requestHandleSchema = z.string().regex(/^[0-9a-f]{64}$/);
+
+export const quickConnectCheckSchema = z.object({ handle: requestHandleSchema });
 
 const permissiveUrlSchema = z.string().refine(
   (val) => {
@@ -216,6 +219,23 @@ export const createServerSchema = z
     },
     { message: PUBLIC_URL_PLEX_MESSAGE, path: ['publicUrl'] }
   );
+
+export const siloPairStartSchema = z.discriminatedUnion('purpose', [
+  z.object({
+    purpose: z.literal('add-server'),
+    url: createServerSchema.shape.url,
+    name: createServerSchema.shape.name,
+    publicUrl: createServerSchema.shape.publicUrl,
+  }),
+  z.object({ purpose: z.literal('rekey'), serverId: uuidSchema }),
+]);
+
+export const siloPairCheckSchema = z.object({
+  handle: requestHandleSchema,
+  pin: z.string().min(1).max(72).optional(),
+});
+
+export const siloPairCancelSchema = z.object({ handle: requestHandleSchema });
 
 /** Body of the Jellyfin and Emby connect-api-key routes, which are how the add dialog creates those servers. */
 export const apiKeyConnectSchema = z.object({

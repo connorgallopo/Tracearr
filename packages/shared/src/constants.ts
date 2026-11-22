@@ -319,6 +319,7 @@ export const REDIS_KEYS = {
   TOFA_DEVICE: (handle: string) => `${_redisPrefix}tracearr:tofa_device:${handle}`,
   TOFA_TEMP: (token: string) => `${_redisPrefix}tracearr:tofa_temp:${token}`,
   QUICK_CONNECT: (handle: string) => `${_redisPrefix}tracearr:quick_connect:${handle}`,
+  SILO_PAIRING: (handle: string) => `${_redisPrefix}tracearr:silo_pairing:${handle}`,
   LOGIN_FAILURES: (serverId: string, username: string) =>
     `${_redisPrefix}tracearr:login_failures:${serverId}:${username}`,
   MOBILE_REFRESH_TOKEN: (hash: string) => `${_redisPrefix}tracearr:mobile_refresh:${hash}`,

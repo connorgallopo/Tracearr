@@ -14,6 +14,11 @@ export const INCREMENT_SCRIPT = `local value = redis.call('INCR', KEYS[1])
 if value == 1 then redis.call('EXPIRE', KEYS[1], ARGV[1]) end
 return value`;
 
+// Lua instead of GETDEL (6.2+) for the reason INCREMENT_SCRIPT gives.
+export const GET_AND_DELETE_SCRIPT = `local value = redis.call('GET', KEYS[1])
+if value then redis.call('DEL', KEYS[1]) end
+return value`;
+
 /** The Fastify plugin's client. Owned by the plugin - closeRedis must not quit it. */
 let injected: Redis | null = null;
 /** Only created when nothing injected a client: scripts and unit tests. */

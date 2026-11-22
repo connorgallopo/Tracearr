@@ -33,6 +33,8 @@ function LinkDialog({
     case 'plexAccount':
       // Plex servers have no owner link fact; the owner links plex.tv accounts instead.
       return null;
+    case 'siloPairing':
+      return null;
     default:
       return assertNever(proof);
   }

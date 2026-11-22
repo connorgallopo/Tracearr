@@ -26,10 +26,10 @@ export interface ServerProfile {
   playerNameCountsTowardDevice: boolean;
   /** History imported for this server is linked to library items after a library sync. */
   linksImportedHistory: boolean;
-  /** How the owner adds the server: picked from a linked Plex account, by URL and API key, or picked from the owner's tofa account, which makes the key. */
-  addServerAuth: 'plexOAuth' | 'apiKey' | 'tofaCloud';
-  /** How members sign in: through plex.tv, with their username and password on the server, through their tofa account, or not at all when the server offers no sign-in Tracearr can call. */
-  memberSignIn: 'plexTv' | 'serverPassword' | 'tofaCloud' | 'unavailable';
+  /** How the owner adds the server: picked from a linked Plex account, by URL and API key, picked from the owner's tofa account, which makes the key, or by a code an admin approves on the server, which makes the key. */
+  addServerAuth: 'plexOAuth' | 'apiKey' | 'tofaCloud' | 'siloPairing';
+  /** How members sign in: through plex.tv, with their username and password on the server, through their tofa account, by a code they approve on the server, or not at all when the server offers no sign-in Tracearr can call. */
+  memberSignIn: 'plexTv' | 'serverPassword' | 'tofaCloud' | 'siloPairing' | 'unavailable';
   /** The server measures its own bandwidth, so the dashboard can chart it. */
   reportsBandwidth: boolean;
   /** A transcode reports separate video and audio bitrates; without them only the total stream bitrate is known. */
@@ -188,7 +188,7 @@ export function liveStatsGapSeconds(serverType: ServerType): number {
  * plex.tv account itself, Jellyfin, Emby and Silo take the account's username typed back, and
  * tofa needs a tofa sign-in as that account, since it also becomes the owner's tofa login.
  */
-export type OwnerLinkProof = 'plexAccount' | 'typedUsername' | 'tofaSignIn';
+export type OwnerLinkProof = 'plexAccount' | 'typedUsername' | 'tofaSignIn' | 'siloPairing';
 
 export function ownerLinkProof(type: ServerType): OwnerLinkProof {
   switch (type) {
