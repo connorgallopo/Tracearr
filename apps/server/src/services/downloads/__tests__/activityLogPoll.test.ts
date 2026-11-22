@@ -3,8 +3,9 @@ import { REDIS_KEYS, type JellyfinEmbyServerType } from '@tracearr/shared';
 import { createMockRedis, queryChain } from '../../../test/helpers.js';
 import type { JellyfinEmbyActivityEntry } from '../../mediaServer/shared/baseMediaServerClient.js';
 
-const { redis, client, getDownloadsAfter } = vi.hoisted(() => ({
+const { redis, client, getDownloadsAfter, getSiloDownloadsAfter } = vi.hoisted(() => ({
   getDownloadsAfter: vi.fn(),
+  getSiloDownloadsAfter: vi.fn(),
   redis: { current: null as unknown },
   client: {
     serverType: 'jellyfin' as JellyfinEmbyServerType,
@@ -23,6 +24,9 @@ vi.mock('../../mediaServer/index.js', async (importOriginal) => ({
   TofaClient: class {
     getDownloadsAfter = getDownloadsAfter;
   },
+  SiloClient: class {
+    getDownloadsAfter = getSiloDownloadsAfter;
+  },
 }));
 vi.mock('../../../jobs/poller/database.js', () => ({
   getServerUserIdByExternalId: vi.fn(),
@@ -32,6 +36,7 @@ vi.mock('../recorder.js', () => ({ recordDownload: vi.fn() }));
 vi.mock('../../profiles.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../../profiles.js')>()),
   resolveProfiles: vi.fn(),
+  storedProfileIds: vi.fn(),
 }));
 
 import { db } from '../../../db/client.js';
@@ -40,9 +45,15 @@ import {
   getServerUserIdsByExternalId,
 } from '../../../jobs/poller/database.js';
 import { recordDownload } from '../recorder.js';
-import { resolveProfiles } from '../../profiles.js';
-import { pollAllDownloads, pollServerDownloads, pollServerSyncJobs } from '../activityLogPoll.js';
+import { resolveProfiles, storedProfileIds } from '../../profiles.js';
+import {
+  pollAllDownloads,
+  pollDownloadsOf,
+  pollServerDownloads,
+  pollServerSyncJobs,
+} from '../activityLogPoll.js';
 import tofa from '../../../test/mediaServerResponses/tofa.json' with { type: 'json' };
+import silo from '../../../test/mediaServerResponses/silo.json' with { type: 'json' };
 import { parseTofaMedia } from '../../mediaServer/tofa/parser.js';
 
 const SERVER = '11111111-1111-4111-8111-111111111111';
@@ -457,6 +468,117 @@ describe('pollAllDownloads on a tofa server', () => {
     expect(vi.mocked(recordDownload).mock.calls.map(([signal]) => signal.profileId)).toEqual([
       'profile-robin',
       'profile-morgan',
+    ]);
+  });
+});
+
+describe('pollAllDownloads on a Silo server', () => {
+  const OWNER_PROFILE = '8581c93e-0798-41e4-ba29-cb7cf3acced0';
+  const VIEWER_PROFILE = '494983e2-3141-4ccf-a3b6-e6af431e5996';
+
+  beforeEach(() => {
+    vi.setSystemTime(new Date('2026-11-21T18:00:00Z'));
+    vi.mocked(db.select).mockImplementation(
+      () =>
+        queryChain(vi.fn, [
+          { id: SERVER, type: 'silo', name: 'Silo', url: 'u', token: 't' },
+        ]) as never
+    );
+    getSiloDownloadsAfter.mockReset();
+    getSiloDownloadsAfter.mockResolvedValue(silo.downloadEntries.items);
+    vi.mocked(getServerUserIdsByExternalId).mockResolvedValue(
+      new Map([
+        ['1', 'su-owner'],
+        ['34', 'su-viewer'],
+      ])
+    );
+    vi.mocked(storedProfileIds).mockReset();
+    vi.mocked(storedProfileIds).mockResolvedValue(
+      new Map([
+        [OWNER_PROFILE, 'profile-owner'],
+        [VIEWER_PROFILE, 'profile-viewer'],
+      ])
+    );
+  });
+
+  it('records each Silo download once under its account and stored profile, by the episode it holds, and keeps its creation time as the cursor', async () => {
+    const store = mockRedis();
+
+    await pollAllDownloads();
+
+    expect(getSiloDownloadsAfter).toHaveBeenCalledWith(new Date('2026-11-20T18:00:00Z'));
+    const signals = vi.mocked(recordDownload).mock.calls.map(([signal]) => signal);
+    expect(signals.map((signal) => signal.seenAt)).toEqual([
+      new Date('2026-11-19T01:18:59.854Z'),
+      new Date('2026-11-19T23:02:15.827Z'),
+      new Date('2026-11-21T17:40:27.185Z'),
+    ]);
+    expect(signals[1]).toEqual({
+      serverId: SERVER,
+      serverUserId: 'su-owner',
+      profileId: 'profile-owner',
+      ratingKey: 'episode-imdb-tt31510819-1-1',
+      title: 'MobLand - Stick or Twist',
+      app: null,
+      device: 'iPhone',
+      source: 'silo',
+      seenAt: new Date('2026-11-19T23:02:15.827Z'),
+      deviceId: 'aef454b9-44e6-412f-913b-3e3a5eb0dbee',
+    });
+    expect(signals[2]).toMatchObject({
+      serverUserId: 'su-viewer',
+      profileId: 'profile-viewer',
+      ratingKey: 'movie-imdb-tt16539454',
+      title: 'Pushpa 2 - The Rule',
+    });
+    expect(store._store.get(CURSOR_KEY)).toBe(String(Date.parse('2026-11-21T17:40:27.185Z')));
+    expect(storedProfileIds).toHaveBeenCalledExactlyOnceWith(SERVER, [
+      OWNER_PROFILE,
+      OWNER_PROFILE,
+      VIEWER_PROFILE,
+    ]);
+
+    getSiloDownloadsAfter.mockImplementationOnce(async (after: Date) =>
+      silo.downloadEntries.items.filter((entry) => Date.parse(entry.created_at) > after.getTime())
+    );
+    await pollAllDownloads();
+
+    expect(getSiloDownloadsAfter).toHaveBeenLastCalledWith(new Date('2026-11-21T17:40:27.185Z'));
+    expect(recordDownload).toHaveBeenCalledTimes(3);
+  });
+
+  it('reads the list once more after a running poll when downloads change during it', async () => {
+    mockRedis();
+    let release: (entries: typeof silo.downloadEntries.items) => void = () => {};
+    getSiloDownloadsAfter.mockReturnValueOnce(
+      new Promise((resolve) => {
+        release = resolve;
+      })
+    );
+
+    const running = pollAllDownloads();
+    await vi.waitFor(() => expect(getSiloDownloadsAfter).toHaveBeenCalledTimes(1));
+    await pollDownloadsOf(SERVER);
+    await pollDownloadsOf(SERVER);
+    getSiloDownloadsAfter.mockResolvedValueOnce([]);
+    release(silo.downloadEntries.items);
+    await running;
+
+    expect(getSiloDownloadsAfter).toHaveBeenCalledTimes(2);
+    expect(getSiloDownloadsAfter).toHaveBeenLastCalledWith(new Date('2026-11-21T17:40:27.185Z'));
+    expect(recordDownload).toHaveBeenCalledTimes(3);
+  });
+
+  it('leaves a download profile empty when that profile is not stored yet', async () => {
+    mockRedis();
+    vi.mocked(storedProfileIds).mockResolvedValue(new Map());
+
+    await pollAllDownloads();
+
+    expect(vi.mocked(recordDownload).mock.calls.map(([signal]) => signal.profileId)).toEqual([
+      null,
+      null,
+      null,
     ]);
   });
 });

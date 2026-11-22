@@ -46,7 +46,7 @@ import { TofaEventSource } from './mediaServer/tofa/eventSource.js';
 import { SiloEventSource, type SiloSessionStop } from './mediaServer/silo/eventSource.js';
 import type { TofaStreamEvent } from './mediaServer/tofa/types.js';
 import { recordServerStatsSample } from './serverLiveStats.js';
-import { pollServerDownloads } from './downloads/activityLogPoll.js';
+import { pollDownloadsOf, pollServerDownloads } from './downloads/activityLogPoll.js';
 import { deliveredFromTranscode } from './downloads/enrich.js';
 import { isTrack, recordDownload } from './downloads/recorder.js';
 import { recordTranscodePullEvent } from './downloads/transcodePull.js';
@@ -73,7 +73,7 @@ export interface SSEManagerEvents {
   'plex:session:paused': { serverId: string; notification: PlexPlaySessionNotification };
   'plex:session:stopped': { serverId: string; notification: PlexPlaySessionNotification };
   'plex:session:progress': { serverId: string; notification: PlexPlaySessionNotification };
-  /** A stop a server's own socket reported with its final position (tofa and Silo) */
+  /** A stop a server's own socket reported (tofa and Silo), with the final position when the server sent one */
   'socket:session:stopped': {
     serverId: string;
     sessionId: string;
@@ -627,8 +627,8 @@ export class SSEManager extends EventEmitter {
   }
 
   /**
-   * Silo's frames only cue a re-read of the session list or the library, except a stop, which
-   * carries the end position and why it ended.
+   * Silo's frames only cue a re-read of the session list, the downloads or the library, except a
+   * stop, which carries why it ended and the end position when Silo sent one.
    */
   private setupSiloEventHandlers(
     eventSource: SiloEventSource,
@@ -645,6 +645,12 @@ export class SSEManager extends EventEmitter {
 
     eventSource.on('library:changed', () => {
       enqueueSocketLibrarySync(serverId, serverName);
+    });
+
+    eventSource.on('downloads:changed', () => {
+      void pollDownloadsOf(serverId).catch((error: unknown) => {
+        console.error(`[SSEManager] Download poll failed for ${serverName}:`, error);
+      });
     });
 
     eventSource.on('connection:state', (state: SSEConnectionState) => {

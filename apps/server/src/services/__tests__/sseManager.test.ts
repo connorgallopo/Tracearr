@@ -116,12 +116,18 @@ vi.mock('../leaderLease.js', () => ({
   isLeader: vi.fn().mockReturnValue(true),
 }));
 
+vi.mock('../downloads/activityLogPoll.js', () => ({
+  pollServerDownloads: vi.fn().mockResolvedValue(undefined),
+  pollDownloadsOf: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { SSEManager } from '../sseManager.js';
 import { PlexEventSource } from '../mediaServer/plex/eventSource.js';
 import { TofaEventSource } from '../mediaServer/tofa/eventSource.js';
 import { SiloEventSource } from '../mediaServer/silo/eventSource.js';
 import { enqueueLibrarySyncForChange } from '../../jobs/librarySyncQueue.js';
 import { triggerServerPoll } from '../../jobs/poller/index.js';
+import { pollDownloadsOf } from '../downloads/activityLogPoll.js';
 import type { CacheService, PubSubService } from '../cache.js';
 
 interface PrivateManager {
@@ -648,6 +654,12 @@ describe('SSEManager.refresh', () => {
         ['silo-1', 60_000],
         ['silo-1', 60_000],
       ]);
+    });
+
+    it("reads the server's downloads when its socket says they changed", () => {
+      onSilo('downloads:changed')();
+
+      expect(pollDownloadsOf).toHaveBeenCalledWith('silo-1');
     });
   });
 

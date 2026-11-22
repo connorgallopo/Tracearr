@@ -1643,7 +1643,7 @@ export interface UserDevice {
 }
 
 export type MediaDownloadSource =
-  'activity_log' | 'emby_sync' | 'plex' | 'jellyfin_transcode' | 'tofa';
+  'activity_log' | 'emby_sync' | 'plex' | 'jellyfin_transcode' | 'tofa' | 'silo';
 
 export interface MediaDownloadRow {
   id: string;

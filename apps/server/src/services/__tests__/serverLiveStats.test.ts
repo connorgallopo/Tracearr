@@ -7,6 +7,8 @@ import {
   serverClockShift,
   trimBandwidthStats,
 } from '../serverLiveStats.js';
+import { SiloClient } from '../mediaServer/silo/client.js';
+import silo from '../../test/mediaServerResponses/silo.json' with { type: 'json' };
 
 const serverId = 'srv-1';
 
@@ -264,5 +266,82 @@ describe('getServerLiveStats', () => {
       bandwidthDevices: [],
     });
     expect(ctx.raw.get).not.toHaveBeenCalled();
+  });
+
+  describe('a Silo server', () => {
+    const [first, second] = silo.resources;
+    if (!first || !second) throw new Error('fixture has two resource readings');
+    const server = { type: 'silo' as const, url: 'http://silo.local:8090', token: 'silo-key' };
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    it('charts a Silo server from its resource readings, one point per new Silo sample', async () => {
+      const ctx = fakeRedis();
+      vi.spyOn(SiloClient.prototype, 'getSystemResources')
+        .mockResolvedValueOnce(first)
+        .mockResolvedValueOnce(second)
+        .mockResolvedValueOnce(second);
+      const read = () => getServerLiveStats(ctx.redis, { ...server, id: 'silo-1' });
+
+      await read();
+      expect(ctx.multiChain.lpush).not.toHaveBeenCalled();
+      await read();
+      expect(ctx.multiChain.lpush).toHaveBeenCalledOnce();
+      const result = await read();
+
+      expect(ctx.multiChain.lpush).toHaveBeenCalledOnce();
+      const [, payload] = ctx.multiChain.lpush.mock.calls[0] as [string, string];
+      const point = JSON.parse(payload) as { timespan: number; processCpuUtilization: number };
+      expect(point.timespan).toBe(5);
+      expect(point.processCpuUtilization).toBeCloseTo(
+        ((1109.152491 - 1109.052426) / (10.001 * 16)) * 100
+      );
+      expect(result).toMatchObject({
+        bandwidth: [],
+        bandwidthSamples: [],
+        bandwidthAccounts: [],
+        bandwidthDevices: [],
+      });
+    });
+
+    it('charts nothing from a stale Silo sample', async () => {
+      const ctx = fakeRedis();
+      vi.spyOn(SiloClient.prototype, 'getSystemResources')
+        .mockResolvedValueOnce(first)
+        .mockResolvedValueOnce({ ...second, stale: true });
+      const read = () => getServerLiveStats(ctx.redis, { ...server, id: 'silo-stale' });
+
+      await read();
+      await read();
+
+      expect(ctx.multiChain.lpush).not.toHaveBeenCalled();
+    });
+
+    it('charts no CPU averaged over a gap of many Silo samples, then charts the next sample', async () => {
+      const ctx = fakeRedis();
+      const cgroup = second.attribution.cgroup_cpu;
+      const later = (sampledAt: string, usageSeconds: number) => ({
+        ...second,
+        sampled_at: sampledAt,
+        attribution: {
+          ...second.attribution,
+          cgroup_cpu: { ...cgroup, usage_seconds: usageSeconds },
+        },
+      });
+      vi.spyOn(SiloClient.prototype, 'getSystemResources')
+        .mockResolvedValueOnce(first)
+        .mockResolvedValueOnce(later('2026-11-21T18:39:42.828Z', cgroup.usage_seconds + 60))
+        .mockResolvedValueOnce(later('2026-11-21T18:39:52.828Z', cgroup.usage_seconds + 60.1));
+      const read = () => getServerLiveStats(ctx.redis, { ...server, id: 'silo-gap' });
+
+      await read();
+      await read();
+      expect(ctx.multiChain.lpush).not.toHaveBeenCalled();
+      await read();
+
+      expect(ctx.multiChain.lpush).toHaveBeenCalledOnce();
+    });
   });
 });

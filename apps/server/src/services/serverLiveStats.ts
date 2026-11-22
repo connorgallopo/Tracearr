@@ -1,7 +1,8 @@
 /**
  * Live server stats (CPU/RAM and bandwidth). Plex and tofa are fetched behind a
  * short Redis cache; Jellyfin/Emby arrive as SSE plugin events into a rolling
- * buffer, so their charts empty when a plugin goes quiet.
+ * buffer, so their charts empty when a plugin goes quiet. Silo's readings are
+ * fetched like tofa's and kept in the plugin buffer, one point per new Silo sample.
  */
 
 import type { Redis } from 'ioredis';
@@ -18,6 +19,12 @@ import {
 import type { ServerResourceDataPoint } from '@tracearr/shared';
 import { PlexClient } from './mediaServer/plex/client.js';
 import type { PlexBandwidthStats, PlexStatisticsDataPoint } from './mediaServer/plex/parser.js';
+import { SiloClient } from './mediaServer/silo/client.js';
+import {
+  parseSiloResources,
+  siloCpuCounter,
+  type SiloCpuCounter,
+} from './mediaServer/silo/parser.js';
 import { TofaClient } from './mediaServer/tofa/client.js';
 import { parseTofaMetrics } from './mediaServer/tofa/parser.js';
 
@@ -162,7 +169,8 @@ function headTimestamp(entry: string | null): number | null {
 export async function recordServerStatsSample(
   redis: Redis,
   serverId: string,
-  sample: PluginStatsSample
+  sample: PluginStatsSample,
+  timespanSeconds = PLUGIN_SAMPLE_INTERVAL_SECONDS
 ): Promise<void> {
   // Process metrics are the floor; host metrics stay null on non-Linux
   // hosts and chart as gaps rather than dropping the whole sample
@@ -174,7 +182,7 @@ export async function recordServerStatsSample(
   // host shifts its whole line against the others
   const point: ServerResourceDataPoint = {
     at: Math.floor(Date.now() / 1000),
-    timespan: PLUGIN_SAMPLE_INTERVAL_SECONDS,
+    timespan: timespanSeconds,
     hostCpuUtilization: sample.hostCpuUtilization,
     processCpuUtilization: sample.processCpuUtilization,
     hostMemoryUtilization: sample.hostMemoryUtilization,
@@ -238,21 +246,25 @@ export async function getServerLiveStats(redis: Redis, server: ServerRow) {
   switch (hostStats) {
     case 'plexStatistics':
       return getPlexLiveStats(redis, server);
-    // Nothing writes Silo samples, so a Silo server reads none and shows no host card
     case 'ssePlugin':
-    case 'siloResources':
-      return {
-        statistics: await getPluginServerStats(redis, server.id),
-        bandwidth: [],
-        bandwidthSamples: [],
-        bandwidthAccounts: [],
-        bandwidthDevices: [],
-      };
+      return getBufferedLiveStats(redis, server.id);
     case 'tofaMetrics':
       return getTofaLiveStats(redis, server);
+    case 'siloResources':
+      return getSiloLiveStats(redis, server);
     default:
       return assertNever(hostStats);
   }
+}
+
+async function getBufferedLiveStats(redis: Redis, serverId: string) {
+  return {
+    statistics: await getPluginServerStats(redis, serverId),
+    bandwidth: [],
+    bandwidthSamples: [],
+    bandwidthAccounts: [],
+    bandwidthDevices: [],
+  };
 }
 
 async function getPlexLiveStats(redis: Redis, server: ServerConnection) {
@@ -295,4 +307,30 @@ async function getTofaLiveStats(redis: Redis, server: ServerConnection) {
     bandwidthAccounts: [],
     bandwidthDevices: [],
   };
+}
+
+// The counter of each Silo server's last sample, so the first reading on a process draws no point
+const siloCpuCounters = new Map<string, SiloCpuCounter>();
+
+// Silo keeps only its latest sample, so each new one read becomes a point in the plugin buffer
+async function getSiloLiveStats(redis: Redis, server: ServerConnection) {
+  const body = await cachedFetch(
+    redis,
+    REDIS_KEYS.SERVER_STATS_RESOURCES(server.id),
+    CACHE_TTL.SERVER_STATS_RESOURCES,
+    () => new SiloClient({ url: server.url, token: server.token }).getSystemResources()
+  );
+  const intervalSeconds = body.attribution?.sample_interval_seconds ?? 5;
+  const counter = siloCpuCounter(body);
+  const held = siloCpuCounters.get(server.id);
+  // A counter from before a long unread or stale stretch would chart that whole stretch's average
+  const previous =
+    held && counter && counter.sampledAt - held.sampledAt <= 3 * intervalSeconds * 1000
+      ? held
+      : undefined;
+  const point = parseSiloResources(body, previous);
+  if (counter) siloCpuCounters.set(server.id, counter);
+  if (point) await recordServerStatsSample(redis, server.id, point, intervalSeconds);
+
+  return getBufferedLiveStats(redis, server.id);
 }

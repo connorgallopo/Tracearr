@@ -454,6 +454,31 @@ describe('SiloClient', () => {
     expect((await downloadsClient.describeDownloadSource(request)).ipAddress).toBeNull();
   });
 
+  it("describes an episode download by the episode's id, the key its recorded download carries", async () => {
+    vi.useFakeTimers({ now: new Date('2026-11-21T18:00:00Z') });
+    serve({ '/admin/downloads/entries': silo.downloadEntries });
+    const downloadsClient = client('http://silo-downloads-episode.local:8090');
+    await downloadsClient.getDownloadsAfter(new Date('2026-11-01T00:00:00Z'));
+    const request = {
+      deviceId: 'aef454b9-44e6-412f-913b-3e3a5eb0dbee',
+      itemKey: 'episode-imdb-tt31510819-1-1',
+      partId: null,
+      userId: '1',
+      app: null,
+      device: null,
+    };
+
+    expect((await downloadsClient.describeDownloadSource(request)).ipAddress).toBe('203.0.113.24');
+    expect(
+      (
+        await downloadsClient.describeDownloadSource({
+          ...request,
+          itemKey: 'series-imdb-tt31510819',
+        })
+      ).ipAddress
+    ).toBeNull();
+  });
+
   it('reads a library once a sync and pages items, episodes and seasons from it', async () => {
     serve({ '/admin/catalog/items': silo.catalog['2'] });
     const syncClient = client();

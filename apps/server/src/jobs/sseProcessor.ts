@@ -614,9 +614,9 @@ async function settlePendingStop(
 }
 
 /**
- * tofa and Silo report a stop with the final position and whether an admin stopped it. Their
- * session ids are never reused, so every open row under the id is the play that stopped, and a
- * later poll must not open the id again.
+ * tofa and Silo report a stop with whether an admin stopped it, and the final position when the
+ * server sent one. Their session ids are never reused, so every open row under the id is the play
+ * that stopped, and a later poll must not open the id again.
  */
 async function handleSocketStopped(event: SocketStopEvent): Promise<void> {
   const { serverId, sessionId, positionMs, stoppedByAdmin } = event;
