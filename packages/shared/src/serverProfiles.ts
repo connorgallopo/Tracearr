@@ -1,6 +1,10 @@
 import { SERVER_STATS_CONFIG } from './constants.js';
 import { assertNever, type ServerType } from './serverTypes.js';
 
+/** The servers whose own watch history Tracearr imports; each importer is named after its server type */
+export const SERVER_HISTORY_IMPORTERS = ['tofa'] as const satisfies readonly ServerType[];
+export type ServerHistoryImporter = (typeof SERVER_HISTORY_IMPORTERS)[number];
+
 export interface ServerProfile {
   /** The product's name, written the way the product writes it. */
   displayName: string;
@@ -33,7 +37,7 @@ export interface ServerProfile {
   /** Tautulli tracks this server, so its play history can be imported from Tautulli. */
   importsTautulliHistory: boolean;
   /** The importer for the watch history the server keeps itself; null when it keeps none. */
-  serverHistoryImport: 'tofa' | null;
+  serverHistoryImport: ServerHistoryImporter | null;
   /** Which rule counts a play as watched: Tracearr's own setting, or the completion percent the server reports. */
   watchedThreshold: 'tracearrSetting' | 'serverRule';
   /** The server keeps requests of its own, mirrored through a request service created and removed with the server. */

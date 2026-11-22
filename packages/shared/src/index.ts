@@ -1018,11 +1018,13 @@ export {
   type JellyfinEmbyServerType,
 } from './serverTypes.js';
 export {
+  SERVER_HISTORY_IMPORTERS,
   SERVER_PROFILES,
   liveStatsGapSeconds,
   ownerLinkProof,
   someServerHasProfiles,
   type OwnerLinkProof,
+  type ServerHistoryImporter,
   type ServerProfile,
 } from './serverProfiles.js';
 

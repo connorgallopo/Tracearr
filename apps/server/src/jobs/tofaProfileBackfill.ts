@@ -2,12 +2,8 @@ import { and, asc, eq, gte, inArray, isNotNull, isNull, lt, sql } from 'drizzle-
 import { db } from '../db/client.js';
 import { serverProfiles, sessions } from '../db/schema.js';
 import { getSessionChunkRanges, uncapDecompressionForTx } from '../db/timescale.js';
-import {
-  CAPTURED_START_SLACK_MS,
-  historyServer,
-  playsOf,
-  watchHistoryPages,
-} from '../services/import/tofaWatchHistory.js';
+import { CAPTURED_START_SLACK_MS } from '../services/import/serverHistory.js';
+import { historyServer, playsOf, watchHistoryPages } from '../services/import/tofaWatchHistory.js';
 import { parseProfileNaming } from '../services/mediaServer/tofa/parser.js';
 import { profileIdOf, profileSightings, resolveProfiles } from '../services/profiles.js';
 import { getServerUserIdsByExternalId } from './poller/database.js';
