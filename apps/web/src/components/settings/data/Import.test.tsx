@@ -209,6 +209,53 @@ describe('Import', () => {
     expect(region).toHaveTextContent('import.importing');
   });
 
+  it('offers a Silo server its own history import, without the still-playing note', async () => {
+    vi.mocked(useServers).mockReturnValue({
+      data: [{ id: 'silo-1', name: 'Loft', type: 'silo' }],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useServers>);
+    vi.mocked(api.import.serverHistory.getActive).mockResolvedValue({
+      active: false,
+      latest: null,
+    });
+    vi.mocked(api.import.serverHistory.start).mockResolvedValue({ status: 'queued', message: '' });
+
+    renderImport();
+
+    expect(screen.getByText('import.siloHistory')).toBeInTheDocument();
+    expect(screen.getByText('import.skipUserNotFoundSilo')).toBeInTheDocument();
+    expect(screen.queryByText('import.skipActiveTofa')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'import.importSiloHistory' }));
+    expect(api.import.serverHistory.start).toHaveBeenCalledWith('silo-1');
+  });
+
+  it('shows tofa and Silo servers each under their own tab', async () => {
+    vi.mocked(useServers).mockReturnValue({
+      data: [
+        { id: 'tofa-1', name: 'Den', type: 'tofa' },
+        { id: 'silo-1', name: 'Loft', type: 'silo' },
+      ],
+      isLoading: false,
+    } as unknown as ReturnType<typeof useServers>);
+    vi.mocked(api.import.serverHistory.getActive).mockResolvedValue({
+      active: false,
+      latest: null,
+    });
+    vi.mocked(api.import.serverHistory.start).mockResolvedValue({ status: 'queued', message: '' });
+
+    renderImport();
+
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+      'import.tofa',
+      'import.silo',
+    ]);
+    await userEvent.click(screen.getByRole('tab', { name: /import\.silo$/ }));
+    expect(screen.getByText('import.siloHistory')).toBeInTheDocument();
+    expect(screen.queryByText('import.targetServer')).not.toBeInTheDocument();
+    await userEvent.click(screen.getByRole('button', { name: 'import.importSiloHistory' }));
+    expect(api.import.serverHistory.start).toHaveBeenCalledExactlyOnceWith('silo-1');
+  });
+
   it.each([
     { source: 'tautulli', server: { id: 'plex-1', name: 'Den', type: 'plex' } },
     { source: 'jellystat', server: { id: 'jf-1', name: 'Jelly', type: 'jellyfin' } },

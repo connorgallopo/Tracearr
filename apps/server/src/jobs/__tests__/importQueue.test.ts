@@ -62,10 +62,12 @@ vi.mock('../../db/timescale.js', () => ({
 }));
 vi.mock('../../services/playbackReporting.js', () => ({ importPlaybackReporting: vi.fn() }));
 vi.mock('../../services/import/tofaHistory.js', () => ({ importTofaHistory: vi.fn() }));
+vi.mock('../../services/import/siloHistory.js', () => ({ importSiloHistory: vi.fn() }));
 
 import { UnrecoverableError } from 'bullmq';
 import { importPlaybackReporting } from '../../services/playbackReporting.js';
 import { importTofaHistory } from '../../services/import/tofaHistory.js';
+import { importSiloHistory } from '../../services/import/siloHistory.js';
 import { HttpClientError } from '../../utils/http.js';
 import { removeJellystatUpload } from '../../services/import/jellystatUpload.js';
 import { hasPendingFirstSync } from '../librarySyncQueue.js';
@@ -78,6 +80,7 @@ import {
   enqueueServerHistoryImport,
   getAllActiveImports,
   getLatestImport,
+  holdServerHistoryImport,
   initImportQueue,
   releaseHeldImport,
   startImportWorker,
@@ -180,6 +183,7 @@ describe('import enqueues', () => {
       () => enqueuePlaybackReportingImport('srv-1', 'owner', 'UTC', false, false),
     ],
     ['tofa', () => enqueueServerHistoryImport('srv-1', 'tofa', 'owner')],
+    ['silo', () => enqueueServerHistoryImport('srv-1', 'silo', 'owner')],
   ] as const;
 
   it.each(starts)('adds a %s import with one deduplication key per server', async (type, start) => {
@@ -263,6 +267,16 @@ describe('imports that wait for a first library sync', () => {
       );
     }
   );
+
+  it("holds a Silo server's history import until its first library sync, as tofa's", async () => {
+    await holdServerHistoryImport('srv-1', 'silo');
+
+    expect(mockAdd).toHaveBeenCalledWith(
+      'silo-import',
+      { type: 'silo', serverId: 'srv-1', userId: 'system' },
+      { jobId: 'held-import-srv-1', delay: 24 * 60 * 60 * 1000 }
+    );
+  });
 
   it('runs a held import at once when the first sync completed while it was being added', async () => {
     vi.mocked(hasPendingFirstSync).mockResolvedValueOnce(true).mockResolvedValue(false);
@@ -424,6 +438,35 @@ describe('import worker', () => {
         status: 'complete',
         importedRecords: 3,
         jobId: 'job-2',
+      })
+    );
+  });
+
+  it('completes a Silo import with the result it returned', async () => {
+    startImportWorker();
+    const result = {
+      success: true,
+      imported: 5,
+      skipped: 2,
+      duplicates: 2,
+      errors: 0,
+      message: 'ok',
+    };
+    vi.mocked(importSiloHistory).mockResolvedValueOnce(result as never);
+    const job = {
+      id: 'job-3',
+      data: { type: 'silo', serverId: 'srv-1', userId: 'owner' },
+      updateProgress: vi.fn(),
+    };
+
+    expect(await worker.processor?.(job)).toBe(result);
+    expect(mockPublish).toHaveBeenCalledWith(
+      'import:server-history:progress',
+      expect.objectContaining({
+        serverId: 'srv-1',
+        status: 'complete',
+        importedRecords: 5,
+        jobId: 'job-3',
       })
     );
   });

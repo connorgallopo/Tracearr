@@ -73,6 +73,14 @@ describe('startAddedServer', () => {
     expect(enqueueLibrarySync).toHaveBeenCalledWith('srv-1', 'event', { firstSync: true });
   });
 
+  it("holds a Silo server's own history import", async () => {
+    await startAddedServer({ id: 'srv-3', type: 'silo' }, []);
+    await settled('librarySync');
+
+    expect(holdServerHistoryImport).toHaveBeenCalledExactlyOnceWith('srv-3', 'silo');
+    expect(calls.indexOf('holdImport')).toBeLessThan(calls.indexOf('markFirstSyncOwed'));
+  });
+
   it('re-arms imported history linking for Plex and holds no import', async () => {
     await startAddedServer({ id: 'srv-2', type: 'plex' }, []);
     await settled('librarySync');

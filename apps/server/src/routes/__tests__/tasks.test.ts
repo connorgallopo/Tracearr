@@ -98,6 +98,16 @@ describe('GET /tasks/running', () => {
     ]);
   });
 
+  it('names a running Silo history import by the server type', async () => {
+    vi.mocked(getAllActiveImports).mockResolvedValue([
+      { ...tofaImport('silo-import-srv-1', 'active', false), type: 'silo' as const },
+    ]);
+
+    expect(await runningTasks()).toEqual([
+      expect.objectContaining({ type: 'server_history_import', name: 'Silo Import' }),
+    ]);
+  });
+
   it('lists a queued first sync and hides a queued change-event sync', async () => {
     vi.mocked(getAllActiveLibrarySyncs).mockResolvedValue([
       librarySync('waiting', true),

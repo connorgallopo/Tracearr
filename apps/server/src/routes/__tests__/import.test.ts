@@ -78,6 +78,8 @@ vi.mock('../../jobs/importQueue.js', () => ({
   getActiveJellystatImportForServer: vi.fn().mockResolvedValue(null),
   getJellystatImportStatus: vi.fn().mockResolvedValue(null),
   getActiveServerHistoryImport: vi.fn().mockResolvedValue(null),
+  enqueueServerHistoryImport: vi.fn().mockRejectedValue(new Error('Queue not available')),
+  runServerHistoryImport: vi.fn().mockResolvedValue({}),
   getLatestImport: vi.fn().mockResolvedValue(null),
   publishImportFailed: vi.fn(),
 }));
@@ -102,6 +104,7 @@ import {
   getActiveJellystatImportForServer,
   getJellystatImportStatus,
   getActiveServerHistoryImport,
+  enqueueServerHistoryImport,
   getLatestImport,
   publishImportFailed,
 } from '../../jobs/importQueue.js';
@@ -1129,6 +1132,46 @@ describe('Import Routes', () => {
       const response = await app.inject({ url: `/import/jellystat/active/${randomUUID()}` });
 
       expect(response.json()).toMatchObject({ active: true, state: 'active', waiting: null });
+    });
+  });
+
+  describe('POST /import/server-history', () => {
+    const serverId = randomUUID();
+
+    it.each([
+      ['tofa', 'tofa'],
+      ['Silo', 'silo'],
+    ] as const)("queues a %s server's own history import", async (_name, type) => {
+      app = await buildTestApp(ownerUser);
+      mockDbSelectLimit([{ id: serverId, type, historicalAt: null }]);
+      vi.mocked(enqueueServerHistoryImport).mockResolvedValueOnce('job-history-1');
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/import/server-history',
+        payload: { serverId },
+      });
+
+      expect(response.json()).toMatchObject({ status: 'queued', jobId: 'job-history-1' });
+      expect(enqueueServerHistoryImport).toHaveBeenCalledExactlyOnceWith(
+        serverId,
+        type,
+        ownerUser.userId
+      );
+    });
+
+    it('refuses a server that keeps no history of its own', async () => {
+      app = await buildTestApp(ownerUser);
+      mockDbSelectLimit([{ id: serverId, type: 'plex', historicalAt: null }]);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/import/server-history',
+        payload: { serverId },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(enqueueServerHistoryImport).not.toHaveBeenCalled();
     });
   });
 

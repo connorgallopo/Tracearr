@@ -136,6 +136,9 @@ export const REDIS_KEYS = {
     `${_redisPrefix}tracearr:servers:${serverId}:stats:samples`,
   DOWNLOAD_CURSOR: (serverId: string) =>
     `${_redisPrefix}tracearr:servers:${serverId}:downloads:cursor`,
+  // The newest ended_at a server's last clean history import read; the next one reads from an hour before it
+  SERVER_HISTORY_CURSOR: (serverId: string) =>
+    `${_redisPrefix}tracearr:servers:${serverId}:history:cursor`,
   SYNC_CURSOR: (serverId: string) =>
     `${_redisPrefix}tracearr:servers:${serverId}:downloads:sync-cursor`,
   SYNC_RECORDED: (serverId: string) =>

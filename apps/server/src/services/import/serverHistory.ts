@@ -24,7 +24,13 @@ import { geoasnService } from '../geoasn.js';
 import { geoipService } from '../geoip.js';
 import { ServerHistoricalError } from '../liveServers.js';
 import { serverWatchedThreshold } from '../mediaServer/byServerType.js';
-import { profileIdOf, profileSightings, resolveProfiles, type ProfileNaming } from '../profiles.js';
+import {
+  profileIdOf,
+  profileSightings,
+  resolveProfiles,
+  storedProfileIds,
+  type ProfileNaming,
+} from '../profiles.js';
 import { markImportedServerLocations } from '../serverLocations.js';
 import { refreshImportAggregates } from './aggregates.js';
 import { flushInsertBatch } from './batchProcessor.js';
@@ -194,6 +200,18 @@ export async function importServerHistory<Row>(
       ),
       'insertMissing'
     );
+    // A profile the row names by id alone is linked to the profile stored under that id, never inserted under it
+    const stored = await storedProfileIds(serverId, [
+      ...new Set(
+        plays.flatMap(({ profile }) =>
+          profile.profileExternalId &&
+          !profile.profileName &&
+          !profiles.has(profile.profileExternalId)
+            ? [profile.profileExternalId]
+            : []
+        )
+      ),
+    ]);
     const insertBatch: (typeof sessions.$inferInsert)[] = [];
 
     for (const { row, play } of entries) {
@@ -236,7 +254,11 @@ export async function importServerHistory<Row>(
             ),
             geo,
             identity: play.ratingKey ? identityByKey.get(play.ratingKey) : undefined,
-            profileId: profileIdOf(profiles, play.profile.profileExternalId),
+            profileId:
+              profileIdOf(profiles, play.profile.profileExternalId) ??
+              (play.profile.profileExternalId
+                ? (stored.get(play.profile.profileExternalId) ?? null)
+                : null),
           })
         );
 

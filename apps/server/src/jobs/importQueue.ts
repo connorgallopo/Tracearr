@@ -7,8 +7,8 @@
  * - Progress tracking via WebSocket
  * - Checkpoint/resume on failure
  *
- * Supports Tautulli (for Plex), Jellystat and Playback Reporting (for Jellyfin/Emby), and tofa's
- * own watch history.
+ * Supports Tautulli (for Plex), Jellystat and Playback Reporting (for Jellyfin/Emby), and the
+ * watch history tofa and Silo keep of their own.
  */
 
 import { randomUUID } from 'node:crypto';
@@ -52,6 +52,7 @@ import {
   sweepJellystatUploads,
 } from '../services/import/jellystatUpload.js';
 import { importPlaybackReporting } from '../services/playbackReporting.js';
+import { importSiloHistory } from '../services/import/siloHistory.js';
 import { importTofaHistory } from '../services/import/tofaHistory.js';
 import { getCacheService, getPubSubService, type PubSubService } from '../services/cache.js';
 import { ServerHistoricalError } from '../services/liveServers.js';
@@ -255,6 +256,7 @@ function blankProgress(
         enrichedRecords: 0,
       } satisfies JellystatImportProgress;
     case 'tofa':
+    case 'silo':
       return {
         ...base,
         fetchedRecords: 0,
@@ -799,6 +801,8 @@ export async function runServerHistoryImport(
   switch (importer) {
     case 'tofa':
       return importTofaHistory(serverId, pubSubService, onProgress);
+    case 'silo':
+      return importSiloHistory(serverId, pubSubService, onProgress);
     default:
       return assertNever(importer);
   }
@@ -855,8 +859,8 @@ const HELD_IMPORT_MAX_WAIT_MS = 24 * 60 * 60 * 1000;
 
 /**
  * Adds an import whose plays take their media, season and show keys from the library as they are
- * written, held like the tofa import while the server's first library sync is queued or running.
- * Plays written before it keep those keys empty.
+ * written, held like the tofa and Silo imports while the server's first library sync is queued or
+ * running. Plays written before it keep those keys empty.
  */
 async function addImportAfterFirstSync(
   queue: Queue<ImportJobData>,

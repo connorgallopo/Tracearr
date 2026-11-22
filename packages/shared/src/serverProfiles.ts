@@ -2,7 +2,7 @@ import { SERVER_STATS_CONFIG } from './constants.js';
 import { assertNever, type ServerType } from './serverTypes.js';
 
 /** The servers whose own watch history Tracearr imports; each importer is named after its server type */
-export const SERVER_HISTORY_IMPORTERS = ['tofa'] as const satisfies readonly ServerType[];
+export const SERVER_HISTORY_IMPORTERS = ['tofa', 'silo'] as const satisfies readonly ServerType[];
 export type ServerHistoryImporter = (typeof SERVER_HISTORY_IMPORTERS)[number];
 
 export interface ServerProfile {
@@ -159,7 +159,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     reportsBandwidth: false,
     reportsTranscodeTrackBitrates: false,
     importsTautulliHistory: false,
-    serverHistoryImport: null,
+    serverHistoryImport: 'silo',
     watchedThreshold: 'tracearrSetting',
     builtInRequests: false,
     guideImageHosts: [],

@@ -51,6 +51,15 @@ export const HISTORY_IMPORT_COPY: Record<
     skipUserNotFound: 'import.skipUserNotFoundTofa',
     skipActive: 'import.skipActiveTofa',
   },
+  silo: {
+    tab: 'import.silo',
+    title: 'import.siloHistory',
+    description: 'import.siloHistoryDesc',
+    selectServer: 'import.selectSiloServer',
+    start: 'import.importSiloHistory',
+    skipUserNotFound: 'import.skipUserNotFoundSilo',
+    skipActive: null,
+  },
 };
 
 const blankProgress = (

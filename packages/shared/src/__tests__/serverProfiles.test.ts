@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { SERVER_PROFILES, SERVER_TYPES, liveStatsGapSeconds } from '../index.js';
+import {
+  SERVER_HISTORY_IMPORTERS,
+  SERVER_PROFILES,
+  SERVER_TYPES,
+  liveStatsGapSeconds,
+} from '../index.js';
 
 describe('server profiles', () => {
   it('has a profile for every server type', () => {
@@ -42,13 +47,20 @@ describe('server profiles', () => {
     ]);
   });
 
-  it('keeps Silo requests off and adds no Silo history yet', () => {
+  it("keeps Silo requests off and imports Silo's own history", () => {
     expect(SERVER_PROFILES.silo).toMatchObject({
       builtInRequests: false,
-      serverHistoryImport: null,
+      serverHistoryImport: 'silo',
       hasProfiles: true,
       itemLinks: 'serverAddress',
     });
+  });
+
+  it('lists tofa and Silo as the servers whose own history Tracearr imports', () => {
+    expect(SERVER_HISTORY_IMPORTERS).toEqual(['tofa', 'silo']);
+    for (const importer of SERVER_HISTORY_IMPORTERS) {
+      expect(SERVER_PROFILES[importer].serverHistoryImport).toBe(importer);
+    }
   });
 
   it.each([
@@ -88,7 +100,7 @@ describe('server profiles', () => {
     ['jellyfin', 'apiKey', 'serverPassword', false, false, false, null],
     ['emby', 'apiKey', 'serverPassword', false, false, false, null],
     ['tofa', 'tofaCloud', 'tofaCloud', false, false, false, 'tofa'],
-    ['silo', 'apiKey', 'unavailable', false, false, false, null],
+    ['silo', 'apiKey', 'unavailable', false, false, false, 'silo'],
   ] as const)(
     '%s adds, signs in, reports bandwidth and bitrates, and imports history',
     (type, addServerAuth, memberSignIn, bandwidth, trackBitrates, tautulli, serverHistory) => {
