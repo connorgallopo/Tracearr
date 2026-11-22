@@ -119,13 +119,13 @@ interface FallbackEvent {
   serverId: string;
   serverName: string;
 }
-type TofaStopEvent = SSEManagerEvents['tofa:session:stopped'];
+type SocketStopEvent = SSEManagerEvents['socket:session:stopped'];
 const wrappedHandlers = {
   playing: (e: SessionEvent) => void handlePlaying(e),
   paused: (e: SessionEvent) => void handlePaused(e),
   stopped: (e: SessionEvent) => void handleStopped(e),
   progress: (e: SessionEvent) => void handleProgress(e),
-  tofaStopped: (e: TofaStopEvent) => void handleTofaStopped(e),
+  socketStopped: (e: SocketStopEvent) => void handleSocketStopped(e),
   reconciliation: () =>
     void handleReconciliation().catch((err: unknown) =>
       console.error('[SSEProcessor] Error in reconciliation handler:', err)
@@ -244,7 +244,7 @@ export function startSSEProcessor(): void {
   sseManager.on('plex:session:paused', wrappedHandlers.paused);
   sseManager.on('plex:session:stopped', wrappedHandlers.stopped);
   sseManager.on('plex:session:progress', wrappedHandlers.progress);
-  sseManager.on('tofa:session:stopped', wrappedHandlers.tofaStopped);
+  sseManager.on('socket:session:stopped', wrappedHandlers.socketStopped);
   sseManager.on('reconciliation:needed', wrappedHandlers.reconciliation);
 
   // Subscribe to server health events (SSE connection state changes)
@@ -289,7 +289,7 @@ export function stopSSEProcessor(): void {
   sseManager.off('plex:session:paused', wrappedHandlers.paused);
   sseManager.off('plex:session:stopped', wrappedHandlers.stopped);
   sseManager.off('plex:session:progress', wrappedHandlers.progress);
-  sseManager.off('tofa:session:stopped', wrappedHandlers.tofaStopped);
+  sseManager.off('socket:session:stopped', wrappedHandlers.socketStopped);
   sseManager.off('reconciliation:needed', wrappedHandlers.reconciliation);
   sseManager.off('fallback:activated', wrappedHandlers.fallbackActivated);
   sseManager.off('fallback:deactivated', wrappedHandlers.fallbackDeactivated);
@@ -614,11 +614,11 @@ async function settlePendingStop(
 }
 
 /**
- * tofa reports a stop with the final position and whether an admin stopped it. Its session
- * ids are never reused, so every open row under the id is the play that stopped, and a later
- * poll must not open the id again.
+ * tofa and Silo report a stop with the final position and whether an admin stopped it. Their
+ * session ids are never reused, so every open row under the id is the play that stopped, and a
+ * later poll must not open the id again.
  */
-async function handleTofaStopped(event: TofaStopEvent): Promise<void> {
+async function handleSocketStopped(event: SocketStopEvent): Promise<void> {
   const { serverId, sessionId, positionMs, stoppedByAdmin } = event;
   // The poller checks the hold only for a listed session with an item key, so a play whose
   // media never resolved cannot be held off this way.
@@ -649,7 +649,7 @@ async function handleTofaStopped(event: TofaStopEvent): Promise<void> {
       await holdOff(row.ratingKey);
     }
   } catch (error) {
-    console.error('[SSEProcessor] Error handling tofa stopped event:', error);
+    console.error('[SSEProcessor] Error handling a socket stop event:', error);
   }
 }
 

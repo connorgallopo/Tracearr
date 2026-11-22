@@ -177,7 +177,8 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
 
     /**
      * Send a message to the client device.
-     * Plex does not support client messaging - only Jellyfin/Emby do. A tofa target fails the
+     * Plex does not support client messaging. Silo shows the message when its player holds a
+     * live control connection. A tofa target, or a Silo player that cannot show it, fails the
      * action with the reason, so the run records it as not done.
      */
     sendClientMessage: async (sessionId, message, startedAt) => {
@@ -216,8 +217,15 @@ export function createActionExecutorDeps(redis: Redis): ActionExecutorDeps {
         }
         case 'tofa':
           throw new Error(TOFA_MESSAGE_UNAVAILABLE);
-        case 'silo':
-          throw new Error('Tracearr sends no messages to Silo players');
+        case 'silo': {
+          const { SiloClient } = await import('../mediaServer/index.js');
+          await new SiloClient({
+            url: session.server.url,
+            token: session.server.token,
+          }).sendMessage(session.sessionKey, message, 'Tracearr');
+          automationsLogger.debug('Client message sent', { sessionId, message });
+          return undefined;
+        }
         default:
           return assertNever(session.server.type);
       }

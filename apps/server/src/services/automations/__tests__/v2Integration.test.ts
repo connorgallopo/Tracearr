@@ -10,13 +10,19 @@ import type { Redis } from 'ioredis';
 import { automationsLogger } from '../../../utils/logger.js';
 import type { NotificationEvent } from '../../notifications/events.js';
 
-const { mockEnqueueNotification, mockApplyTrustChange, mockDispatchTrustChanged, mockFindSession } =
-  vi.hoisted(() => ({
-    mockEnqueueNotification: vi.fn().mockResolvedValue(2),
-    mockApplyTrustChange: vi.fn(),
-    mockDispatchTrustChanged: vi.fn().mockResolvedValue(undefined),
-    mockFindSession: vi.fn(),
-  }));
+const {
+  mockEnqueueNotification,
+  mockApplyTrustChange,
+  mockDispatchTrustChanged,
+  mockFindSession,
+  mockSiloSendMessage,
+} = vi.hoisted(() => ({
+  mockEnqueueNotification: vi.fn().mockResolvedValue(2),
+  mockApplyTrustChange: vi.fn(),
+  mockDispatchTrustChanged: vi.fn().mockResolvedValue(undefined),
+  mockFindSession: vi.fn(),
+  mockSiloSendMessage: vi.fn(),
+}));
 
 vi.mock('../../../jobs/notificationQueue.js', () => ({
   enqueueNotification: mockEnqueueNotification,
@@ -39,6 +45,13 @@ vi.mock('../events/producers.js', () => ({
   dispatchTrustChanged: mockDispatchTrustChanged,
 }));
 
+vi.mock('../../mediaServer/index.js', () => ({
+  SiloClient: class {
+    sendMessage = mockSiloSendMessage;
+  },
+}));
+
+import { SILO_MESSAGE_UNDELIVERED } from '../../mediaServer/silo/client.js';
 import { TOFA_MESSAGE_UNAVAILABLE, createActionExecutorDeps } from '../v2Integration.js';
 
 const event: NotificationEvent = {
@@ -118,6 +131,34 @@ describe('createActionExecutorDeps - sendClientMessage', () => {
     await expect(
       createActionExecutorDeps({} as Redis).sendClientMessage('sess-1', 'Please stop', new Date())
     ).rejects.toThrow(TOFA_MESSAGE_UNAVAILABLE);
+  });
+
+  describe('on a Silo session', () => {
+    beforeEach(() => {
+      mockSiloSendMessage.mockReset();
+      mockFindSession.mockResolvedValue({
+        id: 'sess-1',
+        sessionKey: 'silo-session',
+        server: { type: 'silo', url: 'http://silo.local:8090', token: 'key', historicalAt: null },
+      });
+    });
+
+    it('sends a message to the Silo player of the session, titled Tracearr', async () => {
+      mockSiloSendMessage.mockResolvedValue(undefined);
+
+      await expect(
+        createActionExecutorDeps({} as Redis).sendClientMessage('sess-1', 'Please stop', new Date())
+      ).resolves.toBeUndefined();
+      expect(mockSiloSendMessage).toHaveBeenCalledWith('silo-session', 'Please stop', 'Tracearr');
+    });
+
+    it('fails a Silo message the player cannot show, so the run records it as not done', async () => {
+      mockSiloSendMessage.mockRejectedValue(new Error(SILO_MESSAGE_UNDELIVERED));
+
+      await expect(
+        createActionExecutorDeps({} as Redis).sendClientMessage('sess-1', 'Please stop', new Date())
+      ).rejects.toThrow(SILO_MESSAGE_UNDELIVERED);
+    });
   });
 });
 

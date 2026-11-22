@@ -172,6 +172,38 @@ describe('SiloEventSource', () => {
     expect(sessions).not.toHaveBeenCalled();
   });
 
+  it('passes on a stop without a position when Silo sent no usable end position', async () => {
+    const socket = await connected(source);
+    const stops = counter(source, 'session:stopped');
+    const stop = silo.socket.sessionTerminated;
+
+    socket.receive({ ...stop, data: { ...stop.data, history: null } });
+    socket.receive({
+      ...stop,
+      data: { ...stop.data, history: { ...stop.data.history, end_position_seconds: '9' } },
+    });
+
+    const expected = {
+      sessionId: '6b60c113-c02d-4af0-97de-a04a22f60fce',
+      positionMs: null,
+      stoppedByAdmin: true,
+    };
+    expect(stops.mock.calls).toEqual([[expected], [expected]]);
+  });
+
+  it('reads the session list instead when a stop does not name its session', async () => {
+    const socket = await connected(source);
+    const sessions = counter(source, 'sessions:changed');
+    const stops = counter(source, 'session:stopped');
+    const stop = silo.socket.sessionTerminated;
+
+    socket.receive({ ...stop, data: { ...stop.data, session_id: 42 } });
+    socket.receive({ ...stop, data: null });
+
+    expect(stops).not.toHaveBeenCalled();
+    expect(sessions).toHaveBeenCalledTimes(2);
+  });
+
   it('says downloads changed for each download event', async () => {
     const socket = await connected(source);
     const downloads = counter(source, 'downloads:changed');
@@ -317,6 +349,30 @@ describe('SiloEventSource', () => {
     await flush();
 
     expect(FakeSocket.opened).toHaveLength(1);
+  });
+
+  it('changes nothing when a ticket request fails after its attempt timed out and the next began', async () => {
+    let refuseLate: (error: unknown) => void = () => {};
+    getSocketTicket.mockImplementationOnce(
+      () =>
+        new Promise((_resolve, reject) => {
+          refuseLate = reject;
+        })
+    );
+    const errors = counter(source, 'connection:error');
+
+    void source.connect();
+    await vi.advanceTimersByTimeAsync(30_000);
+    await vi.advanceTimersByTimeAsync(2_000);
+    expect(source.getState()).toBe('connecting');
+    const errorsBefore = errors.mock.calls.length;
+    refuseLate(new HttpClientError({ service: 'silo', statusCode: 401, statusText: '', url: '' }));
+    await flush();
+
+    expect(source.getState()).toBe('connecting');
+    expect(errors).toHaveBeenCalledTimes(errorsBefore);
+    FakeSocket.opened[0]?.receive(silo.socket.subscribed);
+    expect(source.getState()).toBe('connected');
   });
 
   it('treats a socket that stops pinging as dropped, and stays connected while Silo pings', async () => {

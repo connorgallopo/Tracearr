@@ -513,7 +513,7 @@ describe('SSE Processor - Pending Session Flow', () => {
       mockFindActiveSessionsAll.mockResolvedValueOnce([row]);
       const set = vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
       mockDb.update.mockReturnValue({ set });
-      mockSseManager.emit('tofa:session:stopped', {
+      mockSseManager.emit('socket:session:stopped', {
         serverId: 'server-123',
         sessionId: 'tofa-session',
         positionMs: 172476,
@@ -549,7 +549,7 @@ describe('SSE Processor - Pending Session Flow', () => {
       mockFindActiveSessionsAll.mockResolvedValueOnce([channelRow]);
       const set = vi.fn().mockReturnValue({ where: vi.fn().mockResolvedValue(undefined) });
       mockDb.update.mockReturnValue({ set });
-      mockSseManager.emit('tofa:session:stopped', {
+      mockSseManager.emit('socket:session:stopped', {
         serverId: 'server-123',
         sessionId: 'tofa-session',
         positionMs: 48210,
@@ -582,7 +582,7 @@ describe('SSE Processor - Pending Session Flow', () => {
         .mockResolvedValueOnce(pendingSession)
         .mockResolvedValueOnce(pendingSession);
 
-      mockSseManager.emit('tofa:session:stopped', {
+      mockSseManager.emit('socket:session:stopped', {
         serverId: 'server-123',
         sessionId: 'test-session-key',
         positionMs: 5000,

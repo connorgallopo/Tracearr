@@ -23,6 +23,20 @@ export interface SiloSessionStop {
   stoppedByAdmin: boolean;
 }
 
+/** Null for anything but a stop that names its session */
+function stopOf(frame: SiloSocketFrame): SiloSessionStop | null {
+  if (frame.event !== 'session.stopped') return null;
+  const data = frame.data as Partial<SiloSessionStopped> | null | undefined;
+  if (typeof data?.session_id !== 'string') return null;
+  const seconds: unknown = data.history?.end_position_seconds;
+  return {
+    sessionId: data.session_id,
+    positionMs:
+      typeof seconds === 'number' && Number.isFinite(seconds) ? Math.round(seconds * 1000) : null,
+    stoppedByAdmin: data.end_reason === 'terminated',
+  };
+}
+
 /**
  * Only what a Silo library sync can act on. An incremental sync lists new items alone, and a
  * removal or a library turned off drops the count, which makes the sync a full scan. An
@@ -112,13 +126,9 @@ export class SiloEventSource extends SocketEventSource<SiloSocketFrame> {
   private handleChannelFrame(frame: SiloSocketFrame): void {
     switch (frame.channel) {
       case 'sessions': {
-        const stop = frame.event === 'session.stopped' ? (frame.data as SiloSessionStopped) : null;
+        const stop = stopOf(frame);
         if (stop) {
-          this.emit('session:stopped', {
-            sessionId: stop.session_id,
-            positionMs: stop.history ? Math.round(stop.history.end_position_seconds * 1000) : null,
-            stoppedByAdmin: stop.end_reason === 'terminated',
-          } satisfies SiloSessionStop);
+          this.emit('session:stopped', stop);
         } else {
           this.emit('sessions:changed');
         }

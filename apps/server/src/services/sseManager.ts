@@ -43,6 +43,7 @@ import {
   type PluginTranscodePullEvent,
 } from './mediaServer/shared/jellyfinEmbyEventSource.js';
 import { TofaEventSource } from './mediaServer/tofa/eventSource.js';
+import { SiloEventSource, type SiloSessionStop } from './mediaServer/silo/eventSource.js';
 import type { TofaStreamEvent } from './mediaServer/tofa/types.js';
 import { recordServerStatsSample } from './serverLiveStats.js';
 import { pollServerDownloads } from './downloads/activityLogPoll.js';
@@ -72,7 +73,8 @@ export interface SSEManagerEvents {
   'plex:session:paused': { serverId: string; notification: PlexPlaySessionNotification };
   'plex:session:stopped': { serverId: string; notification: PlexPlaySessionNotification };
   'plex:session:progress': { serverId: string; notification: PlexPlaySessionNotification };
-  'tofa:session:stopped': {
+  /** A stop a server's own socket reported with its final position (tofa and Silo) */
+  'socket:session:stopped': {
     serverId: string;
     sessionId: string;
     positionMs: number | null;
@@ -90,7 +92,7 @@ interface ServerConnection {
   // Kept for the plugin-list probe when the SSE endpoint 404s
   url: string;
   token: string;
-  eventSource: PlexEventSource | JellyfinEmbyEventSource | TofaEventSource | null;
+  eventSource: PlexEventSource | JellyfinEmbyEventSource | TofaEventSource | SiloEventSource | null;
   state: SSEConnectionState;
   inFallback: boolean;
   connectedAt: Date | null;
@@ -109,8 +111,9 @@ const pendingServerPollSince = new Map<string, number>();
 const NUDGE_MIN_INTERVAL_MS = 60 * 1000;
 const SERVER_POLL_DEBOUNCE_MS = 1000;
 const SERVER_POLL_MAX_WAIT_MS = 2000;
-// tofa reports each item a scan adds; those within a minute ride on one delayed sync job
-const TOFA_LIBRARY_SYNC_DELAY_MS = 60 * 1000;
+// tofa and Silo report each item a scan adds or removes; those within a minute ride on one
+// delayed sync job
+const SOCKET_LIBRARY_SYNC_DELAY_MS = 60 * 1000;
 // Min gap between plugin-list probes per server while its endpoint 404s
 const PLUGIN_PROBE_MIN_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -142,6 +145,14 @@ function scheduleServerPoll(serverId: string, serverName: string): void {
   }, SERVER_POLL_DEBOUNCE_MS);
 
   pendingServerPolls.set(serverId, timer);
+}
+
+function enqueueSocketLibrarySync(serverId: string, serverName: string): void {
+  void enqueueLibrarySyncForChange(serverId, SOCKET_LIBRARY_SYNC_DELAY_MS).catch(
+    (error: unknown) => {
+      console.warn(`[SSEManager] Failed to enqueue a library sync for ${serverName}:`, error);
+    }
+  );
 }
 
 /**
@@ -314,9 +325,14 @@ export class SSEManager extends EventEmitter {
             await eventSource.connect();
             break;
           }
-          // No socket is opened to Silo, so the connection stays in fallback and the poller covers it
-          case 'silo':
+          case 'silo': {
+            const eventSource = new SiloEventSource({ serverId, serverName, url, token });
+
+            this.setupSiloEventHandlers(eventSource, serverId, serverName);
+            connection.eventSource = eventSource;
+            await eventSource.connect();
             break;
+          }
           default:
             assertNever(serverType);
         }
@@ -575,7 +591,7 @@ export class SSEManager extends EventEmitter {
           scheduleServerPoll(serverId, serverName);
           break;
         case 'stopped':
-          this.emit('tofa:session:stopped', {
+          this.emit('socket:session:stopped', {
             serverId,
             sessionId: event.sessionId,
             positionMs: event.positionMs,
@@ -592,17 +608,43 @@ export class SSEManager extends EventEmitter {
     });
 
     eventSource.on('library:changed', () => {
-      void enqueueLibrarySyncForChange(serverId, TOFA_LIBRARY_SYNC_DELAY_MS).catch(
-        (error: unknown) => {
-          console.warn(`[SSEManager] Failed to enqueue a library sync for ${serverName}:`, error);
-        }
-      );
+      enqueueSocketLibrarySync(serverId, serverName);
     });
 
     eventSource.on('requests:changed', () => {
       void enqueueRequestSyncForServer(serverId).catch((error: unknown) => {
         console.warn(`[SSEManager] Failed to enqueue a request sync for ${serverName}:`, error);
       });
+    });
+
+    eventSource.on('connection:state', (state: SSEConnectionState) => {
+      this.handleConnectionStateChange(serverId, serverName, state, eventSource.getStatus());
+    });
+
+    eventSource.on('connection:error', (error: Error) => {
+      console.error(`[SSEManager] Socket error for ${serverName}:`, error.message);
+    });
+  }
+
+  /**
+   * Silo's frames only cue a re-read of the session list or the library, except a stop, which
+   * carries the end position and why it ended.
+   */
+  private setupSiloEventHandlers(
+    eventSource: SiloEventSource,
+    serverId: string,
+    serverName: string
+  ): void {
+    eventSource.on('sessions:changed', () => {
+      scheduleServerPoll(serverId, serverName);
+    });
+
+    eventSource.on('session:stopped', (stop: SiloSessionStop) => {
+      this.emit('socket:session:stopped', { serverId, ...stop });
+    });
+
+    eventSource.on('library:changed', () => {
+      enqueueSocketLibrarySync(serverId, serverName);
     });
 
     eventSource.on('connection:state', (state: SSEConnectionState) => {
