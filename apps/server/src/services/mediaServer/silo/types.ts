@@ -170,6 +170,40 @@ export interface SiloSessionStopped {
   history?: { end_position_seconds: number } | null;
 }
 
+/** One finished play in /admin/playback-history: one row per playback session, keyed by its id */
+export interface SiloHistoryRow {
+  session_id: string;
+  user_id: string;
+  /** Empty once the account is gone */
+  username: string;
+  profile_id: string;
+  /** The profile id itself when Silo recorded no name */
+  profile_name: string;
+  /** The episode's content id for an episode, else the item's; empty when the play was not attributed */
+  media_item_id: string;
+  media_file_id: string;
+  media_title: string;
+  /** episode, else the catalog item's type; empty once the item left the catalog */
+  media_type: string;
+  started_at: string;
+  ended_at: string;
+  /** Where the play ended, not how long it was watched */
+  end_position_seconds: number;
+  duration_seconds: number | null;
+  /** Measured watch time; null when Silo did not measure the play */
+  played_seconds: number | null;
+  paused_seconds: number | null;
+  series_title: string;
+  season_number: number | null;
+  episode_number: number | null;
+  client_ip: string | null;
+  device_id: string | null;
+  device_platform: string | null;
+  client_name: string | null;
+  video_decision: string | null;
+  audio_decision: string | null;
+}
+
 export interface SiloDownloadEntry {
   id: string;
   user_id: string;

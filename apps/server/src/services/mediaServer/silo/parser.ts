@@ -11,7 +11,11 @@ import {
   type SubtitleInfo,
 } from '@tracearr/shared';
 import { sanitizeCodec } from '../../../utils/codecNormalizer.js';
-import { normalizeStreamDecisions } from '../../../utils/transcodeNormalizer.js';
+import {
+  normalizeStreamDecisions,
+  type StreamDecisions,
+} from '../../../utils/transcodeNormalizer.js';
+import type { ProfileNaming } from '../../profiles.js';
 import { calculateProgress } from '../shared/parserUtils.js';
 import { rollupVersions } from '../shared/versionUtils.js';
 import type {
@@ -29,6 +33,7 @@ import type {
   SiloCatalogVersion,
   SiloDevice,
   SiloDownloadEntry,
+  SiloHistoryRow,
   SiloLibrary,
   SiloProfile,
   SiloSession,
@@ -77,6 +82,11 @@ const STORED_POSTER = /^\/content\/([A-Za-z0-9._-]+)\/poster(?:\?v=[0-9a-f]{8,12
 
 const isContentId = (id: string) => CONTENT_ID.test(id) && id !== '.' && id !== '..';
 
+/** The stored poster path of an item, unversioned; undefined for an id that is not a safe content id */
+export function siloItemPosterPath(contentId: string): string | undefined {
+  return isContentId(contentId) ? `/content/${contentId}/poster` : undefined;
+}
+
 /**
  * Silo's artwork links are signed and expire, so only the content id and the artwork's content
  * hash are stored. A URL outside Silo's API, as an older build gave, stores no path.
@@ -85,9 +95,10 @@ export function siloPosterPath(
   contentId: string,
   posterUrl: string | null | undefined
 ): string | undefined {
-  if (!posterUrl?.startsWith('/api/v2/') || !isContentId(contentId)) return undefined;
+  const path = siloItemPosterPath(contentId);
+  if (!posterUrl?.startsWith('/api/v2/') || !path) return undefined;
   const hash = POSTER_HASH.exec(posterUrl)?.[1];
-  return `/content/${contentId}/poster${hash ? `?v=${hash}` : ''}`;
+  return hash ? `${path}?v=${hash}` : path;
 }
 
 /** The content id of a stored poster path, or null for any other path */
@@ -111,9 +122,37 @@ function subtitleOf(subtitle: SiloSubtitle): SubtitleInfo {
 }
 
 /** Silo's remux keeps the stream as it is in a new container, which Tracearr calls copy */
-const decisionOf = (decision: string | undefined) => (decision === 'remux' ? 'copy' : decision);
+const decisionOf = (decision: string | null | undefined) =>
+  decision === 'remux' ? 'copy' : decision;
 
-function mediaTypeOf(type: string): 'movie' | 'episode' | 'unknown' {
+/** How Silo delivered video and audio, remux read as copy, for live rows and history alike */
+export function siloStreamDecisions(
+  video: string | null | undefined,
+  audio: string | null | undefined
+): StreamDecisions {
+  return normalizeStreamDecisions(decisionOf(video), decisionOf(audio));
+}
+
+/** The account and profile a history row names; a profile Silo recorded no name for is left unnamed */
+export function siloHistoryProfileNaming(row: SiloHistoryRow): ProfileNaming {
+  return {
+    accountExternalId: row.user_id,
+    profileExternalId: row.profile_id || null,
+    profileName: row.profile_name && row.profile_name !== row.profile_id ? row.profile_name : null,
+  };
+}
+
+/** Time watched as Silo's history page shows it: the measurement, else the end position capped at the time from start to end */
+export function siloWatchedSeconds(row: SiloHistoryRow): number {
+  if (row.played_seconds !== null) return row.played_seconds;
+  const elapsed = (Date.parse(row.ended_at) - Date.parse(row.started_at)) / 1000;
+  const capped = Number.isFinite(elapsed)
+    ? Math.min(row.end_position_seconds, Math.max(elapsed, 0))
+    : row.end_position_seconds;
+  return Math.max(capped, 0);
+}
+
+export function siloMediaType(type: string): 'movie' | 'episode' | 'unknown' {
   switch (type) {
     case 'movie':
     case 'episode':
@@ -125,7 +164,7 @@ function mediaTypeOf(type: string): 'movie' | 'episode' | 'unknown' {
 
 /** A row of /admin/sessions; the player is named after its device where the device list names it */
 export function parseSiloSession(row: SiloSession, deviceName: string | undefined): MediaSession {
-  const mediaType = mediaTypeOf(row.media_type);
+  const mediaType = siloMediaType(row.media_type);
   const thumbPath = row.media_item_id
     ? siloPosterPath(row.media_item_id, row.poster_url)
     : undefined;
@@ -166,7 +205,7 @@ export function parseSiloSession(row: SiloSession, deviceName: string | undefine
     network: { ipAddress: row.client_ip ?? '', isLocal: row.stream_location === 'local' },
     quality: {
       bitrate: row.stream_bitrate_kbps ?? row.source_bitrate_kbps ?? 0,
-      ...normalizeStreamDecisions(decisionOf(row.video_decision), decisionOf(row.audio_decision)),
+      ...siloStreamDecisions(row.video_decision, row.audio_decision),
       videoHeight: row.source_video_height,
       sourceVideoCodec: sanitizeCodec(row.source_video_codec) ?? undefined,
       sourceAudioCodec: sanitizeCodec(row.source_audio_codec) ?? undefined,

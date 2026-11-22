@@ -43,6 +43,7 @@ import type {
   SiloCatalogItem,
   SiloDevice,
   SiloDownloadEntry,
+  SiloHistoryRow,
   SiloLibrary,
   SiloPage,
   SiloProfile,
@@ -278,25 +279,27 @@ export class SiloClient implements IMediaServerClient {
     for (const row of rows) {
       if (row.media_item_id) rememberPosterUrl(this.url, row.media_item_id, row.poster_url);
     }
-    const names = await this.deviceNames(rows);
+    const names = await this.getDeviceNames(
+      rows.flatMap((row) => (row.device_id ? [row.device_id] : []))
+    );
     return rows.map((row) =>
       parseSiloSession(row, row.device_id ? names.get(row.device_id) : undefined)
     );
   }
 
   /**
-   * Read again after ten minutes, or sooner when a session names a device the list did not, but
-   * not within a minute of a failed read
+   * Device names by device id from /admin/devices. Read again after ten minutes, or sooner when
+   * an id is one the list did not name, but not within a minute of a failed read
    */
-  private async deviceNames(rows: SiloSession[]): Promise<Map<string, string>> {
+  async getDeviceNames(deviceIds: string[]): Promise<Map<string, string>> {
     const held = deviceNames.get(this.url);
-    const wanted = rows.flatMap((row) => (row.device_id ? [row.device_id] : []));
     const now = Date.now();
     if (
-      wanted.length === 0 ||
+      deviceIds.length === 0 ||
       (held &&
         (now < held.retryAt ||
-          (now - held.readAt < DEVICE_NAMES_KEPT_MS && wanted.every((id) => held.names.has(id)))))
+          (now - held.readAt < DEVICE_NAMES_KEPT_MS &&
+            deviceIds.every((id) => held.names.has(id)))))
     ) {
       return held?.names ?? new Map();
     }
@@ -316,6 +319,19 @@ export class SiloClient implements IMediaServerClient {
       });
       return names;
     }
+  }
+
+  /** One page of finished plays, newest ended first; every page of one walk repeats endedAfter, since Silo binds the cursor to it */
+  getPlaybackHistoryPage(
+    endedAfter: Date | null,
+    cursor: string | null
+  ): Promise<SiloPage<SiloHistoryRow>> {
+    return this.request<SiloPage<SiloHistoryRow>>(
+      `/admin/playback-history?limit=${PAGE_LIMIT}` +
+        (endedAfter ? `&ended_after=${encodeURIComponent(endedAfter.toISOString())}` : '') +
+        (cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''),
+      { timeout: TIMEOUT_MS }
+    );
   }
 
   async getUsers(): Promise<MediaUser[]> {

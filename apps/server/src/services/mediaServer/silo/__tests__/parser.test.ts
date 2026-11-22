@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import silo from '../../../../test/mediaServerResponses/silo.json' with { type: 'json' };
+import { normalizeStreamDecisions } from '../../../../utils/transcodeNormalizer.js';
 import {
   parseSiloDeviceNames,
   parseSiloDownloadSource,
@@ -10,9 +11,13 @@ import {
   parseSiloResources,
   parseSiloSession,
   parseSiloUsers,
+  siloHistoryProfileNaming,
+  siloItemPosterPath,
   siloPosterPath,
+  siloStreamDecisions,
+  siloWatchedSeconds,
 } from '../parser.js';
-import type { SiloSystemResources } from '../types.js';
+import type { SiloHistoryRow, SiloSystemResources } from '../types.js';
 
 const MOVIE_POSTER_HASH = '200475196580003a17cdfe2a5f5452208ae0a2c2ece48fba60ca08333146727b';
 const EPISODE_POSTER_HASH = '8ca719eb62703cb1e5f46090e8d20cc8c7b9941173d0992d0e6b54b8a8b1b8a6';
@@ -25,6 +30,11 @@ function nth<T>(items: T[], index: number): T {
 
 const movieRow = nth(silo.sessions.items, 0);
 const episodeRow = nth(silo.sessions.items, 1);
+const historyRow = (sessionId: string): SiloHistoryRow => {
+  const row = silo.history.items.find((item) => item.session_id === sessionId);
+  if (!row) throw new Error(`the fixture has no history row ${sessionId}`);
+  return row;
+};
 const tvListing = () => parseSiloLibraryListing(silo.catalog['2'].items, '2');
 
 describe('parseSiloUsers', () => {
@@ -236,6 +246,53 @@ describe('siloPosterPath', () => {
     expect(parseSiloPosterPath('/content/../poster')).toBeNull();
     expect(parseSiloPosterPath('/content/a/poster?v=XYZ')).toBeNull();
     expect(parseSiloPosterPath('/api/v2/artwork/x')).toBeNull();
+  });
+});
+
+describe('siloItemPosterPath', () => {
+  it("files an item's poster by its content id, unversioned, and none for an unsafe id", () => {
+    const path = siloItemPosterPath('episode-imdb-tt31510819-1-1');
+    expect(path).toBe('/content/episode-imdb-tt31510819-1-1/poster');
+    expect(parseSiloPosterPath(path ?? '')).toBe('episode-imdb-tt31510819-1-1');
+    for (const id of ['', '..', 'a/b']) expect(siloItemPosterPath(id)).toBeUndefined();
+  });
+});
+
+describe('siloStreamDecisions', () => {
+  it('reads remux as copy and counts a transcoded stream, for live rows and history alike', () => {
+    const decisions = siloStreamDecisions('remux', 'transcode');
+    expect(decisions).toEqual(normalizeStreamDecisions('copy', 'transcode'));
+    expect(decisions.isTranscode).toBe(true);
+    expect(siloStreamDecisions(null, null).isTranscode).toBe(false);
+  });
+});
+
+describe('siloWatchedSeconds', () => {
+  it("times a history play by Silo's measurement, and an unmeasured one as Silo's own page estimates it", () => {
+    const zootopia = historyRow('838e94ff-d2ff-44c8-ac63-25299597ef7d');
+    const odyssey = historyRow('8415ab73-3647-4e59-9ea0-f627e60333eb');
+
+    expect(siloWatchedSeconds(zootopia)).toBe(70.900083828);
+    expect(siloWatchedSeconds(odyssey)).toBeCloseTo(
+      (Date.parse('2026-11-19T01:06:58.525Z') - Date.parse('2026-11-19T01:06:42.274Z')) / 1000
+    );
+    expect(siloWatchedSeconds({ ...odyssey, end_position_seconds: 5 })).toBe(5);
+    expect(siloWatchedSeconds({ ...odyssey, ended_at: '2026-11-19T01:06:41.274Z' })).toBe(0);
+  });
+});
+
+describe('siloHistoryProfileNaming', () => {
+  it("names a history play's account and profile, and leaves a profile Silo recorded no name for unnamed", () => {
+    const kid = historyRow('838e94ff-d2ff-44c8-ac63-25299597ef7d');
+
+    expect(siloHistoryProfileNaming(kid)).toEqual({
+      accountExternalId: '34',
+      profileExternalId: '2770043c-2cab-4bb2-a860-6991aa254f29',
+      profileName: 'Kid',
+    });
+    expect(siloHistoryProfileNaming({ ...kid, profile_name: kid.profile_id }).profileName).toBe(
+      null
+    );
   });
 });
 

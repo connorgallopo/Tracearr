@@ -173,6 +173,20 @@ describe('SiloClient', () => {
     expect(second).toContain('cursor=c2');
   });
 
+  it("reads a page of playback history at Silo's page size, with the ended_after bound and the cursor", async () => {
+    serve({ '/admin/playback-history': silo.history });
+
+    expect(await client().getPlaybackHistoryPage(null, null)).toEqual(silo.history);
+    expect(await client().getPlaybackHistoryPage(new Date('2026-11-21T18:00:00Z'), 'c2')).toEqual(
+      silo.history
+    );
+
+    expect(requested('/admin/playback-history')).toEqual([
+      `${URL}/api/v2/admin/playback-history?limit=200`,
+      `${URL}/api/v2/admin/playback-history?limit=200&ended_after=2026-11-21T18%3A00%3A00.000Z&cursor=c2`,
+    ]);
+  });
+
   it('waits the Retry-After seconds on a 429, then reads the page again', async () => {
     vi.useFakeTimers();
     let reads = 0;
@@ -281,6 +295,18 @@ describe('SiloClient', () => {
     vi.advanceTimersByTime(31_000);
     await client(url).getSessions();
     expect(requested('/admin/devices')).toHaveLength(3);
+  });
+
+  it('names the devices history rows hold, and none for a device the list does not name', async () => {
+    serve({ '/admin/devices': silo.devices });
+
+    const names = await client('http://silo-history-devices.local:8090').getDeviceNames([
+      'aef454b9-44e6-412f-913b-3e3a5eb0dbee',
+      'tracearr-check-device-5',
+    ]);
+
+    expect(names.get('aef454b9-44e6-412f-913b-3e3a5eb0dbee')).toBe('iPhone');
+    expect(names.has('tracearr-check-device-5')).toBe(false);
   });
 
   it('narrows the sessions to one session key', async () => {
