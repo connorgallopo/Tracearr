@@ -125,7 +125,7 @@ async function takeState(handle: string): Promise<SiloPairingState | null> {
   return typeof raw === 'string' ? (JSON.parse(raw) as SiloPairingState) : null;
 }
 
-/** Get-and-delete (Lua) of a parked state; null when absent or not parked */
+/** Get-and-delete (Lua) of a parked state; null when absent or not parked. The claim consumes the state either way */
 export async function claimParked(handle: string): Promise<SiloPairingState | null> {
   const state = await takeState(handle);
   return state?.login ? state : null;

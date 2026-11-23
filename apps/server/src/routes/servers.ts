@@ -34,7 +34,12 @@ import {
 } from '../services/mediaServer/index.js';
 import { readServerFacts } from '../services/mediaServer/byServerType.js';
 import { getServerLiveStats, getServerResourceStats } from '../services/serverLiveStats.js';
-import { createServer, startAddedServer } from '../services/serverCreate.js';
+import {
+  connectedServerConflict,
+  createServer,
+  startAddedServer,
+} from '../services/serverCreate.js';
+import { verifyServerChange } from '../services/serverChange.js';
 import { deleteServer } from '../services/serverDelete.js';
 import { syncServer } from '../services/sync.js';
 import { sseManager } from '../services/sseManager.js';
@@ -45,7 +50,6 @@ import { enqueueLibrarySync } from '../jobs/librarySyncQueue.js';
 import { installedVersionOf } from '../jobs/serverUpdateChecker.js';
 import { publishServersChanged } from '../jobs/poller/database.js';
 import { followServerOnBuiltInRequestService } from '../services/requests/store.js';
-import { readServerIdentity, sharesKnownUsers } from '../services/serverIdentity.js';
 import { getSetting } from '../services/settings.js';
 import { buildServerAccessCondition, hasServerAccess } from '../utils/serverFiltering.js';
 import { serverOrderBy } from '../utils/serverOrder.js';
@@ -146,7 +150,6 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
 
   /**
    * POST /servers - Add a new server
-   * Encrypts the token before storage
    */
   app.post('/', writeServers, async (request, reply) => {
     const body = createServerSchema.safeParse(request.body);
@@ -162,10 +165,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       return reply.forbidden('Only server owners can add servers');
     }
 
-    // Check if server already exists
-    const existing = await db.select().from(servers).where(eq(servers.url, url)).limit(1);
-
-    if (existing.length > 0) {
+    if (await connectedServerConflict(type, url, null)) {
       return reply.conflict('A server with this URL already exists');
     }
 
@@ -222,13 +222,8 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
         } catch {
           app.log.debug({ type }, 'Could not read the server identity at creation time');
         }
-        if (machineIdentifier) {
-          const [connected] = await db
-            .select({ id: servers.id })
-            .from(servers)
-            .where(and(eq(servers.type, type), eq(servers.machineIdentifier, machineIdentifier)))
-            .limit(1);
-          if (connected) return reply.conflict('This server is already connected');
+        if (machineIdentifier && (await connectedServerConflict(type, url, machineIdentifier))) {
+          return reply.conflict('This server is already connected');
         }
         break;
       case 'jellyfin':
@@ -365,83 +360,18 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     let serverFacts: Awaited<ReturnType<typeof readServerFacts>> = {};
 
     if (urlChanging || keyChanging) {
-      // For Plex servers: Validate machineIdentifier if provided
-      switch (server.type) {
-        case 'plex':
-          if (
-            clientIdentifier &&
-            server.machineIdentifier &&
-            server.machineIdentifier !== clientIdentifier
-          ) {
-            return reply.badRequest(
-              'Server mismatch: The selected connection belongs to a different server. ' +
-                'Please select a connection for the correct server.'
-            );
-          }
-          break;
-        case 'jellyfin':
-        case 'emby':
-        case 'tofa':
-        case 'silo':
-          break;
-        default:
-          assertNever(server.type);
-      }
-
-      let adminCheck: Awaited<ReturnType<typeof verifyServerAdmin>>;
-      try {
-        adminCheck = await verifyServerAdmin(server.type, token, targetUrl);
-      } catch (error) {
-        app.log.error({ err: error, serverId: id, url: targetUrl }, 'Failed to verify server');
-        return reply.badRequest(
-          'Failed to connect to the server. Please verify the URL and API key are correct.'
-        );
-      }
-      if (!adminCheck.success) return replyAdminCheckFailure(reply, adminCheck);
-
-      const target = { id, type: server.type, url: targetUrl, token };
-      const expectedIdentity =
-        server.machineIdentifier ?? (await readServerIdentity(server).catch(() => null));
-
-      const reachedIdentity = await readServerIdentity(target).catch((error: unknown) => {
-        app.log.error(
-          { err: error, serverId: id, url: targetUrl },
-          'Failed to read server identity'
-        );
-        return null;
+      const change = await verifyServerChange(server, {
+        url: targetUrl,
+        token,
+        clientIdentifier,
       });
-      if (reachedIdentity === null) {
-        return reply.badRequest('Could not read which server answers at that address.');
+      if (!change.ok) {
+        return change.code
+          ? replyAdminCheckFailure(reply, { code: change.code, message: change.message })
+          : reply.badRequest(change.message);
       }
-
-      if (expectedIdentity) {
-        if (reachedIdentity !== expectedIdentity) {
-          return reply.badRequest(
-            'That address or API key reaches a different server. A server can only be pointed at itself.'
-          );
-        }
-      } else {
-        const sameUsers = await sharesKnownUsers(target).catch((error: unknown) => {
-          app.log.error({ err: error, serverId: id, url: targetUrl }, 'Failed to compare users');
-          return false;
-        });
-        if (!sameUsers) {
-          return reply.badRequest(
-            'Tracearr has no record of which server this is, cannot reach it with the saved address and key, and finds none of its users at the new address, so it cannot confirm the change points at the same server.'
-          );
-        }
-      }
-      if (!server.machineIdentifier) backfilledIdentity = reachedIdentity;
-
-      try {
-        serverFacts = await readServerFacts(server.type, targetUrl, token);
-      } catch (error) {
-        app.log.error(
-          { err: error, serverId: id, url: targetUrl },
-          'Failed to read server settings'
-        );
-        return reply.badRequest('Could not read the API key scopes from the server.');
-      }
+      serverFacts = change.facts;
+      backfilledIdentity = change.backfilledIdentity;
     }
 
     const updatePayload: {
@@ -450,6 +380,7 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
       color?: string | null;
       publicUrl?: string | null;
       token?: string;
+      apiKeyId?: null;
       machineIdentifier?: string;
       allowMemberLogin?: boolean;
       canStopStreams?: boolean;
@@ -461,7 +392,11 @@ export const serverRoutes: FastifyPluginAsync = async (app) => {
     if (newUrl !== undefined) updatePayload.url = newUrl;
     if (newColor !== undefined) updatePayload.color = newColor;
     if (newPublicUrl !== undefined) updatePayload.publicUrl = newPublicUrl;
-    if (newApiKey !== undefined) updatePayload.token = newApiKey;
+    if (newApiKey !== undefined) {
+      updatePayload.token = newApiKey;
+      // A pasted key is not one Tracearr made, so there is no key id to delete it by
+      updatePayload.apiKeyId = null;
+    }
     if (newAllowMemberLogin !== undefined) updatePayload.allowMemberLogin = newAllowMemberLogin;
 
     const updated = await db.transaction(async (tx) => {

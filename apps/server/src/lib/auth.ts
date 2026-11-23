@@ -37,6 +37,7 @@ import {
 import { oidcConfigured, oidcDiscoveryUrl, oidcEnv } from './oidcEnv.js';
 import { getRedis, closeRedis, GET_AND_DELETE_SCRIPT, INCREMENT_SCRIPT } from './redisShared.js';
 import { plexPlugin } from './plexPlugin.js';
+import { siloPlugin } from './siloPlugin.js';
 import { tofaPlugin } from './tofaPlugin.js';
 import { memberLoginPlugin } from './memberLoginPlugin.js';
 import { assertOidcSignInAllowed, linkOidcMember, memberStillValid } from './memberLogin.js';
@@ -353,6 +354,7 @@ function buildAuth(redis: Redis, withOidc: boolean) {
         '/emby/sign-in': { window: 60, max: 10 },
         '/jellyfin/quick-connect/initiate': { window: 60, max: 10 },
         '/tofa/initiate': { window: 60, max: 10 },
+        '/silo/pair/start': { window: 60, max: 10 },
       },
     },
     databaseHooks: {
@@ -524,6 +526,7 @@ function buildAuth(redis: Redis, withOidc: boolean) {
       bearer(),
       plexPlugin(),
       tofaPlugin(),
+      siloPlugin(),
       memberLoginPlugin(),
       ...(oidcConfigured && withOidc
         ? [

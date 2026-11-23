@@ -1,3 +1,4 @@
+import { and, eq, or } from 'drizzle-orm';
 import { pickServerColor, SERVER_PROFILES, type ServerType } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, serverUsers } from '../db/schema.js';
@@ -25,6 +26,8 @@ export interface CreateServerInput {
   token: string;
   publicUrl?: string | null;
   machineIdentifier?: string | null;
+  /** The server's own id for a key Tracearr made, so the key can be deleted later */
+  apiKeyId?: string | null;
   plexAccountId?: string | null;
   facts: Awaited<ReturnType<typeof readServerFacts>>;
   /** The owner's own account on the server, so the first sync finds it instead of adding a person */
@@ -36,6 +39,28 @@ export interface CreateServerInput {
     thumbUrl?: string | null;
     cloudIdentityId: string | null;
   };
+}
+
+/** Why a server cannot be added: its address or its own id is already connected */
+export async function connectedServerConflict(
+  type: ServerType,
+  url: string,
+  machineIdentifier: string | null
+): Promise<'url' | 'identity' | null> {
+  const [connected] = await db
+    .select({ url: servers.url })
+    .from(servers)
+    .where(
+      or(
+        eq(servers.url, url),
+        machineIdentifier
+          ? and(eq(servers.type, type), eq(servers.machineIdentifier, machineIdentifier))
+          : undefined
+      )
+    )
+    .limit(1);
+  if (!connected) return null;
+  return connected.url === url ? 'url' : 'identity';
 }
 
 /**
@@ -62,6 +87,7 @@ export async function createServer(input: CreateServerInput) {
         token: input.token,
         color,
         machineIdentifier: input.machineIdentifier ?? null,
+        apiKeyId: input.apiKeyId ?? null,
         plexAccountId: input.plexAccountId ?? null,
         ...input.facts,
       })

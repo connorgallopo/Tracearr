@@ -1299,8 +1299,39 @@ describe('Server Routes', () => {
       expect(readServerIdentity).toHaveBeenCalledWith(
         expect.objectContaining({ url: 'http://192.168.1.20:8096', token: 'new-key' })
       );
-      expect(update.set).toHaveBeenCalledWith({ token: 'new-key', updatedAt: expect.any(Date) });
+      expect(update.set).toHaveBeenCalledWith({
+        token: 'new-key',
+        apiKeyId: null,
+        updatedAt: expect.any(Date),
+      });
       expect(sseManager.refresh).toHaveBeenCalled();
+    });
+
+    it('forgets the id of a key Tracearr made when a key is pasted over it', async () => {
+      app = await buildTestApp(ownerUser);
+      const silo = {
+        ...mockServer,
+        type: 'silo' as const,
+        url: 'http://silo.local:8090',
+        token: 'made-key',
+        apiKeyId: 'key-1',
+        machineIdentifier: 'silo-1',
+      };
+      vi.mocked(verifyServerAdmin).mockResolvedValue({ success: true });
+      vi.mocked(readServerIdentity).mockResolvedValue('silo-1');
+      mockDbSelectLimit([silo]);
+      const update = mockDbUpdateReturning([silo]);
+
+      const response = await app.inject({
+        method: 'PATCH',
+        url: `/servers/${silo.id}`,
+        payload: { apiKey: 'pasted-key' },
+      });
+
+      expect(response.statusCode).toBe(200);
+      expect(update.set).toHaveBeenCalledWith(
+        expect.objectContaining({ token: 'pasted-key', apiKeyId: null })
+      );
     });
 
     it('verifies a new URL and key as a pair and records the identity it confirmed', async () => {
@@ -1336,6 +1367,7 @@ describe('Server Routes', () => {
       expect(update.set).toHaveBeenCalledWith({
         url: 'http://new-host:8096',
         token: 'new-key',
+        apiKeyId: null,
         machineIdentifier: 'jf-1',
         updatedAt: expect.any(Date),
       });
@@ -1407,6 +1439,7 @@ describe('Server Routes', () => {
       );
       expect(update.set).toHaveBeenCalledWith({
         token: 'new-key',
+        apiKeyId: null,
         machineIdentifier: 'jf-1',
         updatedAt: expect.any(Date),
       });

@@ -102,7 +102,9 @@ export const servers = pgTable(
     url: text('url').notNull(),
     // The address members open a Jellyfin or Emby server at; always null for Plex, which links through app.plex.tv.
     publicUrl: text('public_url'),
-    token: text('token').notNull(), // Encrypted
+    token: text('token').notNull(), // Plain text; utils/crypto.ts migrates old encrypted tokens
+    // The server's own id for the key in token, set only when Tracearr made the key and can delete it
+    apiKeyId: text('api_key_id'),
     machineIdentifier: varchar('machine_identifier', { length: 100 }), // The media server's own id: Plex clientIdentifier (also used for dedup), Jellyfin/Emby System/Info Id
     // For Plex servers: which linked Plex account this server was added from (nullable for Jellyfin/Emby and legacy)
     plexAccountId: uuid('plex_account_id'),
