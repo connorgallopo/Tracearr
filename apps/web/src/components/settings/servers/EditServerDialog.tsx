@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Loader2 } from 'lucide-react';
+import { useQueryClient } from '@tanstack/react-query';
+import { CheckCircle2, Loader2 } from 'lucide-react';
 import {
   SERVER_COLOR_PALETTE,
   SERVER_PROFILES,
@@ -8,6 +9,7 @@ import {
   serverLocationsSchema,
 } from '@tracearr/shared';
 import type { Server } from '@tracearr/shared';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -29,8 +31,14 @@ import {
   useServerLocations,
   useUpdateServerLocations,
 } from '@/hooks/queries';
+import { useSiloPairing } from '@/hooks/queries/useSiloPairing';
 import { useRestoreFocus } from '@/hooks/useRestoreFocus';
-import { API_KEY_HELP, PUBLIC_URL_PLACEHOLDER, SERVER_URL_PLACEHOLDER } from './AddServerFields';
+import {
+  API_KEY_HELP,
+  PUBLIC_URL_PLACEHOLDER,
+  SERVER_URL_PLACEHOLDER,
+  SiloPairingPanel,
+} from './AddServerFields';
 import { SERVER_DIALOG_CONTENT_CLASS } from './dialogClasses';
 import { ServerLocationEditor } from './ServerLocationEditor';
 import { draftsKey, toDrafts, toEntries, type LocationDraft } from './serverLocationDrafts';
@@ -49,6 +57,68 @@ export interface ServerPatch {
   color?: string | null;
   publicUrl?: string | null;
   apiKey?: string;
+}
+
+/**
+ * A new Silo key by code first, the pasted key field under it. Mounted only while the dialog is
+ * open, so closing the dialog cancels a code still waiting.
+ */
+function SiloKeySection({
+  serverId,
+  locked,
+  apiKeyField,
+}: {
+  serverId: string;
+  locked: boolean;
+  apiKeyField: ReactNode;
+}) {
+  const { t } = useTranslation(['settings', 'common']);
+  const queryClient = useQueryClient();
+  const pairing = useSiloPairing();
+  const [pasteKey, setPasteKey] = useState(false);
+  const rekeyed = pairing.check?.status === 'rekeyed' ? pairing.check : null;
+
+  useEffect(() => {
+    if (rekeyed) void queryClient.invalidateQueries({ queryKey: ['servers', 'list'] });
+  }, [rekeyed, queryClient]);
+
+  return (
+    <>
+      <Field>
+        <FieldTitle>{t('common:labels.apiKey')}</FieldTitle>
+        {rekeyed ? (
+          <Alert>
+            <CheckCircle2 />
+            <AlertDescription>
+              <p>{t('servers.pairing.rekeyed')}</p>
+              {rekeyed.oldKeyLeft && <p>{t('servers.pairing.oldKeyLeft')}</p>}
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <SiloPairingPanel
+            pairing={pairing}
+            startLabel={t('servers.pairing.getNewKey')}
+            onStart={() => pairing.start({ purpose: 'rekey', serverId })}
+            disabled={locked}
+          />
+        )}
+        {locked && <FieldDescription>{t('servers.resumeFirst')}</FieldDescription>}
+        {!pasteKey && (
+          <Button
+            variant="link"
+            className="h-auto self-start p-0"
+            onClick={() => {
+              pairing.cancel();
+              setPasteKey(true);
+            }}
+          >
+            {t('servers.pairing.useApiKey')}
+          </Button>
+        )}
+      </Field>
+      {pasteKey && apiKeyField}
+    </>
+  );
 }
 
 export function EditServerDialog({
@@ -146,6 +216,25 @@ export function EditServerDialog({
   const isSaving = isUpdating || updateLocations.isPending;
 
   if (!server) return null;
+
+  const siloPairing = SERVER_PROFILES[server.type].addServerAuth === 'siloPairing';
+  const apiKeyField = holdsApiKey(server.type) && (
+    <Field>
+      <FieldLabel htmlFor="edit-api-key">{t('common:labels.apiKey')}</FieldLabel>
+      <Input
+        id="edit-api-key"
+        type="password"
+        autoComplete="off"
+        value={editApiKey}
+        onChange={(e) => setEditApiKey(e.target.value)}
+        placeholder={t('servers.apiKeyKeepCurrent')}
+        disabled={locked}
+      />
+      <FieldDescription>
+        {locked ? t('servers.resumeFirst') : t(API_KEY_HELP[server.type])}
+      </FieldDescription>
+    </Field>
+  );
 
   const saveLocations = async () => {
     if (!hasLocationChange) return true;
@@ -256,21 +345,11 @@ export function EditServerDialog({
                   <FieldDescription>{t('servers.publicUrlHint')}</FieldDescription>
                 </Field>
               )}
-              <Field>
-                <FieldLabel htmlFor="edit-api-key">{t('common:labels.apiKey')}</FieldLabel>
-                <Input
-                  id="edit-api-key"
-                  type="password"
-                  autoComplete="off"
-                  value={editApiKey}
-                  onChange={(e) => setEditApiKey(e.target.value)}
-                  placeholder={t('servers.apiKeyKeepCurrent')}
-                  disabled={locked}
-                />
-                <FieldDescription>
-                  {locked ? t('servers.resumeFirst') : t(API_KEY_HELP[server.type])}
-                </FieldDescription>
-              </Field>
+              {siloPairing ? (
+                <SiloKeySection serverId={server.id} locked={locked} apiKeyField={apiKeyField} />
+              ) : (
+                apiKeyField
+              )}
             </>
           )}
 

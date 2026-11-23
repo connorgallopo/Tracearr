@@ -100,7 +100,7 @@ describe('server profiles', () => {
     ['jellyfin', 'apiKey', 'serverPassword', false, false, false, null],
     ['emby', 'apiKey', 'serverPassword', false, false, false, null],
     ['tofa', 'tofaCloud', 'tofaCloud', false, false, false, 'tofa'],
-    ['silo', 'apiKey', 'unavailable', false, false, false, 'silo'],
+    ['silo', 'siloPairing', 'unavailable', false, false, false, 'silo'],
   ] as const)(
     '%s adds, signs in, reports bandwidth and bitrates, and imports history',
     (type, addServerAuth, memberSignIn, bandwidth, trackBitrates, tautulli, serverHistory) => {

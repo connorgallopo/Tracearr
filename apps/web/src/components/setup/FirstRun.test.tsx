@@ -155,6 +155,15 @@ describe('FirstRun', () => {
     expect(screen.getByLabelText('settings:account.displayName')).toBeInTheDocument();
   });
 
+  it('offers Silo no sign-up button, only the account form', async () => {
+    render(<FirstRun claimCode={undefined} onSignedIn={vi.fn()} />);
+
+    await choose('Silo');
+    expect(plexButton()).toBeNull();
+    expect(screen.queryByText('common:or')).toBeNull();
+    expect(screen.getByLabelText('settings:account.displayName')).toBeInTheDocument();
+  });
+
   it('step 2 back keeps the chosen server type', async () => {
     render(<FirstRun claimCode={undefined} onSignedIn={vi.fn()} />);
     await choose('Emby');

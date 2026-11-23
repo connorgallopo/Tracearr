@@ -32,16 +32,16 @@ export function holdsApiKey(type: ServerType): type is ApiKeyServerType {
   }
 }
 
-/** The add-server form asks for the URL and API key first; tofa signs in and makes its own key. */
+/** The add-server form asks for the URL and API key first; tofa signs in and Silo approves a code, and each makes its own key. */
 export function addsByApiKey(type: ServerType): boolean {
   switch (type) {
     case 'plex':
       return false;
     case 'jellyfin':
     case 'emby':
-    case 'silo':
       return true;
     case 'tofa':
+    case 'silo':
       return false;
     default:
       return assertNever(type);
