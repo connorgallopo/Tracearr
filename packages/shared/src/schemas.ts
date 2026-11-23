@@ -227,7 +227,7 @@ export const siloPairStartSchema = z.discriminatedUnion('purpose', [
     name: createServerSchema.shape.name,
     publicUrl: createServerSchema.shape.publicUrl,
   }),
-  z.object({ purpose: z.literal('rekey'), serverId: uuidSchema }),
+  z.object({ purpose: z.enum(['rekey', 'link']), serverId: uuidSchema }),
 ]);
 
 export const siloPairCheckSchema = z.object({

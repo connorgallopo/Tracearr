@@ -17,9 +17,14 @@ vi.mock('@/hooks/queries', () => ({
 
 vi.mock('@/components/auth/useTofaSignIn', () => ({ useTofaSignIn: vi.fn() }));
 
+const siloPairing = vi.hoisted(() => ({ current: {} as Record<string, unknown> }));
+vi.mock('@/hooks/queries/useSiloPairing', () => ({
+  useSiloPairing: () => siloPairing.current,
+}));
+
 import { useTofaSignIn } from '@/components/auth/useTofaSignIn';
 import { useLinkOwnerAccount, useOwnerAccountLinked } from '@/hooks/queries';
-import { OwnerLinkDialog, TofaOwnerLinkDialog } from './OwnerLinkDialog';
+import { OwnerLinkDialog, SiloOwnerLinkDialog, TofaOwnerLinkDialog } from './OwnerLinkDialog';
 
 const server = { id: 'srv-1', name: 'Home', type: 'jellyfin' } as unknown as Server;
 
@@ -111,6 +116,52 @@ describe('TofaOwnerLinkDialog', () => {
     expect(options).toMatchObject({ purpose: { link: 'srv-2' } });
     options?.onLinked?.();
     expect(linked).toHaveBeenCalled();
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+});
+
+describe('SiloOwnerLinkDialog', () => {
+  const siloServer = { id: 'srv-3', name: 'Vault', type: 'silo' } as unknown as Server;
+  const code = {
+    handle: 'h-1',
+    userCode: '48217730',
+    link: 'http://silo.lan:8090/activate?code=48217730',
+    expiresIn: 900,
+    interval: 5,
+  };
+
+  it('starts a link for this server and shows the code with the approve line', () => {
+    const start = vi.fn();
+    siloPairing.current = {
+      start,
+      starting: false,
+      pairing: code,
+      check: { status: 'pending', opened: false },
+      error: null,
+    };
+
+    render(<SiloOwnerLinkDialog open onOpenChange={vi.fn()} server={siloServer} />);
+
+    expect(start).toHaveBeenCalledExactlyOnceWith({ purpose: 'link', serverId: 'srv-3' });
+    expect(screen.getByText('4821 7730')).toBeInTheDocument();
+    expect(screen.getByText('servers.ownerAccount.siloDialog.description')).toBeInTheDocument();
+  });
+
+  it('closes once linked', () => {
+    const linked = vi.fn();
+    const onOpenChange = vi.fn();
+    vi.mocked(useOwnerAccountLinked).mockReturnValue(linked);
+    siloPairing.current = {
+      start: vi.fn(),
+      starting: false,
+      pairing: code,
+      check: { status: 'linked' },
+      error: null,
+    };
+
+    render(<SiloOwnerLinkDialog open onOpenChange={onOpenChange} server={siloServer} />);
+
+    expect(linked).toHaveBeenCalledOnce();
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 });

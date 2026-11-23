@@ -35,6 +35,7 @@ vi.mock('../../services/serverCreate.js', () => ({
 vi.mock('../../services/serverChange.js', () => ({ verifyServerChange: vi.fn() }));
 vi.mock('../../jobs/poller/database.js', () => ({ publishServersChanged: vi.fn() }));
 vi.mock('../../services/sseManager.js', () => ({ sseManager: { refresh: vi.fn() } }));
+vi.mock('../../services/ownerAccountLink.js', () => ({ linkOwnerSiloAccount: vi.fn() }));
 
 const { logged } = vi.hoisted(() => ({
   logged: { debug: vi.fn(), info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -68,6 +69,8 @@ import {
 } from '../../services/mediaServer/silo/auth.js';
 import { SiloClient } from '../../services/mediaServer/silo/client.js';
 import { readServerFacts } from '../../services/mediaServer/byServerType.js';
+import { MergeValidationError } from '../../services/mergeService.js';
+import { linkOwnerSiloAccount } from '../../services/ownerAccountLink.js';
 import { verifyServerChange } from '../../services/serverChange.js';
 import {
   connectedServerConflict,
@@ -321,6 +324,28 @@ describe('silo pairing plugin', () => {
         call('siloPairStart', { purpose: 'rekey', serverId: SERVER_ID })
       ).rejects.toMatchObject({ statusCode: 404 });
       expect(startPairing).not.toHaveBeenCalled();
+    });
+
+    it('refuses a link for a server that is not a live Silo server', async () => {
+      savedServer(null as never);
+
+      await expect(
+        call('siloPairStart', { purpose: 'link', serverId: SERVER_ID })
+      ).rejects.toMatchObject({ statusCode: 400, body: { message: 'Server not found' } });
+      expect(pairingOffered).not.toHaveBeenCalled();
+      expect(startPairing).not.toHaveBeenCalled();
+    });
+
+    it('starts a link on the saved server', async () => {
+      savedServer();
+
+      const response = await call('siloPairStart', { purpose: 'link', serverId: SERVER_ID });
+
+      expect(response.userCode).toBe('48217730');
+      expect(pairingOffered).toHaveBeenCalledWith(URL);
+      expect(
+        JSON.parse((await redis.get(REDIS_KEYS.SILO_PAIRING(response.handle as string))) ?? '')
+      ).toMatchObject({ purpose: 'link', ownerId: OWNER_ID, serverId: SERVER_ID, url: URL });
     });
   });
 
@@ -670,6 +695,44 @@ describe('silo pairing plugin', () => {
         expect(deleteKey).not.toHaveBeenCalled();
         expect(logout).toHaveBeenCalledOnce();
       });
+    });
+  });
+
+  describe('link', () => {
+    const linkState = { purpose: 'link', serverId: SERVER_ID } as never;
+    const MEMBER = { id: 'silo-user-2', username: 'connor', email: 'c@example.com', role: 'user' };
+
+    it('links the account that approved, whatever its role, logging out first', async () => {
+      const handle = await seed(linkState);
+      approve(MEMBER);
+
+      expect(await call('siloPairCheck', { handle })).toEqual({ status: 'linked' });
+      expect(linkOwnerSiloAccount).toHaveBeenCalledExactlyOnceWith(
+        OWNER_ID,
+        SERVER_ID,
+        'silo-user-2'
+      );
+      expect(logout).toHaveBeenCalledExactlyOnceWith(URL, ACCESS);
+      expect(order(logout)).toBeLessThan(order(linkOwnerSiloAccount));
+      expect(primaryProfile).not.toHaveBeenCalled();
+      expect(createTracearrKey).not.toHaveBeenCalled();
+      expect(await redis.get(REDIS_KEYS.SILO_PAIRING(handle))).toBeNull();
+    });
+
+    it('answers a refused link with its message', async () => {
+      const handle = await seed(linkState);
+      approve(MEMBER);
+      vi.mocked(linkOwnerSiloAccount).mockRejectedValueOnce(
+        new MergeValidationError(
+          'The Silo account that approved the code has no account on this server'
+        )
+      );
+
+      await expect(call('siloPairCheck', { handle })).rejects.toMatchObject({
+        statusCode: 400,
+        body: { message: 'The Silo account that approved the code has no account on this server' },
+      });
+      expect(logout).toHaveBeenCalledOnce();
     });
   });
 

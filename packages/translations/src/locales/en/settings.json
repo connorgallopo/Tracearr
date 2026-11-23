@@ -315,6 +315,9 @@
       "tofaDialog": {
         "description": "Sign in to tofa as the account you use on this server. Its plays become yours, and signing in with tofa opens Tracearr as you."
       },
+      "siloDialog": {
+        "description": "Approve it while signed in to Silo as your own account."
+      },
       "confirmUnlink": {
         "title": "Unlink {{username}}?",
         "body": "Its plays move back to a person of their own. Tracearr signs you out everywhere except this browser and your paired phones."

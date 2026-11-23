@@ -1,8 +1,8 @@
 /**
  * Owner Account Link Routes
  *
- * GET    /owner-links               - The owner's account on each Jellyfin, Emby and tofa server, or the accounts that could be linked
- * POST   /owner-links               - Fold body.serverUserId into the owner (tofa links through /auth/tofa)
+ * GET    /owner-links               - The owner's account on each Jellyfin, Emby, tofa and Silo server, or the accounts that could be linked
+ * POST   /owner-links               - Fold body.serverUserId into the owner (tofa links through /auth/tofa, Silo through /auth/silo)
  * DELETE /owner-links/:serverUserId - Split the owner's account back out to a person of its own
  */
 

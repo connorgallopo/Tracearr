@@ -185,8 +185,9 @@ export function liveStatsGapSeconds(serverType: ServerType): number {
 
 /**
  * How the owner proves an account on the server is theirs before it joins them: Plex links the
- * plex.tv account itself, Jellyfin, Emby and Silo take the account's username typed back, and
- * tofa needs a tofa sign-in as that account, since it also becomes the owner's tofa login.
+ * plex.tv account itself, Jellyfin and Emby take the account's username typed back, tofa needs a
+ * tofa sign-in as that account, since it also becomes the owner's tofa login, and Silo needs a
+ * pairing code approved while signed in to Silo as that account.
  */
 export type OwnerLinkProof = 'plexAccount' | 'typedUsername' | 'tofaSignIn' | 'siloPairing';
 
@@ -196,10 +197,11 @@ export function ownerLinkProof(type: ServerType): OwnerLinkProof {
       return 'plexAccount';
     case 'jellyfin':
     case 'emby':
-    case 'silo':
       return 'typedUsername';
     case 'tofa':
       return 'tofaSignIn';
+    case 'silo':
+      return 'siloPairing';
     default:
       return assertNever(type);
   }

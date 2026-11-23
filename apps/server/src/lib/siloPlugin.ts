@@ -1,10 +1,11 @@
 /**
- * Adding a Silo server, and replacing its key, by a code a Silo admin approves, as a Better Auth
- * plugin.
+ * Adding a Silo server, and replacing its key, by a code a Silo admin approves, and linking the
+ * owner's own Silo account by a code that account approves, as a Better Auth plugin.
  *
  * Endpoints (mounted under /api/v1/auth via the plugin):
  * - POST /silo/pair/start   -> SiloPairStart: the code to approve in Silo, and a link to Silo's page for it
- * - POST /silo/pair/check   -> SiloPairCheck: one poll; an approval makes a key with the approver's login
+ * - POST /silo/pair/check   -> SiloPairCheck: one poll; an approval makes a key with the approver's
+ *                              login, or links the approver's account to the owner
  * - POST /silo/pair/cancel  -> { status: 'canceled' }
  *
  * Security: only the owner session that started a request can finish or cancel it. The Silo login
@@ -95,39 +96,29 @@ function ownedBy(state: SiloPairingState | null, ownerId: string): state is Owne
   }
 }
 
-function needsAdmin(purpose: OwnerPairing['purpose']): boolean {
-  switch (purpose) {
-    case 'add-server':
-    case 'rekey':
-      return true;
-    case 'link':
-      return false;
-    default:
-      return assertNever(purpose);
-  }
-}
-
 /** Key-less; called only for an address checkSiloServer let through */
 function readIdentity(url: string): Promise<string | null> {
   return new SiloClient({ url, token: '' }).getServerIdentity().catch(() => null);
 }
 
-async function liveSiloServer(serverId: string) {
+async function liveSiloServer(
+  serverId: string,
+  missing: 'NOT_FOUND' | 'BAD_REQUEST' = 'NOT_FOUND'
+) {
   const [server] = await db
     .select()
     .from(servers)
     .where(and(eq(servers.id, serverId), eq(servers.type, 'silo'), liveServerCondition))
     .limit(1);
-  if (!server) throw new APIError('NOT_FOUND', { message: 'Server not found' });
+  if (!server) throw new APIError(missing, { message: 'Server not found' });
   return server;
 }
 
-async function assertPairingOffered(url: string): Promise<void> {
-  if (!(await pairingOffered(url))) {
-    throw new APIError('BAD_REQUEST', {
-      message: 'Pairing is off on this Silo server. Use an API key instead.',
-    });
-  }
+async function assertPairingOffered(
+  url: string,
+  message = 'Pairing is off on this Silo server. Use an API key instead.'
+): Promise<void> {
+  if (!(await pairingOffered(url))) throw new APIError('BAD_REQUEST', { message });
 }
 
 /** Deletes a key a failed attempt made, with the login that made it */
@@ -165,6 +156,18 @@ async function startRekey(ownerId: string, serverId: string): Promise<SiloPairSt
   await assertPairingOffered(server.url);
   return openPairing({
     purpose: 'rekey',
+    ownerId,
+    serverId,
+    url: server.url,
+    publicUrl: server.publicUrl,
+  });
+}
+
+async function startLink(ownerId: string, serverId: string): Promise<SiloPairStart> {
+  const server = await liveSiloServer(serverId, 'BAD_REQUEST');
+  await assertPairingOffered(server.url, 'Pairing is off on this Silo server.');
+  return openPairing({
+    purpose: 'link',
     ownerId,
     serverId,
     url: server.url,
@@ -286,10 +289,35 @@ function finish(
     case 'rekey':
       return rekey(state, login, proof);
     case 'link':
-      throw new APIError('BAD_REQUEST', { message: 'Silo accounts are not linked by code' });
+      // A link never parks its login for a PIN.
+      return Promise.resolve(EXPIRED);
     default:
       return assertNever(state);
   }
+}
+
+/** Any Silo role may approve; the link needs only the approver's id, so the login ends first */
+async function linkApprover(
+  handle: string,
+  state: Extract<OwnerPairing, { serverId: string }>,
+  login: SiloLogin
+): Promise<CheckAnswer> {
+  const approverId = await holdLogin(state.url, login, async () => {
+    await getRedis().del(REDIS_KEYS.SILO_PAIRING(handle));
+    return login.user.id;
+  });
+  // Both import auth.js, which imports this module.
+  const { linkOwnerSiloAccount } = await import('../services/ownerAccountLink.js');
+  const { MergeValidationError } = await import('../services/mergeService.js');
+  try {
+    await linkOwnerSiloAccount(state.ownerId, state.serverId, approverId);
+  } catch (error) {
+    if (error instanceof MergeValidationError) {
+      throw new APIError('BAD_REQUEST', { message: error.message });
+    }
+    throw error;
+  }
+  return { status: 'linked' };
 }
 
 async function approved(
@@ -297,9 +325,10 @@ async function approved(
   state: OwnerPairing,
   login: SiloLogin
 ): Promise<CheckAnswer> {
+  if (state.purpose === 'link') return linkApprover(handle, state, login);
   return holdLogin(state.url, login, async (park) => {
     await getRedis().del(REDIS_KEYS.SILO_PAIRING(handle));
-    if (needsAdmin(state.purpose) && login.user.role !== 'admin') return { status: 'not-admin' };
+    if (login.user.role !== 'admin') return { status: 'not-admin' };
     const profile = await primaryProfile(state.url, login.accessToken);
     if (profile?.hasPin) {
       await parkLogin(handle, state, { ...login, profileId: profile.id });
@@ -355,6 +384,8 @@ export const siloPlugin = () =>
                 return await ctx.json(await startAdd(ownerId, body));
               case 'rekey':
                 return await ctx.json(await startRekey(ownerId, body.serverId));
+              case 'link':
+                return await ctx.json(await startLink(ownerId, body.serverId));
               default:
                 return assertNever(body);
             }

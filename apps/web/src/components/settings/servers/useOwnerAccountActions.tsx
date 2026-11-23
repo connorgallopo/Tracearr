@@ -13,7 +13,7 @@ import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useUnlinkOwnerAccount } from '@/hooks/queries';
-import { OwnerLinkDialog, TofaOwnerLinkDialog } from './OwnerLinkDialog';
+import { OwnerLinkDialog, SiloOwnerLinkDialog, TofaOwnerLinkDialog } from './OwnerLinkDialog';
 
 function LinkDialog({
   server,
@@ -34,14 +34,14 @@ function LinkDialog({
       // Plex servers have no owner link fact; the owner links plex.tv accounts instead.
       return null;
     case 'siloPairing':
-      return null;
+      return <SiloOwnerLinkDialog open onOpenChange={onOpenChange} server={server} />;
     default:
       return assertNever(proof);
   }
 }
 
 /**
- * The owner's own account on a Jellyfin, Emby or tofa server, which their plays and sign-in
+ * The owner's own account on a Jellyfin, Emby, tofa or Silo server, which their plays and sign-in
  * follow: the fact, the unlink item for the row menu, and the dialogs, which the row keeps
  * mounted outside the menu. `fromMenu` wraps the item, which opens a dialog.
  */

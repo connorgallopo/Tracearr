@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, Check, Loader2 } from 'lucide-react';
 import type { OwnerLinkCandidate, OwnerLinkServer, Server } from '@tracearr/shared';
@@ -26,7 +26,9 @@ import { TofaSignInButton, TofaWaiting } from '@/components/auth/TofaSignIn';
 import { useTofaSignIn } from '@/components/auth/useTofaSignIn';
 import { UserCell } from '@/components/users/UserCell';
 import { useLinkOwnerAccount, useOwnerAccountLinked } from '@/hooks/queries';
+import { useSiloPairing } from '@/hooks/queries/useSiloPairing';
 import { safeFormatDistanceToNow } from '@/lib/dateFormat';
+import { SiloPairingPanel } from './AddServerFields';
 
 interface OwnerLinkDialogProps {
   open: boolean;
@@ -199,6 +201,51 @@ export function TofaOwnerLinkDialog({
             <TofaSignInButton label={t('pages:tofa.signIn')} onClick={() => void tofa.start()} />
           </div>
         )}
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+/** Silo proves the account by a code approved while signed in to Silo as it */
+export function SiloOwnerLinkDialog({
+  open,
+  onOpenChange,
+  server,
+}: Omit<OwnerLinkDialogProps, 'link'>) {
+  const { t } = useTranslation('settings');
+  const linked = useOwnerAccountLinked();
+  const pairing = useSiloPairing();
+  const startLink = () => pairing.start({ purpose: 'link', serverId: server.id });
+  const done = pairing.check?.status === 'linked';
+
+  useEffect(() => {
+    startLink();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the dialog opens
+  }, []);
+
+  useEffect(() => {
+    if (!done) return;
+    linked();
+    onOpenChange(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per link; linked is new each render
+  }, [done]);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            {t('servers.ownerAccount.dialog.title', { server: server.name })}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-4">
+          <SiloPairingPanel
+            pairing={pairing}
+            startLabel={t('servers.pairing.getCode')}
+            onStart={startLink}
+          />
+          <DialogDescription>{t('servers.ownerAccount.siloDialog.description')}</DialogDescription>
+        </div>
       </DialogContent>
     </Dialog>
   );
