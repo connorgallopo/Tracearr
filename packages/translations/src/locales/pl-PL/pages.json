@@ -48,6 +48,7 @@
       "codeExpired": "Ten kod wygasł.",
       "newCode": "Nowy kod",
       "refused": "Logowanie nie jest dostępne dla tego konta.",
+      "signInUnavailable": "",
       "notPermitted": "Nie masz uprawnień do logowania. Skontaktuj się z właścicielem serwera."
     }
   },

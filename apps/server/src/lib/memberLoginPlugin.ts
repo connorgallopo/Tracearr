@@ -1,8 +1,9 @@
 /**
- * Member sign-in through Jellyfin (password or Quick Connect) and Emby (password), as a Better
- * Auth plugin. Every endpoint checks, before any outbound call, that the server is a live one of
- * its type that someone could sign in through (openToMemberSignIn); whether this person may is
- * canMemberLogin's answer once the server accepted them.
+ * Member sign-in through Jellyfin (password or Quick Connect), Emby (password) and Silo (password
+ * or a code the member approves in Silo), as a Better Auth plugin. Every endpoint checks, before
+ * any outbound call, that the server is a live one of its type that someone could sign in through
+ * (openToMemberSignIn); whether this person may is canMemberLogin's answer once the server
+ * accepted them.
  */
 
 import { createHash, randomBytes } from 'node:crypto';
@@ -11,20 +12,37 @@ import { createAuthEndpoint, APIError } from 'better-auth/api';
 import { and, eq, sql } from 'drizzle-orm';
 import {
   REDIS_KEYS,
+  assertNever,
   memberPasswordSignInSchema,
   quickConnectCheckSchema,
   quickConnectInitiateSchema,
-  type JellyfinEmbyServerType,
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, serverUsers } from '../db/schema.js';
 import { EmbyClient, JellyfinClient } from '../services/mediaServer/index.js';
+import {
+  pairingOffered,
+  passwordLogin as siloPasswordLogin,
+} from '../services/mediaServer/silo/auth.js';
 import type { MediaServerAuth } from '../services/mediaServer/types.js';
 import { createLogger } from '../utils/logger.js';
 import { CLIENT_IP_HEADER } from './auth.js';
 import { mediaSignInClosed, openToMemberSignIn, refused } from './authGuards.js';
-import { finishMemberLogin, memberDeviceId } from './memberLogin.js';
+import {
+  finishMemberLogin,
+  memberDeviceId,
+  type MemberLoginInput,
+  type MemberLoginProvider,
+} from './memberLogin.js';
 import { getRedis, INCREMENT_SCRIPT } from './redisShared.js';
+import {
+  endPairing,
+  holdLogin,
+  openPairing,
+  pollStoredPairing,
+  readPairing,
+  type SiloPairingState,
+} from './siloPairing.js';
 
 const log = createLogger('member-login');
 
@@ -37,10 +55,12 @@ const MAX_FAILURES = 3;
 export const RELEASE_SCRIPT = `if tonumber(redis.call('GET', KEYS[1]) or '0') > 0 then return redis.call('DECR', KEYS[1]) end
 return 0`;
 
-async function loginServer(serverId: string, type: JellyfinEmbyServerType) {
+type LoginServer = Awaited<ReturnType<typeof loginServer>>;
+
+async function loginServer(serverId: string, type: MemberLoginProvider) {
   if (await mediaSignInClosed()) throw refused();
   const [server] = await db
-    .select({ id: servers.id, url: servers.url })
+    .select({ id: servers.id, url: servers.url, publicUrl: servers.publicUrl })
     .from(servers)
     .where(and(eq(servers.id, serverId), eq(servers.type, type), openToMemberSignIn))
     .limit(1);
@@ -95,7 +115,17 @@ async function callServer<T>(serverId: string, call: () => Promise<T>): Promise<
   }
 }
 
+type SignedInAccount = Pick<MemberLoginInput, 'externalId' | 'token' | 'deviceId'>;
+
+/** null when the server refused the username and password */
 type PasswordSignIn = (
+  server: LoginServer,
+  username: string,
+  password: string,
+  forwardedFor: string
+) => Promise<SignedInAccount | null>;
+
+type AuthenticateByName = (
   url: string,
   username: string,
   pw: string,
@@ -103,7 +133,30 @@ type PasswordSignIn = (
   forwardedFor: string
 ) => Promise<MediaServerAuth | null>;
 
-function passwordSignIn(type: JellyfinEmbyServerType, authenticate: PasswordSignIn) {
+function byNameSignIn(authenticate: AuthenticateByName): PasswordSignIn {
+  return async (server, username, password, forwardedFor) => {
+    const deviceId = await deviceIdFor(server.id, username);
+    const auth = await callServer(server.id, () =>
+      authenticate(server.url, username, password, deviceId, forwardedFor)
+    );
+    return auth && { ...auth, deviceId };
+  };
+}
+
+/** Tracearr keeps no Silo login: it is logged out before the person is signed in here */
+const siloSignIn: PasswordSignIn = async (server, username, password) => {
+  const login = await callServer(server.id, () =>
+    siloPasswordLogin(server.url, username, password)
+  );
+  if (!login) return null;
+  return holdLogin(server.url, login, async () => ({
+    externalId: login.user.id,
+    token: null,
+    deviceId: null,
+  }));
+};
+
+function passwordSignIn(type: MemberLoginProvider, authenticate: PasswordSignIn) {
   return createAuthEndpoint(
     `/${type}/sign-in`,
     { method: 'POST', body: memberPasswordSignInSchema },
@@ -117,34 +170,45 @@ function passwordSignIn(type: JellyfinEmbyServerType, authenticate: PasswordSign
       const attempt = Number(await redis.eval(INCREMENT_SCRIPT, 1, failuresKey, FAILURE_WINDOW));
       if (attempt > MAX_FAILURES) throw refused();
 
-      let auth: MediaServerAuth | null;
-      let deviceId: string;
+      let account: SignedInAccount | null;
       try {
-        deviceId = await deviceIdFor(serverId, username);
-        auth = await callServer(serverId, () =>
-          authenticate(
-            server.url,
-            username,
-            password,
-            deviceId,
-            ctx.headers?.get(CLIENT_IP_HEADER) ?? ''
-          )
+        account = await authenticate(
+          server,
+          username,
+          password,
+          ctx.headers?.get(CLIENT_IP_HEADER) ?? ''
         );
       } catch (error) {
         await redis.eval(RELEASE_SCRIPT, 1, failuresKey);
         throw error;
       }
-      if (!auth) throw refused();
+      if (!account) throw refused();
       await redis.del(failuresKey);
       return finishMemberLogin(ctx, {
         serverId,
         serverUrl: server.url,
         providerId: type,
-        deviceId,
-        ...auth,
+        ...account,
       });
     }
   );
+}
+
+type MemberPairing = Extract<SiloPairingState, { purpose: 'sign-in' }>;
+
+/** An owner's request is never a member's to finish */
+function memberPairing(state: SiloPairingState | null): state is MemberPairing {
+  if (!state) return false;
+  switch (state.purpose) {
+    case 'sign-in':
+      return true;
+    case 'add-server':
+    case 'rekey':
+    case 'link':
+      return false;
+    default:
+      return assertNever(state);
+  }
 }
 
 interface QuickConnectState {
@@ -157,10 +221,15 @@ export const memberLoginPlugin = () =>
   ({
     id: 'member-login',
     endpoints: {
-      jellyfinSignIn: passwordSignIn('jellyfin', (...args) =>
-        JellyfinClient.authenticateByName(...args)
+      jellyfinSignIn: passwordSignIn(
+        'jellyfin',
+        byNameSignIn((...args) => JellyfinClient.authenticateByName(...args))
       ),
-      embySignIn: passwordSignIn('emby', (...args) => EmbyClient.authenticateByName(...args)),
+      embySignIn: passwordSignIn(
+        'emby',
+        byNameSignIn((...args) => EmbyClient.authenticateByName(...args))
+      ),
+      siloSignIn: passwordSignIn('silo', siloSignIn),
       quickConnectInitiate: createAuthEndpoint(
         '/jellyfin/quick-connect/initiate',
         { method: 'POST', body: quickConnectInitiateSchema },
@@ -217,6 +286,66 @@ export const memberLoginPlugin = () =>
             deviceId,
             ...auth,
           });
+        }
+      ),
+      siloCodeInitiate: createAuthEndpoint(
+        '/silo/code/initiate',
+        { method: 'POST', body: quickConnectInitiateSchema },
+        async (ctx) => {
+          const server = await loginServer(ctx.body.serverId, 'silo');
+          if (!(await pairingOffered(server.url))) {
+            throw new APIError('NOT_FOUND', { message: 'Code sign-in is off on this server.' });
+          }
+          const { handle, userCode, link, interval } = await callServer(server.id, () =>
+            openPairing({
+              purpose: 'sign-in',
+              serverId: server.id,
+              url: server.url,
+              publicUrl: server.publicUrl,
+            })
+          );
+          return ctx.json({ handle, code: userCode, link, interval });
+        }
+      ),
+      siloCodeCheck: createAuthEndpoint(
+        '/silo/code/check',
+        { method: 'POST', body: quickConnectCheckSchema },
+        async (ctx) => {
+          const { handle } = ctx.body;
+          const state = await readPairing(handle);
+          if (!memberPairing(state)) return ctx.json({ authorized: false, expired: true });
+          let server: LoginServer;
+          try {
+            server = await loginServer(state.serverId, 'silo');
+          } catch (error) {
+            await endPairing(handle);
+            throw error;
+          }
+
+          const poll = await callServer(server.id, () => pollStoredPairing(handle, state));
+          switch (poll.status) {
+            case 'pending':
+              return ctx.json({ authorized: false });
+            case 'gone':
+              return ctx.json({ authorized: false, expired: true });
+            case 'approved': {
+              const { login } = poll;
+              const externalId = await holdLogin(state.url, login, async () => {
+                await getRedis().del(REDIS_KEYS.SILO_PAIRING(handle));
+                return login.user.id;
+              });
+              return finishMemberLogin(ctx, {
+                serverId: server.id,
+                serverUrl: server.url,
+                externalId,
+                token: null,
+                providerId: 'silo',
+                deviceId: null,
+              });
+            }
+            default:
+              return assertNever(poll);
+          }
         }
       ),
     },

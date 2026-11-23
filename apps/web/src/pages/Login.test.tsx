@@ -49,9 +49,23 @@ import { toast } from 'sonner';
 import { api } from '@/lib/api';
 import { Login } from './Login';
 
-const jellyfin = { id: 'jf', name: 'Jelly', type: 'jellyfin' as const, quickConnect: true };
-const plexMember = { id: 'px', name: 'Plexy', type: 'plex' as const, quickConnect: false };
-const tofaMember = { id: 'tf', name: 'Foxy', type: 'tofa' as const, quickConnect: false };
+const signInOptions = { codeSignIn: false, passwordSignIn: false };
+const jellyfin = {
+  id: 'jf',
+  name: 'Jelly',
+  type: 'jellyfin' as const,
+  codeSignIn: true,
+  passwordSignIn: true,
+};
+const plexMember = { id: 'px', name: 'Plexy', type: 'plex' as const, ...signInOptions };
+const tofaMember = { id: 'tf', name: 'Foxy', type: 'tofa' as const, ...signInOptions };
+const siloMember = {
+  id: 'si',
+  name: 'Vault',
+  type: 'silo' as const,
+  codeSignIn: true,
+  passwordSignIn: true,
+};
 
 function status(
   methods: Partial<SetupStatus['authMethods']>,
@@ -122,6 +136,13 @@ describe('Login blocks', () => {
     expect(screen.queryByRole('tab')).toBeNull();
     expect(screen.queryByText('common:or')).toBeNull();
     expect(screen.queryByText('pages:login.localDisabledHint')).toBeNull();
+  });
+
+  it('lists a Silo server in the media server form', () => {
+    setup.data = status({ member: true }, [jellyfin, siloMember]);
+    renderLogin();
+
+    expect(screen.getByText('member form: Jelly, Vault')).toBeInTheDocument();
   });
 
   it('keeps Plex servers out of the media server form', () => {

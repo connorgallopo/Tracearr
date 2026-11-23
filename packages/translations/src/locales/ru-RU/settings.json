@@ -317,6 +317,9 @@
       "tofaDialog": {
         "description": ""
       },
+      "siloDialog": {
+        "description": ""
+      },
       "confirmUnlink": {
         "title": "Отвязать {{username}}?",
         "body": "Его просмотры снова будут числиться за отдельным человеком. Tracearr завершит ваши сеансы везде, кроме этого браузера и сопряжённых телефонов."

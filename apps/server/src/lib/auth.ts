@@ -355,6 +355,8 @@ function buildAuth(redis: Redis, withOidc: boolean) {
         '/jellyfin/quick-connect/initiate': { window: 60, max: 10 },
         '/tofa/initiate': { window: 60, max: 10 },
         '/silo/pair/start': { window: 60, max: 10 },
+        '/silo/sign-in': { window: 60, max: 10 },
+        '/silo/code/initiate': { window: 60, max: 10 },
       },
     },
     databaseHooks: {

@@ -348,7 +348,14 @@ export interface SetupStatus {
     /** SSO-only is hiding the owner's and admins' other methods; /login?all shows them. */
     ssoOnly: boolean;
   };
-  memberLoginServers: { id: string; name: string; type: ServerType; quickConnect: boolean }[];
+  memberLoginServers: {
+    id: string;
+    name: string;
+    type: ServerType;
+    /** A code the member approves on the server: Jellyfin's Quick Connect, Silo's pairing */
+    codeSignIn: boolean;
+    passwordSignIn: boolean;
+  }[];
 }
 
 /** What a Silo sign-in code is for: adding a server, replacing its key, or linking the owner's own account */

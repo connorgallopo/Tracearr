@@ -314,6 +314,9 @@
       "tofaDialog": {
         "description": ""
       },
+      "siloDialog": {
+        "description": ""
+      },
       "confirmUnlink": {
         "title": "取消关联 {{username}}？",
         "body": "其播放次数将移回给一个独立成员。Tracearr 会在此浏览器和您已配对的手机之外的所有地方将您登出。"

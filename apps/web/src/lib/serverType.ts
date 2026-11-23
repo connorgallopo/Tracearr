@@ -1,4 +1,9 @@
-import { assertNever, type JellyfinEmbyServerType, type ServerType } from '@tracearr/shared';
+import {
+  SERVER_PROFILES,
+  assertNever,
+  type JellyfinEmbyServerType,
+  type ServerType,
+} from '@tracearr/shared';
 
 export function isJellyfinEmby(type: ServerType): type is JellyfinEmbyServerType {
   switch (type) {
@@ -45,5 +50,24 @@ export function addsByApiKey(type: ServerType): boolean {
       return false;
     default:
       return assertNever(type);
+  }
+}
+
+/** Servers whose members sign in through the member form, with their own account on the server. */
+export type ServerAccountSignInType = Extract<ServerType, 'jellyfin' | 'emby' | 'silo'>;
+
+/** By password or by a code approved on the server; Plex and tofa members use their own buttons. */
+export function signsInThroughServerAccount(type: ServerType): type is ServerAccountSignInType {
+  const { memberSignIn } = SERVER_PROFILES[type];
+  switch (memberSignIn) {
+    case 'serverPassword':
+    case 'siloPairing':
+      return true;
+    case 'plexTv':
+    case 'tofaCloud':
+    case 'unavailable':
+      return false;
+    default:
+      return assertNever(memberSignIn);
   }
 }

@@ -13,6 +13,7 @@ import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
 import Fastify from 'fastify';
 import type * as AuthGuards from '../lib/authGuards.js';
 import type * as Settings from '../services/settings.js';
+import type * as SiloAuth from '../services/mediaServer/silo/auth.js';
 
 vi.mock('../db/client.js', () => ({ db: { select: vi.fn(), insert: vi.fn() } }));
 vi.mock('../lib/authGuards.js', async (importOriginal) => ({
@@ -30,6 +31,15 @@ vi.mock('../services/settings.js', async (importOriginal) => {
   };
 });
 vi.mock('../services/userService.js', () => ({ getOwnerUser: vi.fn() }));
+vi.mock('../services/mediaServer/silo/auth.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof SiloAuth>()),
+  passwordLogin: vi.fn(),
+  logout: vi.fn(),
+  pairingOffered: vi.fn(),
+  startPairing: vi.fn(),
+  pollPairing: vi.fn(),
+  cancelPairing: vi.fn(),
+}));
 
 const mockRedis = { get: vi.fn(), setex: vi.fn(), del: vi.fn(), eval: vi.fn() };
 vi.mock('../lib/redisShared.js', () => ({
@@ -45,6 +55,12 @@ import { createBetterAuthHandler } from '../lib/betterAuthRequest.js';
 import { memberLoginPlugin } from '../lib/memberLoginPlugin.js';
 import { getSetting } from '../services/settings.js';
 import { getOwnerUser } from '../services/userService.js';
+import {
+  pairingOffered,
+  passwordLogin,
+  pollPairing,
+  startPairing,
+} from '../services/mediaServer/silo/auth.js';
 import { REQUEST_LOG_REDACT } from '../utils/logger.js';
 
 const SERVER_ID = '7b0f3c2e-9a51-4c1d-8e2f-3a4b5c6d7e8f';
@@ -232,9 +248,13 @@ describe('member login security', () => {
     vi.mocked(getSetting).mockResolvedValueOnce(true as never);
     answers.push(await refusal('jellyfinSignIn', signIn));
 
+    selects([{ id: SERVER_ID, url: 'http://silo.local:8080', publicUrl: null }]);
+    vi.mocked(passwordLogin).mockResolvedValueOnce(null);
+    answers.push(await refusal('siloSignIn', signIn));
+
     // The code is what makes the OIDC callback redirect to the login page instead of raw JSON.
     expect(refused().body).toMatchObject({ code: 'MEMBER_LOGIN_REFUSED' });
-    expect(answers).toHaveLength(8);
+    expect(answers).toHaveLength(9);
     expect(new Set(answers)).toEqual(
       new Set([JSON.stringify({ status: 403, body: refused().body })])
     );
@@ -266,6 +286,51 @@ describe('member login security', () => {
     expect(await refusal('embySignIn', signIn)).toBe(expected);
     expect(await refusal('quickConnectInitiate', { serverId: SERVER_ID })).toBe(expected);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  describe('Silo', () => {
+    const expected = () => JSON.stringify({ status: 403, body: refused().body });
+    const checkState = JSON.stringify({
+      purpose: 'sign-in',
+      serverId: SERVER_ID,
+      url: 'http://silo.local:8080',
+      publicUrl: null,
+      deviceCode: 'device-code',
+      secret: 'binding-secret',
+    });
+
+    function expectNoSiloSignIn() {
+      expect(passwordLogin).not.toHaveBeenCalled();
+      expect(pairingOffered).not.toHaveBeenCalled();
+      expect(startPairing).not.toHaveBeenCalled();
+      expect(pollPairing).not.toHaveBeenCalled();
+    }
+
+    it('refuses every Silo endpoint while media sign-in is closed, before any Silo call', async () => {
+      mockRedis.get.mockResolvedValue(checkState);
+
+      for (const [name, body] of [
+        ['siloSignIn', signIn],
+        ['siloCodeInitiate', { serverId: SERVER_ID }],
+        ['siloCodeCheck', { handle: 'b'.repeat(64) }],
+      ] as const) {
+        vi.mocked(getSetting).mockResolvedValueOnce(true as never);
+        expect(await refusal(name, body)).toBe(expected());
+      }
+      expect(db.select).not.toHaveBeenCalled();
+      expectNoSiloSignIn();
+    });
+
+    // A historical server and one whose member switch is off both leave loginServer no row
+    it('refuses every Silo endpoint with no open server row, before any Silo call', async () => {
+      mockRedis.get.mockResolvedValue(checkState);
+      selects([], [], []);
+
+      expect(await refusal('siloSignIn', signIn)).toBe(expected());
+      expect(await refusal('siloCodeInitiate', { serverId: SERVER_ID })).toBe(expected());
+      expect(await refusal('siloCodeCheck', { handle: 'b'.repeat(64) })).toBe(expected());
+      expectNoSiloSignIn();
+    });
   });
 
   it('says not permitted only after the media server accepted the password', async () => {

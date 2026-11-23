@@ -316,6 +316,9 @@
       "tofaDialog": {
         "description": ""
       },
+      "siloDialog": {
+        "description": ""
+      },
       "confirmUnlink": {
         "title": "",
         "body": ""

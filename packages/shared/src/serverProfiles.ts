@@ -155,7 +155,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     playerNameCountsTowardDevice: true,
     linksImportedHistory: false,
     addServerAuth: 'siloPairing',
-    memberSignIn: 'unavailable',
+    memberSignIn: 'siloPairing',
     reportsBandwidth: false,
     reportsTranscodeTrackBitrates: false,
     importsTautulliHistory: false,

@@ -48,6 +48,7 @@
       "codeExpired": "Dieser Code ist abgelaufen.",
       "newCode": "Neuer Code",
       "refused": "",
+      "signInUnavailable": "",
       "notPermitted": "Sie sind nicht berechtigt, sich anzumelden. Bitte wenden Sie sich an den Serverbetreiber."
     }
   },

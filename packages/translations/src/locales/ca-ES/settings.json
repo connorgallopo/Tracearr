@@ -315,6 +315,9 @@
       "tofaDialog": {
         "description": "Inicieu la sessió a tofa amb el compte que feu servir en aquest servidor. Les seves reproduccions passen a ser vostres, i iniciar la sessió amb tofa obre Tracearr amb el vostre usuari."
       },
+      "siloDialog": {
+        "description": ""
+      },
       "confirmUnlink": {
         "title": "Voleu desenllaçar {{username}}?",
         "body": "Les seves reproduccions tornen a una persona pròpia. Tracearr tancarà la vostra sessió a tot arreu excepte en aquest navegador i als telèfons aparellats."

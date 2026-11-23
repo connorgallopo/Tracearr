@@ -266,16 +266,30 @@ const hasTofaLogin = (leaving: LeavingAccounts) => sql<boolean>`exists (
     and not (${leaving.live})
 )`;
 
-const SERVER_PASSWORD_TYPES = SERVER_TYPES.filter(
-  (type) => SERVER_PROFILES[type].memberSignIn === 'serverPassword'
-);
+function signsInThroughServerAccount(type: ServerType): boolean {
+  const { memberSignIn } = SERVER_PROFILES[type];
+  switch (memberSignIn) {
+    case 'serverPassword':
+    case 'siloPairing':
+      return true;
+    case 'plexTv':
+    case 'tofaCloud':
+    case 'unavailable':
+      return false;
+    default:
+      return assertNever(memberSignIn);
+  }
+}
 
-// The owner signs in through their own Jellyfin or Emby account on a server the login page
+/** Types whose members sign in with their own account on the server, by password or code */
+export const SERVER_ACCOUNT_SIGN_IN_TYPES = SERVER_TYPES.filter(signsInThroughServerAccount);
+
+// The owner signs in through their own Jellyfin, Emby or Silo account on a server the login page
 // offers member sign-in for.
 const hasServerPasswordLogin = (leaving: LeavingAccounts) => sql<boolean>`exists (
   select 1 from server_users su join servers s on s.id = su.server_id
   where su.user_id = users.id and s.type in (${sql.join(
-    SERVER_PASSWORD_TYPES.map((type) => sql`${type}`),
+    SERVER_ACCOUNT_SIGN_IN_TYPES.map((type) => sql`${type}`),
     sql`, `
   )})
     and su.removed_at is null and not su.is_disabled and s.historical_at is null

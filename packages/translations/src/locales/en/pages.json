@@ -48,6 +48,7 @@
       "codeExpired": "This code expired.",
       "newCode": "New code",
       "refused": "Sign-in is not available for this account.",
+      "signInUnavailable": "Sign-in is not available on this server right now.",
       "notPermitted": "You are not permitted to sign in. Please contact the server owner."
     }
   },

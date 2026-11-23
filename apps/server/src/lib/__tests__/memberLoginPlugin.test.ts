@@ -7,7 +7,10 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { SQL } from 'drizzle-orm';
+import { PgDialect } from 'drizzle-orm/pg-core';
 import type * as AuthGuards from '../authGuards.js';
+import type * as SiloAuth from '../../services/mediaServer/silo/auth.js';
 
 vi.mock('../../db/client.js', () => ({ db: { select: vi.fn(), insert: vi.fn() } }));
 vi.mock('../auth.js', () => ({ CLIENT_IP_HEADER: 'x-tracearr-client-ip' }));
@@ -18,11 +21,29 @@ vi.mock('../authGuards.js', async (importOriginal) => ({
 }));
 vi.mock('../../services/userService.js', () => ({ getOwnerUser: vi.fn() }));
 vi.mock('../../services/settings.js', () => ({ getSetting: vi.fn() }));
+vi.mock('../../services/mediaServer/silo/auth.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof SiloAuth>()),
+  passwordLogin: vi.fn(),
+  logout: vi.fn(),
+  pairingOffered: vi.fn(),
+  startPairing: vi.fn(),
+  pollPairing: vi.fn(),
+  cancelPairing: vi.fn(),
+}));
 
-const mockRedis = { get: vi.fn(), setex: vi.fn(), del: vi.fn(), eval: vi.fn() };
+const mockRedis = {
+  get: vi.fn(),
+  set: vi.fn(),
+  setex: vi.fn(),
+  del: vi.fn(),
+  eval: vi.fn(),
+  ttl: vi.fn(),
+  expire: vi.fn(),
+};
 vi.mock('../redisShared.js', () => ({
   getRedis: () => mockRedis,
   INCREMENT_SCRIPT: 'increment',
+  GET_AND_DELETE_SCRIPT: 'get-and-delete',
 }));
 
 const mockSetSessionCookie = vi.fn(async (ctx: { setCookie: (k: string, v: string) => void }) => {
@@ -39,6 +60,14 @@ import { getOwnerUser } from '../../services/userService.js';
 import { getSetting } from '../../services/settings.js';
 import { memberLoginPlugin } from '../memberLoginPlugin.js';
 import { linkOidcMember, memberStillValid } from '../memberLogin.js';
+import {
+  cancelPairing,
+  logout,
+  pairingOffered,
+  passwordLogin,
+  pollPairing,
+  startPairing,
+} from '../../services/mediaServer/silo/auth.js';
 
 const SERVER_ID = '7b0f3c2e-9a51-4c1d-8e2f-3a4b5c6d7e8f';
 const URL = 'http://jellyfin.local:8096';
@@ -399,6 +428,255 @@ describe('member login plugin', () => {
     expect(sent.headers['X-Emby-Authorization']).toMatch(/^Emby /);
     expect(JSON.parse(String(sent.body))).toEqual({ Username: 'Alice', Pw: 'hunter2' });
   });
+
+  describe('silo', () => {
+    const SILO_URL = 'http://silo.local:8080';
+    const siloServer = [{ id: SERVER_ID, url: SILO_URL, publicUrl: null }];
+    const login = {
+      accessToken: 'silo-token',
+      user: { id: '34', username: 'alice', email: null, role: 'user' },
+    };
+    const signInState = {
+      purpose: 'sign-in',
+      serverId: SERVER_ID,
+      url: SILO_URL,
+      publicUrl: null,
+      deviceCode: 'device-code',
+      secret: 'binding-secret',
+    };
+    const stored = (state: object) => mockRedis.get.mockResolvedValue(JSON.stringify(state));
+    const order = (fn: { mock: { invocationCallOrder: number[] } }) =>
+      fn.mock.invocationCallOrder[0] ?? Infinity;
+
+    function storedAccount() {
+      const insert = vi.mocked(db.insert).mock.results[0]?.value as {
+        values: ReturnType<typeof vi.fn>;
+      };
+      return insert.values.mock.calls[0]?.[0] as Record<string, unknown>;
+    }
+
+    beforeEach(() => {
+      vi.mocked(passwordLogin).mockReset();
+      vi.mocked(logout).mockReset().mockResolvedValue(undefined);
+      vi.mocked(pairingOffered).mockReset().mockResolvedValue(true);
+      vi.mocked(startPairing).mockReset();
+      vi.mocked(pollPairing).mockReset();
+      vi.mocked(cancelPairing).mockReset().mockResolvedValue(undefined);
+      mockRedis.ttl.mockResolvedValue(900);
+    });
+
+    describe('password', () => {
+      it('logs the Silo login out, then signs in through the synced account with no token', async () => {
+        selects(siloServer, [{ userId: 'member-1' }], []);
+        vi.mocked(passwordLogin).mockResolvedValue(login);
+
+        const { response, context } = await call('siloSignIn', signIn);
+
+        expect(response).toEqual({
+          authorized: true,
+          user: { id: 'member-1', username: 'alice', role: 'member' },
+        });
+        expect(passwordLogin).toHaveBeenCalledExactlyOnceWith(SILO_URL, 'Alice', 'hunter2');
+        expect(logout).toHaveBeenCalledExactlyOnceWith(SILO_URL, 'silo-token');
+        expect(order(vi.mocked(logout))).toBeLessThan(order(context.internalAdapter.createSession));
+        expect(order(vi.mocked(logout))).toBeLessThan(order(vi.mocked(db.insert)));
+        expect(storedAccount()).toMatchObject({
+          providerId: 'silo',
+          accountId: `${SERVER_ID}:34`,
+          userId: 'member-1',
+          accessToken: null,
+          scope: null,
+        });
+        // No DeviceId lookup: the server row, the account, the stored sign-in row
+        expect(db.select).toHaveBeenCalledTimes(3);
+        expect(fetchMock).not.toHaveBeenCalled();
+      });
+
+      it('counts a refusal as a failure and stops past the third before calling Silo', async () => {
+        selects(siloServer);
+        vi.mocked(passwordLogin).mockResolvedValue(null);
+
+        await expect(call('siloSignIn', signIn)).rejects.toMatchObject({
+          statusCode: 403,
+          body: { message: MEMBER_LOGIN_REFUSED },
+        });
+        expect(mockRedis.eval).toHaveBeenCalledExactlyOnceWith(
+          'increment',
+          1,
+          expect.stringContaining(`${SERVER_ID}:alice`),
+          900
+        );
+        expect(mockRedis.del).not.toHaveBeenCalled();
+        expect(logout).not.toHaveBeenCalled();
+
+        vi.mocked(passwordLogin).mockClear();
+        selects(siloServer);
+        mockRedis.eval.mockResolvedValue(4);
+        await expect(call('siloSignIn', signIn)).rejects.toMatchObject({ statusCode: 403 });
+        expect(passwordLogin).not.toHaveBeenCalled();
+      });
+
+      it('refuses a server not open to sign-in before any Silo call', async () => {
+        selects([]);
+        await expect(call('siloSignIn', signIn)).rejects.toMatchObject({ statusCode: 403 });
+        expect(passwordLogin).not.toHaveBeenCalled();
+        expect(mockRedis.eval).not.toHaveBeenCalled();
+      });
+
+      it('logs out once when the gates refuse, with no token left to discard', async () => {
+        selects(siloServer, [{ userId: 'member-1' }]);
+        vi.mocked(canMemberLogin).mockResolvedValue({ ok: false, reason: 'refused' });
+        vi.mocked(passwordLogin).mockResolvedValue(login);
+
+        await expect(call('siloSignIn', signIn)).rejects.toMatchObject({ statusCode: 403 });
+        expect(logout).toHaveBeenCalledExactlyOnceWith(SILO_URL, 'silo-token');
+        expect(db.insert).not.toHaveBeenCalled();
+        expect(fetchMock).not.toHaveBeenCalled();
+      });
+    });
+
+    describe('code', () => {
+      it('answers 404 when pairing is off, without starting a request', async () => {
+        selects(siloServer);
+        vi.mocked(pairingOffered).mockResolvedValue(false);
+
+        await expect(call('siloCodeInitiate', { serverId: SERVER_ID })).rejects.toMatchObject({
+          statusCode: 404,
+          body: { message: 'Code sign-in is off on this server.' },
+        });
+        expect(startPairing).not.toHaveBeenCalled();
+      });
+
+      it('returns the handle, code, public link and interval, and keeps the device code in Redis', async () => {
+        selects([{ id: SERVER_ID, url: SILO_URL, publicUrl: 'https://silo.example.com' }]);
+        vi.mocked(startPairing).mockResolvedValue({
+          deviceCode: 'device-code',
+          userCode: '12345678',
+          verificationUriComplete: `${SILO_URL}/activate?code=12345678`,
+          expiresIn: 900,
+          interval: 3,
+        });
+
+        const { response } = await call('siloCodeInitiate', { serverId: SERVER_ID });
+
+        expect(Object.keys(response).sort()).toEqual(['code', 'handle', 'interval', 'link']);
+        expect(response).toMatchObject({
+          code: '12345678',
+          link: 'https://silo.example.com/activate?code=12345678',
+          interval: 3,
+        });
+        expect(JSON.stringify(response)).not.toContain('device-code');
+        const [key, value] = mockRedis.set.mock.calls[0] ?? [];
+        expect(key).toContain(String(response.handle));
+        expect(JSON.parse(String(value))).toMatchObject({
+          purpose: 'sign-in',
+          serverId: SERVER_ID,
+          url: SILO_URL,
+          deviceCode: 'device-code',
+        });
+      });
+
+      it('answers a missing handle as expired without any call', async () => {
+        const { response } = await call('siloCodeCheck', { handle: HANDLE });
+        expect(response).toEqual({ authorized: false, expired: true });
+        expect(db.select).not.toHaveBeenCalled();
+        expect(pollPairing).not.toHaveBeenCalled();
+      });
+
+      it.each([
+        { purpose: 'add-server', ownerId: 'owner-1', name: 'Silo' },
+        { purpose: 'rekey', ownerId: 'owner-1', serverId: SERVER_ID },
+        { purpose: 'link', ownerId: 'owner-1', serverId: SERVER_ID },
+      ])('never finishes an owner $purpose request', async (owner) => {
+        stored({ ...signInState, ...owner });
+
+        const { response } = await call('siloCodeCheck', { handle: HANDLE });
+
+        expect(response).toEqual({ authorized: false, expired: true });
+        expect(db.select).not.toHaveBeenCalled();
+        expect(pollPairing).not.toHaveBeenCalled();
+        expect(mockRedis.del).not.toHaveBeenCalled();
+      });
+
+      it('waits while pending and answers expired once Silo drops the code', async () => {
+        stored(signInState);
+        selects(siloServer);
+        vi.mocked(pollPairing).mockResolvedValue({
+          status: 'pending',
+          opened: false,
+          expiresAt: null,
+          pollAfter: 3,
+        });
+        expect((await call('siloCodeCheck', { handle: HANDLE })).response).toEqual({
+          authorized: false,
+        });
+        expect(pollPairing).toHaveBeenCalledWith(SILO_URL, 'device-code', 'binding-secret');
+
+        selects(siloServer);
+        vi.mocked(pollPairing).mockResolvedValue({ status: 'gone' });
+        expect((await call('siloCodeCheck', { handle: HANDLE })).response).toEqual({
+          authorized: false,
+          expired: true,
+        });
+        expect(mockRedis.del).toHaveBeenCalledWith(expect.stringContaining(HANDLE));
+        expect(logout).not.toHaveBeenCalled();
+      });
+
+      it('deletes the state and logs out before signing the approver in', async () => {
+        stored(signInState);
+        selects(siloServer, [{ userId: 'member-1' }], []);
+        vi.mocked(pollPairing).mockResolvedValue({ status: 'approved', login });
+
+        const { response, headers, context } = await call('siloCodeCheck', { handle: HANDLE });
+
+        expect(response).toMatchObject({ authorized: true, user: { id: 'member-1' } });
+        expect(headers.get('set-cookie')).toContain('better-auth.session_token');
+        expect(mockRedis.del).toHaveBeenCalledWith(expect.stringContaining(HANDLE));
+        expect(logout).toHaveBeenCalledExactlyOnceWith(SILO_URL, 'silo-token');
+        expect(order(vi.mocked(logout))).toBeLessThan(order(context.internalAdapter.createSession));
+        expect(storedAccount()).toMatchObject({
+          providerId: 'silo',
+          accountId: `${SERVER_ID}:34`,
+          accessToken: null,
+          scope: null,
+        });
+      });
+
+      it('logs out once and stores nothing when the gates refuse the approver', async () => {
+        stored(signInState);
+        selects(siloServer, [{ userId: 'member-1' }]);
+        vi.mocked(canMemberLogin).mockResolvedValue({ ok: false, reason: 'refused' });
+        vi.mocked(pollPairing).mockResolvedValue({ status: 'approved', login });
+
+        await expect(call('siloCodeCheck', { handle: HANDLE })).rejects.toMatchObject({
+          statusCode: 403,
+          body: { message: MEMBER_LOGIN_REFUSED },
+        });
+        expect(logout).toHaveBeenCalledExactlyOnceWith(SILO_URL, 'silo-token');
+        expect(db.insert).not.toHaveBeenCalled();
+      });
+
+      it('cancels the code and drops the state when the server closed before the check', async () => {
+        stored(signInState);
+        mockRedis.eval.mockImplementation(async (script: string) =>
+          script === 'get-and-delete' ? JSON.stringify(signInState) : 1
+        );
+        selects([]);
+
+        await expect(call('siloCodeCheck', { handle: HANDLE })).rejects.toMatchObject({
+          statusCode: 403,
+        });
+        expect(pollPairing).not.toHaveBeenCalled();
+        expect(cancelPairing).toHaveBeenCalledExactlyOnceWith(SILO_URL, 'device-code');
+        expect(mockRedis.eval).toHaveBeenCalledWith(
+          'get-and-delete',
+          1,
+          expect.stringContaining(HANDLE)
+        );
+        expect(logout).not.toHaveBeenCalled();
+      });
+    });
+  });
 });
 
 describe('memberStillValid', () => {
@@ -473,6 +751,43 @@ describe('memberStillValid', () => {
     selects(defaultMember, [tofa], []);
     await expect(memberStillValid('member-1')).resolves.toBe(false);
     expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  describe('a Silo member', () => {
+    const silo = {
+      providerId: 'silo',
+      accountId: `${SERVER_ID}:34`,
+      token: null,
+      password: null,
+    };
+
+    it('stays signed in through a live synced account without asking Silo', async () => {
+      selects(defaultMember, [silo], [{ serverAllowsMembers: true }]);
+      await expect(memberStillValid('member-1')).resolves.toBe(true);
+
+      const match = vi.mocked(db.select).mock.results[2]?.value as {
+        where: ReturnType<typeof vi.fn>;
+      };
+      const { params } = new PgDialect().sqlToQuery(match.where.mock.calls[0]?.[0] as SQL);
+      expect(params).toEqual(expect.arrayContaining(['silo', SERVER_ID, '34']));
+      expect(fetchMock).not.toHaveBeenCalled();
+      expect(passwordLogin).not.toHaveBeenCalled();
+    });
+
+    it('is signed out once the account is gone or the server stops allowing members', async () => {
+      selects(defaultMember, [silo], []);
+      await expect(memberStillValid('member-1')).resolves.toBe(false);
+
+      selects(defaultMember, [silo], [{ serverAllowsMembers: false }]);
+      await expect(memberStillValid('member-1')).resolves.toBe(false);
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('is not a way in with a malformed account id', async () => {
+      selects(defaultMember, [{ ...silo, accountId: SERVER_ID }]);
+      await expect(memberStillValid('member-1')).resolves.toBe(false);
+      expect(db.select).toHaveBeenCalledTimes(2);
+    });
   });
 
   it('never asks a closed server about a stale token, and another open server keeps the session', async () => {

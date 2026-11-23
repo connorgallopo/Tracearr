@@ -31,6 +31,11 @@ vi.mock('../../services/mediaServer/index.js', () => ({
   JellyfinClient: { quickConnectEnabled: vi.fn().mockResolvedValue(true) },
 }));
 
+vi.mock('../../services/mediaServer/silo/auth.js', () => ({
+  pairingOffered: vi.fn().mockResolvedValue(true),
+  passwordLoginOffered: vi.fn().mockResolvedValue(false),
+}));
+
 // Import the mocked modules and the routes
 import { PgDialect } from 'drizzle-orm/pg-core';
 import type { SQL } from 'drizzle-orm';
@@ -38,6 +43,7 @@ import { db } from '../../db/client.js';
 import { isClaimCodeEnabled } from '../../utils/claimCode.js';
 import { mediaSignInClosed, usableLoginMethods } from '../../lib/authGuards.js';
 import { JellyfinClient } from '../../services/mediaServer/index.js';
+import { pairingOffered, passwordLoginOffered } from '../../services/mediaServer/silo/auth.js';
 import { setupRoutes } from '../setup.js';
 
 /**
@@ -510,8 +516,8 @@ describe('Setup Routes', () => {
 
       expect(response.json().authMethods.member).toBe(true);
       expect(response.json().memberLoginServers).toEqual([
-        { id: 'server-1', name: 'Home', type: 'jellyfin', quickConnect: true },
-        { id: 'server-2', name: 'Cabin', type: 'plex', quickConnect: false },
+        { id: 'server-1', name: 'Home', type: 'jellyfin', codeSignIn: true, passwordSignIn: true },
+        { id: 'server-2', name: 'Cabin', type: 'plex', codeSignIn: false, passwordSignIn: false },
       ]);
       expect(JellyfinClient.quickConnectEnabled).toHaveBeenCalledExactlyOnceWith(
         'http://home:8096'
@@ -545,8 +551,14 @@ describe('Setup Routes', () => {
         expect(response.statusCode).toBe(200);
         expect(response.json().authMethods.member).toBe(true);
         expect(response.json().memberLoginServers).toEqual([
-          { id: 'server-1', name: 'Home', type: 'jellyfin', quickConnect: true },
-          { id: 'server-3', name: 'Attic', type: 'emby', quickConnect: false },
+          {
+            id: 'server-1',
+            name: 'Home',
+            type: 'jellyfin',
+            codeSignIn: true,
+            passwordSignIn: true,
+          },
+          { id: 'server-3', name: 'Attic', type: 'emby', codeSignIn: false, passwordSignIn: true },
         ]);
         const memberCondition = conditions.at(-1);
         if (!memberCondition) throw new Error('member-login server query was not issued');
@@ -579,6 +591,23 @@ describe('Setup Routes', () => {
       expect(response.statusCode).toBe(400);
     });
 
+    it('offers a Silo server the code and password sign-in Silo reports, read once a minute', async () => {
+      app = await buildTestApp();
+      usable({ member: true });
+      const status = [[{ id: 'server-1' }], [], [{ id: 'owner-1' }], []];
+      const servers = [{ id: 'server-5', name: 'Vault', type: 'silo', url: 'http://vault:8080' }];
+      mockDbSelectMultiple([...status, servers, ...status, servers]);
+
+      await app.inject({ method: 'GET', url: '/setup/status' });
+      const second = await app.inject({ method: 'GET', url: '/setup/status' });
+
+      expect(second.json().memberLoginServers).toEqual([
+        { id: 'server-5', name: 'Vault', type: 'silo', codeSignIn: true, passwordSignIn: false },
+      ]);
+      expect(pairingOffered).toHaveBeenCalledExactlyOnceWith('http://vault:8080');
+      expect(passwordLoginOffered).toHaveBeenCalledExactlyOnceWith('http://vault:8080');
+    });
+
     it('asks each Jellyfin server about Quick Connect at most once a minute', async () => {
       app = await buildTestApp();
       usable({ member: true });
@@ -590,7 +619,7 @@ describe('Setup Routes', () => {
       const second = await app.inject({ method: 'GET', url: '/setup/status' });
 
       expect(second.json().memberLoginServers).toEqual([
-        { id: 'server-9', name: 'Den', type: 'jellyfin', quickConnect: true },
+        { id: 'server-9', name: 'Den', type: 'jellyfin', codeSignIn: true, passwordSignIn: true },
       ]);
       expect(JellyfinClient.quickConnectEnabled).toHaveBeenCalledExactlyOnceWith('http://den:8096');
     });

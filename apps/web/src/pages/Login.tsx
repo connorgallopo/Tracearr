@@ -16,6 +16,7 @@ import { api, BASE_URL } from '@/lib/api';
 import { dropUserData } from '@/lib/queryCache';
 import { useSetupStatus } from '@/hooks/queries/useSetup';
 import { type SignInFailure, toastNotPermitted } from '@/lib/signInRefusal';
+import { signsInThroughServerAccount } from '@/lib/serverType';
 import { SERVER_PROFILES, SIGN_IN_ERROR_CODES, type SetupStatus } from '@tracearr/shared';
 import { LogoIcon } from '@/components/brand/Logo';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
@@ -314,8 +315,8 @@ export function Login() {
     );
   }
 
-  const memberServers = memberLoginServers.filter(
-    (server) => SERVER_PROFILES[server.type].memberSignIn === 'serverPassword'
+  const memberServers = memberLoginServers.filter((server) =>
+    signsInThroughServerAccount(server.type)
   );
   // authMethods.plex is the owner's own Plex sign-in; a member's Plex server arrives in the
   // member list and signs in through the same button.
