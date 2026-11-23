@@ -273,6 +273,15 @@ describe('parseSiloSession quality', () => {
     );
   });
 
+  it("keeps the source's size for a video transcode Silo gives no target resolution", () => {
+    for (const target_resolution of [undefined, '']) {
+      const { quality } = parseSiloSession({ ...episodeRow, target_resolution }, undefined);
+
+      expect(tierOf(quality.streamVideoDetails?.height)).toBe('4K');
+      expect(formatQualityString(quality)).toBe('4K');
+    }
+  });
+
   it('falls back to the pixel height when Silo sends no size label', () => {
     const unlabeled = { ...movieRow, source_video_resolution: undefined, source_video_height: 720 };
 

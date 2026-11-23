@@ -229,8 +229,9 @@ const labelLines = (label: string | undefined) => {
 /**
  * The heights a Silo play is classified by. Silo files a source by its size class (a 1920x800
  * film is 1080p), so the label's line count stands in for the height, which is the fallback.
- * Copied video goes out at the source's size. A transcode target names the output height, and
- * one equal to the source's pixel height keeps the source's class, as Silo's own pages show it.
+ * Copied video goes out at the source's size, and so does a transcode with no target, which
+ * Silo treats as no resolution target. A target names the output height, and one equal to the
+ * source's pixel height keeps the source's class, as Silo's own pages show it.
  */
 function siloVideoHeights(row: SiloSession): { source?: number; stream?: number } {
   const source = labelLines(row.source_video_resolution) ?? row.source_video_height;
@@ -238,7 +239,7 @@ function siloVideoHeights(row: SiloSession): { source?: number; stream?: number 
   const target = labelLines(row.target_resolution);
   return {
     source,
-    stream: target !== undefined && target === row.source_video_height ? source : target,
+    stream: target === undefined || target === row.source_video_height ? source : target,
   };
 }
 
