@@ -214,7 +214,7 @@ describe('silo pairing plugin', () => {
     vi.mocked(readServerFacts).mockResolvedValue({});
     vi.mocked(createServer).mockResolvedValue({
       server: SERVER_ROW,
-      requestServiceIds: [],
+      requestServiceIds: ['service-1'],
     } as never);
     vi.mocked(startAddedServer).mockResolvedValue();
     vi.mocked(verifyServerChange).mockResolvedValue({ ok: true, facts: {} });
@@ -425,7 +425,7 @@ describe('silo pairing plugin', () => {
           cloudIdentityId: null,
         },
       });
-      expect(startAddedServer).toHaveBeenCalledWith(SERVER_ROW, []);
+      expect(startAddedServer).toHaveBeenCalledWith(SERVER_ROW, ['service-1']);
       expect(logout).toHaveBeenCalledExactlyOnceWith(URL, ACCESS);
       expect(order(logout)).toBeGreaterThan(order(createServer));
       expect(await redis.get(REDIS_KEYS.SILO_PAIRING(handle))).toBeNull();

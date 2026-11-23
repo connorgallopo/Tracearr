@@ -47,9 +47,9 @@ describe('server profiles', () => {
     ]);
   });
 
-  it("keeps Silo requests off and imports Silo's own history", () => {
+  it("keeps Silo's own requests and imports Silo's own history", () => {
     expect(SERVER_PROFILES.silo).toMatchObject({
-      builtInRequests: false,
+      builtInRequests: true,
       serverHistoryImport: 'silo',
       hasProfiles: true,
       itemLinks: 'serverAddress',

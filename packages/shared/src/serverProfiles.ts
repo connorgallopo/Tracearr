@@ -161,7 +161,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     importsTautulliHistory: false,
     serverHistoryImport: 'silo',
     watchedThreshold: 'tracearrSetting',
-    builtInRequests: false,
+    builtInRequests: true,
     guideImageHosts: [],
     itemLinks: 'serverAddress',
     hasProfiles: true,

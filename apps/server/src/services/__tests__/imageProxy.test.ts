@@ -636,6 +636,18 @@ describe('proxyImage cache-miss pipeline', () => {
       }
     });
 
+    it('fetches no request poster for the server itself, only for its request service', async () => {
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: '/api/v2/admin/requests/101/poster',
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/svg+xml');
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
+
     it('fetches nothing for a stored path that is not a Silo poster path', async () => {
       const result = await proxyImage({
         serverId: randomUUID(),
@@ -747,6 +759,49 @@ describe('proxyImage cache-miss pipeline', () => {
       const calls = fetchSpy.mock.calls as [string, RequestInit][];
       expect(calls[0]?.[0]).toBe(imagePath);
       expect(calls[0]?.[1].headers).toEqual({ Accept: 'image/*' });
+    });
+
+    it("fetches a Silo request's poster from its server with the key, reading no catalog", async () => {
+      const serverId = randomUUID();
+      const poster = '/api/v2/admin/requests/101/poster';
+      mockServiceOrigin(
+        { id: 'svc', type: 'server', url: 'http://silo.local:8090', serverId, enabled: true },
+        { id: serverId, type: 'silo', url: 'http://silo.local:8090', token: 'silo-key' },
+        { id: 'req' }
+      );
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: poster,
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/webp');
+      const calls = fetchSpy.mock.calls as [string, RequestInit][];
+      expect(calls.map(([url]) => url)).toEqual([`http://silo.local:8090${poster}`]);
+      expect(calls[0]?.[1].headers).toEqual({
+        Accept: 'image/*',
+        Authorization: 'Bearer silo-key',
+      });
+    });
+
+    it('fetches nothing for a Silo request poster no request of the service holds', async () => {
+      const serverId = randomUUID();
+      mockServiceOrigin(
+        { id: 'svc', type: 'server', url: 'http://silo.local:8090', serverId, enabled: true },
+        { id: serverId, type: 'silo', url: 'http://silo.local:8090', token: 'silo-key' }
+      );
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: '/api/v2/admin/requests/102/poster',
+        width: 240,
+        height: 360,
+      });
+
+      expect(result.contentType).toBe('image/svg+xml');
+      expect(fetchSpy).not.toHaveBeenCalled();
     });
 
     it('asks a request service only for a poster one of its requests holds', async () => {
@@ -1265,6 +1320,29 @@ describe('buildUpstreamRequest', () => {
         '/content/movie-imdb-tt0038650/poster',
         '/api/v2/admin/users',
         '/api/v2/artwork/x',
+      ]) {
+        expect(() => buildUpstreamRequest(server, path)).toThrow(SsrfBlockedError);
+      }
+    });
+
+    it("fetches a Silo request poster with the server's key and no size", () => {
+      const server = {
+        ...baseServer,
+        type: 'silo',
+        url: 'http://silo.local:8090',
+        token: 'silo-key',
+      } as never;
+      const poster = '/api/v2/admin/requests/101/poster';
+      const expected = {
+        imageUrl: `http://silo.local:8090${poster}`,
+        headers: { Accept: 'image/*', Authorization: 'Bearer silo-key' },
+      };
+      expect(buildUpstreamRequest(server, poster)).toEqual(expected);
+      expect(buildUpstreamRequest(server, poster, { width: 240, height: 360 })).toEqual(expected);
+      for (const path of [
+        `${poster}?w=240`,
+        '/api/v2/admin/requests/101/events',
+        '/api/v2/admin/requests/101/poster/x',
       ]) {
         expect(() => buildUpstreamRequest(server, path)).toThrow(SsrfBlockedError);
       }

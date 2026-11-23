@@ -28,7 +28,7 @@ import { assertSafeProbeUrl, SsrfBlockedError } from '../utils/ssrf.js';
 import { cacheWriteAllowed, noteCacheWrite } from './imageCacheGuard.js';
 import { mediaBrowserTokenHeader } from './mediaServer/shared/baseMediaServerClient.js';
 import { SiloClient } from './mediaServer/silo/client.js';
-import { parseSiloPosterPath } from './mediaServer/silo/parser.js';
+import { parseSiloPosterPath, SILO_REQUEST_POSTER_PATH } from './mediaServer/silo/parser.js';
 
 // libvips defaults its thread pool to the core count, so one background
 // precache walk can own every core of a small box. Inputs are server-resized
@@ -402,8 +402,10 @@ const IMAGE_PATH_ALLOWLIST: Record<ServerType, RegExp> = {
   // An artwork path, or the image cache path it redirects to with the size it was asked for,
   // or one of the avatars bundled with the server
   tofa: /^\/(api\/v1\/artwork\/[0-9a-f-]+\/poster|api\/v1\/profiles\/avatars\/[\w-]+\.png|cache\/images\/[a-z]+\/[^/?#]+(\?[wh]=\d+)?)$/,
-  // A signed artwork URL, or a signed item poster link that redirects to one
-  silo: /^\/api\/v2\/(artwork\/(?:[\w-]+\/)+[\w-]+\.[0-9a-f]+\.[a-z0-9]+|item-posters\/[\w.-]+)\?[\w=&-]+$/,
+  // A signed artwork URL, a signed item poster link that redirects to one, or a request's poster
+  silo: new RegExp(
+    `${/^\/api\/v2\/(artwork\/(?:[\w-]+\/)+[\w-]+\.[0-9a-f]+\.[a-z0-9]+|item-posters\/[\w.-]+)\?[\w=&-]+$/.source}|${SILO_REQUEST_POSTER_PATH.source}`
+  ),
 };
 
 /** A guide image on a host the server's guide links art from, as an https address; null for anything else */
@@ -496,8 +498,12 @@ export function buildUpstreamRequest(
       return { imageUrl: `${baseUrl}${imagePath}`, headers };
     }
     // A signed URL names its own size, and Silo refuses one whose path or query was changed. The
-    // signature is the only credential: a key sent along would spend the key's rate budget.
+    // signature is the only credential: a key sent along would spend the key's rate budget. A
+    // request's poster is not signed and needs the key, and Silo refuses any query on it.
     case 'silo':
+      if (SILO_REQUEST_POSTER_PATH.test(imagePath)) {
+        headers.Authorization = `Bearer ${server.token}`;
+      }
       return { imageUrl: `${baseUrl}${imagePath}`, headers };
     default:
       return assertNever(server.type);
@@ -571,8 +577,11 @@ async function fetchUpstreamImage(
 /** The server has no image at the stored path, which is the item's fault, not the server's */
 class NoServerImageError extends Error {}
 
-/** Where a stored image path is fetched on its server: the path itself, or for Silo the signed URL its catalog gives the item now */
-async function resolveImagePath(server: ServerRow, imagePath: string): Promise<string | null> {
+/** Where a stored image path is fetched on its server: the path itself, or for a Silo item the signed URL its catalog gives the item now */
+async function resolveImagePath(
+  { server, requestServiceId }: Extract<ImageOrigin, { kind: 'server' }>,
+  imagePath: string
+): Promise<string | null> {
   switch (server.type) {
     case 'plex':
     case 'jellyfin':
@@ -580,6 +589,15 @@ async function resolveImagePath(server: ServerRow, imagePath: string): Promise<s
     case 'tofa':
       return imagePath;
     case 'silo': {
+      // A request poster is fetched with the key, so only a request service that holds it may ask
+      if (SILO_REQUEST_POSTER_PATH.test(imagePath)) {
+        if (requestServiceId === null) {
+          throw new SsrfBlockedError(
+            `A Silo request poster needs its request service: ${imagePath}`
+          );
+        }
+        return imagePath;
+      }
       const contentId = parseSiloPosterPath(imagePath);
       if (contentId === null) throw new SsrfBlockedError(`Not a Silo poster path: ${imagePath}`);
       assertSafeProbeUrl(server.url);
@@ -604,7 +622,7 @@ async function upstreamRequests(
 ): Promise<UpstreamRequest[]> {
   switch (origin.kind) {
     case 'server': {
-      const path = await resolveImagePath(origin.server, imagePath);
+      const path = await resolveImagePath(origin, imagePath);
       if (path === null) {
         throw new NoServerImageError(`${origin.server.name} lists no poster for ${imagePath}`);
       }
