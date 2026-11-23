@@ -27,6 +27,7 @@ import {
   type MediaSession,
   type MediaUser,
   type NotNeeded,
+  type ServerRequests,
   type SyncCursor,
 } from '../types.js';
 import {
@@ -39,6 +40,7 @@ import {
   parseSiloUsers,
   type SiloLibraryListing,
 } from './parser.js';
+import { mapSiloRequest } from './requests.js';
 import type {
   SiloCatalogItem,
   SiloDevice,
@@ -47,6 +49,8 @@ import type {
   SiloLibrary,
   SiloPage,
   SiloProfile,
+  SiloRequest,
+  SiloRequestCounts,
   SiloServerIdentity,
   SiloSession,
   SiloSocketTicket,
@@ -60,6 +64,7 @@ const log = createLogger('silo-client');
 export const API_PATH = '/api/v2';
 const TIMEOUT_MS = 10_000;
 const PAGE_LIMIT = 200;
+const REQUEST_PAGE_LIMIT = 50;
 const CONTENT_IDS_PER_READ = 200;
 const STOP_REASON_MAX = 1024;
 const MESSAGE_MAX = 2048;
@@ -250,14 +255,15 @@ export class SiloClient implements IMediaServerClient {
   private async listAll<T>(
     path: string,
     timeout?: number,
-    readOn: (page: T[]) => boolean = () => true
+    readOn: (page: T[]) => boolean = () => true,
+    limit = PAGE_LIMIT
   ): Promise<T[]> {
     const items: T[] = [];
     const separator = path.includes('?') ? '&' : '?';
     let cursor: string | undefined;
     do {
       const page: SiloPage<T> = await this.request<SiloPage<T>>(
-        `${path}${separator}limit=${PAGE_LIMIT}` +
+        `${path}${separator}limit=${limit}` +
           (cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''),
         { timeout }
       );
@@ -603,8 +609,23 @@ export class SiloClient implements IMediaServerClient {
     return found;
   }
 
-  async getRequests(): Promise<NotNeeded> {
-    return NOT_NEEDED;
+  /** The counts say whether requests are on; the list answers either way */
+  async getRequests(): Promise<ServerRequests> {
+    const [counts, version] = await Promise.all([
+      this.request<SiloRequestCounts>('/admin/requests/counts', { timeout: TIMEOUT_MS }),
+      this.getSoftwareVersion(),
+    ]);
+    if (!counts.requests_enabled) return { requestsOn: false, version };
+    const [rows, users] = await Promise.all([
+      this.listAll<SiloRequest>('/admin/requests', TIMEOUT_MS, undefined, REQUEST_PAGE_LIMIT),
+      this.getUsers(),
+    ]);
+    const usernames = new Map(users.map((user) => [user.id, user.username]));
+    return {
+      requestsOn: true,
+      version,
+      requests: rows.flatMap((row) => mapSiloRequest(row, usernames) ?? []),
+    };
   }
 
   async getRequestPosterPath(): Promise<NotNeeded> {

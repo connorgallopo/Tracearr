@@ -107,6 +107,9 @@ export function parseSiloPosterPath(path: string): string | null {
   return id && isContentId(id) ? id : null;
 }
 
+/** A request's poster on Silo, fetched with the key */
+export const SILO_REQUEST_POSTER_PATH = /^\/api\/v2\/admin\/requests\/[\w-]+\/poster$/;
+
 /** Silo lists no seasons, so a season is keyed by its series and number */
 export function siloSeasonKey(seriesId: string, season: number): string {
   return `${seriesId}/season/${season}`;

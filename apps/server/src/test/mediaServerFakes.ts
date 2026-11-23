@@ -14,6 +14,7 @@ import { mapTofaRequest } from '../services/mediaServer/tofa/requests.js';
 import type { TofaLibraryFiles, TofaMediaPage } from '../services/mediaServer/tofa/types.js';
 import { SiloClient } from '../services/mediaServer/silo/client.js';
 import * as siloParser from '../services/mediaServer/silo/parser.js';
+import { mapSiloRequest } from '../services/mediaServer/silo/requests.js';
 import type { SiloCatalogItem, SiloPage, SiloProfile } from '../services/mediaServer/silo/types.js';
 import {
   parseLibrariesResponse,
@@ -443,7 +444,14 @@ export function fakeSiloClient(overrides: Overrides = {}): IMediaServerClient {
     getLibraryAlbums: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     getLibraryAlbumsSince: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     checkFilesExist: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
-    getRequests: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getRequests: vi.fn(async (): Promise<ServerRequests> => {
+      const usernames = new Map(silo.users.items.map((user) => [user.id, user.username]));
+      return {
+        requestsOn: true,
+        version: silo.systemInfo.server_version,
+        requests: silo.requests.items.flatMap((row) => mapSiloRequest(row, usernames) ?? []),
+      };
+    }),
     getRequestPosterPath: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     ...overrides,
   };

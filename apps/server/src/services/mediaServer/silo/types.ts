@@ -284,3 +284,38 @@ export interface SiloCreatedKey {
   id: string;
   key: string;
 }
+
+export interface SiloRequestSeasonProgress {
+  season_number: number;
+  episodes_aired: number;
+  episodes_available: number;
+}
+
+/** A row of /admin/requests */
+export interface SiloRequest {
+  id: string;
+  media_type: string;
+  tmdb_id: number;
+  tvdb_id?: number;
+  imdb_id?: string;
+  title: string;
+  /** What Silo shows; status stays pending on a cancelled request */
+  state: string;
+  /** Series: empty means the whole series */
+  seasons: number[];
+  /** Empty until the series is in the library */
+  season_progress: SiloRequestSeasonProgress[];
+  /** direct or watchlist, more values may come */
+  source: string;
+  requested_by_user_id?: string;
+  requested_by_profile_id?: string;
+  library_content_id?: string;
+  poster_url?: string;
+  created_at: string;
+  updated_at: string;
+  completed_at?: string;
+}
+
+export interface SiloRequestCounts {
+  requests_enabled: boolean;
+}

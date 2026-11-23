@@ -1800,5 +1800,161 @@
     "page": {
       "has_more": false
     }
+  },
+  "requestCounts": {
+    "requests_enabled": true,
+    "needs_approval": 1,
+    "in_progress": 2,
+    "failed": 0,
+    "done": 3
+  },
+  "requests": {
+    "items": [
+      {
+        "id": "101",
+        "provider": "tmdb",
+        "media_type": "movie",
+        "tmdb_id": 11031,
+        "imdb_id": "tt0088258",
+        "title": "This Is Spinal Tap",
+        "year": 1984,
+        "poster_path": "/z2z1ADWG2FqBfKRVZyR3fcB1d6I.jpg",
+        "poster_url": "/api/v2/admin/requests/101/poster",
+        "status": "pending",
+        "outcome": "active",
+        "state": "pending",
+        "seasons": [],
+        "season_progress": [],
+        "source": "direct",
+        "requested_by_user_id": "34",
+        "requested_by_profile_id": "2770043c-2cab-4bb2-a860-6991aa254f29",
+        "is_anime": false,
+        "targets": [],
+        "created_at": "2026-11-19T01:20:04.112Z",
+        "updated_at": "2026-11-19T01:20:04.112Z"
+      },
+      {
+        "id": "102",
+        "provider": "tmdb",
+        "media_type": "series",
+        "tmdb_id": 1408,
+        "tvdb_id": 73255,
+        "title": "House",
+        "year": 2004,
+        "poster_path": "/3Cz7ySOQJmqiuTdrc6CY0r65yDI.jpg",
+        "poster_url": "/api/v2/admin/requests/102/poster",
+        "status": "downloading",
+        "outcome": "active",
+        "state": "partially_available",
+        "seasons": [1, 2],
+        "season_progress": [
+          {
+            "season_number": 1,
+            "episodes_aired": 22,
+            "episodes_available": 22
+          },
+          {
+            "season_number": 2,
+            "episodes_aired": 24,
+            "episodes_available": 3
+          }
+        ],
+        "source": "direct",
+        "requested_by_user_id": "34",
+        "requested_by_profile_id": "2770043c-2cab-4bb2-a860-6991aa254f29",
+        "is_anime": false,
+        "targets": [],
+        "created_at": "2026-11-19T01:21:37.540Z",
+        "updated_at": "2026-11-21T09:12:48.003Z",
+        "approved_at": "2026-11-19T02:00:11.218Z"
+      },
+      {
+        "id": "103",
+        "provider": "tmdb",
+        "media_type": "movie",
+        "tmdb_id": 949,
+        "imdb_id": "tt0113277",
+        "title": "Heat",
+        "year": 1995,
+        "status": "completed",
+        "outcome": "active",
+        "state": "available",
+        "seasons": [],
+        "season_progress": [],
+        "source": "direct",
+        "requested_by_user_id": "1",
+        "requested_by_profile_id": "8581c93e-0798-41e4-ba29-cb7cf3acced0",
+        "is_anime": false,
+        "targets": [],
+        "library_content_id": "movie-imdb-tt0113277",
+        "created_at": "2026-11-18T16:42:09.871Z",
+        "updated_at": "2026-11-20T18:00:00.000Z",
+        "approved_at": "2026-11-18T16:42:09.871Z",
+        "completed_at": "2026-11-20T18:00:00.000Z"
+      },
+      {
+        "id": "104",
+        "provider": "tmdb",
+        "media_type": "series",
+        "tmdb_id": 60622,
+        "title": "Fargo",
+        "year": 2014,
+        "status": "pending",
+        "outcome": "declined",
+        "state": "declined",
+        "seasons": [],
+        "season_progress": [],
+        "outcome_reason": "Already on another server",
+        "source": "direct",
+        "requested_by_user_id": "34",
+        "requested_by_profile_id": "494983e2-3141-4ccf-a3b6-e6af431e5996",
+        "is_anime": false,
+        "targets": [],
+        "created_at": "2026-11-19T01:25:52.004Z",
+        "updated_at": "2026-11-19T03:10:27.665Z"
+      },
+      {
+        "id": "105",
+        "provider": "tmdb",
+        "media_type": "series",
+        "tmdb_id": 63639,
+        "title": "The Expanse",
+        "year": 2015,
+        "status": "queued",
+        "outcome": "active",
+        "state": "processing",
+        "seasons": [3],
+        "season_progress": [],
+        "source": "watchlist",
+        "requested_by_user_id": "1",
+        "is_anime": false,
+        "targets": [],
+        "created_at": "2026-11-20T11:03:44.290Z",
+        "updated_at": "2026-11-20T11:03:45.107Z",
+        "approved_at": "2026-11-20T11:03:44.290Z"
+      },
+      {
+        "id": "106",
+        "provider": "tmdb",
+        "media_type": "movie",
+        "tmdb_id": 329865,
+        "title": "Arrival",
+        "year": 2016,
+        "status": "pending",
+        "outcome": "cancelled",
+        "state": "cancelled",
+        "seasons": [],
+        "season_progress": [],
+        "source": "direct",
+        "requested_by_user_id": "34",
+        "is_anime": false,
+        "targets": [],
+        "created_at": "2026-11-19T01:30:15.338Z",
+        "updated_at": "2026-11-19T01:31:02.776Z"
+      }
+    ],
+    "page": {
+      "has_more": false
+    }
   }
 }

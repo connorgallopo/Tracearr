@@ -711,10 +711,46 @@ describe('SiloClient', () => {
     expect(mockFetchJson).toHaveBeenCalledTimes(3);
   });
 
-  it('answers requests NOT_NEEDED', async () => {
-    expect(await client().getRequests()).toBe(NOT_NEEDED);
+  it('reports requests turned off from the counts without listing them', async () => {
+    serve({
+      '/system/info': silo.systemInfo,
+      '/admin/requests/counts': { ...silo.requestCounts, requests_enabled: false },
+      '/admin/requests': silo.requests,
+    });
+
+    await expect(client().getRequests()).resolves.toEqual({
+      requestsOn: false,
+      version: '28dd1484',
+    });
+    expect(requested('/admin/requests?')).toEqual([]);
+  });
+
+  it('walks every page of requests, fifty at a time, with account names', async () => {
+    const { items } = silo.requests;
+    serve({
+      '/system/info': silo.systemInfo,
+      '/admin/requests/counts': silo.requestCounts,
+      '/admin/users': silo.users,
+      '/admin/requests': (url) =>
+        url.includes('cursor=c2')
+          ? { items: items.slice(3), page: { has_more: false } }
+          : { items: items.slice(0, 3), page: { has_more: true, next_cursor: 'c2' } },
+    });
+
+    const answer = await client().getRequests();
+
+    expect(requested('/admin/requests?')).toEqual([
+      `${URL}/api/v2/admin/requests?limit=50`,
+      `${URL}/api/v2/admin/requests?limit=50&cursor=c2`,
+    ]);
+    expect(answer).toMatchObject({ requestsOn: true, version: '28dd1484' });
+    const requests = answer.requestsOn ? answer.requests : [];
+    expect(requests.map((r) => r.remoteId)).toEqual(['101', '102', '103', '104', '105']);
+    expect(requests.find((r) => r.remoteId === '101')?.remoteUsername).toBe('viewer');
+  });
+
+  it('keeps answering NOT_NEEDED for a poster lookup', async () => {
     expect(await client().getRequestPosterPath()).toBe(NOT_NEEDED);
-    expect(mockFetchJson).not.toHaveBeenCalled();
   });
 });
 
