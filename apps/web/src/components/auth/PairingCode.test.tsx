@@ -11,9 +11,8 @@ vi.mock('react-i18next', () => ({
 }));
 
 const code = {
-  userCode: '12345678',
-  link: 'https://silo.example.com/activate?code=12345678',
-  enterAt: 'https://silo.example.com/activate',
+  userCode: '1234-5678',
+  link: 'https://media.example.com/silo/activate?code=12345678',
   waiting: true,
   opened: false,
   expired: false,
@@ -21,16 +20,19 @@ const code = {
 };
 
 describe('PairingCode', () => {
-  it('shows the code as two groups of four and copies it without the space', async () => {
+  it('shows and copies the code as two groups of four, as Silo shows it', async () => {
     const user = userEvent.setup();
-    render(<PairingCode {...code} />);
+    const { rerender } = render(<PairingCode {...code} />);
 
     expect(screen.getByText('1234 5678')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: 'pages:login.member.copyCode' }));
-    await expect(navigator.clipboard.readText()).resolves.toBe('12345678');
+    await expect(navigator.clipboard.readText()).resolves.toBe('1234 5678');
+
+    rerender(<PairingCode {...code} userCode="12345678" />);
+    expect(screen.getByText('1234 5678')).toBeInTheDocument();
   });
 
-  it('opens Silo in a new tab and says where the code is entered', () => {
+  it('opens Silo in a new tab and says where the code is entered, under its path prefix', () => {
     render(<PairingCode {...code} />);
 
     const open = screen.getByRole('link', { name: 'settings:servers.pairing.openSilo' });
@@ -39,7 +41,7 @@ describe('PairingCode', () => {
     expect(open).toHaveAttribute('rel', 'noreferrer');
     expect(
       screen.getByText(
-        'settings:servers.pairing.enterAt:{"address":"https://silo.example.com/activate"}'
+        'settings:servers.pairing.enterAt:{"address":"https://media.example.com/silo/activate"}'
       )
     ).toBeInTheDocument();
     expect(screen.getByRole('status')).toHaveTextContent('pages:login.member.waiting');

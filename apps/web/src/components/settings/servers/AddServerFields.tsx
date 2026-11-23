@@ -292,7 +292,6 @@ export function SiloPairingPanel({
       <PairingCode
         userCode={code.userCode}
         link={code.link}
-        enterAt={`${new URL(code.link).origin}/activate`}
         waiting={check?.status !== 'expired'}
         opened={check?.status === 'pending' && check.opened}
         expired={check?.status === 'expired'}

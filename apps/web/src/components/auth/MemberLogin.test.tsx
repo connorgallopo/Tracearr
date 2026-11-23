@@ -43,7 +43,7 @@ const silo: MemberLoginServer = {
 };
 const siloCode = {
   handle: 's1',
-  code: '12345678',
+  code: '1234-5678',
   link: 'https://silo.example.com/activate?code=12345678',
   interval: 5,
 };

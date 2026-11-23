@@ -7,7 +7,6 @@ import { CopyButton } from '@/components/ui/copy-button';
 export function PairingCode({
   userCode,
   link,
-  enterAt,
   waiting,
   opened,
   expired,
@@ -15,14 +14,16 @@ export function PairingCode({
 }: {
   userCode: string;
   link: string;
-  /** Where in Silo the code is entered, shown under the code */
-  enterAt: string;
   waiting: boolean;
   opened: boolean;
   expired: boolean;
   onRequestNew: () => void;
 }) {
   const { t } = useTranslation(['settings', 'pages']);
+  const digits = userCode.replace(/\D/g, '');
+  const shown = `${digits.slice(0, 4)} ${digits.slice(4)}`;
+  const linkUrl = new URL(link);
+  const enterAt = `${linkUrl.origin}${linkUrl.pathname}`;
 
   if (expired) {
     return (
@@ -38,12 +39,12 @@ export function PairingCode({
   return (
     <div className="flex flex-col gap-3">
       <CopyButton
-        value={userCode}
+        value={shown}
         label={t('pages:login.member.copyCode')}
         variant="ghost"
         className="h-auto w-full justify-center py-4 font-mono text-3xl tracking-[0.2em] sm:text-4xl"
       >
-        {`${userCode.slice(0, 4)} ${userCode.slice(4)}`}
+        {shown}
       </CopyButton>
       <p className="text-muted-foreground text-center text-sm">
         {t('settings:servers.pairing.enterAt', { address: enterAt })}

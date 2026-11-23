@@ -2,10 +2,15 @@
  * Media-server versions: what a server reports about itself, what its vendor ships,
  * and which of the two is newer. Every feed is public and read without a token; tofa
  * publishes none, so its servers are asked through their own update check instead. Silo
- * reports a build hash, which is no version, so its servers have none.
+ * reports a build hash, which is kept as it is and never compared.
  */
 
-import { assertNever, type ServerType, type JellyfinEmbyServerType } from '@tracearr/shared';
+import {
+  assertNever,
+  SERVER_PROFILES,
+  type ServerType,
+  type JellyfinEmbyServerType,
+} from '@tracearr/shared';
 import { fetchJson } from './http.js';
 import { createLogger } from './logger.js';
 import { compareVersions, maxVersion } from './pluginVersion.js';
@@ -35,6 +40,7 @@ const FEED_TIMEOUT_MS = 10_000;
 // two-part release gets padded rather than dropped: Jellyfin tags 12.0 as `v12.0` while
 // the server reports `12.0.0`, and the two have to compare equal.
 const DOTTED = /^\d+(\.\d+){1,3}$/;
+const BUILD_ID = /^[\w.+-]{1,64}$/;
 
 interface PlexDownloads {
   computer?: Record<string, { version?: unknown } | undefined>;
@@ -58,16 +64,25 @@ function versionDigits(type: ServerType, version: string): string {
 /**
  * The comparable digits of a version: Plex appends a build hash, Jellyfin tags with a
  * leading `v`, Emby and tofa are already numeric. A two-part version gains a `.0` so the
- * comparator can read it. Null when what is left is not two to four dotted numbers.
+ * comparator can read it. Null when what is left is not two to four dotted numbers. A build
+ * id is kept as reported; null unless it is 1 to 64 letters, digits, `.`, `+`, `-` or `_`.
  */
 export function normalizeServerVersion(type: ServerType, raw: string): string | null {
   const candidate = versionDigits(type, raw.trim());
-  if (!DOTTED.test(candidate)) return null;
-  return candidate.split('.').length === 2 ? `${candidate}.0` : candidate;
+  switch (SERVER_PROFILES[type].versionKind) {
+    case 'build':
+      return BUILD_ID.test(candidate) ? candidate : null;
+    case 'release':
+      if (!DOTTED.test(candidate)) return null;
+      return candidate.split('.').length === 2 ? `${candidate}.0` : candidate;
+    default:
+      return assertNever(SERVER_PROFILES[type].versionKind);
+  }
 }
 
-/** An unparseable version on either side is never newer: a nudge needs both numbers. */
+/** An unparseable version on either side is never newer: a nudge needs both numbers. Builds do not order. */
 export function isNewerServerVersion(type: ServerType, latest: string, installed: string): boolean {
+  if (SERVER_PROFILES[type].versionKind === 'build') return false;
   const newer = normalizeServerVersion(type, latest);
   const current = normalizeServerVersion(type, installed);
   if (!newer || !current) return false;

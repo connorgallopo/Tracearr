@@ -8,6 +8,7 @@ import {
   resolutionDisplayName,
   type ResolutionLabel,
 } from './resolution.js';
+import type { ServerType } from './serverTypes.js';
 
 export { IDENTITY_AWARE_CONDITION_FIELDS } from './automations/conditions.js';
 
@@ -900,19 +901,25 @@ export const SERVER_COLOR_PALETTE = [
   { hex: '#3B82F6', label: 'Blue' },
   { hex: '#EF4444', label: 'Red' },
   { hex: '#14B8A6', label: 'Teal' }, // tofa brand
+  { hex: '#1718C9', label: 'Indigo' }, // Silo brand
 ] as const;
 
-export const SERVER_TYPE_BRAND_COLORS: Record<string, string> = {
+export const SERVER_TYPE_BRAND_COLORS: Record<ServerType, string> = {
   plex: '#F4A825',
   jellyfin: '#895FDD',
   emby: '#39C668',
   tofa: '#14B8A6',
+  // Silo's web app manifest theme_color
+  silo: '#1718C9',
 };
 
 /** Pick best color for a server given its type and colors already used by other servers */
-export function pickServerColor(type: string, usedColors: (string | null | undefined)[]): string {
-  const used = new Set(usedColors.filter(Boolean).map((c) => c!.toLowerCase()));
-  const brand = SERVER_TYPE_BRAND_COLORS[type] ?? '#3B82F6';
+export function pickServerColor(
+  type: ServerType,
+  usedColors: (string | null | undefined)[]
+): string {
+  const used = new Set(usedColors.flatMap((c) => (c ? [c.toLowerCase()] : [])));
+  const brand = SERVER_TYPE_BRAND_COLORS[type];
   if (!used.has(brand.toLowerCase())) return brand;
   for (const preset of SERVER_COLOR_PALETTE) {
     if (!used.has(preset.hex.toLowerCase())) return preset.hex;

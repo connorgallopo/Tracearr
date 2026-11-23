@@ -157,7 +157,6 @@ function MemberCredentials({
           <PairingCode
             userCode={code.data.code}
             link={code.data.link}
-            enterAt={`${new URL(code.data.link).origin}/activate`}
             waiting
             opened={false}
             expired={expired}

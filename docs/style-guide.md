@@ -351,6 +351,7 @@ lines are 3px, because neighboring steps are close in color.
 | Jellyfin | `#895FDD` |
 | Emby     | `#39C668` |
 | tofa     | `#14B8A6` |
+| Silo     | `#1718C9` |
 
 Brand colors are identity marks only: a dot, a 2 to 4px edge (the Connections row's 4px left
 border), a map pin. They are never a text

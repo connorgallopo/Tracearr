@@ -40,7 +40,7 @@ import {
   parseSiloUsers,
   type SiloLibraryListing,
 } from './parser.js';
-import { mapSiloRequest } from './requests.js';
+import { isUnknownSiloState, mapSiloRequest } from './requests.js';
 import type {
   SiloCatalogItem,
   SiloDevice,
@@ -85,8 +85,6 @@ export const SILO_MESSAGE_UNDELIVERED =
   'the Silo player has no live connection that can show a message';
 export const SILO_MESSAGE_STALE =
   'Silo refused the message as older than the last command the player applied';
-/** Silo sets it on a 409 only when the command's sequence was stale */
-const LATEST_SEQUENCE_HEADER = 'X-Silo-Latest-Sequence';
 const SESSION_GONE = 'Session not found (may have already ended)';
 
 const MISSING_SCOPES_MESSAGE =
@@ -225,6 +223,8 @@ export class SiloClient implements IMediaServerClient {
    * one library is held at once.
    */
   private readonly listings = new Map<string, Promise<SiloLibraryListing>>();
+  /** Profile lists getUsers read, each handed once to getAccountProfiles so a sync reads them once */
+  private readonly readProfiles = new Map<string, SiloProfile[]>();
 
   constructor(config: MediaServerConfig) {
     this.url = config.url.replace(/\/$/, '');
@@ -345,16 +345,54 @@ export class SiloClient implements IMediaServerClient {
     );
   }
 
+  /** Each account's profiles are read too, for its primary profile's picture */
   async getUsers(): Promise<MediaUser[]> {
-    return parseSiloUsers(await this.listAll<SiloUser>('/admin/users'));
+    const users = await this.listAll<SiloUser>('/admin/users');
+    const profiles = new Map<string, SiloProfile[]>();
+    try {
+      for (const user of users) profiles.set(user.id, await this.listProfiles(user.id));
+    } catch (error) {
+      log.warn('Silo profiles could not be read, leaving user pictures as they are', {
+        err: error,
+      });
+      return parseSiloUsers(users, null);
+    }
+    for (const [accountId, list] of profiles) this.readProfiles.set(accountId, list);
+    return parseSiloUsers(users, profiles);
   }
 
   async getAccountProfiles(accountExternalId: string): Promise<MediaProfile[]> {
+    const held = this.readProfiles.get(accountExternalId);
+    this.readProfiles.delete(accountExternalId);
+    return parseSiloProfiles(
+      held ?? (await this.listProfiles(accountExternalId)),
+      accountExternalId
+    );
+  }
+
+  private async listProfiles(accountId: string, waitBudgetMs?: number): Promise<SiloProfile[]> {
     // Silo refuses query parameters the endpoint does not declare, and this one declares no paging
     const { items } = await this.request<SiloPage<SiloProfile>>(
-      `/admin/users/${encodeURIComponent(accountExternalId)}/profiles`
+      `/admin/users/${encodeURIComponent(accountId)}/profiles`,
+      {},
+      waitBudgetMs
     );
-    return parseSiloProfiles(items);
+    return items;
+  }
+
+  /** An uploaded avatar's signed link, read when the picture is fetched; null for any other avatar */
+  async getAvatarUrl(accountId: string, profileId: string): Promise<string | null> {
+    const profiles = await this.listProfiles(accountId, POSTER_WAIT_BUDGET_MS);
+    const profile = profiles.find((p) => p.id === profileId);
+    return profile?.avatar_source === 'upload' && profile.avatar_url?.startsWith('/api/v2/')
+      ? profile.avatar_url
+      : null;
+  }
+
+  /** Whether the account is the server's owner, the account Silo's first-run setup made */
+  async isServerOwner(accountId: string): Promise<boolean> {
+    const users = await this.listAll<SiloUser>('/admin/users');
+    return users.some((user) => user.id === accountId && user.is_owner);
   }
 
   /** include_hidden, so a library the key's own profile hid is still synced */
@@ -453,7 +491,7 @@ export class SiloClient implements IMediaServerClient {
       if (isHttpStatus(error, 404)) throw new Error(SESSION_GONE);
       if (isHttpStatus(error, 409)) {
         throw new Error(
-          error.headers?.has(LATEST_SEQUENCE_HEADER) ? SILO_MESSAGE_STALE : SILO_MESSAGE_UNDELIVERED
+          error.latestSequence === undefined ? SILO_MESSAGE_UNDELIVERED : SILO_MESSAGE_STALE
         );
       }
       throw new Error(`Failed to send the message: ${failureOf(error)}`);
@@ -464,7 +502,7 @@ export class SiloClient implements IMediaServerClient {
     try {
       await this.request<unknown>(`/admin/sessions/${encodeURIComponent(sessionId)}/terminate`, {
         method: 'POST',
-        body: JSON.stringify(reason ? { reason: reason.slice(0, STOP_REASON_MAX) } : {}),
+        body: JSON.stringify(reason ? { reason: cutTo(reason, STOP_REASON_MAX) } : {}),
         timeout: TIMEOUT_MS,
       });
       return true;
@@ -618,13 +656,14 @@ export class SiloClient implements IMediaServerClient {
     if (counts.requests_enabled === false) return { requestsOn: false, version };
     const [rows, users] = await Promise.all([
       this.listAll<SiloRequest>('/admin/requests', TIMEOUT_MS, undefined, REQUEST_PAGE_LIMIT),
-      this.getUsers(),
+      this.listAll<SiloUser>('/admin/users'),
     ]);
     const usernames = new Map(users.map((user) => [user.id, user.username]));
     return {
       requestsOn: true,
       version,
       requests: rows.flatMap((row) => mapSiloRequest(row, usernames) ?? []),
+      unmappedIds: rows.filter((row) => isUnknownSiloState(row.state)).map((row) => row.id),
     };
   }
 

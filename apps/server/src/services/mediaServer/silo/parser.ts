@@ -7,6 +7,7 @@
 import {
   normalizeDynamicRange,
   normalizeResolution,
+  SERVER_PROFILES,
   type ServerResourceDataPoint,
   type SubtitleInfo,
 } from '@tracearr/shared';
@@ -42,26 +43,80 @@ import type {
   SiloUser,
 } from './types.js';
 
-export function parseSiloUsers(users: SiloUser[]): MediaUser[] {
-  return users.map((user) => ({
-    id: user.id,
-    username: user.username,
-    email: user.email || undefined,
-    isAdmin: user.role === 'admin',
-    isDisabled: !user.enabled,
-    sharedLibraries: user.effective_policy.library_ids ?? undefined,
-    lastActivityAt: user.last_active_at ? new Date(user.last_active_at) : undefined,
-  }));
+/**
+ * An account shows its primary profile's picture; profiles null means they could not be read,
+ * so the stored pictures stay
+ */
+export function parseSiloUsers(
+  users: SiloUser[],
+  profiles: ReadonlyMap<string, SiloProfile[]> | null
+): MediaUser[] {
+  return users.map((user) => {
+    const primary = profiles?.get(user.id)?.find((profile) => profile.is_primary);
+    return {
+      id: user.id,
+      username: user.username,
+      email: user.email || undefined,
+      isAdmin: user.role === 'admin',
+      isDisabled: !user.enabled,
+      sharedLibraries: user.effective_policy.library_ids ?? undefined,
+      lastActivityAt: user.last_active_at ? new Date(user.last_active_at) : undefined,
+      joinedAt: new Date(user.created_at),
+      ...(profiles
+        ? { thumb: primary ? profilePicture(user.id, primary) : null }
+        : { picturesUnread: true }),
+    };
+  });
 }
 
-export function parseSiloProfiles(profiles: SiloProfile[]): MediaProfile[] {
+export function parseSiloProfiles(profiles: SiloProfile[], accountId: string): MediaProfile[] {
   return profiles.map((profile) => ({
     id: profile.id,
     name: profile.name,
-    thumb: null,
+    thumb: profilePicture(accountId, profile),
     isPrimary: profile.is_primary,
     isChild: profile.is_child,
   }));
+}
+
+/** One of the avatars bundled with Silo's web app, served from the server's origin without a key */
+export const SILO_PRESET_AVATAR_PATH = /^\/profile-avatars\/[\w-]+\.svg$/;
+const STORED_AVATAR = /^\/users\/([\w-]+)\/profiles\/([\w-]+)\/avatar$/;
+
+/**
+ * Where an uploaded avatar is filed: Silo's link to it is signed for minutes, so the account and
+ * profile are stored and the link is read again when the picture is fetched
+ */
+function siloAvatarPath(accountId: string, profileId: string): string | null {
+  const path = `/users/${accountId}/profiles/${profileId}/avatar`;
+  return STORED_AVATAR.test(path) ? path : null;
+}
+
+/** The account and profile of a stored upload path, or null for any other path */
+export function parseSiloAvatarPath(path: string): { accountId: string; profileId: string } | null {
+  const [, accountId, profileId] = STORED_AVATAR.exec(path) ?? [];
+  return accountId && profileId ? { accountId, profileId } : null;
+}
+
+/** A DiceBear preset, fetched from its host as guide art is */
+function isAvatarHostUrl(url: string): boolean {
+  if (!URL.canParse(url)) return false;
+  const { protocol, hostname } = new URL(url);
+  return protocol === 'https:' && SERVER_PROFILES.silo.guideImageHosts.includes(hostname);
+}
+
+/** A preset as Silo links it, an upload on Silo's own API by its stored path, else none */
+function profilePicture(accountId: string, profile: SiloProfile): string | null {
+  const url = profile.avatar_url;
+  if (!url) return null;
+  switch (profile.avatar_source) {
+    case 'preset':
+      return SILO_PRESET_AVATAR_PATH.test(url) || isAvatarHostUrl(url) ? url : null;
+    case 'upload':
+      return url.startsWith('/api/v2/') ? siloAvatarPath(accountId, profile.id) : null;
+    default:
+      return null;
+  }
 }
 
 export function parseSiloLibraries(libraries: SiloLibrary[]): MediaLibrary[] {
@@ -165,6 +220,28 @@ export function siloMediaType(type: string): 'movie' | 'episode' | 'unknown' {
   }
 }
 
+/** The line count of a Silo size label such as 1080p */
+const labelLines = (label: string | undefined) => {
+  const lines = /^(\d+)p$/i.exec(label?.trim() ?? '')?.[1];
+  return lines ? Number(lines) : undefined;
+};
+
+/**
+ * The heights a Silo play is classified by. Silo files a source by its size class (a 1920x800
+ * film is 1080p), so the label's line count stands in for the height, which is the fallback.
+ * Copied video goes out at the source's size. A transcode target names the output height, and
+ * one equal to the source's pixel height keeps the source's class, as Silo's own pages show it.
+ */
+function siloVideoHeights(row: SiloSession): { source?: number; stream?: number } {
+  const source = labelLines(row.source_video_resolution) ?? row.source_video_height;
+  if (row.video_decision !== 'transcode') return { source, stream: source };
+  const target = labelLines(row.target_resolution);
+  return {
+    source,
+    stream: target !== undefined && target === row.source_video_height ? source : target,
+  };
+}
+
 /** A row of /admin/sessions; the player is named after its device where the device list names it */
 export function parseSiloSession(row: SiloSession, deviceName: string | undefined): MediaSession {
   const mediaType = siloMediaType(row.media_type);
@@ -173,6 +250,7 @@ export function parseSiloSession(row: SiloSession, deviceName: string | undefine
     : undefined;
   const positionMs = Math.round(row.position_seconds * 1000);
   const durationMs = (row.file_duration ?? 0) * 1000;
+  const heights = siloVideoHeights(row);
 
   return {
     sessionKey: row.session_id,
@@ -209,7 +287,7 @@ export function parseSiloSession(row: SiloSession, deviceName: string | undefine
     quality: {
       bitrate: row.stream_bitrate_kbps ?? row.source_bitrate_kbps ?? 0,
       ...siloStreamDecisions(row.video_decision, row.audio_decision),
-      videoHeight: row.source_video_height,
+      videoHeight: heights.source,
       sourceVideoCodec: sanitizeCodec(row.source_video_codec) ?? undefined,
       sourceAudioCodec: sanitizeCodec(row.source_audio_codec) ?? undefined,
       sourceAudioChannels: row.source_audio_channels ?? undefined,
@@ -223,7 +301,10 @@ export function parseSiloSession(row: SiloSession, deviceName: string | undefine
         sanitizeCodec(row.target_video_codec || row.source_video_codec) ?? undefined,
       streamAudioCodec:
         sanitizeCodec(row.target_audio_codec || row.source_audio_codec) ?? undefined,
-      streamVideoDetails: { bitrate: row.target_bitrate_kbps ?? undefined },
+      streamVideoDetails: {
+        bitrate: row.target_bitrate_kbps ?? undefined,
+        height: heights.stream,
+      },
       streamAudioDetails: { channels: row.target_audio_channels },
       transcodeInfo: {
         hwEncoding: row.transcode_hw_accel || undefined,

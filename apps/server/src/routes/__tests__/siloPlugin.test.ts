@@ -197,6 +197,7 @@ describe('silo pairing plugin', () => {
     vi.spyOn(SiloClient, 'checkSiloServer').mockResolvedValue(null);
     vi.spyOn(SiloClient, 'verifyServerAdmin').mockResolvedValue({ success: true });
     vi.spyOn(SiloClient.prototype, 'getServerIdentity').mockResolvedValue('silo-server-1');
+    vi.spyOn(SiloClient.prototype, 'isServerOwner').mockResolvedValue(true);
     vi.mocked(connectedServerConflict).mockResolvedValue(null);
     vi.mocked(pairingOffered).mockResolvedValue(true);
     vi.mocked(startPairing).mockResolvedValue({
@@ -395,7 +396,7 @@ describe('silo pairing plugin', () => {
       expect(createTracearrKey).not.toHaveBeenCalled();
     });
 
-    it("adds the server with the approver as the owner's account, then logs out", async () => {
+    it("adds the server with the approver as the owner's account when the approver is Silo's owner, then logs out", async () => {
       const handle = await seed({ publicUrl: 'https://silo.example.com' });
       approve();
 
@@ -425,10 +426,31 @@ describe('silo pairing plugin', () => {
           cloudIdentityId: null,
         },
       });
+      expect(SiloClient.prototype.isServerOwner).toHaveBeenCalledWith(ADMIN.id);
       expect(startAddedServer).toHaveBeenCalledWith(SERVER_ROW, ['service-1']);
       expect(logout).toHaveBeenCalledExactlyOnceWith(URL, ACCESS);
       expect(order(logout)).toBeGreaterThan(order(createServer));
       expect(await redis.get(REDIS_KEYS.SILO_PAIRING(handle))).toBeNull();
+    });
+
+    it('adds the server with no account linked when another Silo admin approves', async () => {
+      const handle = await seed();
+      approve();
+      vi.mocked(SiloClient.prototype.isServerOwner).mockResolvedValue(false);
+
+      expect(await call('siloPairCheck', { handle })).toMatchObject({ status: 'added' });
+      expect(createServer).toHaveBeenCalledOnce();
+      expect(vi.mocked(createServer).mock.calls[0]?.[0].ownerServerUser).toBeUndefined();
+      expect(logout).toHaveBeenCalledExactlyOnceWith(URL, ACCESS);
+    });
+
+    it('adds the server with no account linked when the owner flag cannot be read', async () => {
+      const handle = await seed();
+      approve();
+      vi.mocked(SiloClient.prototype.isServerOwner).mockRejectedValue(new Error('timeout'));
+
+      expect(await call('siloPairCheck', { handle })).toMatchObject({ status: 'added' });
+      expect(vi.mocked(createServer).mock.calls[0]?.[0].ownerServerUser).toBeUndefined();
     });
 
     it('sends no profile headers for an admin with no profile', async () => {

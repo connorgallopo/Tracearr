@@ -648,6 +648,63 @@ describe('proxyImage cache-miss pipeline', () => {
       expect(fetchSpy).not.toHaveBeenCalled();
     });
 
+    it("reads an uploaded avatar's signed link with the key, then fetches it without the key", async () => {
+      const kid = '2770043c-2cab-4bb2-a860-6991aa254f29';
+      const signed = `/api/v2/artwork/profile-avatars/34/${kid}/w256.webp?exp=${Math.floor(Date.now() / 1000) + 900}&sig=c2lnbmF0dXJl`;
+      fetchSpy
+        .mockResolvedValueOnce(
+          Response.json({
+            items: [{ id: kid, name: 'Kid', avatar_source: 'upload', avatar_url: signed }],
+          })
+        )
+        .mockResolvedValueOnce(
+          new Response(testImage, { status: 200, headers: { 'content-type': 'image/webp' } })
+        );
+
+      const result = await proxyImage({
+        serverId: randomUUID(),
+        imagePath: `/users/34/profiles/${kid}/avatar`,
+        width: 100,
+        height: 100,
+        fallback: 'avatar',
+      });
+
+      expect(result.contentType).toBe('image/webp');
+      expect(fetchedUrls()).toEqual([
+        `${siloUrl}/api/v2/admin/users/34/profiles`,
+        `${siloUrl}${signed}`,
+      ]);
+      const [read, image] = (fetchSpy.mock.calls as [string, RequestInit][]).map(
+        ([, init]) => init.headers
+      );
+      expect(read).toMatchObject({ Authorization: 'Bearer silo-key' });
+      expect(image).not.toHaveProperty('Authorization');
+    });
+
+    it('fetches a bundled avatar from the server and a DiceBear one from its host, both without the key', async () => {
+      const dicebear =
+        'https://api.dicebear.com/9.x/bottts-neutral/svg?backgroundType=gradientLinear&radius=24&seed=kid&size=128';
+      fetchSpy.mockImplementation(
+        async () =>
+          new Response(testImage, { status: 200, headers: { 'content-type': 'image/svg+xml' } })
+      );
+
+      for (const imagePath of ['/profile-avatars/avatar-3.svg', dicebear]) {
+        await proxyImage({
+          serverId: randomUUID(),
+          imagePath,
+          width: 100,
+          height: 100,
+          fallback: 'avatar',
+        });
+      }
+
+      expect(fetchedUrls()).toEqual([`${siloUrl}/profile-avatars/avatar-3.svg`, dicebear]);
+      for (const [, init] of fetchSpy.mock.calls as [string, RequestInit][]) {
+        expect(init.headers).not.toHaveProperty('Authorization');
+      }
+    });
+
     it('fetches nothing for a stored path that is not a Silo poster path', async () => {
       const result = await proxyImage({
         serverId: randomUUID(),
@@ -1320,6 +1377,31 @@ describe('buildUpstreamRequest', () => {
         '/content/movie-imdb-tt0038650/poster',
         '/api/v2/admin/users',
         '/api/v2/artwork/x',
+      ]) {
+        expect(() => buildUpstreamRequest(server, path)).toThrow(SsrfBlockedError);
+      }
+    });
+
+    it('fetches a Silo avatar, bundled or uploaded, without the key, and no other path under it', () => {
+      const server = {
+        ...baseServer,
+        type: 'silo',
+        url: 'http://silo.local:8090',
+        token: 'silo-key',
+      } as never;
+      const upload =
+        '/api/v2/artwork/profile-avatars/34/2770043c-2cab-4bb2-a860-6991aa254f29/w256.webp?exp=1795372200&sig=c2lnbmF0dXJl';
+      for (const path of ['/profile-avatars/avatar-3.svg', upload]) {
+        expect(buildUpstreamRequest(server, path)).toEqual({
+          imageUrl: `http://silo.local:8090${path}`,
+          headers: { Accept: 'image/*' },
+        });
+      }
+      for (const path of [
+        '/profile-avatars/avatar-3.png',
+        '/profile-avatars/x/avatar-3.svg',
+        '/api/v2/artwork/profile-avatars/34/p/w256.webp',
+        '/users/34/profiles/p/avatar',
       ]) {
         expect(() => buildUpstreamRequest(server, path)).toThrow(SsrfBlockedError);
       }

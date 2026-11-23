@@ -28,7 +28,12 @@ import { assertSafeProbeUrl, SsrfBlockedError } from '../utils/ssrf.js';
 import { cacheWriteAllowed, noteCacheWrite } from './imageCacheGuard.js';
 import { mediaBrowserTokenHeader } from './mediaServer/shared/baseMediaServerClient.js';
 import { SiloClient } from './mediaServer/silo/client.js';
-import { parseSiloPosterPath, SILO_REQUEST_POSTER_PATH } from './mediaServer/silo/parser.js';
+import {
+  parseSiloAvatarPath,
+  parseSiloPosterPath,
+  SILO_PRESET_AVATAR_PATH,
+  SILO_REQUEST_POSTER_PATH,
+} from './mediaServer/silo/parser.js';
 
 // libvips defaults its thread pool to the core count, so one background
 // precache walk can own every core of a small box. Inputs are server-resized
@@ -402,9 +407,10 @@ const IMAGE_PATH_ALLOWLIST: Record<ServerType, RegExp> = {
   // An artwork path, or the image cache path it redirects to with the size it was asked for,
   // or one of the avatars bundled with the server
   tofa: /^\/(api\/v1\/artwork\/[0-9a-f-]+\/poster|api\/v1\/profiles\/avatars\/[\w-]+\.png|cache\/images\/[a-z]+\/[^/?#]+(\?[wh]=\d+)?)$/,
-  // A signed artwork URL, a signed item poster link that redirects to one, or a request's poster
+  // A signed artwork URL or uploaded avatar, a signed item poster link that redirects to one, a
+  // request's poster, or one of the avatars bundled with Silo's web app
   silo: new RegExp(
-    `${/^\/api\/v2\/(artwork\/(?:[\w-]+\/)+[\w-]+\.[0-9a-f]+\.[a-z0-9]+|item-posters\/[\w.-]+)\?[\w=&-]+$/.source}|${SILO_REQUEST_POSTER_PATH.source}`
+    `${/^\/api\/v2\/(artwork\/(?:[\w-]+\/)+[\w-]+\.[0-9a-f]+\.[a-z0-9]+|artwork\/profile-avatars\/[\w-]+\/[\w-]+\/w256\.webp|item-posters\/[\w.-]+)\?[\w=&-]+$/.source}|${SILO_REQUEST_POSTER_PATH.source}|${SILO_PRESET_AVATAR_PATH.source}`
   ),
 };
 
@@ -577,7 +583,10 @@ async function fetchUpstreamImage(
 /** The server has no image at the stored path, which is the item's fault, not the server's */
 class NoServerImageError extends Error {}
 
-/** Where a stored image path is fetched on its server: the path itself, or for a Silo item the signed URL its catalog gives the item now */
+/**
+ * Where a stored image path is fetched on its server: the path itself, or for a Silo item or
+ * uploaded avatar the signed URL Silo gives it now
+ */
 async function resolveImagePath(
   { server, requestServiceId }: Extract<ImageOrigin, { kind: 'server' }>,
   imagePath: string
@@ -598,12 +607,16 @@ async function resolveImagePath(
         }
         return imagePath;
       }
+      if (SILO_PRESET_AVATAR_PATH.test(imagePath) || guideImageUrl(server, imagePath)) {
+        return imagePath;
+      }
+      assertSafeProbeUrl(server.url);
+      const client = new SiloClient({ url: server.url, token: server.token, id: server.id });
+      const avatar = parseSiloAvatarPath(imagePath);
+      if (avatar) return client.getAvatarUrl(avatar.accountId, avatar.profileId);
       const contentId = parseSiloPosterPath(imagePath);
       if (contentId === null) throw new SsrfBlockedError(`Not a Silo poster path: ${imagePath}`);
-      assertSafeProbeUrl(server.url);
-      return new SiloClient({ url: server.url, token: server.token, id: server.id }).getPosterUrl(
-        contentId
-      );
+      return client.getPosterUrl(contentId);
     }
     default:
       return assertNever(server.type);

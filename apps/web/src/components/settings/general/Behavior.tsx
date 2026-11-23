@@ -79,6 +79,9 @@ export function Behavior() {
               <p className="text-muted-foreground text-sm">
                 <strong>tofa:</strong> {t('general.tofaLiveEventsNote')}
               </p>
+              <p className="text-muted-foreground text-sm">
+                <strong>Silo:</strong> {t('general.tofaLiveEventsNote')}
+              </p>
             </div>
 
             <AutosaveSwitchField

@@ -107,7 +107,8 @@ function transformSiloHistoryRow(
     tvdbId: identity?.tvdbId ?? null,
     state: 'stopped',
     mediaType,
-    mediaTitle: row.media_title,
+    // Silo gives no title once the item left its catalog; its own history page shows the id
+    mediaTitle: row.media_title || row.media_item_id,
     grandparentTitle: mediaType === 'episode' ? row.series_title || null : null,
     seasonNumber: row.season_number,
     episodeNumber: row.episode_number,

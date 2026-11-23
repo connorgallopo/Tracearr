@@ -18,7 +18,6 @@ export type MappedRequest = Omit<
   | 'mediaId'
   | 'serverUserId'
   | 'profileId'
-  | 'year'
   | 'syncedAt'
   | 'createdAt'
   | 'updatedAt'

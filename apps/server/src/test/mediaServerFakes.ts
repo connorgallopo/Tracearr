@@ -400,9 +400,14 @@ export function fakeSiloClient(overrides: Overrides = {}): IMediaServerClient {
   return {
     serverType: 'silo',
     getSessions: vi.fn(async () => siloSessions()),
-    getUsers: vi.fn(async () => siloParser.parseSiloUsers(silo.users.items)),
+    getUsers: vi.fn(async () =>
+      siloParser.parseSiloUsers(
+        silo.users.items,
+        new Map(silo.users.items.map((user) => [user.id, siloProfiles[user.id]?.items ?? []]))
+      )
+    ),
     getAccountProfiles: vi.fn(async (accountExternalId: string) =>
-      siloParser.parseSiloProfiles(siloProfiles[accountExternalId]?.items ?? [])
+      siloParser.parseSiloProfiles(siloProfiles[accountExternalId]?.items ?? [], accountExternalId)
     ),
     getLibraries: vi.fn(async () => siloParser.parseSiloLibraries(silo.libraries.items)),
     testConnection: vi.fn(async () => true),

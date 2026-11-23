@@ -102,7 +102,7 @@ function siloPairing(overrides: Partial<AddServerForm['silo']> = {}): AddServerF
 
 const siloCode = {
   handle: 'h'.repeat(43),
-  userCode: '12345678',
+  userCode: '1234-5678',
   link: 'https://silo.example.com/activate?code=12345678',
   expiresIn: 600,
   interval: 1,

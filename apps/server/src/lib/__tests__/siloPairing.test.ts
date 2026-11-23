@@ -107,11 +107,23 @@ describe('openPairing', () => {
 describe('pairingLink', () => {
   it('swaps the origin for the public URL and keeps the path and query', () => {
     expect(
-      pairingLink('http://silo.lan:8090/activate?code=12345678', 'https://silo.example.com/base')
+      pairingLink('http://silo.lan:8090/activate?code=12345678', 'https://silo.example.com')
     ).toBe('https://silo.example.com/activate?code=12345678');
     expect(pairingLink('http://silo.lan:8090/activate?code=12345678', null)).toBe(
       'http://silo.lan:8090/activate?code=12345678'
     );
+  });
+
+  it("keeps the public URL's path, so a Silo served under one links to its own activate page", () => {
+    expect(
+      pairingLink('http://silo.lan:8090/activate?code=12345678', 'https://media.example.com/silo/')
+    ).toBe('https://media.example.com/silo/activate?code=12345678');
+    expect(
+      pairingLink(
+        'https://media.example.com/silo/activate?code=12345678',
+        'https://media.example.com/silo'
+      )
+    ).toBe('https://media.example.com/silo/activate?code=12345678');
   });
 });
 
@@ -123,6 +135,17 @@ describe('pollStoredPairing', () => {
     expect(await pollStoredPairing(start.handle, state)).toEqual({ status: 'gone' });
     expect(await redis.exists(key(start.handle))).toBe(0);
     expect(pollPairing).toHaveBeenCalledWith(URL, 'dc-1', 'secret-1');
+  });
+
+  it('keeps a state another check parked a login in, so the PIN timer can still end that login', async () => {
+    const { start, state } = await open();
+    vi.mocked(pollPairing).mockImplementation(async () => {
+      await parkLogin(start.handle, state, LOGIN);
+      return { status: 'gone' };
+    });
+
+    expect(await pollStoredPairing(start.handle, state)).toEqual({ status: 'gone' });
+    expect((await readPairing(start.handle))?.login).toEqual(LOGIN);
   });
 
   it('keeps a pending state and moves its TTL to a later expires_at only', async () => {

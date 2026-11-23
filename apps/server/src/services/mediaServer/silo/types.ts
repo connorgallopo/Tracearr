@@ -29,6 +29,8 @@ export interface SiloUser {
     library_ids: string[] | null;
   };
   last_active_at: string | null;
+  created_at: string;
+  is_owner: boolean;
 }
 
 export interface SiloProfile {
@@ -36,6 +38,10 @@ export interface SiloProfile {
   name: string;
   is_primary: boolean;
   is_child: boolean;
+  /** none, preset or upload */
+  avatar_source: string;
+  /** Absent when there is none to fetch; an upload's is signed and expires */
+  avatar_url?: string;
 }
 
 /** An entry of GET /profiles, the signed-in account's own profiles */
@@ -94,11 +100,15 @@ export interface SiloSession {
   audio_decision?: string;
   source_container?: string;
   source_video_codec?: string;
+  /** The size class Silo files the source under, which a 3840x1600 file is 2160p in */
+  source_video_resolution?: string;
   source_video_height?: number;
   source_audio_codec?: string;
   source_audio_channels: number | null;
   source_audio_language?: string;
   source_audio_layout?: string;
+  /** The transcode's output height, such as 720p */
+  target_resolution?: string;
   target_video_codec?: string;
   target_audio_codec?: string;
   target_audio_channels?: number;
@@ -299,6 +309,7 @@ export interface SiloRequest {
   tvdb_id?: number;
   imdb_id?: string;
   title: string;
+  year?: number;
   /** What Silo shows; status stays pending on a cancelled request */
   state: string;
   /** Series: empty means the whole series */

@@ -244,6 +244,15 @@ describe('importSiloHistory', () => {
     });
   });
 
+  it("names a play of an item gone from Silo's catalog by its content id, as Silo's history page does", async () => {
+    rows([]);
+    onePage([{ ...ZOOTOPIA, media_title: '', media_type: '' }]);
+
+    await importSiloHistory(SERVER.id);
+
+    expect(insertOf(ZOOTOPIA.session_id)).toMatchObject({ mediaTitle: ZOOTOPIA.media_item_id });
+  });
+
   it("names the player as a live play is named: the device's name, else the app", async () => {
     rows([]);
 

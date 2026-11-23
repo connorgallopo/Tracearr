@@ -473,6 +473,41 @@ describe("runRequestSync for a server's own requests", () => {
     expect(upsert).not.toContain('Symbol(');
   });
 
+  it('leaves a stored request alone while the server lists it in a state Tracearr cannot map', async () => {
+    const [row] = tofa.requests.map(mapTofaRequest);
+    if (!row) throw new Error('fixture has no requests');
+    const client = fakeTofaClient({
+      getRequests: vi.fn(async (): Promise<ServerRequests> => ({
+        requestsOn: true,
+        version: null,
+        requests: [row],
+        unmappedIds: ['held-107'],
+      })),
+    });
+
+    await runRequestSync('svc', 'full', { serverClientFor: () => client });
+
+    const retire = statements.find((q) => q.includes('UPDATE media_requests SET deleted_at'));
+    expect(retire).toContain(`"${row.remoteId}"`);
+    expect(retire).toContain('"held-107"');
+  });
+
+  it('stores the year a request carries when its title is in no library', async () => {
+    const [row] = tofa.requests.map(mapTofaRequest);
+    if (!row) throw new Error('fixture has no requests');
+    const client = fakeTofaClient({
+      getRequests: vi.fn(async (): Promise<ServerRequests> => ({
+        requestsOn: true,
+        version: null,
+        requests: [{ ...row, year: 1897 }],
+      })),
+    });
+
+    await runRequestSync('svc', 'full', { serverClientFor: () => client });
+
+    expect(statements.find((q) => q.includes('INSERT INTO media_requests'))).toContain('1897');
+  });
+
   it('reports requests turned off and leaves the mirror alone', async () => {
     const client = fakeTofaClient({
       getRequests: vi.fn(async (): Promise<ServerRequests> => ({

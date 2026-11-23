@@ -46,12 +46,13 @@ describe('mapSiloRequest', () => {
     vi.restoreAllMocks();
   });
 
-  it('keeps the request id, title, account, profile and poster of a movie request', () => {
+  it('keeps the request id, title, year, account, profile and poster of a movie request', () => {
     expect(mapSiloRequest(byTitle('This Is Spinal Tap'), usernames)).toMatchObject({
       remoteId: '101',
       remoteMediaId: null,
       mediaType: 'movie',
       title: 'This Is Spinal Tap',
+      year: 1984,
       tmdbId: 11031,
       tvdbId: null,
       imdbId: 'tt0088258',

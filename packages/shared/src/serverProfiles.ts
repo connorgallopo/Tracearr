@@ -42,12 +42,14 @@ export interface ServerProfile {
   watchedThreshold: 'tracearrSetting' | 'serverRule';
   /** The server keeps requests of its own, mirrored through a request service created and removed with the server. */
   builtInRequests: boolean;
-  /** Hosts outside the server that its program guide links live TV art from. */
+  /** Hosts outside the server that its program guide links live TV art from, or its profile avatars. */
   guideImageHosts: readonly string[];
   /** Where a link to one item opens: the vendor's hosted web app, or the server's own address, which members must be able to reach. */
   itemLinks: 'hostedApp' | 'serverAddress';
   /** One account plays under several profiles, and each play names the profile that played. */
   hasProfiles: boolean;
+  /** release: a dotted release number, compared with the newest release. build: a build id, shown as reported and never compared. */
+  versionKind: 'release' | 'build';
 }
 
 export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
@@ -73,6 +75,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     guideImageHosts: ['plex.tmsimg.com'],
     itemLinks: 'hostedApp',
     hasProfiles: false,
+    versionKind: 'release',
   },
   jellyfin: {
     displayName: 'Jellyfin',
@@ -96,6 +99,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     guideImageHosts: [],
     itemLinks: 'serverAddress',
     hasProfiles: false,
+    versionKind: 'release',
   },
   emby: {
     displayName: 'Emby',
@@ -119,6 +123,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     guideImageHosts: [],
     itemLinks: 'serverAddress',
     hasProfiles: false,
+    versionKind: 'release',
   },
   tofa: {
     displayName: 'tofa',
@@ -142,6 +147,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     guideImageHosts: ['api.tofa.tv'],
     itemLinks: 'hostedApp',
     hasProfiles: true,
+    versionKind: 'release',
   },
   silo: {
     displayName: 'Silo',
@@ -162,9 +168,10 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     serverHistoryImport: 'silo',
     watchedThreshold: 'tracearrSetting',
     builtInRequests: true,
-    guideImageHosts: [],
+    guideImageHosts: ['api.dicebear.com'],
     itemLinks: 'serverAddress',
     hasProfiles: true,
+    versionKind: 'build',
   },
 };
 

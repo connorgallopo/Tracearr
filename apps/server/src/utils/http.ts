@@ -22,7 +22,8 @@ export class HttpClientError extends Error {
   public readonly responseBody?: string;
   /** The response's Retry-After header, as sent */
   public readonly retryAfter?: string;
-  public readonly headers?: Headers;
+  /** Silo's X-Silo-Latest-Sequence header, which it sets on a 409 for a stale command */
+  public readonly latestSequence?: string;
 
   constructor(options: {
     service: string;
@@ -32,7 +33,7 @@ export class HttpClientError extends Error {
     message?: string;
     responseBody?: string;
     retryAfter?: string;
-    headers?: Headers;
+    latestSequence?: string;
   }) {
     const message =
       options.message ||
@@ -45,7 +46,7 @@ export class HttpClientError extends Error {
     this.url = options.url;
     this.responseBody = options.responseBody;
     this.retryAfter = options.retryAfter;
-    this.headers = options.headers;
+    this.latestSequence = options.latestSequence;
 
     Error.captureStackTrace(this, this.constructor);
     Object.setPrototypeOf(this, HttpClientError.prototype);
@@ -104,7 +105,7 @@ async function assertResponseOk(
     url,
     responseBody,
     retryAfter: response.headers.get('retry-after') ?? undefined,
-    headers: response.headers,
+    latestSequence: response.headers.get('x-silo-latest-sequence') ?? undefined,
   });
 }
 

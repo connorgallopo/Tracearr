@@ -175,6 +175,22 @@ async function startLink(ownerId: string, serverId: string): Promise<SiloPairSta
   });
 }
 
+/**
+ * Any Silo admin may approve, but only Silo's owner is linked as the owner's own account; another
+ * admin's server is added with no account linked, which the owner links later from Connections
+ */
+async function approverIsSiloOwner(url: string, key: string, approverId: string) {
+  try {
+    return await new SiloClient({ url, token: key }).isServerOwner(approverId);
+  } catch (error) {
+    log.warn('could not read whether the approving Silo admin owns the server', {
+      url,
+      error: errorName(error),
+    });
+    return false;
+  }
+}
+
 /** Any failure once the key exists deletes it before the login is logged out */
 async function addServer(
   state: Extract<OwnerPairing, { purpose: 'add-server' }>,
@@ -192,6 +208,7 @@ async function addServer(
     const verify = await SiloClient.verifyServerAdmin(key.key, url);
     if (!verify.success) throw new APIError('BAD_REQUEST', { message: verify.message });
     const facts = await readServerFacts('silo', url, key.key);
+    const ownsSilo = await approverIsSiloOwner(url, key.key, login.user.id);
     // A query error carries its bound parameters, the new key among them.
     added = await createServer({
       name: state.name,
@@ -202,13 +219,15 @@ async function addServer(
       machineIdentifier,
       apiKeyId: key.id,
       facts,
-      ownerServerUser: {
-        userId: state.ownerId,
-        externalId: login.user.id,
-        username: login.user.username,
-        email: login.user.email,
-        cloudIdentityId: null,
-      },
+      ownerServerUser: ownsSilo
+        ? {
+            userId: state.ownerId,
+            externalId: login.user.id,
+            username: login.user.username,
+            email: login.user.email,
+            cloudIdentityId: null,
+          }
+        : undefined,
     }).catch((error: unknown) => {
       log.error('could not save a Silo server added by pairing', { error: errorName(error) });
       throw new APIError('BAD_REQUEST', { message: 'Could not save the server. Try again.' });

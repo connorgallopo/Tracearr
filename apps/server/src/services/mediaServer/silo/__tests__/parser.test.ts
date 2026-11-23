@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
+import { normalizeResolution } from '@tracearr/shared';
 import silo from '../../../../test/mediaServerResponses/silo.json' with { type: 'json' };
+import { formatQualityString } from '../../../../utils/resolutionNormalizer.js';
 import { normalizeStreamDecisions } from '../../../../utils/transcodeNormalizer.js';
 import {
   parseSiloDeviceNames,
@@ -8,6 +10,7 @@ import {
   parseSiloLibraryListing,
   parseSiloPosterPath,
   parseSiloProfiles,
+  parseSiloAvatarPath,
   parseSiloResources,
   parseSiloSession,
   parseSiloUsers,
@@ -17,7 +20,7 @@ import {
   siloStreamDecisions,
   siloWatchedSeconds,
 } from '../parser.js';
-import type { SiloHistoryRow, SiloSystemResources } from '../types.js';
+import type { SiloHistoryRow, SiloProfile, SiloSystemResources } from '../types.js';
 
 const MOVIE_POSTER_HASH = '200475196580003a17cdfe2a5f5452208ae0a2c2ece48fba60ca08333146727b';
 const EPISODE_POSTER_HASH = '8ca719eb62703cb1e5f46090e8d20cc8c7b9941173d0992d0e6b54b8a8b1b8a6';
@@ -37,9 +40,27 @@ const historyRow = (sessionId: string): SiloHistoryRow => {
 };
 const tvListing = () => parseSiloLibraryListing(silo.catalog['2'].items, '2');
 
+const KID = '2770043c-2cab-4bb2-a860-6991aa254f29';
+const UPLOAD_URL = `/api/v2/artwork/profile-avatars/34/${KID}/w256.webp?exp=1795372200&sig=c2lnbmF0dXJl`;
+const DICEBEAR_URL =
+  'https://api.dicebear.com/9.x/bottts-neutral/svg?backgroundType=gradientLinear&radius=24&seed=kid&size=128';
+
+/** The viewer's profiles with the Viewer profile's avatar and the Kid profile's set as given */
+function viewerProfiles(
+  viewer: Partial<SiloProfile>,
+  kid: Partial<SiloProfile> = {}
+): SiloProfile[] {
+  const [primary, second] = silo.profiles['34'].items;
+  if (!primary || !second) throw new Error('the fixture has no viewer profiles');
+  return [
+    { ...primary, ...viewer },
+    { ...second, ...kid },
+  ];
+}
+
 describe('parseSiloUsers', () => {
-  it('maps accounts with their email, admin role and the libraries their policy allows', () => {
-    const [owner, viewer] = parseSiloUsers(silo.users.items);
+  it('maps accounts with their email, admin role, join date and the libraries their policy allows', () => {
+    const [owner, viewer] = parseSiloUsers(silo.users.items, new Map());
 
     expect(owner).toMatchObject({
       id: '1',
@@ -48,16 +69,46 @@ describe('parseSiloUsers', () => {
       isDisabled: false,
       email: 'owner@example.com',
       sharedLibraries: undefined,
+      joinedAt: new Date('2026-11-19T00:54:17.543Z'),
     });
-    expect(viewer).toMatchObject({ id: '34', isAdmin: false, sharedLibraries: ['1', '2'] });
+    expect(viewer).toMatchObject({
+      id: '34',
+      isAdmin: false,
+      sharedLibraries: ['1', '2'],
+      joinedAt: new Date('2026-11-19T01:12:31.344Z'),
+    });
     expect(owner?.lastActivityAt).toBeInstanceOf(Date);
-    expect(owner).not.toHaveProperty('thumb');
+  });
+
+  it("gives an account its primary profile's picture, and none when that profile has none", () => {
+    const profiles = new Map([
+      ['1', silo.profiles['1'].items],
+      [
+        '34',
+        viewerProfiles(
+          { avatar_source: 'preset', avatar_url: '/profile-avatars/avatar-3.svg' },
+          { avatar_source: 'upload', avatar_url: UPLOAD_URL }
+        ),
+      ],
+    ]);
+
+    const [owner, viewer] = parseSiloUsers(silo.users.items, profiles);
+
+    expect(owner).toMatchObject({ thumb: null });
+    expect(viewer).toMatchObject({ thumb: '/profile-avatars/avatar-3.svg' });
+  });
+
+  it('leaves the stored pictures as they are when the profiles could not be read', () => {
+    for (const user of parseSiloUsers(silo.users.items, null)) {
+      expect(user).toMatchObject({ picturesUnread: true });
+      expect(user).not.toHaveProperty('thumb');
+    }
   });
 });
 
 describe('parseSiloProfiles', () => {
-  it("reads an account's profiles, the household parent as primary, with no picture", () => {
-    expect(parseSiloProfiles(silo.profiles['34'].items)).toEqual([
+  it("reads an account's profiles, the household parent as primary, with no picture where none is set", () => {
+    expect(parseSiloProfiles(silo.profiles['34'].items, '34')).toEqual([
       {
         id: '494983e2-3141-4ccf-a3b6-e6af431e5996',
         name: 'Viewer',
@@ -66,13 +117,57 @@ describe('parseSiloProfiles', () => {
         isChild: false,
       },
       {
-        id: '2770043c-2cab-4bb2-a860-6991aa254f29',
+        id: KID,
         name: 'Kid',
         thumb: null,
         isPrimary: false,
         isChild: false,
       },
     ]);
+  });
+
+  it("keeps a bundled or DiceBear preset as Silo gives it, and files an upload by its account and profile, since Silo's link to it expires", () => {
+    const thumbs = (viewer: Partial<SiloProfile>) =>
+      parseSiloProfiles(viewerProfiles(viewer), '34').map((profile) => profile.thumb)[0];
+
+    expect(thumbs({ avatar_source: 'preset', avatar_url: '/profile-avatars/avatar-3.svg' })).toBe(
+      '/profile-avatars/avatar-3.svg'
+    );
+    expect(thumbs({ avatar_source: 'preset', avatar_url: DICEBEAR_URL })).toBe(DICEBEAR_URL);
+    expect(
+      parseSiloProfiles(
+        viewerProfiles({}, { avatar_source: 'upload', avatar_url: UPLOAD_URL }),
+        '34'
+      )[1]?.thumb
+    ).toBe(`/users/34/profiles/${KID}/avatar`);
+  });
+
+  it('gives no picture for one it could not fetch: another host, an unknown path, or an upload with no link', () => {
+    const thumbs = (viewer: Partial<SiloProfile>) =>
+      parseSiloProfiles(viewerProfiles(viewer), '34').map((profile) => profile.thumb)[0];
+
+    expect(
+      thumbs({ avatar_source: 'preset', avatar_url: 'https://elsewhere.example/a.svg' })
+    ).toBeNull();
+    expect(thumbs({ avatar_source: 'preset', avatar_url: '/profile-avatars/../x.svg' })).toBeNull();
+    expect(thumbs({ avatar_source: 'upload' })).toBeNull();
+    expect(
+      thumbs({
+        avatar_source: 'upload',
+        avatar_url: 'https://bucket.example/profile-avatars/w256.webp',
+      })
+    ).toBeNull();
+  });
+});
+
+describe('parseSiloAvatarPath', () => {
+  it('reads the account and profile of a stored upload path, and nothing else', () => {
+    expect(parseSiloAvatarPath(`/users/34/profiles/${KID}/avatar`)).toEqual({
+      accountId: '34',
+      profileId: KID,
+    });
+    expect(parseSiloAvatarPath('/users/../profiles/x/avatar')).toBeNull();
+    expect(parseSiloAvatarPath('/content/movie-1/poster')).toBeNull();
   });
 });
 
@@ -137,6 +232,51 @@ describe('parseSiloSession', () => {
 
   it('names the player after the client when its device is unknown', () => {
     expect(parseSiloSession(movieRow, undefined).player.name).toBe('Silo Web');
+  });
+});
+
+describe('parseSiloSession quality', () => {
+  const tierOf = (height: number | undefined) => normalizeResolution({ height });
+
+  it("files a cropped source by Silo's size label, so a 1920x800 film is 1080p", () => {
+    const { quality } = parseSiloSession(silo.socket.sessionStarted.data.session, undefined);
+
+    expect(tierOf(quality.videoHeight)).toBe('1080p');
+    expect(formatQualityString(quality)).toBe('1080p');
+  });
+
+  it('reads a 2160p to 720p transcode as a 4K source sent at 720p, which is a downscale', () => {
+    const { quality } = parseSiloSession(episodeRow, 'iPhone');
+
+    expect(tierOf(quality.videoHeight)).toBe('4K');
+    expect(tierOf(quality.streamVideoDetails?.height)).toBe('720p');
+    expect(formatQualityString(quality)).toBe('720p');
+  });
+
+  it('sends copied video at the source size, so an audio-only transcode is no downscale', () => {
+    const { quality } = parseSiloSession(movieRow, undefined);
+
+    expect(quality.isTranscode).toBe(true);
+    expect(quality.streamVideoDetails?.height).toBe(quality.videoHeight);
+    expect(formatQualityString(quality)).toBe('4K');
+  });
+
+  it("reads a transcode Silo names by the source's own height as the source's size", () => {
+    const fullSize = {
+      ...episodeRow,
+      source_video_height: 1600,
+      target_resolution: '1600p',
+    };
+
+    expect(tierOf(parseSiloSession(fullSize, undefined).quality.streamVideoDetails?.height)).toBe(
+      '4K'
+    );
+  });
+
+  it('falls back to the pixel height when Silo sends no size label', () => {
+    const unlabeled = { ...movieRow, source_video_resolution: undefined, source_video_height: 720 };
+
+    expect(tierOf(parseSiloSession(unlabeled, undefined).quality.videoHeight)).toBe('720p');
   });
 });
 

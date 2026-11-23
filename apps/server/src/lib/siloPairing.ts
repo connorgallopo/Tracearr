@@ -51,11 +51,22 @@ const stateKey = (handle: string) => REDIS_KEYS.SILO_PAIRING(handle);
 
 const failureOf = (error: unknown) => (error instanceof Error ? error.message : 'unknown error');
 
-/** The link with its origin swapped for publicUrl's, path and query kept */
+// A parked state's JSON is the only one with a top-level "login" key; a quote inside a string
+// value is escaped, so no value can spell it
+const DELETE_UNPARKED_SCRIPT = `local value = redis.call('GET', KEYS[1])
+if value and not string.find(value, '"login":', 1, true) then redis.call('DEL', KEYS[1]) end`;
+
+/**
+ * The link moved under publicUrl, whose path a Silo served under one needs; the link's own path
+ * and query are kept, and a link Silo already built under that path is not prefixed twice
+ */
 export function pairingLink(verificationUriComplete: string, publicUrl: string | null): string {
   if (!publicUrl) return verificationUriComplete;
   const link = new URL(verificationUriComplete);
-  return `${new URL(publicUrl).origin}${link.pathname}${link.search}`;
+  const base = new URL(publicUrl);
+  const prefix = base.pathname.replace(/\/$/, '');
+  const path = link.pathname.startsWith(`${prefix}/`) ? link.pathname : `${prefix}${link.pathname}`;
+  return `${base.origin}${path}${link.search}`;
 }
 
 /** Starts the request, stores the state for Silo's expires_in, returns what the browser may see */
@@ -85,7 +96,10 @@ export async function readPairing(handle: string): Promise<SiloPairingState | nu
   return raw ? (JSON.parse(raw) as SiloPairingState) : null;
 }
 
-/** One poll. Deletes the state when Silo says the request is gone; moves its TTL to a pending poll's expiresAt */
+/**
+ * One poll. Deletes the state when Silo says the request is gone, unless a check running beside
+ * this one parked a login in it; moves its TTL to a pending poll's expiresAt
+ */
 export async function pollStoredPairing(
   handle: string,
   state: SiloPairingState
@@ -93,7 +107,7 @@ export async function pollStoredPairing(
   const poll = await pollPairing(state.url, state.deviceCode, state.secret);
   const key = stateKey(handle);
   if (poll.status === 'gone') {
-    await getRedis().del(key);
+    await getRedis().eval(DELETE_UNPARKED_SCRIPT, 1, key);
   } else if (poll.status === 'pending' && poll.expiresAt) {
     const seconds = Math.ceil((Date.parse(poll.expiresAt) - Date.now()) / 1000);
     if (seconds > (await getRedis().ttl(key))) await getRedis().expire(key, seconds);

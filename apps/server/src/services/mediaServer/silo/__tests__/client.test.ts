@@ -35,14 +35,18 @@ function serve(responses: Record<string, Answer>) {
   });
 }
 
-function httpError(statusCode: number, retryAfter?: string, headers?: Headers): HttpClientError {
+function httpError(
+  statusCode: number,
+  retryAfter?: string,
+  latestSequence?: string
+): HttpClientError {
   return new HttpClientError({
     service: 'silo',
     statusCode,
     statusText: 'error',
     url: URL,
     retryAfter,
-    headers,
+    latestSequence,
   });
 }
 
@@ -155,6 +159,70 @@ describe('SiloClient', () => {
     expect(requested('/profiles')).toEqual([`${URL}/api/v2/admin/users/34/profiles`]);
   });
 
+  it("reads every account's profiles with the accounts, giving each its primary profile's picture, and the profile sync reuses them once", async () => {
+    const [viewer, kid] = silo.profiles['34'].items;
+    if (!viewer || !kid) throw new Error('the fixture has no viewer profiles');
+    serve({
+      '/admin/users': silo.users,
+      '/admin/users/1/profiles': silo.profiles['1'],
+      '/admin/users/34/profiles': {
+        items: [
+          { ...viewer, avatar_source: 'preset', avatar_url: '/profile-avatars/avatar-3.svg' },
+          kid,
+        ],
+      },
+    });
+    const siloClient = client();
+
+    const users = await siloClient.getUsers();
+
+    expect(users.map((user) => user.thumb)).toEqual([null, '/profile-avatars/avatar-3.svg']);
+    expect(requested('/profiles')).toHaveLength(2);
+    const profiles = await siloClient.getAccountProfiles('34');
+    expect(profiles[0]?.thumb).toBe('/profile-avatars/avatar-3.svg');
+    expect(requested('/profiles')).toHaveLength(2);
+    await siloClient.getAccountProfiles('34');
+    expect(requested('/profiles')).toHaveLength(3);
+  });
+
+  it('leaves the account pictures as they are when a profile list cannot be read', async () => {
+    serve({
+      '/admin/users': silo.users,
+      '/admin/users/1/profiles': silo.profiles['1'],
+      '/admin/users/34/profiles': httpError(500),
+    });
+
+    const users = await client().getUsers();
+
+    expect(users.every((user) => user.picturesUnread === true)).toBe(true);
+  });
+
+  it("reads an uploaded avatar's signed link when it is fetched, and none for a preset or a gone profile", async () => {
+    const [viewer, kid] = silo.profiles['34'].items;
+    if (!viewer || !kid) throw new Error('the fixture has no viewer profiles');
+    const signed = `/api/v2/artwork/profile-avatars/34/${kid.id}/w256.webp?exp=1795372200&sig=c2lnbmF0dXJl`;
+    serve({
+      '/admin/users/34/profiles': {
+        items: [
+          { ...viewer, avatar_source: 'preset', avatar_url: '/profile-avatars/avatar-3.svg' },
+          { ...kid, avatar_source: 'upload', avatar_url: signed },
+        ],
+      },
+    });
+
+    expect(await client().getAvatarUrl('34', kid.id)).toBe(signed);
+    expect(await client().getAvatarUrl('34', viewer.id)).toBeNull();
+    expect(await client().getAvatarUrl('34', 'gone')).toBeNull();
+  });
+
+  it("tells whether an account is Silo's owner", async () => {
+    serve({ '/admin/users': silo.users });
+
+    expect(await client().isServerOwner('1')).toBe(true);
+    expect(await client().isServerOwner('34')).toBe(false);
+    expect(await client().isServerOwner('99')).toBe(false);
+  });
+
   it('walks every page of a listing by its cursor', async () => {
     const [owner, viewer] = silo.users.items;
     serve({
@@ -204,7 +272,7 @@ describe('SiloClient', () => {
     await vi.advanceTimersByTimeAsync(1);
 
     expect((await users).map((user) => user.id)).toEqual(['1', '34']);
-    expect(mockFetchJson).toHaveBeenCalledTimes(2);
+    expect(requested('/admin/users?')).toHaveLength(2);
   });
 
   it('fails on the fourth 429 in a row', async () => {
@@ -357,6 +425,15 @@ describe('SiloClient', () => {
     );
   });
 
+  it('cuts a stop reason on characters, never inside an emoji', async () => {
+    serve({ '/admin/sessions/session-1/terminate': { accepted: true } });
+
+    await client().terminateSession('session-1', `${'x'.repeat(1023)}\u{1F600}y`);
+
+    const [, init] = mockFetchJson.mock.calls[0] ?? [];
+    expect(JSON.parse(String(init?.body)).reason).toBe(`${'x'.repeat(1023)}\u{1F600}`);
+  });
+
   it('mints a socket ticket with the key', async () => {
     const ticket = {
       ticket: 'ticket-1',
@@ -408,11 +485,7 @@ describe('SiloClient', () => {
     await expect(client().sendMessage('session-1', 'hi')).rejects.toThrow(SILO_MESSAGE_UNDELIVERED);
 
     serve({
-      '/admin/sessions/session-1/message': httpError(
-        409,
-        undefined,
-        new Headers({ 'X-Silo-Latest-Sequence': '1795282810497' })
-      ),
+      '/admin/sessions/session-1/message': httpError(409, undefined, '1795282810497'),
     });
     await expect(client().sendMessage('session-1', 'hi')).rejects.toThrow(SILO_MESSAGE_STALE);
     expect(requested('/message')).toHaveLength(2);
@@ -763,6 +836,25 @@ describe('SiloClient', () => {
     const requests = answer.requestsOn ? answer.requests : [];
     expect(requests.map((r) => r.remoteId)).toEqual(['101', '102', '103', '104', '105']);
     expect(requests.find((r) => r.remoteId === '101')?.remoteUsername).toBe('viewer');
+  });
+
+  it('names the requests it left out for a state Tracearr does not know, never a cancelled one', async () => {
+    const [first] = silo.requests.items;
+    if (!first) throw new Error('the fixture has no request');
+    serve({
+      '/system/info': silo.systemInfo,
+      '/admin/requests/counts': silo.requestCounts,
+      '/admin/users': silo.users,
+      '/admin/requests': {
+        items: [...silo.requests.items, { ...first, id: '107', state: 'on_hold' }],
+        page: { has_more: false },
+      },
+    });
+
+    const answer = await client().getRequests();
+
+    expect(answer).toMatchObject({ requestsOn: true, unmappedIds: ['107'] });
+    expect(requested('/profiles')).toEqual([]);
   });
 
   it('keeps answering NOT_NEEDED for a poster lookup', async () => {

@@ -21,6 +21,11 @@ export function mapSiloRequestState(state: string): MediaRequestStatus | null {
   return STATUS_BY_STATE[state] ?? null;
 }
 
+/** A state Silo added after this mapping, which is neither mapped nor cancelled */
+export function isUnknownSiloState(state: string): boolean {
+  return state !== 'cancelled' && mapSiloRequestState(state) === null;
+}
+
 const seasonComplete = (progress: SiloRequestSeasonProgress | undefined) =>
   !!progress &&
   progress.episodes_aired > 0 &&
@@ -33,7 +38,7 @@ export function mapSiloRequest(
 ): MappedRequest | null {
   const status = mapSiloRequestState(row.state);
   if (!status) {
-    if (row.state !== 'cancelled') {
+    if (isUnknownSiloState(row.state)) {
       log.warn(`Silo request ${row.id} is in an unknown state ${row.state}, left out`);
     }
     return null;
@@ -44,6 +49,7 @@ export function mapSiloRequest(
     remoteMediaId: null,
     mediaType: row.media_type === 'series' ? 'show' : 'movie',
     title: row.title,
+    year: row.year ?? null,
     tmdbId: row.tmdb_id,
     tvdbId: row.tvdb_id ?? null,
     imdbId: row.imdb_id ?? null,

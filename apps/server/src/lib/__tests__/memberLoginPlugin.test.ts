@@ -617,7 +617,11 @@ describe('member login plugin', () => {
           authorized: false,
           expired: true,
         });
-        expect(mockRedis.del).toHaveBeenCalledWith(expect.stringContaining(HANDLE));
+        expect(mockRedis.eval).toHaveBeenCalledWith(
+          expect.stringContaining("redis.call('DEL'"),
+          1,
+          expect.stringContaining(HANDLE)
+        );
         expect(logout).not.toHaveBeenCalled();
       });
 

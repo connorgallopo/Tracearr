@@ -177,7 +177,7 @@ async function upsertBatch(
     const lookup = lookups.get(r.remoteId);
     return sql`(
       ${serviceId}, ${r.remoteId}, ${r.remoteMediaId}, ${r.mediaType},
-      ${match?.title ?? lookup?.title ?? r.title}, ${match?.year ?? lookup?.year ?? null},
+      ${match?.title ?? lookup?.title ?? r.title}, ${match?.year ?? lookup?.year ?? r.year ?? null},
       ${r.tmdbId}, ${r.tvdbId}, ${r.imdbId}, ${r.ratingKey}, ${lookup?.posterPath ?? r.posterPath ?? null},
       ${match?.mediaId ?? null}::uuid, ${match?.serverUserId ?? null}::uuid, ${match?.profileId ?? null}::uuid,
       ${r.remoteUserId}, ${r.remoteUsername}, ${r.remotePlexId}, ${r.remoteJellyfinUserId},
@@ -377,10 +377,10 @@ async function syncBuiltIn(
       page.filter((r) => r.posterPath == null && wantsPoster(r, resolved, mirrored, mode))
     )
   );
-  const markedDeleted = await markMissingDeleted(
-    row.id,
-    requests.map((r) => r.remoteId)
-  );
+  const markedDeleted = await markMissingDeleted(row.id, [
+    ...requests.map((r) => r.remoteId),
+    ...(listing.unmappedIds ?? []),
+  ]);
 
   await recordSyncResult(row.id, {
     version: listing.version,
