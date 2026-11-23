@@ -131,7 +131,6 @@ describe('pollStoredPairing', () => {
       status: 'pending' as const,
       opened: true,
       expiresAt: new Date(Date.now() + seconds * 1000).toISOString(),
-      pollAfter: 5,
     });
 
     vi.mocked(pollPairing).mockResolvedValueOnce(pending(1200));

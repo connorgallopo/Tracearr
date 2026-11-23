@@ -381,7 +381,6 @@ describe('silo pairing plugin', () => {
         status: 'pending',
         opened: true,
         expiresAt: null,
-        pollAfter: 5,
       });
 
       expect(await call('siloPairCheck', { handle })).toEqual({ status: 'pending', opened: true });

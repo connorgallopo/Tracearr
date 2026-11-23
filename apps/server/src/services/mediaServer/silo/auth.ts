@@ -12,6 +12,7 @@ import { assertNever } from '@tracearr/shared';
 import {
   fetchJson,
   fetchText,
+  HttpClientError,
   isHttpStatus,
   jsonHeaders,
   type HttpRequestOptions,
@@ -60,7 +61,7 @@ export interface SiloPairingRequest {
 }
 
 export type SiloPairingPoll =
-  | { status: 'pending'; opened: boolean; expiresAt: string | null; pollAfter: number }
+  | { status: 'pending'; opened: boolean; expiresAt: string | null }
   | { status: 'gone' }
   | { status: 'approved'; login: SiloLogin };
 
@@ -104,6 +105,16 @@ const profileHeaders = ({ profileId, profileToken }: SiloProfileProof) => ({
 });
 
 const failureOf = (error: unknown) => (error instanceof Error ? error.message : 'unknown error');
+
+const isTransient = (error: unknown) =>
+  error instanceof HttpClientError ? error.statusCode >= 500 : true;
+
+const errorLabel = (error: unknown) =>
+  error instanceof HttpClientError
+    ? String(error.statusCode)
+    : error instanceof Error
+      ? error.name
+      : 'unknown error';
 
 function toLogin({ access_token, user }: SiloTokenPair): SiloLogin {
   return {
@@ -156,6 +167,13 @@ export async function pollPairing(
     );
   } catch (error) {
     if (isHttpStatus(error, 404)) return { status: 'gone' };
+    // Silo limits polls per client IP and every Tracearr poll shares one; the code stays valid, so the next poll collects
+    if (isHttpStatus(error, 429) || isTransient(error)) {
+      if (!isHttpStatus(error, 429)) {
+        log.warn(`Silo poll at ${endpoint(url, '/auth/device/poll')} failed: ${errorLabel(error)}`);
+      }
+      return { status: 'pending', opened: false, expiresAt: null };
+    }
     throw error;
   }
   switch (poll.status) {
@@ -164,7 +182,6 @@ export async function pollPairing(
         status: 'pending',
         opened: poll.opened,
         expiresAt: poll.expires_at ?? null,
-        pollAfter: poll.poll_after,
       };
     case 'approved':
       if (!poll.tokens) throw new Error('Silo approved the sign-in without a token pair');

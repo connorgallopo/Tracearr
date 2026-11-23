@@ -137,7 +137,7 @@ describe('startPairing', () => {
 });
 
 describe('pollPairing', () => {
-  it('answers pending with opened, expiresAt and pollAfter, sending the binding secret', async () => {
+  it('answers pending with opened, and expiresAt, sending the binding secret', async () => {
     mockFetchJson.mockResolvedValue({
       status: 'pending',
       opened: true,
@@ -149,7 +149,6 @@ describe('pollPairing', () => {
       status: 'pending',
       opened: true,
       expiresAt: '2026-11-21T10:20:00Z',
-      pollAfter: 5,
     });
     const { url, init, body } = jsonCall();
     expect(url).toBe(`${URL}/api/v2/auth/device/poll`);
@@ -190,6 +189,34 @@ describe('pollPairing', () => {
       login: login(null),
     });
     expect(await pollPairing(URL, 'dc-1', 's')).toEqual({ status: 'approved', login: login() });
+  });
+
+  it('answers a 429 as pending after one request', async () => {
+    mockFetchJson.mockRejectedValue(httpError(429));
+
+    expect(await pollPairing(URL, 'dc-1', 's')).toEqual({
+      status: 'pending',
+      opened: false,
+      expiresAt: null,
+    });
+    expect(mockFetchJson).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([
+    ['a 503', httpError(503)],
+    ['a network error', new TypeError('fetch failed')],
+  ])('answers %s as pending and warns without the device code or secret', async (_n, error) => {
+    mockFetchJson.mockRejectedValue(error);
+
+    expect(await pollPairing(URL, 'dc-secret-1', 'binding-secret-1')).toEqual({
+      status: 'pending',
+      opened: false,
+      expiresAt: null,
+    });
+    expect(console.warn).toHaveBeenCalledOnce();
+    const logged = JSON.stringify(vi.mocked(console.warn).mock.calls);
+    expect(logged).not.toContain('dc-secret-1');
+    expect(logged).not.toContain('binding-secret-1');
   });
 
   it('throws on a 403', async () => {

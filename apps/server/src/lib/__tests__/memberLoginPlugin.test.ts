@@ -605,7 +605,6 @@ describe('member login plugin', () => {
           status: 'pending',
           opened: false,
           expiresAt: null,
-          pollAfter: 3,
         });
         expect((await call('siloCodeCheck', { handle: HANDLE })).response).toEqual({
           authorized: false,
