@@ -320,4 +320,22 @@ describe('RequestsTable', () => {
     expect(screen.getByText('Alice')).toBeInTheDocument();
     expect(screen.queryAllByRole('img')).toHaveLength(0);
   });
+
+  it('shows a non-main profile on a user request row', () => {
+    renderTable(
+      <RequestsTable
+        subject="user"
+        rows={[
+          makeUserEntry({ nonMainProfile: { name: 'Kid', thumbUrl: null, removed: false } }),
+          makeUserEntry({ id: 'r2' }),
+        ]}
+        isLoading={false}
+        isError={false}
+        onRetry={vi.fn()}
+        emptyTitle="No requests"
+      />
+    );
+    expect(screen.getAllByRole('img')).toHaveLength(1);
+    expect(screen.getByRole('img', { name: 'Kid' })).toBeInTheDocument();
+  });
 });

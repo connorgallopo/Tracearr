@@ -8,6 +8,7 @@ import type {
   MediaRequestEntry,
   MediaRequestMediaType,
   MediaRequestStatus,
+  NonMainProfile,
   RequestSeason,
   RequestServiceType,
   ServerType,
@@ -60,13 +61,13 @@ interface RequestBaseRow {
   seasons: RequestSeason[] | null;
   is_4k: boolean;
   is_auto_request: boolean;
+  profile_id: string | null;
   lens_user_id: string | null;
 }
 
 interface MediaRequestSqlRow extends RequestBaseRow {
   service_type: RequestServiceType;
   server_type: ServerType;
-  profile_id: string | null;
   remote_username: string;
   server_user_id: string | null;
   user_server_id: string | null;
@@ -111,6 +112,17 @@ function toLensRow(row: RequestBaseRow): WatchedLensRow {
     lensUserId: row.lens_user_id,
     seasons: row.seasons,
   };
+}
+
+/** One read of the rows' profiles, answering each row's profile when it is not the account's main one */
+async function nonMainProfiles(
+  rows: RequestBaseRow[]
+): Promise<(row: RequestBaseRow) => NonMainProfile | undefined> {
+  const profiles = await readCurrentProfiles(
+    db,
+    rows.map((row) => row.profile_id)
+  );
+  return (row) => (row.profile_id ? profiles.get(row.profile_id)?.nonMainProfile : undefined);
 }
 
 // Without server activity a member sees whether they watched what they asked for, never
@@ -194,12 +206,9 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
   `);
 
   const rows = result.rows as unknown as MediaRequestSqlRow[];
-  const [states, profiles] = await Promise.all([
+  const [states, profileOf] = await Promise.all([
     watchedStatesFor(rows.map(toLensRow), serverIds),
-    readCurrentProfiles(
-      db,
-      rows.map((row) => row.profile_id)
-    ),
+    nonMainProfiles(rows),
   ]);
 
   return rows.map((row) => ({
@@ -225,7 +234,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
           thumb: null,
           thumbServerId: null,
         },
-    nonMainProfile: row.profile_id ? profiles.get(row.profile_id)?.nonMainProfile : undefined,
+    nonMainProfile: profileOf(row),
   }));
 }
 
@@ -265,6 +274,7 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
         mr.seasons,
         mr.is_4k,
         mr.is_auto_request,
+        mr.profile_id,
         su.user_id AS lens_user_id,
         poster.server_id AS poster_server_id,
         poster.thumb_path AS poster_thumb_path
@@ -329,10 +339,13 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
 
   const pageLensRows = rows.map(toLensRow);
   const completedIds = new Set(completed.map((row) => row.id));
-  const states = await watchedStatesFor(
-    [...completed, ...pageLensRows.filter((row) => !completedIds.has(row.id))],
-    serverIds
-  );
+  const [states, profileOf] = await Promise.all([
+    watchedStatesFor(
+      [...completed, ...pageLensRows.filter((row) => !completedIds.has(row.id))],
+      serverIds
+    ),
+    nonMainProfiles(rows),
+  ]);
 
   const summaryRow = (summaryResult.rows as unknown as UserSummarySqlRow[])[0];
   const decided = summaryRow?.decided ?? 0;
@@ -357,6 +370,7 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
         buildPosterUrl(row.poster_server_id, row.poster_thumb_path) ??
         buildPosterUrl(row.service_id, row.poster_path),
     },
+    nonMainProfile: profileOf(row),
   }));
 
   return { data, total: summary.total, page, pageSize, summary };

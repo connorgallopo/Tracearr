@@ -317,5 +317,6 @@ export interface SiloRequest {
 }
 
 export interface SiloRequestCounts {
-  requests_enabled: boolean;
+  /** Builds before 28dd1484 leave it out, with requests on */
+  requests_enabled?: boolean;
 }

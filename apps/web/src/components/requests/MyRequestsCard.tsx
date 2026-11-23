@@ -5,6 +5,7 @@ import type { UserRequestEntry } from '@tracearr/shared';
 import { Card, CardContent } from '@/components/ui/card';
 import { SectionHeading } from '@/components/dashboard/SectionHeading';
 import { RequestStatusBadge } from '@/components/requests/RequestStatusBadge';
+import { AvatarWithProfile } from '@/components/sessions/AvatarWithProfile';
 import { useMyRequests, useRequestsConfigured } from '@/hooks/queries';
 import { BASE_PATH } from '@/lib/basePath';
 import { formatCompactAge } from '@/lib/dateFormat';
@@ -25,18 +26,20 @@ function RequestRow({ request }: { request: UserRequestEntry }) {
 
   return (
     <li className="flex items-center gap-3 py-2">
-      {media.posterUrl ? (
-        <img
-          src={`${BASE_PATH}${media.posterUrl}`}
-          alt=""
-          loading="lazy"
-          className="aspect-[2/3] w-10 shrink-0 rounded-sm object-cover"
-        />
-      ) : (
-        <div className="bg-muted text-muted-foreground flex aspect-[2/3] w-10 shrink-0 items-center justify-center rounded-sm">
-          <Icon className="size-4" />
-        </div>
-      )}
+      <AvatarWithProfile serverId={request.serverId} profile={request.nonMainProfile}>
+        {media.posterUrl ? (
+          <img
+            src={`${BASE_PATH}${media.posterUrl}`}
+            alt=""
+            loading="lazy"
+            className="aspect-[2/3] w-10 shrink-0 rounded-sm object-cover"
+          />
+        ) : (
+          <div className="bg-muted text-muted-foreground flex aspect-[2/3] w-10 shrink-0 items-center justify-center rounded-sm">
+            <Icon className="size-4" />
+          </div>
+        )}
+      </AvatarWithProfile>
       <div className="min-w-0 flex-1">
         <div className="truncate text-sm font-medium">
           {media.mediaId ? (

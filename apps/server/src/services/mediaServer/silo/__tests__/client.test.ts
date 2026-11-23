@@ -725,6 +725,22 @@ describe('SiloClient', () => {
     expect(requested('/admin/requests?')).toEqual([]);
   });
 
+  it('lists requests when a Silo build too old to report the flag leaves it out', async () => {
+    const { requests_enabled: _omitted, ...counts } = silo.requestCounts;
+    serve({
+      '/system/info': silo.systemInfo,
+      '/admin/requests/counts': counts,
+      '/admin/users': silo.users,
+      '/admin/requests': silo.requests,
+    });
+
+    const answer = await client().getRequests();
+
+    expect(answer).toMatchObject({ requestsOn: true, version: '28dd1484' });
+    const requests = answer.requestsOn ? answer.requests : [];
+    expect(requests.map((r) => r.remoteId)).toEqual(['101', '102', '103', '104', '105']);
+  });
+
   it('walks every page of requests, fifty at a time, with account names', async () => {
     const { items } = silo.requests;
     serve({

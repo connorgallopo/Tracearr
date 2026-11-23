@@ -615,7 +615,7 @@ export class SiloClient implements IMediaServerClient {
       this.request<SiloRequestCounts>('/admin/requests/counts', { timeout: TIMEOUT_MS }),
       this.getSoftwareVersion(),
     ]);
-    if (!counts.requests_enabled) return { requestsOn: false, version };
+    if (counts.requests_enabled === false) return { requestsOn: false, version };
     const [rows, users] = await Promise.all([
       this.listAll<SiloRequest>('/admin/requests', TIMEOUT_MS, undefined, REQUEST_PAGE_LIMIT),
       this.getUsers(),

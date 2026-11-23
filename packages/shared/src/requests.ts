@@ -114,6 +114,8 @@ export interface UserRequestEntry extends RequestEntryBase {
     /** Through the image proxy, from the preferred server's library copy; null with no copy */
     posterUrl: string | null;
   };
+  /** The profile that asked, when it is not the account's main one */
+  nonMainProfile?: NonMainProfile;
 }
 
 export interface UserRequestsSummary {

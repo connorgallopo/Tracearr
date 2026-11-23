@@ -22,6 +22,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { InlineErrorState } from '@/components/library/ErrorState';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { RequesterCell } from '@/components/requests/RequesterCell';
+import { AvatarWithProfile } from '@/components/sessions/AvatarWithProfile';
 import { WatchedBadge } from '@/components/media-browse/WatchedBadge';
 import { RequestStatusBadge } from '@/components/requests/RequestStatusBadge';
 import { formatSeasons, formatWait, type Translate } from '@/components/requests/format';
@@ -100,7 +101,11 @@ function UserLeadingCell({ row }: { row: UserRequestEntry }) {
 
   return (
     <div className="flex items-center gap-2">
-      <Icon aria-hidden="true" className="text-muted-foreground size-4 shrink-0" />
+      <AvatarWithProfile serverId={row.serverId} profile={row.nonMainProfile}>
+        <span className="flex size-6 shrink-0 items-center justify-center">
+          <Icon aria-hidden="true" className="text-muted-foreground size-4" />
+        </span>
+      </AvatarWithProfile>
       {row.media.mediaId !== null ? (
         <Link to={`/media/${row.media.mediaId}`} className="truncate font-medium hover:underline">
           {title}

@@ -7,16 +7,20 @@ import { cn } from '@/lib/utils';
 import { useProfileLabel } from './useProfileLabel';
 
 // Two-letter initials reach toward the avatar's bottom-right corner, so beside them the
-// badge is smaller and its inner edge stays clear of the letters
-const profileBadgeVariants = cva('ring-background @container absolute ring-2', {
-  variants: {
-    initials: {
-      one: '-right-[20%] -bottom-[20%] size-[56%]',
-      two: '-right-[15%] -bottom-[15%] size-[44%]',
+// badge is smaller and its inner edge stays clear of the letters. Sized by width alone so
+// it stays round over a poster taller than it is wide.
+const profileBadgeVariants = cva(
+  'ring-background @container absolute aspect-square h-auto ring-2',
+  {
+    variants: {
+      initials: {
+        one: '-right-[20%] -bottom-[20%] w-[56%]',
+        two: '-right-[15%] -bottom-[15%] w-[44%]',
+      },
     },
-  },
-  defaultVariants: { initials: 'one' },
-});
+    defaultVariants: { initials: 'one' },
+  }
+);
 
 interface AvatarWithProfileProps extends VariantProps<typeof profileBadgeVariants> {
   serverId: string;

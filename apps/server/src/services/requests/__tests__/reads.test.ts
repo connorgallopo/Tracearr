@@ -255,6 +255,7 @@ describe('listUserRequests', () => {
     vi.clearAllMocks();
     watched.fetchEpisodeCounts.mockResolvedValue(new Map());
     watched.resolveWatchedStates.mockResolvedValue(new Map());
+    profiles.readCurrentProfiles.mockResolvedValue(new Map());
   });
 
   function summaryRow(overrides: Record<string, unknown> = {}) {
@@ -303,6 +304,40 @@ describe('listUserRequests', () => {
       mediaType: 'show',
       posterUrl: null,
     });
+  });
+
+  it("returns the profile that asked when it is not the account's main one", async () => {
+    mockDb.execute
+      .mockResolvedValueOnce({
+        rows: [
+          { ...mediaRow({ profile_id: 'sp-kid' }), title: 'X', year: 2020 },
+          { ...mediaRow({ id: 'req-2', profile_id: 'sp-main' }), title: 'Y', year: 2021 },
+        ],
+      })
+      .mockResolvedValueOnce({ rows: [summaryRow({ total: 2 })] })
+      .mockResolvedValueOnce({ rows: [] });
+    profiles.readCurrentProfiles.mockResolvedValue(
+      new Map([
+        [
+          'sp-kid',
+          { name: 'Kid', nonMainProfile: { name: 'Kid', thumbUrl: null, removed: false } },
+        ],
+        ['sp-main', { name: 'Ana' }],
+      ])
+    );
+
+    const result = await listUserRequests({
+      showOthers: true,
+      serverUserIds: [SERVER_USER_ID],
+      serverIds: undefined,
+      page: 1,
+      pageSize: 5,
+    });
+
+    expect(profiles.readCurrentProfiles).toHaveBeenCalledWith(mockDb, ['sp-kid', 'sp-main']);
+    expect(lastSql()).toContain('mr.profile_id');
+    expect(result.data[0]?.nonMainProfile).toEqual({ name: 'Kid', thumbUrl: null, removed: false });
+    expect(result.data[1]?.nonMainProfile).toBeUndefined();
   });
 
   async function posterUrlFor(row: Record<string, unknown>) {
