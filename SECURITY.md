@@ -49,7 +49,7 @@ If 90 days pass without a fix and you want to publish, that's fair. Let me know 
 - Auth bypass that doesn't require pre-existing credentials or host access
 - Token exposure or credential leakage to unauthorized parties
 - Stored XSS or HTML injection that lands in the owner's browser
-- RCE on the Tracearr host via a crafted upstream (Plex/Jellyfin/Emby) response
+- RCE on the Tracearr host via a crafted upstream (Plex/Jellyfin/Emby/tofa/Silo) response
 - SQL injection
 - SSRF that reaches internal targets without owner auth
 - Information disclosure on unauthenticated endpoints
@@ -64,7 +64,7 @@ These are not vulnerabilities and reports will be closed:
 - **Anything requiring a non-owner login.** Tracearr has no multi-user login. Only the owner can authenticate. The `viewer`/`admin` role values in the schema are unused scaffolding for future work. Reports assuming non-owner accounts can be created are not actionable.
 - **Owner-authenticated routes where the owner is the only "victim".** The owner is trusted by design. CSRF, missing rate limits, IDOR, etc. on owner-only endpoints are not vulnerabilities unless they cross a trust boundary.
 - **Plaintext token storage in the local DB.** Intentional. The DB is localhost-only, and tokens are needed in plaintext to make outbound calls to media servers.
-- **Upstream vulnerabilities** in Plex, Jellyfin, Emby, or third-party dependencies. Report those upstream. I'll bump versions when fixes ship.
+- **Upstream vulnerabilities** in Plex, Jellyfin, Emby, tofa, Silo, or third-party dependencies. Report those upstream. I'll bump versions when fixes ship.
 - **Missing security headers** (CSP, HSTS, etc.) without a demonstrated exploit. PRs welcome, but it isn't a security finding on its own.
 - **Self-XSS, clickjacking, tabnabbing** on owner-only routes.
 - **DoS via misconfiguration** (polling intervals, no rate limit on local API, etc.).
@@ -78,7 +78,7 @@ If you used an LLM to find or write up the issue:
 
 - **Run the PoC yourself against a real Tracearr deployment.** Static analysis hallucinates exploits constantly. Running the code is the only way to confirm.
 - **Disclose the AI assistance** in the report. Something like _"This was drafted with Claude Code"_ or _"I used GPT to map the codebase but verified the exploit manually"_ is enough.
-- **Sanity-check the assumptions.** LLMs reading this codebase consistently invent things that don't exist in the product — non-owner logins, multi-tenant scenarios, user invite endpoints, role promotion APIs. If your reproduction steps start with something the product can't actually do, the report will be closed.
+- **Sanity-check the assumptions.** LLMs reading this codebase consistently invent things that don't exist in the product: non-owner logins, multi-tenant scenarios, user invite endpoints, role promotion APIs. If your reproduction steps start with something the product can't actually do, the report will be closed.
 
 Unedited LLM audit output will be closed without a detailed response. Repeat offenders get blocked. This isn't personal; triaging that kind of report eats hours I'd rather spend fixing real bugs.
 
