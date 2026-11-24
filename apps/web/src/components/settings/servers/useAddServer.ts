@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -7,6 +7,7 @@ import { api, type PlexDiscoveredServer } from '@/lib/api';
 import { addsByApiKey, holdsApiKey } from '@/lib/serverType';
 import { useAuth } from '@/hooks/useAuth';
 import { useServers } from '@/hooks/queries';
+import { useSiloPairing } from '@/hooks/queries/useSiloPairing';
 import { useTofaSignIn } from '@/components/auth/useTofaSignIn';
 
 export type PlexDialogStep =
@@ -24,9 +25,10 @@ export type AddedServer = Pick<Server, 'id' | 'type'>;
 
 /**
  * The add-server form: a Plex server picked from a linked account, a tofa server picked after
- * signing in to tofa, or a Jellyfin, Emby or tofa server by URL and API key. onAdded runs once a
- * server is in, before the form resets; when the caller has to say first that its key cannot stop
- * streams, it runs on continueAdded instead.
+ * signing in to tofa, a Silo server by a code an admin approves in Silo, or a Jellyfin, Emby,
+ * tofa or Silo server by URL and API key. onAdded runs
+ * once a server is in, before the form resets; when the caller has to say first that its key
+ * cannot stop streams, it runs on continueAdded instead.
  */
 export function useAddServer({
   initialType,
@@ -62,7 +64,7 @@ export function useAddServer({
     user && !isOwner && SERVER_PROFILES[chosenType].addServerAuth === 'plexOAuth'
       ? 'jellyfin'
       : chosenType;
-  // Only the owner can sign in to tofa to add a server; anyone else types its URL and key.
+  // Only the owner can sign in to tofa or pair Silo to add a server; anyone else types its URL and key.
   const keyFields =
     holdsApiKey(serverType) &&
     (addsByApiKey(serverType) || enterKey || (user !== null && !isOwner));
@@ -74,6 +76,15 @@ export function useAddServer({
       added(server);
     },
   });
+  const silo = useSiloPairing();
+  const siloCheck = silo.check;
+
+  useEffect(() => {
+    if (siloCheck?.status !== 'added') return;
+    const server = { ...siloCheck.server, canStopStreams: siloCheck.canStopStreams };
+    void Promise.all([refetchUser(), refetch()]).then(() => added(server));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once per answer
+  }, [siloCheck]);
 
   const fetchPlexServers = async (accountId?: string) => {
     setPlexStep('loading-servers');
@@ -137,6 +148,7 @@ export function useAddServer({
     setSelectedPlexAccountId(null);
     setEnterKey(false);
     tofa.cancel();
+    silo.cancel();
   };
 
   const added = (server: AddedServer & Partial<Pick<Server, 'name' | 'canStopStreams'>>) => {
@@ -160,6 +172,7 @@ export function useAddServer({
     setConnectError(null);
     setEnterKey(false);
     tofa.cancel();
+    silo.cancel();
     if (SERVER_PROFILES[type].addServerAuth === 'plexOAuth' && isOwner) {
       void loadPlexAccounts();
     }
@@ -204,6 +217,16 @@ export function useAddServer({
     return result.connection;
   };
 
+  const startPairing = () => {
+    if (!serverUrl || !serverName) {
+      setConnectError(t('servers.allFieldsRequired'));
+      return;
+    }
+    setConnectError(null);
+    const address = publicUrl.trim() ? { publicUrl: publicUrl.trim() } : {};
+    silo.start({ purpose: 'add-server', url: serverUrl, name: serverName, ...address });
+  };
+
   const connect = async () => {
     if (!holdsApiKey(serverType)) return;
     if (!serverUrl || !serverName || !apiKey) {
@@ -231,6 +254,7 @@ export function useAddServer({
           break;
         }
         case 'tofa':
+        case 'silo':
           server = await api.servers.create({
             name: serverName,
             type: serverType,
@@ -265,14 +289,25 @@ export function useAddServer({
     apiKey,
     setApiKey,
     isConnecting,
-    busy: isConnecting || connectingPlexServer !== null || tofa.connectingTo !== null,
+    busy:
+      isConnecting ||
+      connectingPlexServer !== null ||
+      tofa.connectingTo !== null ||
+      silo.starting ||
+      silo.submittingPin,
     connectError,
     connect,
     addedWithoutStop: addedWithoutStop !== null,
     continueAdded,
     keyFields,
-    enterKeyFields: () => setEnterKey(true),
+    enterKeyFields: () => {
+      silo.cancel();
+      setEnterKey(true);
+    },
+    leaveKeyFields: () => setEnterKey(false),
+    startPairing,
     tofa,
+    silo,
     plexStep,
     plexAccounts,
     selectedPlexAccountId,

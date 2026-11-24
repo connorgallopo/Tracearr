@@ -1,5 +1,12 @@
-import type { MediaRequestStatus, RequestSeason } from '@tracearr/shared';
+import { sql, type SQL } from 'drizzle-orm';
+import {
+  assertNever,
+  type MediaRequestStatus,
+  type RequestSeason,
+  type ServerType,
+} from '@tracearr/shared';
 import type { mediaRequests } from '../../db/schema.js';
+import type { ResolutionInput } from './resolution.js';
 import type { SeerrRequest } from './seerrClient.js';
 
 type InsertRow = typeof mediaRequests.$inferInsert;
@@ -10,12 +17,15 @@ export type MappedRequest = Omit<
   | 'serviceId'
   | 'mediaId'
   | 'serverUserId'
-  | 'year'
+  | 'profileId'
   | 'syncedAt'
   | 'createdAt'
   | 'updatedAt'
   | 'deletedAt'
->;
+> & {
+  /** The server's own id for the profile that asked */
+  remoteProfileId: string | null;
+};
 
 const STATUS_BY_CODE: Record<number, MediaRequestStatus> = {
   1: 'pending',
@@ -90,6 +100,7 @@ export function mapSeerrRequest(row: SeerrRequest): MappedRequest {
     remoteUsername: row.requestedBy.displayName,
     remotePlexId: row.requestedBy.plexId != null ? String(row.requestedBy.plexId) : null,
     remoteJellyfinUserId: row.requestedBy.jellyfinUserId ?? null,
+    remoteProfileId: null,
     status,
     seasons,
     is4k: row.is4k,
@@ -103,4 +114,37 @@ export function mapSeerrRequest(row: SeerrRequest): MappedRequest {
     ),
     remoteUpdatedAt,
   };
+}
+
+/** The server_users column a request's requester matches, and the request field it matches by */
+export interface RequesterIdentity {
+  column: SQL;
+  key: (r: ResolutionInput) => string | null | undefined;
+}
+
+/** A server's own requests name the requester by the server's own user id */
+export const BUILT_IN_REQUESTER: RequesterIdentity = {
+  column: sql`external_id`,
+  key: (r) => r.remoteUserId,
+};
+
+/**
+ * Seerr names a Plex requester by plex.tv account id, a Jellyfin or Emby requester by the
+ * server's own user id.
+ */
+export function seerrRequesterIdentity(serverType: ServerType): RequesterIdentity {
+  switch (serverType) {
+    case 'plex':
+      return { column: sql`plex_account_id`, key: (r) => r.remotePlexId };
+    case 'jellyfin':
+    case 'emby':
+      return { column: sql`external_id`, key: (r) => r.remoteJellyfinUserId };
+    // A Seerr service links only to the server whose id Seerr reports, and Seerr connects only to
+    // Plex, Jellyfin and Emby, so no Seerr service names a tofa or Silo server
+    case 'tofa':
+    case 'silo':
+      return BUILT_IN_REQUESTER;
+    default:
+      return assertNever(serverType);
+  }
 }

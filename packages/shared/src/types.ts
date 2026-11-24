@@ -348,8 +348,37 @@ export interface SetupStatus {
     /** SSO-only is hiding the owner's and admins' other methods; /login?all shows them. */
     ssoOnly: boolean;
   };
-  memberLoginServers: { id: string; name: string; type: ServerType; quickConnect: boolean }[];
+  memberLoginServers: {
+    id: string;
+    name: string;
+    type: ServerType;
+    /** A code the member approves on the server: Jellyfin's Quick Connect, Silo's pairing */
+    codeSignIn: boolean;
+    passwordSignIn: boolean;
+  }[];
 }
+
+/** What a Silo sign-in code is for: adding a server, replacing its key, or linking the owner's own account */
+export type SiloPairPurpose = 'add-server' | 'rekey' | 'link';
+
+export interface SiloPairStart {
+  handle: string;
+  userCode: string;
+  /** verification_uri_complete, on the server's public URL origin when Tracearr has one */
+  link: string;
+  expiresIn: number;
+  interval: number;
+}
+
+export type SiloPairCheck =
+  | { status: 'pending'; opened: boolean }
+  | { status: 'expired' }
+  | { status: 'not-admin' }
+  | { status: 'needs-pin'; wrongPin: boolean }
+  | { status: 'pin-locked' }
+  | { status: 'added'; server: Server; canStopStreams: boolean }
+  | { status: 'rekeyed'; oldKeyLeft: boolean }
+  | { status: 'linked' };
 
 // Session types
 export type SessionState = 'playing' | 'paused' | 'stopped';
@@ -1086,8 +1115,8 @@ export interface ServerResourceDataPoint {
   timespan: number;
   /** System-wide CPU utilization percentage; null when the source cannot see the host (non-Linux plugin hosts) */
   hostCpuUtilization: number | null;
-  /** Media server process CPU utilization percentage */
-  processCpuUtilization: number;
+  /** Media server process CPU utilization percentage; null when the server reports none for its process (Silo) */
+  processCpuUtilization: number | null;
   /** System-wide memory utilization percentage; null when the source cannot see the host */
   hostMemoryUtilization: number | null;
   /** Media server process memory utilization percentage */
@@ -1482,8 +1511,8 @@ export interface PlaybackReportingImportResult {
   }[];
 }
 
-// tofa watch history import types
-export interface TofaImportProgress {
+/** A server's own watch history import */
+export interface ServerHistoryImportProgress {
   serverId: string;
   status: 'idle' | 'waiting' | 'fetching' | 'processing' | 'retrying' | 'complete' | 'error';
   fetchedRecords: number;
@@ -1504,7 +1533,7 @@ export interface TofaImportProgress {
   retry?: ImportRetry;
 }
 
-export interface TofaImportResult {
+export interface ServerHistoryImportResult {
   /** Always true: a failed import throws */
   success: true;
   imported: number;
@@ -1583,7 +1612,7 @@ export interface ServerToClientEvents {
   'import:progress': (progress: TautulliImportProgress) => void;
   'import:jellystat:progress': (progress: JellystatImportProgress) => void;
   'import:playbackreporting:progress': (progress: PlaybackReportingImportProgress) => void;
-  'import:tofa:progress': (progress: TofaImportProgress) => void;
+  'import:server-history:progress': (progress: ServerHistoryImportProgress) => void;
   'maintenance:progress': (progress: MaintenanceJobProgress) => void;
   'library:sync:progress': (progress: LibrarySyncProgress) => void;
   'tasks:updated': (tasks: RunningTask[]) => void;
@@ -1643,7 +1672,7 @@ export interface UserDevice {
 }
 
 export type MediaDownloadSource =
-  'activity_log' | 'emby_sync' | 'plex' | 'jellyfin_transcode' | 'tofa';
+  'activity_log' | 'emby_sync' | 'plex' | 'jellyfin_transcode' | 'tofa' | 'silo';
 
 export interface MediaDownloadRow {
   id: string;
@@ -2373,7 +2402,7 @@ export type RunningTaskType =
   | 'tautulli_import'
   | 'jellystat_import'
   | 'playback_reporting_import'
-  | 'tofa_import'
+  | 'server_history_import'
   | 'image_precache'
   | 'maintenance';
 

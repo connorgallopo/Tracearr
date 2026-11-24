@@ -28,6 +28,7 @@ const DESCRIPTIONS = {
   jellyfin: 'servers.addServerDialogDescOther',
   emby: 'servers.addServerDialogDescOther',
   tofa: 'servers.addServerDialogDescOther',
+  silo: 'servers.addServerDialogDescSilo',
 } as const satisfies Record<ServerType, string>;
 
 export interface AddServerDialogProps {

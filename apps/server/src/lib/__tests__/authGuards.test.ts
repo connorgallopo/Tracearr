@@ -23,9 +23,11 @@ vi.mock('../../db/client.js', () => ({ db: { select: vi.fn(), update: vi.fn() } 
 import { getOwnerUser } from '../../services/userService.js';
 import { getSetting } from '../../services/settings.js';
 import { isClaimCodeEnabled, validateClaimCode } from '../../utils/claimCode.js';
+import { SERVER_PROFILES, SERVER_TYPES } from '@tracearr/shared';
 import {
   MEMBER_LOGIN_REFUSED,
   MEMBER_NOT_PERMITTED,
+  SERVER_ACCOUNT_SIGN_IN_TYPES,
   assertSignupAllowed,
   assertClaimCode,
   assertUserCanLogin,
@@ -448,6 +450,17 @@ describe('assertOwnerKeepsALoginMethod', () => {
     loginMethods({ local: false, plex: false, oidc: false });
     queueSelects([{ password: false, plex: false, oidc: false }]);
     await expect(assertOwnerKeepsALoginMethod({ local: true })).resolves.toBeUndefined();
+  });
+});
+
+describe('SERVER_ACCOUNT_SIGN_IN_TYPES', () => {
+  it('is every type whose members sign in through their own server account', () => {
+    expect(SERVER_ACCOUNT_SIGN_IN_TYPES).toEqual(
+      SERVER_TYPES.filter((type) =>
+        ['serverPassword', 'siloPairing'].includes(SERVER_PROFILES[type].memberSignIn)
+      )
+    );
+    expect(SERVER_ACCOUNT_SIGN_IN_TYPES).toContain('silo');
   });
 });
 

@@ -9,8 +9,8 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import type { ServerType } from '@tracearr/shared';
 
-/** The servers the showcase seeds; tofa has none yet. */
-export type ServerKey = Exclude<ServerType, 'tofa'>;
+/** The servers the showcase seeds; tofa and Silo have none yet. */
+export type ServerKey = Exclude<ServerType, 'tofa' | 'silo'>;
 
 export interface ShowcaseServer {
   key: ServerKey;

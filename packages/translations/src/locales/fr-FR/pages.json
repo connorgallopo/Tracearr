@@ -48,6 +48,7 @@
       "codeExpired": "Ce code a expiré.",
       "newCode": "Nouveau code",
       "refused": "Connexion non disponible pour ce compte.",
+      "signInUnavailable": "",
       "notPermitted": "Vous n'êtes pas autorisé à vous connecter. S'il vous plaît, contacter le propriétaire du serveur."
     }
   },

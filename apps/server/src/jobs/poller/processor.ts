@@ -656,7 +656,8 @@ function placeSession(
  * user and item means a new key is a duplicate. JF/Emby key sessions by user, device
  * and item, so their tracking key already covers this. A tofa player that reconnects gets
  * a new session id while the old one stays listed; the tofa client passes on only the
- * newest per device and file, and the confirm step stops the row it replaces.
+ * newest per device and file, and the confirm step stops the row it replaces. Silo lists and
+ * records each session id as its own session, so each is its own play here too.
  */
 async function findOpenRowForSameContent(
   serverType: ServerType,
@@ -685,6 +686,7 @@ async function findOpenRowForSameContent(
     case 'jellyfin':
     case 'emby':
     case 'tofa':
+    case 'silo':
       return undefined;
     default:
       return assertNever(serverType);
@@ -700,6 +702,7 @@ function fillsInMediaLater(serverType: ServerType): boolean {
     case 'plex':
     case 'jellyfin':
     case 'emby':
+    case 'silo':
       return false;
     case 'tofa':
       return true;
@@ -741,7 +744,7 @@ function noSessionChanges(success: boolean): ServerProcessingResult {
 
 /**
  * Issue #57: Plex keeps a sessionKey across items (e.g. "Play Next Episode"), so a
- * tracked session can change media. JF/Emby key sessions by item. Whether tofa moves a
+ * tracked session can change media. JF/Emby key sessions by item. Whether tofa or Silo moves a
  * session to the next item is unknown, so a new item under its session id is a new play.
  * Normalize '' to null: a row stored during a metadata blip carries an empty
  * ratingKey, which detectMediaChange would otherwise read as a real key and treat
@@ -755,6 +758,7 @@ function isMediaChange(
   switch (serverType) {
     case 'plex':
     case 'tofa':
+    case 'silo':
       return detectMediaChange(existingRatingKey || null, ratingKey || null);
     case 'jellyfin':
     case 'emby':

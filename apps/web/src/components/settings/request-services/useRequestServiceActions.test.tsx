@@ -170,9 +170,9 @@ describe('useRequestServiceActions', () => {
     const tofa = { ...plex, name: 'Den', type: 'tofa' } as Server;
     renderFor(
       service({
-        type: 'tofa',
+        type: 'server',
         version: null,
-        lastSyncError: 'Requests are turned off on this tofa server',
+        lastSyncError: 'Requests are turned off on this server',
       }),
       tofa
     );
@@ -180,7 +180,7 @@ describe('useRequestServiceActions', () => {
     expect(screen.getByText('requests.syncFailed')).toBeInTheDocument();
     expect(screen.queryByText(/requests\.syncedAgo/)).not.toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Requests are turned off on this tofa server' })
+      screen.getByRole('button', { name: 'Requests are turned off on this server' })
     ).toBeInTheDocument();
   });
 
@@ -239,7 +239,7 @@ describe('useRequestServiceActions', () => {
 
   it('shows tofa requests with the pause switch and no link, edit or unlink', async () => {
     const tofa = { ...plex, name: 'Den', type: 'tofa' } as Server;
-    renderFor(service({ type: 'tofa', name: 'Den', remoteServerId: null, version: null }), tofa);
+    renderFor(service({ type: 'server', name: 'Den', remoteServerId: null, version: null }), tofa);
 
     expect(screen.queryByText('Den')).not.toBeInTheDocument();
     expect(screen.queryByRole('link')).not.toBeInTheDocument();

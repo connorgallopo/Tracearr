@@ -48,6 +48,7 @@
       "codeExpired": "This code expired.",
       "newCode": "New code",
       "refused": "Sign-in is not available for this account.",
+      "signInUnavailable": "Sign-in is not available on this server right now.",
       "notPermitted": "You are not permitted to sign in. Please contact the server owner."
     }
   },
@@ -119,7 +120,7 @@
     "othersStreaming_one": "{{count}} other stream playing",
     "othersStreaming_other": "{{count}} other streams playing",
     "dayStreak": "Day streak",
-    "noServers": "Connect a Plex, Jellyfin, Emby or tofa server to see its streams, history and libraries here.",
+    "noServers": "Connect a Plex, Jellyfin, Emby, tofa or Silo server to see its streams, history and libraries here.",
     "view": {
       "label": "Dashboard view",
       "admin": "Server",
@@ -435,7 +436,7 @@
     },
     "stream": {
       "notAvailable": "N/A",
-      "bitrateUnavailable": "Jellyfin, Emby and tofa do not expose individual video and audio bitrates during transcoding. Only the total stream bitrate is available.",
+      "bitrateUnavailable": "Jellyfin, Emby, tofa and Silo do not expose individual video and audio bitrates during transcoding. Only the total stream bitrate is available.",
       "rebuffers": "Rebuffers",
       "droppedFrames": "Dropped frames",
       "stereo": "Stereo",
@@ -1043,7 +1044,7 @@
       "message_client": {
         "label": "Message Client",
         "description": "Send a message to the media player",
-        "hint": "Jellyfin and Emby only. Plex and tofa only show a message when killing a stream.",
+        "hint": "Jellyfin, Emby and Silo only. A Silo player without a live connection to Silo misses it. Plex and tofa only show a message when killing a stream.",
         "fields": {
           "target": {
             "description": "Which sessions to message"

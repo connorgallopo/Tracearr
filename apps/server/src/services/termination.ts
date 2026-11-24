@@ -37,7 +37,7 @@ export interface TerminateSessionOptions {
   /** For rule: the violation record */
   violationId?: string;
 
-  /** Message to display to user (Plex and tofa; ignored by Jellyfin/Emby) */
+  /** Message to display to user (Plex, tofa and Silo; ignored by Jellyfin/Emby) */
   reason?: string;
 
   /** The session's start when the caller holds it, so the lookup skips the older chunks */

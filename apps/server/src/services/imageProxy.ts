@@ -27,6 +27,13 @@ import { servers, libraryItems, mediaRequests, requestServices } from '../db/sch
 import { assertSafeProbeUrl, SsrfBlockedError } from '../utils/ssrf.js';
 import { cacheWriteAllowed, noteCacheWrite } from './imageCacheGuard.js';
 import { mediaBrowserTokenHeader } from './mediaServer/shared/baseMediaServerClient.js';
+import { SiloClient } from './mediaServer/silo/client.js';
+import {
+  parseSiloAvatarPath,
+  parseSiloPosterPath,
+  SILO_PRESET_AVATAR_PATH,
+  SILO_REQUEST_POSTER_PATH,
+} from './mediaServer/silo/parser.js';
 
 // libvips defaults its thread pool to the core count, so one background
 // precache walk can own every core of a small box. Inputs are server-resized
@@ -400,6 +407,11 @@ const IMAGE_PATH_ALLOWLIST: Record<ServerType, RegExp> = {
   // An artwork path, or the image cache path it redirects to with the size it was asked for,
   // or one of the avatars bundled with the server
   tofa: /^\/(api\/v1\/artwork\/[0-9a-f-]+\/poster|api\/v1\/profiles\/avatars\/[\w-]+\.png|cache\/images\/[a-z]+\/[^/?#]+(\?[wh]=\d+)?)$/,
+  // A signed artwork URL or uploaded avatar, a signed item poster link that redirects to one, a
+  // request's poster, or one of the avatars bundled with Silo's web app
+  silo: new RegExp(
+    `${/^\/api\/v2\/(artwork\/(?:[\w-]+\/)+[\w-]+\.[0-9a-f]+\.[a-z0-9]+|artwork\/profile-avatars\/[\w-]+\/[\w-]+\/w256\.webp|item-posters\/[\w.-]+)\?[\w=&-]+$/.source}|${SILO_REQUEST_POSTER_PATH.source}|${SILO_PRESET_AVATAR_PATH.source}`
+  ),
 };
 
 /** A guide image on a host the server's guide links art from, as an https address; null for anything else */
@@ -491,6 +503,14 @@ export function buildUpstreamRequest(
       }
       return { imageUrl: `${baseUrl}${imagePath}`, headers };
     }
+    // A signed URL names its own size, and Silo refuses one whose path or query was changed. The
+    // signature is the only credential: a key sent along would spend the key's rate budget. A
+    // request's poster is not signed and needs the key, and Silo refuses any query on it.
+    case 'silo':
+      if (SILO_REQUEST_POSTER_PATH.test(imagePath)) {
+        headers.Authorization = `Bearer ${server.token}`;
+      }
+      return { imageUrl: `${baseUrl}${imagePath}`, headers };
     default:
       return assertNever(server.type);
   }
@@ -518,7 +538,10 @@ function buildSeerrImageRequest(url: string, imagePath: string): UpstreamRequest
   return { imageUrl: `${baseUrl}${imagePath}`, headers: { Accept: 'image/*' } };
 }
 
-/** tofa answers an artwork path with a redirect into its own image cache, which needs the key too. */
+/**
+ * tofa answers an artwork path with a redirect into its own image cache, which needs the key too,
+ * and Silo an item poster link with a redirect to its signed artwork.
+ */
 function followsImageRedirect(type: ServerType): boolean {
   switch (type) {
     case 'plex':
@@ -526,6 +549,7 @@ function followsImageRedirect(type: ServerType): boolean {
     case 'emby':
       return false;
     case 'tofa':
+    case 'silo':
       return true;
     default:
       return assertNever(type);
@@ -533,9 +557,9 @@ function followsImageRedirect(type: ServerType): boolean {
 }
 
 /**
- * A redirect is followed, with the key, only where the server's images live behind one and the
- * target passes the same path checks as the first request. Any other redirect is returned as
- * the failure it is, since following it would carry the key past those checks.
+ * A redirect is followed only where the server's images live behind one and the target passes
+ * the same path checks as the first request. Any other redirect is returned as the failure it
+ * is, since following it could carry a key past those checks.
  */
 async function fetchUpstreamImage(
   server: ServerRow,
@@ -556,17 +580,69 @@ async function fetchUpstreamImage(
   return fetch(next.imageUrl, { ...init, headers: next.headers });
 }
 
-/** A media server is asked for a resized image first, then the original; Seerr's cache has one size. */
-function upstreamRequests(
+/** The server has no image at the stored path, which is the item's fault, not the server's */
+class NoServerImageError extends Error {}
+
+/**
+ * Where a stored image path is fetched on its server: the path itself, or for a Silo item or
+ * uploaded avatar the signed URL Silo gives it now
+ */
+async function resolveImagePath(
+  { server, requestServiceId }: Extract<ImageOrigin, { kind: 'server' }>,
+  imagePath: string
+): Promise<string | null> {
+  switch (server.type) {
+    case 'plex':
+    case 'jellyfin':
+    case 'emby':
+    case 'tofa':
+      return imagePath;
+    case 'silo': {
+      // A request poster is fetched with the key, so only a request service that holds it may ask
+      if (SILO_REQUEST_POSTER_PATH.test(imagePath)) {
+        if (requestServiceId === null) {
+          throw new SsrfBlockedError(
+            `A Silo request poster needs its request service: ${imagePath}`
+          );
+        }
+        return imagePath;
+      }
+      if (SILO_PRESET_AVATAR_PATH.test(imagePath) || guideImageUrl(server, imagePath)) {
+        return imagePath;
+      }
+      assertSafeProbeUrl(server.url);
+      const client = new SiloClient({ url: server.url, token: server.token, id: server.id });
+      const avatar = parseSiloAvatarPath(imagePath);
+      if (avatar) return client.getAvatarUrl(avatar.accountId, avatar.profileId);
+      const contentId = parseSiloPosterPath(imagePath);
+      if (contentId === null) throw new SsrfBlockedError(`Not a Silo poster path: ${imagePath}`);
+      return client.getPosterUrl(contentId);
+    }
+    default:
+      return assertNever(server.type);
+  }
+}
+
+/**
+ * A media server is asked for a resized image first, then the original, unless both are the same
+ * request; Seerr's cache has one size.
+ */
+async function upstreamRequests(
   origin: ImageOrigin,
   imagePath: string,
   size: { width: number; height: number },
   resizedOnly: boolean
-): UpstreamRequest[] {
+): Promise<UpstreamRequest[]> {
   switch (origin.kind) {
     case 'server': {
-      const resized = buildUpstreamRequest(origin.server, imagePath, size);
-      return resizedOnly ? [resized] : [resized, buildUpstreamRequest(origin.server, imagePath)];
+      const path = await resolveImagePath(origin, imagePath);
+      if (path === null) {
+        throw new NoServerImageError(`${origin.server.name} lists no poster for ${imagePath}`);
+      }
+      const resized = buildUpstreamRequest(origin.server, path, size);
+      if (resizedOnly) return [resized];
+      const original = buildUpstreamRequest(origin.server, path);
+      return original.imageUrl === resized.imageUrl ? [resized] : [resized, original];
     }
     case 'seerr':
       return [buildSeerrImageRequest(origin.url, imagePath)];
@@ -623,7 +699,7 @@ function serverOrigin(
   return server && !server.historicalAt ? { kind: 'server', server, requestServiceId } : null;
 }
 
-/** tofa's requests are its server's own, so their art comes from that server with its key */
+/** A server's own requests take their art from that server with its key */
 async function requestServiceOrigin(service: {
   id: string;
   type: RequestServiceType;
@@ -631,7 +707,7 @@ async function requestServiceOrigin(service: {
   serverId: string;
 }): Promise<ImageOrigin | null> {
   switch (service.type) {
-    case 'tofa':
+    case 'server':
       return serverOrigin(await selectServer(service.serverId), service.id);
     case 'seerr':
       return { kind: 'seerr', url: service.url, requestServiceId: service.id };
@@ -704,22 +780,24 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
     };
   }
 
-  // Ask the media server for a pre-resized image first (all three types
-  // resize and cache server-side; a 240px poster is ~20-40KB against a
+  // Ask the media server for a pre-resized image first (Plex, Jellyfin, Emby
+  // and tofa resize and cache server-side; a 240px poster is ~20-40KB against a
   // multi-MB original). Fall back to the original path so a transcoder
   // hiccup degrades to the old behavior instead of a broken image.
   const release = await acquireFetchSlot();
   let serverAnswered = false;
+  let rateLimited = false;
   try {
     // Inside the try so a blocked path degrades to the fallback image like any
     // other upstream failure, instead of escaping as a 500.
-    const candidates = upstreamRequests(origin, imagePath, { width, height }, resizedOnly);
+    const candidates = await upstreamRequests(origin, imagePath, { width, height }, resizedOnly);
     let imageBuffer: Buffer | null = null;
     let lastError: unknown = null;
     for (const candidate of candidates) {
       try {
         const response = await fetchFromOrigin(origin, candidate);
         serverAnswered = true;
+        if (response.status === 429) rateLimited = true;
 
         // Reject only clearly-non-image payloads (the Plex transcoder can
         // return an XML error page with a 200). Anything else - image/*,
@@ -772,7 +850,9 @@ async function runMissPipeline(args: MissPipelineArgs): Promise<ProxyResult> {
       degraded: true,
       failure: {
         reason: err instanceof Error ? err.message : String(err),
-        itemFault: serverAnswered || err instanceof SsrfBlockedError,
+        itemFault:
+          !rateLimited &&
+          (serverAnswered || err instanceof SsrfBlockedError || err instanceof NoServerImageError),
       },
       data: getFallbackImage(fallback, width, height),
       contentType: 'image/svg+xml',

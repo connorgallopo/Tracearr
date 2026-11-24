@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -23,10 +23,30 @@ const jellyfin: MemberLoginServer = {
   id: 'jf-1',
   name: 'Home Jellyfin',
   type: 'jellyfin',
-  quickConnect: true,
+  codeSignIn: true,
+  passwordSignIn: true,
 };
-const jellyfinNoQc: MemberLoginServer = { ...jellyfin, id: 'jf-2', quickConnect: false };
-const emby: MemberLoginServer = { id: 'em-1', name: 'Den Emby', type: 'emby', quickConnect: false };
+const jellyfinNoQc: MemberLoginServer = { ...jellyfin, id: 'jf-2', codeSignIn: false };
+const emby: MemberLoginServer = {
+  id: 'em-1',
+  name: 'Den Emby',
+  type: 'emby',
+  codeSignIn: false,
+  passwordSignIn: true,
+};
+const silo: MemberLoginServer = {
+  id: 'si-1',
+  name: 'Vault',
+  type: 'silo',
+  codeSignIn: true,
+  passwordSignIn: true,
+};
+const siloCode = {
+  handle: 's1',
+  code: '1234-5678',
+  link: 'https://silo.example.com/activate?code=12345678',
+  interval: 5,
+};
 
 const REFUSED = 'Sign-in is not available for this account.';
 
@@ -236,6 +256,147 @@ describe('MemberLogin', () => {
       })
     );
     expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  describe('Silo', () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    it('shows the code 4+4 with Open Silo and the password option, polling at the interval', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      serve({
+        '/silo/code/initiate': { data: siloCode },
+        '/silo/code/check': { data: { authorized: false } },
+      });
+      renderLogin([silo]);
+
+      expect(
+        await screen.findByRole('button', { name: 'pages:login.member.copyCode' })
+      ).toHaveTextContent('1234 5678');
+      expect(
+        screen.getByRole('link', { name: 'settings:servers.pairing.openSilo' })
+      ).toHaveAttribute('href', siloCode.link);
+      expect(screen.getByText('settings:servers.pairing.enterAt')).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'pages:login.member.usePassword' })
+      ).toBeInTheDocument();
+      expect(fetchMock).toHaveBeenCalledWith('/silo/code/initiate', {
+        method: 'POST',
+        body: { serverId: 'si-1' },
+      });
+
+      await waitFor(() => expect(calls('/silo/code/check')).toHaveLength(1));
+      await vi.advanceTimersByTimeAsync(4000);
+      expect(calls('/silo/code/check')).toHaveLength(1);
+      await vi.advanceTimersByTimeAsync(1500);
+      expect(calls('/silo/code/check')).toHaveLength(2);
+      expect(fetchMock).toHaveBeenCalledWith('/silo/code/check', {
+        method: 'POST',
+        body: { handle: 's1' },
+      });
+    });
+
+    it('goes back from the password form with Use a code instead', async () => {
+      serve({
+        '/silo/code/initiate': { data: siloCode },
+        '/silo/code/check': { data: { authorized: false } },
+      });
+      renderLogin([silo]);
+      await screen.findByRole('button', { name: 'pages:login.member.copyCode' });
+
+      await userEvent.click(screen.getByRole('button', { name: 'pages:login.member.usePassword' }));
+      await userEvent.click(
+        screen.getByRole('button', { name: 'settings:servers.pairing.useCode' })
+      );
+
+      expect(
+        await screen.findByRole('button', { name: 'pages:login.member.copyCode' })
+      ).toBeInTheDocument();
+      expect(calls('/silo/code/initiate')).toHaveLength(2);
+    });
+
+    it('shows the password form alone when the code request fails to start', async () => {
+      serve({ '/silo/code/initiate': { error: { status: 404, message: 'off' } } });
+      renderLogin([silo]);
+
+      expect(await screen.findByLabelText('settings:account.password')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'pages:login.member.copyCode' })).toBeNull();
+      expect(screen.queryByRole('alert')).toBeNull();
+    });
+
+    it('shows only the password form when Silo offers no code sign-in', async () => {
+      serve({ '/silo/sign-in': { data: { authorized: true } } });
+      const { onSignedIn } = renderLogin([{ ...silo, codeSignIn: false }]);
+
+      await userEvent.type(screen.getByLabelText('pages:login.username'), 'dana');
+      await userEvent.type(screen.getByLabelText('settings:account.password'), 'pw');
+      await userEvent.click(screen.getByRole('button', { name: 'common:actions.signIn' }));
+
+      await waitFor(() => expect(onSignedIn).toHaveBeenCalledTimes(1));
+      expect(fetchMock).toHaveBeenCalledWith('/silo/sign-in', {
+        method: 'POST',
+        body: { serverId: 'si-1', username: 'dana', password: 'pw' },
+      });
+      expect(calls('/silo/code/initiate')).toHaveLength(0);
+      expect(screen.queryByRole('button', { name: 'settings:servers.pairing.useCode' })).toBeNull();
+    });
+
+    it('offers no password when Silo reports password sign-in off', async () => {
+      serve({
+        '/silo/code/initiate': { data: siloCode },
+        '/silo/code/check': { data: { authorized: false } },
+      });
+      renderLogin([{ ...silo, passwordSignIn: false }]);
+
+      await screen.findByRole('button', { name: 'pages:login.member.copyCode' });
+      expect(screen.queryByRole('button', { name: 'pages:login.member.usePassword' })).toBeNull();
+      expect(screen.queryByLabelText('settings:account.password')).toBeNull();
+    });
+
+    it('offers a new code, not a password form, when the code fails and passwords are off', async () => {
+      serve({ '/silo/code/initiate': { error: { status: 500, message: 'Sign-in failed.' } } });
+      renderLogin([{ ...silo, passwordSignIn: false }]);
+
+      expect(await screen.findByRole('alert')).toHaveTextContent('Sign-in failed.');
+      expect(screen.getByText('pages:login.member.signInUnavailable')).toBeInTheDocument();
+      expect(screen.queryByLabelText('settings:account.password')).toBeNull();
+      await userEvent.click(
+        screen.getByRole('button', { name: 'settings:servers.pairing.newCode' })
+      );
+      await waitFor(() => expect(calls('/silo/code/initiate')).toHaveLength(2));
+    });
+
+    it('says sign-in is unavailable when code sign-in is off and passwords are off', async () => {
+      serve({ '/silo/code/initiate': { error: { status: 404, message: 'off' } } });
+      renderLogin([{ ...silo, passwordSignIn: false }]);
+
+      expect(await screen.findByText('pages:login.member.signInUnavailable')).toBeInTheDocument();
+      expect(screen.queryByLabelText('settings:account.password')).toBeNull();
+      expect(screen.queryByRole('alert')).toBeNull();
+    });
+
+    it('says sign-in is unavailable when the server offers neither a code nor a password', () => {
+      serve({});
+      renderLogin([{ ...silo, codeSignIn: false, passwordSignIn: false }]);
+
+      expect(screen.getByText('pages:login.member.signInUnavailable')).toBeInTheDocument();
+      expect(screen.queryByLabelText('settings:account.password')).toBeNull();
+      expect(screen.queryByRole('button', { name: 'settings:servers.pairing.newCode' })).toBeNull();
+      expect(fetchMock).not.toHaveBeenCalled();
+    });
+
+    it('finishes the sign-in once the code is approved', async () => {
+      serve({
+        '/silo/code/initiate': { data: siloCode },
+        '/silo/code/check': {
+          data: { authorized: true, user: { id: 'u1', username: 'bob', role: 'member' } },
+        },
+      });
+      const { onSignedIn } = renderLogin([silo]);
+
+      await waitFor(() => expect(onSignedIn).toHaveBeenCalledTimes(1));
+    });
   });
 
   it('toasts not permitted once Quick Connect is approved, then offers the password form', async () => {

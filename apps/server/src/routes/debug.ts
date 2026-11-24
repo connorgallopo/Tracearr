@@ -39,6 +39,7 @@ import {
   publishDestinationsChanged,
 } from '../services/notifications/destinationStore.js';
 import { seedBuiltinDestinations } from '../services/notifications/destinationsMigration.js';
+import { clearHistoryCursor } from '../services/import/siloHistory.js';
 import { violationAliasConditions } from '../services/automations/aliasFilter.js';
 import { getAllServices } from '../services/serviceTracker.js';
 import { getPublicEventConnectionStats } from '../services/publicEvents/connections.js';
@@ -436,6 +437,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
       .delete(terminationLogs)
       .returning({ id: terminationLogs.id });
     const sessionsDeleted = await db.delete(sessions).returning({ id: sessions.id });
+    await clearHistoryCursor(app.redis);
 
     return {
       success: true,
@@ -496,6 +498,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
 
       // Delete sessions for these server users
       await db.delete(sessions).where(sql`server_user_id = ANY(${serverUserIdArray})`);
+      await clearHistoryCursor(app.redis);
     }
 
     // Delete the users (cascades to serverUsers, plexAccounts, mobileTokens, mobileSessions)
@@ -516,6 +519,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
   app.delete('/servers', async () => {
     const deleted = await db.delete(servers).returning({ id: servers.id });
     invalidateServersCache();
+    await clearHistoryCursor(app.redis);
     return {
       success: true,
       deleted: deleted.length,
@@ -600,6 +604,7 @@ export const debugRoutes: FastifyPluginAsync = async (app) => {
     await db.delete(automationRuns);
     await db.delete(terminationLogs);
     await db.delete(sessions);
+    await clearHistoryCursor(app.redis);
     await db.delete(automations);
     await db.delete(destinations);
     await db.delete(notificationPreferences);

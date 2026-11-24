@@ -44,7 +44,7 @@ interface ServerResourceChartsProps {
   isLoading?: boolean;
   averages?: {
     hostCpu: number | null;
-    processCpu: number;
+    processCpu: number | null;
     hostMemory: number | null;
     processMemory: number;
   } | null;
@@ -62,7 +62,7 @@ interface ResourceChartProps extends Omit<ServerResourceChartsProps, 'averages'>
   icon: React.ReactNode;
   processKey: ProcessKey;
   hostKey: HostKey;
-  processAvg?: number;
+  processAvg?: number | null;
   hostAvg?: number | null;
 }
 

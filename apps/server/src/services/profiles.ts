@@ -148,6 +148,24 @@ export function profileIdOf(
   return profileExternalId ? (profiles.get(profileExternalId)?.id ?? null) : null;
 }
 
+/** The stored server_profiles ids of a server's profiles, by the server's own profile id; ids not stored yet are left out */
+export async function storedProfileIds(
+  serverId: string,
+  externalIds: string[]
+): Promise<Map<string, string>> {
+  if (externalIds.length === 0) return new Map();
+  const rows = await db
+    .select({ externalId: serverProfiles.externalId, id: serverProfiles.id })
+    .from(serverProfiles)
+    .where(
+      and(
+        eq(serverProfiles.serverId, serverId),
+        inArray(serverProfiles.externalId, [...new Set(externalIds)])
+      )
+    );
+  return new Map(rows.map((row) => [row.externalId, row.id]));
+}
+
 /**
  * The stored row of each sighted profile, by the server's profile id, inserting the ones not
  * stored yet. Live plays `refresh` the name and clear a removal; plays from the

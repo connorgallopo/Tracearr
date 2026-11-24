@@ -202,7 +202,7 @@ describe('ServerRow', () => {
       renderRow({
         server: server({ name: 'Den', type: 'tofa' }),
         isOwner: true,
-        requestService: { service: service({ type: 'tofa', name: 'Den', version: null }) },
+        requestService: { service: service({ type: 'server', name: 'Den', version: null }) },
         ownerLink: ownerLink({ serverUserId: 'su-1', username: 'gallapagos', canUnlink: false }),
       });
       await openMenu('Den');

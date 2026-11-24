@@ -78,6 +78,7 @@ export function Connections() {
     ? serversData
     : ((serversData as unknown as { data?: Server[] })?.data ?? []);
   const nameOf = (id: string | null) => servers.find((s) => s.id === id)?.name ?? '';
+  const deleteType = servers.find((s) => s.id === deleteId)?.type;
 
   const openAddDialog = () => {
     setAddedServer(null);
@@ -178,7 +179,11 @@ export function Connections() {
         restoreFocus
         onOpenChange={() => setDeleteId(null)}
         title={t('servers.removeServerTitle', { name: nameOf(deleteId) })}
-        description={t('servers.removeServerConfirm')}
+        description={
+          deleteType && SERVER_PROFILES[deleteType].addServerAuth === 'siloPairing'
+            ? `${t('servers.removeServerConfirm')} ${t('servers.pairing.revokeOnRemove')}`
+            : t('servers.removeServerConfirm')
+        }
         confirmLabel={t('common:actions.remove')}
         isLoading={deleteServer.isPending}
         onConfirm={() => {

@@ -26,6 +26,7 @@ import {
   JellyfinClient,
   EmbyClient,
   TofaClient,
+  SiloClient,
   type IMediaServerClient,
   type MediaSession,
   type MediaUser,
@@ -84,6 +85,17 @@ describe('createMediaServerClient', () => {
 
     expect(client).toBeInstanceOf(TofaClient);
     expect(client.serverType).toBe('tofa');
+  });
+
+  it('should create SiloClient for type "silo"', () => {
+    const client = createMediaServerClient({
+      type: 'silo',
+      url: 'http://silo.local:8090',
+      token: 'encrypted-token',
+    });
+
+    expect(client).toBeInstanceOf(SiloClient);
+    expect(client.serverType).toBe('silo');
   });
 
   it('should throw error for unknown server type', () => {
@@ -153,6 +165,7 @@ describe('per-server decisions', () => {
     expect(isJellyfinEmby('plex')).toBe(false);
     expect(isJellyfinEmby('emby')).toBe(true);
     expect(isJellyfinEmby('tofa')).toBe(false);
+    expect(isJellyfinEmby('silo')).toBe(false);
   });
 
   it('creates the client class named by the server type', () => {
@@ -168,16 +181,19 @@ describe('per-server decisions', () => {
       .mockResolvedValue({ success: true });
     const emby = vi.spyOn(EmbyClient, 'verifyServerAdmin').mockResolvedValue({ success: true });
     const tofa = vi.spyOn(TofaClient, 'verifyServerAdmin').mockResolvedValue({ success: true });
+    const silo = vi.spyOn(SiloClient, 'verifyServerAdmin').mockResolvedValue({ success: true });
 
     await verifyServerAdmin('plex', 'p', 'http://plex');
     await verifyServerAdmin('jellyfin', 'j', 'http://jellyfin');
     await verifyServerAdmin('emby', 'e', 'http://emby');
     await verifyServerAdmin('tofa', 't', 'http://tofa');
+    await verifyServerAdmin('silo', 's', 'http://silo');
 
     expect(plex).toHaveBeenCalledExactlyOnceWith('p', 'http://plex');
     expect(jellyfin).toHaveBeenCalledExactlyOnceWith('j', 'http://jellyfin');
     expect(emby).toHaveBeenCalledExactlyOnceWith('e', 'http://emby');
     expect(tofa).toHaveBeenCalledExactlyOnceWith('t', 'http://tofa');
+    expect(silo).toHaveBeenCalledExactlyOnceWith('s', 'http://silo');
   });
 
   it('logs a token out through the class for the server type', async () => {
@@ -203,6 +219,7 @@ describe('IMediaServerClient Interface Compliance', () => {
       jellyfin: 'http://jellyfin.local:8096',
       emby: 'http://emby.local:8096',
       tofa: 'http://tofa.local:33333',
+      silo: 'http://silo.local:8090',
     };
     return createMediaServerClient({
       type,

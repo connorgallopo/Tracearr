@@ -1,6 +1,8 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { User } from 'lucide-react';
+import type { NonMainProfile } from '@tracearr/shared';
+import { AvatarWithProfile } from '@/components/sessions/AvatarWithProfile';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getAvatarUrl } from '@/components/users/utils';
 import { cn } from '@/lib/utils';
@@ -23,6 +25,8 @@ interface UserCellProps {
   trailing?: ReactNode;
   /** A removed account: the name reads as struck through. */
   muted?: boolean;
+  /** The profile that acted, when it is not the account's main one, badged over the avatar. */
+  profileBadge?: { serverId: string; profile: NonMainProfile };
 }
 
 /** One person, wherever the app shows one: avatar, name, and the way to their page. */
@@ -38,6 +42,7 @@ export function UserCell({
   link = true,
   trailing,
   muted,
+  profileBadge,
 }: UserCellProps) {
   const name = personName ?? identityName ?? username;
   if (name === null) return <span className="text-muted-foreground">—</span>;
@@ -46,19 +51,29 @@ export function UserCell({
   const avatarUrl = getAvatarUrl(serverId, thumbUrl, small ? 24 : 40);
   const subline = details.join(' · ');
 
+  // The name is right beside it, so the initial is decoration rather than a second label.
+  const avatar = (
+    <Avatar aria-hidden className={small ? 'size-6' : 'size-10'}>
+      {avatarUrl !== null && <AvatarImage src={avatarUrl} alt="" />}
+      <AvatarFallback className={small ? 'text-[0.625rem] font-semibold' : 'text-sm font-medium'}>
+        {identityName ? (
+          identityName.slice(0, 1).toUpperCase()
+        ) : (
+          <User className={cn('text-muted-foreground', small ? 'size-3.5' : 'size-5')} />
+        )}
+      </AvatarFallback>
+    </Avatar>
+  );
+
   const body = (
     <>
-      {/* The name is right beside it, so the initial is decoration rather than a second label. */}
-      <Avatar aria-hidden className={small ? 'size-6' : 'size-10'}>
-        {avatarUrl !== null && <AvatarImage src={avatarUrl} alt="" />}
-        <AvatarFallback className={small ? 'text-[0.625rem] font-semibold' : 'text-sm font-medium'}>
-          {identityName ? (
-            identityName.slice(0, 1).toUpperCase()
-          ) : (
-            <User className={cn('text-muted-foreground', small ? 'size-3.5' : 'size-5')} />
-          )}
-        </AvatarFallback>
-      </Avatar>
+      {profileBadge ? (
+        <AvatarWithProfile serverId={profileBadge.serverId} profile={profileBadge.profile}>
+          {avatar}
+        </AvatarWithProfile>
+      ) : (
+        avatar
+      )}
       <span className="min-w-0">
         <span
           className={cn(

@@ -204,6 +204,29 @@ describe('fetchJson', () => {
     }
   });
 
+  it('keeps the two response headers a caller reads, and no others', async () => {
+    mockFetch.mockResolvedValue(
+      createMockResponse({
+        ok: false,
+        status: 409,
+        statusText: 'Conflict',
+        headers: {
+          'Retry-After': '3',
+          'X-Silo-Latest-Sequence': '1795282810497',
+          'Set-Cookie': 'session=abc',
+        },
+      })
+    );
+
+    const error = await fetchJson('https://api.example.com/x', { service: 'silo' }).catch(
+      (thrown: unknown) => thrown
+    );
+
+    expect(error).toMatchObject({ retryAfter: '3', latestSequence: '1795282810497' });
+    expect(JSON.stringify(error)).not.toContain('abc');
+    expect(error).not.toHaveProperty('headers');
+  });
+
   it('should use default service name "API" when not provided', async () => {
     mockFetch.mockResolvedValue(
       createMockResponse({

@@ -104,7 +104,7 @@ export interface ProcessedSession extends StreamDetailFields {
   ratingKey: string;
   /** Identifier of the file/version being played, when the server reports one */
   serverVersionKey?: string | null;
-  /** The profile that played, where one account holds several (tofa) */
+  /** The profile that played, where one account holds several (tofa and Silo) */
   profileName?: string | null;
   /** The server's id for that profile */
   profileExternalId: string | null;

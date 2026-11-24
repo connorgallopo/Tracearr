@@ -38,10 +38,12 @@ import {
   FileDropzone,
   PlaybackReportingImportSection,
   StartImportButton,
-  TofaImportSection,
+  HISTORY_IMPORT_COPY,
+  ServerHistoryImportSection,
   type ImportProgressData,
 } from '@/components/import';
 import {
+  SERVER_HISTORY_IMPORTERS,
   SERVER_PROFILES,
   type Server,
   type ServerType,
@@ -65,7 +67,11 @@ import { SettingsSection } from '@/components/settings/shell/SettingsSection';
 import { StepBadge } from '@/components/settings/shared/StepBadge';
 import { BetaBadge } from '@/components/settings/shared/BetaBadge';
 
-const TAB_COLUMNS: Record<number, string> = { 2: 'grid-cols-2', 3: 'grid-cols-3' };
+const TAB_COLUMNS: Record<number, string> = {
+  2: 'grid-cols-2',
+  3: 'grid-cols-3',
+  4: 'grid-cols-4',
+};
 
 const blankTautulliProgress = (
   status: TautulliImportProgress['status'],
@@ -651,7 +657,6 @@ export function ImportSources({
   // Split servers by type
   const plexServers = servers.filter((s) => SERVER_PROFILES[s.type].importsTautulliHistory);
   const jellyfinEmbyServers = servers.filter((s) => isJellyfinEmby(s.type));
-  const tofaServers = servers.filter((s) => SERVER_PROFILES[s.type].serverHistoryImport === 'tofa');
 
   const plexIds = plexServers.map((server) => server.id);
   const jellyfinEmbyIds = jellyfinEmbyServers.map((server) => server.id);
@@ -898,14 +903,27 @@ export function ImportSources({
       content: <div className="space-y-6">{jellyfinSections}</div>,
     });
   }
-  if (tofaServers.length > 0) {
-    sources.push({
-      value: 'tofa',
-      icon: 'tofa',
-      label: t('import.tofa'),
-      content: <TofaImportSection servers={tofaServers} onStarted={onStarted} />,
-    });
-  }
+  sources.push(
+    ...SERVER_HISTORY_IMPORTERS.flatMap((importer) => {
+      const own = servers.filter((s) => SERVER_PROFILES[s.type].serverHistoryImport === importer);
+      return own.length > 0
+        ? [
+            {
+              value: importer,
+              icon: importer,
+              label: t(HISTORY_IMPORT_COPY[importer].tab),
+              content: (
+                <ServerHistoryImportSection
+                  importer={importer}
+                  servers={own}
+                  onStarted={onStarted}
+                />
+              ),
+            },
+          ]
+        : [];
+    })
+  );
 
   return settingsLoading || serversLoading ? (
     <div className="space-y-4">

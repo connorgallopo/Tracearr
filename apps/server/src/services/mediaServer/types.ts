@@ -15,6 +15,7 @@ import {
   type TranscodeInfo,
   type SubtitleInfo,
 } from '@tracearr/shared';
+import type { MappedRequest } from '../requests/mapping.js';
 
 // ============================================================================
 // Session Types
@@ -42,7 +43,7 @@ export interface MediaSession {
     id: string;
     username: string;
     thumb?: string;
-    /** The profile that plays, where one account holds several (tofa) */
+    /** The profile that plays, where one account holds several (tofa, Silo) */
     profileName?: string;
     /** The server's id for that profile */
     profileId?: string;
@@ -223,7 +224,7 @@ export interface MediaUser {
   lastLoginAt?: Date;
   /** Last activity timestamp */
   lastActivityAt?: Date;
-  /** When user joined/was added to media server (Plex only - from createdAt/joinedAt) */
+  /** When the user joined or was added to the media server (Plex and Silo report it) */
   joinedAt?: Date;
   /** tofa only: the cloud account that signs in as this user, null when none may */
   cloudIdentityId?: string | null;
@@ -528,6 +529,17 @@ export interface LibraryChangeFeed {
   revision: number;
 }
 
+/** A server's own requests, mapped, or its answer that requests are turned off there */
+export type ServerRequests =
+  | {
+      requestsOn: true;
+      version: string | null;
+      requests: MappedRequest[];
+      /** Requests the server listed in a state Tracearr cannot map; their stored rows stay as they are */
+      unmappedIds?: string[];
+    }
+  | { requestsOn: false; version: string | null };
+
 /** The server no longer holds every change since the cursor, so only a full scan is complete */
 export class FullSyncRequiredError extends Error {}
 
@@ -779,6 +791,23 @@ export interface IMediaServerClient {
    * @returns Rating key -> version key -> whether the file exists
    */
   checkFilesExist(ratingKeys: string[]): Promise<Map<string, Map<string, boolean>> | NotNeeded>;
+
+  /**
+   * Every request the server keeps of its own, walking all pages where the server pages
+   * them, or its answer that requests are turned off there. The request sync marks any
+   * request missing from the list as deleted. Servers without requests of their own answer
+   * NOT_NEEDED.
+   */
+  getRequests(): Promise<ServerRequests | NotNeeded>;
+
+  /**
+   * The poster the server serves for a requested title, held in its library or not. Servers
+   * without requests of their own answer NOT_NEEDED.
+   */
+  getRequestPosterPath(
+    mediaType: 'movie' | 'tv',
+    tmdbId: number
+  ): Promise<string | null | NotNeeded>;
 }
 
 /**

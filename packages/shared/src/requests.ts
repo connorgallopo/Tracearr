@@ -1,14 +1,14 @@
 import { z } from 'zod';
 import { serverIdsQuerySchema, uuidSchema } from './schemas.js';
-import type { ServerType, WatchedState } from './types.js';
+import type { NonMainProfile, ServerType, WatchedState } from './types.js';
 
-export const REQUEST_SERVICE_TYPES = ['seerr', 'tofa'] as const;
+export const REQUEST_SERVICE_TYPES = ['seerr', 'server'] as const;
 export type RequestServiceType = (typeof REQUEST_SERVICE_TYPES)[number];
 
 /** A built-in service is the server's own requests: it comes and goes with the server and reads the server's address and key. */
 export const REQUEST_SERVICE_BUILT_IN: Record<RequestServiceType, boolean> = {
   seerr: false,
-  tofa: true,
+  server: true,
 };
 
 export const MEDIA_REQUEST_STATUSES = [
@@ -98,7 +98,11 @@ interface RequestEntryBase {
 export interface MediaRequestEntry extends RequestEntryBase {
   /** The service the request was made through */
   serviceType: RequestServiceType;
+  /** The type of the server the service belongs to */
+  serverType: ServerType;
   requester: RequestRequester;
+  /** The profile that asked, when it is not the account's main one */
+  nonMainProfile?: NonMainProfile;
 }
 
 export interface UserRequestEntry extends RequestEntryBase {
@@ -110,6 +114,8 @@ export interface UserRequestEntry extends RequestEntryBase {
     /** Through the image proxy, from the preferred server's library copy; null with no copy */
     posterUrl: string | null;
   };
+  /** The profile that asked, when it is not the account's main one */
+  nonMainProfile?: NonMainProfile;
 }
 
 export interface UserRequestsSummary {
@@ -170,6 +176,8 @@ export interface RequestOutcomeRow {
   seasons: RequestSeason[] | null;
   fileSizeBytes: number;
   requester: RequestRequester;
+  /** The profile that asked, when it is not the account's main one */
+  nonMainProfile?: NonMainProfile;
 }
 
 export const REQUEST_UNPLAYED_SORTS = ['fileSizeBytes', 'waitMs', 'requestedAt', 'title'] as const;

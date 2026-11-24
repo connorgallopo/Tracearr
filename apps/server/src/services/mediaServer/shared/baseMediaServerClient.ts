@@ -230,6 +230,14 @@ export abstract class BaseMediaServerClient
     return NOT_NEEDED;
   }
 
+  async getRequests(): Promise<NotNeeded> {
+    return NOT_NEEDED;
+  }
+
+  async getRequestPosterPath(): Promise<NotNeeded> {
+    return NOT_NEEDED;
+  }
+
   /**
    * Get all libraries on this server
    */

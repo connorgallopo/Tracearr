@@ -6,7 +6,7 @@
 
 import { createHash } from 'node:crypto';
 import { resolutionTierRank } from '@tracearr/shared';
-import type { MediaItemVersion } from '../types.js';
+import type { MediaItemVersion, MediaLibraryItem } from '../types.js';
 
 /**
  * Deterministic hash over the version set, order-insensitive. Joins the item
@@ -64,4 +64,21 @@ export function sumVersionSizes(versions: MediaItemVersion[]): number | undefine
     }
   }
   return seen ? total : undefined;
+}
+
+/** The quality columns an item rolls up from its versions */
+export function rollupVersions(versions: MediaItemVersion[]): Partial<MediaLibraryItem> {
+  const best = pickBestVersion(versions);
+  return {
+    videoResolution: best?.videoResolution,
+    videoCodec: best?.videoCodec,
+    videoDynamicRange: best?.videoDynamicRange,
+    audioCodec: best?.audioCodec,
+    audioChannels: best?.audioChannels,
+    fileSize: sumVersionSizes(versions),
+    container: best?.container,
+    versions,
+    versionsFingerprint: computeVersionsFingerprint(versions),
+    filePath: best?.filePath,
+  };
 }

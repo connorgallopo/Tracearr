@@ -94,6 +94,7 @@ function requestEntry(overrides: Partial<MediaRequestEntry> = {}): MediaRequestE
     id: 'req-1',
     serverId: 'srv-plex',
     serviceType: 'seerr',
+    serverType: 'plex',
     status: 'completed',
     requestedAt: '2026-01-08T12:00:00.000Z',
     availableAt: '2026-01-08T12:02:00.000Z',
@@ -402,7 +403,7 @@ describe('DetailHero', () => {
     renderHero({
       data: fullDetail(),
       stub,
-      request: requestEntry({ serviceType: 'tofa' }),
+      request: requestEntry({ serviceType: 'server', serverType: 'tofa' }),
     });
 
     const logo = screen.getByText(/Requested by Alice/).parentElement?.querySelector('img');

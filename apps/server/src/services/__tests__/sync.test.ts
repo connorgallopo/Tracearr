@@ -1,11 +1,14 @@
 import { describe, expect, it, vi, beforeEach } from 'vitest';
 
-const { mockLimit, mockReturning, mockGetUsers, mockGetLibraries } = vi.hoisted(() => ({
-  mockLimit: vi.fn(),
-  mockReturning: vi.fn(),
-  mockGetUsers: vi.fn(),
-  mockGetLibraries: vi.fn(),
-}));
+const { mockLimit, mockReturning, mockGetUsers, mockGetLibraries, mockCreateClient } = vi.hoisted(
+  () => ({
+    mockLimit: vi.fn(),
+    mockReturning: vi.fn(),
+    mockGetUsers: vi.fn(),
+    mockGetLibraries: vi.fn(),
+    mockCreateClient: vi.fn(),
+  })
+);
 
 vi.mock('../../db/client.js', () => ({
   db: {
@@ -15,8 +18,7 @@ vi.mock('../../db/client.js', () => ({
   createRawPgClient: () => ({ connect: vi.fn(), query: vi.fn(), end: vi.fn(async () => {}) }),
 }));
 vi.mock('../mediaServer/index.js', () => ({
-  createMediaServerClient: () =>
-    fakeJellyfinClient({ getUsers: mockGetUsers, getLibraries: mockGetLibraries }),
+  createMediaServerClient: mockCreateClient,
   PlexClient: class {},
 }));
 vi.mock('../userService.js', () => ({
@@ -27,12 +29,14 @@ vi.mock('../userService.js', () => ({
 vi.mock('../serverIdentity.js', () => ({ ensureServerIdentifier: vi.fn() }));
 vi.mock('../../lib/revoke.js', () => ({ revokeSessionsForServerUsers: vi.fn() }));
 vi.mock('../../lib/scope.js', () => ({ clearScope: vi.fn() }));
+vi.mock('../profiles.js', () => ({ syncAccountProfiles: vi.fn() }));
 
 import { revokeSessionsForServerUsers } from '../../lib/revoke.js';
 import { clearScope } from '../../lib/scope.js';
+import { syncAccountProfiles } from '../profiles.js';
 import { syncUserFromMediaServer } from '../userService.js';
 import { syncServer } from '../sync.js';
-import { fakeJellyfinClient } from '../../test/mediaServerFakes.js';
+import { fakeJellyfinClient, fakeSiloClient } from '../../test/mediaServerFakes.js';
 import { HttpClientError, isHttpStatus } from '../../utils/http.js';
 
 const SERVER = {
@@ -51,6 +55,9 @@ function synced(id: string, lostAccess: boolean) {
 describe('syncServer revocation', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCreateClient.mockImplementation(() =>
+      fakeJellyfinClient({ getUsers: mockGetUsers, getLibraries: mockGetLibraries })
+    );
     mockLimit.mockResolvedValue([SERVER]);
     mockGetUsers.mockResolvedValue([{ id: 'ext-1' }, { id: 'ext-2' }]);
     mockGetLibraries.mockResolvedValue([]);
@@ -101,6 +108,9 @@ describe('syncServer revocation', () => {
 describe('syncServer library access', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCreateClient.mockImplementation(() =>
+      fakeJellyfinClient({ getUsers: mockGetUsers, getLibraries: mockGetLibraries })
+    );
     mockLimit.mockResolvedValue([SERVER]);
     mockReturning.mockResolvedValue([]);
     vi.mocked(syncUserFromMediaServer).mockResolvedValue(synced('su-1', false));
@@ -173,5 +183,21 @@ describe('syncServer library access', () => {
       usersError: refused,
       errors: ['Jellyfin user sync failed: jellyfin request failed: 401 Unauthorized'],
     });
+  });
+});
+
+describe('syncServer for Silo', () => {
+  it("syncs a Silo server's accounts, then each account's profiles", async () => {
+    vi.clearAllMocks();
+    const client = fakeSiloClient();
+    mockCreateClient.mockReturnValue(client);
+    mockLimit.mockResolvedValue([{ ...SERVER, type: 'silo' }]);
+    mockReturning.mockResolvedValue([]);
+    vi.mocked(syncUserFromMediaServer).mockResolvedValue(synced('su-1', false));
+
+    const result = await syncServer('srv-1', { syncUsers: true, syncLibraries: false });
+
+    expect(result.errors).toEqual([]);
+    expect(syncAccountProfiles).toHaveBeenCalledExactlyOnceWith('srv-1', client, ['1', '34']);
   });
 });

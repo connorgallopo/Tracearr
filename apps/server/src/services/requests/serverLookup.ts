@@ -35,12 +35,17 @@ export async function findServerById(
   return rows[0] ?? null;
 }
 
+export interface LiveServer {
+  id: string;
+  type: ServerType;
+  url: string;
+  token: string;
+}
+
 /** The address and key of a server Tracearr still monitors; null once it is removed or historical */
-export async function liveServerConnection(
-  id: string
-): Promise<{ url: string; token: string } | null> {
+export async function liveServerConnection(id: string): Promise<LiveServer | null> {
   const rows = await db
-    .select({ url: servers.url, token: servers.token })
+    .select({ id: servers.id, type: servers.type, url: servers.url, token: servers.token })
     .from(servers)
     .where(and(eq(servers.id, id), liveServerCondition))
     .limit(1);

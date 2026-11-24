@@ -1,7 +1,6 @@
 import { sql, type SQL } from 'drizzle-orm';
-import { assertNever, type ServerType } from '@tracearr/shared';
 import { db } from '../../db/client.js';
-import type { MappedRequest } from './mapping.js';
+import type { MappedRequest, RequesterIdentity } from './mapping.js';
 
 export type ResolutionInput = Pick<
   MappedRequest,
@@ -13,11 +12,13 @@ export type ResolutionInput = Pick<
   | 'remoteUserId'
   | 'remotePlexId'
   | 'remoteJellyfinUserId'
+  | 'remoteProfileId'
 >;
 
 export interface Resolved {
   mediaId: string | null;
   serverUserId: string | null;
+  profileId: string | null;
   title: string | null;
   year: number | null;
 }
@@ -100,34 +101,8 @@ async function byRatingKey(serverId: string, keys: string[]): Promise<Map<string
   return out;
 }
 
-/**
- * Seerr names a Plex requester by plex.tv account id, a Jellyfin or Emby requester by the
- * server's own user id. A tofa request names the tofa user it is for.
- */
-function requesterIdentity(serverType: ServerType) {
-  switch (serverType) {
-    case 'plex':
-      return {
-        column: sql`plex_account_id`,
-        key: (r: ResolutionInput) => r.remotePlexId,
-      };
-    case 'jellyfin':
-    case 'emby':
-      return {
-        column: sql`external_id`,
-        key: (r: ResolutionInput) => r.remoteJellyfinUserId,
-      };
-    case 'tofa':
-      return {
-        column: sql`external_id`,
-        key: (r: ResolutionInput) => r.remoteUserId,
-      };
-    default:
-      return assertNever(serverType);
-  }
-}
-
-async function requesters(
+async function idsByKey(
+  table: SQL,
   serverId: string,
   column: SQL,
   keys: string[]
@@ -135,7 +110,7 @@ async function requesters(
   const out = new Map<string, string>();
   if (keys.length === 0) return out;
   const result = await db.execute(sql`
-    SELECT ${column} AS key, id FROM server_users
+    SELECT ${column} AS key, id FROM ${table}
     WHERE server_id = ${serverId} AND ${column} = ANY(${sql.param(keys)}::text[])
   `);
   for (const row of result.rows as { key: string; id: string }[]) out.set(row.key, row.id);
@@ -144,12 +119,11 @@ async function requesters(
 
 export async function resolveRequests(
   serverId: string,
-  serverType: ServerType,
+  requester: RequesterIdentity,
   rows: ResolutionInput[]
 ): Promise<Map<string, Resolved>> {
   const movies = rows.filter((r) => r.mediaType === 'movie');
   const shows = rows.filter((r) => r.mediaType === 'show');
-  const requester = requesterIdentity(serverType);
 
   const movieHits = await moviesByTmdb(uniqueNumbers(movies.map((r) => r.tmdbId)));
   const showHits = await showsByIds(
@@ -157,10 +131,19 @@ export async function resolveRequests(
     uniqueNumbers(shows.map((r) => r.tmdbId))
   );
   const keyHits = await byRatingKey(serverId, uniqueStrings(rows.map((r) => r.ratingKey)));
-  const userHits = await requesters(
+  const userHits = await idsByKey(
+    sql`server_users`,
     serverId,
     requester.column,
     uniqueStrings(rows.map(requester.key))
+  );
+  // A request names its profile only by the server's id for it, so a profile not stored yet
+  // stays unlinked until a later sync. Removed profiles keep their rows and still match.
+  const profileHits = await idsByKey(
+    sql`server_profiles`,
+    serverId,
+    sql`external_id`,
+    uniqueStrings(rows.map((r) => r.remoteProfileId))
   );
 
   const out = new Map<string, Resolved>();
@@ -178,6 +161,7 @@ export async function resolveRequests(
     out.set(row.remoteId, {
       mediaId: hit?.id ?? null,
       serverUserId: key ? (userHits.get(key) ?? null) : null,
+      profileId: row.remoteProfileId ? (profileHits.get(row.remoteProfileId) ?? null) : null,
       title: hit?.title ?? null,
       year: hit?.year ?? null,
     });

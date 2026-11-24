@@ -1,7 +1,8 @@
-import { assertNever, pickServerColor, SERVER_PROFILES, type ServerType } from '@tracearr/shared';
+import { and, eq, or } from 'drizzle-orm';
+import { pickServerColor, SERVER_PROFILES, type ServerType } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers, serverUsers } from '../db/schema.js';
-import { holdTofaImport } from '../jobs/importQueue.js';
+import { holdServerHistoryImport } from '../jobs/importQueue.js';
 import { publishServersChanged } from '../jobs/poller/database.js';
 import {
   enqueueLibrarySync,
@@ -25,6 +26,8 @@ export interface CreateServerInput {
   token: string;
   publicUrl?: string | null;
   machineIdentifier?: string | null;
+  /** The server's own id for a key Tracearr made, so the key can be deleted later */
+  apiKeyId?: string | null;
   plexAccountId?: string | null;
   facts: Awaited<ReturnType<typeof readServerFacts>>;
   /** The owner's own account on the server, so the first sync finds it instead of adding a person */
@@ -36,6 +39,28 @@ export interface CreateServerInput {
     thumbUrl?: string | null;
     cloudIdentityId: string | null;
   };
+}
+
+/** Why a server cannot be added: its address or its own id is already connected */
+export async function connectedServerConflict(
+  type: ServerType,
+  url: string,
+  machineIdentifier: string | null
+): Promise<'url' | 'identity' | null> {
+  const [connected] = await db
+    .select({ url: servers.url })
+    .from(servers)
+    .where(
+      or(
+        eq(servers.url, url),
+        machineIdentifier
+          ? and(eq(servers.type, type), eq(servers.machineIdentifier, machineIdentifier))
+          : undefined
+      )
+    )
+    .limit(1);
+  if (!connected) return null;
+  return connected.url === url ? 'url' : 'identity';
 }
 
 /**
@@ -62,6 +87,7 @@ export async function createServer(input: CreateServerInput) {
         token: input.token,
         color,
         machineIdentifier: input.machineIdentifier ?? null,
+        apiKeyId: input.apiKeyId ?? null,
         plexAccountId: input.plexAccountId ?? null,
         ...input.facts,
       })
@@ -87,19 +113,6 @@ export async function createServer(input: CreateServerInput) {
   });
 }
 
-/** The history the server keeps itself, held behind its first library sync. */
-async function holdServerHistoryImport(server: { id: string; type: ServerType }): Promise<void> {
-  const importer = SERVER_PROFILES[server.type].serverHistoryImport;
-  switch (importer) {
-    case 'tofa':
-      return holdTofaImport(server.id);
-    case null:
-      return;
-    default:
-      return assertNever(importer);
-  }
-}
-
 /**
  * Everything a server needs once its row is saved, for every way a server is added. A step that
  * fails is logged and never undoes the add; the steps that need it do not run.
@@ -120,7 +133,12 @@ export async function startAddedServer(
     );
   }
   // Held before the add answers, so an import the owner starts meanwhile finds it and is refused
-  await holdServerHistoryImport(server).catch(failedFor('Holding the history import'));
+  const importer = SERVER_PROFILES[server.type].serverHistoryImport;
+  if (importer !== null) {
+    await holdServerHistoryImport(server.id, importer).catch(
+      failedFor('Holding the history import')
+    );
+  }
   // Before the add answers too: a Tautulli, Jellystat or Playback Reporting import started
   // meanwhile waits
   await markFirstSyncOwed(server.id).catch(failedFor('Marking the first sync owed'));

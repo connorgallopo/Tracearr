@@ -102,7 +102,9 @@ export const servers = pgTable(
     url: text('url').notNull(),
     // The address members open a Jellyfin or Emby server at; always null for Plex, which links through app.plex.tv.
     publicUrl: text('public_url'),
-    token: text('token').notNull(), // Encrypted
+    token: text('token').notNull(), // Plain text; utils/crypto.ts migrates old encrypted tokens
+    // The server's own id for the key in token, set only when Tracearr made the key and can delete it
+    apiKeyId: text('api_key_id'),
     machineIdentifier: varchar('machine_identifier', { length: 100 }), // The media server's own id: Plex clientIdentifier (also used for dedup), Jellyfin/Emby System/Info Id
     // For Plex servers: which linked Plex account this server was added from (nullable for Jellyfin/Emby and legacy)
     plexAccountId: uuid('plex_account_id'),
@@ -416,7 +418,7 @@ export const serverUserExternalAliases = pgTable(
 );
 
 /**
- * The profiles one server account plays under (tofa). Plays count toward the account and
+ * The profiles one server account plays under (tofa and Silo). Plays count toward the account and
  * carry the profile that played. A profile the server stops listing keeps its row, with
  * its removal time set, so its plays keep their link.
  */
@@ -513,7 +515,8 @@ export const sessions = pgTable(
     geoAsnOrganization: varchar('geo_asn_organization', { length: 255 }),
     // From the IP at insert; null on rows the location sync has not classified yet
     isLocal: boolean('is_local'),
-    // The profile that played, where one account holds several (tofa). Null for every other server.
+    // The profile that played, where one account holds several (tofa and Silo). Null for every
+    // other server.
     // No foreign key: a profile is deleted only with its stored account or server, and reads fall
     // back to the stored name, so a key would cost every insert without protecting a read.
     profileId: uuid('profile_id'),
@@ -997,6 +1000,9 @@ export const mediaRequests = pgTable(
     serverUserId: uuid('server_user_id').references(() => serverUsers.id, {
       onDelete: 'set null',
     }),
+    // A profile on the request's own server; only Silo requests name one, tofa and Seerr requests
+    // name none
+    profileId: uuid('profile_id').references(() => serverProfiles.id, { onDelete: 'set null' }),
     remoteUserId: text('remote_user_id').notNull(),
     remoteUsername: text('remote_username').notNull(),
     remotePlexId: varchar('remote_plex_id', { length: 64 }),

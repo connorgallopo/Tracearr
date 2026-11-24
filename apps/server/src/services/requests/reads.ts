@@ -8,8 +8,10 @@ import type {
   MediaRequestEntry,
   MediaRequestMediaType,
   MediaRequestStatus,
+  NonMainProfile,
   RequestSeason,
   RequestServiceType,
+  ServerType,
   UserRequestEntry,
   UserRequestsResponse,
   WatchedState,
@@ -22,6 +24,7 @@ import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { buildPosterOrderFragment } from '../../routes/library/catalog.js';
 import { buildPosterUrl } from '../imageProxy.js';
 import { getSetting } from '../settings.js';
+import { readCurrentProfiles } from '../profiles.js';
 import {
   UNWATCHED_LENSES,
   watchedStatesFor,
@@ -58,11 +61,13 @@ interface RequestBaseRow {
   seasons: RequestSeason[] | null;
   is_4k: boolean;
   is_auto_request: boolean;
+  profile_id: string | null;
   lens_user_id: string | null;
 }
 
 interface MediaRequestSqlRow extends RequestBaseRow {
   service_type: RequestServiceType;
+  server_type: ServerType;
   remote_username: string;
   server_user_id: string | null;
   user_server_id: string | null;
@@ -107,6 +112,17 @@ function toLensRow(row: RequestBaseRow): WatchedLensRow {
     lensUserId: row.lens_user_id,
     seasons: row.seasons,
   };
+}
+
+/** One read of the rows' profiles, answering each row's profile when it is not the account's main one */
+async function nonMainProfiles(
+  rows: RequestBaseRow[]
+): Promise<(row: RequestBaseRow) => NonMainProfile | undefined> {
+  const profiles = await readCurrentProfiles(
+    db,
+    rows.map((row) => row.profile_id)
+  );
+  return (row) => (row.profile_id ? profiles.get(row.profile_id)?.nonMainProfile : undefined);
 }
 
 // Without server activity a member sees whether they watched what they asked for, never
@@ -169,6 +185,8 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
       mr.is_4k,
       mr.is_auto_request,
       rs.type AS service_type,
+      sv.type AS server_type,
+      mr.profile_id,
       mr.remote_username,
       mr.server_user_id,
       su.user_id AS lens_user_id,
@@ -179,6 +197,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
       pic.server_id AS thumb_server_id
     FROM media_requests mr
     JOIN request_services rs ON rs.id = mr.service_id
+    JOIN servers sv ON sv.id = rs.server_id
     LEFT JOIN server_users su ON su.id = mr.server_user_id
     LEFT JOIN users u ON u.id = su.user_id
     ${personPictureJoinSql()}
@@ -187,11 +206,15 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
   `);
 
   const rows = result.rows as unknown as MediaRequestSqlRow[];
-  const states = await watchedStatesFor(rows.map(toLensRow), serverIds);
+  const [states, profileOf] = await Promise.all([
+    watchedStatesFor(rows.map(toLensRow), serverIds),
+    nonMainProfiles(rows),
+  ]);
 
   return rows.map((row) => ({
     ...baseEntry(row, states.get(row.id) ?? UNWATCHED_LENSES, showOthers),
     serviceType: row.service_type,
+    serverType: row.server_type,
     requester: row.server_user_id
       ? {
           serverUserId: row.server_user_id,
@@ -211,6 +234,7 @@ export async function listMediaRequests(args: ListMediaRequestsArgs): Promise<Me
           thumb: null,
           thumbServerId: null,
         },
+    nonMainProfile: profileOf(row),
   }));
 }
 
@@ -250,6 +274,7 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
         mr.seasons,
         mr.is_4k,
         mr.is_auto_request,
+        mr.profile_id,
         su.user_id AS lens_user_id,
         poster.server_id AS poster_server_id,
         poster.thumb_path AS poster_thumb_path
@@ -314,10 +339,13 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
 
   const pageLensRows = rows.map(toLensRow);
   const completedIds = new Set(completed.map((row) => row.id));
-  const states = await watchedStatesFor(
-    [...completed, ...pageLensRows.filter((row) => !completedIds.has(row.id))],
-    serverIds
-  );
+  const [states, profileOf] = await Promise.all([
+    watchedStatesFor(
+      [...completed, ...pageLensRows.filter((row) => !completedIds.has(row.id))],
+      serverIds
+    ),
+    nonMainProfiles(rows),
+  ]);
 
   const summaryRow = (summaryResult.rows as unknown as UserSummarySqlRow[])[0];
   const decided = summaryRow?.decided ?? 0;
@@ -342,6 +370,7 @@ export async function listUserRequests(args: ListUserRequestsArgs): Promise<User
         buildPosterUrl(row.poster_server_id, row.poster_thumb_path) ??
         buildPosterUrl(row.service_id, row.poster_path),
     },
+    nonMainProfile: profileOf(row),
   }));
 
   return { data, total: summary.total, page, pageSize, summary };

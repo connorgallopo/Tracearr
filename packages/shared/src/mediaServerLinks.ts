@@ -7,7 +7,8 @@
  * through app.tofa.tv with a plain `/media/<id>` path and no server in the URL,
  * so the link opens on the server the member last chose there. tofa has a page
  * only for a movie or a show; a season or episode is the show's page with
- * `?season=<number>` and `&episode=<number>`.
+ * `?season=<number>` and `&episode=<number>`. Silo's web router opens a movie, show or episode at
+ * `/item/<content id>`; its catalog has no season ids, so a season opens its show.
  *
  * Null means a required identifier is missing; link to the server root.
  */
@@ -18,7 +19,7 @@ export interface MediaServerItemLinkInput {
   serverType: ServerType;
   /** Server URL as configured in Tracearr. Ignored for Plex and tofa. */
   baseUrl: string;
-  /** Item id on that server: Plex ratingKey, Emby/Jellyfin item id, tofa media, season or episode id. */
+  /** Item id on that server: Plex ratingKey, Emby/Jellyfin item id, tofa media, season or episode id, Silo content id. */
   ratingKey: string;
   mediaType?: string;
   /** The show an episode or season belongs to, when known. */
@@ -79,6 +80,12 @@ export function buildMediaServerItemUrl({
       }
       const url = `${TOFA_APP_BASE}/media/${encodeURIComponent(page)}`;
       return query.size > 0 ? `${url}?${query.toString()}` : url;
+    }
+    case 'silo': {
+      const root = trimTrailingSlash(baseUrl);
+      const page = mediaType === 'season' ? showRatingKey : ratingKey;
+      if (!root || !page) return null;
+      return `${root}/item/${encodeURIComponent(page)}`;
     }
     default:
       return assertNever(serverType);

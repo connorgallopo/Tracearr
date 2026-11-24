@@ -48,6 +48,7 @@
       "codeExpired": "",
       "newCode": "",
       "refused": "",
+      "signInUnavailable": "",
       "notPermitted": ""
     }
   },

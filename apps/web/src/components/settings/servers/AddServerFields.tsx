@@ -1,11 +1,11 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle, Loader2, Server as ServerIcon, XCircle } from 'lucide-react';
 import { SERVER_PROFILES, assertNever } from '@tracearr/shared';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
-import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field';
+import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -15,33 +15,39 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { SignInAgainAlert, SignInFailedAlert } from '@/components/auth/AuthFormError';
+import { PairingCode } from '@/components/auth/PairingCode';
 import { PlexServerSelector } from '@/components/auth/PlexServerSelector';
 import { TofaServerPicker, TofaSignInButton, TofaWaiting } from '@/components/auth/TofaSignIn';
 import { holdsApiKey, type ApiKeyServerType } from '@/lib/serverType';
 import { LinkPlexAccountPrompt } from './linkPlexAccount';
+import type { useSiloPairing } from '@/hooks/queries/useSiloPairing';
 import type { AddServerForm, PlexAccountOption } from './useAddServer';
 
 const SERVER_URL_HELP = {
   jellyfin: 'servers.serverUrlHelpJellyfin',
   emby: 'servers.serverUrlHelpEmby',
   tofa: 'servers.serverUrlHelpTofa',
+  silo: 'servers.serverUrlHelpSilo',
 } as const satisfies Record<ApiKeyServerType, string>;
 
 export const API_KEY_HELP = {
   jellyfin: 'servers.apiKeyHelpJellyfin',
   emby: 'servers.apiKeyHelpEmby',
   tofa: 'servers.apiKeyHelpTofa',
+  silo: 'servers.apiKeyHelpSilo',
 } as const satisfies Record<ApiKeyServerType, string>;
 
 export const SERVER_URL_PLACEHOLDER = {
   jellyfin: 'servers.serverUrlPlaceholder',
   emby: 'servers.serverUrlPlaceholder',
   tofa: 'servers.serverUrlPlaceholderTofa',
+  silo: 'servers.serverUrlPlaceholderSilo',
 } as const satisfies Record<ApiKeyServerType, string>;
 
 export const PUBLIC_URL_PLACEHOLDER: Partial<Record<ApiKeyServerType, string>> = {
   jellyfin: 'https://jellyfin.example.com',
   emby: 'https://emby.example.com',
+  silo: 'https://silo.example.com',
 };
 
 function PlexAccountSelect({
@@ -182,6 +188,133 @@ function TofaSignInFields({ form, inlineCancel }: { form: AddServerForm; inlineC
   }
 }
 
+type SiloPairing = ReturnType<typeof useSiloPairing>;
+
+function SiloPinForm({ pairing, wrongPin }: { pairing: SiloPairing; wrongPin: boolean }) {
+  const { t } = useTranslation(['settings', 'common']);
+  const [pin, setPin] = useState('');
+
+  return (
+    <form
+      className="flex flex-col gap-3"
+      onSubmit={(event) => {
+        event.preventDefault();
+        if (pin) pairing.submitPin(pin);
+      }}
+    >
+      <Field>
+        <FieldLabel htmlFor="silo-pin">{t('servers.pairing.pinLabel')}</FieldLabel>
+        <Input
+          id="silo-pin"
+          type="password"
+          inputMode="numeric"
+          autoComplete="off"
+          value={pin}
+          onChange={(e) => setPin(e.target.value)}
+          aria-invalid={wrongPin}
+          disabled={pairing.submittingPin}
+        />
+        <FieldDescription>{t('servers.pairing.pinNeeded')}</FieldDescription>
+        {wrongPin && <FieldError>{t('servers.pairing.wrongPin')}</FieldError>}
+      </Field>
+      <Button type="submit" className="self-start" disabled={!pin || pairing.submittingPin}>
+        {pairing.submittingPin && <Loader2 className="animate-spin" />}
+        {t('common:actions.continue')}
+      </Button>
+    </form>
+  );
+}
+
+/**
+ * Silo's code from start to approval: the start button, the code while Silo waits, and what an
+ * approval still needs. A finished pairing renders nothing; the caller shows what it did.
+ */
+export function SiloPairingPanel({
+  pairing,
+  startLabel,
+  onStart,
+  disabled = false,
+}: {
+  pairing: SiloPairing;
+  startLabel: string;
+  onStart: () => void;
+  disabled?: boolean;
+}) {
+  const { t } = useTranslation('settings');
+  const { pairing: code, check, error } = pairing;
+  const errorAlert = error && (
+    <Alert variant="destructive">
+      <XCircle />
+      <AlertDescription>{error}</AlertDescription>
+    </Alert>
+  );
+  const newCode = (
+    <Button type="button" variant="outline" className="self-start" onClick={onStart}>
+      {t('servers.pairing.newCode')}
+    </Button>
+  );
+  const refusal = (message: string) => (
+    <>
+      <Alert variant="warning">
+        <AlertTriangle />
+        <AlertDescription>{message}</AlertDescription>
+      </Alert>
+      {newCode}
+    </>
+  );
+
+  if (!code) {
+    return (
+      <>
+        {errorAlert}
+        <Button
+          type="button"
+          className="self-start"
+          onClick={onStart}
+          disabled={disabled || pairing.starting}
+        >
+          {pairing.starting && <Loader2 className="animate-spin" />}
+          {startLabel}
+        </Button>
+      </>
+    );
+  }
+  if (error) {
+    return (
+      <>
+        {errorAlert}
+        {newCode}
+      </>
+    );
+  }
+  if (!check || check.status === 'pending' || check.status === 'expired') {
+    return (
+      <PairingCode
+        userCode={code.userCode}
+        link={code.link}
+        waiting={check?.status !== 'expired'}
+        opened={check?.status === 'pending' && check.opened}
+        expired={check?.status === 'expired'}
+        onRequestNew={onStart}
+      />
+    );
+  }
+  switch (check.status) {
+    case 'not-admin':
+      return refusal(t('servers.pairing.notAdmin'));
+    case 'pin-locked':
+      return refusal(t('servers.pairing.pinLocked'));
+    case 'needs-pin':
+      return <SiloPinForm pairing={pairing} wrongPin={check.wrongPin} />;
+    case 'added':
+    case 'rekeyed':
+    case 'linked':
+      return null;
+    default:
+      return assertNever(check);
+  }
+}
+
 /**
  * The fields of the add-server form for whichever server type the form holds. The empty
  * Plex server list can be replaced where the surrounding page offers its own way forward, and a
@@ -204,6 +337,7 @@ export function AddServerFields({
   const { serverType, plexStep, plexAccounts, connectError } = form;
   const showAccountPicker = plexAccounts.length > 1;
   const auth = SERVER_PROFILES[serverType].addServerAuth;
+  const pairsSilo = auth === 'siloPairing' && !form.keyFields;
 
   const accountPicker = showAccountPicker && (
     <PlexAccountSelect
@@ -300,7 +434,7 @@ export function AddServerFields({
         {auth === 'tofaCloud' && !form.keyFields && (
           <TofaSignInFields form={form} inlineCancel={inlineCancel} />
         )}
-        {form.keyFields && holdsApiKey(serverType) && (
+        {(form.keyFields || pairsSilo) && holdsApiKey(serverType) && (
           <>
             <Field>
               <FieldLabel htmlFor="serverUrl">{t('servers.serverUrl')}</FieldLabel>
@@ -336,19 +470,48 @@ export function AddServerFields({
               />
             </Field>
 
-            <Field>
-              <FieldLabel htmlFor="apiKey">{t('common:labels.apiKey')}</FieldLabel>
-              <Input
-                id="apiKey"
-                type="password"
-                placeholder={t('servers.apiKeyPlaceholder')}
-                value={form.apiKey}
-                onChange={(e) => form.setApiKey(e.target.value)}
-              />
-              <FieldDescription>{t(API_KEY_HELP[serverType])}</FieldDescription>
-            </Field>
+            {pairsSilo ? (
+              <>
+                <SiloPairingPanel
+                  pairing={form.silo}
+                  startLabel={t('servers.pairing.getCode')}
+                  onStart={form.startPairing}
+                />
+                {errorAlert}
+                <Button
+                  variant="link"
+                  className="h-auto self-start p-0"
+                  onClick={form.enterKeyFields}
+                >
+                  {t('servers.pairing.useApiKey')}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Field>
+                  <FieldLabel htmlFor="apiKey">{t('common:labels.apiKey')}</FieldLabel>
+                  <Input
+                    id="apiKey"
+                    type="password"
+                    placeholder={t('servers.apiKeyPlaceholder')}
+                    value={form.apiKey}
+                    onChange={(e) => form.setApiKey(e.target.value)}
+                  />
+                  <FieldDescription>{t(API_KEY_HELP[serverType])}</FieldDescription>
+                </Field>
 
-            {errorAlert}
+                {errorAlert}
+                {auth === 'siloPairing' && form.isOwner && (
+                  <Button
+                    variant="link"
+                    className="h-auto self-start p-0"
+                    onClick={form.leaveKeyFields}
+                  >
+                    {t('servers.pairing.useCode')}
+                  </Button>
+                )}
+              </>
+            )}
           </>
         )}
       </FieldGroup>

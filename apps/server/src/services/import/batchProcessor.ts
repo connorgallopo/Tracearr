@@ -61,7 +61,7 @@ export interface UpdateBatchOptions {
 /**
  * Normalize session device/platform fields before insert
  */
-function normalizeSessionFields(session: NewSession): NewSession {
+export function normalizeSessionFields(session: NewSession): NewSession {
   // Get the client string to normalize (prefer product, fallback to playerName)
   const clientString = session.product || session.playerName || '';
 

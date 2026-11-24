@@ -86,6 +86,27 @@ vi.mock('../mediaServer/tofa/eventSource.js', () => ({
   }),
 }));
 
+vi.mock('../mediaServer/silo/eventSource.js', () => ({
+  SiloEventSource: vi.fn(function () {
+    return {
+      on: vi.fn(),
+      connect: vi.fn().mockResolvedValue(undefined),
+      disconnect: vi.fn(),
+      removeAllListeners: vi.fn(),
+      retryFromFallback: vi.fn(),
+      getStatus: vi.fn().mockReturnValue({
+        serverId: 'silo-1',
+        serverName: 'Silo',
+        state: 'connected',
+        connectedAt: new Date('2026-01-01T00:00:00Z'),
+        lastEventAt: null,
+        reconnectAttempts: 0,
+        error: null,
+      }),
+    };
+  }),
+}));
+
 vi.mock('../serviceTracker.js', () => ({
   registerService: vi.fn(),
   unregisterService: vi.fn(),
@@ -95,11 +116,18 @@ vi.mock('../leaderLease.js', () => ({
   isLeader: vi.fn().mockReturnValue(true),
 }));
 
+vi.mock('../downloads/activityLogPoll.js', () => ({
+  pollServerDownloads: vi.fn().mockResolvedValue(undefined),
+  pollDownloadsOf: vi.fn().mockResolvedValue(undefined),
+}));
+
 import { SSEManager } from '../sseManager.js';
 import { PlexEventSource } from '../mediaServer/plex/eventSource.js';
 import { TofaEventSource } from '../mediaServer/tofa/eventSource.js';
+import { SiloEventSource } from '../mediaServer/silo/eventSource.js';
 import { enqueueLibrarySyncForChange } from '../../jobs/librarySyncQueue.js';
 import { triggerServerPoll } from '../../jobs/poller/index.js';
+import { pollDownloadsOf } from '../downloads/activityLogPoll.js';
 import type { CacheService, PubSubService } from '../cache.js';
 
 interface PrivateManager {
@@ -284,6 +312,28 @@ describe('SSEManager.addServer', () => {
     // A retry with a working connect() must succeed - a stuck pendingOperations
     // entry from the failed attempt would silently no-op this call instead.
     await manager.addServer('plex-1', 'Plex Server', 'plex', 'http://plex.local', 'token');
+    expect(manager.getStatus()).toHaveLength(1);
+  });
+
+  it("adds a Silo server without waiting on its socket ticket, so the next server's start is not held", async () => {
+    vi.mocked(SiloEventSource).mockImplementationOnce(function () {
+      return {
+        on: vi.fn(),
+        connect: vi.fn(() => new Promise<void>(() => undefined)),
+        disconnect: vi.fn(),
+        removeAllListeners: vi.fn(),
+        retryFromFallback: vi.fn(),
+        getStatus: vi.fn(),
+      } as unknown as InstanceType<typeof SiloEventSource>;
+    });
+    await manager.initialize(cache, makePubSubService());
+
+    const added = manager
+      .addServer('silo-1', 'Silo', 'silo', 'http://silo.local:8090', 'token')
+      .then(() => 'added');
+    const held = new Promise((resolve) => setTimeout(() => resolve('held'), 50));
+
+    await expect(Promise.race([added, held])).resolves.toBe('added');
     expect(manager.getStatus()).toHaveLength(1);
   });
 });
@@ -536,7 +586,7 @@ describe('SSEManager.refresh', () => {
 
     it('hands a stop with its position to the session processor', () => {
       const stopped = vi.fn();
-      manager.on('tofa:session:stopped', stopped);
+      manager.on('socket:session:stopped', stopped);
 
       onTofa('stream')({
         kind: 'stopped',
@@ -551,6 +601,87 @@ describe('SSEManager.refresh', () => {
         positionMs: 172476,
         stoppedByAdmin: false,
       });
+    });
+  });
+
+  describe('a Silo server', () => {
+    const silo = { ...row, id: 'silo-1', name: 'Silo', type: 'silo' as const, token: 'silo-key' };
+    let cache: CacheService;
+
+    /** The handler the manager registered on the Silo socket for an event */
+    function onSilo(event: string): (payload?: unknown) => void {
+      const source = vi.mocked(SiloEventSource).mock.results[0]?.value as {
+        on: ReturnType<typeof vi.fn>;
+      };
+      const call = source.on.mock.calls.find(([name]) => name === event);
+      return call?.[1] as (payload?: unknown) => void;
+    }
+
+    beforeEach(async () => {
+      cache = makeCacheService();
+      await manager.initialize(cache, makePubSubService());
+      mockServerRows([silo, row]);
+      await manager.start();
+    });
+
+    it('is polled until its socket connects, then left to the socket', () => {
+      expect(vi.mocked(SiloEventSource).mock.calls[0]![0]).toMatchObject({ token: 'silo-key' });
+      expect(manager.getServersNeedingPoll()).toContain('silo-1');
+
+      onSilo('connection:state')('connected');
+
+      expect(manager.getServersNeedingPoll()).not.toContain('silo-1');
+    });
+
+    it("publishes its connection status as tofa's does", () => {
+      onSilo('connection:state')('connected');
+
+      expect(cache.setServerConnectionStatus).toHaveBeenCalledWith(
+        'silo-1',
+        expect.objectContaining({ mode: 'realtime', serverType: 'silo' })
+      );
+    });
+
+    it('reads the session list when its socket says sessions changed', async () => {
+      vi.useFakeTimers();
+      onSilo('sessions:changed')();
+      await vi.advanceTimersByTimeAsync(200);
+      onSilo('sessions:changed')();
+      await vi.advanceTimersByTimeAsync(1200);
+      vi.useRealTimers();
+
+      expect(triggerServerPoll).toHaveBeenCalledTimes(1);
+      expect(triggerServerPoll).toHaveBeenCalledWith('silo-1');
+    });
+
+    it("hands a stop with Silo's final position to the session processor", () => {
+      const stopped = vi.fn();
+      manager.on('socket:session:stopped', stopped);
+
+      onSilo('session:stopped')({ sessionId: 's-1', positionMs: 9000, stoppedByAdmin: true });
+
+      expect(stopped).toHaveBeenCalledWith({
+        serverId: 'silo-1',
+        sessionId: 's-1',
+        positionMs: 9000,
+        stoppedByAdmin: true,
+      });
+    });
+
+    it('asks for one delayed library sync for every library change its socket reports', () => {
+      onSilo('library:changed')();
+      onSilo('library:changed')();
+
+      expect(vi.mocked(enqueueLibrarySyncForChange).mock.calls).toEqual([
+        ['silo-1', 60_000],
+        ['silo-1', 60_000],
+      ]);
+    });
+
+    it("reads the server's downloads when its socket says they changed", () => {
+      onSilo('downloads:changed')();
+
+      expect(pollDownloadsOf).toHaveBeenCalledWith('silo-1');
     });
   });
 

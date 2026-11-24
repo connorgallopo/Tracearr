@@ -48,6 +48,7 @@
       "codeExpired": "Aquest codi ha caducat.",
       "newCode": "Nou codi",
       "refused": "L'inici de sessió no està disponible per a aquest compte.",
+      "signInUnavailable": "",
       "notPermitted": "No teniu permís per iniciar sessió. Si us plau, poseu-vos en contacte amb el propietari del servidor."
     }
   },

@@ -8,7 +8,7 @@ import { enrichDownload, sourceColumns, type DownloadEnrichment } from './enrich
 export interface DownloadSignal {
   serverId: string;
   serverUserId: string | null;
-  /** Jellyfin ItemId, Plex metadataID, Emby sync ItemId, tofa movie or episode id, null on the Emby activity log */
+  /** Jellyfin ItemId, Plex metadataID, Emby sync ItemId, tofa movie or episode id, Silo episode or movie content id, null on the Emby activity log */
   ratingKey: string | null;
   title: string;
   app: string | null;
@@ -17,11 +17,11 @@ export interface DownloadSignal {
   seenAt: Date;
   /** Plex Context.partID, tofa media_file_id */
   partId?: string | null;
-  /** Plex Context.deviceID (a clientIdentifier), Emby sync TargetId, tofa device_id */
+  /** Plex Context.deviceID (a clientIdentifier), Emby sync TargetId, tofa device_id, Silo device_id */
   deviceId?: string | null;
   /** Known before enrichment: a Plex static transcode, an Emby sync item's file */
   delivered?: DownloadEnrichment['delivered'];
-  /** The server_profiles row of the profile that downloaded, where one account holds several (tofa) */
+  /** The server_profiles row of the profile that downloaded, where one account holds several (tofa, Silo) */
   profileId?: string | null;
 }
 

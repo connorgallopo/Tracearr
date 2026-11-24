@@ -12,6 +12,7 @@ import { buildMultiServerFragment } from '../../utils/serverFiltering.js';
 import { type Scope, scopedServerFragment } from '../../lib/scope.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 import { personPictureJoinSql } from '../../utils/representativeAccount.js';
+import { readCurrentProfiles } from '../profiles.js';
 
 export interface RequestsAnalyticsData {
   funnel: RequestsFunnel;
@@ -33,6 +34,7 @@ interface AnalyticsSqlRow {
   available_at: Date | string | null;
   seasons: RequestSeason[] | null;
   lens_user_id: string | null;
+  profile_id: string | null;
   remote_username: string;
   server_user_id: string | null;
   user_server_id: string | null;
@@ -283,6 +285,7 @@ export async function getRequestsAnalytics(
       mr.requested_at,
       mr.available_at,
       mr.seasons,
+      mr.profile_id,
       mr.remote_username,
       mr.server_user_id,
       su.user_id AS lens_user_id,
@@ -309,7 +312,13 @@ export async function getRequestsAnalytics(
     [...new Set(landed.flatMap((row) => (row.media_id ? [row.media_id] : [])))],
     serverIds
   );
-  const plays = await fetchRequestPlays(serverIds, showOthers ? 'all' : scope);
+  const [plays, profiles] = await Promise.all([
+    fetchRequestPlays(serverIds, showOthers ? 'all' : scope),
+    readCurrentProfiles(
+      db,
+      landed.map((row) => row.profile_id)
+    ),
+  ]);
 
   const sizeBuckets = new Map<string, [number, number][]>();
   const outcomes = landed.map((row): RequestOutcomeRow => {
@@ -328,6 +337,7 @@ export async function getRequestsAnalytics(
       seasons: row.seasons,
       fileSizeBytes: rowBuckets.reduce((sum, [, bytes]) => sum + bytes, 0),
       requester: requesterOf(row),
+      nonMainProfile: row.profile_id ? profiles.get(row.profile_id)?.nonMainProfile : undefined,
     };
   });
 

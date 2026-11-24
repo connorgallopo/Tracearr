@@ -803,11 +803,12 @@ export async function enqueueLibrarySyncFromEvent(serverId: string): Promise<voi
 const QUEUED_STATES = new Set<string | undefined>(['waiting', 'delayed', 'prioritized']);
 
 /**
- * A sync for a library change tofa reported on its socket, after the delay, so the changes of
- * one scan ride on one job. A refused add means another sync holds the server. One still
- * waiting reads the change when it runs. One running may already have read past it, so the
- * change is marked for that run's end, which queues one more; and when the holder is no longer
- * running, by the time the mark is set, nothing is left to read it, so it is read at once.
+ * A sync for a library change a server reported on its own socket (tofa, Silo), after the
+ * delay, so the changes of one scan ride on one job. A refused add means another sync holds the
+ * server. One still waiting reads the change when it runs. One running may already have read
+ * past it, so the change is marked for that run's end, which queues one more; and when the
+ * holder is no longer running, by the time the mark is set, nothing is left to read it, so it
+ * is read at once.
  */
 export async function enqueueLibrarySyncForChange(serverId: string, delay: number): Promise<void> {
   const queue = librarySyncQueue;

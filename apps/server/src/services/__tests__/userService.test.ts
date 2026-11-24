@@ -308,6 +308,28 @@ describe('syncUserFromMediaServer', () => {
     expect(set.mock.calls[1]?.[0]).toHaveProperty('thumbUrl', null);
   });
 
+  it('writes the join date onto an account already stored only when the server reports one', async () => {
+    const existing = createMockServerUser({ serverId, externalId: mediaUser.id, joinedAt: null });
+    vi.mocked(db.select).mockReturnValue({
+      from: vi.fn().mockReturnThis(),
+      where: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockResolvedValue([{ ...existing, user: createMockUser() }]),
+    } as never);
+    const set = vi.fn().mockReturnThis();
+    vi.mocked(db.update).mockReturnValue({
+      set,
+      where: vi.fn().mockReturnThis(),
+      returning: vi.fn().mockResolvedValue([existing]),
+    } as never);
+    const joinedAt = new Date('2026-11-19T01:12:31.344Z');
+
+    await syncUserFromMediaServer(serverId, { ...mediaUser, joinedAt: undefined });
+    await syncUserFromMediaServer(serverId, { ...mediaUser, joinedAt });
+
+    expect(set.mock.calls[0]?.[0]).not.toHaveProperty('joinedAt');
+    expect(set.mock.calls[1]?.[0]).toHaveProperty('joinedAt', joinedAt);
+  });
+
   it('writes the cloud identity only for accounts that report one', async () => {
     const existing = createMockServerUser({ serverId, externalId: mediaUser.id });
     vi.mocked(db.select).mockReturnValue({

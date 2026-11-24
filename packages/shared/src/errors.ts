@@ -35,6 +35,7 @@ export const ErrorCodes = {
   GEOIP_ERROR: 'EXT_003',
   EMBY_ERROR: 'EXT_004',
   TOFA_ERROR: 'EXT_005',
+  SILO_ERROR: 'EXT_006',
 } as const;
 
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];

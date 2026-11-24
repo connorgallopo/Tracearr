@@ -12,6 +12,7 @@ import {
 import { db, type Executor } from '../db/client.js';
 import { authAccounts, servers, serverUsers, users } from '../db/schema.js';
 import { EmbyClient, JellyfinClient, logoutUserToken } from '../services/mediaServer/index.js';
+import { logout as siloLogout } from '../services/mediaServer/silo/auth.js';
 import { getOwnerUser } from '../services/userService.js';
 import { getSetting } from '../services/settings.js';
 import { createLogger } from '../utils/logger.js';
@@ -31,13 +32,16 @@ const log = createLogger('member-login');
 
 type Ctx = Parameters<typeof setSessionCookie>[0];
 
+export type MemberLoginProvider = JellyfinEmbyServerType | 'silo';
+
 export interface MemberLoginInput {
   serverId: string;
   serverUrl: string;
   externalId: string;
-  token: string;
-  providerId: JellyfinEmbyServerType;
-  deviceId: string;
+  /** null for Silo, whose login is logged out before this runs */
+  token: string | null;
+  providerId: MemberLoginProvider;
+  deviceId: string | null;
 }
 
 export const memberDeviceId = (userId: string): string => `tracearr-${userId}`;
@@ -52,10 +56,23 @@ export async function createSignedInSession(ctx: Ctx, userId: string) {
   return { id: user.id, username: username ?? user.name, role: role ?? 'member' };
 }
 
+function logoutMemberToken(type: MemberLoginProvider, url: string, token: string) {
+  switch (type) {
+    case 'jellyfin':
+    case 'emby':
+      return logoutUserToken(type, url, token);
+    case 'silo':
+      return siloLogout(url, token);
+    default:
+      return assertNever(type);
+  }
+}
+
 // The token is already a device on the media server; one Tracearr will not use is logged out
 // there rather than left behind.
-async function discardToken(input: MemberLoginInput, token: string): Promise<void> {
-  await logoutUserToken(input.providerId, input.serverUrl, token).catch(() => {
+async function discardToken(input: MemberLoginInput, token: string | null): Promise<void> {
+  if (!token) return;
+  await logoutMemberToken(input.providerId, input.serverUrl, token).catch(() => {
     log.warn('could not log out an unused member token', { serverId: input.serverId });
   });
 }
@@ -150,7 +167,7 @@ export async function finishMemberLogin(ctx: Ctx, input: MemberLoginInput) {
   // scope holds the DeviceId the stored token was issued to.
   const replacedOnServer =
     revokesTokenOnSameDeviceSignIn(input.providerId) && stored?.deviceId === input.deviceId;
-  if (stored?.token && stored.token !== input.token && !replacedOnServer) {
+  if (input.token && stored?.token && stored.token !== input.token && !replacedOnServer) {
     await discardToken(input, stored.token);
   }
 
@@ -159,11 +176,12 @@ export async function finishMemberLogin(ctx: Ctx, input: MemberLoginInput) {
 }
 
 /** Jellyfin revokes the old token when the same DeviceId signs in again; Emby keeps both. */
-function revokesTokenOnSameDeviceSignIn(type: JellyfinEmbyServerType): boolean {
+function revokesTokenOnSameDeviceSignIn(type: MemberLoginProvider): boolean {
   switch (type) {
     case 'jellyfin':
       return true;
     case 'emby':
+    case 'silo':
       return false;
     default:
       return assertNever(type);
@@ -183,6 +201,12 @@ function fetchSelf(type: JellyfinEmbyServerType, url: string, token: string, use
 
 type MediaAccount = { providerId: string; accountId: string; token: string | null };
 
+/** The server and the account on it that a `${serverId}:${externalId}` account id names */
+function serverAccount(accountId: string): { serverId: string; externalId: string } | null {
+  const [serverId, externalId] = accountId.split(':');
+  return serverId && externalId ? { serverId, externalId } : null;
+}
+
 async function mediaAccountIsAWayIn(
   userId: string,
   identity: { role: UserRole; loginAccess: LoginAccess },
@@ -192,8 +216,8 @@ async function mediaAccountIsAWayIn(
   const type = account.providerId;
   if (!isServerType(type)) return false;
   const live = and(eq(serverUsers.userId, userId), liveServerAccount);
-  // plex.tv and tofa cloud vouch for the person; the sync's view of their server accounts is what
-  // keeps them signed in, so no server is asked.
+  // plex.tv, tofa cloud and Silo vouch for the person once, at sign-in; the sync's view of their
+  // server accounts is what keeps them signed in, so no server is asked.
   const syncedAccountIsAWayIn = async (match: SQL | undefined) => {
     const rows = await db
       .select({ serverAllowsMembers: servers.allowMemberLogin })
@@ -213,6 +237,19 @@ async function mediaAccountIsAWayIn(
       return syncedAccountIsAWayIn(
         and(eq(servers.type, 'tofa'), eq(serverUsers.cloudIdentityId, account.accountId))
       );
+    case 'silo': {
+      const named = serverAccount(account.accountId);
+      return (
+        !!named &&
+        syncedAccountIsAWayIn(
+          and(
+            eq(servers.type, 'silo'),
+            eq(serverUsers.serverId, named.serverId),
+            eq(serverUsers.externalId, named.externalId)
+          )
+        )
+      );
+    }
     case 'jellyfin':
     case 'emby':
       break;
@@ -220,8 +257,9 @@ async function mediaAccountIsAWayIn(
       return assertNever(type);
   }
 
-  const [serverId, externalId] = account.accountId.split(':');
-  if (!serverId || !externalId || !account.token) return false;
+  const named = serverAccount(account.accountId);
+  if (!named || !account.token) return false;
+  const { serverId, externalId } = named;
   const [row] = await db
     .select({ url: servers.url, serverAllowsMembers: servers.allowMemberLogin })
     .from(serverUsers)

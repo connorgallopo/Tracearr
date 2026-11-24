@@ -62,9 +62,20 @@ describe('normalizeServerVersion', () => {
     expect(normalizeServerVersion('emby', '4.9.5')).toBe('4.9.5');
     expect(normalizeServerVersion('emby', '4.9.5.0')).toBe('4.9.5.0');
   });
+
+  it('keeps the build Silo reports as it is, and nothing that is no build id', () => {
+    expect(normalizeServerVersion('silo', '28dd1484')).toBe('28dd1484');
+    expect(normalizeServerVersion('silo', ' 28dd1484 ')).toBe('28dd1484');
+    expect(normalizeServerVersion('silo', '')).toBeNull();
+    expect(normalizeServerVersion('silo', 'a b')).toBeNull();
+  });
 });
 
 describe('isNewerServerVersion', () => {
+  it('never calls one Silo build newer than another, since builds do not order', () => {
+    expect(isNewerServerVersion('silo', 'ffffffff', '28dd1484')).toBe(false);
+  });
+
   it('compares Plex versions with their hashes stripped', () => {
     expect(isNewerServerVersion('plex', '1.44.0.11000-aa11bb22c', '1.43.3.10896-cb3ebc72d')).toBe(
       true

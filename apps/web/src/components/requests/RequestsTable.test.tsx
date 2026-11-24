@@ -21,6 +21,7 @@ function makeMediaEntry(overrides: Partial<MediaRequestEntry> = {}): MediaReques
     id: 'r1',
     serverId: 's1',
     serviceType: 'seerr',
+    serverType: 'plex',
     status: 'completed',
     requestedAt: '2026-01-01T00:00:00.000Z',
     availableAt: '2026-01-02T00:00:00.000Z',
@@ -282,5 +283,59 @@ describe('RequestsTable', () => {
     );
     expect(screen.getByText('localbob')).toBeInTheDocument();
     expect(screen.queryByText('Not on this server')).not.toBeInTheDocument();
+  });
+
+  it('shows a non-main profile over the requester avatar, grayed once removed', () => {
+    renderTable(
+      <RequestsTable
+        subject="media"
+        rows={[
+          makeMediaEntry({ nonMainProfile: { name: 'Kid', thumbUrl: null, removed: false } }),
+          makeMediaEntry({
+            id: 'r2',
+            nonMainProfile: { name: 'Old', thumbUrl: null, removed: true },
+          }),
+        ]}
+        isLoading={false}
+        isError={false}
+        onRetry={vi.fn()}
+        emptyTitle="No requests"
+      />
+    );
+    expect(screen.getByRole('img', { name: 'Kid' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /Old/ })).toHaveClass('grayscale');
+  });
+
+  it('shows no profile badge for a request from the main profile', () => {
+    renderTable(
+      <RequestsTable
+        subject="media"
+        rows={[makeMediaEntry()]}
+        isLoading={false}
+        isError={false}
+        onRetry={vi.fn()}
+        emptyTitle="No requests"
+      />
+    );
+    expect(screen.getByText('Alice')).toBeInTheDocument();
+    expect(screen.queryAllByRole('img')).toHaveLength(0);
+  });
+
+  it('shows a non-main profile on a user request row', () => {
+    renderTable(
+      <RequestsTable
+        subject="user"
+        rows={[
+          makeUserEntry({ nonMainProfile: { name: 'Kid', thumbUrl: null, removed: false } }),
+          makeUserEntry({ id: 'r2' }),
+        ]}
+        isLoading={false}
+        isError={false}
+        onRetry={vi.fn()}
+        emptyTitle="No requests"
+      />
+    );
+    expect(screen.getAllByRole('img')).toHaveLength(1);
+    expect(screen.getByRole('img', { name: 'Kid' })).toBeInTheDocument();
   });
 });

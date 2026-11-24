@@ -7,6 +7,8 @@ import {
   serverClockShift,
   trimBandwidthStats,
 } from '../serverLiveStats.js';
+import { SiloClient } from '../mediaServer/silo/client.js';
+import silo from '../../test/mediaServerResponses/silo.json' with { type: 'json' };
 
 const serverId = 'srv-1';
 
@@ -264,5 +266,104 @@ describe('getServerLiveStats', () => {
       bandwidthDevices: [],
     });
     expect(ctx.raw.get).not.toHaveBeenCalled();
+  });
+
+  describe('a Silo server', () => {
+    const [first, second] = silo.resources;
+    if (!first || !second) throw new Error('fixture has two resource readings');
+    const server = { type: 'silo' as const, url: 'http://silo.local:8090', token: 'silo-key' };
+    const secondAt = Math.floor(Date.parse(second.sampled_at) / 1000);
+
+    /** Redis whose buffer head is the last point pushed, as the real list would be */
+    function bufferedRedis() {
+      const ctx = fakeRedis();
+      ctx.raw.lindex.mockImplementation(() => {
+        const last = ctx.multiChain.lpush.mock.calls.at(-1) as [string, string] | undefined;
+        return Promise.resolve(last?.[1] ?? null);
+      });
+      return ctx;
+    }
+
+    function pushed(ctx: ReturnType<typeof fakeRedis>) {
+      return ctx.multiChain.lpush.mock.calls.map(
+        ([, payload]) => JSON.parse(payload as string) as Record<string, unknown>
+      );
+    }
+
+    beforeEach(() => {
+      vi.useFakeTimers();
+      vi.setSystemTime(Date.parse(second.sampled_at) + 1_000);
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+      vi.restoreAllMocks();
+    });
+
+    it("charts Silo's own readings from the first read, at Silo's sample time", async () => {
+      const ctx = bufferedRedis();
+      vi.spyOn(SiloClient.prototype, 'getSystemResources').mockResolvedValueOnce(second);
+
+      const result = await getServerLiveStats(ctx.redis, { ...server, id: 'silo-1' });
+
+      expect(pushed(ctx)).toEqual([
+        {
+          at: secondAt,
+          timespan: 5,
+          hostCpuUtilization: 2,
+          processCpuUtilization: null,
+          hostMemoryUtilization: (1163 / 12288) * 100,
+          processMemoryUtilization: (384167936 / 12884901888) * 100,
+        },
+      ]);
+      expect(result).toMatchObject({
+        bandwidth: [],
+        bandwidthSamples: [],
+        bandwidthAccounts: [],
+        bandwidthDevices: [],
+      });
+    });
+
+    it("charts a point on each read 30 s apart, the web's cadence while a chart is empty", async () => {
+      const ctx = bufferedRedis();
+      const later = {
+        ...second,
+        sampled_at: new Date(Date.parse(second.sampled_at) + 30_000).toISOString(),
+      };
+      vi.spyOn(SiloClient.prototype, 'getSystemResources')
+        .mockResolvedValueOnce(second)
+        .mockResolvedValueOnce(later);
+      const read = () => getServerLiveStats(ctx.redis, { ...server, id: 'silo-backoff' });
+
+      await read();
+      await vi.advanceTimersByTimeAsync(30_000);
+      await read();
+
+      expect(pushed(ctx).map((p) => p.at)).toEqual([secondAt, secondAt + 30]);
+    });
+
+    it('keeps one point for a Silo sample read twice', async () => {
+      const ctx = bufferedRedis();
+      vi.spyOn(SiloClient.prototype, 'getSystemResources').mockResolvedValue(second);
+      const read = () => getServerLiveStats(ctx.redis, { ...server, id: 'silo-same' });
+
+      await read();
+      await vi.advanceTimersByTimeAsync(4_000);
+      await read();
+
+      expect(ctx.multiChain.lpush).toHaveBeenCalledOnce();
+    });
+
+    it('charts nothing from a stale Silo sample', async () => {
+      const ctx = bufferedRedis();
+      vi.spyOn(SiloClient.prototype, 'getSystemResources').mockResolvedValueOnce({
+        ...first,
+        stale: true,
+      });
+
+      await getServerLiveStats(ctx.redis, { ...server, id: 'silo-stale' });
+
+      expect(ctx.multiChain.lpush).not.toHaveBeenCalled();
+    });
   });
 });

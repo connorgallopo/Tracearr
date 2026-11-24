@@ -90,7 +90,21 @@ describe('GET /tasks/running', () => {
     ]);
 
     expect(await runningTasks()).toEqual([
-      expect.objectContaining({ type: 'tofa_import', name: 'tofa Import', context: 'Den' }),
+      expect.objectContaining({
+        type: 'server_history_import',
+        name: 'tofa Import',
+        context: 'Den',
+      }),
+    ]);
+  });
+
+  it('names a running Silo history import by the server type', async () => {
+    vi.mocked(getAllActiveImports).mockResolvedValue([
+      { ...tofaImport('silo-import-srv-1', 'active', false), type: 'silo' as const },
+    ]);
+
+    expect(await runningTasks()).toEqual([
+      expect.objectContaining({ type: 'server_history_import', name: 'Silo Import' }),
     ]);
   });
 

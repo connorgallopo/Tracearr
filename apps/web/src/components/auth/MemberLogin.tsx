@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { KeyRound, Loader2 } from 'lucide-react';
-import type { SetupStatus } from '@tracearr/shared';
+import { assertNever, type ServerType, type SetupStatus } from '@tracearr/shared';
 import { MediaServerIcon } from '@/components/icons/MediaServerIcon';
 import { AuthFormError } from '@/components/auth/AuthFormError';
+import { PairingCode } from '@/components/auth/PairingCode';
 import { Button } from '@/components/ui/button';
 import { CopyButton } from '@/components/ui/copy-button';
 import { Input } from '@/components/ui/input';
@@ -16,19 +17,31 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
-import { isJellyfinEmby } from '@/lib/serverType';
+import { signsInThroughServerAccount } from '@/lib/serverType';
 import { isNotPermitted, toastNotPermitted } from '@/lib/signInRefusal';
-import {
-  useMemberSignIn,
-  useQuickConnectCheck,
-  useQuickConnectCode,
-} from '@/hooks/queries/useMemberLogin';
+import { useMemberCode, useMemberCodeCheck, useMemberSignIn } from '@/hooks/queries/useMemberLogin';
 
 export type MemberLoginServer = SetupStatus['memberLoginServers'][number];
 
 interface MemberLoginProps {
   servers: MemberLoginServer[];
   onSignedIn: () => Promise<void>;
+}
+
+/** The link from the password form back to the code */
+function backToCodeLabel(type: ServerType) {
+  switch (type) {
+    case 'jellyfin':
+      return 'pages:login.member.useQuickConnect' as const;
+    case 'silo':
+      return 'settings:servers.pairing.useCode' as const;
+    case 'plex':
+    case 'emby':
+    case 'tofa':
+      return null;
+    default:
+      return assertNever(type);
+  }
 }
 
 function ServerLabel({ server }: { server: MemberLoginServer }) {
@@ -92,9 +105,9 @@ function MemberCredentials({
   const signedIn = useRef(false);
 
   const signIn = useMemberSignIn();
-  const wantsCode = server.quickConnect && !passwordChosen;
-  const code = useQuickConnectCode(server.id, attempt, wantsCode);
-  const check = useQuickConnectCheck(wantsCode ? code.data?.handle : undefined);
+  const wantsCode = server.codeSignIn && !passwordChosen;
+  const code = useMemberCode(server.type, server.id, attempt, wantsCode);
+  const check = useMemberCodeCheck(server.type, wantsCode ? code.data : undefined);
 
   const notPermitted = [signIn.error, code.error, check.error].some(isNotPermitted);
   useEffect(() => {
@@ -103,9 +116,9 @@ function MemberCredentials({
   const shownError = (error: Error | null) =>
     error && !isNotPermitted(error) ? error.message : null;
 
-  const quickConnectError = shownError(code.error) ?? shownError(check.error);
-  // Quick Connect off, or failed: the password form is the only way left
-  const showCode = wantsCode && code.data !== null && !quickConnectError && !notPermitted;
+  const codeError = shownError(code.error) ?? shownError(check.error);
+  // Code sign-in off, or failed: the password form is the only way left
+  const showCode = wantsCode && code.data !== null && !codeError && !notPermitted;
   const authorized = !!check.data?.authorized;
 
   useEffect(() => {
@@ -121,7 +134,7 @@ function MemberCredentials({
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isJellyfinEmby(server.type)) return;
+    if (!signsInThroughServerAccount(server.type)) return;
     signIn.mutate(
       {
         type: server.type,
@@ -140,6 +153,15 @@ function MemberCredentials({
       <div className="space-y-3">
         {code.isFetching || !code.data ? (
           <Skeleton className="h-16 w-full" />
+        ) : code.data.link ? (
+          <PairingCode
+            userCode={code.data.code}
+            link={code.data.link}
+            waiting
+            opened={false}
+            expired={expired}
+            onRequestNew={requestNewCode}
+          />
         ) : expired ? (
           <output className="bg-muted/50 flex flex-col items-center gap-3 rounded-lg p-4 text-center">
             <p className="text-sm font-medium">{t('pages:login.member.codeExpired')}</p>
@@ -167,20 +189,41 @@ function MemberCredentials({
             </div>
           </>
         )}
-        <Button
-          type="button"
-          variant="link"
-          size="sm"
-          className="mx-auto flex"
-          onClick={() => setPasswordChosen(true)}
-        >
-          {t('pages:login.member.usePassword')}
-        </Button>
+        {server.passwordSignIn && (
+          <Button
+            type="button"
+            variant="link"
+            size="sm"
+            className="mx-auto flex"
+            onClick={() => setPasswordChosen(true)}
+          >
+            {t('pages:login.member.usePassword')}
+          </Button>
+        )}
       </div>
     );
   }
 
-  const error = shownError(signIn.error) ?? quickConnectError;
+  const error = shownError(signIn.error) ?? codeError;
+  const backToCode = server.codeSignIn ? backToCodeLabel(server.type) : null;
+
+  if (!server.passwordSignIn) {
+    return (
+      <div className="flex flex-col items-center gap-3 text-center">
+        {!notPermitted && (
+          <p className="text-muted-foreground text-sm">
+            {t('pages:login.member.signInUnavailable')}
+          </p>
+        )}
+        <AuthFormError id="member-login-error" message={error} />
+        {server.codeSignIn && (
+          <Button type="button" onClick={requestNewCode}>
+            {t('settings:servers.pairing.newCode')}
+          </Button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -223,7 +266,7 @@ function MemberCredentials({
         {signIn.isPending ? <Loader2 className="animate-spin" /> : <KeyRound />}
         {t('common:actions.signIn')}
       </Button>
-      {server.quickConnect && passwordChosen && (
+      {backToCode && passwordChosen && (
         <Button
           type="button"
           variant="link"
@@ -231,7 +274,7 @@ function MemberCredentials({
           className="mx-auto flex"
           onClick={requestNewCode}
         >
-          {t('pages:login.member.useQuickConnect')}
+          {t(backToCode)}
         </Button>
       )}
     </form>

@@ -6,13 +6,14 @@ import { MemoryRouter } from 'react-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type {
   LatestImportStatus,
+  ServerHistoryImportProgress,
+  ServerHistoryImportResult,
   ServerType,
-  TofaImportProgress,
-  TofaImportResult,
 } from '@tracearr/shared';
+import { resources } from '@tracearr/translations';
 import { api } from '@/lib/api';
 import { AddServerDialog } from './AddServerDialog';
-import type { AddServerForm } from './useAddServer';
+import { useAddServer, type AddServerForm } from './useAddServer';
 
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({ t: (key: string) => key }),
@@ -27,12 +28,19 @@ const servers = [
 
 vi.mock('@/hooks/queries', () => ({
   usePlexAccounts: () => ({ data: { accounts: [], clientIdentifier: 'client-1' } }),
-  useServers: () => ({ data: servers, isLoading: false }),
+  useServers: () => ({ data: servers, isLoading: false, refetch: vi.fn() }),
   useSettings: () => ({ data: {}, isLoading: false }),
   useUpdateSettings: () => ({ mutate: vi.fn(), isPending: false }),
 }));
 
 vi.mock('@/hooks/useSocket', () => ({ useSocket: () => ({ socket: null }) }));
+
+const $fetch = vi.hoisted(() => vi.fn());
+vi.mock('@/lib/authClient', () => ({ authClient: { $fetch } }));
+
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: { role: 'owner' }, refetch: vi.fn() }),
+}));
 
 vi.mock('@/lib/api', () => {
   const importer = () => ({
@@ -42,11 +50,12 @@ vi.mock('@/lib/api', () => {
   });
   return {
     api: {
+      servers: { create: vi.fn() },
       import: {
         tautulli: importer(),
         jellystat: importer(),
         playbackReporting: importer(),
-        tofa: importer(),
+        serverHistory: importer(),
       },
     },
   };
@@ -76,6 +85,29 @@ function tofaSignIn(overrides: Partial<AddServerForm['tofa']> = {}): AddServerFo
   };
 }
 
+function siloPairing(overrides: Partial<AddServerForm['silo']> = {}): AddServerForm['silo'] {
+  return {
+    start: vi.fn(),
+    starting: false,
+    pairing: null,
+    check: null,
+    submitPin: vi.fn(),
+    submittingPin: false,
+    cancel: vi.fn(),
+    error: null,
+    reset: vi.fn(),
+    ...overrides,
+  };
+}
+
+const siloCode = {
+  handle: 'h'.repeat(43),
+  userCode: '1234-5678',
+  link: 'https://silo.example.com/activate?code=12345678',
+  expiresIn: 600,
+  interval: 1,
+};
+
 function form(overrides: Partial<AddServerForm> = {}): AddServerForm {
   return {
     isOwner: true,
@@ -96,7 +128,10 @@ function form(overrides: Partial<AddServerForm> = {}): AddServerForm {
     addedWithoutStop: false,
     keyFields: true,
     enterKeyFields: vi.fn(),
+    leaveKeyFields: vi.fn(),
+    startPairing: vi.fn(),
     tofa: tofaSignIn(),
+    silo: siloPairing(),
     plexStep: 'loading',
     plexAccounts: [],
     selectedPlexAccountId: null,
@@ -127,6 +162,11 @@ function renderImportStep(id: string, type: ServerType) {
     ),
   });
   return dialog;
+}
+
+function AddServerFromList({ onAdded }: { onAdded: (server: { id: string }) => void }) {
+  const form = useAddServer({ onAdded });
+  return <AddServerDialog open onOpenChange={vi.fn()} form={form} />;
 }
 
 describe('AddServerDialog', () => {
@@ -229,6 +269,203 @@ describe('AddServerDialog', () => {
     expect(screen.getByRole('button', { name: 'servers.connectServer' })).toBeInTheDocument();
   });
 
+  it('asks Silo for its address, public address, name and an API key with the scopes it needs', () => {
+    render(<AddServerDialog {...props({ serverType: 'silo' })} />);
+
+    expect(screen.getByLabelText('servers.serverUrl')).toHaveAttribute(
+      'placeholder',
+      'servers.serverUrlPlaceholderSilo'
+    );
+    expect(screen.getByLabelText('servers.publicUrl')).toBeInTheDocument();
+    expect(screen.getByLabelText('servers.serverName')).toBeInTheDocument();
+    expect(screen.getByLabelText('common:labels.apiKey')).toBeInTheDocument();
+    expect(screen.getByText('servers.apiKeyHelpSilo')).toBeInTheDocument();
+
+    const english = resources.en.settings.servers;
+    expect(english.serverUrlPlaceholderSilo).toBe('http://192.168.1.100:8090');
+    for (const scope of ['admin:monitor:read', 'admin:sessions:control', 'libraries:read']) {
+      expect(english.apiKeyHelpSilo).toContain(scope);
+    }
+  });
+
+  it('adds a Silo server through the server type list with the pasted key', async () => {
+    vi.mocked(api.servers.create).mockResolvedValueOnce({ id: 'silo-1', type: 'silo' } as never);
+    const onAdded = vi.fn();
+    render(<AddServerFromList onAdded={onAdded} />, {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
+      ),
+    });
+
+    await userEvent.click(screen.getByRole('combobox', { name: 'servers.serverType' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Silo' }));
+    await userEvent.click(screen.getByRole('button', { name: 'servers.pairing.useApiKey' }));
+    await userEvent.type(screen.getByLabelText('servers.serverUrl'), 'http://192.168.1.30:8090');
+    await userEvent.type(screen.getByLabelText('servers.serverName'), 'Basement');
+    await userEvent.type(screen.getByLabelText('common:labels.apiKey'), 'silo-key');
+    await userEvent.click(screen.getByRole('button', { name: 'servers.connectServer' }));
+
+    await waitFor(() => expect(onAdded).toHaveBeenCalledWith({ id: 'silo-1', type: 'silo' }));
+    expect(api.servers.create).toHaveBeenCalledWith({
+      name: 'Basement',
+      type: 'silo',
+      url: 'http://192.168.1.30:8090',
+      token: 'silo-key',
+    });
+  });
+
+  it('asks Silo for its address and name, then offers a code instead of a key field', async () => {
+    const startPairing = vi.fn();
+    render(<AddServerDialog {...props({ serverType: 'silo', keyFields: false, startPairing })} />);
+
+    expect(screen.getByLabelText('servers.serverUrl')).toBeInTheDocument();
+    expect(screen.getByLabelText('servers.publicUrl')).toBeInTheDocument();
+    expect(screen.getByLabelText('servers.serverName')).toBeInTheDocument();
+    expect(screen.queryByLabelText('common:labels.apiKey')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'servers.connectServer' })).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'servers.pairing.getCode' }));
+    expect(startPairing).toHaveBeenCalled();
+  });
+
+  it('shows the code in place of the button while Silo waits for approval', () => {
+    render(
+      <AddServerDialog
+        {...props({
+          serverType: 'silo',
+          keyFields: false,
+          silo: siloPairing({ pairing: siloCode, check: { status: 'pending', opened: false } }),
+        })}
+      />
+    );
+
+    expect(screen.getByText('1234 5678')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'servers.pairing.getCode' })).toBeNull();
+    expect(screen.getByRole('button', { name: 'servers.pairing.useApiKey' })).toBeInTheDocument();
+  });
+
+  it('switches Silo between the code and a pasted key', async () => {
+    render(<AddServerFromList onAdded={vi.fn()} />, {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
+      ),
+    });
+
+    await userEvent.click(screen.getByRole('combobox', { name: 'servers.serverType' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Silo' }));
+    expect(screen.queryByLabelText('common:labels.apiKey')).toBeNull();
+
+    await userEvent.click(screen.getByRole('button', { name: 'servers.pairing.useApiKey' }));
+    expect(screen.getByLabelText('common:labels.apiKey')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'servers.pairing.getCode' })).toBeNull();
+
+    await userEvent.click(screen.getByRole('button', { name: 'servers.pairing.useCode' }));
+    expect(screen.queryByLabelText('common:labels.apiKey')).toBeNull();
+    expect(screen.getByRole('button', { name: 'servers.pairing.getCode' })).toBeInTheDocument();
+  });
+
+  it('asks for an admin when a Silo member approved the code', async () => {
+    const startPairing = vi.fn();
+    render(
+      <AddServerDialog
+        {...props({
+          serverType: 'silo',
+          keyFields: false,
+          startPairing,
+          silo: siloPairing({ pairing: siloCode, check: { status: 'not-admin' } }),
+        })}
+      />
+    );
+
+    expect(screen.getByText('servers.pairing.notAdmin')).toBeInTheDocument();
+    expect(screen.queryByText('1234 5678')).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'servers.pairing.newCode' }));
+    expect(startPairing).toHaveBeenCalled();
+  });
+
+  it('asks for the Silo profile PIN and sends it', async () => {
+    const submitPin = vi.fn();
+    const { rerender } = render(
+      <AddServerDialog
+        {...props({
+          serverType: 'silo',
+          keyFields: false,
+          silo: siloPairing({
+            pairing: siloCode,
+            check: { status: 'needs-pin', wrongPin: false },
+            submitPin,
+          }),
+        })}
+      />
+    );
+
+    expect(screen.getByText('servers.pairing.pinNeeded')).toBeInTheDocument();
+    expect(screen.queryByText('servers.pairing.wrongPin')).toBeNull();
+    await userEvent.type(screen.getByLabelText('servers.pairing.pinLabel'), '1234');
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.continue' }));
+    expect(submitPin).toHaveBeenCalledWith('1234');
+
+    rerender(
+      <AddServerDialog
+        {...props({
+          serverType: 'silo',
+          keyFields: false,
+          silo: siloPairing({ pairing: siloCode, check: { status: 'needs-pin', wrongPin: true } }),
+        })}
+      />
+    );
+    expect(screen.getByText('servers.pairing.wrongPin')).toBeInTheDocument();
+  });
+
+  it('says Silo locked the profile and offers a new code', () => {
+    render(
+      <AddServerDialog
+        {...props({
+          serverType: 'silo',
+          keyFields: false,
+          silo: siloPairing({ pairing: siloCode, check: { status: 'pin-locked' } }),
+        })}
+      />
+    );
+
+    expect(screen.getByText('servers.pairing.pinLocked')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'servers.pairing.newCode' })).toBeInTheDocument();
+  });
+
+  it('adds a Silo server by code the way a key add does, warning first when it cannot stop streams', async () => {
+    const silo = { id: 'silo-1', type: 'silo', name: 'Basement', canStopStreams: false };
+    $fetch.mockImplementation((url: string) =>
+      Promise.resolve({
+        data:
+          url === '/silo/pair/start'
+            ? siloCode
+            : { status: 'added', server: silo, canStopStreams: false },
+        error: null,
+      })
+    );
+    const onAdded = vi.fn();
+    render(<AddServerFromList onAdded={onAdded} />, {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={new QueryClient()}>{children}</QueryClientProvider>
+      ),
+    });
+
+    await userEvent.click(screen.getByRole('combobox', { name: 'servers.serverType' }));
+    await userEvent.click(screen.getByRole('option', { name: 'Silo' }));
+    await userEvent.type(screen.getByLabelText('servers.serverUrl'), 'http://192.168.1.30:8090');
+    await userEvent.type(screen.getByLabelText('servers.serverName'), 'Basement');
+    await userEvent.click(screen.getByRole('button', { name: 'servers.pairing.getCode' }));
+
+    expect(await screen.findByText('servers.cannotStopStreams')).toBeInTheDocument();
+    expect($fetch).toHaveBeenCalledWith('/silo/pair/start', {
+      method: 'POST',
+      body: { purpose: 'add-server', url: 'http://192.168.1.30:8090', name: 'Basement' },
+    });
+    expect(onAdded).not.toHaveBeenCalled();
+    await userEvent.click(screen.getByRole('button', { name: 'common:actions.continue' }));
+    expect(onAdded).toHaveBeenCalledWith(expect.objectContaining({ id: 'silo-1', type: 'silo' }));
+    expect($fetch).not.toHaveBeenCalledWith('/silo/pair/cancel', expect.anything());
+  });
+
   it('says a connected key cannot stop streams and offers only to close', () => {
     render(
       <AddServerDialog {...props({ serverType: 'tofa', addedWithoutStop: true, isOwner: false })} />
@@ -270,11 +507,11 @@ describe('AddServerDialog', () => {
   });
 
   it('shows a tofa server its held import waiting on the library sync, and no second import', async () => {
-    const waiting: LatestImportStatus<TofaImportProgress, TofaImportResult> = {
+    const waiting: LatestImportStatus<ServerHistoryImportProgress, ServerHistoryImportResult> = {
       state: 'waitingForLibrarySync',
       librarySync: { state: 'running', progress: 42 },
     };
-    vi.mocked(api.import.tofa.getActive).mockResolvedValueOnce({
+    vi.mocked(api.import.serverHistory.getActive).mockResolvedValueOnce({
       active: true,
       jobId: 'held-import-tofa-1',
       latest: waiting,
@@ -284,7 +521,7 @@ describe('AddServerDialog', () => {
     await waitFor(() =>
       expect(screen.getByRole('status')).toHaveTextContent('import.waitingForLibrarySyncPercent')
     );
-    expect(api.import.tofa.getActive).toHaveBeenCalledWith('tofa-1');
+    expect(api.import.serverHistory.getActive).toHaveBeenCalledWith('tofa-1');
     expect(screen.queryByRole('button', { name: 'import.importing' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'import.importTofaHistory' })).toBeNull();
     expect(screen.getByRole('button', { name: 'common:actions.close' })).toBeInTheDocument();

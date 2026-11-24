@@ -10,8 +10,12 @@ import * as plexParser from '../services/mediaServer/plex/parser.js';
 import { parseSessionsResponse as parseJellyfinSessions } from '../services/mediaServer/jellyfin/parser.js';
 import { parseSessionsResponse as parseEmbySessions } from '../services/mediaServer/emby/parser.js';
 import * as tofaParser from '../services/mediaServer/tofa/parser.js';
+import { mapTofaRequest } from '../services/mediaServer/tofa/requests.js';
 import type { TofaLibraryFiles, TofaMediaPage } from '../services/mediaServer/tofa/types.js';
-import type { TofaRequestSource } from '../services/requests/sync.js';
+import { SiloClient } from '../services/mediaServer/silo/client.js';
+import * as siloParser from '../services/mediaServer/silo/parser.js';
+import { mapSiloRequest } from '../services/mediaServer/silo/requests.js';
+import type { SiloCatalogItem, SiloPage, SiloProfile } from '../services/mediaServer/silo/types.js';
 import {
   parseLibrariesResponse,
   parseLibraryItemsResponse,
@@ -24,6 +28,7 @@ import {
   type MediaLibraryItem,
   type MediaSession,
   type NotNeeded,
+  type ServerRequests,
   type SyncCursor,
 } from '../services/mediaServer/types.js';
 import { normalizeClient } from '../utils/platformNormalizer.js';
@@ -31,6 +36,7 @@ import plex from './mediaServerResponses/plex.json' with { type: 'json' };
 import jellyfin from './mediaServerResponses/jellyfin.json' with { type: 'json' };
 import emby from './mediaServerResponses/emby.json' with { type: 'json' };
 import tofa from './mediaServerResponses/tofa.json' with { type: 'json' };
+import silo from './mediaServerResponses/silo.json' with { type: 'json' };
 
 type Overrides = Partial<Omit<IMediaServerClient, 'serverType'>>;
 type ItemsSince = Awaited<ReturnType<IMediaServerClient['getLibraryItemsSince']>>;
@@ -145,6 +151,8 @@ export function fakePlexClient(overrides: Overrides = {}): IMediaServerClient {
           )
         )
     ),
+    getRequests: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getRequestPosterPath: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     ...overrides,
   };
 }
@@ -234,6 +242,8 @@ function fakeJellyfinEmbyClient(
     getLibraryAlbums: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     getLibraryAlbumsSince: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     checkFilesExist: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getRequests: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getRequestPosterPath: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     ...overrides,
   };
 }
@@ -353,18 +363,101 @@ export function fakeTofaClient(overrides: Overrides = {}): IMediaServerClient {
       }
       return existence;
     }),
+    getRequests: vi.fn(async (): Promise<ServerRequests> => ({
+      requestsOn: true,
+      version: tofa.systemInfo.version,
+      requests: tofa.requests.map(mapTofaRequest),
+    })),
+    getRequestPosterPath: vi.fn(async () => null),
     ...overrides,
   };
 }
 
-/** tofa's own requests, which only tofa has, so they sit outside IMediaServerClient */
-export function fakeTofaRequestSource(
-  overrides: Partial<TofaRequestSource> = {}
-): TofaRequestSource {
+const siloCatalog: Record<string, SiloPage<SiloCatalogItem>> = silo.catalog;
+const siloProfiles: Record<string, SiloPage<SiloProfile>> = silo.profiles;
+
+// Silo applies added_after to catalog rows, so a listing since a date is built from those rows
+function siloListing(libraryId: string, since?: SyncCursor) {
+  const rows = siloCatalog[libraryId]?.items ?? [];
+  const added = since ? rows.filter((row) => new Date(row.added_at) >= cursorDate(since)) : rows;
+  return siloParser.parseSiloLibraryListing(added, libraryId);
+}
+
+function siloPage(items: MediaLibraryItem[], paging?: Paging) {
+  const offset = paging?.offset ?? 0;
+  const page = items.slice(offset, offset + (paging?.limit ?? 200));
+  return { items: page, totalCount: items.length, rawCount: page.length };
+}
+
+function siloSessions(): MediaSession[] {
+  const names = siloParser.parseSiloDeviceNames(silo.devices.items);
+  return silo.sessions.items.map((row) =>
+    siloParser.parseSiloSession(row, names.get(row.device_id))
+  );
+}
+
+export function fakeSiloClient(overrides: Overrides = {}): IMediaServerClient {
   return {
-    systemInfo: vi.fn(async () => tofa.systemInfo),
-    getRequests: vi.fn(async () => tofa.requests),
-    getRequestPosterPath: vi.fn(async () => null),
+    serverType: 'silo',
+    getSessions: vi.fn(async () => siloSessions()),
+    getUsers: vi.fn(async () =>
+      siloParser.parseSiloUsers(
+        silo.users.items,
+        new Map(silo.users.items.map((user) => [user.id, siloProfiles[user.id]?.items ?? []]))
+      )
+    ),
+    getAccountProfiles: vi.fn(async (accountExternalId: string) =>
+      siloParser.parseSiloProfiles(siloProfiles[accountExternalId]?.items ?? [], accountExternalId)
+    ),
+    getLibraries: vi.fn(async () => siloParser.parseSiloLibraries(silo.libraries.items)),
+    testConnection: vi.fn(async () => true),
+    getServerIdentity: vi.fn(async () => silo.identity.server_id),
+    getSoftwareVersion: vi.fn(async () => silo.systemInfo.server_version),
+    describeDownloadSource: vi.fn(async (request) =>
+      new SiloClient({ url: '', token: '' }).describeDownloadSource(request)
+    ),
+    terminateSession: vi.fn(async () => true),
+    getLibraryItems: vi.fn(async (libraryId: string, paging?: Paging) =>
+      siloPage(siloListing(libraryId).items, paging)
+    ),
+    findExistingRatingKeys: vi.fn(async (ratingKeys: string[], library) => {
+      const { items, episodes } = siloListing(library.id);
+      const listed = new Set([...items, ...episodes].map((item) => item.ratingKey));
+      return new Set(ratingKeys.filter((key) => listed.has(key)));
+    }),
+    getLibraryLeaves: vi.fn(async (libraryId: string, paging?: Paging) =>
+      siloPage(siloListing(libraryId).episodes, paging)
+    ),
+    getLibrarySeasons: vi.fn(async (libraryId: string, paging?: Paging) =>
+      siloPage(siloListing(libraryId).seasons, paging)
+    ),
+    getLibraryItemsSince: vi.fn(
+      async (libraryId: string, since: SyncCursor): Promise<ItemsSince> => {
+        const { items } = siloListing(libraryId, since);
+        return { items, totalCount: items.length, feed: NOT_NEEDED };
+      }
+    ),
+    getLibraryLeavesSince: vi.fn(async (libraryId: string, since: SyncCursor) => {
+      const { episodes } = siloListing(libraryId, since);
+      return { items: episodes, totalCount: episodes.length };
+    }),
+    getLibrarySeasonsSince: vi.fn(async (libraryId: string, since: SyncCursor) => {
+      const { seasons } = siloListing(libraryId, since);
+      return { items: seasons, totalCount: seasons.length };
+    }),
+    getLibraryRevision: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getLibraryAlbums: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getLibraryAlbumsSince: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    checkFilesExist: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
+    getRequests: vi.fn(async (): Promise<ServerRequests> => {
+      const usernames = new Map(silo.users.items.map((user) => [user.id, user.username]));
+      return {
+        requestsOn: true,
+        version: silo.systemInfo.server_version,
+        requests: silo.requests.items.flatMap((row) => mapSiloRequest(row, usernames) ?? []),
+      };
+    }),
+    getRequestPosterPath: vi.fn(async (): Promise<NotNeeded> => NOT_NEEDED),
     ...overrides,
   };
 }

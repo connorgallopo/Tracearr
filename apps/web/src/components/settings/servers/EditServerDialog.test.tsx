@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import type { Server, ServerLocationEntry } from '@tracearr/shared';
 import { EditServerDialog } from './EditServerDialog';
 
@@ -18,6 +19,12 @@ vi.mock('@/hooks/queries', () => ({
     isFetchedAfterMount: true,
   })),
   useUpdateServerLocations: vi.fn(() => ({ mutateAsync, isPending: false })),
+}));
+const siloPairing = vi.hoisted(() => ({
+  current: {} as Record<string, unknown>,
+}));
+vi.mock('@/hooks/queries/useSiloPairing', () => ({
+  useSiloPairing: () => siloPairing.current,
 }));
 vi.mock('@/components/map/LocationPicker', () => ({ LocationPicker: () => <div>map</div> }));
 vi.mock('@/components/settings/shared/CountrySelect', () => ({
@@ -94,6 +101,34 @@ function server(overrides: Partial<Server> = {}): Server {
     updatedAt: new Date('2026-01-01'),
     ...overrides,
   } as Server;
+}
+
+function renderSilo(overrides: Record<string, unknown> = {}) {
+  siloPairing.current = {
+    start: vi.fn(),
+    starting: false,
+    pairing: null,
+    check: null,
+    submitPin: vi.fn(),
+    submittingPin: false,
+    cancel: vi.fn(),
+    error: null,
+    reset: vi.fn(),
+    ...overrides,
+  };
+  const silo = server({ id: 'silo-1', type: 'silo', url: 'http://10.0.0.5:8090' });
+  render(
+    <QueryClientProvider client={new QueryClient()}>
+      <EditServerDialog
+        server={silo}
+        servers={[silo]}
+        onClose={vi.fn()}
+        onUpdate={vi.fn()}
+        isUpdating={false}
+      />
+    </QueryClientProvider>
+  );
+  return siloPairing.current;
 }
 
 describe('EditServerDialog', () => {
@@ -214,6 +249,65 @@ describe('EditServerDialog', () => {
     await userEvent.type(field, ' new-key ');
     await userEvent.click(screen.getByRole('button', { name: 'common:actions.update' }));
     expect(onUpdate).toHaveBeenCalledWith({ apiKey: 'new-key' });
+  });
+
+  it('offers a Silo server a new key by code first, and the API key field only on request', async () => {
+    const pairing = renderSilo();
+
+    expect(screen.queryByLabelText('common:labels.apiKey')).toBeNull();
+    await userEvent.click(screen.getByRole('button', { name: 'servers.pairing.getNewKey' }));
+    expect(pairing.start).toHaveBeenCalledWith({ purpose: 'rekey', serverId: 'silo-1' });
+
+    await userEvent.click(screen.getByRole('button', { name: 'servers.pairing.useApiKey' }));
+    expect(screen.getByLabelText('common:labels.apiKey')).toBeInTheDocument();
+  });
+
+  it('says Tracearr uses the new key, and to revoke an old one Silo still lists', () => {
+    renderSilo({
+      pairing: {
+        handle: 'h',
+        userCode: '12345678',
+        link: 'https://s/a',
+        expiresIn: 600,
+        interval: 5,
+      },
+      check: { status: 'rekeyed', oldKeyLeft: true },
+    });
+
+    expect(screen.getByText('servers.pairing.rekeyed')).toBeInTheDocument();
+    expect(screen.getByText('servers.pairing.oldKeyLeft')).toBeInTheDocument();
+    expect(screen.queryByText('1234 5678')).toBeNull();
+  });
+
+  it('keeps the old-key line back when Tracearr deleted the old key', () => {
+    renderSilo({
+      pairing: {
+        handle: 'h',
+        userCode: '12345678',
+        link: 'https://s/a',
+        expiresIn: 600,
+        interval: 5,
+      },
+      check: { status: 'rekeyed', oldKeyLeft: false },
+    });
+
+    expect(screen.getByText('servers.pairing.rekeyed')).toBeInTheDocument();
+    expect(screen.queryByText('servers.pairing.oldKeyLeft')).toBeNull();
+  });
+
+  it('offers a Jellyfin server no code', () => {
+    render(
+      <EditServerDialog
+        server={server()}
+        servers={[server()]}
+        onClose={vi.fn()}
+        onUpdate={vi.fn()}
+        isUpdating={false}
+      />
+    );
+
+    expect(screen.queryByRole('button', { name: 'servers.pairing.getNewKey' })).toBeNull();
+    expect(screen.getByLabelText('common:labels.apiKey')).toBeInTheDocument();
   });
 
   it('keeps the save button disabled until something changes', () => {

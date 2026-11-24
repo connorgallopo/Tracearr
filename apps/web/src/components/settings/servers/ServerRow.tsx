@@ -361,6 +361,7 @@ function RealtimeStatus({
     case 'plexWebsocket':
       return null;
     case 'tofaSocket':
+    case 'siloSocket':
       if (!connectionStatus) return checking;
       return connectionStatus.mode === 'realtime'
         ? realtime()

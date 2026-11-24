@@ -291,7 +291,15 @@ describe('getAuth construction', () => {
   it('registers the expected plugins', () => {
     const auth = getAuth();
     const pluginIds = auth.options.plugins?.map((p) => p.id);
-    expect(pluginIds).toEqual(['username', 'admin', 'bearer', 'plex', 'tofa', 'member-login']);
+    expect(pluginIds).toEqual([
+      'username',
+      'admin',
+      'bearer',
+      'plex',
+      'tofa',
+      'silo',
+      'member-login',
+    ]);
   });
 
   it('counts a sign-in when a session is created, never when one is refreshed', () => {
@@ -340,6 +348,7 @@ describe('getAuth construction', () => {
         'bearer',
         'plex',
         'tofa',
+        'silo',
         'member-login',
         'generic-oauth',
       ]);

@@ -38,6 +38,10 @@ export function importForm(alias: string, type: DuplicateCleanupServer['type']):
       return sql`(${a}.external_session_id IS NOT NULL AND ${a}.session_key = ${a}.external_session_id)`;
     case 'tofa':
       return sql`(${a}.session_key = 'tofa-' || ${a}.external_session_id)`;
+    // Silo history is matched to captured plays by session id, and each Silo session is its own
+    // play, so no Silo import is a duplicate to remove
+    case 'silo':
+      return sql`FALSE`;
     default:
       return assertNever(type);
   }

@@ -469,7 +469,11 @@ export function DetailHero({
 
               {request && (
                 <p className="text-muted-foreground text-dense mt-2 flex items-center gap-2">
-                  <RequestServiceIcon type={request.serviceType} className="h-3.5 w-3.5" />
+                  <RequestServiceIcon
+                    type={request.serviceType}
+                    serverType={request.serverType}
+                    className="h-3.5 w-3.5"
+                  />
                   <span>{heroRequestText(request, t as Translate)}</span>
                 </p>
               )}

@@ -1,0 +1,1 @@
+ALTER TABLE "servers" ADD COLUMN "api_key_id" text;

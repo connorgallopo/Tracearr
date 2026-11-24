@@ -4,49 +4,30 @@
  * records.
  */
 
-import { SERVER_PROFILES } from '@tracearr/shared';
-import { UnrecoverableError } from 'bullmq';
-import { and, eq, gte, inArray, lte, or, type SQL } from 'drizzle-orm';
-import { db } from '../../db/client.js';
-import { servers, sessions } from '../../db/schema.js';
-import { ServerHistoricalError } from '../liveServers.js';
+import type { SQL } from 'drizzle-orm';
 import { TofaClient } from '../mediaServer/tofa/client.js';
 import type { TofaWatchHistoryRow } from '../mediaServer/tofa/types.js';
+import { historyPlaysOf, historyServerRow } from './serverHistory.js';
 
 const PAGE_SIZE = 200;
-// A play Tracearr captured starts within moments of tofa's record of it
-export const CAPTURED_START_SLACK_MS = 24 * 60 * 60 * 1000;
 
 /**
  * The plays in Tracearr that history rows record: a play it captured carries tofa's session id
  * as its session key, and a play an earlier import brought in carries the history id.
  */
 export function playsOf(serverId: string, rows: TofaWatchHistoryRow[]): SQL | undefined {
-  const sessionIds = rows.flatMap((row) => (row.session_id ? [row.session_id] : []));
-  const starts = rows.map((row) => Date.parse(row.started_at));
-  return and(
-    eq(sessions.serverId, serverId),
-    gte(sessions.startedAt, new Date(Math.min(...starts) - CAPTURED_START_SLACK_MS)),
-    lte(sessions.startedAt, new Date(Math.max(...starts) + CAPTURED_START_SLACK_MS)),
-    or(
-      inArray(
-        sessions.externalSessionId,
-        rows.map((row) => row.id)
-      ),
-      sessionIds.length > 0 ? inArray(sessions.sessionKey, sessionIds) : undefined
-    )
+  return historyPlaysOf(
+    serverId,
+    rows.map((row) => ({
+      historyId: row.id,
+      sessionId: row.session_id ?? null,
+      startedAt: new Date(row.started_at),
+    }))
   );
 }
 
 export async function historyServer(serverId: string) {
-  const [server] = await db.select().from(servers).where(eq(servers.id, serverId)).limit(1);
-  if (!server) throw new UnrecoverableError(`Server not found: ${serverId}`);
-  if (server.historicalAt) throw new ServerHistoricalError(serverId);
-  if (SERVER_PROFILES[server.type].serverHistoryImport !== 'tofa') {
-    throw new UnrecoverableError(
-      `${server.type} servers keep no watch history of their own to import`
-    );
-  }
+  const server = await historyServerRow(serverId, 'tofa');
   return {
     server,
     client: new TofaClient({ url: server.url, token: server.token, id: server.id }),

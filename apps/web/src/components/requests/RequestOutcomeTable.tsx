@@ -88,7 +88,12 @@ export function RequestOutcomeTable({
           id: 'requester',
           header: t('pages:requests.outcomes.requester'),
           enableSorting: false,
-          cell: (info) => <RequesterCell requester={info.row.original.requester} />,
+          cell: (info) => (
+            <RequesterCell
+              requester={info.row.original.requester}
+              profile={info.row.original.nonMainProfile}
+            />
+          ),
         }),
         columnHelper.accessor((row) => row.waitMs, {
           id: 'waitMs',

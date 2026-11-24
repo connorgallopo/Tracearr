@@ -4,14 +4,20 @@ import { db } from '../../db/client.js';
 import { servers } from '../../db/schema.js';
 import { getRedis } from '../../lib/redisShared.js';
 import { liveServerCondition, type ServerRow } from '../liveServers.js';
-import { createJellyfinEmbyClient, isJellyfinEmby, TofaClient } from '../mediaServer/index.js';
+import {
+  createJellyfinEmbyClient,
+  isJellyfinEmby,
+  SiloClient,
+  TofaClient,
+} from '../mediaServer/index.js';
+import type { SiloDownloadEntry } from '../mediaServer/silo/types.js';
 import { parseProfileNaming } from '../mediaServer/tofa/parser.js';
 import type { TofaMedia, TofaDownload } from '../mediaServer/tofa/types.js';
 import {
   getServerUserIdByExternalId,
   getServerUserIdsByExternalId,
 } from '../../jobs/poller/database.js';
-import { profileIdOf, profileSightings, resolveProfiles } from '../profiles.js';
+import { profileIdOf, profileSightings, resolveProfiles, storedProfileIds } from '../profiles.js';
 import { deliveredFile } from './enrich.js';
 import { recordDownload, type DownloadSignal } from './recorder.js';
 import { pollServerTranscodePulls } from './transcodePull.js';
@@ -38,12 +44,27 @@ const SYNC_RECORDED_TTL_SECONDS = 30 * 24 * 60 * 60;
 type ActivityLogClient = BaseMediaServerClient;
 
 const inFlight = new Set<string>();
+const rerunRequested = new Set<string>();
 
-async function exclusive(key: string, run: () => Promise<void>): Promise<void> {
-  if (inFlight.has(key)) return;
+/**
+ * Runs one poll per key at a time. A call made while one runs is dropped, or with `rerun`
+ * queues a single further run, however many calls arrive, for after the current one.
+ */
+async function exclusive(
+  key: string,
+  run: () => Promise<void>,
+  { rerun = false } = {}
+): Promise<void> {
+  if (inFlight.has(key)) {
+    if (rerun) rerunRequested.add(key);
+    return;
+  }
   inFlight.add(key);
   try {
-    await run();
+    do {
+      rerunRequested.delete(key);
+      await run();
+    } while (rerunRequested.has(key));
   } finally {
     inFlight.delete(key);
   }
@@ -274,7 +295,82 @@ async function pollTofa(server: ServerRow): Promise<void> {
   });
 }
 
-/** The polls that find a server's downloads; Plex reports its downloads on its socket instead. */
+function siloSignal(
+  server: ServerRow,
+  entry: SiloDownloadEntry,
+  serverUserId: string | null,
+  profileId: string | null
+): DownloadSignal {
+  return {
+    serverId: server.id,
+    serverUserId,
+    profileId,
+    // The key describeDownloadSource finds the listed entry by
+    ratingKey: entry.episode_id ?? entry.content_id,
+    title: entry.episode?.title ? `${entry.title} - ${entry.episode.title}` : entry.title,
+    app: null,
+    device: entry.device_name || null,
+    source: 'silo',
+    seenAt: new Date(entry.created_at),
+    deviceId: entry.device_id,
+  };
+}
+
+/**
+ * Records each download Silo lists after the server's cursor, a creation time seeded 24 h back. A
+ * call during a run reads the list once more after it, so a download created after the listing
+ * was read does not wait for the next tick.
+ */
+async function pollSilo(server: ServerRow): Promise<void> {
+  await exclusive(
+    server.id,
+    async () => {
+      const redis = getRedis();
+      const key = REDIS_KEYS.DOWNLOAD_CURSOR(server.id);
+      const stored = await redis.get(key);
+      const cursor = stored === null ? null : Number(stored);
+      const entries = (
+        await new SiloClient(server).getDownloadsAfter(
+          new Date(cursor ?? Date.now() - SEED_WINDOW_MS)
+        )
+      ).toSorted((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
+
+      const accountOf = await getServerUserIdsByExternalId(
+        server.id,
+        entries.map((entry) => entry.user_id)
+      );
+      const profiles = await storedProfileIds(
+        server.id,
+        entries.map((entry) => entry.profile_id)
+      );
+
+      let last = cursor;
+      try {
+        for (const entry of entries) {
+          await recordDownload(
+            siloSignal(
+              server,
+              entry,
+              accountOf.get(entry.user_id) ?? null,
+              profiles.get(entry.profile_id) ?? null
+            )
+          ).catch((error: unknown) => {
+            console.error(
+              `[Downloads] Download ${entry.id} on ${server.name} not recorded:`,
+              error
+            );
+          });
+          last = Date.parse(entry.created_at);
+        }
+      } finally {
+        if (last !== null && last !== cursor) await redis.set(key, String(last));
+      }
+    },
+    { rerun: true }
+  );
+}
+
+/** The polls that find a server's downloads. Plex reports its downloads on its socket instead. */
 function downloadPolls(server: ServerRow): Promise<void>[] {
   switch (server.type) {
     case 'plex':
@@ -295,6 +391,12 @@ function downloadPolls(server: ServerRow): Promise<void>[] {
     case 'tofa':
       return [
         pollTofa(server).catch((error: unknown) => {
+          console.error(`[Downloads] Download list poll failed for ${server.name}:`, error);
+        }),
+      ];
+    case 'silo':
+      return [
+        pollSilo(server).catch((error: unknown) => {
           console.error(`[Downloads] Download list poll failed for ${server.name}:`, error);
         }),
       ];
@@ -333,6 +435,16 @@ export async function pollServerSyncJobs(serverId: string): Promise<void> {
     )
     .limit(1);
   if (server) await pollSync(server);
+}
+
+/** Runs the server's download polls now, as the reconciliation tick does */
+export async function pollDownloadsOf(serverId: string): Promise<void> {
+  const [server] = await db
+    .select()
+    .from(servers)
+    .where(and(eq(servers.id, serverId), liveServerCondition))
+    .limit(1);
+  if (server) await Promise.all(downloadPolls(server));
 }
 
 export async function pollAllDownloads(): Promise<void> {

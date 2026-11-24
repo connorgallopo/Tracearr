@@ -372,6 +372,14 @@ export class PlexClient implements IMediaServerClient, IMediaServerClientWithHis
     return NOT_NEEDED;
   }
 
+  async getRequests(): Promise<NotNeeded> {
+    return NOT_NEEDED;
+  }
+
+  async getRequestPosterPath(): Promise<NotNeeded> {
+    return NOT_NEEDED;
+  }
+
   /**
    * Get all libraries on this server
    */

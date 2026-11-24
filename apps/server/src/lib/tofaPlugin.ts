@@ -21,7 +21,7 @@
 
 import { randomBytes } from 'node:crypto';
 import type { BetterAuthPlugin } from 'better-auth';
-import { APIError, createAuthEndpoint, getSessionFromCtx } from 'better-auth/api';
+import { APIError, createAuthEndpoint } from 'better-auth/api';
 import { expireCookie, type setSessionCookie } from 'better-auth/cookies';
 import { and, asc, eq, inArray, isNotNull, ne, or } from 'drizzle-orm';
 import { z } from 'zod';
@@ -58,6 +58,7 @@ import {
 } from './authGuards.js';
 import { getRedis } from './redisShared.js';
 import { createSignedInSession, upsertTofaAccount } from './memberLogin.js';
+import { requireOwnerSession } from './ownerSession.js';
 
 const log = createLogger('tofa-sign-in');
 
@@ -94,15 +95,6 @@ interface CloudSignIn {
 }
 
 const EXPIRED = { status: 'expired' } as const;
-
-async function requireOwnerSession(ctx: TofaEndpointCtx): Promise<string> {
-  const current = await getSessionFromCtx(ctx);
-  const role = (current?.user as { role?: string } | undefined)?.role;
-  if (!current || current.session.impersonatedBy || role !== 'owner') {
-    throw new APIError('FORBIDDEN', { message: 'Only the owner can add servers' });
-  }
-  return current.user.id;
-}
 
 /**
  * The owner's picture follows the one their tofa account last synced, unless it came from elsewhere;
@@ -366,7 +358,7 @@ async function createOwner(
 
 async function removeServer(serverId: string): Promise<void> {
   try {
-    await deleteServer(serverId);
+    await deleteServer(serverId, getRedis());
   } catch {
     log.error('could not remove the server a failed tofa connect made', { serverId });
   }

@@ -104,6 +104,9 @@ vi.mock('@/components/settings/servers/EditServerDialog', () => ({
 }));
 
 vi.mock('@/hooks/useAuth', () => ({ useAuth: vi.fn() }));
+vi.mock('@/hooks/queries/useSiloPairing', () => ({
+  useSiloPairing: () => ({ pairing: null, check: null, cancel: vi.fn() }),
+}));
 vi.mock('@/hooks/useSocket', () => ({ useSocket: vi.fn() }));
 
 const deleteMutate = vi.fn((_id: string, opts?: { onSuccess?: () => void }) => {
@@ -285,6 +288,23 @@ describe('Connections', () => {
     await userEvent.click(screen.getByRole('button', { name: 'remove-server-2' }));
 
     expect(screen.getByText('servers.removeServerTitle:{"name":"Server 2"}')).toBeInTheDocument();
+  });
+
+  it('tells the owner to revoke the key in Silo when removing a Silo server, and only then', async () => {
+    vi.mocked(useServers).mockReturnValue({
+      data: [server({ id: 'silo-1', type: 'silo' }), server({ id: 'jf-1' })],
+      isLoading: false,
+      refetch: vi.fn(),
+    } as unknown as ReturnType<typeof useServers>);
+    render(<Connections />);
+
+    await userEvent.click(screen.getByRole('button', { name: 'remove-silo-1' }));
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('servers.pairing.revokeOnRemove');
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    await userEvent.click(screen.getByRole('button', { name: 'remove-jf-1' }));
+    expect(screen.getByRole('alertdialog')).toHaveTextContent('servers.removeServerConfirm');
+    expect(screen.getByRole('alertdialog')).not.toHaveTextContent('servers.pairing.revokeOnRemove');
   });
 
   it('offers reordering only when there is more than one server', () => {

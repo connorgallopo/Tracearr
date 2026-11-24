@@ -21,7 +21,8 @@ import {
   followServerOnBuiltInRequestService,
 } from '../../src/services/requests/store.js';
 import { runRequestSync } from '../../src/services/requests/sync.js';
-import { fakeTofaRequestSource } from '../../src/test/mediaServerFakes.js';
+import { mapTofaRequest } from '../../src/services/mediaServer/tofa/requests.js';
+import { fakeTofaClient } from '../../src/test/mediaServerFakes.js';
 import tofa from '../../src/test/mediaServerResponses/tofa.json' with { type: 'json' };
 
 const REQUESTER = 'b1e4c7a2-5d38-4f91-8a6c-2e7f0d3b9c14';
@@ -61,7 +62,7 @@ describe('tofa request sync', () => {
     expect(await addBuiltInRequestServices(db, ['tofa'])).toEqual([]);
     const server = await db.execute(sql`SELECT name, url FROM servers WHERE id = ${serverId}`);
     expect((await builtIn()).rows).toEqual([
-      { id: serviceId, type: 'tofa', ...server.rows[0], config: null, remote_server_id: null },
+      { id: serviceId, type: 'server', ...server.rows[0], config: null, remote_server_id: null },
     ]);
 
     await db.execute(
@@ -79,7 +80,14 @@ describe('tofa request sync', () => {
     }
     const replay = (requests: typeof waiting) =>
       runRequestSync(serviceId, 'incremental', {
-        tofaClientFor: () => fakeTofaRequestSource({ getRequests: async () => requests }),
+        serverClientFor: () =>
+          fakeTofaClient({
+            getRequests: async () => ({
+              requestsOn: true,
+              version: null,
+              requests: requests.map(mapTofaRequest),
+            }),
+          }),
       });
 
     await replay(waiting);
@@ -114,26 +122,54 @@ describe('tofa request sync', () => {
     expect((await mirror(serviceId)).every((r) => r.deleted_at !== null)).toBe(true);
   });
 
-  it('offers Requests for a tofa server only while tofa has its requests on', async () => {
-    const { serviceId } = await seed();
-    const syncWith = (requestsAvailable: boolean) =>
+  it('links a request to its profile once the profile is stored', async () => {
+    const { serverId, serviceId, requesterId } = await seed();
+    const [first] = tofa.requests;
+    if (!first) throw new Error('fixture has no requests');
+    const sync = () =>
       runRequestSync(serviceId, 'full', {
-        tofaClientFor: () =>
-          fakeTofaRequestSource({
-            systemInfo: async () => ({ ...tofa.systemInfo, requests_available: requestsAvailable }),
+        serverClientFor: () =>
+          fakeTofaClient({
+            getRequests: async () => ({
+              requestsOn: true,
+              version: null,
+              requests: [{ ...mapTofaRequest(first), remoteProfileId: 'p-kid' }],
+            }),
           }),
       });
+    const profileId = async () =>
+      (await db.execute(sql`SELECT profile_id FROM media_requests WHERE service_id = ${serviceId}`))
+        .rows[0]?.profile_id;
 
-    await syncWith(false);
+    await sync();
+    expect(await profileId()).toBeNull();
+
+    const stored = await db.execute(sql`
+      INSERT INTO server_profiles (server_id, server_user_id, external_id, name)
+      VALUES (${serverId}, ${requesterId}, 'p-kid', 'Kid')
+      RETURNING id
+    `);
+    await sync();
+    expect(await profileId()).toBe(stored.rows[0]?.id);
+  });
+
+  it('offers Requests for a tofa server only while tofa has its requests on', async () => {
+    const { serviceId } = await seed();
+    await runRequestSync(serviceId, 'full', {
+      serverClientFor: () =>
+        fakeTofaClient({
+          getRequests: async () => ({ requestsOn: false, version: tofa.systemInfo.version }),
+        }),
+    });
     expect(await anyRequestServiceLinked()).toBe(false);
 
-    await syncWith(true);
+    await runRequestSync(serviceId, 'full', { serverClientFor: () => fakeTofaClient() });
     expect(await anyRequestServiceLinked()).toBe(true);
   });
 
   it('removes the request service and its mirror with the server', async () => {
     const { serverId, serviceId } = await seed();
-    await runRequestSync(serviceId, 'full', { tofaClientFor: () => fakeTofaRequestSource() });
+    await runRequestSync(serviceId, 'full', { serverClientFor: () => fakeTofaClient() });
     expect(await mirror(serviceId)).toHaveLength(tofa.requests.length);
 
     await db.execute(sql`DELETE FROM servers WHERE id = ${serverId}`);

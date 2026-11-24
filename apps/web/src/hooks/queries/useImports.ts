@@ -12,10 +12,10 @@ import {
   type LatestImportStatus,
   type PlaybackReportingImportProgress,
   type PlaybackReportingImportResult,
+  type ServerHistoryImportProgress,
+  type ServerHistoryImportResult,
   type TautulliImportProgress,
   type TautulliImportResult,
-  type TofaImportProgress,
-  type TofaImportResult,
 } from '@tracearr/shared';
 import { api } from '@/lib/api';
 import { useMultiServerQuery, type MultiServerQueryResult } from '@/hooks/useMultiServerQuery';
@@ -31,7 +31,10 @@ interface ImportShapes {
     progress: CardProgress<PlaybackReportingImportProgress>;
     result: PlaybackReportingImportResult;
   };
-  tofa: { progress: CardProgress<TofaImportProgress>; result: TofaImportResult };
+  serverHistory: {
+    progress: CardProgress<ServerHistoryImportProgress>;
+    result: ServerHistoryImportResult;
+  };
 }
 
 export type ImportSource = keyof ImportShapes;
@@ -46,7 +49,7 @@ const PROGRESS_EVENTS = {
   tautulli: WS_EVENTS.IMPORT_PROGRESS,
   jellystat: WS_EVENTS.IMPORT_JELLYSTAT_PROGRESS,
   playbackReporting: WS_EVENTS.IMPORT_PLAYBACK_REPORTING_PROGRESS,
-  tofa: WS_EVENTS.IMPORT_TOFA_PROGRESS,
+  serverHistory: WS_EVENTS.IMPORT_SERVER_HISTORY_PROGRESS,
 } as const satisfies Record<ImportSource, string>;
 
 type ImportAnswer<S extends ImportSource> = { latest: LatestOf<S> | null };

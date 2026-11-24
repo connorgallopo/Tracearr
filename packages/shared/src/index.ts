@@ -21,6 +21,9 @@ export type {
   LoginAccess,
   AuthUser,
   SetupStatus,
+  SiloPairPurpose,
+  SiloPairStart,
+  SiloPairCheck,
   UserLocation,
   UserDevice,
   MediaDownloadRow,
@@ -121,8 +124,8 @@ export type {
   // Playback Reporting import
   PlaybackReportingImportProgress,
   PlaybackReportingImportResult,
-  TofaImportProgress,
-  TofaImportResult,
+  ServerHistoryImportProgress,
+  ServerHistoryImportResult,
   ImportRetry,
   LatestImportStatus,
   ImportWaitingForLibrarySync,
@@ -496,6 +499,9 @@ export {
   memberPasswordSignInSchema,
   quickConnectInitiateSchema,
   quickConnectCheckSchema,
+  siloPairStartSchema,
+  siloPairCheckSchema,
+  siloPairCancelSchema,
   callbackSchema,
   // Server
   createServerSchema,
@@ -601,7 +607,7 @@ export {
   // Playback Reporting import
   playbackReportingImportSchema,
   playbackReportingTestSchema,
-  tofaImportSchema,
+  serverHistoryImportSchema,
   // Engagement tracking
   engagementTierSchema,
   userBehaviorTypeSchema,
@@ -1018,11 +1024,13 @@ export {
   type JellyfinEmbyServerType,
 } from './serverTypes.js';
 export {
+  SERVER_HISTORY_IMPORTERS,
   SERVER_PROFILES,
   liveStatsGapSeconds,
   ownerLinkProof,
   someServerHasProfiles,
   type OwnerLinkProof,
+  type ServerHistoryImporter,
   type ServerProfile,
 } from './serverProfiles.js';
 

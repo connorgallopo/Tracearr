@@ -31,6 +31,7 @@ const apiAuth = vi.hoisted(() => ({
 }));
 const { connectJellyfinWithApiKey, getPlexAccounts } = apiAuth;
 vi.mock('@/lib/api', () => ({ api: { auth: apiAuth } }));
+vi.mock('@/lib/authClient', () => ({ authClient: { $fetch: vi.fn() } }));
 vi.mock('sonner', () => ({ toast: { success: vi.fn(), error: vi.fn() } }));
 vi.mock('@/components/brand/Logo', () => ({ LogoIcon: () => null }));
 vi.mock('@/components/settings/data/Import', () => ({
@@ -197,6 +198,20 @@ describe('Setup', () => {
 
     finishRefetch();
     expect(await screen.findByText('importers for tofa')).toBeInTheDocument();
+  });
+
+  it('connects Silo by a code, with the API key one click away', async () => {
+    renderSetup('/setup?type=silo');
+
+    expect(screen.getByLabelText('servers.serverUrl')).toBeInTheDocument();
+    expect(screen.getByLabelText('servers.serverName')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'servers.pairing.getCode' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('common:labels.apiKey')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'servers.connectServer' })).toBeNull();
+
+    await userEvent.click(screen.getByRole('button', { name: 'servers.pairing.useApiKey' }));
+    expect(screen.getByLabelText('common:labels.apiKey')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'servers.connectServer' })).toBeInTheDocument();
   });
 
   it('the manual fields stay one click away', async () => {

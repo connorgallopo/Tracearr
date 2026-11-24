@@ -77,7 +77,9 @@ vi.mock('../../jobs/importQueue.js', () => ({
   getActivePlaybackReportingImportForServer: vi.fn().mockResolvedValue(null),
   getActiveJellystatImportForServer: vi.fn().mockResolvedValue(null),
   getJellystatImportStatus: vi.fn().mockResolvedValue(null),
-  getActiveTofaImportForServer: vi.fn().mockResolvedValue(null),
+  getActiveServerHistoryImport: vi.fn().mockResolvedValue(null),
+  enqueueServerHistoryImport: vi.fn().mockRejectedValue(new Error('Queue not available')),
+  runServerHistoryImport: vi.fn().mockResolvedValue({}),
   getLatestImport: vi.fn().mockResolvedValue(null),
   publishImportFailed: vi.fn(),
 }));
@@ -101,7 +103,8 @@ import {
   getActivePlaybackReportingImportForServer,
   getActiveJellystatImportForServer,
   getJellystatImportStatus,
-  getActiveTofaImportForServer,
+  getActiveServerHistoryImport,
+  enqueueServerHistoryImport,
   getLatestImport,
   publishImportFailed,
 } from '../../jobs/importQueue.js';
@@ -1132,7 +1135,47 @@ describe('Import Routes', () => {
     });
   });
 
-  describe('GET /import/tofa/active/:serverId', () => {
+  describe('POST /import/server-history', () => {
+    const serverId = randomUUID();
+
+    it.each([
+      ['tofa', 'tofa'],
+      ['Silo', 'silo'],
+    ] as const)("queues a %s server's own history import", async (_name, type) => {
+      app = await buildTestApp(ownerUser);
+      mockDbSelectLimit([{ id: serverId, type, historicalAt: null }]);
+      vi.mocked(enqueueServerHistoryImport).mockResolvedValueOnce('job-history-1');
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/import/server-history',
+        payload: { serverId },
+      });
+
+      expect(response.json()).toMatchObject({ status: 'queued', jobId: 'job-history-1' });
+      expect(enqueueServerHistoryImport).toHaveBeenCalledExactlyOnceWith(
+        serverId,
+        type,
+        ownerUser.userId
+      );
+    });
+
+    it('refuses a server that keeps no history of its own', async () => {
+      app = await buildTestApp(ownerUser);
+      mockDbSelectLimit([{ id: serverId, type: 'plex', historicalAt: null }]);
+
+      const response = await app.inject({
+        method: 'POST',
+        url: '/import/server-history',
+        payload: { serverId },
+      });
+
+      expect(response.statusCode).toBe(400);
+      expect(enqueueServerHistoryImport).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /import/server-history/active/:serverId', () => {
     const serverId = randomUUID();
     const result = {
       success: true as const,
@@ -1143,9 +1186,24 @@ describe('Import Routes', () => {
       message: 'Import complete: 9 imported, 3 already in Tracearr',
     };
 
+    beforeEach(() => {
+      mockDbSelectLimit([{ type: 'tofa' }]);
+    });
+
+    it('answers no import for a server that keeps no history of its own', async () => {
+      app = await buildTestApp(ownerUser);
+      mockDbSelectLimit([{ type: 'plex' }]);
+
+      const response = await app.inject({ url: `/import/server-history/active/${serverId}` });
+
+      expect(response.statusCode).toBe(200);
+      expect(response.json()).toEqual({ active: false, latest: null });
+      expect(getLatestImport).not.toHaveBeenCalled();
+    });
+
     it('says the held backfill waits for the library sync running for the server', async () => {
       app = await buildTestApp(ownerUser);
-      vi.mocked(getActiveTofaImportForServer).mockResolvedValueOnce('held-import-1');
+      vi.mocked(getActiveServerHistoryImport).mockResolvedValueOnce('held-import-1');
       vi.mocked(getImportStatus).mockResolvedValueOnce({
         jobId: 'held-import-1',
         state: 'delayed',
@@ -1168,7 +1226,7 @@ describe('Import Routes', () => {
         jobId: 'sync-1',
       });
 
-      const response = await app.inject({ url: `/import/tofa/active/${serverId}` });
+      const response = await app.inject({ url: `/import/server-history/active/${serverId}` });
 
       expect(response.json()).toMatchObject({
         active: true,
@@ -1205,7 +1263,7 @@ describe('Import Routes', () => {
         attempts: 3,
       });
 
-      const response = await app.inject({ url: `/import/tofa/active/${serverId}` });
+      const response = await app.inject({ url: `/import/server-history/active/${serverId}` });
 
       expect(response.json()).toEqual({
         active: false,
@@ -1240,11 +1298,15 @@ describe('Import Routes', () => {
       message: 'Processing: 10 plays',
     };
 
+    beforeEach(() => {
+      mockDbSelectLimit([{ type: 'tofa' }]);
+    });
+
     it.each([
       ['tautulli', 'tautulli'],
       ['jellystat', 'jellystat'],
       ['playback-reporting', 'playback-reporting'],
-      ['tofa', 'tofa'],
+      ['server-history', 'tofa'],
     ] as const)('answers the %s route in its latest field', async (path, type) => {
       app = await buildTestApp(ownerUser);
       vi.mocked(getLatestImport).mockResolvedValueOnce({ ...kept, state: 'waiting' });

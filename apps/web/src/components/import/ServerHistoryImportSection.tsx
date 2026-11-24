@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { ParseKeys } from 'i18next';
 import { AlertTriangle, Download, Info } from 'lucide-react';
-import type { Server, TofaImportProgress, TofaImportResult } from '@tracearr/shared';
+import type {
+  Server,
+  ServerHistoryImporter,
+  ServerHistoryImportProgress,
+  ServerHistoryImportResult,
+} from '@tracearr/shared';
 import { Field, FieldLabel } from '@/components/ui/field';
 import {
   Select,
@@ -23,10 +29,43 @@ import { cn } from '@/lib/utils';
 import { ImportProgressCard, type ImportProgressData } from './ImportProgressCard';
 import { StartImportButton } from './StartImportButton';
 
+export const HISTORY_IMPORT_COPY: Record<
+  ServerHistoryImporter,
+  {
+    tab: ParseKeys<'settings'>;
+    title: ParseKeys<'settings'>;
+    description: ParseKeys<'settings'>;
+    selectServer: ParseKeys<'settings'>;
+    start: ParseKeys<'settings'>;
+    skipUserNotFound: ParseKeys<'settings'>;
+    /** Only a server whose history lists plays still running skips them */
+    skipActive: ParseKeys<'settings'> | null;
+  }
+> = {
+  tofa: {
+    tab: 'import.tofa',
+    title: 'import.tofaHistory',
+    description: 'import.tofaHistoryDesc',
+    selectServer: 'import.selectTofaServer',
+    start: 'import.importTofaHistory',
+    skipUserNotFound: 'import.skipUserNotFoundTofa',
+    skipActive: 'import.skipActiveTofa',
+  },
+  silo: {
+    tab: 'import.silo',
+    title: 'import.siloHistory',
+    description: 'import.siloHistoryDesc',
+    selectServer: 'import.selectSiloServer',
+    start: 'import.importSiloHistory',
+    skipUserNotFound: 'import.skipUserNotFoundSilo',
+    skipActive: null,
+  },
+};
+
 const blankProgress = (
-  status: TofaImportProgress['status'],
+  status: ServerHistoryImportProgress['status'],
   message: string
-): CardProgress<TofaImportProgress> => ({
+): CardProgress<ServerHistoryImportProgress> => ({
   status,
   fetchedRecords: 0,
   processedRecords: 0,
@@ -39,7 +78,9 @@ const blankProgress = (
   message,
 });
 
-function resultProgress(result: TofaImportResult): CardProgress<TofaImportProgress> {
+function resultProgress(
+  result: ServerHistoryImportResult
+): CardProgress<ServerHistoryImportProgress> {
   const processed = result.imported + result.skipped + result.errors;
   return {
     ...blankProgress('complete', result.message),
@@ -52,17 +93,20 @@ function resultProgress(result: TofaImportResult): CardProgress<TofaImportProgre
   };
 }
 
-export function TofaImportSection({
+export function ServerHistoryImportSection({
+  importer,
   servers,
   onStarted,
 }: {
+  importer: ServerHistoryImporter;
   servers: Server[];
   onStarted?: () => void;
 }) {
   const { t } = useTranslation(['settings', 'common']);
   const [pickedServerId, setServerId] = useState('');
+  const copy = HISTORY_IMPORT_COPY[importer];
   const serverIds = servers.map((server) => server.id);
-  const imports = useActiveImports('tofa', serverIds);
+  const imports = useActiveImports('serverHistory', serverIds);
 
   // Until the owner picks one, show the server whose import is under way, else one with a result
   const serverId =
@@ -74,7 +118,7 @@ export function TofaImportSection({
     phase,
     start,
   } = useImportStatus(
-    'tofa',
+    'serverHistory',
     serverId,
     latestImport(imports, serverId),
     { blank: blankProgress, fromResult: resultProgress },
@@ -83,7 +127,7 @@ export function TofaImportSection({
 
   const handleStart = () =>
     start(blankProgress('fetching', t('import.startingImport')), () =>
-      api.import.tofa.start(serverId)
+      api.import.serverHistory.start(serverId)
     );
 
   const progressData: ImportProgressData | null = shown
@@ -102,20 +146,20 @@ export function TofaImportSection({
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h4 className="text-sm font-semibold">{t('import.tofaHistory')}</h4>
-        <p className="text-muted-foreground text-sm">{t('import.tofaHistoryDesc')}</p>
+        <h4 className="text-sm font-semibold">{t(copy.title)}</h4>
+        <p className="text-muted-foreground text-sm">{t(copy.description)}</p>
       </div>
 
       {servers.length > 1 && (
         <Field>
-          <FieldLabel htmlFor="tofaServer">{t('import.targetServer')}</FieldLabel>
+          <FieldLabel htmlFor={`historyServer-${importer}`}>{t('import.targetServer')}</FieldLabel>
           <Select
             value={serverId}
             onValueChange={setServerId}
             disabled={phase === 'pending' || phase === 'importing'}
           >
-            <SelectTrigger id="tofaServer">
-              <SelectValue placeholder={t('import.selectTofaServer')} />
+            <SelectTrigger id={`historyServer-${importer}`}>
+              <SelectValue placeholder={t(copy.selectServer)} />
             </SelectTrigger>
             <SelectContent>
               {servers.map((server) => (
@@ -137,7 +181,7 @@ export function TofaImportSection({
           onClick={() => void handleStart()}
           disabled={!serverId}
           icon={Download}
-          label={t('import.importTofaHistory')}
+          label={t(copy.start)}
         />
 
         <div className={cn('space-y-2', progressData && phase !== 'pending' && 'mt-4')}>
@@ -164,9 +208,9 @@ export function TofaImportSection({
           <div className="space-y-2 text-sm">
             <p className="font-medium">{t('import.recordsMayBeSkipped')}</p>
             <ul className="text-muted-foreground list-inside list-disc space-y-1">
-              <li>{t('import.skipUserNotFoundTofa')}</li>
+              <li>{t(copy.skipUserNotFound)}</li>
               <li>{t('import.skipDuplicateTofa')}</li>
-              <li>{t('import.skipActiveTofa')}</li>
+              {copy.skipActive && <li>{t(copy.skipActive)}</li>}
             </ul>
           </div>
         </div>

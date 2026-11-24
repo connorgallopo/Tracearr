@@ -353,7 +353,7 @@ describe('Request Service Routes', () => {
     it('refuses an address or key for built-in requests, which use the server address and key', async () => {
       app = await buildTestApp(ownerUser);
       vi.mocked(getRequestService).mockResolvedValue(
-        makeRow({ type: 'tofa', config: null, remoteServerId: null })
+        makeRow({ type: 'server', config: null, remoteServerId: null })
       );
 
       const response = await app.inject({
@@ -413,7 +413,7 @@ describe('Request Service Routes', () => {
       app = await buildTestApp(ownerUser);
       vi.mocked(deleteRequestService).mockResolvedValue(false);
       vi.mocked(getRequestService).mockResolvedValue(
-        makeRow({ type: 'tofa', config: null, remoteServerId: null })
+        makeRow({ type: 'server', config: null, remoteServerId: null })
       );
 
       const response = await app.inject({

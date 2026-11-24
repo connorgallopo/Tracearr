@@ -1,7 +1,7 @@
 /**
  * Media Server Client Module
  *
- * Provides a unified interface for Plex, Jellyfin, Emby and tofa media server integrations.
+ * Provides a unified interface for Plex, Jellyfin, Emby, tofa and Silo media server integrations.
  * Use the factory function to create clients based on server type.
  *
  * @example
@@ -22,6 +22,7 @@ import { PlexClient } from './plex/client.js';
 import { JellyfinClient } from './jellyfin/client.js';
 import { EmbyClient } from './emby/client.js';
 import { TofaClient } from './tofa/client.js';
+import { SiloClient } from './silo/client.js';
 import type { IMediaServerClient, MediaServerConfig, CreateClientOptions } from './types.js';
 
 // ============================================================================
@@ -62,6 +63,8 @@ export function createMediaServerClient(options: CreateClientOptions): IMediaSer
       return new EmbyClient(config);
     case 'tofa':
       return new TofaClient(config);
+    case 'silo':
+      return new SiloClient(config);
     default:
       return assertNever(options.type);
   }
@@ -86,10 +89,10 @@ export function isJellyfinEmby(type: ServerType): type is JellyfinEmbyServerType
     case 'plex':
       return false;
     case 'jellyfin':
-      return true;
     case 'emby':
       return true;
     case 'tofa':
+    case 'silo':
       return false;
     default:
       return assertNever(type);
@@ -106,6 +109,8 @@ export function verifyServerAdmin(type: ServerType, token: string, url: string) 
       return EmbyClient.verifyServerAdmin(token, url);
     case 'tofa':
       return TofaClient.verifyServerAdmin(token, url);
+    case 'silo':
+      return SiloClient.verifyServerAdmin(token, url);
     default:
       return assertNever(type);
   }
@@ -148,6 +153,7 @@ export { PlexClient } from './plex/client.js';
 export { JellyfinClient } from './jellyfin/client.js';
 export { EmbyClient } from './emby/client.js';
 export { TofaClient } from './tofa/client.js';
+export { SiloClient } from './silo/client.js';
 
 // Plex-specific types
 export type { PlexServerResource, PlexServerConnection } from './plex/parser.js';

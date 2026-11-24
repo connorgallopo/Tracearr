@@ -35,8 +35,9 @@ import {
   usableLoginMethods,
 } from './authGuards.js';
 import { oidcConfigured, oidcDiscoveryUrl, oidcEnv } from './oidcEnv.js';
-import { getRedis, closeRedis, INCREMENT_SCRIPT } from './redisShared.js';
+import { getRedis, closeRedis, GET_AND_DELETE_SCRIPT, INCREMENT_SCRIPT } from './redisShared.js';
 import { plexPlugin } from './plexPlugin.js';
+import { siloPlugin } from './siloPlugin.js';
 import { tofaPlugin } from './tofaPlugin.js';
 import { memberLoginPlugin } from './memberLoginPlugin.js';
 import { assertOidcSignInAllowed, linkOidcMember, memberStillValid } from './memberLogin.js';
@@ -54,11 +55,6 @@ const logger = createLogger('auth');
  * rate-limit bucket or forge session.ipAddress.
  */
 export const CLIENT_IP_HEADER = 'x-tracearr-client-ip';
-
-// Lua instead of GETDEL (6.2+) for the reason INCREMENT_SCRIPT gives.
-const GET_AND_DELETE_SCRIPT = `local value = redis.call('GET', KEYS[1])
-if value then redis.call('DEL', KEYS[1]) end
-return value`;
 
 /**
  * Per-request trusted origins for Better Auth's CSRF origin check.
@@ -358,6 +354,9 @@ function buildAuth(redis: Redis, withOidc: boolean) {
         '/emby/sign-in': { window: 60, max: 10 },
         '/jellyfin/quick-connect/initiate': { window: 60, max: 10 },
         '/tofa/initiate': { window: 60, max: 10 },
+        '/silo/pair/start': { window: 60, max: 10 },
+        '/silo/sign-in': { window: 60, max: 10 },
+        '/silo/code/initiate': { window: 60, max: 10 },
       },
     },
     databaseHooks: {
@@ -529,6 +528,7 @@ function buildAuth(redis: Redis, withOidc: boolean) {
       bearer(),
       plexPlugin(),
       tofaPlugin(),
+      siloPlugin(),
       memberLoginPlugin(),
       ...(oidcConfigured && withOidc
         ? [

@@ -14,6 +14,7 @@ import {
 } from '../../../utils/http.js';
 import { createLogger } from '../../../utils/logger.js';
 import { assertSafeProbeUrl, probeRefusal } from '../../../utils/ssrf.js';
+import { newestBy } from '../shared/parserUtils.js';
 import {
   FullSyncRequiredError,
   INCREMENTAL_CAP_RATIO,
@@ -29,6 +30,7 @@ import {
   type DownloadSourceDescription,
   type DownloadSourceRequest,
   type NotNeeded,
+  type ServerRequests,
   type SyncCursor,
 } from '../types.js';
 import { lookupTofaMedia } from './mediaLookup.js';
@@ -47,6 +49,7 @@ import {
   parseUsers,
   type TofaLinkedAccount,
 } from './parser.js';
+import { mapTofaRequest } from './requests.js';
 import type {
   TofaApiKey,
   TofaCloudUser,
@@ -187,13 +190,11 @@ function cursorRevision(cursor: SyncCursor): number {
  * no device id is never folded into another.
  */
 function newestPerDeviceAndFile(rows: TofaPlaybackSession[]): TofaPlaybackSession[] {
-  const newest = new Map<string, TofaPlaybackSession>();
-  for (const row of rows) {
-    const key = `${row.user_id}:${row.device_id ?? row.session_id}:${row.media_file_id}`;
-    const kept = newest.get(key);
-    if (!kept || Date.parse(row.created_at) > Date.parse(kept.created_at)) newest.set(key, row);
-  }
-  return [...newest.values()];
+  return newestBy(
+    rows,
+    (row) => `${row.user_id}:${row.device_id ?? row.session_id}:${row.media_file_id}`,
+    (row) => Date.parse(row.created_at)
+  );
 }
 
 export class TofaClient implements IMediaServerClient {
@@ -476,8 +477,14 @@ export class TofaClient implements IMediaServerClient {
     });
   }
 
+  async getRequests(): Promise<ServerRequests> {
+    const { requests_available, version } = await this.systemInfo();
+    if (!requests_available) return { requestsOn: false, version };
+    return { requestsOn: true, version, requests: (await this.listRequests()).map(mapTofaRequest) };
+  }
+
   /** Every request on the server; tofa pages none of them */
-  async getRequests(): Promise<TofaRequest[]> {
+  private async listRequests(): Promise<TofaRequest[]> {
     return (await this.request<{ requests: TofaRequest[] }>('/requests')).requests;
   }
 

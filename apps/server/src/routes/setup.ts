@@ -15,28 +15,47 @@ import { servers, users } from '../db/schema.js';
 import { isClaimCodeEnabled } from '../utils/claimCode.js';
 import { mediaSignInClosed, openToMemberSignIn, usableLoginMethods } from '../lib/authGuards.js';
 import { JellyfinClient } from '../services/mediaServer/index.js';
+import { pairingOffered, passwordLoginOffered } from '../services/mediaServer/silo/auth.js';
 
-// The status route is public, so each hit must not become a request to every Jellyfin server.
-const QUICK_CONNECT_TTL_MS = 60_000;
-const quickConnectCache = new Map<string, { enabled: boolean; checkedAt: number }>();
+// The status route is public, so each hit must not become a request to every member server.
+const SIGN_IN_CHECK_TTL_MS = 60_000;
 
-async function quickConnectEnabled(url: string): Promise<boolean> {
-  const cached = quickConnectCache.get(url);
-  if (cached && Date.now() - cached.checkedAt < QUICK_CONNECT_TTL_MS) return cached.enabled;
-  const enabled = await JellyfinClient.quickConnectEnabled(url);
-  quickConnectCache.set(url, { enabled, checkedAt: Date.now() });
-  return enabled;
+/** A read of a server's sign-in options, answered from a cache for a minute per URL */
+function cachedCheck(read: (url: string) => Promise<boolean>) {
+  const cache = new Map<string, { enabled: boolean; checkedAt: number }>();
+  return async (url: string): Promise<boolean> => {
+    const cached = cache.get(url);
+    if (cached && Date.now() - cached.checkedAt < SIGN_IN_CHECK_TTL_MS) return cached.enabled;
+    const enabled = await read(url);
+    cache.set(url, { enabled, checkedAt: Date.now() });
+    return enabled;
+  };
 }
 
-/** Quick Connect is a Jellyfin feature; Plex and Emby have nothing like it. */
-async function offersQuickConnect(type: ServerType, url: string): Promise<boolean> {
+const quickConnectEnabled = cachedCheck((url) => JellyfinClient.quickConnectEnabled(url));
+const siloPairingOffered = cachedCheck(pairingOffered);
+const siloPasswordOffered = cachedCheck(passwordLoginOffered);
+
+/** Plex and tofa members sign in through their own buttons, not the member form. */
+async function memberSignInOptions(
+  type: ServerType,
+  url: string
+): Promise<{ codeSignIn: boolean; passwordSignIn: boolean }> {
   switch (type) {
-    case 'jellyfin':
-      return quickConnectEnabled(url);
     case 'plex':
-    case 'emby':
     case 'tofa':
-      return false;
+      return { codeSignIn: false, passwordSignIn: false };
+    case 'jellyfin':
+      return { codeSignIn: await quickConnectEnabled(url), passwordSignIn: true };
+    case 'emby':
+      return { codeSignIn: false, passwordSignIn: true };
+    case 'silo': {
+      const [codeSignIn, passwordSignIn] = await Promise.all([
+        siloPairingOffered(url),
+        siloPasswordOffered(url),
+      ]);
+      return { codeSignIn, passwordSignIn };
+    }
     default:
       return assertNever(type);
   }
@@ -91,7 +110,7 @@ export const setupRoutes: FastifyPluginAsync = async (app) => {
     const memberLoginServers = await Promise.all(
       loginServers.map(async ({ url, ...server }) => ({
         ...server,
-        quickConnect: await offersQuickConnect(server.type, url),
+        ...(await memberSignInOptions(server.type, url)),
       }))
     );
 

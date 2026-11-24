@@ -17,11 +17,7 @@ import {
   type StreamDecisions,
 } from '../../../utils/transcodeNormalizer.js';
 import { calculateProgress } from '../shared/parserUtils.js';
-import {
-  computeVersionsFingerprint,
-  pickBestVersion,
-  sumVersionSizes,
-} from '../shared/versionUtils.js';
+import { rollupVersions } from '../shared/versionUtils.js';
 import type {
   DownloadSourceDescription,
   DownloadSourceRequest,
@@ -269,20 +265,7 @@ function fileVersion(file: TofaMediaFile): MediaItemVersion {
 
 /** The quality columns an item rolls up from its files */
 function fileRollup(files: TofaMediaFile[]): Partial<MediaLibraryItem> {
-  const versions = files.map(fileVersion);
-  const best = pickBestVersion(versions);
-  return {
-    videoResolution: best?.videoResolution,
-    videoCodec: best?.videoCodec,
-    videoDynamicRange: best?.videoDynamicRange,
-    audioCodec: best?.audioCodec,
-    audioChannels: best?.audioChannels,
-    fileSize: sumVersionSizes(versions),
-    container: best?.container,
-    versions,
-    versionsFingerprint: computeVersionsFingerprint(versions),
-    filePath: best?.filePath,
-  };
+  return rollupVersions(files.map(fileVersion));
 }
 
 /** Season and episode posters live in tofa's image cache, which the image proxy reads with the key */

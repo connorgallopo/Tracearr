@@ -1,11 +1,12 @@
 /**
- * The owner's own Jellyfin, Emby and tofa accounts
+ * The owner's own Jellyfin, Emby, tofa and Silo accounts
  *
- * Jellyfin and Emby report no email, and a tofa server added by its key arrives without the owner's
- * account, so the owner's account there syncs in as a separate person, and the owner has no Users
- * row to merge it into. Linking folds that one account into the owner through the ordinary merge; unlinking splits
- * it back out. A tofa account also brings the owner's tofa sign-in, so it is proved by signing in to
- * tofa as it rather than by typing its name.
+ * Jellyfin and Emby report no email, and a tofa or Silo server added by its key arrives without the
+ * owner's account, so the owner's account there syncs in as a separate person, and the owner has no
+ * Users row to merge it into. Linking folds that one account into the owner through the ordinary
+ * merge; unlinking splits it back out. A tofa account also brings the owner's tofa sign-in, so it is
+ * proved by signing in to tofa as it rather than by typing its name, and a Silo account by a pairing
+ * code approved while signed in to Silo as it.
  */
 
 import { and, eq, inArray, or, sql } from 'drizzle-orm';
@@ -36,9 +37,10 @@ import { ServerUserNotFoundError } from './userService.js';
 const typesProvedBy = (...proofs: OwnerLinkProof[]) =>
   SERVER_TYPES.filter((type) => proofs.includes(ownerLinkProof(type)));
 
-const LINKABLE_TYPES = typesProvedBy('typedUsername', 'tofaSignIn');
+const LINKABLE_TYPES = typesProvedBy('typedUsername', 'tofaSignIn', 'siloPairing');
 const TYPED_USERNAME_TYPES = typesProvedBy('typedUsername');
 const TOFA_SIGN_IN_TYPES = typesProvedBy('tofaSignIn');
+const SILO_PAIRING_TYPES = typesProvedBy('siloPairing');
 
 const mediaProviders = sql.join(
   MEDIA_AUTH_PROVIDERS.map((provider) => sql`${provider}`),
@@ -255,6 +257,38 @@ export async function linkOwnerTofaAccount(
   );
 }
 
+/**
+ * The live account synced from this Silo server under the id of the account that approved the
+ * code joins the owner.
+ */
+export async function linkOwnerSiloAccount(
+  ownerId: string,
+  serverId: string,
+  externalId: string
+): Promise<void> {
+  const [account] = await db
+    .select({ userId: serverUsers.userId, serverId: serverUsers.serverId })
+    .from(serverUsers)
+    .innerJoin(servers, eq(servers.id, serverUsers.serverId))
+    .where(
+      and(
+        eq(serverUsers.serverId, serverId),
+        eq(serverUsers.externalId, externalId),
+        inArray(servers.type, SILO_PAIRING_TYPES),
+        liveServerAccount
+      )
+    )
+    .limit(1);
+  if (!account) {
+    throw new MergeValidationError(
+      'The Silo account that approved the code has no account on this server'
+    );
+  }
+  if (account.userId === ownerId) return;
+  await assertFoldsIntoOwner(ownerId, account);
+  await mergeUsers(account.userId, ownerId, ownerId);
+}
+
 export async function unlinkOwnerAccount(
   ownerId: string,
   serverUserId: string,
@@ -263,7 +297,7 @@ export async function unlinkOwnerAccount(
   const account = await loadAccount(
     serverUserId,
     LINKABLE_TYPES,
-    'Only Jellyfin, Emby and tofa accounts are unlinked from the owner here'
+    'Only Jellyfin, Emby, tofa and Silo accounts are unlinked from the owner here'
   );
   if (account.userId !== ownerId) throw new ServerUserNotFoundError(serverUserId);
 

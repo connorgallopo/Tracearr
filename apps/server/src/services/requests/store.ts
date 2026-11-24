@@ -110,11 +110,10 @@ export async function addBuiltInRequestServices(
 ): Promise<string[]> {
   const created: string[] = [];
   for (const serverType of serverTypes) {
-    const type = SERVER_PROFILES[serverType].builtInRequests;
-    if (type === null) continue;
+    if (!SERVER_PROFILES[serverType].builtInRequests) continue;
     const result = await executor.execute(sql`
       INSERT INTO request_services (server_id, type, name, url)
-      SELECT id, ${type}, name, url FROM servers WHERE type = ${serverType}
+      SELECT id, ${'server' satisfies RequestServiceType}, name, url FROM servers WHERE type = ${serverType}
       ON CONFLICT (server_id) DO NOTHING
       RETURNING id
     `);
@@ -189,7 +188,7 @@ export async function markRequestServiceReencrypt(id: string): Promise<void> {
 export async function recordSyncResult(
   id: string,
   patch: {
-    version?: string;
+    version?: string | null;
     syncCursor?: Date | null;
     lastCounts?: RequestServiceRow['lastCounts'];
     lastSyncAt?: Date;

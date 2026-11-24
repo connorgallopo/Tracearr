@@ -11,8 +11,12 @@ const { calls, step } = vi.hoisted(() => {
   return { calls, step };
 });
 
-vi.mock('../../db/client.js', () => ({ db: {} }));
-vi.mock('../../jobs/importQueue.js', () => ({ holdTofaImport: vi.fn(step('holdImport')) }));
+vi.mock('../../db/client.js', () => ({
+  db: { select: vi.fn(), insert: vi.fn(), transaction: vi.fn() },
+}));
+vi.mock('../../jobs/importQueue.js', () => ({
+  holdServerHistoryImport: vi.fn(step('holdImport')),
+}));
 vi.mock('../../jobs/poller/database.js', () => ({
   publishServersChanged: vi.fn(step('publishServersChanged')),
 }));
@@ -30,8 +34,17 @@ vi.mock('../settings.js', () => ({ rearmImportedHistoryLink: vi.fn(step('rearm')
 vi.mock('../sseManager.js', () => ({ sseManager: { refresh: vi.fn(step('sseRefresh')) } }));
 vi.mock('../sync.js', () => ({ syncServer: vi.fn() }));
 
+import type { SQL } from 'drizzle-orm';
+import { db } from '../../db/client.js';
+import { holdServerHistoryImport } from '../../jobs/importQueue.js';
 import { enqueueLibrarySync } from '../../jobs/librarySyncQueue.js';
-import { startAddedServer, syncReconnectedServer } from '../serverCreate.js';
+import { renderSql } from '../../test/helpers.js';
+import {
+  connectedServerConflict,
+  createServer,
+  startAddedServer,
+  syncReconnectedServer,
+} from '../serverCreate.js';
 import { syncServer } from '../sync.js';
 
 const usersSynced = { usersAdded: 2, usersRead: true, errors: [] as string[] };
@@ -65,8 +78,17 @@ describe('startAddedServer', () => {
       'scheduleRequestSync',
       'requestSync',
     ]);
+    expect(holdServerHistoryImport).toHaveBeenCalledExactlyOnceWith('srv-1', 'tofa');
     expect(syncServer).toHaveBeenCalledWith('srv-1', { syncUsers: true, syncLibraries: false });
     expect(enqueueLibrarySync).toHaveBeenCalledWith('srv-1', 'event', { firstSync: true });
+  });
+
+  it("holds a Silo server's own history import", async () => {
+    await startAddedServer({ id: 'srv-3', type: 'silo' }, []);
+    await settled('librarySync');
+
+    expect(holdServerHistoryImport).toHaveBeenCalledExactlyOnceWith('srv-3', 'silo');
+    expect(calls.indexOf('holdImport')).toBeLessThan(calls.indexOf('markFirstSyncOwed'));
   });
 
   it('re-arms imported history linking for Plex and holds no import', async () => {
@@ -119,5 +141,66 @@ describe('syncReconnectedServer', () => {
 
     expect(calls).toEqual(['userSync', 'librarySync']);
     expect(enqueueLibrarySync).toHaveBeenCalledWith('srv-3', 'event', { firstSync: false });
+  });
+});
+
+describe('connectedServerConflict', () => {
+  function connected(rows: { url: string }[]) {
+    const where = vi.fn().mockReturnThis();
+    vi.mocked(db.select).mockReturnValueOnce({
+      from: vi.fn().mockReturnThis(),
+      where,
+      limit: vi.fn().mockResolvedValue(rows),
+    } as never);
+    return where;
+  }
+
+  it('names the address when a server is connected there', async () => {
+    connected([{ url: 'http://silo.lan:8090' }]);
+    expect(await connectedServerConflict('silo', 'http://silo.lan:8090', 'silo-1')).toBe('url');
+  });
+
+  it('names the identity when a server of the same type reports the same id elsewhere', async () => {
+    const where = connected([{ url: 'http://192.168.1.20:8090' }]);
+
+    expect(await connectedServerConflict('silo', 'http://silo.lan:8090', 'silo-1')).toBe(
+      'identity'
+    );
+    const condition = renderSql(where.mock.calls[0]?.[0] as SQL);
+    expect(condition.sql).toContain('type =');
+    expect(condition.sql).toContain('machine_identifier =');
+    expect(condition.params).toEqual(expect.arrayContaining(['silo', 'silo-1']));
+  });
+
+  it('finds nothing to refuse, and checks only the address without an identity', async () => {
+    const where = connected([]);
+
+    expect(await connectedServerConflict('silo', 'http://silo.lan:8090', null)).toBeNull();
+    expect(renderSql(where.mock.calls[0]?.[0] as SQL).sql).not.toContain('machine_identifier');
+  });
+});
+
+describe('createServer', () => {
+  it('stores the id of a key Tracearr made', async () => {
+    vi.mocked(db.select).mockReturnValueOnce({ from: vi.fn().mockResolvedValue([]) } as never);
+    const values = vi.fn().mockReturnThis();
+    vi.mocked(db.insert).mockReturnValue({
+      values,
+      returning: vi.fn().mockResolvedValue([{ id: 'srv-4', type: 'silo' }]),
+    } as never);
+    vi.mocked(db.transaction).mockImplementation(async (fn: unknown) =>
+      (fn as (tx: typeof db) => Promise<unknown>)(db)
+    );
+
+    await createServer({
+      name: 'Silo',
+      type: 'silo',
+      url: 'http://silo.lan:8090',
+      token: 'silo-key',
+      apiKeyId: 'key-1',
+      facts: {},
+    });
+
+    expect(values).toHaveBeenCalledWith(expect.objectContaining({ apiKeyId: 'key-1' }));
   });
 });

@@ -1,6 +1,6 @@
 import type { MediaRequestStatus } from '@tracearr/shared';
-import type { TofaRequest } from '../mediaServer/tofa/types.js';
-import { toDate, type MappedRequest } from './mapping.js';
+import { toDate, type MappedRequest } from '../../requests/mapping.js';
+import type { TofaRequest } from './types.js';
 
 const STATUS_BY_NAME: Record<string, MediaRequestStatus> = {
   pending_approval: 'pending',
@@ -36,6 +36,7 @@ export function mapTofaRequest(row: TofaRequest): MappedRequest {
     remoteUsername: row.requested_by_name ?? row.requested_by,
     remotePlexId: null,
     remoteJellyfinUserId: null,
+    remoteProfileId: null,
     status,
     seasons:
       row.media_type === 'tv'
