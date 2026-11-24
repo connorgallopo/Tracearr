@@ -239,12 +239,12 @@ reviews:
           code quality.
 
           Pass if Related Issue links a GitHub issue or discussion in this
-          repository that carries the label `planned` or `help wanted`.
+          repository that carries the label `planned`.
 
           Fail if nothing is linked. Text like "found this on my own
           install", "can open an issue if you want", "no issue for this", or
           a bare "Closes #" is nothing linked.
-          Fail if the linked issue or discussion has neither label. An issue
+          Fail if the linked issue or discussion does not have it. An issue
           the author opened themselves that a maintainer has not labelled is
           not agreement, whatever the comments say.
           Fail if the only link is to a Discord thread or an external page;

@@ -12,7 +12,7 @@
 
 ## Related Issue
 
-<!-- Link the issue or discussion a maintainer labelled `planned` or `help wanted`.
+<!-- Link the issue or discussion a maintainer labelled `planned`.
      Every PR needs one, bug fixes included. Documentation-only PRs are exempt.
      Your account also has to be vouched (a maintainer commented `!vouch`) or
      this PR closes automatically.
@@ -54,6 +54,6 @@ Closes #
 
 - [ ] Code follows project style (ran `pnpm lint` and `pnpm format`)
 - [ ] Self-reviewed, and I can explain every part of this diff
-- [ ] A maintainer agreed to this change first (the issue or discussion linked above is labelled `planned` or `help wanted`)
+- [ ] A maintainer agreed to this change first (the issue or discussion linked above is labelled `planned`)
 - [ ] No new warnings from `pnpm typecheck`
 - [ ] Only `packages/translations/src/locales/en/` changed among locale files (Crowdin handles the rest)

@@ -20,3 +20,7 @@ policy:
       keys: [ "Jellyfin" ]
     - name: "emby"
       keys: [ "Emby" ]
+    - name: "tofa"
+      keys: [ "tofa" ]
+    - name: "silo"
+      keys: [ "Silo" ]

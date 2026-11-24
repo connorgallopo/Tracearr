@@ -9,7 +9,7 @@ body:
         **Before submitting:** Search [existing requests](https://github.com/connorgallopo/Tracearr/discussions/categories/feature-requests) to avoid duplicates.
 
         This is where features get discussed before anyone writes code. A pull request
-        needs a request here that a maintainer labelled `planned` or `help wanted`.
+        needs a request here that a maintainer labelled `planned`.
         Agreement on Discord doesn't count, because only GitHub carries the label.
         PRs without it get closed, so starting here is the fast path, not the slow one.
 

@@ -22,7 +22,7 @@ The one exception is documentation-only PRs (typos, README wording): open them d
 The whole path, in order. Each step is one action from a maintainer.
 
 1. **You post in the right place** (above). If you want to write the code yourself, say so in the same post.
-2. **A maintainer labels it accepted.** `planned` means we'll do it; `help wanted` means a contributor may. Only maintainers can label, so the label is the agreement. No label, no PR. If a maintainer replies "sounds good" and no label appears, ask for one; the bots only read labels.
+2. **A maintainer labels it `planned`.** Only maintainers can label, so the label is the agreement. No label, no PR. If a maintainer replies "sounds good" and no label appears, ask for one; the bots only read labels.
 3. **A maintainer vouches for your account** by commenting `!vouch`. Pull requests stay open only for vouched accounts ([Vouch](https://github.com/mitchellh/vouch); the list is `.github/VOUCHED.td`). A PR from an unvouched account is closed automatically with a note linking here. That says nothing about the code, which hasn't been read. Once vouched, reopen it. Vouching happens once per account and does not replace step 2: every PR still needs an accepted issue or discussion behind it.
 4. **You open the PR** with the template filled in and the accepted issue or discussion linked. CodeRabbit runs the policy checks; a maintainer reviews the code once they pass.
 
@@ -63,7 +63,7 @@ pnpm dev
 
 Every PR:
 
-- Links the issue or discussion labelled `planned` or `help wanted`.
+- Links the issue or discussion labelled `planned`.
 - Stays inside the scope agreed there. A PR that grows past it is sent back to be split.
 - Passes CI. Locally that is `pnpm lint && pnpm typecheck && pnpm test`; CI also runs the integration tier, the web tests, and the e2e suite.
 - Fills in the PR template as-is. Replacing it with your tool's default output counts as not filling it in.

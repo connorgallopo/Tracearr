@@ -241,7 +241,7 @@ Or [open an issue](https://github.com/connorgallopo/Tracearr/issues) on GitHub.
 
 ## Contributing
 
-Every change starts as an issue or a [Discussion](https://github.com/connorgallopo/Tracearr/discussions) before any code is written. A maintainer labels it `planned` or `help wanted`, vouches for your account with `!vouch`, and only then does a pull request stay open. A PR with no agreed issue behind it is closed regardless of the code, and so is one from an unvouched account. Documentation-only fixes are the one exception to the discussion step.
+Every change starts as an issue or a [Discussion](https://github.com/connorgallopo/Tracearr/discussions) before any code is written. A maintainer labels it `planned`, vouches for your account with `!vouch`, and only then does a pull request stay open. A PR with no agreed issue behind it is closed regardless of the code, and so is one from an unvouched account. Documentation-only fixes are the one exception to the discussion step.
 
 AI tools are fine to use; you still have to be able to explain and change every line, and significant AI usage goes in the PR template. Submissions from autonomous agents are closed. [CONTRIBUTING.md](CONTRIBUTING.md) has the full rules, the PR checklist, and the testing commands.
 

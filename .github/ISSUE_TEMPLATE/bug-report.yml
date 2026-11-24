@@ -63,6 +63,8 @@ body:
     - label: Plex
     - label: Jellyfin
     - label: Emby
+    - label: tofa
+    - label: Silo
     - label: None configured yet
 
 - type: input
