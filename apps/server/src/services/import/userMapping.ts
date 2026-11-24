@@ -4,13 +4,13 @@
  * Creates a mapping from external user IDs (Plex user_id, Jellyfin GUID)
  * to Tracearr server user IDs.
  *
- * Used by both Tautulli and Jellystat importers.
+ * Used by every history importer.
  */
 
 import { UnrecoverableError } from 'bullmq';
 import { eq } from 'drizzle-orm';
 import { db } from '../../db/client.js';
-import { serverUsers } from '../../db/schema.js';
+import { serverUserExternalAliases, serverUsers } from '../../db/schema.js';
 import { NotFoundError } from '../../utils/errors.js';
 import { isHttpStatus } from '../../utils/http.js';
 import { syncServer } from '../sync.js';
@@ -57,6 +57,19 @@ export async function createUserMapping(serverId: string): Promise<Map<string, s
     if (serverUser.plexAccountId && serverUser.plexAccountId !== serverUser.externalId) {
       userMap.set(serverUser.plexAccountId, serverUser.id);
     }
+  }
+
+  // An account folded into another by a merge is gone from server_users, but the server still
+  // reports its plays under the old id; a live account claiming the same id wins, as it does live
+  const aliases = await db
+    .select({
+      externalId: serverUserExternalAliases.externalId,
+      serverUserId: serverUserExternalAliases.serverUserId,
+    })
+    .from(serverUserExternalAliases)
+    .where(eq(serverUserExternalAliases.serverId, serverId));
+  for (const alias of aliases) {
+    if (!userMap.has(alias.externalId)) userMap.set(alias.externalId, alias.serverUserId);
   }
 
   return userMap;

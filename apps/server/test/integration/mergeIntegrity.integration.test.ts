@@ -31,6 +31,7 @@ import {
   userMergeAudits,
 } from '../../src/db/schema.js';
 import { mergeUsers, splitServerUser } from '../../src/services/mergeService.js';
+import { createUserMapping } from '../../src/services/import/userMapping.js';
 import {
   getServerUserByExternalId,
   syncUserFromMediaServer,
@@ -394,6 +395,46 @@ describe('a same-server combine keeps the absorbed external id resolvable', () =
       },
       { timeout: 10_000, interval: 100 }
     );
+  });
+
+  it('maps the folded external id to the surviving account for history imports', async () => {
+    const admin = await createTestUser({ role: 'owner' });
+    const server = await createTestServer({ type: 'silo' });
+
+    const person = await createTestUser({ role: 'member', username: 'collision' });
+    const duplicate = await createTestUser({ role: 'member', username: 'collisionc' });
+    const surviving = await createTestServerUser({
+      userId: person.id,
+      serverId: server.id,
+      externalId: '1',
+    });
+    await createTestServerUser({ userId: duplicate.id, serverId: server.id, externalId: '5' });
+
+    await mergeUsers(duplicate.id, person.id, admin.id, { confirmSameServerCombine: true });
+
+    const userMap = await createUserMapping(server.id);
+    expect(userMap.get('5')).toBe(surviving.id);
+    expect(userMap.get('1')).toBe(surviving.id);
+  });
+
+  it('lets a live account win over an alias holding the same external id', async () => {
+    const server = await createTestServer({ type: 'silo' });
+    const aliased = await createTestServerUser({
+      userId: (await createTestUser({ role: 'member' })).id,
+      serverId: server.id,
+      externalId: '2',
+    });
+    const live = await createTestServerUser({
+      userId: (await createTestUser({ role: 'member' })).id,
+      serverId: server.id,
+      externalId: '7',
+    });
+    await db
+      .insert(serverUserExternalAliases)
+      .values({ serverId: server.id, externalId: '7', serverUserId: aliased.id });
+
+    const userMap = await createUserMapping(server.id);
+    expect(userMap.get('7')).toBe(live.id);
   });
 });
 

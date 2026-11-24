@@ -24,6 +24,11 @@
       "text": "History and the user page hide Quality and Progress when the table is too narrow; turning one on in Columns keeps it"
     },
     {
+      "type": "fix",
+      "text": "history imports no longer skip the plays of an account merged into another on the same server as unknown user",
+      "refs": ["#1492"]
+    },
+    {
       "type": "note",
       "text": "Silo has no 1.0 release yet and its API still changes, so a Silo update can need a newer Tracearr"
     },
