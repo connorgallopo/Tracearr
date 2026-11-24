@@ -163,9 +163,9 @@
     "watchHours": "Hores de reproducció",
     "completion": "Finalització",
     "serverLegend": "Llegenda del servidor",
-    "profile": "",
-    "profiles": "",
-    "profileRemoved": ""
+    "profile": "Perfil",
+    "profiles": "Perfils",
+    "profileRemoved": "{{name}} (suprimit)"
   },
   "search": {
     "searchUsers": "Cerca d'usuaris...",
