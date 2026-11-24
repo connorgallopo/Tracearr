@@ -48,6 +48,7 @@
       "codeExpired": "Ce code a expiré.",
       "newCode": "Nouveau code",
       "refused": "Connexion non disponible pour ce compte.",
+      "signInUnavailable": "",
       "notPermitted": "Vous n'êtes pas autorisé à vous connecter. S'il vous plaît, contacter le propriétaire du serveur."
     }
   },
@@ -315,6 +316,7 @@
     "overallTrust": "Confiance globale",
     "serverScope": "Serveur",
     "allServers": "Tous les serveurs",
+    "allProfiles": "",
     "title": "Détail de l'utilisateur",
     "editIdentity": "",
     "editIdentityDescription": "",
@@ -421,6 +423,7 @@
       "clearUsers": "",
       "clearPlatforms": "",
       "clearCountries": "",
+      "clearProfiles": "",
       "clearFilters": "",
       "selected_one": "",
       "selected_other": ""
