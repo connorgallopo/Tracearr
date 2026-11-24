@@ -48,6 +48,7 @@
       "codeExpired": "Dieser Code ist abgelaufen.",
       "newCode": "Neuer Code",
       "refused": "",
+      "signInUnavailable": "",
       "notPermitted": "Sie sind nicht berechtigt, sich anzumelden. Bitte wenden Sie sich an den Serverbetreiber."
     }
   },
@@ -315,6 +316,7 @@
     "overallTrust": "",
     "serverScope": "Server",
     "allServers": "Alle Server",
+    "allProfiles": "",
     "title": "Benutzer Details",
     "editIdentity": "Name und E-Mail-Adresse bearbeiten",
     "editIdentityDescription": "",
@@ -421,6 +423,7 @@
       "clearUsers": "",
       "clearPlatforms": "",
       "clearCountries": "",
+      "clearProfiles": "",
       "clearFilters": "",
       "selected_one": "",
       "selected_other": ""
