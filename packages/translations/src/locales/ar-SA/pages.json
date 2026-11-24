@@ -48,6 +48,7 @@
       "codeExpired": "",
       "newCode": "",
       "refused": "",
+      "signInUnavailable": "",
       "notPermitted": ""
     }
   },
@@ -387,6 +388,7 @@
     "overallTrust": "",
     "serverScope": "",
     "allServers": "",
+    "allProfiles": "",
     "title": "",
     "editIdentity": "",
     "editIdentityDescription": "",
@@ -505,6 +507,7 @@
       "clearUsers": "",
       "clearPlatforms": "",
       "clearCountries": "",
+      "clearProfiles": "",
       "clearFilters": "",
       "selected_zero": "",
       "selected_one": "",
