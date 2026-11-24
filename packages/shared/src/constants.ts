@@ -895,22 +895,22 @@ export function formatAudioChannels(channels: number | null | undefined): string
 
 // Server color palette (40-60% HSL lightness, visible on both dark and light backgrounds)
 export const SERVER_COLOR_PALETTE = [
-  { hex: '#F4A825', label: 'Gold' }, // Plex brand
-  { hex: '#895FDD', label: 'Purple' }, // Jellyfin brand
-  { hex: '#39C668', label: 'Green' }, // Emby brand
+  { hex: '#D89012', label: 'Gold' }, // Plex brand
+  { hex: '#9D60C4', label: 'Purple' }, // Jellyfin brand
+  { hex: '#19B361', label: 'Green' }, // Emby brand
   { hex: '#3B82F6', label: 'Blue' },
   { hex: '#EF4444', label: 'Red' },
-  { hex: '#14B8A6', label: 'Teal' }, // tofa brand
-  { hex: '#1718C9', label: 'Indigo' }, // Silo brand
+  { hex: '#1ACEB7', label: 'Teal' }, // tofa brand
+  { hex: '#0331EA', label: 'Indigo' }, // Silo brand
 ] as const;
 
+// The dominant color of each server's logo; Emby's green is lifted to 40% lightness to fit the palette
 export const SERVER_TYPE_BRAND_COLORS: Record<ServerType, string> = {
-  plex: '#F4A825',
-  jellyfin: '#895FDD',
-  emby: '#39C668',
-  tofa: '#14B8A6',
-  // Silo's web app manifest theme_color
-  silo: '#1718C9',
+  plex: '#D89012',
+  jellyfin: '#9D60C4',
+  emby: '#19B361',
+  tofa: '#1ACEB7',
+  silo: '#0331EA',
 };
 
 /** Pick best color for a server given its type and colors already used by other servers */

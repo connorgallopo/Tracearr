@@ -347,11 +347,11 @@ lines are 3px, because neighboring steps are close in color.
 
 | Server   | Color     |
 | -------- | --------- |
-| Plex     | `#F4A825` |
-| Jellyfin | `#895FDD` |
-| Emby     | `#39C668` |
-| tofa     | `#14B8A6` |
-| Silo     | `#1718C9` |
+| Plex     | `#D89012` |
+| Jellyfin | `#9D60C4` |
+| Emby     | `#19B361` |
+| tofa     | `#1ACEB7` |
+| Silo     | `#0331EA` |
 
 Brand colors are identity marks only: a dot, a 2 to 4px edge (the Connections row's 4px left
 border), a map pin. They are never a text
