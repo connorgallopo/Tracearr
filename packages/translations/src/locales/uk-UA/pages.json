@@ -48,6 +48,7 @@
       "codeExpired": "",
       "newCode": "",
       "refused": "",
+      "signInUnavailable": "",
       "notPermitted": ""
     }
   },
@@ -351,6 +352,7 @@
     "overallTrust": "",
     "serverScope": "Сервер",
     "allServers": "Всі сервери",
+    "allProfiles": "",
     "title": "Інформація про користувача",
     "editIdentity": "",
     "editIdentityDescription": "",
@@ -463,6 +465,7 @@
       "clearUsers": "",
       "clearPlatforms": "",
       "clearCountries": "",
+      "clearProfiles": "",
       "clearFilters": "",
       "selected_one": "",
       "selected_few": "",
