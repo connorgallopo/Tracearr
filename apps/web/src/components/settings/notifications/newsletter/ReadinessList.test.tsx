@@ -152,6 +152,8 @@ describe('readinessChecks', () => {
         { name: 'Attic', type: 'jellyfin', url: 'http://192.168.1.20:8096', publicUrl: null },
         { name: 'Basement', type: 'plex', url: 'http://192.168.1.10:32400', publicUrl: null },
         { name: 'Shed', type: 'emby', url: 'https://emby.example.com', publicUrl: null },
+        { name: 'Loft', type: 'silo', url: 'http://192.168.1.30:8090', publicUrl: null },
+        { name: 'Den', type: 'tofa', url: 'http://192.168.1.40:8080', publicUrl: null },
       ],
     });
     expect(
@@ -160,6 +162,7 @@ describe('readinessChecks', () => {
       ['recipients', 'fail'],
       ['externalUrl', 'warn'],
       ['privateServer', 'Attic'],
+      ['privateServer', 'Loft'],
       ['destination', 'pass'],
       ['fromDomain', 'pass'],
       ['dns', 'info'],

@@ -1,5 +1,6 @@
 import {
   POSTER_IMAGE_SIZE,
+  SERVER_PROFILES,
   assertNever,
   buildMediaServerItemUrl,
   isServerType,
@@ -83,18 +84,16 @@ export function substitutePosterRefs(
   });
 }
 
-/** Plex and tofa route through their hosted apps; a Jellyfin, Emby or Silo link opens on the server itself and needs an address members can reach. */
+/** A link into a vendor's hosted app works anywhere; one on the server itself needs an address members can reach. */
 function itemLinkBase(type: ServerType, server: ServerLink): string | null {
-  switch (type) {
-    case 'plex':
-    case 'tofa':
+  const itemLinks = SERVER_PROFILES[type].itemLinks;
+  switch (itemLinks) {
+    case 'hostedApp':
       return server.url;
-    case 'jellyfin':
-    case 'emby':
-    case 'silo':
+    case 'serverAddress':
       return memberFacingUrl(server);
     default:
-      return assertNever(type);
+      return assertNever(itemLinks);
   }
 }
 

@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import {
   memberFacingUrl,
+  SERVER_PROFILES,
   type Destination,
   type NewsletterRecipientsView,
   type NewsletterVariantsView,
@@ -19,7 +20,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { useDestinations, useNewsletterVariants, useServers, useSettings } from '@/hooks/queries';
 import { formatList } from '@/lib/listFormat';
-import { isJellyfinEmby } from '@/lib/serverType';
 import { cn } from '@/lib/utils';
 import type { Translate } from '../newsletterFormat';
 import { EditorCard } from './EditorCard';
@@ -95,7 +95,9 @@ export function readinessChecks(input: {
   const user = domainOf(input.destination?.config?.['username']);
   const recipients = recipientsState(input.recipients.empty, input.recipients.view);
   const privateServers: ReadinessCheck[] = input.servers
-    .filter((s) => isJellyfinEmby(s.type) && memberFacingUrl(s) === null)
+    .filter(
+      (s) => SERVER_PROFILES[s.type].itemLinks === 'serverAddress' && memberFacingUrl(s) === null
+    )
     .map((s) => ({
       id: 'privateServer',
       status: 'warn',
