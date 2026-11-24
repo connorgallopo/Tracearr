@@ -24,7 +24,7 @@ services:
       retries: 5
 
   redis-test:
-    image: redis:8-alpine@sha256:7958cfbb9d152f87dadfbc89f1b0b15938f0b81ff8982feb327476f4911935c3
+    image: redis:8-alpine@sha256:5af80107c1eeecb484a2269b80a26d12bfa6521787da4663bd9f19f60a163483
     command: ["redis-server", "--databases", "32"]
     ports:
       - "6380:6379"  # Different port to avoid conflicts with dev
