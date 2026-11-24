@@ -162,7 +162,10 @@
     "viewers": "Widzowie",
     "watchHours": "Godziny oglądania",
     "completion": "Ukończenie",
-    "serverLegend": "Legenda serwerów"
+    "serverLegend": "Legenda serwerów",
+    "profile": "",
+    "profiles": "",
+    "profileRemoved": ""
   },
   "search": {
     "searchUsers": "Szukaj użytkowników...",
