@@ -1,0 +1,35 @@
+{
+  "version": "3.3.0",
+  "date": "2026-11-23",
+  "upgradeWarning": "Back up before upgrading. tofa requests are stored differently from this release on, so going back to 3.2 needs that backup",
+  "changes": [
+    {
+      "type": "new",
+      "text": "Silo servers: live sessions, library, history import, downloads, CPU and memory, and Silo's own requests"
+    },
+    {
+      "type": "new",
+      "text": "add a Silo server with a code approved in Silo or with an API key; members sign in with their Silo account"
+    },
+    {
+      "type": "new",
+      "text": "profiles on tofa and Silo: plays, downloads and requests record the profile used, and History filters by profile"
+    },
+    {
+      "type": "improved",
+      "text": "a play from a profile other than the account's main one shows that profile's picture on the account avatar"
+    },
+    {
+      "type": "improved",
+      "text": "History and the user page hide Quality and Progress when the table is too narrow; turning one on in Columns keeps it"
+    },
+    {
+      "type": "note",
+      "text": "Silo has no 1.0 release yet and its API still changes, so a Silo update can need a newer Tracearr"
+    },
+    {
+      "type": "note",
+      "text": "a Silo server's version shows as its build id, and Tracearr doesn't check it for updates"
+    }
+  ]
+}
