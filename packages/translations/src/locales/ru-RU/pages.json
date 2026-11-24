@@ -48,6 +48,7 @@
       "codeExpired": "Срок действия кода истёк.",
       "newCode": "Новый код",
       "refused": "Вход для этого аккаунта недоступен.",
+      "signInUnavailable": "",
       "notPermitted": "У вас нет разрешения на вход. Обратитесь к владельцу сервера."
     }
   },
@@ -351,6 +352,7 @@
     "overallTrust": "Общий балл доверия",
     "serverScope": "Сервер",
     "allServers": "Все серверы",
+    "allProfiles": "",
     "title": "Сведения о пользователе",
     "editIdentity": "Изменить имя и контактный адрес",
     "editIdentityDescription": "Оба значения действуют для этого человека везде. Оставьте имя пустым, чтобы показывать @{{username}}.",
@@ -463,6 +465,7 @@
       "clearUsers": "Сбросить пользователей",
       "clearPlatforms": "Сбросить платформы",
       "clearCountries": "Сбросить страны",
+      "clearProfiles": "",
       "clearFilters": "Сбросить все фильтры",
       "selected_one": "Выбрано: {{count}}",
       "selected_few": "Выбрано: {{count}}",
