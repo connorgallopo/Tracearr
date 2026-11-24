@@ -1,6 +1,6 @@
 {
   "version": "3.3.0",
-  "date": "2026-11-23",
+  "date": "2026-11-24",
   "upgradeWarning": "Back up before upgrading. tofa requests are stored differently from this release on, so going back to 3.2 needs that backup",
   "changes": [
     {
@@ -16,8 +16,12 @@
       "text": "profiles on tofa and Silo: plays and downloads record the profile, Silo requests too, and History filters by profile"
     },
     {
-      "type": "improved",
+      "type": "new",
       "text": "a play from a profile other than the account's main one shows that profile's picture on the account avatar"
+    },
+    {
+      "type": "new",
+      "text": "stream notifications, the public API, Downloads and media History also show a profile that isn't the account's main one"
     },
     {
       "type": "improved",
@@ -35,6 +39,10 @@
     {
       "type": "note",
       "text": "a Silo server's version shows as its build id, and Tracearr doesn't check it for updates"
+    },
+    {
+      "type": "note",
+      "text": "posters and uploaded avatars from a Silo server that keeps its artwork in S3 or R2 don't show in Tracearr yet"
     }
   ]
 }
