@@ -139,7 +139,7 @@
     "noTerminations": "Brak przerwanych strumieni",
     "lastSeen": "Ostatnio aktywny {{relative}}",
     "terminatedBy": "Przez @{{username}}",
-    "terminatedByName": "",
+    "terminatedByName": "Przez {{name}}",
     "trustScoreConfirm": "Ustawić wynik zaufania dla @{{username}} na {{score}}?",
     "trustScoreRange": "Wynik zaufania dla @{{username}}, od 0 do 100.",
     "moreLocations_one": "+{{count}} inna lokalizacja",
