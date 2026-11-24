@@ -1015,7 +1015,8 @@
         "sourceVideoCodec": "Źródłowy kodek wideo",
         "seasonNumber": "Numer sezonu",
         "episodeNumber": "Numer odcinka",
-        "name": "Serial z nazwą odcinka lub tytuł"
+        "name": "Serial z nazwą odcinka lub tytuł",
+        "profile": ""
       },
       "server": {
         "name": "Nazwa serwera",
