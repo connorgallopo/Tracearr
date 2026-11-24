@@ -10,7 +10,7 @@ import { db } from '../../db/client.js';
 import { getCacheService } from '../../services/cache.js';
 import { buildAvatarUrl, buildPosterUrl } from '../../services/imageProxy.js';
 import { countStreams } from '../../utils/streamCounts.js';
-import { displayValues, emptyToNull, type RouteConfig } from './shared.js';
+import { displayValues, emptyToNull, formatProfile, type RouteConfig } from './shared.js';
 
 export interface SessionIdentityRow {
   id: string;
@@ -40,6 +40,7 @@ export function formatActiveStream(session: ActiveSession, identity?: SessionIde
     username: session.user.identityName ?? session.user.username,
     user_thumb: session.user.thumbUrl,
     user_avatar_url: buildAvatarUrl(session.serverId, session.user.thumbUrl),
+    profile: formatProfile(session.nonMainProfile),
     media_title: session.mediaTitle,
     media_type: session.mediaType,
     show_title: session.grandparentTitle,

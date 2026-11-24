@@ -953,7 +953,7 @@ export async function getMediaHistoryPage(
   if (authCondition) conditions.push(authCondition);
   const ownRows = scopeSessionsRaw(rowScope, sql`s.server_user_id`);
   if (ownRows) conditions.push(ownRows);
-  return runHistoryPage(conditions, pageSize, cursorValue, undefined);
+  return runHistoryPage(conditions, pageSize, cursorValue, undefined, { serverIds });
 }
 
 export interface MediaPlatformBreakdownRow {

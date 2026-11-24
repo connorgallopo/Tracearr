@@ -365,6 +365,23 @@ const HistoryUser = z
   })
   .openapi('HistoryUser');
 
+const PlayProfile = z
+  .object({
+    name: z.string().openapi({ example: 'Kids' }),
+    thumb_url: z
+      .string()
+      .nullable()
+      .openapi({ description: 'Avatar path or URL from the media server as stored, not proxied' }),
+    removed: z
+      .boolean()
+      .openapi({ description: 'True once the server no longer lists the profile' }),
+  })
+  .nullable()
+  .openapi('PlayProfile', {
+    description:
+      "The profile that played, on accounts that hold several (tofa and Silo), when it is not the account's main one. Null for a main-profile play and on servers without profiles. Unrelated to the codec profile inside the video and audio details.",
+  });
+
 const HistoryRecord = z
   .object({
     id: z.uuid().openapi({ description: 'Chain id: the id of the first session in the play' }),
@@ -400,6 +417,7 @@ const HistoryRecord = z
       .uuid()
       .openapi({ description: 'Chain key shared by all segments of this play (equals id)' }),
     user: HistoryUser,
+    profile: PlayProfile,
   })
   .openapi('HistoryRecord');
 
@@ -455,6 +473,7 @@ const ActiveStream = z
     }),
     user_thumb: z.string().nullable().openapi({ description: 'Avatar as the server reports it' }),
     user_avatar_url: z.string().nullable().openapi({ description: 'Proxied avatar URL' }),
+    profile: PlayProfile,
     ...mediaMetadataFields,
     duration_ms: z
       .number()
@@ -875,6 +894,7 @@ const ACTIVE_STREAM_EXAMPLE = {
   username: 'alice',
   user_thumb: 'https://plex.tv/users/8f3a1c/avatar',
   user_avatar_url: 'https://plex.tv/users/8f3a1c/avatar',
+  profile: null,
   media_title: 'Inception',
   media_type: 'movie',
   show_title: null,

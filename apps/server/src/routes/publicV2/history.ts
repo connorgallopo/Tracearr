@@ -101,7 +101,7 @@ export function registerHistoryRoutes(app: FastifyInstance, routeConfig: RouteCo
         pageSize,
         cursorValue,
         watched,
-        { since, until }
+        { since, until, serverIds: serverId ? [serverId] : undefined }
       );
       return cursorPage(data, nextCursor, pageSize);
     }

@@ -42,6 +42,7 @@ import {
   historyMediaTypeDefault,
   PLAY_COUNT,
   playCountQuery,
+  profileColumnsSql,
   readSessionRowOrActive,
 } from '../db/sessions/index.js';
 import { db } from '../db/client.js';
@@ -57,6 +58,11 @@ import { violationAliasConditions } from '../services/automations/aliasFilter.js
 import { getCacheService } from '../services/cache.js';
 import { getDashboardStats } from '../services/dashboardStats.js';
 import { buildAvatarUrl, buildPosterUrl } from '../services/imageProxy.js';
+import {
+  nonMainProfileFor,
+  readCurrentProfiles,
+  serversHaveProfiles,
+} from '../services/profiles.js';
 import { terminateSession } from '../services/termination.js';
 import { getCurrentVersion } from '../utils/buildInfo.js';
 import { serverOrderBy } from '../utils/serverOrder.js';
@@ -363,6 +369,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
           username: session.user.identityName ?? session.user.username,
           userThumb: session.user.thumbUrl,
           userAvatarUrl: buildAvatarUrl(session.serverId, session.user.thumbUrl),
+          profile: session.nonMainProfile ?? null,
           mediaTitle: session.mediaTitle,
           mediaType: session.mediaType,
           showTitle: session.grandparentTitle,
@@ -663,6 +670,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
     // Get total count of unique plays (grouped by reference_id)
     const countResult = await db.execute(playCountQuery(conditions));
     const total = (countResult.rows[0] as { count: number })?.count ?? 0;
+    const hasProfiles = await serversHaveProfiles(serverId ? [serverId] : undefined);
 
     // Query sessions grouped by reference_id (or id if no reference)
     // This matches the behavior of the internal /sessions/history endpoint
@@ -715,6 +723,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         s.stream_audio_details,
         s.transcode_info,
         s.subtitle_info,
+        ${profileColumnsSql(hasProfiles)},
         su.user_id,
         su.thumb_url as user_thumb_url,
         u.name as user_name,
@@ -727,58 +736,62 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
       ORDER BY gs.started_at DESC
     `);
 
-    // Type the result and transform
-    const sessionData = (
-      result.rows as {
-        id: string;
-        started_at: Date;
-        stopped_at: Date | null;
-        duration_ms: string | null;
-        progress_ms: number | null;
-        total_duration_ms: number | null;
-        segment_count: string;
-        watched: boolean;
-        state: string;
-        server_id: string;
-        server_name: string;
-        media_type: string;
-        media_title: string;
-        grandparent_title: string | null;
-        season_number: number | null;
-        episode_number: number | null;
-        year: number | null;
-        artist_name: string | null;
-        album_name: string | null;
-        track_number: number | null;
-        disc_number: number | null;
-        thumb_path: string | null;
-        device: string | null;
-        player_name: string | null;
-        product: string | null;
-        platform: string | null;
-        is_transcode: boolean | null;
-        video_decision: string | null;
-        audio_decision: string | null;
-        bitrate: number | null;
-        source_video_codec: string | null;
-        source_audio_codec: string | null;
-        source_audio_channels: number | null;
-        source_video_width: number | null;
-        source_video_height: number | null;
-        source_video_details: SourceVideoDetails | null;
-        source_audio_details: SourceAudioDetails | null;
-        stream_video_codec: string | null;
-        stream_audio_codec: string | null;
-        stream_video_details: StreamVideoDetails | null;
-        stream_audio_details: StreamAudioDetails | null;
-        transcode_info: TranscodeInfo | null;
-        subtitle_info: SubtitleInfo | null;
-        user_id: string;
-        user_thumb_url: string | null;
-        user_name: string | null;
-        user_username: string;
-      }[]
-    ).map((row) => ({
+    const rows = result.rows as {
+      id: string;
+      started_at: Date;
+      stopped_at: Date | null;
+      duration_ms: string | null;
+      progress_ms: number | null;
+      total_duration_ms: number | null;
+      segment_count: string;
+      watched: boolean;
+      state: string;
+      server_id: string;
+      server_name: string;
+      media_type: string;
+      media_title: string;
+      grandparent_title: string | null;
+      season_number: number | null;
+      episode_number: number | null;
+      year: number | null;
+      artist_name: string | null;
+      album_name: string | null;
+      track_number: number | null;
+      disc_number: number | null;
+      thumb_path: string | null;
+      device: string | null;
+      player_name: string | null;
+      product: string | null;
+      platform: string | null;
+      is_transcode: boolean | null;
+      video_decision: string | null;
+      audio_decision: string | null;
+      bitrate: number | null;
+      source_video_codec: string | null;
+      source_audio_codec: string | null;
+      source_audio_channels: number | null;
+      source_video_width: number | null;
+      source_video_height: number | null;
+      source_video_details: SourceVideoDetails | null;
+      source_audio_details: SourceAudioDetails | null;
+      stream_video_codec: string | null;
+      stream_audio_codec: string | null;
+      stream_video_details: StreamVideoDetails | null;
+      stream_audio_details: StreamAudioDetails | null;
+      transcode_info: TranscodeInfo | null;
+      subtitle_info: SubtitleInfo | null;
+      profile_id: string | null;
+      profile_name: string | null;
+      user_id: string;
+      user_thumb_url: string | null;
+      user_name: string | null;
+      user_username: string;
+    }[];
+    const profiles = await readCurrentProfiles(
+      db,
+      rows.map((row) => row.profile_id)
+    );
+    const sessionData = rows.map((row) => ({
       id: row.id,
       serverId: row.server_id,
       serverName: row.server_name,
@@ -838,6 +851,7 @@ export const publicRoutes: FastifyPluginAsync = async (app) => {
         thumbUrl: row.user_thumb_url,
         avatarUrl: buildAvatarUrl(row.server_id, row.user_thumb_url),
       },
+      profile: nonMainProfileFor(profiles, row.profile_id) ?? null,
     }));
 
     return paginatedResponse(sessionData, total, page, pageSize);

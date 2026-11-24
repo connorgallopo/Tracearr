@@ -30,6 +30,12 @@ vi.mock('../publicV2/shared.js', async (importOriginal) => ({
   runHistoryPage: vi.fn(async () => ({ data: [], nextCursor: null })),
 }));
 
+vi.mock('../../services/profiles.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../services/profiles.js')>()),
+  serversHaveProfiles: vi.fn(async () => false),
+  readCurrentProfiles: vi.fn(async () => new Map()),
+}));
+
 vi.mock('../library/queries.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../library/queries.js')>()),
   listTopMedia: vi.fn(async () => ({ data: [], nextCursor: null })),
@@ -216,6 +222,23 @@ describe('public API v2 skeleton', () => {
       expect(trailers.some((c) => c.sql === 's.media_type = $1' && c.params[0] === 'trailer')).toBe(
         true
       );
+    });
+
+    it('passes server_id to the history page as its server scope', async () => {
+      const serverId = '00000000-0000-4000-8000-0000000000aa';
+      vi.mocked(runHistoryPage).mockClear();
+
+      const res = await app.inject({
+        method: 'GET',
+        url: `/api/v2/public/history?server_id=${serverId}`,
+      });
+
+      expect(res.statusCode).toBe(200);
+      expect(vi.mocked(runHistoryPage).mock.calls[0]?.[4]).toEqual({
+        since: undefined,
+        until: undefined,
+        serverIds: [serverId],
+      });
     });
 
     it('re-applies the since and until window on the join back to sessions', async () => {

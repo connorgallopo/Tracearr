@@ -9,6 +9,7 @@ import {
   formatAudioChannels,
   formatMediaTech,
   getResolutionLabel,
+  type NonMainProfile,
   type SourceAudioDetails,
   type SourceVideoDetails,
   type StreamAudioDetails,
@@ -18,9 +19,20 @@ import {
 } from '@tracearr/shared';
 import { sql, type SQL } from 'drizzle-orm';
 import { z } from 'zod';
-import { countedSessionSql, firstSegmentJoin, groupedPlaysCte } from '../../db/sessions/index.js';
+import {
+  countedSessionSql,
+  firstSegmentJoin,
+  groupedPlaysCte,
+  profileColumnsSql,
+} from '../../db/sessions/index.js';
 import { db } from '../../db/client.js';
 import { buildAvatarUrl, buildPosterUrl } from '../../services/imageProxy.js';
+import {
+  nonMainProfileFor,
+  readCurrentProfiles,
+  serversHaveProfiles,
+  type CurrentProfiles,
+} from '../../services/profiles.js';
 import { encodeCursor } from '../../utils/cursor.js';
 import { uuidArraySql } from '../../utils/sqlArrays.js';
 
@@ -59,6 +71,14 @@ interface StreamCodecData {
   sourceVideoHeight: number | null;
   streamVideoCodec: string | null;
   streamAudioCodec: string | null;
+}
+
+export function formatProfile(
+  profile: NonMainProfile | undefined
+): { name: string; thumb_url: string | null; removed: boolean } | null {
+  return profile
+    ? { name: profile.name, thumb_url: profile.thumbUrl, removed: profile.removed }
+    : null;
 }
 
 export function displayValues(data: StreamCodecData) {
@@ -136,6 +156,8 @@ interface HistoryRow {
   grandparent_rating_key: string | null;
   library_id: string | null;
   genres: string[] | null;
+  profile_id: string | null;
+  profile_name: string | null;
   server_user_id: string;
   user_id: string;
   user_thumb_url: string | null;
@@ -159,7 +181,7 @@ export const STATS_WINDOWS = [
 
 export type StatsWindowKey = (typeof STATS_WINDOWS)[number]['key'];
 
-function mapHistoryRow(row: HistoryRow) {
+function mapHistoryRow(row: HistoryRow, profiles: CurrentProfiles) {
   return {
     id: row.chain_id,
     server_id: row.server_id,
@@ -234,6 +256,7 @@ function mapHistoryRow(row: HistoryRow) {
       thumb_url: row.user_thumb_url,
       avatar_url: buildAvatarUrl(row.server_id, row.user_thumb_url),
     },
+    profile: formatProfile(nonMainProfileFor(profiles, row.profile_id)),
   };
 }
 
@@ -312,7 +335,8 @@ async function aggregateChainPage(
   watchedFilter: SQL,
   cursorFilter: SQL,
   pageSize: number,
-  windowConditions: SQL[]
+  windowConditions: SQL[],
+  hasProfiles: boolean
 ) {
   return db.execute(sql`
     WITH chains AS (${groupedPlaysCte({
@@ -385,6 +409,7 @@ async function aggregateChainPage(
       s.grandparent_rating_key,
       li.library_id,
       m.genres,
+      ${profileColumnsSql(hasProfiles)},
       su.id as server_user_id,
       su.user_id,
       su.thumb_url as user_thumb_url,
@@ -406,15 +431,16 @@ export async function runHistoryPage(
   pageSize: number,
   cursorValue: { startedAt: Date; id: string } | null,
   watched: boolean | undefined,
-  window: { since?: Date; until?: Date } = {}
+  options: { since?: Date; until?: Date; serverIds?: string[] } = {}
 ): Promise<{ data: ReturnType<typeof mapHistoryRow>[]; nextCursor: string | null }> {
   const watchedFilter = watched === undefined ? sql`` : sql` AND BOOL_OR(s.watched) = ${watched}`;
   const cursorFilter = cursorValue
     ? sql`WHERE (started_at, play_id) < (${cursorValue.startedAt}::timestamptz, ${cursorValue.id}::uuid)`
     : sql``;
   const windowConditions: SQL[] = [];
-  if (window.since) windowConditions.push(sql`s.started_at >= ${window.since}`);
-  if (window.until) windowConditions.push(sql`s.started_at <= ${window.until}`);
+  if (options.since) windowConditions.push(sql`s.started_at >= ${options.since}`);
+  if (options.until) windowConditions.push(sql`s.started_at <= ${options.until}`);
+  const hasProfiles = await serversHaveProfiles(options.serverIds);
 
   let rawLimit = pageSize * RAW_WINDOW_INITIAL_MULTIPLIER;
   let rows: HistoryRow[] = [];
@@ -432,7 +458,8 @@ export async function runHistoryPage(
       watchedFilter,
       cursorFilter,
       pageSize,
-      windowConditions
+      windowConditions,
+      hasProfiles
     );
     rows = windowed.rows as unknown as HistoryRow[];
 
@@ -454,7 +481,8 @@ export async function runHistoryPage(
         watchedFilter,
         cursorFilter,
         pageSize,
-        windowConditions
+        windowConditions,
+        hasProfiles
       );
       rows = fallback.rows as unknown as HistoryRow[];
       break;
@@ -462,7 +490,11 @@ export async function runHistoryPage(
     rawLimit = Math.min(rawLimit * RAW_WINDOW_GROWTH_FACTOR, RAW_WINDOW_MAX);
   }
 
-  const data = rows.map(mapHistoryRow);
+  const profiles = await readCurrentProfiles(
+    db,
+    rows.map((row) => row.profile_id)
+  );
+  const data = rows.map((row) => mapHistoryRow(row, profiles));
   const lastRow = rows.length === pageSize ? rows[rows.length - 1] : undefined;
   const nextCursor = lastRow
     ? encodeCursor(new Date(lastRow.chain_started_at), lastRow.chain_id)

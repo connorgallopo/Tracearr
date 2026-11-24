@@ -2,9 +2,10 @@
  * Public API v1 contract tests
  *
  * `/api/v1/public` is frozen: third-party integrations read these payloads, so a
- * renamed, added or dropped key is a break. Every key is spelled out here rather
- * than matched loosely, and the assertions run against the serialized response,
- * not the handler's return value.
+ * renamed or dropped key is a break. A new response key is allowed, as in the
+ * contract baseline. Every key is spelled out here rather than matched loosely,
+ * and the assertions run against the serialized response, not the handler's
+ * return value.
  *
  * The violation endpoints read `automation_runs`, which also holds notification
  * runs and runs that stopped or errored, so each query's WHERE is rendered and
@@ -16,6 +17,7 @@ import Fastify, { type FastifyInstance, type FastifyRequest } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
 import type { SQL } from 'drizzle-orm';
+import { createMockActiveSession } from '../../test/fixtures.js';
 import { queryChain, renderCall, renderSql } from '../../test/helpers.js';
 
 vi.mock('../../db/client.js', () => ({
@@ -33,6 +35,12 @@ vi.mock('../../services/termination.js', () => ({
   terminateSession: vi.fn(),
 }));
 
+vi.mock('../../services/profiles.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../services/profiles.js')>()),
+  serversHaveProfiles: vi.fn(async () => false),
+  readCurrentProfiles: vi.fn(async () => new Map()),
+}));
+
 vi.mock('../stats/queries.js', () => ({
   queryPlaysOverTime: vi.fn(async () => []),
   queryConcurrentStreams: vi.fn(async () => []),
@@ -44,6 +52,8 @@ vi.mock('../stats/queries.js', () => ({
 
 import { db } from '../../db/client.js';
 import { getCacheService } from '../../services/cache.js';
+import { KIDS, kidsSession } from '../../services/notifications/__tests__/fixtures.js';
+import { readCurrentProfiles, serversHaveProfiles } from '../../services/profiles.js';
 import { terminateSession } from '../../services/termination.js';
 import { publicRoutes } from '../public.js';
 
@@ -415,6 +425,97 @@ describe('GET /api/v1/public/history', () => {
     expect(where.text).not.toContain("<> 'trailer'");
     expect(where.text).toContain('s.media_type =');
     expect(where.params).toContain('trailer');
+  });
+
+  it('reads profile_id only when a server keeps profiles', async () => {
+    const pageQuery = async () => {
+      vi.mocked(db.execute).mockClear();
+      const response = await app.inject({ method: 'GET', url: '/api/v1/public/history' });
+      expect(response.statusCode).toBe(200);
+      return renderSql(vi.mocked(db.execute).mock.calls[1]?.[0] as SQL).sql;
+    };
+    app = await buildTestApp();
+
+    vi.mocked(serversHaveProfiles).mockResolvedValueOnce(false);
+    expect(await pageQuery()).toContain('NULL::uuid AS profile_id');
+
+    vi.mocked(serversHaveProfiles).mockResolvedValueOnce(true);
+    expect(await pageQuery()).toContain('s.profile_id');
+  });
+
+  it('asks whether the serverId scope keeps profiles', async () => {
+    const serverId = randomUUID();
+    app = await buildTestApp();
+
+    const response = await app.inject({
+      method: 'GET',
+      url: `/api/v1/public/history?serverId=${serverId}`,
+    });
+
+    expect(response.statusCode).toBe(200);
+    expect(serversHaveProfiles).toHaveBeenCalledWith([serverId]);
+  });
+
+  it('names the non-main profile on a history item', async () => {
+    const row = { id: randomUUID(), server_id: randomUUID(), segment_count: '1' };
+    vi.mocked(db.execute)
+      .mockResolvedValueOnce({ rows: [{ count: 2 }] } as never)
+      .mockResolvedValueOnce({
+        rows: [
+          { ...row, profile_id: 'p-1' },
+          { ...row, id: randomUUID(), profile_id: null },
+        ],
+      } as never);
+    vi.mocked(readCurrentProfiles).mockResolvedValueOnce(
+      new Map([['p-1', { name: 'Kids', nonMainProfile: { ...KIDS, removed: true } }]])
+    );
+    app = await buildTestApp();
+
+    const response = await app.inject({ method: 'GET', url: '/api/v1/public/history' });
+
+    expect(response.statusCode).toBe(200);
+    const data = response.json().data as { profile: unknown }[];
+    expect(data[0]?.profile).toEqual({ name: 'Kids', thumbUrl: null, removed: true });
+    expect(data[1]?.profile).toBeNull();
+  });
+
+  it('leaves a main-profile play null', async () => {
+    vi.mocked(db.execute)
+      .mockResolvedValueOnce({ rows: [{ count: 1 }] } as never)
+      .mockResolvedValueOnce({
+        rows: [
+          { id: randomUUID(), server_id: randomUUID(), segment_count: '1', profile_id: 'p-1' },
+        ],
+      } as never);
+    vi.mocked(readCurrentProfiles).mockResolvedValueOnce(new Map([['p-1', { name: 'connor' }]]));
+    app = await buildTestApp();
+
+    const response = await app.inject({ method: 'GET', url: '/api/v1/public/history' });
+
+    expect(response.statusCode).toBe(200);
+    expect((response.json().data as { profile: unknown }[])[0]?.profile).toBeNull();
+  });
+});
+
+describe('GET /api/v1/public/streams', () => {
+  let app: FastifyInstance;
+
+  afterEach(async () => {
+    await app.close();
+  });
+
+  it('carries the non-main profile on a stream and null otherwise', async () => {
+    vi.mocked(getCacheService).mockReturnValueOnce({
+      getAllActiveSessions: vi.fn().mockResolvedValue([kidsSession, createMockActiveSession()]),
+    } as never);
+    app = await buildTestApp();
+
+    const response = await app.inject({ method: 'GET', url: '/api/v1/public/streams' });
+
+    expect(response.statusCode).toBe(200);
+    const data = response.json().data as { profile: unknown }[];
+    expect(data[0]?.profile).toEqual(KIDS);
+    expect(data[1]?.profile).toBeNull();
   });
 });
 
