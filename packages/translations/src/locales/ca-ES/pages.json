@@ -48,7 +48,7 @@
       "codeExpired": "Aquest codi ha caducat.",
       "newCode": "Nou codi",
       "refused": "L'inici de sessió no està disponible per a aquest compte.",
-      "signInUnavailable": "",
+      "signInUnavailable": "Ara mateix no es pot iniciar la sessió en aquest servidor.",
       "notPermitted": "No teniu permís per iniciar sessió. Si us plau, poseu-vos en contacte amb el propietari del servidor."
     }
   },
@@ -316,7 +316,7 @@
     "overallTrust": "Confiança global",
     "serverScope": "Servidor",
     "allServers": "Tots els servidors",
-    "allProfiles": "",
+    "allProfiles": "Tots els perfils",
     "title": "Detalls de l'usuari",
     "editIdentity": "Edita el nom i el correu de contacte",
     "editIdentityDescription": "Tots dos s'apliquen a aquesta persona a tot arreu. Deixeu el nom buit per mostrar @{{username}}.",
@@ -423,7 +423,7 @@
       "clearUsers": "Treu tots els usuaris",
       "clearPlatforms": "Treu totes les plataformes",
       "clearCountries": "Treu tots els països",
-      "clearProfiles": "",
+      "clearProfiles": "Treu tots els perfils",
       "clearFilters": "Neteja tots els filtres",
       "selected_one": "{{count}} seleccionat",
       "selected_other": "{{count}} seleccionats"
