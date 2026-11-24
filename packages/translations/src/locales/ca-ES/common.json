@@ -162,7 +162,10 @@
     "viewers": "Espectadors",
     "watchHours": "Hores de reproducció",
     "completion": "Finalització",
-    "serverLegend": "Llegenda del servidor"
+    "serverLegend": "Llegenda del servidor",
+    "profile": "",
+    "profiles": "",
+    "profileRemoved": ""
   },
   "search": {
     "searchUsers": "Cerca d'usuaris...",
