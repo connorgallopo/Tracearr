@@ -48,6 +48,7 @@
       "codeExpired": "此代码已过期。",
       "newCode": "获取新代码",
       "refused": "此账户无法登录。",
+      "signInUnavailable": "",
       "notPermitted": "你无权登录。请联系服务器所有者。"
     }
   },
@@ -117,7 +118,7 @@
     "noActiveStreams": "没有活动流",
     "streamsAppearHere": "当用户开始观看时活跃的流将出现在这里",
     "dayStreak": "连续天数",
-    "noServers": "连接 Plex、Jellyfin、Emby 或 tofa 服务器后，就能在这里看到它的流、历史和媒体库。",
+    "noServers": "",
     "view": {
       "label": "仪表盘视图",
       "admin": "服务器",
@@ -297,6 +298,7 @@
     "overallTrust": "总体信任度",
     "serverScope": "服务器",
     "allServers": "所有服务器",
+    "allProfiles": "",
     "title": "用户详情",
     "editIdentity": "编辑姓名和联系人电子邮件",
     "editIdentityDescription": "两者在所有位置都适用于此人。将名称留空则显示 @{{username}}。",
@@ -400,6 +402,7 @@
       "clearUsers": "清除所有用户",
       "clearPlatforms": "清除所有平台",
       "clearCountries": "清除所有国家/地区",
+      "clearProfiles": "",
       "clearFilters": "清除所有筛选条件",
       "selected_other": "已选择 {{count}} 项"
     },
