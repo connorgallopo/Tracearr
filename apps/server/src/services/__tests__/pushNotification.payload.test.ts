@@ -7,7 +7,7 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ExpoPushMessage } from 'expo-server-sdk';
-import type { ViolationWithDetails } from '@tracearr/shared';
+import type { NonMainProfile, ViolationWithDetails } from '@tracearr/shared';
 import { createMockActiveSession } from '../../test/fixtures.js';
 
 const { sent, rows, activeSessionIds, claimSessionsSync } = vi.hoisted(() => ({
@@ -80,6 +80,9 @@ function outsideData(message: ExpoPushMessage | undefined): string {
   const { data: _data, ...visible } = message;
   return JSON.stringify(visible);
 }
+
+const KIDS: NonMainProfile = { name: 'Kids', thumbUrl: null, removed: false };
+const CONNOR = { id: 'su-1', username: 'connor', thumbUrl: null, identityName: null };
 
 const IOS = { expoPushToken: 'ExponentPushToken[x]', deviceSecret: null, platform: 'ios' } as const;
 
@@ -195,6 +198,35 @@ describe('push text', () => {
     );
 
     expect(sent[0]?.body).toMatch(/^zoe: /);
+  });
+
+  it('names the profile after the person on a stream from a non-main profile', async () => {
+    await pushNotificationService.notifySessionStarted(
+      createMockActiveSession({
+        mediaType: 'movie',
+        mediaTitle: 'Bluey',
+        nonMainProfile: KIDS,
+        user: CONNOR,
+        server: { id: SERVER_ID, name: 'Living Room', type: 'tofa' },
+      })
+    );
+
+    expect(sent[0]?.body).toBe('connor (Kids): Bluey');
+    expect(sent[0]?.data).toMatchObject({ profile: KIDS });
+  });
+
+  it('keeps a main-profile stream to the person alone', async () => {
+    await pushNotificationService.notifySessionStopped(
+      createMockActiveSession({
+        mediaType: 'movie',
+        mediaTitle: 'Bluey',
+        user: CONNOR,
+        server: { id: SERVER_ID, name: 'Living Room', type: 'plex' },
+      })
+    );
+
+    expect(sent[0]?.body).toBe('connor: Bluey');
+    expect(sent[0]?.data).toMatchObject({ profile: null });
   });
 });
 

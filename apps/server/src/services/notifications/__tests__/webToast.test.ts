@@ -4,6 +4,7 @@ import { getPubSubService, type PubSubService } from '../../cache.js';
 import { createMockActiveSession } from '../../../test/fixtures.js';
 import { webToastType, type ToastRendered } from '../destinations/webToast.js';
 import type { RenderContext } from '../destinations/types.js';
+import { kidsSession } from './fixtures.js';
 
 vi.mock('../../cache.js', () => ({ getPubSubService: vi.fn() }));
 
@@ -125,6 +126,14 @@ describe('webToastType.render', () => {
         severity: 'low',
       },
     });
+  });
+
+  it('names the profile inline in an automation stream toast', async () => {
+    const { toast } = await render(
+      { type: 'session_started', payload: kidsSession },
+      automationCtx()
+    );
+    expect(toast?.message).toBe('connor (Kids) started streaming');
   });
 
   it('toasts an automation-sourced violation shape', async () => {

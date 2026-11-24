@@ -925,7 +925,8 @@
         "sourceVideoCodec": "",
         "seasonNumber": "Staffel Nummer",
         "episodeNumber": "Folgen Nummer",
-        "name": ""
+        "name": "",
+        "profile": ""
       },
       "server": {
         "name": "Server Name",

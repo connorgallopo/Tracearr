@@ -9,7 +9,12 @@ import { formatViolationMessage } from '../formatters/violation.js';
 import { buildMediaLinks } from '../mediaLinks.js';
 import { toNotificationPayload } from '../types.js';
 import { fitted, ownText, textOf } from './overrides.js';
-import { formatDuration, getMediaDisplay, getUserDisplayName } from './sessionText.js';
+import {
+  formatDuration,
+  getMediaDisplay,
+  getUserDisplayName,
+  nameWithProfile,
+} from './sessionText.js';
 import type { NotificationEvent, NotificationSource } from '../events.js';
 import type { MediaLink } from '../mediaLinks.js';
 import type {
@@ -49,7 +54,7 @@ function buildViolation(payload: NotificationPayload, ctx: ViolationContext): Te
 function buildSessionStarted(payload: NotificationPayload, ctx: SessionContext): TextMessage {
   const { session } = ctx;
   const { title: mediaTitle, subtitle } = getMediaDisplay(session);
-  const userName = getUserDisplayName(session);
+  const userName = nameWithProfile(getUserDisplayName(session), session.nonMainProfile);
   const mediaDisplay = subtitle ? `${mediaTitle} - ${subtitle}` : mediaTitle;
 
   return textOf(payload, {
@@ -61,7 +66,7 @@ function buildSessionStarted(payload: NotificationPayload, ctx: SessionContext):
 function buildSessionStopped(payload: NotificationPayload, ctx: SessionContext): TextMessage {
   const { session } = ctx;
   const { title: mediaTitle, subtitle } = getMediaDisplay(session);
-  const userName = getUserDisplayName(session);
+  const userName = nameWithProfile(getUserDisplayName(session), session.nonMainProfile);
   const mediaDisplay = subtitle ? `${mediaTitle} - ${subtitle}` : mediaTitle;
   const durationStr = session.durationMs ? ` (${formatDuration(session.durationMs)})` : '';
 

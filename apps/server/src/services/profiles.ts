@@ -97,14 +97,17 @@ export function isMainProfile(isPrimary: boolean | null): boolean {
   return isPrimary !== false;
 }
 
-/** The profile as screens show it; nothing for a main profile, which shows as its account */
+/**
+ * The profile as screens show it; nothing for a main profile, which shows as its account, or for
+ * a profile with a blank name, which would leave an empty field in a notification
+ */
 function nonMainProfileOf(profile: {
   name: string;
   thumbUrl: string | null;
   isPrimary: boolean | null;
   removed: boolean;
 }): NonMainProfile | undefined {
-  return isMainProfile(profile.isPrimary)
+  return isMainProfile(profile.isPrimary) || profile.name.trim() === ''
     ? undefined
     : { name: profile.name, thumbUrl: profile.thumbUrl, removed: profile.removed };
 }
@@ -427,6 +430,14 @@ export async function readCurrentProfiles(
       },
     ])
   );
+}
+
+/** The play's profile as a NonMainProfile, or undefined for the main profile or a row that is gone */
+export function nonMainProfileFor(
+  profiles: CurrentProfiles,
+  profileId: string | null
+): NonMainProfile | undefined {
+  return profileId === null ? undefined : profiles.get(profileId)?.nonMainProfile;
 }
 
 /** The profile a play shows: its profile's current name, else the name the play stored */

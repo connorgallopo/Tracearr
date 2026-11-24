@@ -26,7 +26,12 @@ import {
 } from './emailTransport.js';
 import { fitted, ownText, textOf } from './overrides.js';
 import { fetchPoster, posterFilename } from './poster.js';
-import { formatDuration, getMediaDisplay, getUserDisplayName } from './sessionText.js';
+import {
+  formatDuration,
+  getMediaDisplay,
+  getUserDisplayName,
+  nameWithProfile,
+} from './sessionText.js';
 import type { NotificationEvent } from '../events.js';
 import type { MediaAddedContext, MediaUpgradedContext, NotificationPayload } from '../types.js';
 import type { DeliverContext, DestinationType, RenderContext, TestReport } from './types.js';
@@ -141,7 +146,7 @@ function textFor(payload: NotificationPayload): { title: string; message: string
       const { title, subtitle } = getMediaDisplay(session);
       return textOf(payload, {
         title: 'Stream Started',
-        message: `${getUserDisplayName(session)} started watching ${subtitle ? `${title} - ${subtitle}` : title}`,
+        message: `${nameWithProfile(getUserDisplayName(session), session.nonMainProfile)} started watching ${subtitle ? `${title} - ${subtitle}` : title}`,
       });
     }
     case 'stream_stopped': {
@@ -150,7 +155,7 @@ function textFor(payload: NotificationPayload): { title: string; message: string
       const duration = session.durationMs ? ` (${formatDuration(session.durationMs)})` : '';
       return textOf(payload, {
         title: 'Stream Ended',
-        message: `${getUserDisplayName(session)} finished watching ${subtitle ? `${title} - ${subtitle}` : title}${duration}`,
+        message: `${nameWithProfile(getUserDisplayName(session), session.nonMainProfile)} finished watching ${subtitle ? `${title} - ${subtitle}` : title}${duration}`,
       });
     }
     case 'server_down':

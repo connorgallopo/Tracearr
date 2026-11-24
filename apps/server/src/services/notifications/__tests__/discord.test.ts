@@ -12,7 +12,7 @@ vi.mock('../mediaLinks.js', () => ({
 
 import { createMockActiveSession } from '../../../test/fixtures.js';
 import { discordType, fitEmbed, type DiscordEmbed } from '../destinations/discord.js';
-import { mediaUpgraded, session, violation } from './fixtures.js';
+import { KIDS, mediaUpgraded, session, violation } from './fixtures.js';
 import type { NotificationEvent } from '../events.js';
 import type { RenderContext } from '../destinations/types.js';
 
@@ -60,6 +60,24 @@ describe('discordType.render', () => {
     ]);
     expect(embed.fields?.[3]?.value).toBe('Direct Play');
     expect(embed.fields?.[4]?.value).toBe('New York, US');
+  });
+
+  it('adds a Profile field after User for a non-main profile', async () => {
+    const embed = await render({
+      type: 'session_started',
+      payload: { ...session, nonMainProfile: KIDS },
+    });
+
+    expect(fieldNames(embed)).toEqual([
+      'User',
+      'Profile',
+      'Media',
+      'Episode',
+      'Playback',
+      'Location',
+      'Player',
+    ]);
+    expect(embed.fields?.[1]).toEqual({ name: 'Profile', value: 'Kids', inline: true });
   });
 
   it('marks a placed local session in the Location field', async () => {

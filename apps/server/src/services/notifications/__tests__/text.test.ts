@@ -9,7 +9,7 @@ vi.mock('../mediaLinks.js', () => ({
 import { createMockActiveSession } from '../../../test/fixtures.js';
 import { priorityOf, renderText, type TextMessage } from '../destinations/text.js';
 import { toNotificationPayload } from '../types.js';
-import { mediaAdded, mediaUpgraded, session, violation } from './fixtures.js';
+import { KIDS, kidsSession, mediaAdded, mediaUpgraded, session, violation } from './fixtures.js';
 import type { NotificationEvent, NotificationSource } from '../events.js';
 
 mockBuildMediaLinks.mockResolvedValue([
@@ -105,6 +105,23 @@ describe('renderText text', () => {
       title: 'Stream Ended',
       message: 'testuser finished watching Test Movie - 2024 (1h 2m)',
     });
+  });
+
+  it('names the non-main profile inline in a stream message', async () => {
+    const text = await render(
+      { type: 'session_started', payload: kidsSession },
+      system,
+      DESTINATION_TEXT_PROFILES.ntfy
+    );
+    expect(text.message).toBe('connor (Kids) started watching Bluey - 2024');
+  });
+
+  it('prints a removed profile by its last name', async () => {
+    const text = await render({
+      type: 'session_stopped',
+      payload: { ...kidsSession, nonMainProfile: { ...KIDS, removed: true } },
+    });
+    expect(text.message).toMatch(/^connor \(Kids\) finished watching Bluey/);
   });
 
   it('builds the server down message', async () => {

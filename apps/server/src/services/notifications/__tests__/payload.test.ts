@@ -3,6 +3,7 @@ import { TRIGGERS, type TriggerType, type ViolationWithDetails } from '@tracearr
 import { createMockActiveSession } from '../../../test/fixtures.js';
 import { PayloadBuilders, toNotificationPayload } from '../types.js';
 import type { NotificationEvent } from '../events.js';
+import { KIDS, kidsSession } from './fixtures.js';
 
 const system = { kind: 'system' } as const;
 
@@ -227,6 +228,26 @@ describe('toNotificationPayload with an automation source', () => {
     );
 
     expect(payload.message).toBe('season []');
+  });
+
+  it('renders the profile variable from a stream event', () => {
+    const payload = toNotificationPayload(
+      { type: 'session_started', payload: kidsSession },
+      automation({ body: '{{session.profile}}' })
+    );
+
+    expect(payload.message).toBe('Kids');
+  });
+
+  it('renders the profile variable empty for a main-profile play and on a violation-shaped send', () => {
+    const body = automation({ body: 'x{{session.profile}}x' });
+
+    expect(toNotificationPayload({ type: 'session_started', payload: session }, body).message).toBe(
+      'xx'
+    );
+    expect(toNotificationPayload({ type: 'violation', payload: violation }, body).message).toBe(
+      'xx'
+    );
   });
 
   it('reads the same stream variables off a violation-shaped run', () => {
@@ -611,6 +632,7 @@ describe('variables per trigger', () => {
     sourceVideoCodec: 'HEVC',
     sourceVideoDetails: { dynamicRange: 'HDR10' },
     durationMs: 600_000,
+    nonMainProfile: KIDS,
   });
   const fullViolation: ViolationWithDetails = {
     ...violation,
@@ -754,6 +776,7 @@ describe('variables per trigger', () => {
         const event = events[eventName];
         if (!event) throw new Error(`no fixture for ${eventName}`);
         for (const name of TRIGGERS[trigger].variables) {
+          if (eventName === 'violation' && name === 'session.profile') continue;
           const rendered = toNotificationPayload(event, automation({ body: `{{ ${name} }}` }));
           expect(rendered.automation?.message, `${trigger} ${eventName} ${name}`).toBeTruthy();
         }

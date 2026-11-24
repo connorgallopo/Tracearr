@@ -5,11 +5,13 @@ import {
   type ServerDownReason,
   type Session,
 } from '@tracearr/shared';
+import { db } from '../../../db/client.js';
 import { getActiveAutomations } from '../../../jobs/poller/database.js';
 import { automationsLogger } from '../../../utils/logger.js';
 import { getPubSubService } from '../../cache.js';
 import { countDownloads } from '../../downloads/queries.js';
 import { isLiveServer } from '../../liveServers.js';
+import { nonMainProfileFor, readCurrentProfiles } from '../../profiles.js';
 import {
   assembleEvaluationInputs,
   installInputs,
@@ -103,13 +105,20 @@ export async function dispatchSessionStopped(
     if (!rules) return;
     const context = await loadEvaluationContext(session.serverId, session.serverUserId, rules);
     if (!context) return;
+    const { profileId } = session;
+    const stopped = profileId
+      ? {
+          ...session,
+          nonMainProfile: nonMainProfileFor(await readCurrentProfiles(db, [profileId]), profileId),
+        }
+      : session;
     await dispatch(
       {
         type: 'session.stopped',
         at,
         server: context.server,
         serverUser: context.serverUser,
-        session,
+        session: stopped,
         durationMs,
       },
       context.inputs

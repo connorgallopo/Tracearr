@@ -925,7 +925,8 @@
         "sourceVideoCodec": "Còdec de vídeo de la font",
         "seasonNumber": "Número de temporada",
         "episodeNumber": "Número d'episodi",
-        "name": "Sèrie i episodi, o títol"
+        "name": "Sèrie i episodi, o títol",
+        "profile": ""
       },
       "server": {
         "name": "Nom del servidor",

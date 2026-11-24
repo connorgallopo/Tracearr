@@ -9,7 +9,7 @@
 
 import { randomUUID } from 'node:crypto';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { EngineAutomation } from '@tracearr/shared';
+import type { EngineAutomation, NonMainProfile } from '@tracearr/shared';
 import type { sessions } from '../../../db/schema.js';
 import type { SessionGeo } from '../../../services/serverLocations.js';
 import type { PendingSessionData, ProcessedSession } from '../types.js';
@@ -212,6 +212,8 @@ const processed = {
 } as unknown as ProcessedSession;
 
 const server = { id: 'srv1', name: 'S', type: 'plex' as const };
+
+const KIDS: NonMainProfile = { name: 'Kids', thumbUrl: null, removed: false };
 
 const serverUser = {
   id: 'su1',
@@ -442,6 +444,21 @@ describe('createSessionWithRulesAtomic dispatch contract', () => {
     });
 
     expect(insertValues).toHaveBeenCalledWith(expect.objectContaining({ isLocal: true }));
+  });
+
+  it('hands session.started the non-main profile the poll resolved', async () => {
+    await createSessionWithRulesAtomic({
+      processed: { ...processed, nonMainProfile: KIDS },
+      server,
+      serverUser,
+      geo,
+      activeAutomations: [rule],
+      activeSessions: [],
+      recentSessions: [],
+    });
+
+    const [context] = mockExecuteActions.mock.calls[0] ?? [];
+    expect(context?.session.nonMainProfile).toEqual(KIDS);
   });
 });
 

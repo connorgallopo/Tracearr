@@ -26,6 +26,7 @@ import {
   getUserDisplayName,
 } from './sessionText.js';
 import type {
+  ActiveSession,
   MediaAddedContext,
   MediaUpgradedContext,
   NotificationPayload,
@@ -108,23 +109,22 @@ function buildViolationEmbed(payload: NotificationPayload, ctx: ViolationContext
   };
 }
 
+function sessionFields(session: ActiveSession, mediaTitle: string): DiscordField[] {
+  return [
+    { name: 'User', value: getUserDisplayName(session), inline: true },
+    ...(session.nonMainProfile
+      ? [{ name: 'Profile', value: session.nonMainProfile.name, inline: true }]
+      : []),
+    { name: 'Media', value: mediaTitle, inline: true },
+  ];
+}
+
 function buildSessionStartedEmbed(payload: NotificationPayload, ctx: SessionContext): DiscordEmbed {
   const { session } = ctx;
   const { title: mediaTitle, subtitle } = getMediaDisplay(session);
   const playbackType = getPlaybackType(session);
 
-  const fields: DiscordField[] = [
-    {
-      name: 'User',
-      value: getUserDisplayName(session),
-      inline: true,
-    },
-    {
-      name: 'Media',
-      value: mediaTitle,
-      inline: true,
-    },
-  ];
+  const fields = sessionFields(session, mediaTitle);
 
   if (subtitle) {
     fields.push({ name: 'Episode', value: subtitle, inline: true });
@@ -162,18 +162,7 @@ function buildSessionStoppedEmbed(payload: NotificationPayload, ctx: SessionCont
   const { title: mediaTitle, subtitle } = getMediaDisplay(session);
   const durationStr = session.durationMs ? formatDuration(session.durationMs) : 'Unknown';
 
-  const fields: DiscordField[] = [
-    {
-      name: 'User',
-      value: getUserDisplayName(session),
-      inline: true,
-    },
-    {
-      name: 'Media',
-      value: mediaTitle,
-      inline: true,
-    },
-  ];
+  const fields = sessionFields(session, mediaTitle);
 
   if (subtitle) {
     fields.push({ name: 'Episode', value: subtitle, inline: true });

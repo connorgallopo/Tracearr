@@ -51,6 +51,11 @@ const STREAM_VARS = [
   'session.episodeNumber',
   'session.name',
 ] as const;
+/**
+ * Only the triggers whose sends are the native stream events offer the profile; the other
+ * session triggers send the violation shape, which names the account alone.
+ */
+const PLAY_VARS = [...STREAM_VARS, 'session.profile'] as const;
 const ACCOUNT_VARS = ['user.username', 'user.identityName', 'server.name', 'server.type'] as const;
 const SERVER_VARS = ['server.name', 'server.type'] as const;
 /** `server.name` doubles `media.server` so an automation that also carries a server trigger keeps one. */
@@ -101,12 +106,12 @@ export const TRIGGER_GROUPS = [
 export type TriggerGroup = (typeof TRIGGER_GROUPS)[number];
 
 export const TRIGGERS = {
-  'session.started': { context: 'session', group: 'sessions', variables: STREAM_VARS },
-  'session.first_seen': { context: 'session', group: 'sessions', variables: STREAM_VARS },
+  'session.started': { context: 'session', group: 'sessions', variables: PLAY_VARS },
+  'session.first_seen': { context: 'session', group: 'sessions', variables: PLAY_VARS },
   'session.stopped': {
     context: 'session',
     group: 'sessions',
-    variables: [...STREAM_VARS, 'durationMinutes'],
+    variables: [...PLAY_VARS, 'durationMinutes'],
   },
   'session.transcode_changed': { context: 'session', group: 'sessions', variables: STREAM_VARS },
   'session.paused': { context: 'session', group: 'sessions', variables: STREAM_VARS },

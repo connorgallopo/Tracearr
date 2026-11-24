@@ -1,4 +1,4 @@
-import type { ViolationWithDetails } from '@tracearr/shared';
+import type { NonMainProfile, ViolationWithDetails } from '@tracearr/shared';
 import { createMockActiveSession } from '../../../test/fixtures.js';
 import type { MediaEventPayload, NotificationEvent } from '../events.js';
 
@@ -22,6 +22,16 @@ export const violation: ViolationWithDetails = {
 };
 
 export const session = createMockActiveSession({ durationMs: 3_725_000 });
+
+export const KIDS: NonMainProfile = { name: 'Kids', thumbUrl: null, removed: false };
+
+export const kidsSession = createMockActiveSession({
+  mediaTitle: 'Bluey',
+  durationMs: 3_725_000,
+  user: { id: 'su-1', username: 'connor', thumbUrl: null, identityName: null },
+  server: { id: 'server-1', name: 'Living Room', type: 'tofa' },
+  nonMainProfile: KIDS,
+});
 
 const media: MediaEventPayload = {
   serverId: 'server-1',

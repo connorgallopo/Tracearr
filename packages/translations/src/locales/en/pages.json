@@ -925,7 +925,8 @@
         "sourceVideoCodec": "Source video codec",
         "seasonNumber": "Season number",
         "episodeNumber": "Episode number",
-        "name": "Show and episode, or title"
+        "name": "Show and episode, or title",
+        "profile": "Profile, when not the main one"
       },
       "server": {
         "name": "Server name",

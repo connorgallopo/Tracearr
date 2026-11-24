@@ -970,7 +970,8 @@
         "sourceVideoCodec": "",
         "seasonNumber": "",
         "episodeNumber": "",
-        "name": ""
+        "name": "",
+        "profile": ""
       },
       "server": {
         "name": "",

@@ -1,6 +1,7 @@
 import {
   formatEpisodeLabel,
   namesShow,
+  type NonMainProfile,
   type PlaybackDecision,
   playbackDecision,
 } from '@tracearr/shared';
@@ -54,4 +55,9 @@ export function getPlaybackType(session: ActiveSession): string {
 
 export function getUserDisplayName(session: ActiveSession): string {
   return session.user.identityName ?? session.user.username;
+}
+
+/** A removed profile keeps its last name here: notification text carries no marker for it. */
+export function nameWithProfile(name: string, profile: NonMainProfile | undefined): string {
+  return profile ? `${name} (${profile.name})` : name;
 }

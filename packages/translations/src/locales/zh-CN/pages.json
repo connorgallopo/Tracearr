@@ -880,7 +880,8 @@
         "sourceVideoCodec": "源视频编码",
         "seasonNumber": "季号",
         "episodeNumber": "集号",
-        "name": "剧集和集数，或标题"
+        "name": "剧集和集数，或标题",
+        "profile": ""
       },
       "server": {
         "name": "服务器名称",

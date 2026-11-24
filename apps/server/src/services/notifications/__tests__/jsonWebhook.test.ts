@@ -4,6 +4,7 @@ import { createMockActiveSession } from '../../../test/fixtures.js';
 import { jsonWebhookType, type JsonWebhookBody } from '../destinations/jsonWebhook.js';
 import type { NotificationEvent } from '../events.js';
 import type { RenderContext } from '../destinations/types.js';
+import { KIDS, kidsSession } from './fixtures.js';
 
 const config = { url: 'https://example.com/webhook' };
 const destination = { id: 'dest-1', name: 'My Webhook' };
@@ -168,6 +169,14 @@ describe('jsonWebhookType.render', () => {
       grandparentRatingKey: 'grandparent-789',
     });
     expect(body.data.session).toEqual({ durationMs: 5000 });
+  });
+
+  it('carries the non-main profile as data.profile and null otherwise', async () => {
+    const started = await render({ type: 'session_started', payload: kidsSession });
+    const stopped = await render({ type: 'session_stopped', payload: session });
+
+    expect(started.data.profile).toEqual(KIDS);
+    expect(stopped.data.profile).toBeNull();
   });
 
   it('builds the server down body', async () => {

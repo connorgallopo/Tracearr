@@ -11,6 +11,7 @@ export const VARIABLE_SAMPLES: Readonly<Record<TemplateVariable, string>> = {
   'session.seasonNumber': '1',
   'session.episodeNumber': '6',
   'session.name': 'The Bear S01 · E06',
+  'session.profile': 'Kids',
   'server.name': 'Basement',
   'server.type': 'plex',
   durationMinutes: '42',

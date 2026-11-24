@@ -943,7 +943,7 @@ export async function createSessionWithRulesAtomic(
             })
             .where(eq(users.id, serverUser.userId));
 
-          const session = toRuleSession(inserted);
+          const session = toRuleSession(inserted, { nonMainProfile: processed.nonMainProfile });
           const ruleServer = { id: server.id, name: server.name, type: server.type };
           const inputs = {
             activeAutomations,

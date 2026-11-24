@@ -42,6 +42,7 @@ vi.mock('../emailBranding.js', () => ({
 import { createMockActiveSession } from '../../../test/fixtures.js';
 import { _resetTransportersForTests } from '../destinations/emailTransport.js';
 import { emailType, type EmailConfig, type EmailMessage } from '../destinations/email.js';
+import { kidsSession } from './fixtures.js';
 import type { NotificationEvent } from '../events.js';
 import type { RenderContext } from '../destinations/types.js';
 
@@ -273,6 +274,12 @@ describe('emailType.render', () => {
     expect(out.attachments).toEqual([]);
     expect(out.html).not.toContain('Open Tracearr');
     expect(out.html).toContain('Attic Plex');
+  });
+
+  it('names the non-main profile inline in a stream email', async () => {
+    const out = await render({ type: 'session_started', payload: kidsSession });
+    expect(out.html).toContain('connor (Kids) started watching Bluey - 2024');
+    expect(out.html).not.toMatch(/Profile<!-- -->:/);
   });
 
   it('renders a newsletter outcome with Tracearr as the sender', async () => {

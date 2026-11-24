@@ -25,6 +25,7 @@ import { pushEncryptionService } from './pushEncryption.js';
 import { getNetworkSettings } from '../routes/settings.js';
 import { buildPushPosterUrl, buildPushAvatarUrl, buildLogoUrl } from './imageProxy.js';
 import { hashSha256 } from '../utils/hash.js';
+import { getUserDisplayName, nameWithProfile } from './notifications/destinations/sessionText.js';
 import type { NewDevicePayload, TrustChangedPayload } from './notifications/events.js';
 
 const PUSH_PAYLOAD_BYTES = 4096;
@@ -710,7 +711,7 @@ export class PushNotificationService {
         subtitle: 'Now Playing',
         body:
           override?.body ??
-          `${session.user.identityName ?? session.user.username}: ${formattedTitle}`,
+          `${nameWithProfile(getUserDisplayName(session), session.nonMainProfile)}: ${formattedTitle}`,
         data: {
           type: 'stream_started',
           sessionId: session.id,
@@ -721,6 +722,7 @@ export class PushNotificationService {
           mediaTitle: session.mediaTitle,
           mediaType: session.mediaType,
           serverId: session.server.id,
+          profile: session.nonMainProfile ?? null,
         },
         channelId: 'sessions',
         categoryId: PUSH_CATEGORY.STREAM,
@@ -782,7 +784,7 @@ export class PushNotificationService {
         subtitle: 'Stream Ended',
         body:
           override?.body ??
-          `${session.user.identityName ?? session.user.username}: ${formattedTitle}`,
+          `${nameWithProfile(getUserDisplayName(session), session.nonMainProfile)}: ${formattedTitle}`,
         data: {
           type: 'stream_stopped',
           sessionId: session.id,
@@ -792,6 +794,7 @@ export class PushNotificationService {
           identityUserId,
           mediaTitle: session.mediaTitle,
           serverId: session.server.id,
+          profile: session.nonMainProfile ?? null,
         },
         channelId: 'sessions',
         categoryId: PUSH_CATEGORY.STREAM,

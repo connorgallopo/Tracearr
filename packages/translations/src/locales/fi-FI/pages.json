@@ -925,7 +925,8 @@
         "sourceVideoCodec": "Lähteen videokoodekki",
         "seasonNumber": "Kauden numero",
         "episodeNumber": "Jakson numero",
-        "name": "Sarja ja jakso, tai nimike"
+        "name": "Sarja ja jakso, tai nimike",
+        "profile": ""
       },
       "server": {
         "name": "Palvelimen nimi",
