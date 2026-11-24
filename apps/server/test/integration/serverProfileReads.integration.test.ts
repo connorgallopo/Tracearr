@@ -1,7 +1,8 @@
 /**
  * Reading server_profiles against the real database: the name and removed flag History and
- * session detail show for a play, the profile filter on History, the filter's options, and
- * the user page's per-profile split.
+ * session detail show for a play, the profile filter on History, the filter's options, the
+ * user page's per-profile split, the profile on public API v2 history rows, and the profile on
+ * download rows.
  *
  * Run with: pnpm --filter @tracearr/server test:integration serverProfileReads
  */
@@ -9,7 +10,12 @@
 import { randomUUID } from 'node:crypto';
 import { describe, it, expect, afterEach } from 'vitest';
 import type { FastifyInstance } from 'fastify';
-import type { HistoryFilterOptions, HistorySessionResponse, Session } from '@tracearr/shared';
+import type {
+  HistoryFilterOptions,
+  HistorySessionResponse,
+  NonMainProfile,
+  Session,
+} from '@tracearr/shared';
 import {
   createStoppedSession,
   createTestServer,
@@ -17,7 +23,12 @@ import {
   createTestServerUser,
   createTestUser,
 } from '@tracearr/test-utils/factories';
+import { db } from '../../src/db/client.js';
+import { mediaDownloads } from '../../src/db/schema.js';
+import { invalidateServersCache } from '../../src/jobs/poller/database.js';
+import { runHistoryPage } from '../../src/routes/publicV2/shared.js';
 import { sessionRoutes } from '../../src/routes/sessions/index.js';
+import { listDownloadRows } from '../../src/services/downloads/queries.js';
 import { resolveProfiles, syncAccountProfiles } from '../../src/services/profiles.js';
 import {
   queryIdentityRangeStats,
@@ -28,6 +39,7 @@ import { fakeTofaClient } from '../../src/test/mediaServerFakes.js';
 
 const MORGAN_ACCOUNT = 'b1e4c7a2-5d38-4f91-8a6c-2e7f0d3b9c14';
 const ROBIN = 'd2f8a4c6-3b1e-4a97-8c5d-7e0b2f9a6c13';
+const KIDS: NonMainProfile = { name: 'Kids', thumbUrl: null, removed: false };
 
 let app: FastifyInstance | undefined;
 
@@ -166,6 +178,20 @@ describe('the profile shown on a play', () => {
     expect(await detail(robinPlay)).toMatchObject({
       nonMainProfile: { name: 'Robin', thumbUrl, removed: false },
     });
+  });
+
+  it('leaves a non-main profile with a blank name to the account', async () => {
+    const { serverId, account } = await seedAccount();
+    const blank = await createTestServerProfile({
+      serverId,
+      serverUserId: account.id,
+      externalId: randomUUID(),
+      name: '  ',
+      isPrimary: false,
+    });
+    const playId = await play(serverId, account.id, blank);
+
+    expect(await detail(playId)).not.toHaveProperty('nonMainProfile');
   });
 });
 
@@ -312,5 +338,67 @@ describe("the user page's profile split", () => {
       expect.objectContaining({ profileId: morgan.id, plays: 1, watchMs: 200_000 }),
       expect.objectContaining({ profileId: robin.id, plays: 1, watchMs: 400_000 }),
     ]);
+  });
+});
+
+describe('profiles in the public API', () => {
+  it('names a non-main profile on a v2 history row and leaves a Plex play null', async () => {
+    const { serverId, account } = await seedAccount();
+    const kids = await createTestServerProfile({
+      serverId,
+      serverUserId: account.id,
+      externalId: randomUUID(),
+      name: 'Kids',
+      isPrimary: false,
+    });
+    const kidsPlay = await play(serverId, account.id, kids);
+    const plex = await createTestServer({ type: 'plex' });
+    const plexAccount = await createTestServerUser({
+      userId: (await createTestUser()).id,
+      serverId: plex.id,
+    });
+    const { id: plexPlay } = await createStoppedSession({
+      serverId: plex.id,
+      serverUserId: plexAccount.id,
+      durationMs: 600_000,
+    });
+    invalidateServersCache();
+
+    const { data } = await runHistoryPage([], 10, null, undefined);
+
+    expect(new Map(data.map((row) => [row.id, row.profile]))).toEqual(
+      new Map([
+        [kidsPlay, { name: 'Kids', thumb_url: null, removed: false }],
+        [plexPlay, null],
+      ])
+    );
+  });
+});
+
+describe('profiles on downloads', () => {
+  it('names a non-main profile on a download row', async () => {
+    const { serverId, account } = await seedAccount();
+    const kids = await createTestServerProfile({
+      serverId,
+      serverUserId: account.id,
+      externalId: randomUUID(),
+      name: 'Kids',
+      isPrimary: false,
+    });
+    const seenAt = new Date();
+    await db.insert(mediaDownloads).values({
+      serverId,
+      serverUserId: account.id,
+      profileId: kids.id,
+      title: 'Bluey',
+      source: 'tofa',
+      firstSeenAt: seenAt,
+      lastSeenAt: seenAt,
+    });
+
+    const [row] = await listDownloadRows(undefined, 10);
+
+    expect(row).toMatchObject({ title: 'Bluey', nonMainProfile: KIDS });
+    expect(row).not.toHaveProperty('profileId');
   });
 });

@@ -1683,6 +1683,8 @@ export interface MediaDownloadRow {
   username: string | null;
   identityName: string | null;
   thumbUrl: string | null;
+  /** The profile that downloaded, when it is not the account's main one */
+  nonMainProfile?: NonMainProfile;
   libraryItemId: string | null;
   mediaId: string | null;
   title: string;

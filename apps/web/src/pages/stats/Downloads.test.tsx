@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
-import type { DownloadsStats, MediaDownloadRow } from '@tracearr/shared';
+import type { DownloadsStats, MediaDownloadRow, NonMainProfile } from '@tracearr/shared';
 import { StatsDownloads } from './Downloads';
 import { useTimeRange } from '@/hooks/useTimeRange';
 
@@ -19,6 +19,8 @@ vi.mock('@/hooks/useTimeRange', () => ({ useTimeRange: vi.fn() }));
 
 import { useDownloadsStats } from '@/hooks/queries';
 import { useServer } from '@/hooks/useServer';
+
+const KIDS: NonMainProfile = { name: 'Kids', thumbUrl: null, removed: false };
 
 const row = (overrides: Partial<MediaDownloadRow> = {}): MediaDownloadRow => ({
   id: 'd-1',
@@ -128,6 +130,12 @@ describe('StatsDownloads', () => {
     expect(screen.getByText('Alice iPhone')).toBeInTheDocument();
     expect(screen.getByText(/^Austin, /)).toBeInTheDocument();
     expect(screen.getByText('Server One')).toBeInTheDocument();
+  });
+
+  it('badges a download made on a non-main profile', () => {
+    renderPage([row({ nonMainProfile: KIDS })]);
+
+    expect(screen.getByRole('img', { name: 'Kids' })).toBeInTheDocument();
   });
 
   it('shows the delivered line for a converted download and falls back to the file size', () => {

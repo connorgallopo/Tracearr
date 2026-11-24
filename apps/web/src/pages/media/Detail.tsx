@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { verbKeysFor, type MediaRequestEntry } from '@tracearr/shared';
-import { ApiError } from '@/lib/api';
+import { verbKeysFor, type MediaRequestEntry, type NonMainProfile } from '@tracearr/shared';
+import { ApiError, type MediaHistoryPlayEntry } from '@/lib/api';
 import {
   useMediaDetail,
   useMediaStats,
@@ -20,6 +20,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import { useServer } from '@/hooks/useServer';
 import { SessionDetailSheet } from '@/components/history/SessionDetailSheet';
+import { AvatarWithProfile } from '@/components/sessions/AvatarWithProfile';
 import { DetailHero } from '@/components/media-browse/DetailHero';
 import { CopiesPanel } from '@/components/media-browse/CopiesPanel';
 import { KpiStrip, MemberKpiStrip } from '@/components/media-browse/KpiStrip';
@@ -92,6 +93,29 @@ interface HistoryRow {
     username: string;
     thumb_url: string | null;
   };
+  profile: MediaHistoryPlayEntry['profile'];
+}
+
+function nonMainProfileOf(profile: HistoryRow['profile']): NonMainProfile | undefined {
+  return profile
+    ? { name: profile.name, thumbUrl: profile.thumb_url, removed: profile.removed }
+    : undefined;
+}
+
+function HistoryPerson({ row }: { row: HistoryRow }) {
+  return (
+    <>
+      <AvatarWithProfile serverId={row.server_id} profile={nonMainProfileOf(row.profile)}>
+        <Avatar className="h-6 w-6">
+          <AvatarImage src={getAvatarUrl(row.server_id, row.user.thumb_url, 24) ?? undefined} />
+          <AvatarFallback className="text-xs">
+            {row.user.username[0]?.toUpperCase() ?? '?'}
+          </AvatarFallback>
+        </Avatar>
+      </AvatarWithProfile>
+      <span className="truncate text-sm">{row.user.username}</span>
+    </>
+  );
 }
 
 function HistoryPanel({
@@ -252,31 +276,11 @@ function HistoryPanel({
                             onClick={(event) => event.stopPropagation()}
                             className="flex items-center gap-2 hover:underline"
                           >
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage
-                                src={
-                                  getAvatarUrl(row.server_id, row.user.thumb_url, 24) ?? undefined
-                                }
-                              />
-                              <AvatarFallback className="text-xs">
-                                {row.user.username[0]?.toUpperCase() ?? '?'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="truncate text-sm">{row.user.username}</span>
+                            <HistoryPerson row={row} />
                           </Link>
                         ) : (
                           <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage
-                                src={
-                                  getAvatarUrl(row.server_id, row.user.thumb_url, 24) ?? undefined
-                                }
-                              />
-                              <AvatarFallback className="text-xs">
-                                {row.user.username[0]?.toUpperCase() ?? '?'}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span className="truncate text-sm">{row.user.username}</span>
+                            <HistoryPerson row={row} />
                           </div>
                         )}
                       </div>

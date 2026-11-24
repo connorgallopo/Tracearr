@@ -10,7 +10,11 @@ import { MediaDetail } from './Detail';
 vi.mock('react-i18next', () => ({
   useTranslation: () => ({
     t: (key: string, options?: Record<string, unknown>) =>
-      options ? `${key}:${JSON.stringify(options)}` : key,
+      key === 'labels.profileRemoved'
+        ? `${String(options?.name)} (removed)`
+        : options
+          ? `${key}:${JSON.stringify(options)}`
+          : key,
     i18n: { language: 'en' },
   }),
 }));
@@ -299,6 +303,45 @@ describe('MediaDetail page', () => {
 
     expect(screen.getByText('common:labels.user')).toBeInTheDocument();
     expect(screen.getByText('ari')).toBeInTheDocument();
+  });
+
+  it('badges a history play from a removed non-main profile', () => {
+    mockUseMediaHistory.mockReturnValue(
+      pendingQuery({
+        isLoading: false,
+        data: {
+          pages: [
+            {
+              data: [
+                {
+                  id: 'chain-1',
+                  server_id: 'srv-1',
+                  server_name: 'tofa',
+                  media_title: 'Bluey',
+                  started_at: '2026-07-01T12:00:00.000Z',
+                  duration_ms: 2_700_000,
+                  watched: true,
+                  user: {
+                    id: 'user-1',
+                    server_user_id: 'server-user-1',
+                    username: 'connor',
+                    thumb_url: null,
+                  },
+                  profile: { name: 'Kids', thumb_url: null, removed: true },
+                },
+              ],
+            },
+          ],
+        },
+        hasNextPage: false,
+        isFetchingNextPage: false,
+        fetchNextPage: vi.fn(),
+      })
+    );
+
+    renderPage();
+
+    expect(screen.getByRole('img', { name: 'Kids (removed)' })).toBeInTheDocument();
   });
 
   it('links the history user cell to that user profile without triggering the row click', () => {

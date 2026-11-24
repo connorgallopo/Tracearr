@@ -30,12 +30,16 @@ const download = {
   isLocal: true,
 };
 
+function mockDownloads(rows: object[], total: number) {
+  vi.mocked(useUserDownloads).mockReturnValue({
+    data: { data: rows, total },
+    isLoading: false,
+  } as unknown as ReturnType<typeof useUserDownloads>);
+}
+
 describe('DownloadsTab', () => {
   it('lists the downloads without a user column and pages ten at a time', async () => {
-    vi.mocked(useUserDownloads).mockReturnValue({
-      data: { data: [download], total: 25 },
-      isLoading: false,
-    } as unknown as ReturnType<typeof useUserDownloads>);
+    mockDownloads([download], 25);
 
     render(
       <MemoryRouter>
@@ -45,6 +49,7 @@ describe('DownloadsTab', () => {
 
     expect(screen.getByText('The Movie')).toBeInTheDocument();
     expect(screen.queryByText('labels.user')).not.toBeInTheDocument();
+    expect(screen.queryByText('labels.profile')).not.toBeInTheDocument();
     await userEvent.click(screen.getByRole('button', { name: 'actions.next' }));
 
     expect(vi.mocked(useUserDownloads)).toHaveBeenLastCalledWith('su-1', {
@@ -52,5 +57,21 @@ describe('DownloadsTab', () => {
       pageSize: 10,
       scope: 'identity',
     });
+  });
+
+  it("names a download's non-main profile in a Profile column", () => {
+    mockDownloads(
+      [{ ...download, nonMainProfile: { name: 'Kids', thumbUrl: null, removed: false } }],
+      1
+    );
+
+    render(
+      <MemoryRouter>
+        <DownloadsTab userId="su-1" scope="identity" showServer={false} />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole('columnheader', { name: 'labels.profile' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'Kids' })).toBeInTheDocument();
   });
 });

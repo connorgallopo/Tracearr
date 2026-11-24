@@ -383,7 +383,7 @@ export interface BulkViolationParams {
 
 // GET /library/media/:id/history has no shared-package response type yet (its
 // query builder still returns the public v2 snake_case play shape rather than
-// the internal camelCase convention other Task-18-era routes use) - minimal
+// the internal camelCase convention other routes use) - minimal
 // shape only, refine once a dedicated internal history type lands. `user` is
 // typed to match mapHistoryRow's actual serialization (snake_case keys,
 // username already resolved to identity name over server username).
@@ -405,6 +405,7 @@ export interface MediaHistoryPlayEntry {
     thumb_url: string | null;
     avatar_url: string | null;
   };
+  profile: { name: string; thumb_url: string | null; removed: boolean } | null;
   [key: string]: unknown;
 }
 

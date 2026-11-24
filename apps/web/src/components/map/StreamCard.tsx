@@ -11,6 +11,7 @@ import {
 } from '@tracearr/shared';
 import { cn, formatLocationCompact, getMediaLinks } from '@/lib/utils';
 import { ActiveSessionBadge } from '@/components/sessions/ActiveSessionBadge';
+import { AvatarWithProfile } from '@/components/sessions/AvatarWithProfile';
 import { LocalBadge } from '@/components/sessions/LocalBadge';
 import { MediaPageLink } from '@/components/media/MediaPageLink';
 import { ServerLegend } from '@/components/server';
@@ -253,13 +254,15 @@ function SessionPopupContent({ session }: { session: ActiveSession }) {
         const name = session.user.identityName ?? session.user.username;
         const body = (
           <>
-            <div className="bg-muted flex h-5 w-5 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
-              {avatarUrl ? (
-                <img src={avatarUrl} alt={name} className="h-5 w-5 object-cover" />
-              ) : (
-                <User className="text-muted-foreground h-3 w-3" />
-              )}
-            </div>
+            <AvatarWithProfile serverId={session.serverId} profile={session.nonMainProfile}>
+              <div className="bg-muted flex h-5 w-5 flex-shrink-0 items-center justify-center overflow-hidden rounded-full">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt={name} className="h-5 w-5 object-cover" />
+                ) : (
+                  <User className="text-muted-foreground h-3 w-3" />
+                )}
+              </div>
+            </AvatarWithProfile>
             <span className="text-xs font-medium">{name}</span>
           </>
         );

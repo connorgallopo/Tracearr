@@ -2,6 +2,7 @@ import { and, count, desc, eq, gte, inArray, sql, type SQL } from 'drizzle-orm';
 import type { DownloadsStats, MediaDownloadRow } from '@tracearr/shared';
 import { db } from '../../db/client.js';
 import { libraryItems, mediaDownloads, servers, serverUsers, users } from '../../db/schema.js';
+import { type CurrentProfiles, nonMainProfileFor, readCurrentProfiles } from '../profiles.js';
 
 // A converted pull sent less than its source file; without the plugin's byte count it counts zero
 const downloadBytes = sql`coalesce(${mediaDownloads.deliveredBytes}, case when ${mediaDownloads.source} = 'jellyfin_transcode' then null else ${mediaDownloads.fileSizeBytes} end)`;
@@ -55,6 +56,7 @@ const downloadRowColumns = {
   serverName: servers.name,
   serverType: servers.type,
   serverUserId: mediaDownloads.serverUserId,
+  profileId: mediaDownloads.profileId,
   username: serverUsers.username,
   identityName: sql<string | null>`coalesce(${users.name}, ${users.username})`,
   thumbUrl: serverUsers.thumbUrl,
@@ -92,16 +94,21 @@ const downloadRowColumns = {
   platform: mediaDownloads.platform,
 };
 
-type DownloadDbRow = Omit<MediaDownloadRow, 'firstSeenAt' | 'lastSeenAt'> & {
+type DownloadDbRow = Omit<MediaDownloadRow, 'firstSeenAt' | 'lastSeenAt' | 'nonMainProfile'> & {
+  profileId: string | null;
   firstSeenAt: Date;
   lastSeenAt: Date;
 };
 
-function toDownloadRow(row: DownloadDbRow): MediaDownloadRow {
+function toDownloadRow(
+  { profileId, ...row }: DownloadDbRow,
+  profiles: CurrentProfiles
+): MediaDownloadRow {
   return {
     ...row,
     firstSeenAt: row.firstSeenAt.toISOString(),
     lastSeenAt: row.lastSeenAt.toISOString(),
+    nonMainProfile: nonMainProfileFor(profiles, profileId),
   };
 }
 
@@ -123,7 +130,11 @@ export async function listDownloadRows(
     .orderBy(desc(mediaDownloads.lastSeenAt), desc(mediaDownloads.id))
     .limit(limit)
     .offset(offset);
-  return rows.map(toDownloadRow);
+  const profiles = await readCurrentProfiles(
+    dbOrTx,
+    rows.map((row) => row.profileId)
+  );
+  return rows.map((row) => toDownloadRow(row, profiles));
 }
 
 /** Newest downloads of a canonical media item, including the ids merged into it. */

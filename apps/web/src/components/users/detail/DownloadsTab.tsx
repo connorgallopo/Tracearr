@@ -21,15 +21,17 @@ export function DownloadsTab({ userId, scope, showServer }: DownloadsTabProps) {
     pageSize: DOWNLOADS_PAGE_SIZE,
     scope,
   });
+  const rows = data?.data ?? [];
   const pageCount = Math.ceil((data?.total ?? 0) / DOWNLOADS_PAGE_SIZE);
   const labels = usePagerLabels(page, pageCount);
 
   return (
     <div className="space-y-4">
       <DownloadsTable
-        rows={data?.data ?? []}
+        rows={rows}
         isLoading={isLoading}
         showUser={false}
+        showProfile={rows.some((row) => row.nonMainProfile)}
         showServer={showServer}
         empty={<p className="text-muted-foreground text-sm">{t('downloads.empty')}</p>}
       />

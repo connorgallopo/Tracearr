@@ -18,6 +18,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ServerColumnCell } from '@/components/server';
+import { useProfileLabel } from '@/components/sessions/useProfileLabel';
 import { UserCell } from '@/components/users';
 import { formatBytes } from '@/lib/formatters';
 import { safeFormatDistanceToNow } from '@/lib/dateFormat';
@@ -67,6 +68,7 @@ export function DownloadUser({ row }: { row: MediaDownloadRow }) {
       identityName={row.identityName}
       thumbUrl={row.thumbUrl}
       serverId={row.serverId}
+      profileBadge={row.nonMainProfile && { serverId: row.serverId, profile: row.nonMainProfile }}
     />
   );
 }
@@ -158,6 +160,13 @@ function DownloadWhat({ row }: { row: MediaDownloadRow }) {
   );
 }
 
+function DownloadProfile({ row }: { row: MediaDownloadRow }) {
+  const profileLabel = useProfileLabel();
+  return row.nonMainProfile ? (
+    <span className="block truncate text-sm">{profileLabel(row.nonMainProfile)}</span>
+  ) : null;
+}
+
 function DownloadWhere({ row }: { row: MediaDownloadRow }) {
   const { t } = useTranslation('common');
   if (row.isLocal) return <span className="text-sm">{t('labels.local')}</span>;
@@ -169,6 +178,8 @@ interface DownloadsTableProps {
   rows: MediaDownloadRow[];
   isLoading?: boolean;
   showUser: boolean;
+  /** Names each row's non-main profile in a column of its own, for a table without the user column */
+  showProfile?: boolean;
   showServer: boolean;
   empty: ReactNode;
 }
@@ -177,6 +188,7 @@ export function DownloadsTable({
   rows,
   isLoading,
   showUser,
+  showProfile = false,
   showServer,
   empty,
 }: DownloadsTableProps) {
@@ -200,6 +212,7 @@ export function DownloadsTable({
         <TableRow className="hover:bg-transparent">
           <TableHead>{t('labels.when')}</TableHead>
           {showUser && <TableHead>{t('labels.user')}</TableHead>}
+          {showProfile && <TableHead>{t('labels.profile')}</TableHead>}
           <TableHead>{t('labels.content')}</TableHead>
           <TableHead>{t('labels.device')}</TableHead>
           <TableHead>{t('labels.location')}</TableHead>
@@ -215,6 +228,11 @@ export function DownloadsTable({
             {showUser && (
               <TableCell>
                 <DownloadUser row={row} />
+              </TableCell>
+            )}
+            {showProfile && (
+              <TableCell>
+                <DownloadProfile row={row} />
               </TableCell>
             )}
             <TableCell>
