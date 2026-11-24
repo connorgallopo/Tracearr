@@ -13,7 +13,7 @@
     },
     {
       "type": "new",
-      "text": "profiles on tofa and Silo: plays, downloads and requests record the profile used, and History filters by profile"
+      "text": "profiles on tofa and Silo: plays and downloads record the profile, Silo requests too, and History filters by profile"
     },
     {
       "type": "improved",
