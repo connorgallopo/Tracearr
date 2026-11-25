@@ -926,7 +926,7 @@
         "seasonNumber": "Número de temporada",
         "episodeNumber": "Número d'episodi",
         "name": "Sèrie i episodi, o títol",
-        "profile": ""
+        "profile": "Perfil, si no és el principal"
       },
       "server": {
         "name": "Nom del servidor",
