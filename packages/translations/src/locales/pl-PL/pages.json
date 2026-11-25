@@ -118,7 +118,7 @@
     "noActiveStreams": "Brak aktywnych strumieni",
     "streamsAppearHere": "Aktywne strumienie pojawią się tutaj, gdy użytkownicy zaczną oglądać",
     "dayStreak": "Seria dni",
-    "noServers": "Połącz serwer Plex, Jellyfin, Emby lub tofa aby zobaczyć tutaj jego strumienie, historię i biblioteki.",
+    "noServers": "Połącz serwer Plex, Jellyfin, Emby, tofa lub Silo, aby zobaczyć tutaj jego strumienie, historię i biblioteki.",
     "view": {
       "label": "Widok pulpitu",
       "admin": "Serwer",
@@ -482,7 +482,7 @@
     },
     "stream": {
       "notAvailable": "Nd.",
-      "bitrateUnavailable": "Jellyfin i Emby nie ujawniają indywidualnych bitrate wideo i audio podczas transkodowania. Dostępny jest tylko całkowity bitrate strumienia.",
+      "bitrateUnavailable": "Jellyfin, Emby tofa oraz Silo nie ujawniają indywidualnych bitrate wideo i audio podczas transkodowania. Dostępny jest tylko całkowity bitrate strumienia.",
       "rebuffers": "Ponowne buforowania",
       "droppedFrames": "Pominięte klatki",
       "stereo": "Stereo",
@@ -1135,7 +1135,7 @@
       "message_client": {
         "label": "Wyślij wiadomość do klienta",
         "description": "Wyślij wiadomość do odtwarzacza multimediów",
-        "hint": "Tylko Jellyfin i Emby. Plex obsługuje wiadomości wyłącznie przy przerywaniu strumienia.",
+        "hint": "Tylko Jellyfin, Emby i Silo. Odtwarzacz Silo bez aktywnego połączenia z Silo nie obsługuje wiadomości. Plex i tofa obsługują wiadomości wyłącznie przy przerywaniu strumienia.",
         "fields": {
           "target": {
             "description": "Do których sesji wysłać wiadomość"
