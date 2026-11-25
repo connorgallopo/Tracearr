@@ -5,14 +5,6 @@
   "changes": [
     {
       "type": "new",
-      "text": "Silo servers: live sessions, library, history import, downloads, CPU and memory, and Silo's own requests"
-    },
-    {
-      "type": "new",
-      "text": "add a Silo server with a code approved in Silo or with an API key; members sign in with their Silo account"
-    },
-    {
-      "type": "new",
       "text": "profiles on tofa and Silo: plays and downloads record the profile, Silo requests too, and History filters by profile"
     },
     {
@@ -22,6 +14,14 @@
     {
       "type": "new",
       "text": "stream notifications, the public API, Downloads and media History also show a profile that isn't the account's main one"
+    },
+    {
+      "type": "new",
+      "text": "Silo servers: live sessions, library, history import, downloads, CPU and memory, and Silo's own requests"
+    },
+    {
+      "type": "new",
+      "text": "add a Silo server with a code approved in Silo or with an API key; members sign in with their Silo account"
     },
     {
       "type": "improved",
@@ -34,7 +34,11 @@
     },
     {
       "type": "note",
-      "text": "Silo has no 1.0 release yet and its API still changes, so a Silo update can need a newer Tracearr"
+      "text": "Silo support isn't an endorsement. Silo is pre-release with no tagged releases yet, and its API still changes"
+    },
+    {
+      "type": "note",
+      "text": "Silo changes land fast, often dozens of commits a day, so a Silo update can break support until Tracearr catches up"
     },
     {
       "type": "note",
