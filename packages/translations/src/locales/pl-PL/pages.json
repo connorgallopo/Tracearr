@@ -48,7 +48,7 @@
       "codeExpired": "Ten kod wygasł.",
       "newCode": "Nowy kod",
       "refused": "Logowanie nie jest dostępne dla tego konta.",
-      "signInUnavailable": "",
+      "signInUnavailable": "Logowanie nie jest dostępne na tym serwerze.",
       "notPermitted": "Nie masz uprawnień do logowania. Skontaktuj się z właścicielem serwera."
     }
   },
@@ -352,7 +352,7 @@
     "overallTrust": "Zaufanie ogółem",
     "serverScope": "Serwer",
     "allServers": "Wszystkie serwery",
-    "allProfiles": "",
+    "allProfiles": "Wszystkie profile",
     "title": "Szczegóły użytkownika",
     "editIdentity": "Edytuj nazwę i e-mail kontaktowy",
     "editIdentityDescription": "Oba ustawienia dotyczą tej osoby wszędzie. Zostaw nazwę pustą, aby wyświetlać @{{username}}.",
@@ -465,7 +465,7 @@
       "clearUsers": "Wyczyść wszystkich użytkowników",
       "clearPlatforms": "Wyczyść wszystkie platformy",
       "clearCountries": "Wyczyść wszystkie kraje",
-      "clearProfiles": "",
+      "clearProfiles": "Wyczyść wszystkie profile",
       "clearFilters": "Wyczyść wszystkie filtry",
       "selected_one": "Wybrano {{count}}",
       "selected_few": "Wybrano {{count}}",
@@ -1016,7 +1016,7 @@
         "seasonNumber": "Numer sezonu",
         "episodeNumber": "Numer odcinka",
         "name": "Serial z nazwą odcinka lub tytuł",
-        "profile": ""
+        "profile": "Profil, gdy nie główny"
       },
       "server": {
         "name": "Nazwa serwera",
