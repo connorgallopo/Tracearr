@@ -163,9 +163,9 @@
     "watchHours": "Godziny oglądania",
     "completion": "Ukończenie",
     "serverLegend": "Legenda serwerów",
-    "profile": "",
-    "profiles": "",
-    "profileRemoved": ""
+    "profile": "Profil",
+    "profiles": "Profile",
+    "profileRemoved": "{{name}} (usunięty)"
   },
   "search": {
     "searchUsers": "Szukaj użytkowników...",
