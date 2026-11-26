@@ -86,6 +86,7 @@ import { runServerLocationSyncWalk } from './serverLocationSync.js';
 import {
   IMPORTED_LINK_REPAIR_VERSION,
   IMPORTED_LINK_REPAIR_WRITES,
+  hasRepairWork,
   heldRepairServers,
   runImportedLinkRepair,
   type RepairCount,
@@ -832,6 +833,11 @@ export async function processImportedLinkRepairJob(
       autoAttempts: attempts + (auto ? 1 : 0),
       attemptsResetFor: IMPORTED_LINK_REPAIR_VERSION,
     });
+  }
+  // Checked before the walk, which pauses compression even when it has nothing to read.
+  if (state.refreshFrom === null && !(await hasRepairWork())) {
+    await updateImportedLinkRepair({ version: IMPORTED_LINK_REPAIR_VERSION, breaker: null });
+    return completeWithNothingToDo('repair_imported_links', 'No imported Plex links to repair');
   }
   let tripped: RepairCount[] = [];
   const result = await runSessionMaintenanceWalk(job, {

@@ -43,7 +43,7 @@ import {
   startMaintenanceWorker,
   type MaintenanceJobData,
 } from '../../src/jobs/maintenanceQueue.js';
-import { getSetting, resetSettingsCache } from '../../src/services/settings.js';
+import { getSetting, resetSettingsCache, setSetting } from '../../src/services/settings.js';
 import type { KeyedPlay, LinkedMedia } from '../../src/services/import/libraryKeyMatch.js';
 
 const gate = vi.hoisted(() => ({
@@ -293,7 +293,11 @@ describe('imported link repair: unlink steps', () => {
       });
     }
 
-    expect(await unlinkByRule([owner.serverId], null, LIMIT)).toEqual({ count: 0, oldest: null });
+    expect(await unlinkByRule([owner.serverId], null, LIMIT)).toEqual({
+      count: 0,
+      read: 0,
+      oldest: null,
+    });
   });
 
   it('keeps a renamed show, a renumbered show and placeholder titles', async () => {
@@ -302,7 +306,11 @@ describe('imported link repair: unlink steps', () => {
     const seeded = [];
     for (const c of cases) seeded.push({ c, ...(await seed(owner, c.link, c.play)) });
 
-    expect(await unlinkByRule([owner.serverId], null, LIMIT)).toEqual({ count: 0, oldest: null });
+    expect(await unlinkByRule([owner.serverId], null, LIMIT)).toEqual({
+      count: 0,
+      read: 0,
+      oldest: null,
+    });
     for (const { c, sessionId, mediaId } of seeded) {
       expect({ name: c.name, mediaId: (await stateOf(sessionId)).media_id }).toEqual({
         name: c.name,
@@ -353,7 +361,11 @@ describe('imported link repair: unlink steps', () => {
     });
     const sessionId = await importedPlay(owner, play, loser, loserShow);
 
-    expect(await unlinkByRule([owner.serverId], null, LIMIT)).toEqual({ count: 0, oldest: null });
+    expect(await unlinkByRule([owner.serverId], null, LIMIT)).toEqual({
+      count: 0,
+      read: 0,
+      oldest: null,
+    });
     expect((await stateOf(sessionId)).media_id).toBe(loser);
     expect(await countRepairCandidates(null)).toEqual([
       { serverId: owner.serverId, candidates: 0, linked: 1 },
@@ -368,7 +380,11 @@ describe('imported link repair: unlink steps', () => {
 
     expect(await hasRepairableRows()).toBe(false);
     expect(await countRepairCandidates(null)).toEqual([]);
-    expect(await unlinkByRule([owner.serverId], null, LIMIT)).toEqual({ count: 0, oldest: null });
+    expect(await unlinkByRule([owner.serverId], null, LIMIT)).toEqual({
+      count: 0,
+      read: 0,
+      oldest: null,
+    });
     expect((await stateOf(sessionId)).media_id).toBe(mediaId);
     expect(await logCount()).toBe(0);
   });
@@ -416,6 +432,7 @@ describe('imported link repair: unlink steps', () => {
 
     expect(await unlinkFoldPairs([owner.serverId], null, LIMIT)).toEqual({
       count: 0,
+      read: 0,
       oldest: null,
     });
 
@@ -602,6 +619,7 @@ describe('imported link repair: unlink steps', () => {
 
     expect(await unlinkFoldPairs([owner.serverId], null, LIMIT)).toEqual({
       count: 0,
+      read: 0,
       oldest: null,
     });
     for (const { sessionId, episode } of ids) {
@@ -723,10 +741,12 @@ describe('imported link repair: unlink steps', () => {
       for (const window of windows) {
         expect(await unlinkByRule([owner.serverId], window, LIMIT)).toEqual({
           count: 0,
+          read: 0,
           oldest: null,
         });
         expect(await unlinkFoldPairs([owner.serverId], window, LIMIT)).toEqual({
           count: 0,
+          read: 0,
           oldest: null,
         });
       }
@@ -793,6 +813,96 @@ async function rowVersions() {
 }
 
 const numbersCases = REPAIR_CASES.filter((c) => c.clause === 'numbers');
+
+/** `n` copies of a session, each a second older than the last. */
+const copies = async (sessionId: string, n: number) =>
+  db.execute(sql`
+    INSERT INTO sessions
+    SELECT (jsonb_populate_record(s, jsonb_build_object(
+      'id', gen_random_uuid(),
+      'started_at', s.started_at - g * interval '1 second',
+      'external_session_id', 'tautulli-' || gen_random_uuid()))).*
+    FROM sessions s, generate_series(1, ${n}::int) g
+    WHERE s.id = ${sessionId}::uuid
+  `);
+
+/**
+ * A show the library renamed from La Casa de Papel to Money Heist: a renumbered play the rule
+ * unlinks, a play its own key still names that seeds the fold, and plays the title path filed
+ * under the show, which the logged pair takes and relink refuses.
+ */
+async function renamedShow() {
+  const owner = await account('plex');
+  const moneyHeist = await insertMedia({
+    mediaType: 'show',
+    matchKey: `show:local:${randomUUID()}`,
+    title: 'Money Heist',
+  });
+  const episode = (title: string) =>
+    insertMedia({
+      mediaType: 'episode',
+      matchKey: `episode:local:${randomUUID()}`,
+      title,
+      year: 2017,
+      showMediaId: moneyHeist,
+    });
+  const play = (seasonNumber: number, episodeNumber: number, title: string): KeyedPlay => ({
+    mediaType: 'episode',
+    grandparentTitle: 'La Casa de Papel',
+    seasonNumber,
+    episodeNumber,
+    title,
+    year: 2017,
+    guid: null,
+  });
+
+  const keyedEpisode = await episode('Efectuar lo acordado');
+  await createTestLibraryItem({
+    serverId: owner.serverId,
+    ratingKey: '9807',
+    mediaType: 'episode',
+    parentIndex: 1,
+    itemIndex: 1,
+    mediaId: keyedEpisode,
+  });
+  const keyed = await importedPlay(
+    owner,
+    play(1, 1, 'Efectuar lo acordado'),
+    keyedEpisode,
+    moneyHeist
+  );
+
+  const renumberedEpisode = await episode('Do as Planned');
+  await createTestLibraryItem({
+    serverId: owner.serverId,
+    ratingKey: randomUUID(),
+    mediaType: 'episode',
+    parentIndex: 2,
+    itemIndex: 1,
+    mediaId: renumberedEpisode,
+  });
+  const renumbered = await importedPlay(
+    owner,
+    play(3, 1, "We're Back"),
+    renumberedEpisode,
+    moneyHeist
+  );
+
+  const titlePath = [];
+  for (const [n, title] of [
+    [2, 'Imprudencias letales'],
+    [3, 'Errar al disparar'],
+  ] as const) {
+    const sessionId = await importedPlay(
+      owner,
+      play(1, n, title),
+      await episode(title),
+      moneyHeist
+    );
+    titlePath.push({ sessionId, before: await stateOf(sessionId) });
+  }
+  return { keyed, renumbered, titlePath };
+}
 
 describe('imported link repair: relink and the job', () => {
   beforeEach(() => {
@@ -897,10 +1007,110 @@ describe('imported link repair: relink and the job', () => {
         'numbers', 'SpongeBob SquarePants', ${blacklist}::uuid)
     `);
 
-    expect(await fullRun()).toMatchObject({ foldUnlinked: 1, relinked: 0 });
+    const before = await stateOf(sessionId);
 
-    expect(await stateOf(sessionId)).toMatchObject(cleared);
-    expect((await logOf(sessionId))[0]?.relinked_at).toBeNull();
+    expect(await fullRun()).toMatchObject({ foldUnlinked: 0, relinked: 0, restored: 1 });
+
+    expect(await stateOf(sessionId)).toEqual(before);
+    expect(await logOf(sessionId)).toMatchObject([{ clause: 'fold', media_id: folded }]);
+  });
+
+  it("restores a renamed show's fold rows that relink cannot place", async () => {
+    const { keyed, renumbered, titlePath } = await renamedShow();
+    const keyedBefore = await stateOf(keyed);
+
+    expect(await fullRun()).toMatchObject({
+      unlinked: 1,
+      foldUnlinked: 0,
+      relinked: 0,
+      restored: titlePath.length,
+    });
+
+    for (const { sessionId, before } of titlePath) {
+      expect(await stateOf(sessionId)).toEqual(before);
+      const [log] = await logOf(sessionId);
+      expect(log).toMatchObject({ clause: 'fold', media_id: before.media_id });
+      expect(log?.relinked_at).not.toBeNull();
+    }
+    expect(await stateOf(keyed)).toEqual(keyedBefore);
+    expect(await stateOf(renumbered)).toMatchObject(cleared);
+    expect(await logOf(renumbered)).toMatchObject([{ clause: 'numbers', relinked_at: null }]);
+  });
+
+  it('a manual rerun does not take restored rows again', async () => {
+    const { titlePath } = await renamedShow();
+    await processImportedLinkRepairJob(repairJob('manual'));
+    const before = await rowVersions();
+    const restored = titlePath.map(({ sessionId }) => sessionId);
+    const ofRestored = (rows: Awaited<ReturnType<typeof rowVersions>>) =>
+      rows.filter((row) => restored.some((id) => String(row.id).endsWith(id)));
+
+    expect(await processImportedLinkRepairJob(repairJob('manual'))).toMatchObject({
+      success: true,
+      updated: 0,
+    });
+
+    expect(ofRestored(await rowVersions())).toEqual(ofRestored(before));
+    expect(ofRestored(before)).toHaveLength(restored.length * 2);
+  });
+
+  it(
+    'drains a window past a row whose guarded update skipped it',
+    { timeout: 120_000 },
+    async () => {
+      const owner = await account('plex');
+      const c = numbersCases[0];
+      if (!c) throw new Error('no numbers case');
+      const newest = await seed(owner, c.link, c.play);
+      await copies(newest.sessionId, 500);
+      let changed = false;
+
+      const result = await runImportedLinkRepair({
+        skipBreaker: true,
+        onBatch: async () => {},
+        onCommit: () => {},
+        // Changes the newest candidate between the first batch's read and its write.
+        beforeUnlink: async () => {
+          if (changed) return;
+          changed = true;
+          await db.execute(
+            sql`UPDATE sessions SET imdb_id = 'tt0000001' WHERE id = ${newest.sessionId}::uuid`
+          );
+        },
+      });
+
+      expect(changed).toBe(true);
+      expect(result.unlinked).toBe(500);
+    }
+  );
+
+  it('a run with nothing to repair leaves the compression policy alone', async () => {
+    const policy = async () =>
+      (
+        await db.execute(sql`
+          SELECT job_id FROM timescaledb_information.jobs
+          WHERE hypertable_name = 'sessions' AND proc_name = 'policy_compression'
+        `)
+      ).rows;
+    const before = await policy();
+    expect(before).toHaveLength(1);
+    await setSetting('importedLinkRepair', {
+      ...(await getSetting('importedLinkRepair')),
+      breaker: { at: new Date().toISOString(), servers: [] },
+    });
+
+    expect(await processImportedLinkRepairJob(repairJob('auto'))).toMatchObject({
+      success: true,
+      updated: 0,
+    });
+
+    expect(await policy()).toEqual(before);
+    resetSettingsCache();
+    expect(await getSetting('importedLinkRepair')).toMatchObject({
+      version: IMPORTED_LINK_REPAIR_VERSION,
+      refreshFrom: null,
+      breaker: null,
+    });
   });
 
   it('does not relink under a show with another title', async () => {
@@ -1133,16 +1343,6 @@ describe('imported link repair: relink and the job', () => {
       const candidate = numbersCases[0];
       const kept = REPAIR_CASES.find((c) => c.clause === null);
       if (!candidate || !kept) throw new Error('missing cases');
-      const copies = async (sessionId: string, n: number) =>
-        db.execute(sql`
-          INSERT INTO sessions
-          SELECT (jsonb_populate_record(s, jsonb_build_object(
-            'id', gen_random_uuid(),
-            'started_at', s.started_at - g * interval '1 minute',
-            'external_session_id', 'tautulli-' || gen_random_uuid()))).*
-          FROM sessions s, generate_series(1, ${n}::int) g
-          WHERE s.id = ${sessionId}::uuid
-        `);
       const bad = await seed(owner, candidate.link, candidate.play);
       await copies(bad.sessionId, 500);
       const good = await seed(owner, kept.link, kept.play);

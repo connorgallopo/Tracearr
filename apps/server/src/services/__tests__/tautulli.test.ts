@@ -3098,6 +3098,67 @@ describe('TautulliService.importHistory Plex guid fallback', () => {
     expect(inserted?.[0]).toMatchObject({ mediaId: 'media-by-key', imdbId: 'tt555' });
   });
 
+  it.each([
+    { type: 'plex', mediaId: null },
+    { type: 'jellyfin', mediaId: 'media-blacklist-s7e9' },
+  ] as const)(
+    'links an episode by a key whose item only the provably-reused rule accepts on $type: $mediaId',
+    async ({ type, mediaId }) => {
+      const record = {
+        ...REAL_EPISODE_RECORD,
+        user_id: REAL_MOVIE_RECORD.user_id,
+        full_title: 'Forged in Fire - The Zweihander',
+        title: 'The Zweihander',
+        grandparent_title: 'Forged in Fire',
+        year: 2020,
+        media_index: 17,
+        parent_media_index: 7,
+        guid: null,
+        group_count: 1,
+        group_ids: String(REAL_EPISODE_RECORD.reference_id),
+        started: Math.floor(CUTOFF.getTime() / 1000) - 3600,
+      };
+      global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
+      vi.mocked(db.select).mockReturnValue(
+        queryChain(vi.fn, [{ type, machineIdentifier: 'pms-other' }])
+      );
+      vi.mocked(batchGetImportKeyIdentity).mockResolvedValueOnce(
+        new Map([
+          [
+            String(record.rating_key),
+            {
+              mediaId: 'media-blacklist-s7e9',
+              showMediaId: 'media-blacklist',
+              imdbId: null,
+              tmdbId: null,
+              tvdbId: null,
+              parentRatingKey: null,
+              grandparentRatingKey: null,
+              itemMediaType: 'episode',
+              itemTitle: 'Les Fleurs du Mal',
+              itemYear: 2019,
+              itemGuid: null,
+              itemShowTitle: 'The Blacklist',
+              itemSeason: 7,
+              itemEpisode: 9,
+              showTvdbId: null,
+              showTmdbId: null,
+            },
+          ],
+        ])
+      );
+      let inserted: Array<Record<string, unknown>> | undefined;
+      vi.mocked(flushInsertBatch).mockImplementation(async (batch) => {
+        inserted = [...(batch as Array<Record<string, unknown>>)];
+        return batch.length;
+      });
+
+      await TautulliService.importHistory(SERVER_ID);
+
+      expect(inserted?.[0]).toMatchObject({ mediaId });
+    }
+  );
+
   it('does not fall back to guid when the rating key resolved a row with no mediaId yet', async () => {
     const ratingKeyStr = String(REAL_MOVIE_RECORD.rating_key);
     const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };

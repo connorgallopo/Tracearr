@@ -44,9 +44,13 @@ export const IMPORTED_LINK_REPAIR_WRITES = [
   'grandparent_rating_key',
 ];
 
-/** Rows unlinked by one batch; `cursor` bounds the next batch of the same window from above. */
+/**
+ * Rows unlinked by one batch out of the candidates it read; `cursor` bounds the next batch of the
+ * same window from above.
+ */
 export interface UnlinkBatch {
   count: number;
+  read: number;
   oldest: Date | null;
   cursor?: string;
 }
@@ -149,7 +153,7 @@ export function breakerTrips(count: RepairCount): boolean {
  * batch may start at the oldest row read, ties included.
  */
 async function unlink(candidates: Candidate[], beforeWrite?: BeforeWrite): Promise<UnlinkBatch> {
-  if (candidates.length === 0) return { count: 0, oldest: null };
+  if (candidates.length === 0) return { count: 0, read: 0, oldest: null };
   const cursor = candidates.reduce((min, row) =>
     byInstant(row.started_at, min.started_at) < 0 ? row : min
   ).started_at;
@@ -194,14 +198,14 @@ async function unlink(candidates: Candidate[], beforeWrite?: BeforeWrite): Promi
             grandparentRatingKey: row.grandparent_rating_key,
           }))
         )
-        // A row unlinked again after its relink keeps the values its first unlink cleared.
+        // A row unlinked again keeps the values its first unlink cleared and takes this clause.
         .onConflictDoUpdate({
           target: [
             sessionLinkRepairs.sessionId,
             sessionLinkRepairs.startedAt,
             sessionLinkRepairs.repairVersion,
           ],
-          set: { relinkedAt: null },
+          set: { relinkedAt: null, clause: sql`excluded.clause` },
         });
     }
     return unlinked;
@@ -210,7 +214,7 @@ async function unlink(candidates: Candidate[], beforeWrite?: BeforeWrite): Promi
     const at = new Date(row.started_at);
     return min === null || at < min ? at : min;
   }, null);
-  return { count: done.length, oldest, cursor };
+  return { count: done.length, read: candidates.length, oldest, cursor };
 }
 
 /** One batch of the newest rows in the window whose link the disagreement rule refuses. */
@@ -221,7 +225,7 @@ export async function unlinkByRule(
   cursor?: string,
   beforeWrite?: BeforeWrite
 ): Promise<UnlinkBatch> {
-  if (serverIds.length === 0) return { count: 0, oldest: null };
+  if (serverIds.length === 0) return { count: 0, read: 0, oldest: null };
   const { rows } = await db.execute(sql`
     SELECT * FROM (
       SELECT ${CANDIDATE_COLUMNS}, ${repairClauseSql()} AS clause
@@ -242,7 +246,8 @@ export async function unlinkByRule(
  * rule keeps them. A row whose show title matches its show is never taken, whatever the log holds,
  * and neither is one whose own rating key names its linked media on its server: a renamed show's
  * plays linked by key stay, while the fold's landings, on a title-path episode or on a library
- * episode at the same numbers, are never backed by the play's key.
+ * episode at the same numbers, are never backed by the play's key. A row this version already
+ * logged is never taken again, so one put back stays put back.
  */
 export async function unlinkFoldPairs(
   serverIds: string[],
@@ -251,7 +256,7 @@ export async function unlinkFoldPairs(
   cursor?: string,
   beforeWrite?: BeforeWrite
 ): Promise<UnlinkBatch> {
-  if (serverIds.length === 0) return { count: 0, oldest: null };
+  if (serverIds.length === 0) return { count: 0, read: 0, oldest: null };
   const pairs = (
     await db.execute(sql`
       SELECT DISTINCT p.title, p.show_id FROM (
@@ -264,7 +269,7 @@ export async function unlinkFoldPairs(
       WHERE p.title <> ''
     `)
   ).rows as Array<{ title: string; show_id: string }>;
-  if (pairs.length === 0) return { count: 0, oldest: null };
+  if (pairs.length === 0) return { count: 0, read: 0, oldest: null };
 
   const playShow = sql.raw(normalizedShowTitleSql('s.grandparent_title'));
   const { rows } = await db.execute(sql`
@@ -285,6 +290,9 @@ export async function unlinkFoldPairs(
         JOIN media km ON km.id = li.media_id
         WHERE li.server_id = s.server_id AND li.rating_key = s.rating_key
           AND COALESCE(km.merged_into_id, km.id) = COALESCE(lm.merged_into_id, lm.id))
+      AND NOT EXISTS (SELECT 1 FROM session_link_repairs r
+        WHERE r.session_id = s.id AND r.started_at = s.started_at
+          AND r.repair_version = ${IMPORTED_LINK_REPAIR_VERSION})
     ORDER BY s.started_at DESC
     LIMIT ${limit}
   `);
@@ -415,11 +423,93 @@ export async function relinkRepaired(
   return { count: linked.length, oldest, next };
 }
 
-/** Whether this version logged a row that is still unlinked; a run that stopped leaves some. */
-async function hasPendingRelinks(): Promise<boolean> {
+interface RestoreRow {
+  session_id: string;
+  started_at: string;
+  media_id: string | null;
+  show_media_id: string | null;
+  imdb_id: string | null;
+  tmdb_id: number | null;
+  tvdb_id: number | null;
+  parent_rating_key: string | null;
+  grandparent_rating_key: string | null;
+  /** Logged on or after `since`. */
+  recent: boolean;
+}
+
+/**
+ * Puts back one batch of this version's fold unlinks that relink could not place: a renamed
+ * show's correct plays share the logged pair, and relink refuses them because their show title
+ * is not the play's own. Only fold rows go back; a rule clause proves the link wrong. Each logged
+ * value is written back by a point update that only fills a still-unlinked row, and the log row's
+ * relinked_at is set so relink and a later restore pass it by.
+ */
+async function restoreUnplacedFolds(
+  limit: number,
+  since: string
+): Promise<{ count: number; recent: number; read: number; oldest: Date | null }> {
+  const rows = (
+    await db.execute(sql`
+      SELECT r.session_id::text AS session_id, r.started_at, r.media_id, r.show_media_id, r.imdb_id,
+        r.tmdb_id, r.tvdb_id, r.parent_rating_key, r.grandparent_rating_key,
+        r.created_at >= ${since}::timestamptz AS recent
+      FROM session_link_repairs r
+      JOIN sessions s ON s.id = r.session_id AND s.started_at = r.started_at
+      WHERE r.repair_version = ${IMPORTED_LINK_REPAIR_VERSION} AND r.relinked_at IS NULL
+        AND r.clause = 'fold' AND s.media_id IS NULL
+      ORDER BY r.started_at DESC, r.session_id DESC
+      LIMIT ${limit}
+    `)
+  ).rows as unknown as RestoreRow[];
+  if (rows.length === 0) return { count: 0, recent: 0, read: 0, oldest: null };
+
+  const restored = await db.transaction(async (tx) => {
+    await uncapDecompressionForTx(tx);
+    const done: RestoreRow[] = [];
+    for (const row of rows) {
+      const { rows: written } = await tx.execute(sql`
+        UPDATE sessions s
+        SET media_id = ${row.media_id}::uuid, show_media_id = ${row.show_media_id}::uuid,
+          imdb_id = ${row.imdb_id}::text, tmdb_id = ${row.tmdb_id}::int,
+          tvdb_id = ${row.tvdb_id}::int, parent_rating_key = ${row.parent_rating_key}::text,
+          grandparent_rating_key = ${row.grandparent_rating_key}::text
+        WHERE s.id = ${row.session_id}::uuid AND s.started_at = ${row.started_at}::timestamptz
+          AND s.media_id IS NULL
+        RETURNING s.id
+      `);
+      if (written.length === 0) continue;
+      await tx.execute(sql`
+        UPDATE session_link_repairs SET relinked_at = now()
+        WHERE session_id = ${row.session_id}::uuid AND started_at = ${row.started_at}::timestamptz
+          AND repair_version = ${IMPORTED_LINK_REPAIR_VERSION}
+      `);
+      done.push(row);
+    }
+    return done;
+  });
+  const oldest = restored.reduce<Date | null>((min, row) => {
+    const at = new Date(row.started_at);
+    return min === null || at < min ? at : min;
+  }, null);
+  return {
+    count: restored.length,
+    recent: restored.filter((row) => row.recent).length,
+    read: rows.length,
+    oldest,
+  };
+}
+
+/**
+ * Whether a run has anything to read: an imported link in scope, or a row this version logged
+ * whose play is still unlinked, which a run that stopped leaves behind.
+ */
+export async function hasRepairWork(): Promise<boolean> {
+  if (await hasRepairableRows()) return true;
   const { rows } = await db.execute(sql`
-    SELECT 1 FROM session_link_repairs
-    WHERE repair_version = ${IMPORTED_LINK_REPAIR_VERSION} AND relinked_at IS NULL
+    SELECT 1 FROM session_link_repairs r
+    JOIN sessions s ON s.id = r.session_id AND s.started_at = r.started_at
+    WHERE r.repair_version = ${IMPORTED_LINK_REPAIR_VERSION} AND r.relinked_at IS NULL
+      AND s.media_id IS NULL
     LIMIT 1
   `);
   return rows.length > 0;
@@ -427,8 +517,11 @@ async function hasPendingRelinks(): Promise<boolean> {
 
 export interface ImportedLinkRepairResult {
   unlinked: number;
+  /** Fold unlinks of this run, less those the run put back. */
   foldUnlinked: number;
   relinked: number;
+  /** Fold rows put back, this run's and any a stopped run left unlinked. */
+  restored: number;
   /** Servers whose count tripped the breaker; nothing on them was written. */
   trippedServers: RepairCount[];
   failedRanges: string[];
@@ -436,10 +529,11 @@ export interface ImportedLinkRepairResult {
 
 /**
  * The whole repair, each step over the whole history: count, unlink by the rule, unlink fold
- * rows, relink. A history with no imported link in scope and nothing left to relink is not read
- * further. `onCommit` gets the oldest play of every committed batch. `beforeUnlink` gets the
- * oldest candidate of every unlink batch before its transaction opens: a play unlinked and never
- * relinked still changed the aggregates, so its refresh start has to outlive a kill mid-batch.
+ * rows, relink, put back the fold rows relink could not place. A history with no imported link
+ * in scope and nothing left to relink is not read further. `onCommit` gets the oldest play of
+ * every committed batch. `beforeUnlink` gets the oldest candidate of every unlink batch before
+ * its transaction opens: a play unlinked and never relinked still changed the aggregates, so its
+ * refresh start has to outlive a kill mid-batch.
  */
 export async function runImportedLinkRepair(opts: {
   skipBreaker: boolean;
@@ -451,10 +545,14 @@ export async function runImportedLinkRepair(opts: {
     unlinked: 0,
     foldUnlinked: 0,
     relinked: 0,
+    restored: 0,
     trippedServers: [],
     failedRanges: [],
   };
-  if (!(await hasRepairableRows()) && !(await hasPendingRelinks())) return result;
+  if (!(await hasRepairWork())) return result;
+  const { now: since } = (await db.execute(sql`SELECT now()::text AS now`)).rows[0] as {
+    now: string;
+  };
 
   const windows = await sessionWalkWindows(null);
   const counts = await countRepairCandidates(windows);
@@ -465,22 +563,26 @@ export async function runImportedLinkRepair(opts: {
 
   let done = 0;
   const drain = async (step: typeof unlinkByRule, label: string) => {
+    let changed = 0;
     const walked = await drainWindowsWithBisection<string>(
       windows,
       async (window, cursor) => {
         const batch = await step(serverIds, window, REPAIR_BATCH_SIZE, cursor, opts.beforeUnlink);
+        changed += batch.count;
         opts.onCommit(batch.oldest);
-        return batch;
+        // A window ends on a short read, not on a guarded update that skipped a row. A full batch
+        // that changed nothing would read the same rows at the cursor again.
+        return { ...batch, count: batch.count === 0 ? 0 : batch.read };
       },
       {
         batchSize: REPAIR_BATCH_SIZE,
         label,
-        onBatch: (total) => opts.onBatch(done + total),
+        onBatch: () => opts.onBatch(done + changed),
       }
     );
-    done += walked.total;
+    done += changed;
     result.failedRanges.push(...walked.failedRanges);
-    return walked.total;
+    return changed;
   };
   result.unlinked = await drain(unlinkByRule, 'ImportedLinkRepair');
   result.foldUnlinked = await drain(unlinkFoldPairs, 'ImportedLinkRepairFold');
@@ -493,6 +595,15 @@ export async function runImportedLinkRepair(opts: {
     await opts.onBatch(done + result.relinked);
     before = batch.next;
   } while (before);
+
+  for (;;) {
+    const batch = await restoreUnplacedFolds(REPAIR_BATCH_SIZE, since);
+    result.restored += batch.count;
+    result.foldUnlinked -= batch.recent;
+    opts.onCommit(batch.oldest);
+    await opts.onBatch(done + result.relinked);
+    if (batch.read < REPAIR_BATCH_SIZE) break;
+  }
   return result;
 }
 
