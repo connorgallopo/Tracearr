@@ -20,6 +20,7 @@ const ROOT_TABLES = [
   'mobile_sessions',
   'mobile_tokens',
   'sessions',
+  'session_link_repairs',
   'library_items',
   'media',
   'automation_templates',

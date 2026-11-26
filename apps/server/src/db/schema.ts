@@ -599,6 +599,33 @@ export const sessions = pgTable(
   ]
 );
 
+// The values a link repair cleared from an imported session, enough to put them back.
+// No foreign keys: the log outlives a session or server deleted later.
+export const sessionLinkRepairs = pgTable(
+  'session_link_repairs',
+  {
+    sessionId: uuid('session_id').notNull(),
+    startedAt: timestamp('started_at', { withTimezone: true }).notNull(),
+    repairVersion: integer('repair_version').notNull(),
+    serverId: uuid('server_id').notNull(),
+    clause: text('clause').notNull().$type<'numbers' | 'titles' | 'movie' | 'fold'>(),
+    grandparentTitle: text('grandparent_title'),
+    mediaId: uuid('media_id'),
+    showMediaId: uuid('show_media_id'),
+    imdbId: varchar('imdb_id', { length: 20 }),
+    tmdbId: integer('tmdb_id'),
+    tvdbId: integer('tvdb_id'),
+    parentRatingKey: text('parent_rating_key'),
+    grandparentRatingKey: text('grandparent_rating_key'),
+    relinkedAt: timestamp('relinked_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.sessionId, table.startedAt, table.repairVersion] }),
+    index('session_link_repairs_version_relinked_idx').on(table.repairVersion, table.relinkedAt),
+  ]
+);
+
 // A parameterized automation blueprint; instances bind its inputs and point back at it
 export const automationTemplates = pgTable('automation_templates', {
   id: uuid('id').primaryKey().defaultRandom(),
