@@ -424,7 +424,8 @@
     "deletesData": "Tämä poistaa tiedot pysyvästi.",
     "deletesDataDesc": "Poistettuja rivejä ei voi palauttaa. Ota varmuuskopio ensin, jos olet epävarma.",
     "automatic": "Automaattinen",
-    "startJob": "Aloita Työ"
+    "startJob": "Aloita Työ",
+    "repairHeld": ""
   },
   "memberLogin": {
     "serverActivity": "",
