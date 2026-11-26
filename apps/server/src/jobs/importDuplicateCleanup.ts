@@ -277,13 +277,17 @@ async function importsSharingChain(
  * the doomed rows by (id, started_at) and return the started_at of each row
  * deleted. `bounds` constrains alias `s` in the DELETE and is the caller's
  * guard on which rows may go. A root_id must never be a doomed row's own id.
- * Runs inside the caller's transaction, after uncapDecompressionForTx.
+ * Runs inside the caller's transaction, after uncapDecompressionForTx. One
+ * DELETE decompresses every compressed batch its bounds reach; with
+ * `pointDeletes` each row takes its own DELETE on constant (id, started_at),
+ * which decompresses only the batch holding the row.
  */
 export async function deleteSessionsRepointingChildren(
   tx: { execute: (query: SQL) => Promise<{ rows: unknown[] }> },
   serverId: string,
   doomed: Array<{ id: string; started_at: string; server_user_id: string; root_id: string }>,
-  bounds: SQL
+  bounds: SQL,
+  pointDeletes = false
 ): Promise<string[]> {
   const doomedIds = doomed.map((p) => p.id);
   const minStarted = doomed.map((p) => p.started_at).sort(byInstant)[0];
@@ -303,6 +307,19 @@ export async function deleteSessionsRepointingChildren(
     await repointChildren(tx, serverId, childRows, doomed);
   }
 
+  if (pointDeletes) {
+    const deleted: string[] = [];
+    for (const p of doomed) {
+      const removed = await tx.execute(sql`
+        DELETE FROM sessions s
+        WHERE s.id = ${p.id}::uuid AND s.started_at = ${p.started_at}::timestamptz
+          AND ${bounds}
+        RETURNING s.started_at
+      `);
+      deleted.push(...(removed.rows as Array<{ started_at: string }>).map((r) => r.started_at));
+    }
+    return deleted;
+  }
   const removed = await tx.execute(sql`
     DELETE FROM sessions s
     USING unnest(${uuids(doomedIds)}, ${sql.param(doomed.map((p) => p.started_at))}::timestamptz[]) AS d(id, started_at)

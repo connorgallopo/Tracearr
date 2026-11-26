@@ -13,14 +13,17 @@ import {
   createTestSession,
   createTestUser,
 } from '@tracearr/test-utils/factories';
-import { db } from '../client.js';
+import { db, recreatePool } from '../client.js';
 import { servers } from '../schema.js';
 import { runServerLocationSyncWalk } from '../../jobs/serverLocationSync.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../../jobs/sessionIdentityBackfill.js';
 import { getServerLocations, replaceServerLocations } from '../../services/serverLocations.js';
 import { localSessionSql } from '../../db/sessions/rules.js';
 import { compressSessionChunks } from '../../test/compressChunks.js';
 
 const DAY = 24 * 60 * 60 * 1000;
+const MIN = 60 * 1000;
+const FILLER_SESSIONS = 40;
 const CHICAGO = { lat: 41.8781, lon: -87.6298, city: 'Chicago', region: 'Illinois', country: 'US' };
 const DENVER = { lat: 39.7392, lon: -104.9903, city: 'Denver', region: 'Colorado', country: 'US' };
 
@@ -248,5 +251,127 @@ describe('server location sync', () => {
       .from(servers)
       .where(eq(servers.id, s.server.id));
     expect(row && row.v !== row.s).toBe(true);
+  });
+});
+
+describe('server location sync over a compressed chunk', { timeout: 120_000 }, () => {
+  /** Uncompressed heap rows across the compressed-age sessions chunks, and whether each is compressed */
+  async function oldChunkHeaps() {
+    const { rows } = await db.execute(sql`
+      SELECT format('%I.%I', chunk_schema, chunk_name) AS name, is_compressed
+      FROM timescaledb_information.chunks
+      WHERE hypertable_name = 'sessions' AND range_end <= now() - interval '30 days'
+    `);
+    const chunks = rows as Array<{ name: string; is_compressed: boolean }>;
+    let heap = 0;
+    for (const chunk of chunks) {
+      const result = await db.execute(
+        sql`SELECT count(*)::int AS n FROM ONLY ${sql.raw(chunk.name)}`
+      );
+      heap += (result.rows[0] as { n: number }).n;
+    }
+    return { chunks: chunks.length, compressed: chunks.every((c) => c.is_compressed), heap };
+  }
+
+  /**
+   * FILLER_SESSIONS local plays of one account already placed in Chicago, one a minute, and
+   * `changed` local plays in the Local Network shape between them: each in its own account's
+   * batch when `lone`, otherwise all in one. The database's decompression cap is 10 while the
+   * walk runs, so a write that kept the cap fails.
+   */
+  async function syncThroughCompressedChunk(changed: number, lone: boolean) {
+    const server = await createTestServer();
+    const newAccount = async () =>
+      createTestServerUser({ serverId: server.id, userId: (await createTestUser()).id });
+    const base = new Date(Math.floor((Date.now() - 60 * DAY) / DAY) * DAY + DAY / 4);
+    const filler = await newAccount();
+    for (let i = 0; i < FILLER_SESSIONS; i++) {
+      await createTestSession({
+        serverId: server.id,
+        serverUserId: filler.id,
+        ipAddress: '192.168.1.20',
+        startedAt: new Date(base.getTime() + i * MIN),
+      });
+    }
+    const shared = await newAccount();
+    for (let i = 0; i < changed; i++) {
+      await createTestSession({
+        serverId: server.id,
+        serverUserId: lone ? (await newAccount()).id : shared.id,
+        ipAddress: '192.168.1.21',
+        startedAt: new Date(
+          base.getTime() + MIN / 2 + Math.floor((i * (FILLER_SESSIONS - 1)) / changed) * MIN + i
+        ),
+      });
+    }
+    await db.execute(sql`
+      UPDATE sessions SET is_local = true, geo_city = ${CHICAGO.city}, geo_region = ${CHICAGO.region},
+        geo_country = ${CHICAGO.country}, geo_lat = ${CHICAGO.lat}::real, geo_lon = ${CHICAGO.lon}::real,
+        geo_continent = NULL, geo_postal = NULL
+      WHERE server_user_id = ${filler.id}::uuid
+    `);
+    await db.execute(sql`
+      UPDATE sessions SET is_local = NULL, geo_city = NULL, geo_region = NULL, geo_country = 'Local Network',
+        geo_lat = NULL, geo_lon = NULL, geo_continent = NULL, geo_postal = NULL
+      WHERE server_id = ${server.id}::uuid AND server_user_id <> ${filler.id}::uuid
+    `);
+    await setEntries(server.id, [{ ...CHICAGO, effectiveFrom: null }]);
+    expect((await compressSessionChunks(30)).length).toBeGreaterThanOrEqual(1);
+    expect(await oldChunkHeaps()).toMatchObject({ compressed: true, heap: 0 });
+
+    const dbName = (
+      (await db.execute(sql`SELECT current_database() AS db`)).rows[0] as { db: string }
+    ).db;
+    await db.execute(
+      sql.raw(
+        `ALTER DATABASE "${dbName}" SET timescaledb.max_tuples_decompressed_per_dml_transaction = 10`
+      )
+    );
+    await recreatePool();
+    try {
+      const { total } = await runServerLocationSyncWalk({ scope: 'behind' });
+      const placed = await db.execute(sql`
+        SELECT count(*)::int AS n FROM sessions
+        WHERE server_id = ${server.id}::uuid AND is_local AND geo_city = ${CHICAGO.city}
+      `);
+      expect((placed.rows[0] as { n: number }).n).toBe(FILLER_SESSIONS + changed);
+      return { total, after: await oldChunkHeaps() };
+    } finally {
+      await db.execute(
+        sql.raw(
+          `ALTER DATABASE "${dbName}" RESET timescaledb.max_tuples_decompressed_per_dml_transaction`
+        )
+      );
+      await recreatePool();
+    }
+  }
+
+  it('leaves a compressed chunk compressed and untouched when every row is placed', async () => {
+    const { total, after } = await syncThroughCompressedChunk(0, true);
+    expect(total).toBe(0);
+    expect(after).toMatchObject({ compressed: true, heap: 0 });
+  });
+
+  it('decompresses only the batches of the rows it places', async () => {
+    const { total, after } = await syncThroughCompressedChunk(3, true);
+    expect(total).toBe(3);
+    expect(after.heap).toBe(3);
+  });
+
+  it('places up to the point-update limit by point updates, decompressing only their batch', async () => {
+    // Below the crossover measured on TimescaleDB 2.28 and 2.31; re-measure before moving it.
+    expect(MAX_POINT_UPDATES_PER_PASS).toBe(50);
+    const { total, after } = await syncThroughCompressedChunk(MAX_POINT_UPDATES_PER_PASS, false);
+    expect(total).toBe(MAX_POINT_UPDATES_PER_PASS);
+    expect(after.heap).toBe(MAX_POINT_UPDATES_PER_PASS);
+  });
+
+  it('places more rows than the point-update limit with the batch statement, decompressing its span', async () => {
+    const { total, after } = await syncThroughCompressedChunk(
+      MAX_POINT_UPDATES_PER_PASS + 1,
+      false
+    );
+    expect(total).toBe(MAX_POINT_UPDATES_PER_PASS + 1);
+    expect(after.heap).toBe(MAX_POINT_UPDATES_PER_PASS + 1 + FILLER_SESSIONS);
   });
 });

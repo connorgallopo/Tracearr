@@ -14,6 +14,7 @@ import { db } from '../db/client.js';
 import { servers, serverUsers, sessions, users } from '../db/schema.js';
 import {
   checkAggregateNeedsRebuild,
+  getCompressedSessionChunkRanges,
   refreshAggregates,
   uncapDecompressionForTx,
 } from '../db/timescale.js';
@@ -24,6 +25,7 @@ import {
 } from '../jobs/maintenanceQueue.js';
 import { importIdentityByKey, parseHistoryGuid, type KeyedPlay } from './import/libraryKeyMatch.js';
 import { batchGetImportKeyIdentity, batchResolveMediaByPlexGuid } from '../jobs/poller/database.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../jobs/sessionIdentityBackfill.js';
 import { ts } from '../jobs/sessionWalk.js';
 import { sanitizeCodec } from '../utils/codecNormalizer.js';
 import { extractIpFromEndpoint } from '../utils/parsing.js';
@@ -1588,9 +1590,10 @@ export class TautulliService {
     const maxStop = new Date(Math.max(...groups.map((g) => g.stopped.getTime())));
     const imported = sql`s.server_id = ${serverId}::uuid AND s.started_at >= ${ts(minStart)} AND ${importForm('s', 'plex')}`;
 
-    return db.transaction(async (tx) => {
-      await uncapDecompressionForTx(tx);
-      const found = await tx.execute(sql`
+    // Imports outside the queue run without compression paused, so every call reads the chunks;
+    // alongside the candidates, so the read costs no round trip of its own.
+    const [found, compressed] = await Promise.all([
+      db.execute(sql`
         SELECT DISTINCT ON (s.id) s.id, s.started_at, s.server_user_id,
           r.id AS r_id, r.started_at AS r_started, r.reference_id AS r_ref
         FROM unnest(
@@ -1610,28 +1613,45 @@ export class TautulliService {
           AND r.server_user_id = g.server_user_id AND r.started_at = g.started
           AND r.external_session_id = g.root_external_id
         ORDER BY s.id, r.id
-      `);
-      const rows = found.rows as Array<{
-        id: string;
-        started_at: string;
-        server_user_id: string;
-        r_id: string;
-        r_started: string;
-        r_ref: string | null;
-      }>;
-      if (rows.length === 0) return [];
+      `),
+      getCompressedSessionChunkRanges(),
+    ]);
+    const rows = found.rows as Array<{
+      id: string;
+      started_at: string;
+      server_user_id: string;
+      r_id: string;
+      r_started: string;
+      r_ref: string | null;
+    }>;
+    if (rows.length === 0) return [];
+    // The writes are bounded below by minStart only, so they reach every compressed batch of the
+    // server from there on; a point write on constant (id, started_at) reaches only its row's batch.
+    const pointWrites =
+      rows.length <= MAX_POINT_UPDATES_PER_PASS && compressed.some((chunk) => chunk.end > minStart);
 
+    return db.transaction(async (tx) => {
+      await uncapDecompressionForTx(tx);
       const doomedIds = new Set(rows.map((r) => r.id));
       // The removed group_ids link pass could point a root at a play it absorbed.
       // That root starts before the play, below the children lookup's bound.
       const detached = rows.filter((r) => r.r_ref !== null && doomedIds.has(r.r_ref));
-      if (detached.length > 0) {
+      const detachGuard = sql`r.server_id = ${serverId}::uuid AND r.started_at >= ${ts(minStart)}
+        AND r.reference_id = ANY(${sql.param([...doomedIds])}::uuid[])`;
+      if (pointWrites) {
+        for (const d of detached) {
+          await tx.execute(sql`
+            UPDATE sessions r SET reference_id = NULL
+            WHERE r.id = ${d.r_id}::uuid AND r.started_at = ${d.r_started}::timestamptz
+              AND ${detachGuard}
+          `);
+        }
+      } else if (detached.length > 0) {
         await tx.execute(sql`
           UPDATE sessions r SET reference_id = NULL
           FROM unnest(${sql.param(detached.map((d) => d.r_id))}::uuid[], ${sql.param(detached.map((d) => d.r_started))}::timestamptz[]) AS d(id, started_at)
           WHERE r.id = d.id AND r.started_at = d.started_at
-            AND r.server_id = ${serverId}::uuid AND r.started_at >= ${ts(minStart)}
-            AND r.reference_id = ANY(${sql.param([...doomedIds])}::uuid[])
+            AND ${detachGuard}
         `);
       }
 
@@ -1644,7 +1664,8 @@ export class TautulliService {
           server_user_id: r.server_user_id,
           root_id: r.r_ref !== null && !doomedIds.has(r.r_ref) ? r.r_ref : r.r_id,
         })),
-        imported
+        imported,
+        pointWrites
       );
     });
   }

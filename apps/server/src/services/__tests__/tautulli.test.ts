@@ -34,7 +34,12 @@ import {
 import { getSettings, rearmImportedHistoryLink } from '../settings.js';
 import { syncServer } from '../sync.js';
 import { db } from '../../db/client.js';
-import { checkAggregateNeedsRebuild, refreshAggregates } from '../../db/timescale.js';
+import {
+  checkAggregateNeedsRebuild,
+  getCompressedSessionChunkRanges,
+  refreshAggregates,
+} from '../../db/timescale.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../../jobs/sessionIdentityBackfill.js';
 import {
   enqueueMaintenanceJob,
   enqueueServerLocationSyncIfBehind,
@@ -85,6 +90,7 @@ vi.mock('../../db/timescale.js', () => ({
   checkAggregateNeedsRebuild: vi.fn().mockResolvedValue({ needsRebuild: false }),
   uncapDecompressionForTx: vi.fn().mockResolvedValue(undefined),
   getSessionChunkRanges: vi.fn().mockResolvedValue([]),
+  getCompressedSessionChunkRanges: vi.fn().mockResolvedValue([]),
 }));
 
 vi.mock('../../jobs/maintenanceQueue.js', () => ({
@@ -2324,6 +2330,7 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
     vi.mocked(flushUpdateBatch).mockResolvedValue(0);
     vi.mocked(db.transaction).mockImplementation((async (callback: (tx: unknown) => unknown) =>
       callback({ execute: vi.fn().mockResolvedValue({ rows: [] }) })) as never);
+    vi.mocked(db.execute).mockResolvedValue({ rows: [] } as never);
   });
 
   afterEach(() => {
@@ -2718,12 +2725,37 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
       );
     }
 
+    beforeEach(() => {
+      vi.mocked(getCompressedSessionChunkRanges).mockResolvedValue([]);
+    });
+
+    /** The first statement is the read on db, the rest run in the transaction */
     function mockMergeTransaction(results: Array<{ rows: unknown[] }>) {
       const execute = vi.fn().mockResolvedValue({ rows: [] });
       for (const result of results) execute.mockResolvedValueOnce(result);
+      vi.mocked(db.execute).mockImplementationOnce(execute);
       vi.mocked(db.transaction).mockImplementation((async (callback: (tx: unknown) => unknown) =>
         callback({ execute })) as never);
       return execute;
+    }
+
+    function absorbedRows(count: number, ref: (i: number) => string | null = () => null) {
+      return Array.from({ length: count }, (_, i) => ({
+        id: `absorbed-${i}`,
+        started_at: absorbedStartedIso,
+        server_user_id: SERVER_USER_ID,
+        r_id: `root-${i}`,
+        r_started: new Date(rootStarted * 1000).toISOString(),
+        r_ref: ref(i),
+      }));
+    }
+
+    /** A compressed chunk ending `endOffsetMs` after the group's start, the lower bound of every write */
+    function compressedChunkEnding(endOffsetMs: number) {
+      const end = new Date(rootStarted * 1000 + endOffsetMs);
+      vi.mocked(getCompressedSessionChunkRanges).mockResolvedValue([
+        { start: new Date(end.getTime() - 30 * DAY_SEC * 1000), end },
+      ]);
     }
 
     function statements(execute: ReturnType<typeof vi.fn>) {
@@ -2867,6 +2899,93 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
       expect(remove?.params).toContainEqual(['absorbed-session']);
     });
 
+    it('detaches and deletes by point writes on constant (id, started_at) when the span reaches a compressed chunk', async () => {
+      mockFetch = mockTautulliFetch([mergedRecord()], 1);
+      global.fetch = mockFetch as typeof global.fetch;
+      existingRoot();
+      compressedChunkEnding(1);
+      const execute = mockMergeTransaction([
+        { rows: absorbedRows(1, () => 'absorbed-0') },
+        { rows: [] },
+        { rows: [] },
+        { rows: [{ started_at: absorbedStartedIso }] },
+      ]);
+
+      const result = await TautulliService.importHistory(SERVER_ID);
+
+      const [, detach, , remove] = statements(execute);
+      expect(detach?.sql).toBe(
+        'UPDATE sessions r SET reference_id = NULL WHERE r.id = $1::uuid AND r.started_at = $2::timestamptz AND r.server_id = $3::uuid AND r.started_at >= $4::timestamptz AND r.reference_id = ANY($5::uuid[])'
+      );
+      expect(detach?.params).toEqual([
+        'root-0',
+        new Date(rootStarted * 1000).toISOString(),
+        SERVER_ID,
+        new Date(rootStarted * 1000).toISOString(),
+        ['absorbed-0'],
+      ]);
+      expect(remove?.sql).toBe(
+        "DELETE FROM sessions s WHERE s.id = $1::uuid AND s.started_at = $2::timestamptz AND s.server_id = $3::uuid AND s.started_at >= $4::timestamptz AND (s.session_key = 'tautulli-' || s.external_session_id) RETURNING s.started_at"
+      );
+      expect(remove?.params).toEqual([
+        'absorbed-0',
+        absorbedStartedIso,
+        SERVER_ID,
+        new Date(rootStarted * 1000).toISOString(),
+      ]);
+      expect(result.message).toContain(
+        '1 plays Tautulli merged into another play since the last import'
+      );
+    });
+
+    it('deletes up to the point-write limit one row at a time', async () => {
+      mockFetch = mockTautulliFetch([mergedRecord()], 1);
+      global.fetch = mockFetch as typeof global.fetch;
+      existingRoot();
+      compressedChunkEnding(1);
+      const execute = mockMergeTransaction([{ rows: absorbedRows(MAX_POINT_UPDATES_PER_PASS) }]);
+
+      await TautulliService.importHistory(SERVER_ID);
+
+      const deletes = statements(execute).filter((st) => st.sql.startsWith('DELETE'));
+      expect(deletes).toHaveLength(MAX_POINT_UPDATES_PER_PASS);
+      expect(deletes.every((st) => !st.sql.includes('unnest'))).toBe(true);
+    });
+
+    it('detaches and deletes more rows than the point-write limit with one statement each', async () => {
+      mockFetch = mockTautulliFetch([mergedRecord()], 1);
+      global.fetch = mockFetch as typeof global.fetch;
+      existingRoot();
+      compressedChunkEnding(1);
+      const execute = mockMergeTransaction([
+        { rows: absorbedRows(MAX_POINT_UPDATES_PER_PASS + 1, (i) => `absorbed-${i}`) },
+      ]);
+
+      await TautulliService.importHistory(SERVER_ID);
+
+      const writes = statements(execute).filter((st) => /^(UPDATE|DELETE)/.test(st.sql));
+      expect(writes.map((st) => st.sql.slice(0, 30))).toEqual([
+        'UPDATE sessions r SET referenc',
+        'DELETE FROM sessions s USING u',
+      ]);
+    });
+
+    it('writes with one statement each when the compressed chunks end at the span start', async () => {
+      mockFetch = mockTautulliFetch([mergedRecord()], 1);
+      global.fetch = mockFetch as typeof global.fetch;
+      existingRoot();
+      compressedChunkEnding(0);
+      const execute = mockMergeTransaction([{ rows: absorbedRows(1, () => 'absorbed-0') }]);
+
+      await TautulliService.importHistory(SERVER_ID);
+
+      const writes = statements(execute).filter((st) => /^(UPDATE|DELETE)/.test(st.sql));
+      expect(writes.map((st) => st.sql.slice(0, 30))).toEqual([
+        'UPDATE sessions r SET referenc',
+        'DELETE FROM sessions s USING u',
+      ]);
+    });
+
     it('deletes nothing when no import row matches the absorbed ids', async () => {
       mockFetch = mockTautulliFetch([mergedRecord()], 1);
       global.fetch = mockFetch as typeof global.fetch;
@@ -2876,6 +2995,7 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
       const result = await TautulliService.importHistory(SERVER_ID);
 
       expect(execute).toHaveBeenCalledTimes(1);
+      expect(db.transaction).not.toHaveBeenCalled();
       expect(result.message).not.toContain('merged');
     });
 

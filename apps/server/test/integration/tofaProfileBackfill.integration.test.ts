@@ -8,6 +8,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Job } from 'bullmq';
+import pg from 'pg';
 import { eq, sql } from 'drizzle-orm';
 import {
   createStoppedSession,
@@ -41,6 +42,10 @@ import {
   shutdownMaintenanceQueue,
   type MaintenanceJobData,
 } from '../../src/jobs/maintenanceQueue.js';
+import {
+  linkTofaPlayProfiles,
+  MAX_POINT_UPDATES_PER_PROFILE_PASS,
+} from '../../src/jobs/tofaProfileBackfill.js';
 import { getSetting, setSetting } from '../../src/services/settings.js';
 import { syncServer } from '../../src/services/sync.js';
 
@@ -250,4 +255,258 @@ describe('backfill_tofa_profiles', () => {
       await shutdownMaintenanceQueue();
     }
   });
+});
+
+describe('backfill_tofa_profiles writes only what it links', { timeout: 120_000 }, () => {
+  const DAY_MS = 86_400_000;
+  const MIN_MS = 60_000;
+  const FILLER_SESSIONS = 40;
+
+  /** Uncompressed heap rows across the compressed-age sessions chunks, and whether each is compressed */
+  async function oldChunkHeaps() {
+    const { rows } = await db.execute(sql`
+      SELECT format('%I.%I', chunk_schema, chunk_name) AS name, is_compressed
+      FROM timescaledb_information.chunks
+      WHERE hypertable_name = 'sessions' AND range_end <= now() - interval '30 days'
+    `);
+    const chunks = rows as Array<{ name: string; is_compressed: boolean }>;
+    let heap = 0;
+    for (const chunk of chunks) {
+      const result = await db.execute(
+        sql`SELECT count(*)::int AS n FROM ONLY ${sql.raw(chunk.name)}`
+      );
+      heap += (result.rows[0] as { n: number }).n;
+    }
+    return { chunks: chunks.length, compressed: chunks.every((c) => c.is_compressed), heap };
+  }
+
+  /**
+   * FILLER_SESSIONS plays of one account linked to its profile, one a minute and all on tofa's
+   * history, and `unlinked` plays without a profile between them: each in its own account's batch
+   * when `lone`, otherwise all in one. Each account has one profile, Main. `by` says how the
+   * unlinked plays can link: on the history, by their stored name Main alone, or not at all (named
+   * Kids, which two of their account's profiles share). The database's decompression cap is 10
+   * while it links, so a write that kept the cap fails.
+   */
+  async function linkThroughCompressedChunk(
+    unlinked: number,
+    opts: { lone: boolean; by: 'history' | 'name' | 'nothing' }
+  ) {
+    const server = await createTestServer({ type: 'tofa' });
+    const newAccount = async () => {
+      const externalId = `account-${crypto.randomUUID()}`;
+      const account = await createTestServerUser({
+        userId: (await createTestUser()).id,
+        serverId: server.id,
+        externalId,
+      });
+      const profile = await createTestServerProfile({
+        serverId: server.id,
+        serverUserId: account.id,
+        name: 'Main',
+        externalId: `profile-${account.id}`,
+      });
+      if (opts.by === 'nothing') {
+        for (const n of [1, 2]) {
+          await createTestServerProfile({
+            serverId: server.id,
+            serverUserId: account.id,
+            name: 'Kids',
+            externalId: `kids-${n}-${account.id}`,
+          });
+        }
+      }
+      return { id: account.id, externalId, profile };
+    };
+    const base = new Date(Math.floor((Date.now() - 60 * DAY_MS) / DAY_MS) * DAY_MS + DAY_MS / 4);
+    const history: NonNullable<typeof imported>[] = [];
+    const play = async (
+      account: Awaited<ReturnType<typeof newAccount>>,
+      key: string,
+      startedAt: Date,
+      linked: boolean
+    ) => {
+      await createStoppedSession({
+        serverId: server.id,
+        serverUserId: account.id,
+        sessionKey: `tofa-${key}`,
+        externalSessionId: key,
+        startedAt,
+        profileId: linked ? account.profile.id : null,
+        profileName: opts.by === 'nothing' && !linked ? 'Kids' : 'Main',
+      });
+      if (linked || opts.by === 'history') {
+        history.push({
+          ...imported,
+          id: key,
+          session_id: null,
+          user_id: account.externalId,
+          profile_id: account.profile.externalId,
+          profile_name: 'Main',
+          started_at: startedAt.toISOString(),
+        });
+      }
+    };
+    const filler = await newAccount();
+    for (let i = 0; i < FILLER_SESSIONS; i++) {
+      await play(filler, `filler-${i}`, new Date(base.getTime() + i * MIN_MS), true);
+    }
+    const shared = await newAccount();
+    for (let i = 0; i < unlinked; i++) {
+      const at = MIN_MS / 2 + Math.floor((i * (FILLER_SESSIONS - 1)) / unlinked) * MIN_MS + i;
+      await play(
+        opts.lone ? await newAccount() : shared,
+        `play-${i}`,
+        new Date(base.getTime() + at),
+        false
+      );
+    }
+    history.sort((a, b) => b.started_at.localeCompare(a.started_at));
+    getWatchHistoryPage.mockImplementation(async (before: string | null, limit: number) => {
+      const older = history.filter((row) => before === null || row.started_at < before);
+      return { items: older.slice(0, limit), has_more: older.length > limit };
+    });
+    expect((await compressSessionChunks(30)).length).toBeGreaterThanOrEqual(1);
+    expect(await oldChunkHeaps()).toMatchObject({ compressed: true, heap: 0 });
+
+    const dbName = (
+      (await db.execute(sql`SELECT current_database() AS db`)).rows[0] as { db: string }
+    ).db;
+    await db.execute(
+      sql.raw(
+        `ALTER DATABASE "${dbName}" SET timescaledb.max_tuples_decompressed_per_dml_transaction = 10`
+      )
+    );
+    await recreatePool();
+    const sent = vi.spyOn(pg.Client.prototype, 'query');
+    try {
+      // The function, not the job: the job restores the compression policy when it ends, and the
+      // policy can recompress the chunk before its heap is read.
+      const linked = await linkTofaPlayProfiles(server.id, async () => undefined);
+      const statements = sent.mock.calls.flatMap(([query]) =>
+        typeof query === 'string'
+          ? [query]
+          : typeof query === 'object' && query && 'text' in query
+            ? [String(query.text)]
+            : []
+      );
+      return { linked, after: await oldChunkHeaps(), statements };
+    } finally {
+      sent.mockRestore();
+      await db.execute(
+        sql.raw(
+          `ALTER DATABASE "${dbName}" RESET timescaledb.max_tuples_decompressed_per_dml_transaction`
+        )
+      );
+      await recreatePool();
+    }
+  }
+
+  it('leaves a compressed chunk compressed and untouched when nothing links', async () => {
+    const { linked, after } = await linkThroughCompressedChunk(3, { lone: true, by: 'nothing' });
+    expect(linked).toBe(0);
+    expect(after).toMatchObject({ compressed: true, heap: 0 });
+  });
+
+  it('links by the history over a compressed chunk, decompressing only the batches it links', async () => {
+    const { linked, after, statements } = await linkThroughCompressedChunk(3, {
+      lone: true,
+      by: 'history',
+    });
+    expect(linked).toBe(3);
+    expect(after.heap).toBe(3);
+    const updates = statements.filter((text) => text.startsWith('update "sessions"'));
+    expect(updates).toHaveLength(3);
+    expect(updates[0]).toBe(
+      'update "sessions" set "profile_id" = $1 where ("sessions"."id" = $2 and "sessions"."started_at" = $3::timestamptz and (("sessions"."server_id" = $4 and "sessions"."started_at" >= $5 and "sessions"."started_at" <= $6 and "sessions"."external_session_id" in ($7)) and "sessions"."server_user_id" in ($8) and "sessions"."profile_id" is null))'
+    );
+  });
+
+  it('links by a unique name over a compressed chunk, decompressing only the batches it links', async () => {
+    const { linked, after, statements } = await linkThroughCompressedChunk(3, {
+      lone: true,
+      by: 'name',
+    });
+    expect(linked).toBe(3);
+    expect(after.heap).toBe(3);
+    const updates = statements.filter((text) => text.startsWith('update "sessions"'));
+    expect(updates).toHaveLength(3);
+    expect(updates[0]).toBe(
+      'update "sessions" set "profile_id" = "named_profile_id" from (select (array_agg("id"))[1] as "named_profile_id", "server_user_id", "name" from "server_profiles" where "server_profiles"."server_id" = $1 group by "server_profiles"."server_user_id", "server_profiles"."name" having count(*) = 1) "unique_names" where ("sessions"."id" = $2 and "sessions"."started_at" = $3::timestamptz and ("sessions"."server_id" = $4 and "sessions"."profile_id" is null and "sessions"."profile_name" is not null and "sessions"."server_user_id" = "unique_names"."server_user_id" and "sessions"."profile_name" = "unique_names"."name" and "sessions"."started_at" >= $5 and "sessions"."started_at" < $6))'
+    );
+  });
+
+  it("links a play two profiles' history rows both match to the first profile on the page, through a compressed chunk", async () => {
+    const ids = await seed();
+    const first = (await createTestServerProfile({ ...ids, name: 'One', externalId: 'p-one' })).id;
+    await createTestServerProfile({ ...ids, name: 'Two', externalId: 'p-two' });
+    const play = await storePlay(ids, {
+      profileName: 'Robin',
+      startedAt: imported.started_at,
+      sessionKey: 'session-shared',
+      externalSessionId: 'history-one',
+    });
+    const row = { ...imported, user_id: MORGAN_ACCOUNT, started_at: imported.started_at };
+    getWatchHistoryPage.mockResolvedValue({
+      items: [
+        { ...row, id: 'history-one', session_id: null, profile_id: 'p-one', profile_name: 'One' },
+        {
+          ...row,
+          id: 'history-two',
+          session_id: 'session-shared',
+          profile_id: 'p-two',
+          profile_name: 'Two',
+        },
+      ],
+      has_more: false,
+    });
+    expect((await compressSessionChunks(30)).length).toBeGreaterThanOrEqual(1);
+
+    expect(await linkTofaPlayProfiles(ids.serverId, async () => undefined)).toBe(1);
+
+    expect(await profileOf(play)).toBe(first);
+  });
+
+  it('opens no transaction for a history page with no play it can link', async () => {
+    const ids = await seed();
+    await createTestServerProfile({ ...ids, name: 'Kids' });
+    await createTestServerProfile({ ...ids, name: 'Kids' });
+    const play = await storePlay(ids, { profileName: 'Kids', startedAt: imported.started_at });
+    getWatchHistoryPage.mockResolvedValue({
+      items: [{ ...imported, user_id: 'an-account-tracearr-never-saw' }],
+      has_more: false,
+    });
+    expect((await compressSessionChunks(30)).length).toBeGreaterThanOrEqual(1);
+    const transactions = vi.spyOn(db, 'transaction');
+
+    expect(await linkTofaPlayProfiles(ids.serverId, async () => undefined)).toBe(0);
+
+    expect(transactions).not.toHaveBeenCalled();
+    expect(await profileOf(play)).toBeNull();
+  });
+
+  it('pins the point-update limit below the measured crossover', () => {
+    // Below the crossover measured on TimescaleDB 2.28 and 2.31; re-measure before moving it.
+    expect(MAX_POINT_UPDATES_PER_PROFILE_PASS).toBe(40);
+  });
+
+  for (const by of ['history', 'name'] as const) {
+    it(`links up to the point-update limit by ${by} with point updates, decompressing only their batch`, async () => {
+      const { linked, after } = await linkThroughCompressedChunk(
+        MAX_POINT_UPDATES_PER_PROFILE_PASS,
+        { lone: false, by }
+      );
+      expect(linked).toBe(MAX_POINT_UPDATES_PER_PROFILE_PASS);
+      expect(after.heap).toBe(MAX_POINT_UPDATES_PER_PROFILE_PASS);
+    });
+
+    it(`links more plays than the point-update limit by ${by} with its statements, decompressing their span`, async () => {
+      const { linked, after } = await linkThroughCompressedChunk(
+        MAX_POINT_UPDATES_PER_PROFILE_PASS + 1,
+        { lone: false, by }
+      );
+      expect(linked).toBe(MAX_POINT_UPDATES_PER_PROFILE_PASS + 1);
+      expect(after.heap).toBe(MAX_POINT_UPDATES_PER_PROFILE_PASS + 1 + FILLER_SESSIONS);
+    });
+  }
 });
