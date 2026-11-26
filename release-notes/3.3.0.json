@@ -1,6 +1,6 @@
 {
   "version": "3.3.0",
-  "date": "2026-11-24",
+  "date": "2026-11-25",
   "upgradeWarning": "Back up before upgrading. tofa requests are stored differently from this release on, so going back to 3.2 needs that backup",
   "changes": [
     {
@@ -26,6 +26,10 @@
     {
       "type": "improved",
       "text": "History and the user page hide Quality and Progress when the table is too narrow; turning one on in Columns keeps it"
+    },
+    {
+      "type": "improved",
+      "text": "background maintenance no longer decompresses and rewrites old history it doesn't change, cutting disk writes"
     },
     {
       "type": "fix",
