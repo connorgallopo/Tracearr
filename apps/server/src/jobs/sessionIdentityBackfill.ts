@@ -3,6 +3,12 @@ import { REDIS_KEYS } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { uncapDecompressionForTx, type ChunkTimeRange } from '../db/timescale.js';
 import { getRedis } from '../lib/redisShared.js';
+import {
+  keyAgreesSql,
+  keyProvablyReusedSql,
+  keyReusingServerTypesSql,
+  serverTypesSql,
+} from '../services/import/keyRuleSql.js';
 import { resolveImportedPlays } from '../services/library/importedPlayIdentity.js';
 import { CONTAINER_MEDIA_TYPES_SQL } from './poller/database.js';
 import {
@@ -29,25 +35,24 @@ export const IDENTITY_PASSES_VERSION = 1;
 
 /**
  * A rating key is only evidence for a tracked play. An import's key may since have been
- * reused by an unrelated item, so an imported row takes a library item by key unless the
- * reuse is provable: another media type, or a title and a year that both disagree beyond the
- * resolver's tolerance of a year (libraryKeyMatch.ts states the same rule for insert time).
+ * reused by an unrelated item. On a server whose keys can be reused, an imported row takes a
+ * library item by key only when the play and the item agree (keyAgreesSql); elsewhere it does
+ * unless the reuse is provable: another media type, or a title and a year that both disagree
+ * beyond the resolver's tolerance of a year. libraryKeyMatch.ts states both rules for insert time.
  */
 function sameTitleForImport(item: string): SQL {
-  const norm = (column: string) =>
-    `regexp_replace(lower(COALESCE(${column}, '')), '[^[:alnum:]]', '', 'g')`;
   // The stored media type is evidence only where the import source stated it: a Playback
-  // Reporting import (pr-<row> ids) or an import on a Plex server (Tautulli). A Jellystat
-  // import on Jellyfin or Emby may carry a heuristic type (legacy rows without a SeriesName),
-  // whatever the shape of its id, so its type never refuses the key.
+  // Reporting import (pr-<row> ids) or a Tautulli import. A Jellystat import on Jellyfin or
+  // Emby may carry a heuristic type (legacy rows without a SeriesName), whatever the shape of
+  // its id, so its type never refuses the key.
   const sourceStatedType = `(s.external_session_id LIKE 'pr-%'
-            OR EXISTS (SELECT 1 FROM servers sv WHERE sv.id = s.server_id AND sv.type = 'plex'))`;
-  return sql.raw(`(s.external_session_id IS NULL OR NOT (
-          (${sourceStatedType} AND s.media_type IN ('movie', 'episode')
-            AND ${item}.media_type IN ('movie', 'episode') AND ${item}.media_type <> s.media_type)
-          OR (${norm(`${item}.title`)} <> ${norm('s.media_title')}
-            AND ${item}.year IS NOT NULL AND s.year IS NOT NULL
-            AND abs(${item}.year - s.year) > 1)))`);
+            OR EXISTS (SELECT 1 FROM servers sv WHERE sv.id = s.server_id
+              AND sv.type = ANY(${serverTypesSql((profile) => profile.importsTautulliHistory)})))`;
+  return sql`(s.external_session_id IS NULL OR CASE
+          WHEN EXISTS (SELECT 1 FROM servers sv WHERE sv.id = s.server_id
+            AND sv.type = ANY(${keyReusingServerTypesSql()}))
+          THEN ${keyAgreesSql(item)}
+          ELSE NOT (${sql.raw(keyProvablyReusedSql(item, sourceStatedType))}) END)`;
 }
 
 /** The started_at range a server's gone-key rows are confirmed in: before the floor, at or after the floor last handled. */

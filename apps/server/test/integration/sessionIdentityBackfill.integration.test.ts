@@ -1087,6 +1087,68 @@ describe('session identity backfill', () => {
     expect(await linkOf('ep-legacy')).toEqual({ media_id: episodeId, show_media_id: showId });
   });
 
+  async function importedOnReusedKey(type: 'plex' | 'jellyfin') {
+    const server = await createTestServer({ type });
+    const user = await createTestUser();
+    const su = await createTestServerUser({ userId: user.id, serverId: server.id });
+    const showId = await resolveMediaForItem({
+      mediaType: 'show',
+      tvdbId: 61_801,
+      title: 'The Blacklist',
+      year: 2013,
+      serverId: server.id,
+      ratingKey: 'blacklist',
+    });
+    const episodeId = await resolveMediaForItem({
+      mediaType: 'episode',
+      tvdbId: 61_802,
+      title: 'Orion Relocation Services',
+      year: 2019,
+      serverId: server.id,
+      ratingKey: 'reused-key',
+      showMediaId: showId,
+      seasonNumber: 7,
+      episodeNumber: 9,
+    });
+    await createTestLibraryItem({
+      serverId: server.id,
+      ratingKey: 'reused-key',
+      title: 'Orion Relocation Services',
+      year: 2019,
+      mediaType: 'episode',
+      grandparentTitle: 'The Blacklist',
+      grandparentRatingKey: 'blacklist',
+      parentIndex: 7,
+      itemIndex: 9,
+      mediaId: episodeId,
+    });
+    await createTestSession({
+      serverId: server.id,
+      serverUserId: su.id,
+      externalSessionId: 'import-forged-s7e17',
+      ratingKey: 'reused-key',
+      mediaType: 'episode',
+      mediaTitle: 'Charlemagne’s Sword',
+      grandparentTitle: 'Forged in Fire',
+      seasonNumber: 7,
+      episodeNumber: 17,
+      year: 2020,
+      startedAt: daysAgo(2),
+    });
+    await backfillSessionIdentityBatch(1000, undefined, undefined, { resolveImports: true });
+    return { episodeId, link: await linkOf('reused-key') };
+  }
+
+  it('fresh stamp refuses a key the repair unlinked', async () => {
+    const { episodeId, link } = await importedOnReusedKey('plex');
+    expect(link.media_id).not.toBe(episodeId);
+  });
+
+  it('fresh stamp keeps the provably-reused rule on a Jellyfin server', async () => {
+    const { episodeId, link } = await importedOnReusedKey('jellyfin');
+    expect(link.media_id).toBe(episodeId);
+  });
+
   it('never title-resolves a tracked play whose key a library item has held', async () => {
     const server = await createTestServer({ type: 'plex' });
     const user = await createTestUser();

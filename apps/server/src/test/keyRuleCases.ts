@@ -396,4 +396,27 @@ export const NORMALIZATION_CASES: Array<{ raw: string; normalized: string }> = [
   { raw: '○△□', normalized: '' },
   { raw: 'PLUR1BUS', normalized: 'plur1bus' },
   { raw: 'Men in Black³', normalized: 'meninblack3' },
+  { raw: 'Poke\u0301mon', normalized: 'pokémon' },
+  { raw: 'Война и мир', normalized: 'войнаимир' },
+  { raw: 'Ｆｕｌｌｗｉｄｔｈ', normalized: 'fullwidth' },
+  { raw: 'İstanbul', normalized: 'istanbul' },
+  { raw: 'हिन्दी', normalized: 'हनद' },
+  { raw: 'สวัสดี', normalized: 'สวสด' },
+  { raw: 'ΣΙΣΥΦΟΣ', normalized: 'σισυφοσ' },
+  { raw: 'Ο Σίσυφος', normalized: 'οσίσυφοσ' },
+  // Unknown: folded or decomposed outside the blocks Postgres maps the way Node does.
+  { raw: '𝐁𝐨𝐥𝐝', normalized: '' },
+  { raw: 'Ꟈ', normalized: '' },
+];
+
+export const SHOW_NORMALIZATION_CASES: Array<{ raw: string; normalized: string }> = [
+  { raw: 'Snowfall (2017)', normalized: 'snowfall' },
+  { raw: '  Doctor Who (2005)  ', normalized: 'doctorwho' },
+  { raw: 'Doctor Who(2005)', normalized: 'doctorwho' },
+  { raw: '(2017)', normalized: '2017' },
+  { raw: 'Show (17)', normalized: 'show17' },
+  { raw: 'A (2017) (2018)', normalized: 'a2017' },
+  { raw: 'A\nB (2017)', normalized: 'ab2017' },
+  { raw: 'A\n(2017)', normalized: 'a' },
+  { raw: 'Pokémon\u00a0(2019)\u3000', normalized: 'pokémon' },
 ];

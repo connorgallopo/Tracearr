@@ -59,9 +59,40 @@ export function parseHistoryGuid(guid: string | null | undefined): {
   return {};
 }
 
+// Postgres lowercases and NFKC-normalizes these blocks the way Node does: checked code point by
+// code point on Postgres 15 (glibc, C.UTF-8) and 18 (musl). Outside them a character Node maps
+// can be newer than the database's Unicode tables.
+const FOLD_STABLE_BLOCKS: ReadonlyArray<readonly [number, number]> = [
+  [0x0000, 0x052f],
+  [0x1e00, 0x2bff],
+  [0x3000, 0x33ff],
+  [0xac00, 0xd7af],
+  [0xf900, 0xfdff],
+  [0xfe30, 0xfeff],
+  [0xff00, 0xffef],
+];
+
+/** Whether Postgres may lowercase or normalize the character differently from Node. */
+export function foldsUnreliably(char: string): boolean {
+  const cp = char.codePointAt(0) ?? 0;
+  if (FOLD_STABLE_BLOCKS.some(([from, to]) => cp >= from && cp <= to)) return false;
+  return char.normalize('NFKC').toLowerCase() !== char;
+}
+
+/**
+ * A title as the key rules compare it: normalized, or empty (unknown) when the SQL form of the
+ * rules could not normalize it the same way. Final sigma folds to sigma: Node lowers a capital
+ * sigma by its place in the word, Postgres one character at a time.
+ */
+export function comparableTitle(title: string | null | undefined): string {
+  const text = title ?? '';
+  for (const char of text) if (foldsUnreliably(char)) return '';
+  return normalizeTitle(text).replaceAll('ς', 'σ');
+}
+
 /** A show title as a library names it: a trailing "(YYYY)" dropped, then normalized. */
 export function normalizeShowTitle(title: string | null | undefined): string {
-  return normalizeTitle(showTitleOf(title ?? '').base);
+  return comparableTitle(showTitleOf(title ?? '').base);
 }
 
 // A title that normalizes to empty is unknown: it neither agrees nor disagrees.
@@ -71,10 +102,6 @@ function agree(a: string, b: string): boolean {
 
 function differ(a: string, b: string): boolean {
   return a !== '' && b !== '' && a !== b;
-}
-
-function titleOf(title: string | null | undefined): string {
-  return normalizeTitle(title ?? '');
 }
 
 function yearGap(a: number | null | undefined, b: number | null | undefined): number | null {
@@ -109,7 +136,7 @@ function episodeKeyAgrees(item: KeyedItem, play: KeyedPlay): boolean {
     normalizeShowTitle(item.showTitle),
     normalizeShowTitle(play.grandparentTitle)
   );
-  const titleAgrees = agree(titleOf(item.title), titleOf(play.title));
+  const titleAgrees = agree(comparableTitle(item.title), comparableTitle(play.title));
   const gap = yearGap(item.year, play.year);
   const yearAgrees = gap !== null && gap <= 1;
   const itemNumbers = numbersOf(item.seasonNumber, item.episodeNumber);
@@ -174,7 +201,7 @@ export function keyAgreesWithPlay(item: KeyedItem, play: KeyedPlay): boolean {
  */
 export function linkDisagreesWithPlay(link: LinkedMedia, play: KeyedPlay): RepairClause | null {
   if (link.mediaType !== play.mediaType) return null;
-  const titlesDiffer = differ(titleOf(link.title), titleOf(play.title));
+  const titlesDiffer = differ(comparableTitle(link.title), comparableTitle(play.title));
   const gap = yearGap(link.year, play.year);
   const yearsDiffer = gap !== null && gap > 1;
   if (play.mediaType === 'movie') return titlesDiffer && yearsDiffer ? 'movie' : null;
@@ -190,7 +217,8 @@ export function linkDisagreesWithPlay(link: LinkedMedia, play: KeyedPlay): Repai
     numbers !== null &&
     link.numbers.length > 0 &&
     !link.numbers.some(([season, episode]) => season === numbers[0] && episode === numbers[1]);
-  if (numbersDiffer && !agree(titleOf(link.title), titleOf(play.title))) return 'numbers';
+  if (numbersDiffer && !agree(comparableTitle(link.title), comparableTitle(play.title)))
+    return 'numbers';
   return titlesDiffer && yearsDiffer ? 'titles' : null;
 }
 

@@ -1,12 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import type { ImportKeyIdentity } from '../../../jobs/poller/database.js';
-import { AGREEMENT_CASES, NORMALIZATION_CASES, REPAIR_CASES } from '../../../test/keyRuleCases.js';
-import { normalizeTitle } from '../../library/mediaMatchKey.js';
 import {
+  AGREEMENT_CASES,
+  NORMALIZATION_CASES,
+  REPAIR_CASES,
+  SHOW_NORMALIZATION_CASES,
+} from '../../../test/keyRuleCases.js';
+import {
+  comparableTitle,
   importIdentityByKey,
   keyAgreesWithPlay,
   libraryKeyProvablyReused,
   linkDisagreesWithPlay,
+  normalizeShowTitle,
   parseHistoryGuid,
 } from '../libraryKeyMatch.js';
 
@@ -56,9 +62,15 @@ describe('linkDisagreesWithPlay', () => {
   });
 });
 
-describe('normalizeTitle', () => {
+describe('comparableTitle', () => {
   it.each(NORMALIZATION_CASES)('$raw', ({ raw, normalized }) => {
-    expect(normalizeTitle(raw)).toBe(normalized);
+    expect(comparableTitle(raw)).toBe(normalized);
+  });
+});
+
+describe('normalizeShowTitle', () => {
+  it.each(SHOW_NORMALIZATION_CASES)('$raw', ({ raw, normalized }) => {
+    expect(normalizeShowTitle(raw)).toBe(normalized);
   });
 });
 
