@@ -34,6 +34,7 @@ vi.mock('../../../utils/logger.js', () => ({
 
 import {
   CONTAINER_MEDIA_TYPES,
+  batchGetImportKeyIdentity,
   batchGetLibraryItemIdentity,
   batchGetRecentUserSessions,
   batchResolveMediaByPlexGuid,
@@ -322,6 +323,25 @@ describe('batchGetLibraryItemIdentity', () => {
     expect(text).toMatch(
       /\(media\.media_type is null or media\.media_type not in \(\$\d+, \$\d+, \$\d+, \$\d+\)\)/
     );
+  });
+});
+
+describe('batchGetImportKeyIdentity', () => {
+  it("reads the show's ids through its merge winner", async () => {
+    const chain = queryChain(vi.fn, []);
+    mockDbSelect.mockReturnValue(chain);
+
+    await batchGetImportKeyIdentity('server-1', ['rk-1']);
+
+    expect(renderedJoins(chain, 'leftJoin')).toEqual([
+      'media.id = library_items.media_id',
+      'keyed_show.id = media.show_media_id',
+      'show_media.id = coalesce(keyed_show.merged_into_id, keyed_show.id)',
+    ]);
+    const selected = mockDbSelect.mock.calls[0]?.[0] as Record<string, SQLWrapper>;
+    for (const field of ['showTvdbId', 'showTmdbId']) {
+      expect(renderSql(sql`${selected[field]}`).sql).toMatch(/^show_media\./);
+    }
   });
 });
 

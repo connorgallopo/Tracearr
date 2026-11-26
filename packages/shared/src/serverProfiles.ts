@@ -26,6 +26,8 @@ export interface ServerProfile {
   playerNameCountsTowardDevice: boolean;
   /** History imported for this server is linked to library items after a library sync. */
   linksImportedHistory: boolean;
+  /** An item's key can name a different item after the server's database is rebuilt, so a key recorded at play time is evidence only when the play and the item agree. */
+  reusesItemKeys: boolean;
   /** How the owner adds the server: picked from a linked Plex account, by URL and API key, picked from the owner's tofa account, which makes the key, or by a code an admin approves on the server, which makes the key. */
   addServerAuth: 'plexOAuth' | 'apiKey' | 'tofaCloud' | 'siloPairing';
   /** How members sign in: through plex.tv, with their username and password on the server, through their tofa account, by a code they approve on the server, or not at all when the server offers no sign-in Tracearr can call. */
@@ -64,6 +66,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     userIdsIdentifyInstall: false,
     playerNameCountsTowardDevice: false,
     linksImportedHistory: true,
+    reusesItemKeys: true,
     addServerAuth: 'plexOAuth',
     memberSignIn: 'plexTv',
     reportsBandwidth: true,
@@ -88,6 +91,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     userIdsIdentifyInstall: true,
     playerNameCountsTowardDevice: true,
     linksImportedHistory: false,
+    reusesItemKeys: false,
     addServerAuth: 'apiKey',
     memberSignIn: 'serverPassword',
     reportsBandwidth: false,
@@ -112,6 +116,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     userIdsIdentifyInstall: true,
     playerNameCountsTowardDevice: true,
     linksImportedHistory: false,
+    reusesItemKeys: false,
     addServerAuth: 'apiKey',
     memberSignIn: 'serverPassword',
     reportsBandwidth: false,
@@ -136,6 +141,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     userIdsIdentifyInstall: false,
     playerNameCountsTowardDevice: true,
     linksImportedHistory: false,
+    reusesItemKeys: false,
     addServerAuth: 'tofaCloud',
     memberSignIn: 'tofaCloud',
     reportsBandwidth: false,
@@ -160,6 +166,7 @@ export const SERVER_PROFILES: Record<ServerType, ServerProfile> = {
     userIdsIdentifyInstall: false,
     playerNameCountsTowardDevice: true,
     linksImportedHistory: false,
+    reusesItemKeys: false,
     addServerAuth: 'siloPairing',
     memberSignIn: 'siloPairing',
     reportsBandwidth: false,

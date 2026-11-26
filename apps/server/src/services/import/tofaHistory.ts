@@ -6,6 +6,7 @@
  */
 
 import {
+  SERVER_PROFILES,
   SESSION_LIMITS,
   type ServerHistoryImportProgress,
   type ServerHistoryImportResult,
@@ -59,7 +60,11 @@ function transformTofaHistoryRow(
   const durationMs = Math.max(endedAt.getTime() - startedAt.getTime(), 0);
   const { ratingKey, mediaType } = historyItem(row);
   const mediaTitle = mediaType === 'episode' ? (row.episode_title ?? row.title) : row.title;
-  const identity = importIdentityByKey(ctx.identity, { mediaType, title: mediaTitle, year: null });
+  const identity = importIdentityByKey(
+    ctx.identity,
+    { mediaType, title: mediaTitle, year: null },
+    SERVER_PROFILES.tofa.reusesItemKeys
+  );
   const totalDurationMs = row.duration_ms ?? null;
   const { videoDecision, audioDecision, isTranscode } = playMethodDecisions(row.play_method);
   const clientName = row.client_name ?? '';

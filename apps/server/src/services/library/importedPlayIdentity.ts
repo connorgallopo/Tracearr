@@ -102,7 +102,7 @@ interface ShowTitle {
 }
 
 /** Plex history names a show "Title (2021)" where the library item is "Title"; split the two. */
-function showTitleOf(raw: string): ShowTitle {
+export function showTitleOf(raw: string): ShowTitle {
   const title = raw.trim();
   const [, base, year] = /^(.*\S)\s*\((\d{4})\)$/.exec(title) ?? [];
   return base && year ? { title, base, year: Number(year) } : { title, base: title, year: null };

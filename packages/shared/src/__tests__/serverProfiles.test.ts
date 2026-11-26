@@ -47,6 +47,10 @@ describe('server profiles', () => {
     ]);
   });
 
+  it('only plex reuses item keys', () => {
+    expect(SERVER_TYPES.filter((t) => SERVER_PROFILES[t].reusesItemKeys)).toEqual(['plex']);
+  });
+
   it("keeps Silo's own requests and imports Silo's own history", () => {
     expect(SERVER_PROFILES.silo).toMatchObject({
       builtInRequests: true,

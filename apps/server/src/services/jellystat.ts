@@ -26,6 +26,7 @@ import type {
   TranscodeInfo,
 } from '@tracearr/shared';
 import {
+  SERVER_PROFILES,
   jellystatBackupSchema,
   jellystatLibraryEpisodeSchema,
   jellystatLibraryItemSchema,
@@ -438,7 +439,8 @@ export function transformActivityToSession(
   enrichment?: MediaEnrichment,
   identity?: SessionIdentity,
   ratingKey: string | null = activity.NowPlayingItemId,
-  thresholds?: WatchedThresholds
+  thresholds?: WatchedThresholds,
+  reusesItemKeys = false
 ): typeof sessions.$inferInsert {
   const stoppedAt = new Date(activity.ActivityDateInserted);
   const startedAt = computeActivityStartedAt(activity);
@@ -497,11 +499,15 @@ export function transformActivityToSession(
     : (streamDetails.sourceVideoDetails?.bitrate ?? null);
   // The type is evidence only when the source stated it; the SeriesName and stream
   // heuristics above are guesses that must not refuse a key the library still holds.
-  identity = importIdentityByKey(identity, {
-    mediaType: enrichment?.itemType ? mediaType : 'unknown',
-    title: activity.NowPlayingItemName,
-    year: enrichment?.year ?? null,
-  });
+  identity = importIdentityByKey(
+    identity,
+    {
+      mediaType: enrichment?.itemType ? mediaType : 'unknown',
+      title: activity.NowPlayingItemName,
+      year: enrichment?.year ?? null,
+    },
+    reusesItemKeys
+  );
 
   return {
     serverId,
@@ -984,7 +990,8 @@ export async function importJellystatBackup(
           enrichment,
           isVetoed ? undefined : identity,
           isVetoed ? null : ratingKey,
-          thresholds
+          thresholds,
+          SERVER_PROFILES[server.type].reusesItemKeys
         );
         insertBatch.push(sessionData);
 

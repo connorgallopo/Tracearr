@@ -67,11 +67,63 @@ export interface SessionIdentity {
   itemYear?: number | null;
 }
 
+/** What an import reads from the keyed item, beyond the session identity, to test a key against the play. */
+export interface ImportKeyFields {
+  itemGuid: string | null;
+  itemShowTitle: string | null;
+  itemSeason: number | null;
+  itemEpisode: number | null;
+  showTvdbId: number | null;
+  showTmdbId: number | null;
+}
+
+export type ImportKeyIdentity = SessionIdentity & ImportKeyFields;
+
+const libraryItemIdentityColumns = {
+  ratingKey: libraryItems.ratingKey,
+  mediaId: libraryItems.mediaId,
+  imdbId: libraryItems.imdbId,
+  tmdbId: libraryItems.tmdbId,
+  tvdbId: libraryItems.tvdbId,
+  parentRatingKey: libraryItems.parentRatingKey,
+  grandparentRatingKey: libraryItems.grandparentRatingKey,
+  showMediaId: media.showMediaId,
+  itemMediaType: libraryItems.mediaType,
+  itemTitle: libraryItems.title,
+  itemYear: libraryItems.year,
+};
+
+/**
+ * Container items, and items whose media row is a container, are skipped, so a rating key
+ * that points at a show, season, artist or album resolves to nothing.
+ */
+function playableLibraryItems(serverId: string, ratingKeys: string[]) {
+  return and(
+    eq(libraryItems.serverId, serverId),
+    inArray(libraryItems.ratingKey, ratingKeys),
+    notInArray(libraryItems.mediaType, [...CONTAINER_MEDIA_TYPES]),
+    or(isNull(media.mediaType), notInArray(media.mediaType, [...CONTAINER_MEDIA_TYPES]))
+  );
+}
+
+function sessionIdentityOf(r: SessionIdentity): SessionIdentity {
+  return {
+    mediaId: r.mediaId,
+    showMediaId: r.itemMediaType === 'episode' ? r.showMediaId : null,
+    imdbId: r.imdbId,
+    tmdbId: r.tmdbId,
+    tvdbId: r.tvdbId,
+    parentRatingKey: r.parentRatingKey,
+    grandparentRatingKey: r.grandparentRatingKey,
+    itemMediaType: r.itemMediaType,
+    itemTitle: r.itemTitle,
+    itemYear: r.itemYear,
+  };
+}
+
 /**
  * Batch load canonical media identity for a set of rating keys on one server
- * (eliminates a per-session lookup in the polling loop). Container items, and
- * items whose media row is a container, are skipped, so a rating key that
- * points at a show, season, artist or album resolves to nothing.
+ * (eliminates a per-session lookup in the polling loop).
  *
  * @param serverId - Server the rating keys belong to
  * @param ratingKeys - Rating keys to resolve identity for
@@ -85,45 +137,55 @@ export async function batchGetLibraryItemIdentity(
   if (ratingKeys.length === 0) return result;
 
   const rows = await db
+    .select(libraryItemIdentityColumns)
+    .from(libraryItems)
+    .leftJoin(media, eq(media.id, libraryItems.mediaId))
+    .where(playableLibraryItems(serverId, ratingKeys));
+
+  for (const r of rows) result.set(r.ratingKey, sessionIdentityOf(r));
+  return result;
+}
+
+/**
+ * The same lookup for an import, which also reads what it tests a key against: the item's
+ * guid, show title and numbers, and the show's ids through its merge winner.
+ */
+export async function batchGetImportKeyIdentity(
+  serverId: string,
+  ratingKeys: string[]
+): Promise<Map<string, ImportKeyIdentity>> {
+  const result = new Map<string, ImportKeyIdentity>();
+  if (ratingKeys.length === 0) return result;
+
+  const keyedShow = alias(media, 'keyed_show');
+  const show = alias(media, 'show_media');
+  const rows = await db
     .select({
-      ratingKey: libraryItems.ratingKey,
-      mediaId: libraryItems.mediaId,
-      imdbId: libraryItems.imdbId,
-      tmdbId: libraryItems.tmdbId,
-      tvdbId: libraryItems.tvdbId,
-      parentRatingKey: libraryItems.parentRatingKey,
-      grandparentRatingKey: libraryItems.grandparentRatingKey,
-      showMediaId: media.showMediaId,
-      itemMediaType: libraryItems.mediaType,
-      itemTitle: libraryItems.title,
-      itemYear: libraryItems.year,
+      ...libraryItemIdentityColumns,
+      itemGuid: libraryItems.plexGuid,
+      itemShowTitle: libraryItems.grandparentTitle,
+      itemSeason: libraryItems.parentIndex,
+      itemEpisode: libraryItems.itemIndex,
+      showTvdbId: show.tvdbId,
+      showTmdbId: show.tmdbId,
     })
     .from(libraryItems)
     .leftJoin(media, eq(media.id, libraryItems.mediaId))
-    .where(
-      and(
-        eq(libraryItems.serverId, serverId),
-        inArray(libraryItems.ratingKey, ratingKeys),
-        notInArray(libraryItems.mediaType, [...CONTAINER_MEDIA_TYPES]),
-        or(isNull(media.mediaType), notInArray(media.mediaType, [...CONTAINER_MEDIA_TYPES]))
-      )
-    );
+    .leftJoin(keyedShow, eq(keyedShow.id, media.showMediaId))
+    .leftJoin(show, eq(show.id, sql`coalesce(${keyedShow.mergedIntoId}, ${keyedShow.id})`))
+    .where(playableLibraryItems(serverId, ratingKeys));
 
   for (const r of rows) {
     result.set(r.ratingKey, {
-      mediaId: r.mediaId,
-      showMediaId: r.itemMediaType === 'episode' ? r.showMediaId : null,
-      imdbId: r.imdbId,
-      tmdbId: r.tmdbId,
-      tvdbId: r.tvdbId,
-      parentRatingKey: r.parentRatingKey,
-      grandparentRatingKey: r.grandparentRatingKey,
-      itemMediaType: r.itemMediaType,
-      itemTitle: r.itemTitle,
-      itemYear: r.itemYear,
+      ...sessionIdentityOf(r),
+      itemGuid: r.itemGuid,
+      itemShowTitle: r.itemShowTitle,
+      itemSeason: r.itemSeason,
+      itemEpisode: r.itemEpisode,
+      showTvdbId: r.showTvdbId,
+      showTmdbId: r.showTmdbId,
     });
   }
-
   return result;
 }
 

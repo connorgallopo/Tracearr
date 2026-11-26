@@ -7,6 +7,7 @@
 
 import {
   REDIS_KEYS,
+  SERVER_PROFILES,
   SESSION_LIMITS,
   type ServerHistoryImportProgress,
   type ServerHistoryImportResult,
@@ -71,11 +72,11 @@ function transformSiloHistoryRow(
   ctx: HistoryPlayContext
 ): typeof sessions.$inferInsert {
   const { mediaType } = play;
-  const identity = importIdentityByKey(ctx.identity, {
-    mediaType,
-    title: row.media_title,
-    year: null,
-  });
+  const identity = importIdentityByKey(
+    ctx.identity,
+    { mediaType, title: row.media_title, year: null },
+    SERVER_PROFILES.silo.reusesItemKeys
+  );
   const durationMs = Math.round(siloWatchedSeconds(row) * 1000);
   const progressMs = Math.round(row.end_position_seconds * 1000);
   const totalDurationMs =

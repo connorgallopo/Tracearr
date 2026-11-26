@@ -28,7 +28,6 @@ import {
   TautulliUsersResponseSchema,
   isFatalImportError,
   mapStreamDataToSession,
-  parseHistoryGuid,
   type TautulliHistoryRecord,
   type TautulliUserRecord,
 } from '../tautulli.js';
@@ -41,7 +40,7 @@ import {
   enqueueServerLocationSyncIfBehind,
 } from '../../jobs/maintenanceQueue.js';
 import {
-  batchGetLibraryItemIdentity,
+  batchGetImportKeyIdentity,
   batchResolveMediaByPlexGuid,
 } from '../../jobs/poller/database.js';
 import {
@@ -98,7 +97,7 @@ vi.mock('../serverLocations.js', () => ({
 }));
 
 vi.mock('../../jobs/poller/database.js', () => ({
-  batchGetLibraryItemIdentity: vi.fn(async () => new Map()),
+  batchGetImportKeyIdentity: vi.fn(async () => new Map()),
   batchResolveMediaByPlexGuid: vi.fn(async () => new Map()),
 }));
 
@@ -1266,32 +1265,6 @@ describe('TautulliUsersResponseSchema', () => {
 });
 
 // ============================================================================
-// GUID PARSING TESTS
-// ============================================================================
-
-describe('parseHistoryGuid', () => {
-  it('parses legacy tvdb agent guids at series level', () => {
-    expect(parseHistoryGuid('com.plexapp.agents.thetvdb://121361/6/1?lang=en')).toEqual({
-      tvdbId: 121361,
-    });
-  });
-  it('parses legacy tmdb agent guids', () => {
-    expect(parseHistoryGuid('com.plexapp.agents.themoviedb://584?lang=en')).toEqual({
-      tmdbId: 584,
-    });
-  });
-  it('parses legacy imdb agent guids', () => {
-    expect(parseHistoryGuid('com.plexapp.agents.imdb://tt0322259?lang=en')).toEqual({
-      imdbId: 'tt0322259',
-    });
-  });
-  it('returns empty for new-style plex guids and null', () => {
-    expect(parseHistoryGuid('plex://movie/5d776b59ad5437001f79c6f8')).toEqual({});
-    expect(parseHistoryGuid(null)).toEqual({});
-  });
-});
-
-// ============================================================================
 // FIELD MAPPING TESTS
 // ============================================================================
 
@@ -2342,7 +2315,9 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
       new Map([[String(REAL_MOVIE_RECORD.user_id), SERVER_USER_ID]])
     );
     vi.mocked(getServerTrackingStart).mockResolvedValue(CUTOFF);
-    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ machineIdentifier: PMS_ID }]));
+    vi.mocked(db.select).mockReturnValue(
+      queryChain(vi.fn, [{ type: 'plex', machineIdentifier: PMS_ID }])
+    );
     vi.mocked(queryExistingByExternalIds).mockResolvedValue(new Map());
     vi.mocked(queryExistingByTimeKeys).mockResolvedValue(new Map());
     vi.mocked(flushInsertBatch).mockResolvedValue(0);
@@ -2999,7 +2974,9 @@ describe('TautulliService.importHistory Plex guid fallback', () => {
       new Map([[String(REAL_MOVIE_RECORD.user_id), SERVER_USER_ID]])
     );
     vi.mocked(getServerTrackingStart).mockResolvedValue(CUTOFF);
-    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ machineIdentifier: PMS_ID }]));
+    vi.mocked(db.select).mockReturnValue(
+      queryChain(vi.fn, [{ type: 'plex', machineIdentifier: PMS_ID }])
+    );
     vi.mocked(queryExistingByExternalIds).mockResolvedValue(new Map());
     vi.mocked(queryExistingByTimeKeys).mockResolvedValue(new Map());
     vi.mocked(flushInsertBatch).mockResolvedValue(0);
@@ -3048,7 +3025,9 @@ describe('TautulliService.importHistory Plex guid fallback', () => {
   ])('never falls back to guid when $label', async ({ tracearr }) => {
     const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };
     global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
-    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ machineIdentifier: tracearr }]));
+    vi.mocked(db.select).mockReturnValue(
+      queryChain(vi.fn, [{ type: 'plex', machineIdentifier: tracearr }])
+    );
     let inserted: Array<Record<string, unknown>> | undefined;
     vi.mocked(flushInsertBatch).mockImplementation(async (batch) => {
       inserted = [...(batch as Array<Record<string, unknown>>)];
@@ -3081,8 +3060,10 @@ describe('TautulliService.importHistory Plex guid fallback', () => {
   it('still links by rating key when Tautulli monitors a different Plex server', async () => {
     const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };
     global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
-    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ machineIdentifier: 'pms-other' }]));
-    vi.mocked(batchGetLibraryItemIdentity).mockResolvedValueOnce(
+    vi.mocked(db.select).mockReturnValue(
+      queryChain(vi.fn, [{ type: 'plex', machineIdentifier: 'pms-other' }])
+    );
+    vi.mocked(batchGetImportKeyIdentity).mockResolvedValueOnce(
       new Map([
         [
           String(REAL_MOVIE_RECORD.rating_key),
@@ -3095,6 +3076,12 @@ describe('TautulliService.importHistory Plex guid fallback', () => {
             parentRatingKey: null,
             grandparentRatingKey: null,
             itemMediaType: 'movie',
+            itemGuid: null,
+            itemShowTitle: null,
+            itemSeason: null,
+            itemEpisode: null,
+            showTvdbId: null,
+            showTmdbId: null,
           },
         ],
       ])
@@ -3115,7 +3102,7 @@ describe('TautulliService.importHistory Plex guid fallback', () => {
     const ratingKeyStr = String(REAL_MOVIE_RECORD.rating_key);
     const record = { ...REAL_MOVIE_RECORD, started: Math.floor(CUTOFF.getTime() / 1000) - 3600 };
     global.fetch = mockTautulliFetch([record]) as typeof global.fetch;
-    vi.mocked(batchGetLibraryItemIdentity).mockResolvedValue(
+    vi.mocked(batchGetImportKeyIdentity).mockResolvedValue(
       new Map([
         [
           ratingKeyStr,
@@ -3128,6 +3115,12 @@ describe('TautulliService.importHistory Plex guid fallback', () => {
             parentRatingKey: null,
             grandparentRatingKey: null,
             itemMediaType: 'movie',
+            itemGuid: null,
+            itemShowTitle: null,
+            itemSeason: null,
+            itemEpisode: null,
+            showTvdbId: null,
+            showTmdbId: null,
           },
         ],
       ])

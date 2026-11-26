@@ -6,10 +6,11 @@
  * does not already track.
  */
 
-import type {
-  PlaybackReportingImportProgress,
-  PlaybackReportingImportResult,
-  JellyfinEmbyServerType,
+import {
+  SERVER_PROFILES,
+  type PlaybackReportingImportProgress,
+  type PlaybackReportingImportResult,
+  type JellyfinEmbyServerType,
 } from '@tracearr/shared';
 import { UnrecoverableError } from 'bullmq';
 import { and, eq, sql } from 'drizzle-orm';
@@ -205,11 +206,11 @@ export function transformPlaybackReportingRow(
 
   const totalDurationMs = ctx.enrichment?.runtimeMs ?? null;
   const threshold = watchedThresholdFor(ctx.thresholds, mediaType);
-  const identity = importIdentityByKey(ctx.identity, {
-    mediaType,
-    title: mediaTitle,
-    year: ctx.enrichment?.year ?? null,
-  });
+  const identity = importIdentityByKey(
+    ctx.identity,
+    { mediaType, title: mediaTitle, year: ctx.enrichment?.year ?? null },
+    SERVER_PROFILES[ctx.serverType].reusesItemKeys
+  );
   const watched = totalDurationMs != null && durationMs >= totalDurationMs * threshold;
 
   const { videoDecision, audioDecision, isTranscode } = parseJellystatPlayMethod(
