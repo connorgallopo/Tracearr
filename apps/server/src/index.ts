@@ -171,6 +171,7 @@ import {
   startMaintenanceWorker,
   shutdownMaintenanceQueue,
   enqueueServerLocationSyncIfBehind,
+  enqueueImportedLinkRepairIfBehind,
   seedSnapshotsNormalizedAt,
 } from './jobs/maintenanceQueue.js';
 import {
@@ -1054,6 +1055,9 @@ async function initializeServices(app: FastifyInstance) {
   // Picks up a sync lost to a restart or a busy queue, and the first run after upgrading
   void enqueueServerLocationSyncIfBehind().catch((err: unknown) => {
     app.log.error({ err }, 'Failed to check for a pending server location sync');
+  });
+  void enqueueImportedLinkRepairIfBehind().catch((err: unknown) => {
+    app.log.error({ err }, 'Failed to check for a pending imported link repair');
   });
 
   // Size the pg pool from the server's real max_connections and the live

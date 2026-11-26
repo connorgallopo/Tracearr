@@ -422,7 +422,8 @@
     "deletesData": "데이터가 영구 삭제됩니다.",
     "deletesDataDesc": "삭제된 행은 복원할 수 없습니다. 확실하지 않다면 먼저 백업하세요.",
     "automatic": "자동",
-    "startJob": "작업 시작"
+    "startJob": "작업 시작",
+    "repairHeld": ""
   },
   "memberLogin": {
     "serverActivity": "",

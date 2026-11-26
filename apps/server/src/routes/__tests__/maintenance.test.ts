@@ -10,7 +10,7 @@
  * - GET /maintenance/history - Get recent job history
  */
 
-import { describe, it, expect, afterEach, vi } from 'vitest';
+import { describe, it, expect, afterEach, beforeEach, vi } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import sensible from '@fastify/sensible';
 import { randomUUID } from 'node:crypto';
@@ -25,7 +25,13 @@ vi.mock('../../jobs/maintenanceQueue.js', () => ({
   getMaintenanceJobHistory: vi.fn(),
 }));
 
+vi.mock('../../services/settings.js', () => ({ getSetting: vi.fn() }));
+vi.mock('../../db/client.js', () => ({ db: { select: vi.fn() } }));
+
 // Import mocked modules
+import { getSetting } from '../../services/settings.js';
+import { db } from '../../db/client.js';
+import { queryChain } from '../../test/helpers.js';
 import {
   enqueueMaintenanceJob,
   getMaintenanceProgress,
@@ -62,8 +68,20 @@ const viewerUser: AuthUser = {
   serverIds: [],
 };
 
+const REPAIR_STATE = {
+  version: 1,
+  autoAttempts: 0,
+  attemptsResetFor: 1,
+  refreshFrom: null,
+  breaker: null,
+};
+
 describe('Maintenance Routes', () => {
   let app: FastifyInstance;
+
+  beforeEach(() => {
+    vi.mocked(getSetting).mockResolvedValue(REPAIR_STATE as never);
+  });
 
   afterEach(async () => {
     await app?.close();
@@ -151,6 +169,34 @@ describe('Maintenance Routes', () => {
       );
       expect(rebuildJob).toBeDefined();
       expect(rebuildJob.name).toBe('Rebuild TimescaleDB Views');
+    });
+
+    it('the jobs list reports a held server', async () => {
+      const kept = randomUUID();
+      vi.mocked(getSetting).mockResolvedValue({
+        ...REPAIR_STATE,
+        breaker: {
+          at: '2026-11-25T00:00:00.000Z',
+          servers: [
+            { serverId: kept, candidates: 501, linked: 600 },
+            { serverId: randomUUID(), candidates: 700, linked: 800 },
+          ],
+        },
+      } as never);
+      vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, [{ id: kept, name: 'Living Room' }]));
+      app = await buildTestApp(ownerUser);
+
+      const held = async () =>
+        (await app.inject({ method: 'GET', url: '/maintenance/jobs' }))
+          .json()
+          .jobs.find((j: { type: string }) => j.type === 'repair_imported_links').held;
+
+      expect(await held()).toEqual([
+        { serverId: kept, serverName: 'Living Room', candidates: 501, linked: 600 },
+      ]);
+
+      vi.mocked(getSetting).mockResolvedValue(REPAIR_STATE as never);
+      expect(await held()).toEqual([]);
     });
 
     it('rejects non-owner accessing jobs list', async () => {

@@ -2365,7 +2365,8 @@ export type MaintenanceJobType =
   | 'remove_import_duplicates'
   | 'link_imported_history'
   | 'sync_server_locations'
-  | 'backfill_tofa_profiles';
+  | 'backfill_tofa_profiles'
+  | 'repair_imported_links';
 
 export type MaintenanceJobStatus = 'idle' | 'waiting' | 'running' | 'complete' | 'error';
 

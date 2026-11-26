@@ -428,7 +428,8 @@
     "deletesData": "",
     "deletesDataDesc": "",
     "automatic": "",
-    "startJob": "Почати роботу"
+    "startJob": "Почати роботу",
+    "repairHeld": ""
   },
   "memberLogin": {
     "serverActivity": "",

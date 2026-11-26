@@ -1,12 +1,15 @@
 /**
- * The repair's unlink steps on real TimescaleDB: which imported links they clear, what they log,
- * and that a history with nothing to repair is read without a write or a decompressed chunk.
+ * The repair on real TimescaleDB: which imported links its unlink steps clear and what they log,
+ * that a history with nothing to repair is read without a write or a decompressed chunk, and the
+ * job: relinking through the import resolver, the breaker, the aggregate refresh and the lock.
  *
  * Run with: pnpm --filter @tracearr/server test:integration importedLinkRepair
  */
 
 import { randomUUID } from 'node:crypto';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Job } from 'bullmq';
+import { Redis } from 'ioredis';
 import { sql } from 'drizzle-orm';
 import {
   createTestLibraryItem,
@@ -25,10 +28,64 @@ import {
   breakerTrips,
   countRepairCandidates,
   hasRepairableRows,
+  runImportedLinkRepair,
   unlinkByRule,
   unlinkFoldPairs,
 } from '../../src/jobs/importedLinkRepair.js';
+import { acquireHeavyOpsLock, initHeavyOpsLock } from '../../src/jobs/heavyOpsLock.js';
+import {
+  enqueueMaintenanceJob,
+  getMaintenanceJobStatus,
+  initMaintenanceQueue,
+  obliterateMaintenanceQueue,
+  processImportedLinkRepairJob,
+  shutdownMaintenanceQueue,
+  startMaintenanceWorker,
+  type MaintenanceJobData,
+} from '../../src/jobs/maintenanceQueue.js';
+import { getSetting, resetSettingsCache } from '../../src/services/settings.js';
 import type { KeyedPlay, LinkedMedia } from '../../src/services/import/libraryKeyMatch.js';
+
+const gate = vi.hoisted(() => ({
+  hold: null as Promise<void> | null,
+  reached: () => {},
+  failResolve: false,
+  refreshes: [] as Array<{ aggregate: string; start: Date }>,
+}));
+vi.mock('../../src/db/timescale.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/db/timescale.js')>();
+  return {
+    ...actual,
+    safeFullRefreshAggregate: (...args: Parameters<typeof actual.safeFullRefreshAggregate>) => {
+      gate.refreshes.push({ aggregate: args[0], start: args[1] });
+      return actual.safeFullRefreshAggregate(...args);
+    },
+  };
+});
+vi.mock('../../src/services/library/importedPlayIdentity.js', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('../../src/services/library/importedPlayIdentity.js')>();
+  return {
+    ...actual,
+    resolveImportedPlays: (...args: Parameters<typeof actual.resolveImportedPlays>) => {
+      if (gate.failResolve) throw new Error('resolver unavailable');
+      return actual.resolveImportedPlays(...args);
+    },
+  };
+});
+vi.mock('../../src/jobs/sessionWalk.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../src/jobs/sessionWalk.js')>();
+  return {
+    ...actual,
+    sessionWalkWindows: async (minStart: Date | null) => {
+      if (gate.hold) {
+        gate.reached();
+        await gate.hold;
+      }
+      return actual.sessionWalkWindows(minStart);
+    },
+  };
+});
 
 const LIMIT = 1000;
 
@@ -687,4 +744,476 @@ describe('imported link repair: unlink steps', () => {
       expect(await logCount()).toBe(1);
     }
   );
+});
+
+function repairJob(trigger: 'auto' | 'manual'): Job<MaintenanceJobData> {
+  return {
+    id: `test-repair-${trigger}`,
+    token: 'test-token',
+    data: {
+      type: 'repair_imported_links',
+      userId: trigger === 'auto' ? 'system' : 'owner',
+      options: trigger === 'auto' ? { trigger } : undefined,
+    },
+    updateProgress: async () => undefined,
+    extendLock: async () => undefined,
+  } as unknown as Job<MaintenanceJobData>;
+}
+
+const fullRun = () =>
+  runImportedLinkRepair({
+    skipBreaker: false,
+    onBatch: async () => {},
+    onCommit: () => {},
+    beforeUnlink: async () => {},
+  });
+
+/** The titles of the media a play is linked to and of its show. */
+async function linkOf(sessionId: string) {
+  const { rows } = await db.execute(sql`
+    SELECT m.title AS media, sh.title AS show
+    FROM sessions s
+    LEFT JOIN media m ON m.id = s.media_id
+    LEFT JOIN media sh ON sh.id = s.show_media_id
+    WHERE s.id = ${sessionId}::uuid
+  `);
+  const [row] = rows as Array<{ media: string | null; show: string | null }>;
+  if (!row) throw new Error(`no session ${sessionId}`);
+  return row;
+}
+
+/** Row versions of every session and log row; any write changes one. */
+async function rowVersions() {
+  const { rows } = await db.execute(sql`
+    SELECT 'session:' || id AS id, xmin::text AS v FROM sessions
+    UNION ALL SELECT 'log:' || session_id, xmin::text FROM session_link_repairs
+    ORDER BY 1
+  `);
+  return rows;
+}
+
+const numbersCases = REPAIR_CASES.filter((c) => c.clause === 'numbers');
+
+describe('imported link repair: relink and the job', () => {
+  beforeEach(() => {
+    resetSettingsCache();
+    gate.failResolve = false;
+    gate.hold = null;
+    gate.refreshes = [];
+  });
+
+  it('relinks unlinked rows to their own show', async () => {
+    const owner = await account('plex');
+    const seeded = [];
+    for (const c of numbersCases) seeded.push({ c, ...(await seed(owner, c.link, c.play)) });
+
+    const result = await fullRun();
+
+    expect(result).toMatchObject({
+      unlinked: numbersCases.length,
+      relinked: numbersCases.length,
+      trippedServers: [],
+    });
+    for (const { c, sessionId } of seeded) {
+      expect({ name: c.name, show: (await linkOf(sessionId)).show }).toEqual({
+        name: c.name,
+        show: c.play.grandparentTitle,
+      });
+      const log = await logOf(sessionId);
+      expect(log).toHaveLength(1);
+      expect(log[0]?.relinked_at).not.toBeNull();
+    }
+  });
+
+  it('does not relink a movie by the ids the bad link copied', async () => {
+    const owner = await account('plex');
+    const c = REPAIR_CASES.find((r) => r.clause === 'movie');
+    if (!c) throw new Error('no movie case');
+    const { sessionId, mediaId } = await seed(owner, c.link, c.play);
+    await db.execute(
+      sql`UPDATE media SET imdb_id = 'tt0285331', tmdb_id = 46952 WHERE id = ${mediaId}::uuid`
+    );
+
+    await fullRun();
+
+    const after = await stateOf(sessionId);
+    expect(after.media_id).not.toBe(mediaId);
+    expect(after.imdb_id).toBeNull();
+    if (after.media_id) expect((await linkOf(sessionId)).media).toBe(c.play.title);
+  });
+
+  it('resumes after stopping between steps', async () => {
+    const stopped = await account('plex');
+    const straight = await account('plex');
+    const pairs = [];
+    for (const c of numbersCases) {
+      pairs.push({
+        stopped: (await seed(stopped, c.link, c.play)).sessionId,
+        straight: (await seed(straight, c.link, c.play)).sessionId,
+      });
+    }
+
+    expect((await unlinkByRule([stopped.serverId], null, LIMIT)).count).toBe(numbersCases.length);
+    await unlinkFoldPairs([stopped.serverId], null, LIMIT);
+    await fullRun();
+
+    for (const pair of pairs) {
+      expect(await linkOf(pair.stopped)).toEqual(await linkOf(pair.straight));
+      expect((await logOf(pair.stopped))[0]?.relinked_at).not.toBeNull();
+      expect((await logOf(pair.straight))[0]?.relinked_at).not.toBeNull();
+    }
+  });
+
+  it('never relinks a play to the media it was unlinked from', async () => {
+    const owner = await account('plex');
+    const outOfScope = await account('jellyfin');
+    const blacklist = await insertMedia({
+      mediaType: 'show',
+      matchKey: `show:local:${randomUUID()}`,
+      title: 'The Blacklist',
+    });
+    const play: KeyedPlay = {
+      mediaType: 'episode',
+      grandparentTitle: 'SpongeBob SquarePants',
+      seasonNumber: 12,
+      episodeNumber: 22,
+      title: 'Big Bad Bubble Bass',
+      year: null,
+      guid: null,
+    };
+    const folded = await insertMedia({
+      mediaType: 'episode',
+      matchKey: `episode:${blacklist}:s12e22`,
+      title: 'Big Bad Bubble Bass',
+      showMediaId: blacklist,
+    });
+    const sessionId = await importedPlay(owner, play, folded, blacklist);
+    // A play the repair never touches keeps the title folded onto the wrong show.
+    await importedPlay(outOfScope, play, folded, blacklist);
+    await db.execute(sql`
+      INSERT INTO session_link_repairs (session_id, started_at, repair_version, server_id, clause,
+        grandparent_title, show_media_id)
+      VALUES (${randomUUID()}::uuid, now(), ${IMPORTED_LINK_REPAIR_VERSION}, ${owner.serverId}::uuid,
+        'numbers', 'SpongeBob SquarePants', ${blacklist}::uuid)
+    `);
+
+    expect(await fullRun()).toMatchObject({ foldUnlinked: 1, relinked: 0 });
+
+    expect(await stateOf(sessionId)).toMatchObject(cleared);
+    expect((await logOf(sessionId))[0]?.relinked_at).toBeNull();
+  });
+
+  it('does not relink under a show with another title', async () => {
+    const owner = await account('plex');
+    const outOfScope = await account('jellyfin');
+    const c = numbersCases[0];
+    if (!c) throw new Error('no numbers case');
+    const { sessionId, mediaId, showId } = await seed(owner, c.link, c.play);
+    // A play the repair never touches keeps the title folded onto The Blacklist.
+    await importedPlay(outOfScope, c.play, mediaId, showId);
+
+    expect(await fullRun()).toMatchObject({ unlinked: 1, relinked: 0 });
+
+    expect(await stateOf(sessionId)).toMatchObject(cleared);
+    expect((await logOf(sessionId))[0]?.relinked_at).toBeNull();
+  });
+
+  it('relinks a row unlinked again after its relink', async () => {
+    const owner = await account('plex');
+    const c = numbersCases[0];
+    if (!c) throw new Error('no numbers case');
+    const { sessionId, mediaId, showId } = await seed(owner, c.link, c.play);
+    await fullRun();
+    const [first] = await logOf(sessionId);
+
+    await db.execute(sql`
+      UPDATE sessions SET media_id = ${mediaId}::uuid, show_media_id = ${showId}::uuid
+      WHERE id = ${sessionId}::uuid
+    `);
+    expect((await unlinkByRule([owner.serverId], null, LIMIT)).count).toBe(1);
+    expect(await logOf(sessionId)).toEqual([{ ...first, relinked_at: null }]);
+
+    expect((await fullRun()).relinked).toBe(1);
+    expect((await linkOf(sessionId)).show).toBe(c.play.grandparentTitle);
+  });
+
+  it('refreshes the daily aggregate from the oldest repaired play', async () => {
+    const owner = await account('plex');
+    const startedAt = new Date(Date.now() - 30 * 86_400_000);
+    const blacklistShows: string[] = [];
+    for (const c of numbersCases) {
+      const { sessionId, showId } = await seed(owner, c.link, c.play, startedAt);
+      if (showId) blacklistShows.push(showId);
+      await db.execute(sql`
+        UPDATE sessions SET duration_ms = 1200000, total_duration_ms = 1300000,
+          progress_ms = 1200000, watched = true, stopped_at = started_at + interval '20 minutes'
+        WHERE id = ${sessionId}::uuid
+      `);
+    }
+    await db.execute(
+      sql`CALL refresh_continuous_aggregate('user_media_plays_daily'::regclass, NULL, NULL)`
+    );
+    const underBlacklist = async () =>
+      (
+        (
+          await db.execute(sql`
+            SELECT count(*)::int AS n FROM user_media_plays_daily
+            WHERE show_media_id = ANY(${sql.param(blacklistShows)}::uuid[])
+          `)
+        ).rows[0] as { n: number }
+      ).n;
+    expect(await underBlacklist()).toBe(numbersCases.length);
+
+    await processImportedLinkRepairJob(repairJob('auto'));
+
+    expect(await underBlacklist()).toBe(0);
+    expect(await getSetting('importedLinkRepair')).toMatchObject({
+      version: IMPORTED_LINK_REPAIR_VERSION,
+      refreshFrom: null,
+      breaker: null,
+    });
+  });
+
+  it('refreshes from the stored start after a run stopped after unlinking', async () => {
+    const owner = await account('plex');
+    const c = numbersCases[0];
+    if (!c) throw new Error('no numbers case');
+    const older = new Date(Date.now() - 40 * 86_400_000);
+    const unplaceable = await seed(
+      owner,
+      {
+        mediaType: 'episode',
+        title: 'Kings of the Highway',
+        year: 2015,
+        showTitle: 'The Blacklist',
+        numbers: [],
+      },
+      {
+        mediaType: 'episode',
+        grandparentTitle: 'SpongeBob SquarePants',
+        seasonNumber: null,
+        episodeNumber: null,
+        title: 'The Krusty Slammer',
+        year: 2019,
+        guid: null,
+      },
+      older
+    );
+    const placeable = await seed(owner, c.link, c.play, new Date(Date.now() - 10 * 86_400_000));
+
+    gate.failResolve = true;
+    await expect(processImportedLinkRepairJob(repairJob('auto'))).rejects.toThrow(
+      'resolver unavailable'
+    );
+    expect((await stateOf(unplaceable.sessionId)).media_id).toBeNull();
+    const { refreshFrom } = await getSetting('importedLinkRepair');
+    expect(refreshFrom && new Date(refreshFrom).getTime()).toBe(older.getTime());
+
+    gate.failResolve = false;
+    gate.refreshes = [];
+    const result = await processImportedLinkRepairJob(repairJob('auto'));
+
+    expect(result).toMatchObject({ success: true, updated: 1 });
+    expect((await linkOf(placeable.sessionId)).show).toBe(c.play.grandparentTitle);
+    expect(gate.refreshes.length).toBeGreaterThan(0);
+    expect(gate.refreshes.every((r) => r.start.getTime() === older.getTime())).toBe(true);
+    expect((await getSetting('importedLinkRepair')).refreshFrom).toBeNull();
+  });
+
+  it('stores the refresh start before the unlink transaction opens', async () => {
+    const owner = await account('plex');
+    const c = numbersCases[0];
+    if (!c) throw new Error('no numbers case');
+    const startedAt = new Date(Date.now() - 20 * 86_400_000);
+    const { sessionId, mediaId } = await seed(owner, c.link, c.play, startedAt);
+    await db.execute(sql`
+      CREATE FUNCTION fail_repair_log() RETURNS trigger LANGUAGE plpgsql AS
+        $$ BEGIN RAISE EXCEPTION 'repair log unavailable'; END $$
+    `);
+    await db.execute(sql`
+      CREATE TRIGGER fail_repair_log BEFORE INSERT ON session_link_repairs
+        FOR EACH ROW EXECUTE FUNCTION fail_repair_log()
+    `);
+    try {
+      await expect(processImportedLinkRepairJob(repairJob('auto'))).rejects.toThrow();
+    } finally {
+      await db.execute(sql`DROP TRIGGER fail_repair_log ON session_link_repairs`);
+      await db.execute(sql`DROP FUNCTION fail_repair_log()`);
+    }
+
+    expect((await stateOf(sessionId)).media_id).toBe(mediaId);
+    expect(await logCount()).toBe(0);
+    const { refreshFrom } = await getSetting('importedLinkRepair');
+    expect(refreshFrom && new Date(refreshFrom).getTime()).toBe(startedAt.getTime());
+  });
+
+  it('counts automatic runs when they start and never manual ones', async () => {
+    const owner = await account('plex');
+    const c = numbersCases[0];
+    if (!c) throw new Error('no numbers case');
+    await seed(owner, c.link, c.play);
+    const attempts = async () => {
+      resetSettingsCache();
+      return (await getSetting('importedLinkRepair')).autoAttempts;
+    };
+
+    gate.failResolve = true;
+    await expect(processImportedLinkRepairJob(repairJob('manual'))).rejects.toThrow();
+    expect(await attempts()).toBe(0);
+    await expect(processImportedLinkRepairJob(repairJob('auto'))).rejects.toThrow();
+    expect(await attempts()).toBe(1);
+
+    // Held inside the walk, before any outcome: the run already counts.
+    gate.failResolve = false;
+    let release = () => {};
+    gate.hold = new Promise<void>((resolve) => (release = resolve));
+    const reached = new Promise<void>((resolve) => (gate.reached = resolve));
+    const held = processImportedLinkRepairJob(repairJob('auto'));
+    await reached;
+    expect(await attempts()).toBe(2);
+    gate.hold = null;
+    release();
+    await held;
+
+    await processImportedLinkRepairJob(repairJob('manual'));
+    expect(await attempts()).toBe(2);
+  });
+
+  it('a run with nothing new refreshes no aggregate', async () => {
+    const owner = await account('plex');
+    for (const c of numbersCases) await seed(owner, c.link, c.play);
+    await processImportedLinkRepairJob(repairJob('manual'));
+    expect(gate.refreshes.length).toBeGreaterThan(0);
+
+    gate.refreshes = [];
+    const again = await processImportedLinkRepairJob(repairJob('manual'));
+
+    expect(again).toMatchObject({ success: true, updated: 0 });
+    expect(gate.refreshes).toEqual([]);
+  });
+
+  it('a second run changes nothing', async () => {
+    const owner = await account('plex');
+    for (const c of REPAIR_CASES) await seed(owner, c.link, c.play);
+    // Without numbers an episode never names a show, so the resolver cannot place it.
+    const unplaceable = await seed(
+      owner,
+      {
+        mediaType: 'episode',
+        title: 'Kings of the Highway',
+        year: 2015,
+        showTitle: 'The Blacklist',
+        numbers: [],
+      },
+      {
+        mediaType: 'episode',
+        grandparentTitle: 'SpongeBob SquarePants',
+        seasonNumber: null,
+        episodeNumber: null,
+        title: 'The Krusty Slammer',
+        year: 2019,
+        guid: null,
+      }
+    );
+    expect((await fullRun()).relinked).toBeGreaterThan(0);
+    expect((await stateOf(unplaceable.sessionId)).media_id).toBeNull();
+    expect((await logOf(unplaceable.sessionId))[0]?.relinked_at).toBeNull();
+    const before = await rowVersions();
+
+    expect(await fullRun()).toMatchObject({ unlinked: 0, foldUnlinked: 0, relinked: 0 });
+
+    expect(await rowVersions()).toEqual(before);
+  });
+
+  it(
+    'the automatic run honors the breaker and the manual run does not',
+    { timeout: 120_000 },
+    async () => {
+      const owner = await account('plex');
+      const candidate = numbersCases[0];
+      const kept = REPAIR_CASES.find((c) => c.clause === null);
+      if (!candidate || !kept) throw new Error('missing cases');
+      const copies = async (sessionId: string, n: number) =>
+        db.execute(sql`
+          INSERT INTO sessions
+          SELECT (jsonb_populate_record(s, jsonb_build_object(
+            'id', gen_random_uuid(),
+            'started_at', s.started_at - g * interval '1 minute',
+            'external_session_id', 'tautulli-' || gen_random_uuid()))).*
+          FROM sessions s, generate_series(1, ${n}::int) g
+          WHERE s.id = ${sessionId}::uuid
+        `);
+      const bad = await seed(owner, candidate.link, candidate.play);
+      await copies(bad.sessionId, 500);
+      const good = await seed(owner, kept.link, kept.play);
+      await copies(good.sessionId, 98);
+      const onBlacklist = async () =>
+        (
+          (
+            await db.execute(sql`
+              SELECT count(*)::int AS n FROM sessions
+              WHERE server_id = ${owner.serverId}::uuid AND media_id = ${bad.mediaId}::uuid
+            `)
+          ).rows[0] as { n: number }
+        ).n;
+
+      const auto = await processImportedLinkRepairJob(repairJob('auto'));
+
+      expect(auto.success).toBe(true);
+      expect(await onBlacklist()).toBe(501);
+      expect(await logCount()).toBe(0);
+      expect(await getSetting('importedLinkRepair')).toMatchObject({
+        version: IMPORTED_LINK_REPAIR_VERSION,
+        breaker: { servers: [{ serverId: owner.serverId, candidates: 501, linked: 600 }] },
+      });
+
+      await processImportedLinkRepairJob(repairJob('manual'));
+
+      expect(await onBlacklist()).toBe(0);
+      expect(await logCount()).toBe(501);
+      expect((await linkOf(bad.sessionId)).show).toBe(candidate.play.grandparentTitle);
+      expect((await getSetting('importedLinkRepair')).breaker).toBeNull();
+    }
+  );
+
+  it('takes the heavy-ops lock', { timeout: 60_000 }, async () => {
+    const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:6380';
+    const redis = new Redis(redisUrl);
+    await initHeavyOpsLock(redis);
+    initMaintenanceQueue(redisUrl);
+    await obliterateMaintenanceQueue();
+    startMaintenanceWorker();
+    try {
+      const owner = await account('plex');
+      const c = numbersCases[0];
+      if (!c) throw new Error('no numbers case');
+      await seed(owner, c.link, c.play);
+      let release = () => {};
+      gate.hold = new Promise<void>((resolve) => (release = resolve));
+      const reached = new Promise<void>((resolve) => (gate.reached = resolve));
+
+      const jobId = await enqueueMaintenanceJob('repair_imported_links', 'owner');
+      await reached;
+
+      await expect(
+        acquireHeavyOpsLock('maintenance', 'another-job', 'Another job', randomUUID())
+      ).resolves.toMatchObject({
+        jobType: 'maintenance',
+        jobId,
+        description: 'Imported Plex link repair',
+      });
+
+      gate.hold = null;
+      release();
+      await vi.waitFor(
+        async () => expect((await getMaintenanceJobStatus(jobId))?.state).toBe('completed'),
+        { timeout: 30_000, interval: 200 }
+      );
+    } finally {
+      gate.hold = null;
+      await obliterateMaintenanceQueue();
+      await shutdownMaintenanceQueue();
+      redis.disconnect();
+    }
+  });
 });

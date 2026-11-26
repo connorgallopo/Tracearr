@@ -5,18 +5,31 @@
  * from the earliest committed started_at, including when the walk throws
  * after committing batches, unless the job lost its lock. Job history marks
  * system and auto-triggered jobs as automatic. The automatic location sync is
- * queued with a single attempt, and only when a server is behind.
+ * queued with a single attempt, and only when a server is behind. The imported
+ * link repair is queued once per repair version and stops after five failed
+ * automatic runs.
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach, type Mock } from 'vitest';
 import { DelayedError, UnrecoverableError, type Job } from 'bullmq';
 
-const { mockGetJobs, mockAdd } = vi.hoisted(() => ({ mockGetJobs: vi.fn(), mockAdd: vi.fn() }));
+const { mockGetJobs, mockAdd, workerHandlers } = vi.hoisted(() => ({
+  mockGetJobs: vi.fn(),
+  mockAdd: vi.fn(),
+  workerHandlers: new Map<string, (...args: unknown[]) => void>(),
+}));
 
 vi.mock('bullmq', async (importOriginal) => ({
   ...(await importOriginal<typeof import('bullmq')>()),
   Queue: vi.fn(function () {
     return { on: vi.fn(), getJobs: mockGetJobs, add: mockAdd };
+  }),
+  Worker: vi.fn(function () {
+    return {
+      on: (event: string, handler: (...args: unknown[]) => void) =>
+        workerHandlers.set(event, handler),
+      once: vi.fn(),
+    };
   }),
 }));
 
@@ -68,11 +81,14 @@ import { queryChain } from '../../test/helpers.js';
 import { extendJobLock } from '../lockUtils.js';
 import { isImportWaiting } from '../heavyOpsLock.js';
 import { getSetting, setSetting } from '../../services/settings.js';
+import { IMPORTED_LINK_REPAIR_VERSION } from '../importedLinkRepair.js';
 import {
+  enqueueImportedLinkRepairIfBehind,
   enqueueMaintenanceJob,
   enqueueServerLocationSyncIfBehind,
   getMaintenanceJobHistory,
   initMaintenanceQueue,
+  startMaintenanceWorker,
   processBackfillLibrarySnapshotsJob,
   processNormalizeLibrarySnapshotsJob,
   processFixImportedProgressJob,
@@ -361,6 +377,76 @@ describe('enqueueServerLocationSyncIfBehind', () => {
       jobId: expect.stringMatching(/^maintenance-/),
       deduplication: { id: 'maintenance' },
     });
+  });
+});
+
+describe('enqueueImportedLinkRepairIfBehind', () => {
+  const state = (fields: Record<string, unknown>) =>
+    vi.mocked(getSetting).mockResolvedValue({
+      version: 0,
+      autoAttempts: 0,
+      attemptsResetFor: 0,
+      refreshFrom: null,
+      breaker: null,
+      ...fields,
+    } as never);
+
+  beforeEach(() => {
+    vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    initMaintenanceQueue('redis://localhost:6379');
+    mockAdd.mockImplementation(async (_name: string, _data: unknown, opts: { jobId: string }) => ({
+      id: opts.jobId,
+    }));
+  });
+
+  it('queues once per version and stops at five failed auto runs', async () => {
+    const current = IMPORTED_LINK_REPAIR_VERSION;
+
+    state({ version: current - 1 });
+    await expect(enqueueImportedLinkRepairIfBehind()).resolves.toBe(true);
+    expect(mockAdd).toHaveBeenCalledWith(
+      'maintenance-repair_imported_links',
+      { type: 'repair_imported_links', userId: 'system', options: { trigger: 'auto' } },
+      expect.objectContaining({ attempts: 1 })
+    );
+
+    state({ version: current });
+    await expect(enqueueImportedLinkRepairIfBehind()).resolves.toBe(false);
+
+    state({ version: current - 1, autoAttempts: 4, attemptsResetFor: current });
+    await expect(enqueueImportedLinkRepairIfBehind()).resolves.toBe(true);
+
+    state({ version: current - 1, autoAttempts: 5, attemptsResetFor: current });
+    await expect(enqueueImportedLinkRepairIfBehind()).resolves.toBe(false);
+
+    // Failures counted for an earlier version do not hold back this one.
+    state({ version: current - 1, autoAttempts: 5, attemptsResetFor: current - 1 });
+    await expect(enqueueImportedLinkRepairIfBehind()).resolves.toBe(true);
+
+    expect(mockAdd).toHaveBeenCalledTimes(3);
+  });
+
+  it('checks again after any maintenance job completes', async () => {
+    state({ version: IMPORTED_LINK_REPAIR_VERSION - 1 });
+    vi.mocked(db.select).mockReturnValue(queryChain(vi.fn, []));
+    startMaintenanceWorker();
+
+    workerHandlers.get('completed')?.({ id: 'done', data: { type: 'normalize_players' } });
+
+    await vi.waitFor(() =>
+      expect(mockAdd).toHaveBeenCalledWith(
+        'maintenance-repair_imported_links',
+        expect.objectContaining({ type: 'repair_imported_links' }),
+        expect.objectContaining({ attempts: 1 })
+      )
+    );
+  });
+
+  it('queues nothing while another maintenance job holds the queue', async () => {
+    state({ version: IMPORTED_LINK_REPAIR_VERSION - 1 });
+    mockAdd.mockResolvedValueOnce({ id: 'maintenance-busy' });
+
+    await expect(enqueueImportedLinkRepairIfBehind()).resolves.toBe(false);
   });
 });
 

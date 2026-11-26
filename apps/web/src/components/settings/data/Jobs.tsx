@@ -52,6 +52,7 @@ import {
   Link2,
   MapPin,
   UsersRound,
+  Unlink2,
   type LucideIcon,
 } from 'lucide-react';
 import { api } from '@/lib/api';
@@ -88,6 +89,8 @@ interface JobDefinition {
   description: string;
   options?: JobOption[];
   destructive?: boolean;
+  /** Servers the imported link repair held back on its automatic run. */
+  held?: Array<{ serverId: string; serverName: string; candidates: number; linked: number }>;
 }
 
 interface JobHistoryItem {
@@ -136,6 +139,7 @@ const JOB_ICONS = {
   link_imported_history: Link2,
   sync_server_locations: MapPin,
   backfill_tofa_profiles: UsersRound,
+  repair_imported_links: Unlink2,
 } satisfies Partial<Record<MaintenanceJobType, LucideIcon>>;
 
 const CATEGORY_CONFIG = {
@@ -443,6 +447,22 @@ export function Jobs() {
                   variant="outline"
                   className={cn(isRunning && 'border-primary/30 bg-primary/5')}
                 >
+                  {job.held && job.held.length > 0 && (
+                    <div className="w-full space-y-2">
+                      {job.held.map((server) => (
+                        <Alert key={server.serverId} variant="warning">
+                          <AlertTriangle />
+                          <AlertDescription>
+                            {t('jobs.repairHeld', {
+                              server: server.serverName,
+                              count: server.candidates,
+                              percent: Math.round((server.candidates / server.linked) * 100),
+                            })}
+                          </AlertDescription>
+                        </Alert>
+                      ))}
+                    </div>
+                  )}
                   <ItemMedia
                     className={cn('size-10 rounded-lg', isRunning ? 'bg-primary/10' : 'bg-muted')}
                   >

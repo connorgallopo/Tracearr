@@ -83,6 +83,13 @@ import {
   type ImportedHistoryLinkDeps,
 } from './importedHistoryLinking.js';
 import { runServerLocationSyncWalk } from './serverLocationSync.js';
+import {
+  IMPORTED_LINK_REPAIR_VERSION,
+  IMPORTED_LINK_REPAIR_WRITES,
+  heldRepairServers,
+  runImportedLinkRepair,
+  type RepairCount,
+} from './importedLinkRepair.js';
 import { linkTofaPlayProfiles } from './tofaProfileBackfill.js';
 import {
   PROGRESS_COLUMNS,
@@ -117,6 +124,7 @@ function getMaintenanceJobDescription(type: MaintenanceJobType): string {
     link_imported_history: 'Imported history linking',
     sync_server_locations: 'Server location sync',
     backfill_tofa_profiles: 'tofa profile backfill',
+    repair_imported_links: 'Imported Plex link repair',
   };
   return descriptions[type] || type;
 }
@@ -128,7 +136,7 @@ export interface MaintenanceJobData {
   options?: {
     /** For rebuild_timescale_views: refresh all historical data (slow but complete) */
     fullRefresh?: boolean;
-    /** For link_imported_history and sync_server_locations: 'auto' when the server enqueued it; missing means manual */
+    /** For link_imported_history, sync_server_locations and repair_imported_links: 'auto' when the server enqueued it; missing means manual */
     trigger?: 'manual' | 'auto';
     /** For backfill_tofa_profiles: the server whose plays to link */
     serverId?: string;
@@ -387,6 +395,7 @@ export function startMaintenanceWorker(): void {
 
   maintenanceWorker.on('completed', () => {
     void checkServerLocationSync();
+    void checkImportedLinkRepair();
   });
 
   maintenanceWorker.on('error', (error) => {
@@ -435,6 +444,8 @@ async function processMaintenanceJob(job: Job<MaintenanceJobData>): Promise<Main
       return processSyncServerLocationsJob(job);
     case 'backfill_tofa_profiles':
       return processBackfillTofaProfilesJob(job);
+    case 'repair_imported_links':
+      return processImportedLinkRepairJob(job);
     default:
       throw new Error(`Unknown maintenance job type: ${job.data.type}`);
   }
@@ -793,6 +804,79 @@ export async function processBackfillTofaProfilesJob(
     throw error;
   }
   await setSetting('profileBackfillDoneServers', [...done, serverId]);
+  return result;
+}
+
+async function updateImportedLinkRepair(
+  patch: Partial<Awaited<ReturnType<typeof getSetting<'importedLinkRepair'>>>>
+): Promise<void> {
+  await setSetting('importedLinkRepair', { ...(await getSetting('importedLinkRepair')), ...patch });
+}
+
+/**
+ * Unlinks imported Plex plays whose link disagrees with their own fields and links them again
+ * through the import resolver. An automatic run leaves servers the breaker trips untouched and
+ * records them; a manual run repairs every server. The oldest play a run unlinked is kept in
+ * the setting as the aggregate refresh start until a refresh from it succeeds, so a run that
+ * stopped after unlinking is refreshed by the next one.
+ */
+export async function processImportedLinkRepairJob(
+  job: Job<MaintenanceJobData>
+): Promise<MaintenanceJobResult> {
+  const auto = job.data.options?.trigger === 'auto';
+  const state = await getSetting('importedLinkRepair');
+  // Counted at the start, so a run killed before it could fail still counts toward the cap.
+  const attempts = state.attemptsResetFor < IMPORTED_LINK_REPAIR_VERSION ? 0 : state.autoAttempts;
+  if (auto || state.attemptsResetFor < IMPORTED_LINK_REPAIR_VERSION) {
+    await updateImportedLinkRepair({
+      autoAttempts: attempts + (auto ? 1 : 0),
+      attemptsResetFor: IMPORTED_LINK_REPAIR_VERSION,
+    });
+  }
+  let tripped: RepairCount[] = [];
+  const result = await runSessionMaintenanceWalk(job, {
+    type: 'repair_imported_links',
+    startMessage: 'Repairing imported Plex links...',
+    progressMessage: (total) => `Repaired ${total.toLocaleString()} imported play links...`,
+    completeMessage: (_total, details) => `Completed! ${details}`,
+    resultMessage: (_total, details) => details,
+    failurePrefix: 'Imported link repair skipped',
+    totalCountsUpdates: true,
+    writes: IMPORTED_LINK_REPAIR_WRITES,
+    walk: async (onBatch, onCommit) => {
+      let stored = state.refreshFrom ? new Date(state.refreshFrom) : null;
+      onCommit(stored);
+      const repair = await runImportedLinkRepair({
+        skipBreaker: !auto,
+        onBatch,
+        onCommit,
+        beforeUnlink: async (oldest) => {
+          const start = new Date(oldest);
+          if (stored && stored <= start) return;
+          stored = start;
+          await updateImportedLinkRepair({ refreshFrom: start.toISOString() });
+        },
+      });
+      tripped = repair.trippedServers;
+      const unlinked = repair.unlinked + repair.foldUnlinked;
+      const held = tripped.length > 0 ? `, held ${tripped.length} server(s)` : '';
+      return {
+        total: unlinked + repair.relinked,
+        failedRanges: repair.failedRanges,
+        details: `Unlinked ${unlinked} imported plays and linked ${repair.relinked} again${held}`,
+      };
+    },
+  });
+  for (const server of tripped) {
+    console.warn(
+      `[Maintenance] Imported link repair held server ${server.serverId}: ${server.candidates} of ${server.linked} imported plays look linked to the wrong media`
+    );
+  }
+  await updateImportedLinkRepair({
+    version: IMPORTED_LINK_REPAIR_VERSION,
+    refreshFrom: null,
+    breaker: tripped.length > 0 ? { at: new Date().toISOString(), servers: tripped } : null,
+  });
   return result;
 }
 
@@ -2409,6 +2493,38 @@ export async function enqueueServerLocationSyncIfBehind(): Promise<boolean> {
   return jobId !== null;
 }
 
+const MAX_AUTO_IMPORTED_LINK_REPAIRS = 5;
+
+let heldServersLogged = false;
+
+/**
+ * Queues the imported link repair when its version is behind, unless automatic runs for this
+ * version started the capped number of times without one finishing. The first call in a process
+ * logs the servers the last automatic run held back.
+ */
+export async function enqueueImportedLinkRepairIfBehind(): Promise<boolean> {
+  const held = heldServersLogged ? [] : await heldRepairServers();
+  heldServersLogged = true;
+  for (const server of held) {
+    console.warn(
+      `[Maintenance] Imported link repair is holding ${server.serverName}: ${server.candidates} of ${server.linked} imported plays look linked to the wrong media. Run Repair Imported Plex Links to repair them.`
+    );
+  }
+  const state = await getSetting('importedLinkRepair');
+  const attempts = state.attemptsResetFor < IMPORTED_LINK_REPAIR_VERSION ? 0 : state.autoAttempts;
+  if (state.version >= IMPORTED_LINK_REPAIR_VERSION || attempts >= MAX_AUTO_IMPORTED_LINK_REPAIRS) {
+    return false;
+  }
+  // One attempt, so the cap counts automatic runs, not BullMQ retries
+  const jobId = await maybeEnqueueMaintenanceJob(
+    'repair_imported_links',
+    'system',
+    { trigger: 'auto' },
+    { attempts: 1 }
+  );
+  return jobId !== null;
+}
+
 const MAX_AUTO_PROFILE_BACKFILL_RUNS = 5;
 
 /**
@@ -2433,6 +2549,13 @@ export async function enqueueTofaProfileBackfillIfNeeded(serverId: string): Prom
     'system',
     { serverId },
     { attempts: 1 }
+  );
+}
+
+function checkImportedLinkRepair(): Promise<void> {
+  return enqueueImportedLinkRepairIfBehind().then(
+    () => undefined,
+    (err: unknown) => console.error('[Maintenance] Imported link repair check failed:', err)
   );
 }
 

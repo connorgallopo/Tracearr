@@ -30,6 +30,7 @@ const ALLOWLIST: Record<string, string> = {
   'db/timescale.ts': AGGREGATE_DEFINITIONS,
   'jobs/importDuplicateCleanup.ts': IMPORTS,
   'jobs/importedHistoryLinking.ts': IMPORTS,
+  'jobs/importedLinkRepair.ts': IMPORTS,
   'jobs/maintenanceQueue.ts': IMPORTS,
   'jobs/poller/database.ts': HOT_PATH,
   'jobs/poller/processor.ts': HOT_PATH,

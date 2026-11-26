@@ -424,7 +424,8 @@
     "deletesData": "Això elimina dades permanentment",
     "deletesDataDesc": "Les files eliminades no es poden restaurar. Feu abans una còpia de seguretat si no n'esteu segur.",
     "automatic": "Automàtica",
-    "startJob": "Inicia la tasca"
+    "startJob": "Inicia la tasca",
+    "repairHeld": ""
   },
   "memberLogin": {
     "serverActivity": "Mostra als membres l'activitat anònima del servidor",

@@ -424,7 +424,8 @@
     "deletesData": "This permanently deletes data",
     "deletesDataDesc": "Deleted rows cannot be restored. Take a backup first if you are unsure.",
     "automatic": "Automatic",
-    "startJob": "Start Job"
+    "startJob": "Start Job",
+    "repairHeld": "Held on {{server}}: {{count}} imported plays ({{percent}}% of its imported plays) look linked to the wrong show or movie, more than Tracearr repairs without asking. Run the job to repair them."
   },
   "memberLogin": {
     "serverActivity": "Show members anonymous server activity",

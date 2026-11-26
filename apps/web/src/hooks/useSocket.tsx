@@ -418,6 +418,7 @@ export function SocketProvider({ children }: { children: ReactNode }) {
           case 'backfill_session_identity':
           case 'remove_import_duplicates':
           case 'link_imported_history':
+          case 'repair_imported_links':
             void queryClient.invalidateQueries({ queryKey: ['sessions'] });
             void queryClient.invalidateQueries({ queryKey: ['stats'] });
             void queryClient.invalidateQueries({ queryKey: ['library'] });

@@ -4,7 +4,10 @@ import userEvent from '@testing-library/user-event';
 import { Jobs } from './Jobs';
 
 vi.mock('react-i18next', () => ({
-  useTranslation: () => ({ t: (key: string) => key }),
+  useTranslation: () => ({
+    t: (key: string, values?: Record<string, unknown>) =>
+      values ? `${key} ${JSON.stringify(values)}` : key,
+  }),
 }));
 
 vi.mock('@/hooks/useSocket', () => ({ useSocket: () => ({ socket: null }) }));
@@ -195,6 +198,56 @@ describe('Jobs', () => {
     expect(screen.queryByText(/\/ 0/)).not.toBeInTheDocument();
     expect(screen.queryByText('0%')).not.toBeInTheDocument();
     expect(screen.queryByText('jobs.updated')).not.toBeInTheDocument();
+  });
+
+  const repairJob = {
+    type: 'repair_imported_links',
+    category: 'backfill',
+    name: 'Repair Imported Plex Links',
+    description: 'Unlinks imported Plex plays that sit on the wrong show or movie',
+  };
+
+  async function repairRow() {
+    const user = userEvent.setup();
+    render(<Jobs />);
+    await user.click(await screen.findByRole('tab', { name: /jobs.backfill/ }));
+    const row = (await screen.findByText('Repair Imported Plex Links')).closest(
+      '[data-slot="item"]'
+    );
+    if (!row) throw new Error('no repair job row');
+    return row;
+  }
+
+  it("renders the repair job's icon without a fallback", async () => {
+    withJobs([{ ...repairJob, held: [] }]);
+
+    const row = await repairRow();
+
+    expect(row.querySelector('.lucide-unlink-2')).not.toBeNull();
+    expect(row.querySelector('.lucide-wrench')).toBeNull();
+  });
+
+  it('shows a held notice on the repair job', async () => {
+    withJobs([
+      {
+        ...repairJob,
+        held: [{ serverId: 's1', serverName: 'Living Room', candidates: 501, linked: 600 }],
+      },
+    ]);
+
+    const row = await repairRow();
+
+    expect(row.querySelector('[data-slot="alert"]')).toHaveTextContent(
+      'jobs.repairHeld {"server":"Living Room","count":501,"percent":84}'
+    );
+  });
+
+  it('shows no held notice when nothing is held', async () => {
+    withJobs([repairJob]);
+
+    const row = await repairRow();
+
+    expect(row.querySelector('[data-slot="alert"]')).toBeNull();
   });
 
   it('marks an automatic history run with a badge', async () => {

@@ -33,6 +33,11 @@
       "refs": ["#1492"]
     },
     {
+      "type": "fix",
+      "text": "after a Plex rebuild, imported plays no longer show under another show, and updating repairs the ones that did",
+      "refs": ["#1486"]
+    },
+    {
       "type": "note",
       "text": "Silo support isn't an endorsement. Silo is pre-release with no tagged releases yet, and its API still changes"
     },

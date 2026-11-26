@@ -12,6 +12,7 @@ import {
   getMaintenanceQueueStats,
   getMaintenanceJobHistory,
 } from '../jobs/maintenanceQueue.js';
+import { heldRepairServers } from '../jobs/importedLinkRepair.js';
 import { db } from '../db/client.js';
 import { librarySnapshots } from '../db/schema.js';
 
@@ -114,6 +115,15 @@ export const maintenanceRoutes: FastifyPluginAsync = async (app) => {
             "Writes each server's location onto its local network sessions, or puts the Local Network label back where a location was removed. " +
             'Runs by itself after a server location changes; run it here to recheck every server.',
         },
+        {
+          type: 'repair_imported_links',
+          category: 'backfill',
+          name: 'Repair Imported Plex Links',
+          description:
+            'Unlinks imported Plex plays that sit on the wrong show or movie after a Plex rebuild, then links them again from their own titles. ' +
+            'Runs by itself once after updating; run it here to repair a server the automatic run skipped.',
+          held: await heldRepairServers(),
+        },
         // Cleanup jobs - database maintenance and optimization
         {
           type: 'rebuild_timescale_views',
@@ -197,6 +207,7 @@ export const maintenanceRoutes: FastifyPluginAsync = async (app) => {
         'remove_import_duplicates',
         'link_imported_history',
         'sync_server_locations',
+        'repair_imported_links',
       ];
       if (!validTypes.includes(type as MaintenanceJobType)) {
         return reply.badRequest(`Invalid job type: ${type}`);

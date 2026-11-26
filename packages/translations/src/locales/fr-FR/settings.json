@@ -424,7 +424,8 @@
     "deletesData": "Cela supprimera définitivement les données",
     "deletesDataDesc": "Les rangées supprimées ne peuvent être restaurées. Faites d'Abord une sauvegarde si vous n'êtes pas sûr.",
     "automatic": "Automatique",
-    "startJob": "Commencer la tâche"
+    "startJob": "Commencer la tâche",
+    "repairHeld": ""
   },
   "memberLogin": {
     "serverActivity": "Montrer aux membres l'activité du serveur de façon anonyme",

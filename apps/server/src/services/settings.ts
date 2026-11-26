@@ -15,6 +15,7 @@ import {
 } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { settings } from '../db/schema.js';
+import type { RepairCount } from '../jobs/importedLinkRepair.js';
 
 /** Default values for public settings (returned by GET /settings). */
 const PUBLIC_DEFAULTS: Settings = {
@@ -99,6 +100,16 @@ const INTERNAL_DEFAULTS = {
   profileBackfillDoneServers: [] as string[],
   // Failed profile backfill runs per tofa server; the user sync stops queuing one at the cap.
   profileBackfillFailedRuns: {} as Record<string, number>,
+  // The imported link repair: the version it last finished, automatic runs started for the
+  // version in attemptsResetFor, the aggregate refresh start not yet refreshed, and the servers
+  // the last automatic run held back.
+  importedLinkRepair: {
+    version: 0,
+    autoAttempts: 0,
+    attemptsResetFor: 0,
+    refreshFrom: null as string | null,
+    breaker: null as { at: string; servers: RepairCount[] } | null,
+  },
 };
 
 type InternalSettings = typeof INTERNAL_DEFAULTS;

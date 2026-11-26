@@ -180,6 +180,11 @@ function pickShow(candidates: ShowCandidate[], playYear: number | null): string 
 const FOLD_CACHE_LIMIT = 10_000;
 const foldCache = new Map<string, string>();
 
+/** Forgets every remembered fold, for a caller that just changed which shows history files titles under. */
+export function clearFoldCache(): void {
+  foldCache.clear();
+}
+
 async function foldedShows(titles: string[]): Promise<Map<string, string | null>> {
   const found = new Map<string, string | null>();
   const cached = titles.filter((title) => foldCache.has(title));
