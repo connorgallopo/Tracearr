@@ -428,7 +428,8 @@
     "deletesData": "Ta operacja trwale usuwa dane",
     "deletesDataDesc": "Usuniętych wierszy nie można przywrócić. Jeśli nie masz pewności, najpierw wykonaj kopię zapasową.",
     "automatic": "Automatyczne",
-    "startJob": "Uruchom zadanie"
+    "startJob": "Uruchom zadanie",
+    "repairHeld": ""
   },
   "memberLogin": {
     "serverActivity": "Pokaż członkom anonimową aktywność serwera",
