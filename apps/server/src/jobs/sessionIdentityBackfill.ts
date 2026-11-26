@@ -1,7 +1,11 @@
 import { sql, type SQL } from 'drizzle-orm';
 import { REDIS_KEYS } from '@tracearr/shared';
 import { db } from '../db/client.js';
-import { uncapDecompressionForTx, type ChunkTimeRange } from '../db/timescale.js';
+import {
+  getCompressedSessionChunkRanges,
+  uncapDecompressionForTx,
+  type ChunkTimeRange,
+} from '../db/timescale.js';
 import { getRedis } from '../lib/redisShared.js';
 import {
   keyAgreesSql,
@@ -10,6 +14,7 @@ import {
   serverTypesSql,
 } from '../services/import/keyRuleSql.js';
 import { resolveImportedPlays } from '../services/library/importedPlayIdentity.js';
+import { IMPORTED_LINK_REPAIR_VERSION } from './importedLinkRepair.js';
 import { CONTAINER_MEDIA_TYPES_SQL } from './poller/database.js';
 import {
   byInstant,
@@ -78,6 +83,20 @@ interface OrphanImportRow {
 
 type StampedRows = Array<{ started_at: string }>;
 
+/** A row a key pass read: the media and show ids it writes, or the media id its guard checks. */
+interface PassRow {
+  id: string;
+  started_at: string;
+  media_id: string | null;
+  show_media_id: string | null;
+}
+
+/** How a key pass writes one row it read by a point update: its SET list and its guard. */
+interface PointWrite {
+  set: (row: PassRow) => SQL;
+  guard: (row: PassRow) => SQL;
+}
+
 function laterOf(a: string | null, b: string | null): string | null {
   if (a === null) return b;
   if (b === null) return a;
@@ -91,51 +110,6 @@ function oldestOf(rows: StampedRows): string | null {
   );
 }
 
-/**
- * Stamp canonical media identity onto historical sessions in one bounded batch.
- *
- * Three passes, each windowed the same way (ORDER BY started_at DESC LIMIT):
- * - Fresh stamp: joins sessions to library_items on (server_id, rating_key) and
- *   fills the resolved media id and show id. Nothing else on a row is written:
- *   history keeps its own provider ids, keys and titles. Sessions whose rating
- *   key has no non-container library item pointing at a non-container media row
- *   are excluded so they never re-select; an imported row also needs the item to
- *   carry its title (sameTitleForImport), since its key may have been reused.
- * - Show-link repair: sessions that already have media_id but were stamped before
- *   their media row's show_media_id existed (e.g. the show synced later). Re-running
- *   this is safe - a repaired session no longer matches either pass's WHERE clause.
- * - Container unlink: sessions linked to a show, season, artist or album media row
- *   lose their media and provider ids. The fresh stamp refuses container items, so
- *   an unlinked session is never stamped back onto one.
- * - Imported plays still without identity after the key passes resolve through
- *   the media resolver by title, year and episode numbers (importedPlayIdentity.ts),
- *   as a fresh import does at insert. A tracked play takes this path only when its
- *   rating key is confirmed gone from the server (fullScanFloors): otherwise what is
- *   playing exists there, its key is exact and the sync of the item stamps it.
- *   A row the fresh stamp could still take by key is left to it,
- *   so a batch limit never sends a keyed row down the title path. Every row the
- *   pass reads is handled, linked or not, so its bound moves past rows that
- *   cannot resolve instead of re-reading them.
- *
- * The optional started_at window is what keeps this survivable on a compressed
- * hypertable: one transaction per chunk bounds tuple decompression to a single
- * chunk's segments. The per-transaction cap is lifted inside that bound - a
- * busy month-chunk decompresses more tuples than the 100k default even for a
- * 10k-row batch, and tripping the cap turns the walk into a fail-retry loop.
- * The window is the memory guard, not the cap; an unwindowed batch with the
- * cap disabled globally is what once ballooned until the OOM killer took
- * postgres down.
- *
- * `bounds` is the cursor the previous batch of the same window returned. Each
- * pass picks its newest rows first, so a pass that filled its limit has
- * written every match newer than its oldest row, and one that came back short
- * has written every match below its bound. A written row stops matching its
- * own pass, which is why the bound can be inclusive without an id tiebreak:
- * only unwritten ties come back. The passes feed each other, though. A fresh
- * stamp can create repair work in the same batch, and an unlink can create
- * fresh work for the next one, so a pass's next bound also covers the rows the
- * pass feeding it wrote or will write.
- */
 /**
  * Per server, the earliest completed full scan among its libraries, for servers whose every
  * library has one on record. A play that started before that time and whose key no library
@@ -257,6 +231,108 @@ export async function hasConfirmedAbsentTrackedRows(
   return rows.length > 0;
 }
 
+/**
+ * Above this many rows a pass over a compressed chunk writes with one window-bounded statement
+ * instead of point updates. A point update costs about a millisecond and decompresses the batch
+ * holding its row, while the window statement decompresses the whole window once whatever it
+ * writes. On TimescaleDB 2.31 over a 40,000-row chunk with the changed rows spread across it,
+ * the two cost the same at about 60 rows; 2.28 crosses later.
+ */
+export const MAX_POINT_UPDATES_PER_PASS = 50;
+
+/**
+ * Runs one key pass. `select` reads its rows (id, started_at, media_id, show_media_id); the window
+ * statement selects and writes them in one statement. A window with no
+ * compressed chunk takes that statement directly, under the default decompression cap, so a chunk
+ * compressed after the check fails the statement instead of decompressing, and the next batch
+ * retries. Over a compressed chunk the select runs read-only first and nothing is written when it
+ * finds nothing: the window statement's constant bounds decompress every batch they reach, even
+ * with nothing to write. Up to MAX_POINT_UPDATES_PER_PASS rows then each take a point update on
+ * constant (id, started_at), which decompresses only the batch holding the row and skips a row
+ * the guard says changed since the read; a join-driven UPDATE on a partially compressed chunk
+ * without constant bounds would reach only the rows already outside its compressed batches. More
+ * rows take the window statement.
+ */
+async function runPass(
+  select: SQL,
+  windowWrite: SQL,
+  compressed: boolean,
+  point: PointWrite
+): Promise<{ read: StampedRows; written: StampedRows }> {
+  if (!compressed) {
+    const written = (await db.execute(windowWrite)).rows as unknown as StampedRows;
+    return { read: written, written };
+  }
+  // Raw db.execute results carry timestamptz columns as Postgres text, not Date.
+  const rows = (await db.execute(select)).rows as unknown as PassRow[];
+  if (rows.length === 0) return { read: [], written: [] };
+  return db.transaction(async (tx) => {
+    await uncapDecompressionForTx(tx);
+    if (rows.length > MAX_POINT_UPDATES_PER_PASS) {
+      const written = (await tx.execute(windowWrite)).rows as unknown as StampedRows;
+      return { read: written, written };
+    }
+    const written: StampedRows = [];
+    for (const row of rows) {
+      const { rows: one } = await tx.execute(sql`
+        UPDATE sessions s SET ${point.set(row)}
+        WHERE s.id = ${row.id}::uuid AND s.started_at = ${row.started_at}::timestamptz
+          AND ${point.guard(row)}
+        RETURNING s.started_at
+      `);
+      written.push(...(one as unknown as StampedRows));
+    }
+    return { read: rows, written };
+  });
+}
+
+/**
+ * Stamp canonical media identity onto historical sessions in one bounded batch.
+ *
+ * Four passes, each windowed the same way (ORDER BY started_at DESC LIMIT):
+ * - Fresh stamp: joins sessions to library_items on (server_id, rating_key) and
+ *   fills the resolved media id and show id. Nothing else on a row is written:
+ *   history keeps its own provider ids, keys and titles. Sessions whose rating
+ *   key has no non-container library item pointing at a non-container media row
+ *   are excluded so they never re-select; an imported row also needs the item to
+ *   carry its title (sameTitleForImport), since its key may have been reused.
+ * - Show-link repair: sessions that already have media_id but were stamped before
+ *   their media row's show_media_id existed (e.g. the show synced later). Re-running
+ *   this is safe - a repaired session no longer matches either pass's WHERE clause.
+ * - Container unlink: sessions linked to a show, season, artist or album media row
+ *   lose their media and provider ids. The fresh stamp refuses container items, so
+ *   an unlinked session is never stamped back onto one.
+ * - Imported plays still without identity after the key passes resolve through
+ *   the media resolver by title, year and episode numbers (importedPlayIdentity.ts),
+ *   as a fresh import does at insert. A tracked play takes this path only when its
+ *   rating key is confirmed gone from the server (fullScanFloors): otherwise what is
+ *   playing exists there, its key is exact and the sync of the item stamps it.
+ *   A row the fresh stamp could still take by key is left to it,
+ *   so a batch limit never sends a keyed row down the title path. Every row the
+ *   pass reads is handled, linked or not, so its bound moves past rows that
+ *   cannot resolve instead of re-reading them.
+ *
+ * The optional started_at window is what keeps this survivable on a compressed
+ * hypertable. Over a compressed chunk each pass reads its rows first and writes
+ * only those (runPass), so a window with nothing to change decompresses nothing,
+ * a few changed rows decompress a batch each and more decompress the window. The
+ * per-transaction cap is lifted inside that bound - a compressed batch holds up
+ * to 1,000 rows, so about a hundred changed rows reach the 100k default, and
+ * tripping the cap turns the walk into a fail-retry loop.
+ * The window is the memory guard, not the cap; an unwindowed batch with the
+ * cap disabled globally is what once ballooned until the OOM killer took
+ * postgres down.
+ *
+ * `bounds` is the cursor the previous batch of the same window returned. Each
+ * pass picks its newest rows first, so a pass that filled its limit has
+ * written every match newer than its oldest row, and one that came back short
+ * has written every match below its bound. A written row stops matching its
+ * own pass, which is why the bound can be inclusive without an id tiebreak:
+ * only unwritten ties come back. The passes feed each other, though. A fresh
+ * stamp can create repair work in the same batch, and an unlink can create
+ * fresh work for the next one, so a pass's next bound also covers the rows the
+ * pass feeding it wrote or will write.
+ */
 export async function backfillSessionIdentityBatch(
   limit: number,
   window?: BackfillWindow,
@@ -301,15 +377,32 @@ export async function backfillSessionIdentityBatch(
       : new Map<string, GoneKeyWindow>()
   );
 
-  const [freshRows, repairRows, unlinkRows, orphanRows] = await db.transaction(async (tx) => {
-    await uncapDecompressionForTx(tx);
-    // Raw db.execute results carry timestamptz columns as Postgres text, not Date.
-    const stamp = async (pass: Pass, query: SQL): Promise<StampedRows> =>
-      skip(pass) ? [] : ((await tx.execute(query)).rows as unknown as StampedRows);
+  const compressed = (await getCompressedSessionChunkRanges()).some(
+    (chunk) =>
+      (!window?.start || chunk.end > window.start) && (!window?.end || chunk.start < window.end)
+  );
+  const none = { read: [], written: [] };
+  const pass = (n: Pass, select: SQL, windowWrite: SQL, point: PointWrite) =>
+    skip(n) ? none : runPass(select, windowWrite, compressed, point);
 
-    const fresh = await stamp(
-      0,
-      sql`
+  const fresh = await pass(
+    0,
+    sql`
+      SELECT s.id, s.started_at, li.media_id,
+        CASE WHEN li.media_type = 'episode' THEN m.show_media_id END AS show_media_id
+      FROM sessions s
+      JOIN library_items li ON li.server_id = s.server_id AND li.rating_key = s.rating_key
+      JOIN media m ON m.id = li.media_id
+      WHERE s.media_id IS NULL AND s.rating_key IS NOT NULL
+        ${range(0)}
+        AND li.media_id IS NOT NULL
+        AND li.media_type NOT IN (${CONTAINER_MEDIA_TYPES_SQL})
+        AND m.media_type NOT IN (${CONTAINER_MEDIA_TYPES_SQL})
+        AND ${sameTitleForImport('li')}
+      ORDER BY s.started_at DESC
+      LIMIT ${limit}
+    `,
+    sql`
       WITH batch AS (
         SELECT s.id, s.started_at, s.server_id, s.rating_key
         FROM sessions s
@@ -339,55 +432,78 @@ export async function backfillSessionIdentityBatch(
         AND ${sameTitleForImport('li')}
         ${range(0)}
       RETURNING s.started_at
-    `
-    );
+    `,
+    {
+      set: (row) =>
+        sql`media_id = ${row.media_id}::uuid, show_media_id = ${row.show_media_id}::uuid`,
+      guard: () => sql`s.media_id IS NULL`,
+    }
+  );
 
-    const repair = await stamp(
-      1,
-      sql`
-      WITH batch AS (
-        SELECT s.id, s.started_at, m.show_media_id AS new_show_media_id
-        FROM sessions s
-        JOIN media m ON m.id = s.media_id
-        WHERE s.media_id IS NOT NULL AND s.show_media_id IS NULL AND m.show_media_id IS NOT NULL
-          ${range(1)}
-        ORDER BY s.started_at DESC
-        LIMIT ${limit}
-      )
+  // Read after the fresh stamp commits: a row it stamped without a show can be repair work.
+  const repairSelect = sql`
+    SELECT s.id, s.started_at, s.media_id, m.show_media_id
+    FROM sessions s
+    JOIN media m ON m.id = s.media_id
+    WHERE s.media_id IS NOT NULL AND s.show_media_id IS NULL AND m.show_media_id IS NOT NULL
+      ${range(1)}
+    ORDER BY s.started_at DESC
+    LIMIT ${limit}
+  `;
+  const repair = await pass(
+    1,
+    repairSelect,
+    sql`
+      WITH batch AS (${repairSelect})
       UPDATE sessions s
-      SET show_media_id = b.new_show_media_id
+      SET show_media_id = b.show_media_id
       FROM batch b
       WHERE s.id = b.id AND s.started_at = b.started_at
         ${range(1)}
       RETURNING s.started_at
-    `
-    );
+    `,
+    {
+      set: (row) => sql`show_media_id = ${row.show_media_id}::uuid`,
+      guard: (row) => sql`s.show_media_id IS NULL AND s.media_id = ${row.media_id}::uuid`,
+    }
+  );
 
-    const unlink = await stamp(
-      2,
-      sql`
-      WITH batch AS (
-        SELECT s.id, s.started_at
-        FROM sessions s
-        JOIN media m ON m.id = s.media_id
-        WHERE m.media_type IN (${CONTAINER_MEDIA_TYPES_SQL})
-          ${range(2)}
-        ORDER BY s.started_at DESC
-        LIMIT ${limit}
-      )
+  const unlinkSelect = sql`
+    SELECT s.id, s.started_at, s.media_id, NULL::uuid AS show_media_id
+    FROM sessions s
+    JOIN media m ON m.id = s.media_id
+    WHERE m.media_type IN (${CONTAINER_MEDIA_TYPES_SQL})
+      ${range(2)}
+    ORDER BY s.started_at DESC
+    LIMIT ${limit}
+  `;
+  const unlinkSet = sql`media_id = NULL, show_media_id = NULL, imdb_id = NULL, tmdb_id = NULL, tvdb_id = NULL`;
+  const unlink = await pass(
+    2,
+    unlinkSelect,
+    sql`
+      WITH batch AS (${unlinkSelect})
       UPDATE sessions s
-      SET media_id = NULL, show_media_id = NULL, imdb_id = NULL, tmdb_id = NULL, tvdb_id = NULL
+      SET ${unlinkSet}
       FROM batch b
       WHERE s.id = b.id AND s.started_at = b.started_at
         ${range(2)}
       RETURNING s.started_at
-    `
-    );
+    `,
+    {
+      set: () => unlinkSet,
+      guard: () => sql`EXISTS (
+        SELECT 1 FROM media m
+        WHERE m.id = s.media_id AND m.media_type IN (${CONTAINER_MEDIA_TYPES_SQL}))`,
+    }
+  );
 
-    const orphans = !resolveByTitle
-      ? []
-      : ((
-          await tx.execute(sql`
+  // A play the imported link repair unlinked and could not place stays unlinked: the title
+  // path would file it by the same fields the repair refused.
+  const orphanRows = !resolveByTitle
+    ? []
+    : ((
+        await db.execute(sql`
       SELECT s.id, s.started_at, s.server_id, s.media_type, s.media_title, s.grandparent_title,
         s.year, s.season_number, s.episode_number, s.imdb_id, s.tmdb_id, s.tvdb_id
       FROM sessions s
@@ -403,13 +519,16 @@ export async function backfillSessionIdentityBatch(
             AND m2.media_type NOT IN (${CONTAINER_MEDIA_TYPES_SQL})
             AND ${sameTitleForImport('li2')}
         )
+        AND NOT EXISTS (
+          SELECT 1 FROM session_link_repairs r
+          WHERE r.session_id = s.id AND r.started_at = s.started_at
+            AND r.repair_version = ${IMPORTED_LINK_REPAIR_VERSION} AND r.relinked_at IS NULL
+        )
         ${range(3)}
       ORDER BY s.started_at DESC
       LIMIT ${limit}
     `)
-        ).rows as unknown as OrphanImportRow[]);
-    return [fresh, repair, unlink, orphans] as const;
-  });
+      ).rows as unknown as OrphanImportRow[]);
 
   // The resolver runs its own short transactions; keeping it outside the key passes' transaction
   // keeps that transaction as short as the key passes alone, so the maintenance walk and the
@@ -453,20 +572,21 @@ export async function backfillSessionIdentityBatch(
   }
 
   const own = (rows: StampedRows) => (rows.length >= limit ? oldestOf(rows) : null);
-  const newestUnlinked = unlinkRows.reduce<string | null>(
+  const newestUnlinked = unlink.written.reduce<string | null>(
     (max, r) => laterOf(max, r.started_at),
     null
   );
-  const nextFresh = laterOf(own(freshRows), newestUnlinked);
-  const oldest = oldestOf([...freshRows, ...repairRows, ...unlinkRows, ...importRows]);
+  const nextFresh = laterOf(own(fresh.read), newestUnlinked);
+  const oldest = oldestOf([...fresh.written, ...repair.written, ...unlink.written, ...importRows]);
   return {
-    updated: freshRows.length + repairRows.length + unlinkRows.length + importRows.length,
+    updated:
+      fresh.written.length + repair.written.length + unlink.written.length + importRows.length,
     examined: orphanRows.length,
     oldest: oldest ? new Date(oldest) : null,
     cursor: [
       nextFresh,
-      laterOf(own(repairRows), nextFresh),
-      own(unlinkRows),
+      laterOf(own(repair.read), nextFresh),
+      own(unlink.read),
       laterOf(own(orphanRows), newestUnlinked),
     ],
   };

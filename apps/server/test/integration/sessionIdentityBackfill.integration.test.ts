@@ -6,7 +6,7 @@
  * bounded batches and is resumable: sessions whose rating key has no resolvable
  * library item are excluded so they never re-select.
  *
- * Run with: pnpm --filter @tracearr/server test:integration -- sessionIdentityBackfill
+ * Run with: pnpm --filter @tracearr/server test:integration sessionIdentityBackfill
  */
 
 import { randomUUID } from 'node:crypto';
@@ -27,6 +27,7 @@ import { setSetting } from '../../src/services/settings.js';
 import { getCompressedSessionChunkRanges, getSessionChunkRanges } from '../../src/db/timescale.js';
 import { resolveMediaForItem } from '../../src/services/library/mediaResolutionService.js';
 import { stampPendingSessionIdentity } from '../../src/services/librarySync.js';
+import { IMPORTED_LINK_REPAIR_VERSION } from '../../src/jobs/importedLinkRepair.js';
 import {
   backfillSessionIdentityBatch,
   fullScanFloors,
@@ -1174,5 +1175,35 @@ describe('session identity backfill', () => {
     expect(updated).toBe(0);
     expect((await linkOf('held-key')).media_id).toBeNull();
     expect(await mediaRowsTitled('Harbor Gone')).toBe(0);
+  });
+
+  it('the title pass does not relink a play the repair could not place', async () => {
+    const server = await createTestServer({ type: 'plex' });
+    const user = await createTestUser();
+    const su = await createTestServerUser({ userId: user.id, serverId: server.id });
+    const imported = (ratingKey: string) =>
+      createTestSession({
+        serverId: server.id,
+        serverUserId: su.id,
+        externalSessionId: `import-${ratingKey}`,
+        ratingKey,
+        mediaType: 'movie',
+        mediaTitle: 'Harbor Gone',
+        year: 2001,
+        tmdbId: 61_501,
+        startedAt: daysAgo(2),
+      });
+    const unplaced = await imported('unplaced-key');
+    await imported('placed-key');
+    await db.execute(sql`
+      INSERT INTO session_link_repairs (session_id, started_at, repair_version, server_id, clause)
+      SELECT id, started_at, ${IMPORTED_LINK_REPAIR_VERSION}, server_id, 'numbers'
+      FROM sessions WHERE id = ${unplaced.id}::uuid
+    `);
+
+    await backfillSessionIdentityBatch(1000);
+
+    expect((await linkOf('unplaced-key')).media_id).toBeNull();
+    expect((await linkOf('placed-key')).media_id).not.toBeNull();
   });
 });
