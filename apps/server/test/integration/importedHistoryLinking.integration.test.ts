@@ -3,7 +3,7 @@
  * decompression cap lowered beneath what the batch needs, so a link written
  * without lifting the cap fails.
  *
- * Run with: pnpm --filter @tracearr/server test:integration -- importedHistoryLinking
+ * Run with: pnpm --filter @tracearr/server test:integration importedHistoryLinking
  */
 
 import { describe, it, expect } from 'vitest';
@@ -21,7 +21,11 @@ import { db, recreatePool } from '../../src/db/client.js';
 import { compressSessionChunks } from '../../src/test/compressChunks.js';
 import { libraries, media } from '../../src/db/schema.js';
 import { getRedis } from '../../src/lib/redisShared.js';
-import { listLinkingServers } from '../../src/jobs/importedHistoryLinking.js';
+import {
+  listLinkingServers,
+  runImportedHistoryLinkingWalk,
+} from '../../src/jobs/importedHistoryLinking.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../../src/jobs/sessionIdentityBackfill.js';
 import {
   runImportedHistoryLinking,
   type MaintenanceJobData,
@@ -485,5 +489,217 @@ describe('link_imported_history on a compressed chunk', { timeout: 120_000 }, ()
     ]);
     const { armedAt } = (stored.rows[0] as { value: { armedAt: string } }).value;
     expect(Date.parse(armedAt)).toBeGreaterThanOrEqual(before);
+  });
+});
+
+describe('link_imported_history writes only what it links', { timeout: 120_000 }, () => {
+  const IMDB_ID = 'tt0068646';
+  const GUID = 'plex://movie/5d7768ba96b655001fdc0408';
+
+  /** Uncompressed heap rows across the old sessions chunks, and whether every one is compressed. */
+  async function oldChunkHeaps() {
+    const { rows } = await db.execute(sql`
+      SELECT format('%I.%I', chunk_schema, chunk_name) AS name, is_compressed
+      FROM timescaledb_information.chunks
+      WHERE hypertable_name = 'sessions'
+        AND range_end <= now() - make_interval(days => ${CHUNK_AGE_DAYS - 30})
+    `);
+    const chunks = rows as Array<{ name: string; is_compressed: boolean }>;
+    let heap = 0;
+    for (const chunk of chunks) {
+      const result = await db.execute(
+        sql`SELECT count(*)::int AS n FROM ONLY ${sql.raw(chunk.name)}`
+      );
+      heap += (result.rows[0] as { n: number }).n;
+    }
+    return { chunks: chunks.length, compressed: chunks.every((c) => c.is_compressed), heap };
+  }
+
+  /**
+   * FILLER_SESSIONS linked plays of one account in one compressed batch, then `orphans` imported
+   * movie plays carrying IMDB_ID after it: each in its own account's batch when `lone`, otherwise
+   * all in one. The library movie carries `libraryImdbId`. Runs the linker by provider id with the
+   * database's decompression cap at 10 and returns the plays it linked and left unlinked, and the
+   * old chunks' heaps. With `guidListed`, the plays carry no provider id and link through the
+   * guid pass instead, Tautulli returning only the first `guidListed` of their reference ids.
+   */
+  async function linkThroughCompressedChunk(
+    orphans: number,
+    opts: { lone: boolean; libraryImdbId: string; guidListed?: number }
+  ) {
+    const server = await plexServerWithSyncedLibrary('lib-movies');
+    const newAccount = async () =>
+      createTestServerUser({ serverId: server.id, userId: (await createTestUser()).id });
+    const [mediaRow] = await db
+      .insert(media)
+      .values({
+        mediaType: 'movie',
+        matchKey: `movie:linking-compressed:${server.id}`,
+        title: 'The Godfather',
+        normalizedTitle: 'the godfather',
+        year: 1972,
+        imdbId: opts.libraryImdbId,
+      })
+      .returning({ id: media.id });
+    if (!mediaRow) throw new Error('media insert returned nothing');
+    const item = await createTestLibraryItem({
+      serverId: server.id,
+      libraryId: 'lib-movies',
+      ratingKey: 'rk-new',
+      mediaId: mediaRow.id,
+      fileSize: 1000,
+    });
+    await db.execute(sql`UPDATE library_items SET plex_guid = ${GUID} WHERE id = ${item.id}::uuid`);
+    await getRedis().set(REDIS_KEYS.LIBRARY_SYNC_SCAN_VERSION(server.id, 'lib-movies'), '2');
+
+    const base = new Date(
+      Math.floor((Date.now() - CHUNK_AGE_DAYS * DAY_MS) / DAY_MS) * DAY_MS + DAY_MS / 4
+    );
+    const filler = await newAccount();
+    for (let i = 0; i < FILLER_SESSIONS; i++) {
+      await createTestSession({
+        serverId: server.id,
+        serverUserId: filler.id,
+        state: 'stopped',
+        ratingKey: 'rk-new',
+        mediaId: mediaRow.id,
+        startedAt: new Date(base.getTime() + i * MIN_MS),
+        durationMs: MIN_MS,
+      });
+    }
+    const shared = await newAccount();
+    for (let i = 0; i < orphans; i++) {
+      const account = opts.lone ? await newAccount() : shared;
+      await createTestSession({
+        serverId: server.id,
+        serverUserId: account.id,
+        state: 'stopped',
+        sessionKey: `tautulli-${i}`,
+        externalSessionId: `${i}`,
+        ratingKey: 'rk-old',
+        imdbId: opts.guidListed === undefined ? IMDB_ID : null,
+        tvdbId: 42,
+        startedAt: new Date(base.getTime() + (FILLER_SESSIONS + 60 + i) * MIN_MS),
+        durationMs: MIN_MS,
+      });
+    }
+
+    expect((await compressSessionChunks(CHUNK_AGE_DAYS - 30)).length).toBeGreaterThanOrEqual(1);
+    const before = await oldChunkHeaps();
+    expect(before.chunks).toBeGreaterThanOrEqual(1);
+    expect(before).toMatchObject({ compressed: true, heap: 0 });
+
+    const dbName = (
+      (await db.execute(sql`SELECT current_database() AS db`)).rows[0] as { db: string }
+    ).db;
+    await db.execute(
+      sql.raw(
+        `ALTER DATABASE "${dbName}" SET timescaledb.max_tuples_decompressed_per_dml_transaction = 10`
+      )
+    );
+    await recreatePool();
+    let total: number;
+    try {
+      // The walk, not the job: the job restores the compression policy when it ends, and the
+      // policy can recompress the chunk before its heap is read.
+      const listed = opts.guidListed;
+      ({ total } = await runImportedHistoryLinkingWalk({
+        tautulli:
+          listed === undefined
+            ? null
+            : {
+                getPmsIdentifier: async () => MACHINE_ID,
+                getGuidsByRatingKey: async (keys) =>
+                  new Map(
+                    keys
+                      .filter((key) => key === 'rk-old')
+                      .map((key) => [
+                        key,
+                        {
+                          guids: new Set([GUID]),
+                          referenceIds: new Set(Array.from({ length: listed }, (_, i) => `${i}`)),
+                        },
+                      ])
+                  ),
+              },
+        trigger: 'manual',
+        hasPendingLibrarySync: async () => false,
+        onBatch: async () => undefined,
+        onCommit: () => undefined,
+      }));
+    } finally {
+      await db.execute(
+        sql.raw(
+          `ALTER DATABASE "${dbName}" RESET timescaledb.max_tuples_decompressed_per_dml_transaction`
+        )
+      );
+      await recreatePool();
+    }
+
+    const linked = await db.execute(sql`
+      SELECT count(*)::int AS n FROM sessions
+      WHERE server_id = ${server.id}::uuid AND rating_key = 'rk-old'
+        AND media_id = ${mediaRow.id}::uuid AND imdb_id = ${IMDB_ID} AND tvdb_id = 42
+    `);
+    const count = (linked.rows[0] as { n: number }).n;
+    expect(total).toBe(count);
+    const unlinked = await db.execute(sql`
+      SELECT array_agg(external_session_id ORDER BY external_session_id) AS ids FROM sessions
+      WHERE server_id = ${server.id}::uuid AND rating_key = 'rk-old' AND media_id IS NULL
+    `);
+    return {
+      linked: count,
+      unlinked: (unlinked.rows[0] as { ids: string[] | null }).ids ?? [],
+      after: await oldChunkHeaps(),
+    };
+  }
+
+  it('leaves a compressed chunk compressed and untouched when nothing links', async () => {
+    const { linked, after } = await linkThroughCompressedChunk(3, {
+      lone: true,
+      libraryImdbId: 'tt0071562',
+    });
+    expect(linked).toBe(0);
+    expect(after).toMatchObject({ compressed: true, heap: 0 });
+  });
+
+  it('linking over a compressed chunk decompresses only the rows it links', async () => {
+    const { linked, after } = await linkThroughCompressedChunk(3, {
+      lone: true,
+      libraryImdbId: IMDB_ID,
+    });
+    expect(linked).toBe(3);
+    expect(after.heap).toBe(3);
+  });
+
+  it('links through the guid pass inside a compressed chunk, decompressing only the listed rows', async () => {
+    const { linked, unlinked, after } = await linkThroughCompressedChunk(4, {
+      lone: true,
+      libraryImdbId: IMDB_ID,
+      guidListed: 3,
+    });
+    expect(linked).toBe(3);
+    expect(unlinked).toEqual(['3']);
+    expect(after.heap).toBe(3);
+  });
+
+  it('links up to the point-update limit by point updates, decompressing only their batch', async () => {
+    // Below the crossover measured on TimescaleDB 2.28 and 2.31; re-measure before moving it.
+    expect(MAX_POINT_UPDATES_PER_PASS).toBe(50);
+    const { linked, after } = await linkThroughCompressedChunk(MAX_POINT_UPDATES_PER_PASS, {
+      lone: false,
+      libraryImdbId: IMDB_ID,
+    });
+    expect(linked).toBe(MAX_POINT_UPDATES_PER_PASS);
+    expect(after.heap).toBe(MAX_POINT_UPDATES_PER_PASS);
+  });
+
+  it('links more rows than the point-update limit with the window statement, decompressing the window', async () => {
+    const { linked, after } = await linkThroughCompressedChunk(MAX_POINT_UPDATES_PER_PASS + 1, {
+      lone: false,
+      libraryImdbId: IMDB_ID,
+    });
+    expect(linked).toBe(MAX_POINT_UPDATES_PER_PASS + 1);
+    expect(after.heap).toBe(MAX_POINT_UPDATES_PER_PASS + 1 + FILLER_SESSIONS);
   });
 });

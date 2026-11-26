@@ -15,6 +15,7 @@ vi.mock('../../db/client.js', () => ({
 
 vi.mock('../../db/timescale.js', () => ({
   uncapDecompressionForTx: vi.fn(),
+  getCompressedSessionChunkRanges: vi.fn(),
   getSessionChunkRanges: vi.fn(),
   getTimescaleStatus: vi.fn(),
 }));
@@ -58,6 +59,7 @@ vi.mock('../../services/import/trackingCutoff.js', () => ({
 }));
 
 import { db } from '../../db/client.js';
+import { getCompressedSessionChunkRanges } from '../../db/timescale.js';
 import { getRedis } from '../../lib/redisShared.js';
 import {
   getImportedHistoryLinkState,
@@ -72,6 +74,7 @@ import {
 } from '../importedHistoryLinking.js';
 import { hasPendingLibrarySync } from '../librarySyncQueue.js';
 import { batchResolveMediaByPlexGuid } from '../poller/database.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../sessionIdentityBackfill.js';
 import { sessionWalkWindows } from '../sessionWalk.js';
 import type { SQL } from 'drizzle-orm';
 
@@ -142,6 +145,14 @@ function setup(
       servers.map((s) => ({ id: s.id, name: s.name, machineIdentifier: s.machineIdentifier }))
     )
   );
+  const pickedRows = (statement: Statement) => {
+    if (statement.sql.includes('by_imdb')) return providerPicked;
+    if (!statement.sql.includes('JOIN unnest(')) return [];
+    const [keys, ids] = statement.params as string[][];
+    return (picked as Array<{ rating_key: string; external_session_id: string }>).filter((row) =>
+      keys?.some((key, i) => key === row.rating_key && ids?.[i] === row.external_session_id)
+    );
+  };
   vi.mocked(db.execute).mockImplementation((async (query: SQL) => {
     const statement = record(query);
     const server = servers.find((s) => statement.params.includes(s.id));
@@ -154,7 +165,7 @@ function setup(
     if (statement.sql.includes('DISTINCT o.rating_key')) {
       return { rows: server?.orphanKeys ?? [] };
     }
-    return { rows: [] };
+    return { rows: pickedRows(statement) };
   }) as never);
   vi.mocked(getRedis).mockReturnValue({
     mget: vi.fn(async (keys: string[]) =>
@@ -165,19 +176,10 @@ function setup(
     callback({
       execute: vi.fn(async (query: SQL) => {
         const statement = record(query);
-        if (statement.sql.includes('by_imdb')) return { rows: providerPicked };
-        if (statement.sql.includes('UPDATE sessions s')) {
-          const [ids] = statement.params as string[][];
-          return { rows: (ids ?? []).map(() => ({ started_at: '2026-02-10 12:00:00+00' })) };
-        }
-        if (!statement.sql.includes('JOIN unnest(')) return { rows: [] };
-        const [keys, ids] = statement.params as string[][];
-        return {
-          rows: (picked as Array<{ rating_key: string; external_session_id: string }>).filter(
-            (row) =>
-              keys?.some((key, i) => key === row.rating_key && ids?.[i] === row.external_session_id)
-          ),
-        };
+        if (!statement.sql.includes('UPDATE sessions s')) return { rows: [] };
+        const [first] = statement.params;
+        const written = Array.isArray(first) ? first : [first];
+        return { rows: written.map(() => ({ started_at: '2026-02-10 12:00:00+00' })) };
       }),
     })) as never);
   return statements;
@@ -231,6 +233,7 @@ beforeEach(() => {
   vi.spyOn(console, 'warn').mockImplementation(() => undefined);
   vi.spyOn(console, 'error').mockImplementation(() => undefined);
   vi.mocked(sessionWalkWindows).mockResolvedValue(null);
+  vi.mocked(getCompressedSessionChunkRanges).mockResolvedValue([]);
   vi.mocked(batchResolveMediaByPlexGuid).mockResolvedValue(new Map());
   vi.mocked(hasPendingLibrarySync).mockResolvedValue(false);
   vi.mocked(getServerTrackingStart).mockResolvedValue(new Date('2027-01-01T00:00:00Z'));
@@ -694,6 +697,119 @@ describe('runImportedHistoryLinkingWalk state', () => {
     });
 
     expect(lastState()).toMatchObject({ state: 'pending', autoAttempts: 0 });
+  });
+});
+
+describe('runImportedHistoryLinkingWalk writes over a compressed chunk', () => {
+  const WINDOW = { start: new Date('2026-02-01T00:00:00Z'), end: new Date('2026-03-01T00:00:00Z') };
+  const episodeRow = (id: string) => ({
+    id,
+    started_at: '2026-02-10 12:00:00+00',
+    rating_key: '10',
+    external_session_id: 'ref-10',
+    media_type: 'episode',
+    media_id: MEDIA_ID,
+    show_media_id: SHOW_ID,
+    imdb_id: null,
+    tmdb_id: null,
+    tvdb_id: 81189,
+  });
+
+  async function linkOverCompressedChunk(picked: object[], compressed = [WINDOW]) {
+    vi.mocked(sessionWalkWindows).mockResolvedValue([WINDOW]);
+    vi.mocked(getCompressedSessionChunkRanges).mockResolvedValue(compressed);
+    const statements = setup(
+      [plexServer({ id: SERVER_A, orphanKeys: [{ rating_key: '10', media_type: 'episode' }] })],
+      PENDING,
+      picked
+    );
+    vi.mocked(batchResolveMediaByPlexGuid).mockResolvedValue(
+      new Map([
+        [
+          'plex://episode/aaa',
+          { mediaId: MEDIA_ID, showMediaId: SHOW_ID, imdbId: null, tmdbId: null, tvdbId: 81189 },
+        ],
+      ])
+    );
+    const result = await walk(
+      tautulliStub(
+        `pms-${SERVER_A}`,
+        { '10': ['plex://episode/aaa'] },
+        { '10': ['ref-10', 'ref-11'] }
+      )
+    );
+    return { result, updates: statements.filter((s) => s.sql.includes('UPDATE sessions s')) };
+  }
+
+  it('reads without writing and opens no transaction when nothing links', async () => {
+    const { result, updates } = await linkOverCompressedChunk([]);
+
+    expect(result.total).toBe(0);
+    expect(updates).toHaveLength(0);
+    expect(db.transaction).not.toHaveBeenCalled();
+  });
+
+  it('writes each picked row by a point update carrying every predicate of the window statement, its own link pair only', async () => {
+    const { result, updates } = await linkOverCompressedChunk([episodeRow('session-1')]);
+
+    expect(result.total).toBe(1);
+    expect(updates).toHaveLength(1);
+    const [update] = updates;
+    expect(update?.sql).not.toContain(') AS p(');
+    expect(update?.sql).toContain(
+      'SET media_id = $1::uuid, show_media_id = $2::uuid, imdb_id = COALESCE($3::text, s.imdb_id), ' +
+        'tmdb_id = COALESCE($4::int, s.tmdb_id), tvdb_id = COALESCE($5::int, s.tvdb_id) ' +
+        'WHERE s.id = $6::uuid AND s.started_at = $7::timestamptz AND s.rating_key = $8::text ' +
+        'AND s.external_session_id = $9::text AND s.server_id = $10::uuid ' +
+        'AND s.started_at >= $11::timestamptz AND s.started_at < $12::timestamptz ' +
+        'AND s.started_at < $13::timestamptz AND s.media_type = $14::text ' +
+        "AND s.media_type IN ('movie', 'episode') " +
+        'AND (s.rating_key, s.external_session_id) IN (SELECT * FROM unnest($15::text[], $16::text[])) ' +
+        'AND s.media_id IS NULL AND s.rating_key IS NOT NULL AND s.external_session_id IS NOT NULL ' +
+        'RETURNING s.started_at'
+    );
+    expect(update?.params).toEqual([
+      MEDIA_ID,
+      SHOW_ID,
+      null,
+      null,
+      81189,
+      'session-1',
+      '2026-02-10 12:00:00+00',
+      '10',
+      'ref-10',
+      SERVER_A,
+      WINDOW.start.toISOString(),
+      WINDOW.end.toISOString(),
+      '2027-01-01T00:00:00.000Z',
+      'episode',
+      ['10'],
+      ['ref-10'],
+    ]);
+  });
+
+  it('writes with the window statement when compressed chunks only touch the window edges', async () => {
+    const { updates } = await linkOverCompressedChunk(
+      [episodeRow('session-1')],
+      [
+        { start: new Date('2026-01-01T00:00:00Z'), end: WINDOW.start },
+        { start: WINDOW.end, end: new Date('2026-04-01T00:00:00Z') },
+      ]
+    );
+
+    expect(updates).toHaveLength(1);
+    expect(updates[0]?.sql).toContain(') AS p(');
+  });
+
+  it('writes more rows than the point-update limit with the window statement', async () => {
+    const picked = Array.from({ length: MAX_POINT_UPDATES_PER_PASS + 1 }, (_, i) =>
+      episodeRow(`session-${i}`)
+    );
+    const { result, updates } = await linkOverCompressedChunk(picked);
+
+    expect(result.total).toBe(MAX_POINT_UPDATES_PER_PASS + 1);
+    expect(updates).toHaveLength(1);
+    expect(updates[0]?.sql).toContain(') AS p(');
   });
 });
 

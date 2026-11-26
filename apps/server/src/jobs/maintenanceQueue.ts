@@ -78,6 +78,7 @@ import {
 } from './sessionIdentityBackfill.js';
 import { runImportDuplicateCleanupWalk } from './importDuplicateCleanup.js';
 import {
+  IMPORTED_HISTORY_LINK_WRITES,
   importedHistoryLinkDeps,
   runImportedHistoryLinkingWalk,
   type ImportedHistoryLinkDeps,
@@ -922,6 +923,7 @@ export async function runImportedHistoryLinking(
     resultMessage: (_total, details) => details,
     failurePrefix: 'Imported history linking skipped',
     totalCountsUpdates: true,
+    writes: IMPORTED_HISTORY_LINK_WRITES,
     walk: (onBatch, onCommit) => runImportedHistoryLinkingWalk({ ...deps, onBatch, onCommit }),
   });
 }

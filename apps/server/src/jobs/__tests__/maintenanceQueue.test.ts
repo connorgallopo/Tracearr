@@ -60,6 +60,14 @@ vi.mock('../../services/settings.js', async (importOriginal) => ({
   setSetting: vi.fn(),
 }));
 
+// The real Tautulli service imports this queue, which would load it before the walk mock exists.
+vi.mock('../../services/tautulli.js', () => ({ TautulliService: vi.fn() }));
+
+vi.mock('../importedHistoryLinking.js', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../importedHistoryLinking.js')>()),
+  runImportedHistoryLinkingWalk: vi.fn(),
+}));
+
 vi.mock('../heavyOpsLock.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../heavyOpsLock.js')>()),
   isImportWaiting: vi.fn(),
@@ -82,6 +90,7 @@ import { extendJobLock } from '../lockUtils.js';
 import { isImportWaiting } from '../heavyOpsLock.js';
 import { getSetting, setSetting } from '../../services/settings.js';
 import { IMPORTED_LINK_REPAIR_VERSION } from '../importedLinkRepair.js';
+import { runImportedHistoryLinkingWalk } from '../importedHistoryLinking.js';
 import {
   enqueueImportedLinkRepairIfBehind,
   enqueueMaintenanceJob,
@@ -92,6 +101,7 @@ import {
   processBackfillLibrarySnapshotsJob,
   processNormalizeLibrarySnapshotsJob,
   processFixImportedProgressJob,
+  runImportedHistoryLinking,
   runSessionMaintenanceWalk,
   getMaintenanceProgress,
   type MaintenanceJobData,
@@ -297,6 +307,31 @@ describe('aggregate refresh after a walk', () => {
 
     expect(aggregatesReadingSessionColumns).toHaveBeenCalledWith(PROGRESS_COLUMNS);
     expect(refreshed()).toEqual(['daily_content_engagement', 'user_media_plays_daily']);
+  });
+
+  it('refreshes only the aggregates that read the columns a link writes for link_imported_history', async () => {
+    vi.mocked(aggregatesReadingSessionColumns).mockImplementation(async (columns) =>
+      columns.includes('media_id') ? ['user_media_plays_daily'] : []
+    );
+    vi.mocked(runImportedHistoryLinkingWalk).mockImplementation(async ({ onCommit }) => {
+      onCommit(COMMITTED);
+      return { total: 1, earliest: COMMITTED, failedRanges: [], details: '' };
+    });
+
+    await runImportedHistoryLinking(job(), {
+      tautulli: null,
+      trigger: 'manual',
+      hasPendingLibrarySync: async () => false,
+    });
+
+    expect(aggregatesReadingSessionColumns).toHaveBeenCalledWith([
+      'media_id',
+      'show_media_id',
+      'imdb_id',
+      'tmdb_id',
+      'tvdb_id',
+    ]);
+    expect(refreshed()).toEqual(['user_media_plays_daily']);
   });
 });
 

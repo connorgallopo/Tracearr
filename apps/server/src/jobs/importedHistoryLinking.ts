@@ -2,7 +2,11 @@ import { inArray, sql, type SQL } from 'drizzle-orm';
 import { REDIS_KEYS, SERVER_PROFILES, SERVER_TYPES } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
-import { uncapDecompressionForTx } from '../db/timescale.js';
+import {
+  type ChunkTimeRange,
+  getCompressedSessionChunkRanges,
+  uncapDecompressionForTx,
+} from '../db/timescale.js';
 import { getRedis } from '../lib/redisShared.js';
 import { getServerTrackingStart } from '../services/import/trackingCutoff.js';
 import {
@@ -14,6 +18,7 @@ import {
 import { TautulliService } from '../services/tautulli.js';
 import { normalizePlexGuid } from '../utils/plexGuid.js';
 import { batchResolveMediaByPlexGuid, CONTAINER_MEDIA_TYPES_SQL } from './poller/database.js';
+import { MAX_POINT_UPDATES_PER_PASS } from './sessionIdentityBackfill.js';
 import {
   byInstant,
   drainWindowsWithBisection,
@@ -59,6 +64,14 @@ const BATCH_SIZE = 1000;
 const GUID_KEYS_PER_REQUEST = 100;
 const MIN_SCAN_VERSION = 2;
 export const MAX_AUTO_LINK_ATTEMPTS = 5;
+/** The sessions columns a link writes. */
+export const IMPORTED_HISTORY_LINK_WRITES = [
+  'media_id',
+  'show_media_id',
+  'imdb_id',
+  'tmdb_id',
+  'tvdb_id',
+];
 export const AUTO_LINK_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const AUTO_LINK_WARNING_MS = 48 * 60 * 60 * 1000;
 
@@ -113,52 +126,83 @@ interface PickedLink {
 }
 
 /**
- * Select the rows to link read-only, then write only those rows. A compressed
- * chunk is decompressed for writing only when the window has something to
- * link, and the UPDATE target repeats the bounds and orphan predicates. A
- * provider id the match lacks never blanks the one the row already has.
+ * Select the rows to link read-only, then write only those rows: a window with
+ * nothing to link opens no transaction and decompresses nothing. Every write
+ * repeats the bounds and orphan predicates, and a provider id the match lacks
+ * never blanks the one the row already has. A window with no compressed chunk,
+ * or more than MAX_POINT_UPDATES_PER_PASS rows, takes one statement over the
+ * picked rows, which decompresses every compressed batch the window bounds
+ * reach. Fewer rows over a compressed chunk each take a point update on
+ * constant (id, started_at), which decompresses only the batch holding the row.
  */
 async function linkPicked(
   serverId: string,
   cutoff: Date,
   window: Window,
+  compressed: ChunkTimeRange[],
   before: string | undefined,
   pick: SQL,
-  target: SQL
+  target: (row?: PickedLink) => SQL
 ): Promise<{ count: number; oldest: Date | null; cursor?: string }> {
   if (startsAfterCutoff(window, cutoff)) return { count: 0, oldest: null };
+  const picked = (await db.execute(pick)).rows as unknown as PickedLink[];
+  if (picked.length === 0) return { count: 0, oldest: null };
+  const pointUpdates =
+    picked.length <= MAX_POINT_UPDATES_PER_PASS &&
+    compressed.some((chunk) => !window || (chunk.end > window.start && chunk.start < window.end));
+  const bounds = sessionBounds('s', serverId, cutoff, window, before);
   const starts = await db.transaction(async (tx) => {
-    const picked = (await tx.execute(pick)).rows as unknown as PickedLink[];
-    if (picked.length === 0) return [];
     await uncapDecompressionForTx(tx);
-    const updated = await tx.execute(sql`
-      UPDATE sessions s
-      SET media_id = p.media_id, show_media_id = p.show_media_id,
-        imdb_id = COALESCE(p.imdb_id, s.imdb_id),
-        tmdb_id = COALESCE(p.tmdb_id, s.tmdb_id),
-        tvdb_id = COALESCE(p.tvdb_id, s.tvdb_id)
-      FROM unnest(
-        ${sql.param(picked.map((r) => r.id))}::uuid[],
-        ${sql.param(picked.map((r) => r.started_at))}::timestamptz[],
-        ${sql.param(picked.map((r) => r.rating_key))}::text[],
-        ${sql.param(picked.map((r) => r.external_session_id))}::text[],
-        ${sql.param(picked.map((r) => r.media_type))}::text[],
-        ${sql.param(picked.map((r) => r.media_id))}::uuid[],
-        ${sql.param(picked.map((r) => r.show_media_id))}::uuid[],
-        ${sql.param(picked.map((r) => r.imdb_id))}::text[],
-        ${sql.param(picked.map((r) => r.tmdb_id))}::int[],
-        ${sql.param(picked.map((r) => r.tvdb_id))}::int[]
-      ) AS p(id, started_at, rating_key, external_session_id, media_type, media_id,
-        show_media_id, imdb_id, tmdb_id, tvdb_id)
-      WHERE s.id = p.id AND s.started_at = p.started_at
-        AND s.rating_key = p.rating_key AND s.external_session_id = p.external_session_id
-        AND ${sessionBounds('s', serverId, cutoff, window, before)}
-        AND s.media_type = p.media_type
-        AND ${target}
-        AND ${orphan('s')}
-      RETURNING s.started_at
-    `);
-    return (updated.rows as Array<{ started_at: string }>).map((r) => r.started_at);
+    if (!pointUpdates) {
+      const updated = await tx.execute(sql`
+        UPDATE sessions s
+        SET media_id = p.media_id, show_media_id = p.show_media_id,
+          imdb_id = COALESCE(p.imdb_id, s.imdb_id),
+          tmdb_id = COALESCE(p.tmdb_id, s.tmdb_id),
+          tvdb_id = COALESCE(p.tvdb_id, s.tvdb_id)
+        FROM unnest(
+          ${sql.param(picked.map((r) => r.id))}::uuid[],
+          ${sql.param(picked.map((r) => r.started_at))}::timestamptz[],
+          ${sql.param(picked.map((r) => r.rating_key))}::text[],
+          ${sql.param(picked.map((r) => r.external_session_id))}::text[],
+          ${sql.param(picked.map((r) => r.media_type))}::text[],
+          ${sql.param(picked.map((r) => r.media_id))}::uuid[],
+          ${sql.param(picked.map((r) => r.show_media_id))}::uuid[],
+          ${sql.param(picked.map((r) => r.imdb_id))}::text[],
+          ${sql.param(picked.map((r) => r.tmdb_id))}::int[],
+          ${sql.param(picked.map((r) => r.tvdb_id))}::int[]
+        ) AS p(id, started_at, rating_key, external_session_id, media_type, media_id,
+          show_media_id, imdb_id, tmdb_id, tvdb_id)
+        WHERE s.id = p.id AND s.started_at = p.started_at
+          AND s.rating_key = p.rating_key AND s.external_session_id = p.external_session_id
+          AND ${bounds}
+          AND s.media_type = p.media_type
+          AND ${target()}
+          AND ${orphan('s')}
+        RETURNING s.started_at
+      `);
+      return (updated.rows as Array<{ started_at: string }>).map((r) => r.started_at);
+    }
+    const written: string[] = [];
+    for (const p of picked) {
+      const { rows } = await tx.execute(sql`
+        UPDATE sessions s
+        SET media_id = ${p.media_id}::uuid, show_media_id = ${p.show_media_id}::uuid,
+          imdb_id = COALESCE(${p.imdb_id}::text, s.imdb_id),
+          tmdb_id = COALESCE(${p.tmdb_id}::int, s.tmdb_id),
+          tvdb_id = COALESCE(${p.tvdb_id}::int, s.tvdb_id)
+        WHERE s.id = ${p.id}::uuid AND s.started_at = ${p.started_at}::timestamptz
+          AND s.rating_key = ${p.rating_key}::text
+          AND s.external_session_id = ${p.external_session_id}::text
+          AND ${bounds}
+          AND s.media_type = ${p.media_type}::text
+          AND ${target(p)}
+          AND ${orphan('s')}
+        RETURNING s.started_at
+      `);
+      written.push(...(rows as Array<{ started_at: string }>).map((r) => r.started_at));
+    }
+    return written;
   });
   // Counting written rows, not picked ones: a picked row left unwritten would
   // be picked again, and the drain loop only stops on a short batch.
@@ -180,19 +224,23 @@ async function linkOrphanSessionsBatch(
   links: OrphanKeyLink[],
   limit: number,
   window: Window,
+  compressed: ChunkTimeRange[],
   before: string | undefined
 ): Promise<{ count: number; oldest: Date | null; cursor?: string }> {
   const pairs = links.flatMap((link) =>
     link.externalSessionIds.map((externalSessionId) => ({ link, externalSessionId }))
   );
   if (pairs.length === 0) return { count: 0, oldest: null };
-  const pairKeys = sql`${sql.param(pairs.map((p) => p.link.ratingKey))}::text[]`;
-  const pairIds = sql`${sql.param(pairs.map((p) => p.externalSessionId))}::text[]`;
+  const pairKeys = (list: typeof pairs) =>
+    sql`${sql.param(list.map((p) => p.link.ratingKey))}::text[]`;
+  const pairIds = (list: typeof pairs) =>
+    sql`${sql.param(list.map((p) => p.externalSessionId))}::text[]`;
 
   return linkPicked(
     serverId,
     cutoff,
     window,
+    compressed,
     before,
     sql`
       SELECT o.id, o.started_at, o.rating_key, o.external_session_id, l.media_type, l.media_id,
@@ -200,8 +248,8 @@ async function linkOrphanSessionsBatch(
         l.imdb_id, l.tmdb_id, l.tvdb_id
       FROM sessions o
       JOIN unnest(
-        ${pairKeys},
-        ${pairIds},
+        ${pairKeys(pairs)},
+        ${pairIds(pairs)},
         ${sql.param(pairs.map((p) => p.link.mediaType))}::text[],
         ${sql.param(pairs.map((p) => p.link.mediaId))}::uuid[],
         ${sql.param(pairs.map((p) => p.link.showMediaId))}::uuid[],
@@ -218,8 +266,17 @@ async function linkOrphanSessionsBatch(
       ORDER BY o.started_at DESC
       LIMIT ${limit}
     `,
-    sql`s.media_type IN ('movie', 'episode')
-      AND (s.rating_key, s.external_session_id) IN (SELECT * FROM unnest(${pairKeys}, ${pairIds}))`
+    (row) => {
+      // A point update fixes the row's pair, so only list entries equal to it can match.
+      const list = row
+        ? pairs.filter(
+            (p) =>
+              p.link.ratingKey === row.rating_key && p.externalSessionId === row.external_session_id
+          )
+        : pairs;
+      return sql`s.media_type IN ('movie', 'episode')
+        AND (s.rating_key, s.external_session_id) IN (SELECT * FROM unnest(${pairKeys(list)}, ${pairIds(list)}))`;
+    }
   );
 }
 
@@ -235,12 +292,14 @@ async function linkOrphanMoviesByProviderIdBatch(
   cutoff: Date,
   limit: number,
   window: Window,
+  compressed: ChunkTimeRange[],
   before: string | undefined
 ): Promise<{ count: number; oldest: Date | null; cursor?: string }> {
   return linkPicked(
     serverId,
     cutoff,
     window,
+    compressed,
     before,
     sql`
       WITH orphan AS (
@@ -285,7 +344,7 @@ async function linkOrphanMoviesByProviderIdBatch(
       ORDER BY o.started_at DESC
       LIMIT ${limit}
     `,
-    sql`s.media_type = 'movie'`
+    () => sql`s.media_type = 'movie'`
   );
 }
 
@@ -477,7 +536,8 @@ export async function runImportedHistoryLinkingWalk(
     server: { id: string; machineIdentifier: string | null },
     cutoff: Date,
     client: LinkingTautulli,
-    windows: Required<BackfillWindow>[] | null
+    windows: Required<BackfillWindow>[] | null,
+    compressed: ChunkTimeRange[]
   ): Promise<boolean> => {
     let pmsIdentifier: string | null;
     try {
@@ -593,7 +653,15 @@ export async function runImportedHistoryLinkingWalk(
         return links.filter((l) => keys.has(l.ratingKey));
       };
       const drained = await drain(server.id, windows, 'guid', (window, cursor) =>
-        linkOrphanSessionsBatch(server.id, cutoff, linksFor(window), batchSize, window, cursor)
+        linkOrphanSessionsBatch(
+          server.id,
+          cutoff,
+          linksFor(window),
+          batchSize,
+          window,
+          compressed,
+          cursor
+        )
       );
       if (!drained) complete = false;
     }
@@ -622,14 +690,25 @@ export async function runImportedHistoryLinkingWalk(
       const cutoff = await getServerTrackingStart(server.id);
       if (!cutoff) continue;
       const windows = await sessionWalkWindows(null);
+      // Callers run the walk with compression paused, so no chunk becomes compressed during it.
+      const compressed = await getCompressedSessionChunkRanges();
 
       outcome.providerPassDone =
         before.providerPassDoneServers.includes(server.id) ||
         (await drain(server.id, windows, 'provider', (window, cursor) =>
-          linkOrphanMoviesByProviderIdBatch(server.id, cutoff, batchSize, window, cursor)
+          linkOrphanMoviesByProviderIdBatch(
+            server.id,
+            cutoff,
+            batchSize,
+            window,
+            compressed,
+            cursor
+          )
         ));
 
-      const guidComplete = tautulli ? await guidPass(server, cutoff, tautulli, windows) : true;
+      const guidComplete = tautulli
+        ? await guidPass(server, cutoff, tautulli, windows, compressed)
+        : true;
       if (tautulli && !guidComplete) skipped.unfinished++;
       outcome.complete = outcome.providerPassDone && guidComplete;
     }
