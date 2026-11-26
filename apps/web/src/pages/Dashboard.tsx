@@ -105,15 +105,7 @@ function ServerDashboard({ actions }: { actions?: ReactNode }) {
   const showBandwidthChart =
     !!singleProfile?.reportsBandwidth ||
     (isMultiServer && liveSelected.some((s) => SERVER_PROFILES[s.type].reportsBandwidth));
-  const singleProcessLabel = singleServer
-    ? {
-        plex: 'Plex Media Server',
-        jellyfin: 'Jellyfin',
-        emby: 'Emby',
-        tofa: 'tofa',
-        silo: 'Silo',
-      }[singleServer.type]
-    : undefined;
+  const singleProcessLabel = singleProfile?.displayName;
 
   const {
     series: multiLiveStats,

@@ -460,17 +460,24 @@ export function parseSiloResources(
 ): Omit<ServerResourceDataPoint, 'timespan'> | null {
   const { system, attribution } = body;
   const sampledAt = Date.parse(body.sampled_at ?? '');
-  const residentBytes = attribution?.process?.resident_bytes;
   if (
     !body.available ||
     body.stale ||
     !Number.isFinite(sampledAt) ||
     !system ||
-    !(system.mem_total_mb > 0) ||
-    residentBytes === undefined
+    !(system.mem_total_mb > 0)
   ) {
     return null;
   }
+  // The working set of Silo's own cgroup holds the whole all-in-one stack (Postgres, Redis and its
+  // transcoders); a process alone, or a parent cgroup shared with other workloads, falls back to
+  // the Silo process's resident memory
+  const cgroup = attribution?.cgroup_memory;
+  const siloBytes =
+    cgroup?.scope === 'leaf' && cgroup.working_set_bytes !== undefined
+      ? cgroup.working_set_bytes
+      : attribution?.process?.resident_bytes;
+  if (siloBytes === undefined) return null;
   return {
     at: Math.floor(sampledAt / 1000),
     hostCpuUtilization: attribution?.cpu?.available === false ? null : system.cpu_pct,
@@ -479,7 +486,7 @@ export function parseSiloResources(
         ? null
         : (system.mem_used_mb / system.mem_total_mb) * 100,
     processCpuUtilization: null,
-    processMemoryUtilization: (residentBytes / (system.mem_total_mb * 1024 * 1024)) * 100,
+    processMemoryUtilization: (siloBytes / (system.mem_total_mb * 1024 * 1024)) * 100,
   };
 }
 

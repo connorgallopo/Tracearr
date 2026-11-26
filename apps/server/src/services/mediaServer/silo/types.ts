@@ -250,6 +250,8 @@ export interface SiloSystemResources {
     cpu?: { available: boolean };
     memory?: { available: boolean };
     process?: { resident_bytes?: number };
+    /** leaf: Silo's own cgroup; ancestor: a parent level whose counters include sibling workloads */
+    cgroup_memory?: { scope: string; working_set_bytes?: number };
   };
 }
 

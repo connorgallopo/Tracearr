@@ -50,7 +50,7 @@ interface ServerResourceChartsProps {
   } | null;
   /** One per-server line each; host metrics are dropped in this mode */
   multiSeries?: ResourceMultiSeries[];
-  /** Single-view name for the process series (defaults to Plex's) */
+  /** Single-view name for the process series */
   processLabel?: string;
   /** Single-view counterpart of a series' gapSeconds */
   gapSeconds?: number;
@@ -98,49 +98,57 @@ function ResourceChart({
   const { t } = useTranslation(['pages', 'common']);
   const chartRef = useRef<HighchartsReact.RefObject | null>(null);
   const isMulti = !!multiSeries && multiSeries.length > 0;
-  const hasData = isMulti ? multiSeries.some((s) => s.data.length > 0) : !!data?.length;
+  // A server that does not report this metric gets no line and no average, not an empty one
+  const plotted = useMemo(
+    () => (multiSeries ?? []).filter((s) => s.data.some((p) => p[processKey] != null)),
+    [multiSeries, processKey]
+  );
+  const processPlotted = !!data?.some((p) => p[processKey] != null);
+  const hasData = isMulti ? plotted.length > 0 : !!data?.length;
 
   useSlidingWindow(chartRef, clockSkewMs);
 
   const chartOptions = useMemo<Highcharts.Options>(() => {
     if (!hasData) return {};
 
+    const processSeries: Highcharts.SeriesOptionsType = {
+      type: 'area',
+      ...(processLabel === undefined ? {} : { name: processLabel }),
+      color: COLORS.process,
+      data: withGaps(pointsFor(data ?? [], processKey), gap),
+      fillColor: {
+        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+        stops: [
+          [0, COLORS.processGradientStart],
+          [1, COLORS.processGradientEnd],
+        ],
+      },
+    };
+    const systemSeries: Highcharts.SeriesOptionsType = {
+      type: 'area',
+      name: t('dashboard.resources.system'),
+      color: COLORS.system,
+      data: withGaps(pointsFor(data ?? [], hostKey), gap),
+      fillColor: {
+        linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
+        stops: [
+          [0, COLORS.systemGradientStart],
+          [1, COLORS.systemGradientEnd],
+        ],
+      },
+    };
+
     // Host metrics belong to the box: N co-hosted servers, N identical lines
     const series: Highcharts.SeriesOptionsType[] = isMulti
-      ? multiSeries.map((s) => ({
+      ? plotted.map((s) => ({
           type: 'line' as const,
           name: s.serverName,
           color: s.color,
           data: withGaps(pointsFor(s.data, processKey), s.gapSeconds),
         }))
-      : [
-          {
-            type: 'area',
-            name: processLabel ?? 'Plex Media Server',
-            color: COLORS.process,
-            data: withGaps(pointsFor(data ?? [], processKey), gap),
-            fillColor: {
-              linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-              stops: [
-                [0, COLORS.processGradientStart],
-                [1, COLORS.processGradientEnd],
-              ],
-            },
-          },
-          {
-            type: 'area',
-            name: t('dashboard.resources.system'),
-            color: COLORS.system,
-            data: withGaps(pointsFor(data ?? [], hostKey), gap),
-            fillColor: {
-              linearGradient: { x1: 0, y1: 0, x2: 0, y2: 1 },
-              stops: [
-                [0, COLORS.systemGradientStart],
-                [1, COLORS.systemGradientEnd],
-              ],
-            },
-          },
-        ];
+      : processPlotted
+        ? [processSeries, systemSeries]
+        : [systemSeries];
 
     const values = series.flatMap((s) =>
       ((s as { data?: [number, number | null][] }).data ?? [])
@@ -219,7 +227,19 @@ function ResourceChart({
         ],
       },
     };
-  }, [data, processKey, hostKey, multiSeries, isMulti, hasData, processLabel, gap, clockSkewMs, t]);
+  }, [
+    data,
+    processKey,
+    hostKey,
+    plotted,
+    processPlotted,
+    isMulti,
+    hasData,
+    processLabel,
+    gap,
+    clockSkewMs,
+    t,
+  ]);
 
   const header = (
     <CardHeader>
@@ -272,7 +292,7 @@ function ResourceChart({
         />
         <div className="text-muted-foreground mt-1 flex flex-wrap justify-end gap-4 pr-2 text-xs">
           {isMulti ? (
-            multiSeries.map((s) => {
+            plotted.map((s) => {
               const values = s.data.map((p) => p[processKey]).filter((v): v is number => v != null);
               const avg =
                 values.length > 0
@@ -282,7 +302,7 @@ function ResourceChart({
             })
           ) : (
             <>
-              <AverageChip color={COLORS.process} value={processAvg} />
+              {processPlotted && <AverageChip color={COLORS.process} value={processAvg} />}
               <AverageChip color={COLORS.system} value={hostAvg} />
             </>
           )}

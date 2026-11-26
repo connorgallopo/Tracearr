@@ -458,7 +458,7 @@ describe('parseSiloResources', () => {
       hostCpuUtilization: 2,
       hostMemoryUtilization: (1163 / 12288) * 100,
       processCpuUtilization: null,
-      processMemoryUtilization: (384167936 / 12884901888) * 100,
+      processMemoryUtilization: (1220411392 / 12884901888) * 100,
     });
   });
 
@@ -474,7 +474,7 @@ describe('parseSiloResources', () => {
     expect(parseSiloResources(ancestor)?.processCpuUtilization).toBeNull();
   });
 
-  it("counts Silo's process memory without its transcoders', which Silo keeps apart", () => {
+  it("does not add Silo's transcoders to its cgroup's working set, which already holds them", () => {
     const transcoding = {
       ...second,
       attribution: {
@@ -484,8 +484,37 @@ describe('parseSiloResources', () => {
     };
 
     expect(parseSiloResources(transcoding)?.processMemoryUtilization).toBeCloseTo(
+      (1220411392 / 12884901888) * 100
+    );
+  });
+
+  it("charts Silo's process memory when the cgroup it can see is shared with other workloads", () => {
+    const ancestor = {
+      ...second,
+      attribution: {
+        ...second.attribution,
+        cgroup_memory: { scope: 'ancestor', working_set_bytes: 8 * 1024 * 1024 * 1024 },
+      },
+    };
+
+    expect(parseSiloResources(ancestor)?.processMemoryUtilization).toBeCloseTo(
       (384167936 / 12884901888) * 100
     );
+  });
+
+  it("charts Silo's process memory when Silo cannot read its cgroup", () => {
+    const point = parseSiloResources({
+      ...second,
+      attribution: { sample_interval_seconds: 5, process: { resident_bytes: 384167936 } },
+    });
+
+    expect(point?.processMemoryUtilization).toBeCloseTo((384167936 / 12884901888) * 100);
+  });
+
+  it('adds no point when Silo reports neither its cgroup nor its process memory', () => {
+    expect(
+      parseSiloResources({ ...second, attribution: { sample_interval_seconds: 5 } })
+    ).toBeNull();
   });
 
   it('leaves out a reading Silo marks unavailable rather than charting it as zero', () => {

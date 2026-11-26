@@ -313,7 +313,7 @@ describe('getServerLiveStats', () => {
           hostCpuUtilization: 2,
           processCpuUtilization: null,
           hostMemoryUtilization: (1163 / 12288) * 100,
-          processMemoryUtilization: (384167936 / 12884901888) * 100,
+          processMemoryUtilization: (1220411392 / 12884901888) * 100,
         },
       ]);
       expect(result).toMatchObject({
