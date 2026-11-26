@@ -426,7 +426,8 @@
     "deletesData": "",
     "deletesDataDesc": "",
     "automatic": "",
-    "startJob": ""
+    "startJob": "",
+    "repairHeld": ""
   },
   "memberLogin": {
     "serverActivity": "",
