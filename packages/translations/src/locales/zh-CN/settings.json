@@ -422,7 +422,8 @@
     "deletesData": "此操作会永久删除数据",
     "deletesDataDesc": "已删除的行无法恢复。如不确定请先备份。",
     "automatic": "自动",
-    "startJob": "开始作业"
+    "startJob": "开始作业",
+    "repairHeld": ""
   },
   "memberLogin": {
     "serverActivity": "向成员显示匿名服务器活动",
