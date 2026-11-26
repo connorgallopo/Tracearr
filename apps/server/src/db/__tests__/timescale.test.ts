@@ -26,6 +26,7 @@ import {
   getCachedSessionsCompressionHorizon,
   uncapDecompressionForTx,
   MAX_TUPLES_DECOMPRESSED_GUC,
+  rangeReachesChunk,
 } from '../timescale.js';
 
 function executeMock() {
@@ -776,5 +777,56 @@ describe('uncapDecompressionForTx', () => {
     const execute = vi.fn().mockResolvedValueOnce({ rows: [] });
     await uncapDecompressionForTx({ execute });
     expect(execute).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('rangeReachesChunk', () => {
+  const day = (d: number) => new Date(Date.UTC(2026, 0, d));
+  // Chunks cover [start, end): a row at a chunk's end belongs to the next chunk.
+  const chunks = [{ start: day(10), end: day(20) }];
+
+  it('finds nothing without chunks', () => {
+    expect(rangeReachesChunk([], {})).toBe(false);
+    expect(rangeReachesChunk([], { start: day(1), end: day(30) })).toBe(false);
+  });
+
+  it('treats a missing bound as open on that side', () => {
+    expect(rangeReachesChunk(chunks, {})).toBe(true);
+    expect(rangeReachesChunk(chunks, { start: null, end: null })).toBe(true);
+    expect(rangeReachesChunk(chunks, { end: day(11) })).toBe(true);
+    expect(rangeReachesChunk(chunks, { start: day(19) })).toBe(true);
+  });
+
+  it('excludes a chunk that ends where the range starts', () => {
+    expect(rangeReachesChunk(chunks, { start: day(20) })).toBe(false);
+    expect(rangeReachesChunk(chunks, { start: day(20), end: day(30) })).toBe(false);
+    expect(rangeReachesChunk(chunks, { start: day(20), end: day(30), endInclusive: true })).toBe(
+      false
+    );
+  });
+
+  it('excludes a chunk that starts at an exclusive end', () => {
+    expect(rangeReachesChunk(chunks, { end: day(10) })).toBe(false);
+    expect(rangeReachesChunk(chunks, { start: day(1), end: day(10) })).toBe(false);
+  });
+
+  it('includes a chunk that starts at an inclusive end', () => {
+    expect(rangeReachesChunk(chunks, { start: day(1), end: day(10), endInclusive: true })).toBe(
+      true
+    );
+  });
+
+  it('reaches a chunk the range sits inside or spans', () => {
+    expect(rangeReachesChunk(chunks, { start: day(12), end: day(13) })).toBe(true);
+    expect(rangeReachesChunk(chunks, { start: day(12), end: day(12), endInclusive: true })).toBe(
+      true
+    );
+    expect(rangeReachesChunk(chunks, { start: day(1), end: day(30) })).toBe(true);
+  });
+
+  it('reaches when any one of several chunks is reached', () => {
+    const two = [{ start: day(25), end: day(28) }, ...chunks];
+    expect(rangeReachesChunk(two, { start: day(21), end: day(26) })).toBe(true);
+    expect(rangeReachesChunk(two, { start: day(21), end: day(25) })).toBe(false);
   });
 });

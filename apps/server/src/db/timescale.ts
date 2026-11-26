@@ -1101,6 +1101,62 @@ function toChunkTimeRanges(rows: unknown[]): ChunkTimeRange[] {
 }
 
 /**
+ * Above this many rows a session walk pass over a compressed chunk writes with its one
+ * window-bounded statement instead of point updates on constant (id, started_at). A point update
+ * decompresses the batch holding its row and writes it to the heap: about 16 to 28 ms a row on
+ * TimescaleDB 2.31 over a 40,000-row chunk with the rows spread across it. The window statement
+ * decompresses every batch the window reaches once, about a second there, whatever it writes.
+ * The two cost the same at about 60 rows on 2.31; 2.28 crosses later.
+ */
+export const MAX_POINT_UPDATES_PER_PASS = 50;
+
+/** A sessions row as read for a point write: its key and its compression segment. */
+export interface SessionRowPoint {
+  id: string;
+  /** Postgres text, microseconds intact */
+  started_at: string;
+  server_user_id: string;
+  server_id: string;
+}
+
+/**
+ * Matches one sessions row (under `alias`) by constant values for its key and its compression
+ * segment, so an UPDATE or DELETE on a compressed chunk decompresses only the batch holding the
+ * row. Over a chunk split among 300 accounts, 50 point updates ran 15 to 25% faster with the
+ * segment columns than on (id, started_at) alone, and no slower over 20 accounts.
+ */
+export function sessionRowPoint(alias: string, row: SessionRowPoint): SQL {
+  const column = (name: string) => sql.raw(`${alias}.${name}`);
+  return sql.join(
+    [
+      sql`${column('id')} = ${row.id}::uuid`,
+      sql`${column('started_at')} = ${row.started_at}::timestamptz`,
+      sql`${column('server_user_id')} = ${row.server_user_id}::uuid`,
+      sql`${column('server_id')} = ${row.server_id}::uuid`,
+    ],
+    sql` AND `
+  );
+}
+
+/**
+ * Whether a started_at range reaches any of these chunks, which decides whether a write bounded
+ * by that range would decompress compressed history. A missing bound leaves that side open. `end`
+ * is exclusive, for a `started_at < end` bound, unless `endInclusive` says the range is closed,
+ * for `started_at <= end`.
+ */
+export function rangeReachesChunk(
+  chunks: ChunkTimeRange[],
+  range: { start?: Date | null; end?: Date | null; endInclusive?: boolean }
+): boolean {
+  const { start, end, endInclusive = false } = range;
+  return chunks.some(
+    (chunk) =>
+      (!start || chunk.end > start) &&
+      (!end || (endInclusive ? chunk.start <= end : chunk.start < end))
+  );
+}
+
+/**
  * started_at bound above which no sessions chunk is compressed - null when
  * nothing is compressed (or TimescaleDB is absent). Convenience for one-shot
  * callers that only need the boundary, not the per-chunk ranges.

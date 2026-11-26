@@ -18,11 +18,11 @@ vi.mock('../../db/client.js', () => ({
 }));
 
 import { db } from '../../db/client.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../../db/timescale.js';
 import { renderSql } from '../../test/helpers.js';
 import {
   backfillSessionIdentityBatch,
   hasStampableSessionsBefore,
-  MAX_POINT_UPDATES_PER_PASS,
   runSessionIdentityBackfillWalk,
 } from '../sessionIdentityBackfill.js';
 import type { SQL } from 'drizzle-orm';
@@ -163,17 +163,20 @@ describe('backfillSessionIdentityBatch', () => {
       start: new Date('2026-01-01T00:00:00.000Z'),
       end: new Date('2026-01-31T00:00:00.000Z'),
     };
-    const read = (id: string, mediaId: string, showMediaId: string | null) => ({
+    const read = (n: number, mediaId: string, showMediaId: string | null) => ({
       rows: [
-        { id, started_at: '2026-01-05 00:00:00+00', media_id: mediaId, show_media_id: showMediaId },
+        {
+          id: `session-${n}`,
+          started_at: '2026-01-05 00:00:00+00',
+          server_user_id: `user-${n}`,
+          server_id: 'server-1',
+          media_id: mediaId,
+          show_media_id: showMediaId,
+        },
       ],
     });
     mockBatch(
-      [
-        read('session-1', 'media-1', 'show-1'),
-        read('session-2', 'media-2', 'show-2'),
-        read('session-3', 'season-3', null),
-      ],
+      [read(1, 'media-1', 'show-1'), read(2, 'media-2', 'show-2'), read(3, 'season-3', null)],
       [{ range_start: '2026-01-01T00:00:00.000Z', range_end: '2026-01-31T00:00:00.000Z' }]
     );
     // One write transaction per pass: the GUC probe, SET LOCAL, then the point update.
@@ -193,19 +196,41 @@ describe('backfillSessionIdentityBatch', () => {
     };
     const [fresh, repair, unlink] = [update(2), update(5), update(8)];
     for (const { text } of [fresh, repair, unlink]) {
-      expect(text).toMatch(/WHERE s\.id = \$\d+::uuid AND s\.started_at = \$\d+::timestamptz/);
+      expect(text).toMatch(
+        /WHERE s\.id = \$\d+::uuid AND s\.started_at = \$\d+::timestamptz AND s\.server_user_id = \$\d+::uuid AND s\.server_id = \$\d+::uuid AND/
+      );
     }
     expect(fresh.text).toContain('AND s.media_id IS NULL RETURNING');
     expect(fresh.text).not.toContain('FROM');
-    expect(fresh.params).toEqual(['media-1', 'show-1', 'session-1', '2026-01-05 00:00:00+00']);
+    expect(fresh.params).toEqual([
+      'media-1',
+      'show-1',
+      'session-1',
+      '2026-01-05 00:00:00+00',
+      'user-1',
+      'server-1',
+    ]);
     expect(repair.text).toMatch(
-      /AND s\.show_media_id IS NULL AND s\.media_id = \$4::uuid RETURNING/
+      /AND s\.show_media_id IS NULL AND s\.media_id = \$6::uuid RETURNING/
     );
-    expect(repair.params).toEqual(['show-2', 'session-2', '2026-01-05 00:00:00+00', 'media-2']);
+    expect(repair.params).toEqual([
+      'show-2',
+      'session-2',
+      '2026-01-05 00:00:00+00',
+      'user-2',
+      'server-1',
+      'media-2',
+    ]);
     expect(unlink.text).toMatch(
-      /AND EXISTS \( SELECT 1 FROM media m WHERE m\.id = s\.media_id AND m\.media_type IN \(\$3, \$4, \$5, \$6\)\) RETURNING/
+      /AND EXISTS \( SELECT 1 FROM media m WHERE m\.id = s\.media_id AND m\.media_type IN \(\$5, \$6, \$7, \$8\)\) RETURNING/
     );
-    expect(unlink.params).toEqual(['session-3', '2026-01-05 00:00:00+00', ...CONTAINER_TYPES]);
+    expect(unlink.params).toEqual([
+      'session-3',
+      '2026-01-05 00:00:00+00',
+      'user-3',
+      'server-1',
+      ...CONTAINER_TYPES,
+    ]);
   });
 
   it('writes more rows than the point-update limit with the window statement, with the cap lifted', async () => {

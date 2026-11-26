@@ -16,7 +16,7 @@ import {
 import { db, recreatePool } from '../client.js';
 import { servers } from '../schema.js';
 import { runServerLocationSyncWalk } from '../../jobs/serverLocationSync.js';
-import { MAX_POINT_UPDATES_PER_PASS } from '../../jobs/sessionIdentityBackfill.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../timescale.js';
 import { getServerLocations, replaceServerLocations } from '../../services/serverLocations.js';
 import { localSessionSql } from '../../db/sessions/rules.js';
 import { compressSessionChunks } from '../../test/compressChunks.js';

@@ -3,8 +3,12 @@ import { REDIS_KEYS } from '@tracearr/shared';
 import { db } from '../db/client.js';
 import {
   getCompressedSessionChunkRanges,
+  MAX_POINT_UPDATES_PER_PASS,
+  rangeReachesChunk,
+  sessionRowPoint,
   uncapDecompressionForTx,
   type ChunkTimeRange,
+  type SessionRowPoint,
 } from '../db/timescale.js';
 import { getRedis } from '../lib/redisShared.js';
 import {
@@ -14,7 +18,6 @@ import {
   serverTypesSql,
 } from '../services/import/keyRuleSql.js';
 import { resolveImportedPlays } from '../services/library/importedPlayIdentity.js';
-import { IMPORTED_LINK_REPAIR_VERSION } from './importedLinkRepair.js';
 import { CONTAINER_MEDIA_TYPES_SQL } from './poller/database.js';
 import {
   byInstant,
@@ -66,10 +69,7 @@ export interface GoneKeyWindow {
   after: Date | null;
 }
 
-interface OrphanImportRow {
-  id: string;
-  started_at: string;
-  server_id: string;
+interface OrphanImportRow extends SessionRowPoint {
   media_type: string;
   media_title: string;
   grandparent_title: string | null;
@@ -84,9 +84,7 @@ interface OrphanImportRow {
 type StampedRows = Array<{ started_at: string }>;
 
 /** A row a key pass read: the media and show ids it writes, or the media id its guard checks. */
-interface PassRow {
-  id: string;
-  started_at: string;
+interface PassRow extends SessionRowPoint {
   media_id: string | null;
   show_media_id: string | null;
 }
@@ -232,15 +230,6 @@ export async function hasConfirmedAbsentTrackedRows(
 }
 
 /**
- * Above this many rows a pass over a compressed chunk writes with one window-bounded statement
- * instead of point updates. A point update costs about a millisecond and decompresses the batch
- * holding its row, while the window statement decompresses the whole window once whatever it
- * writes. On TimescaleDB 2.31 over a 40,000-row chunk with the changed rows spread across it,
- * the two cost the same at about 60 rows; 2.28 crosses later.
- */
-export const MAX_POINT_UPDATES_PER_PASS = 50;
-
-/**
  * Runs one key pass. `select` reads its rows (id, started_at, media_id, show_media_id); the window
  * statement selects and writes them in one statement. A window with no
  * compressed chunk takes that statement directly, under the default decompression cap, so a chunk
@@ -248,10 +237,10 @@ export const MAX_POINT_UPDATES_PER_PASS = 50;
  * retries. Over a compressed chunk the select runs read-only first and nothing is written when it
  * finds nothing: the window statement's constant bounds decompress every batch they reach, even
  * with nothing to write. Up to MAX_POINT_UPDATES_PER_PASS rows then each take a point update on
- * constant (id, started_at), which decompresses only the batch holding the row and skips a row
- * the guard says changed since the read; a join-driven UPDATE on a partially compressed chunk
- * without constant bounds would reach only the rows already outside its compressed batches. More
- * rows take the window statement.
+ * the row's constant key and segment (sessionRowPoint), which decompresses only the batch holding
+ * the row and skips a row the guard says changed since the read; a join-driven UPDATE on a
+ * partially compressed chunk without constant bounds would reach only the rows already outside
+ * its compressed batches. More rows take the window statement.
  */
 async function runPass(
   select: SQL,
@@ -276,7 +265,7 @@ async function runPass(
     for (const row of rows) {
       const { rows: one } = await tx.execute(sql`
         UPDATE sessions s SET ${point.set(row)}
-        WHERE s.id = ${row.id}::uuid AND s.started_at = ${row.started_at}::timestamptz
+        WHERE ${sessionRowPoint('s', row)}
           AND ${point.guard(row)}
         RETURNING s.started_at
       `);
@@ -377,10 +366,10 @@ export async function backfillSessionIdentityBatch(
       : new Map<string, GoneKeyWindow>()
   );
 
-  const compressed = (await getCompressedSessionChunkRanges()).some(
-    (chunk) =>
-      (!window?.start || chunk.end > window.start) && (!window?.end || chunk.start < window.end)
-  );
+  const compressed = rangeReachesChunk(await getCompressedSessionChunkRanges(), {
+    start: window?.start,
+    end: window?.end,
+  });
   const none = { read: [], written: [] };
   const pass = (n: Pass, select: SQL, windowWrite: SQL, point: PointWrite) =>
     skip(n) ? none : runPass(select, windowWrite, compressed, point);
@@ -388,7 +377,7 @@ export async function backfillSessionIdentityBatch(
   const fresh = await pass(
     0,
     sql`
-      SELECT s.id, s.started_at, li.media_id,
+      SELECT s.id, s.started_at, s.server_user_id, s.server_id, li.media_id,
         CASE WHEN li.media_type = 'episode' THEN m.show_media_id END AS show_media_id
       FROM sessions s
       JOIN library_items li ON li.server_id = s.server_id AND li.rating_key = s.rating_key
@@ -442,7 +431,7 @@ export async function backfillSessionIdentityBatch(
 
   // Read after the fresh stamp commits: a row it stamped without a show can be repair work.
   const repairSelect = sql`
-    SELECT s.id, s.started_at, s.media_id, m.show_media_id
+    SELECT s.id, s.started_at, s.server_user_id, s.server_id, s.media_id, m.show_media_id
     FROM sessions s
     JOIN media m ON m.id = s.media_id
     WHERE s.media_id IS NOT NULL AND s.show_media_id IS NULL AND m.show_media_id IS NOT NULL
@@ -469,7 +458,7 @@ export async function backfillSessionIdentityBatch(
   );
 
   const unlinkSelect = sql`
-    SELECT s.id, s.started_at, s.media_id, NULL::uuid AS show_media_id
+    SELECT s.id, s.started_at, s.server_user_id, s.server_id, s.media_id, NULL::uuid AS show_media_id
     FROM sessions s
     JOIN media m ON m.id = s.media_id
     WHERE m.media_type IN (${CONTAINER_MEDIA_TYPES_SQL})
@@ -499,12 +488,14 @@ export async function backfillSessionIdentityBatch(
   );
 
   // A play the imported link repair unlinked and could not place stays unlinked: the title
-  // path would file it by the same fields the repair refused.
+  // path would file it by the same fields the repair refused. A log row of any repair version
+  // counts: the repair reads only linked plays, so a later version never logs this one again.
   const orphanRows = !resolveByTitle
     ? []
     : ((
         await db.execute(sql`
-      SELECT s.id, s.started_at, s.server_id, s.media_type, s.media_title, s.grandparent_title,
+      SELECT s.id, s.started_at, s.server_user_id, s.server_id, s.media_type, s.media_title,
+        s.grandparent_title,
         s.year, s.season_number, s.episode_number, s.imdb_id, s.tmdb_id, s.tvdb_id
       FROM sessions s
       WHERE s.media_id IS NULL AND s.rating_key IS NOT NULL
@@ -521,8 +512,7 @@ export async function backfillSessionIdentityBatch(
         )
         AND NOT EXISTS (
           SELECT 1 FROM session_link_repairs r
-          WHERE r.session_id = s.id AND r.started_at = s.started_at
-            AND r.repair_version = ${IMPORTED_LINK_REPAIR_VERSION} AND r.relinked_at IS NULL
+          WHERE r.session_id = s.id AND r.started_at = s.started_at AND r.relinked_at IS NULL
         )
         ${range(3)}
       ORDER BY s.started_at DESC
@@ -560,8 +550,7 @@ export async function backfillSessionIdentityBatch(
             await tx.execute(sql`
       UPDATE sessions s
       SET media_id = ${identity.mediaId}::uuid, show_media_id = ${identity.showMediaId}::uuid
-      WHERE s.id = ${play.row.id}::uuid AND s.started_at = ${play.row.started_at}::timestamptz
-        AND s.media_id IS NULL
+      WHERE ${sessionRowPoint('s', play.row)} AND s.media_id IS NULL
       RETURNING s.started_at
     `)
           ).rows as unknown as StampedRows;

@@ -15,7 +15,10 @@ import { servers, serverUsers, sessions, users } from '../db/schema.js';
 import {
   checkAggregateNeedsRebuild,
   getCompressedSessionChunkRanges,
+  MAX_POINT_UPDATES_PER_PASS,
+  rangeReachesChunk,
   refreshAggregates,
+  sessionRowPoint,
   uncapDecompressionForTx,
 } from '../db/timescale.js';
 import { deleteSessionsRepointingChildren, importForm } from '../jobs/importDuplicateCleanup.js';
@@ -25,7 +28,6 @@ import {
 } from '../jobs/maintenanceQueue.js';
 import { importIdentityByKey, parseHistoryGuid, type KeyedPlay } from './import/libraryKeyMatch.js';
 import { batchGetImportKeyIdentity, batchResolveMediaByPlexGuid } from '../jobs/poller/database.js';
-import { MAX_POINT_UPDATES_PER_PASS } from '../jobs/sessionIdentityBackfill.js';
 import { ts } from '../jobs/sessionWalk.js';
 import { sanitizeCodec } from '../utils/codecNormalizer.js';
 import { extractIpFromEndpoint } from '../utils/parsing.js';
@@ -1595,7 +1597,8 @@ export class TautulliService {
     const [found, compressed] = await Promise.all([
       db.execute(sql`
         SELECT DISTINCT ON (s.id) s.id, s.started_at, s.server_user_id,
-          r.id AS r_id, r.started_at AS r_started, r.reference_id AS r_ref
+          r.id AS r_id, r.started_at AS r_started, r.server_user_id AS r_server_user_id,
+          r.reference_id AS r_ref
         FROM unnest(
           ${sql.param(plays.map((p) => p.externalId))}::text[],
           ${sql.param(plays.map((p) => p.g.rootExternalId))}::text[],
@@ -1622,13 +1625,16 @@ export class TautulliService {
       server_user_id: string;
       r_id: string;
       r_started: string;
+      r_server_user_id: string;
       r_ref: string | null;
     }>;
     if (rows.length === 0) return [];
     // The writes are bounded below by minStart only, so they reach every compressed batch of the
-    // server from there on; a point write on constant (id, started_at) reaches only its row's batch.
+    // server from there on; a point write on the row's constant key and segment reaches only the
+    // batch holding the row.
     const pointWrites =
-      rows.length <= MAX_POINT_UPDATES_PER_PASS && compressed.some((chunk) => chunk.end > minStart);
+      rows.length <= MAX_POINT_UPDATES_PER_PASS &&
+      rangeReachesChunk(compressed, { start: minStart });
 
     return db.transaction(async (tx) => {
       await uncapDecompressionForTx(tx);
@@ -1642,7 +1648,12 @@ export class TautulliService {
         for (const d of detached) {
           await tx.execute(sql`
             UPDATE sessions r SET reference_id = NULL
-            WHERE r.id = ${d.r_id}::uuid AND r.started_at = ${d.r_started}::timestamptz
+            WHERE ${sessionRowPoint('r', {
+              id: d.r_id,
+              started_at: d.r_started,
+              server_user_id: d.r_server_user_id,
+              server_id: serverId,
+            })}
               AND ${detachGuard}
           `);
         }

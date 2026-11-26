@@ -20,10 +20,8 @@ import {
 import { db, recreatePool } from '../../src/db/client.js';
 import { compressSessionChunks } from '../../src/test/compressChunks.js';
 import { media } from '../../src/db/schema.js';
-import {
-  backfillSessionIdentityBatch,
-  MAX_POINT_UPDATES_PER_PASS,
-} from '../../src/jobs/sessionIdentityBackfill.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../../src/db/timescale.js';
+import { backfillSessionIdentityBatch } from '../../src/jobs/sessionIdentityBackfill.js';
 
 const SESSIONS = 50;
 const CHUNK_AGE_DAYS = 120;

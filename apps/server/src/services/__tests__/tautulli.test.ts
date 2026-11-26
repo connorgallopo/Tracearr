@@ -37,9 +37,9 @@ import { db } from '../../db/client.js';
 import {
   checkAggregateNeedsRebuild,
   getCompressedSessionChunkRanges,
+  MAX_POINT_UPDATES_PER_PASS,
   refreshAggregates,
 } from '../../db/timescale.js';
-import { MAX_POINT_UPDATES_PER_PASS } from '../../jobs/sessionIdentityBackfill.js';
 import {
   enqueueMaintenanceJob,
   enqueueServerLocationSyncIfBehind,
@@ -60,6 +60,7 @@ import {
 import { queryChain, renderSql } from '../../test/helpers.js';
 import type * as ImportModule from '../import/index.js';
 import type { SQL } from 'drizzle-orm';
+import type * as TimescaleModule from '../../db/timescale.js';
 
 vi.mock('../geoip.js', () => ({
   geoipService: {
@@ -85,13 +86,20 @@ vi.mock('../../db/client.js', () => ({
   db: { execute: vi.fn(), select: vi.fn(), update: vi.fn(), transaction: vi.fn() },
 }));
 
-vi.mock('../../db/timescale.js', () => ({
-  refreshAggregates: vi.fn().mockResolvedValue(undefined),
-  checkAggregateNeedsRebuild: vi.fn().mockResolvedValue({ needsRebuild: false }),
-  uncapDecompressionForTx: vi.fn().mockResolvedValue(undefined),
-  getSessionChunkRanges: vi.fn().mockResolvedValue([]),
-  getCompressedSessionChunkRanges: vi.fn().mockResolvedValue([]),
-}));
+vi.mock('../../db/timescale.js', async (importOriginal) => {
+  const { MAX_POINT_UPDATES_PER_PASS, rangeReachesChunk, sessionRowPoint } =
+    await importOriginal<typeof TimescaleModule>();
+  return {
+    MAX_POINT_UPDATES_PER_PASS,
+    rangeReachesChunk,
+    sessionRowPoint,
+    refreshAggregates: vi.fn().mockResolvedValue(undefined),
+    checkAggregateNeedsRebuild: vi.fn().mockResolvedValue({ needsRebuild: false }),
+    uncapDecompressionForTx: vi.fn().mockResolvedValue(undefined),
+    getSessionChunkRanges: vi.fn().mockResolvedValue([]),
+    getCompressedSessionChunkRanges: vi.fn().mockResolvedValue([]),
+  };
+});
 
 vi.mock('../../jobs/maintenanceQueue.js', () => ({
   enqueueMaintenanceJob: vi.fn().mockResolvedValue('job-1'),
@@ -2746,6 +2754,7 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
         server_user_id: SERVER_USER_ID,
         r_id: `root-${i}`,
         r_started: new Date(rootStarted * 1000).toISOString(),
+        r_server_user_id: SERVER_USER_ID,
         r_ref: ref(i),
       }));
     }
@@ -2899,7 +2908,7 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
       expect(remove?.params).toContainEqual(['absorbed-session']);
     });
 
-    it('detaches and deletes by point writes on constant (id, started_at) when the span reaches a compressed chunk', async () => {
+    it("detaches and deletes by point writes on each row's constant key and segment when the span reaches a compressed chunk", async () => {
       mockFetch = mockTautulliFetch([mergedRecord()], 1);
       global.fetch = mockFetch as typeof global.fetch;
       existingRoot();
@@ -2915,21 +2924,25 @@ describe('TautulliService.importHistory cutoff and safe updates', () => {
 
       const [, detach, , remove] = statements(execute);
       expect(detach?.sql).toBe(
-        'UPDATE sessions r SET reference_id = NULL WHERE r.id = $1::uuid AND r.started_at = $2::timestamptz AND r.server_id = $3::uuid AND r.started_at >= $4::timestamptz AND r.reference_id = ANY($5::uuid[])'
+        'UPDATE sessions r SET reference_id = NULL WHERE r.id = $1::uuid AND r.started_at = $2::timestamptz AND r.server_user_id = $3::uuid AND r.server_id = $4::uuid AND r.server_id = $5::uuid AND r.started_at >= $6::timestamptz AND r.reference_id = ANY($7::uuid[])'
       );
       expect(detach?.params).toEqual([
         'root-0',
         new Date(rootStarted * 1000).toISOString(),
+        SERVER_USER_ID,
+        SERVER_ID,
         SERVER_ID,
         new Date(rootStarted * 1000).toISOString(),
         ['absorbed-0'],
       ]);
       expect(remove?.sql).toBe(
-        "DELETE FROM sessions s WHERE s.id = $1::uuid AND s.started_at = $2::timestamptz AND s.server_id = $3::uuid AND s.started_at >= $4::timestamptz AND (s.session_key = 'tautulli-' || s.external_session_id) RETURNING s.started_at"
+        "DELETE FROM sessions s WHERE s.id = $1::uuid AND s.started_at = $2::timestamptz AND s.server_user_id = $3::uuid AND s.server_id = $4::uuid AND s.server_id = $5::uuid AND s.started_at >= $6::timestamptz AND (s.session_key = 'tautulli-' || s.external_session_id) RETURNING s.started_at"
       );
       expect(remove?.params).toEqual([
         'absorbed-0',
         absorbedStartedIso,
+        SERVER_USER_ID,
+        SERVER_ID,
         SERVER_ID,
         new Date(rootStarted * 1000).toISOString(),
       ]);

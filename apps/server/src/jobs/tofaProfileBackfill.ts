@@ -4,7 +4,10 @@ import { serverProfiles, sessions } from '../db/schema.js';
 import {
   getCompressedSessionChunkRanges,
   getSessionChunkRanges,
+  rangeReachesChunk,
+  sessionRowPoint,
   uncapDecompressionForTx,
+  type SessionRowPoint,
 } from '../db/timescale.js';
 import { CAPTURED_START_SLACK_MS } from '../services/import/serverHistory.js';
 import { historyServer, playsOf, watchHistoryPages } from '../services/import/tofaWatchHistory.js';
@@ -21,8 +24,12 @@ import { getServerUserIdsByExternalId } from './poller/database.js';
 export const MAX_POINT_UPDATES_PER_PROFILE_PASS = 40;
 
 /** started_at as Postgres text, microseconds intact */
-const UNLINKED = { id: sessions.id, startedAt: sql<string>`${sessions.startedAt}::text` };
-type UnlinkedPlay = { id: string; startedAt: string };
+const UNLINKED = {
+  id: sessions.id,
+  started_at: sql<string>`${sessions.startedAt}::text`,
+  server_user_id: sessions.serverUserId,
+  server_id: sessions.serverId,
+};
 
 /**
  * Links a server's plays stored without a profile to the profile that played them: by the
@@ -34,9 +41,9 @@ type UnlinkedPlay = { id: string; startedAt: string };
  *
  * A statement bounded by a time span decompresses every compressed batch of the server it
  * reaches, even with nothing to link. Where a span reaches a compressed chunk the plays are read
- * first and nothing is written when none links; up to MAX_POINT_UPDATES_PER_PROFILE_PASS plays then each
- * take a point update on constant (id, started_at) under the same predicate, which decompresses
- * only the batch holding the play.
+ * first and nothing is written when none links; up to MAX_POINT_UPDATES_PER_PROFILE_PASS plays
+ * then each take a point update on the play's constant key and segment under the same predicate,
+ * which decompresses only the batch holding the play.
  */
 export async function linkTofaPlayProfiles(
   serverId: string,
@@ -56,12 +63,8 @@ export async function linkTofaPlayProfiles(
   ]);
   if (!oldestUnlinked) return 0;
 
-  const pointOf = (play: UnlinkedPlay, where: SQL | undefined) =>
-    and(
-      eq(sessions.id, play.id),
-      sql`${sessions.startedAt} = ${play.startedAt}::timestamptz`,
-      where
-    );
+  const pointOf = (play: SessionRowPoint, where: SQL | undefined) =>
+    and(sessionRowPoint('sessions', play), where);
 
   let linked = 0;
   for await (const rows of watchHistoryPages(client)) {
@@ -97,9 +100,11 @@ export async function linkTofaPlayProfiles(
     }));
     const spanStart = Math.min(...starts) - CAPTURED_START_SLACK_MS;
     const spanEnd = newest + CAPTURED_START_SLACK_MS;
-    const reachesCompressed = compressed.some(
-      (chunk) => chunk.end.getTime() > spanStart && chunk.start.getTime() <= spanEnd
-    );
+    const reachesCompressed = rangeReachesChunk(compressed, {
+      start: new Date(spanStart),
+      end: new Date(spanEnd),
+      endInclusive: true,
+    });
     // Each play read goes with the first group whose predicate it meets, the group that writes it
     const read =
       reachesCompressed && groups.length > 0
@@ -163,7 +168,7 @@ export async function linkTofaPlayProfiles(
       ...(window ? [gte(sessions.startedAt, window.start), lt(sessions.startedAt, window.end)] : [])
     );
     const read =
-      window && compressed.some((chunk) => chunk.end > window.start && chunk.start < window.end)
+      window && rangeReachesChunk(compressed, window)
         ? await db
             .select(UNLINKED)
             .from(sessions)

@@ -25,7 +25,7 @@ import {
   listLinkingServers,
   runImportedHistoryLinkingWalk,
 } from '../../src/jobs/importedHistoryLinking.js';
-import { MAX_POINT_UPDATES_PER_PASS } from '../../src/jobs/sessionIdentityBackfill.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../../src/db/timescale.js';
 import {
   runImportedHistoryLinking,
   type MaintenanceJobData,

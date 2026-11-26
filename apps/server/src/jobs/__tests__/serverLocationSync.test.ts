@@ -6,7 +6,7 @@ vi.mock('../../db/client.js', () => ({ db: { execute: vi.fn(), transaction: vi.f
 import { db } from '../../db/client.js';
 import { renderSql } from '../../test/helpers.js';
 import { syncLocationBatch } from '../serverLocationSync.js';
-import { MAX_POINT_UPDATES_PER_PASS } from '../sessionIdentityBackfill.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../../db/timescale.js';
 import type { LocationRange } from '../../services/serverLocationRanges.js';
 
 const PLACED: LocationRange = {
@@ -40,6 +40,8 @@ const flat = (text: string) => text.replace(/\s+/g, ' ').trim();
 const localRow = (id: string, startedAt: string) => ({
   id,
   started_at: startedAt,
+  server_user_id: 'user-1',
+  server_id: 'server-1',
   ip_address: '192.168.1.5',
   is_local: true,
 });
@@ -147,10 +149,17 @@ describe('syncLocationBatch', () => {
     expect(db.transaction).not.toHaveBeenCalled();
   });
 
-  it('writes a batch over a compressed chunk by point updates on constant (id, started_at)', async () => {
+  it("writes a batch over a compressed chunk by point updates on each row's constant key and segment", async () => {
     const execute = mockTransaction([
       localRow('private', '2026-01-02 10:00:00.123456+00'),
-      { id: 'public', started_at: '2026-01-01 09:00:00+00', ip_address: '8.8.8.8', is_local: null },
+      {
+        id: 'public',
+        started_at: '2026-01-01 09:00:00+00',
+        server_user_id: 'user-2',
+        server_id: 'server-1',
+        ip_address: '8.8.8.8',
+        is_local: null,
+      },
     ]);
     const result = await syncLocationBatch(
       'server-1',
@@ -165,7 +174,7 @@ describe('syncLocationBatch', () => {
     });
     const place = rendered(execute, 1);
     expect(flat(place.sql)).toBe(
-      'UPDATE sessions SET is_local = true, geo_city = $1, geo_region = $2, geo_country = $3, geo_lat = $4::real, geo_lon = $5::real, geo_continent = NULL, geo_postal = NULL WHERE id = $6::uuid AND started_at = $7::timestamptz AND server_id = $8::uuid'
+      'UPDATE sessions s SET is_local = true, geo_city = $1, geo_region = $2, geo_country = $3, geo_lat = $4::real, geo_lon = $5::real, geo_continent = NULL, geo_postal = NULL WHERE s.id = $6::uuid AND s.started_at = $7::timestamptz AND s.server_user_id = $8::uuid AND s.server_id = $9::uuid'
     );
     expect(place.params).toEqual([
       'Chicago',
@@ -175,13 +184,14 @@ describe('syncLocationBatch', () => {
       -87.6298,
       'private',
       '2026-01-02 10:00:00.123456+00',
+      'user-1',
       'server-1',
     ]);
     const remote = rendered(execute, 2);
     expect(flat(remote.sql)).toBe(
-      'UPDATE sessions SET is_local = false WHERE id = $1::uuid AND started_at = $2::timestamptz AND server_id = $3::uuid'
+      'UPDATE sessions s SET is_local = false WHERE s.id = $1::uuid AND s.started_at = $2::timestamptz AND s.server_user_id = $3::uuid AND s.server_id = $4::uuid'
     );
-    expect(remote.params).toEqual(['public', '2026-01-01 09:00:00+00', 'server-1']);
+    expect(remote.params).toEqual(['public', '2026-01-01 09:00:00+00', 'user-2', 'server-1']);
     expect(execute).toHaveBeenCalledTimes(3);
   });
 

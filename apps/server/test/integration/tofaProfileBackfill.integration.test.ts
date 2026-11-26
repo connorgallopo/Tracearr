@@ -418,7 +418,7 @@ describe('backfill_tofa_profiles writes only what it links', { timeout: 120_000 
     const updates = statements.filter((text) => text.startsWith('update "sessions"'));
     expect(updates).toHaveLength(3);
     expect(updates[0]).toBe(
-      'update "sessions" set "profile_id" = $1 where ("sessions"."id" = $2 and "sessions"."started_at" = $3::timestamptz and (("sessions"."server_id" = $4 and "sessions"."started_at" >= $5 and "sessions"."started_at" <= $6 and "sessions"."external_session_id" in ($7)) and "sessions"."server_user_id" in ($8) and "sessions"."profile_id" is null))'
+      'update "sessions" set "profile_id" = $1 where (sessions.id = $2::uuid AND sessions.started_at = $3::timestamptz AND sessions.server_user_id = $4::uuid AND sessions.server_id = $5::uuid and (("sessions"."server_id" = $6 and "sessions"."started_at" >= $7 and "sessions"."started_at" <= $8 and "sessions"."external_session_id" in ($9)) and "sessions"."server_user_id" in ($10) and "sessions"."profile_id" is null))'
     );
   });
 
@@ -432,7 +432,7 @@ describe('backfill_tofa_profiles writes only what it links', { timeout: 120_000 
     const updates = statements.filter((text) => text.startsWith('update "sessions"'));
     expect(updates).toHaveLength(3);
     expect(updates[0]).toBe(
-      'update "sessions" set "profile_id" = "named_profile_id" from (select (array_agg("id"))[1] as "named_profile_id", "server_user_id", "name" from "server_profiles" where "server_profiles"."server_id" = $1 group by "server_profiles"."server_user_id", "server_profiles"."name" having count(*) = 1) "unique_names" where ("sessions"."id" = $2 and "sessions"."started_at" = $3::timestamptz and ("sessions"."server_id" = $4 and "sessions"."profile_id" is null and "sessions"."profile_name" is not null and "sessions"."server_user_id" = "unique_names"."server_user_id" and "sessions"."profile_name" = "unique_names"."name" and "sessions"."started_at" >= $5 and "sessions"."started_at" < $6))'
+      'update "sessions" set "profile_id" = "named_profile_id" from (select (array_agg("id"))[1] as "named_profile_id", "server_user_id", "name" from "server_profiles" where "server_profiles"."server_id" = $1 group by "server_profiles"."server_user_id", "server_profiles"."name" having count(*) = 1) "unique_names" where (sessions.id = $2::uuid AND sessions.started_at = $3::timestamptz AND sessions.server_user_id = $4::uuid AND sessions.server_id = $5::uuid and ("sessions"."server_id" = $6 and "sessions"."profile_id" is null and "sessions"."profile_name" is not null and "sessions"."server_user_id" = "unique_names"."server_user_id" and "sessions"."profile_name" = "unique_names"."name" and "sessions"."started_at" >= $7 and "sessions"."started_at" < $8))'
     );
   });
 

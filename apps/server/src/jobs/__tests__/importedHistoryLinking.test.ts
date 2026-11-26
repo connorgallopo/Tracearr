@@ -13,12 +13,19 @@ vi.mock('../../db/client.js', () => ({
   db: { transaction: vi.fn(), execute: vi.fn(), select: vi.fn() },
 }));
 
-vi.mock('../../db/timescale.js', () => ({
-  uncapDecompressionForTx: vi.fn(),
-  getCompressedSessionChunkRanges: vi.fn(),
-  getSessionChunkRanges: vi.fn(),
-  getTimescaleStatus: vi.fn(),
-}));
+vi.mock('../../db/timescale.js', async (importOriginal) => {
+  const { MAX_POINT_UPDATES_PER_PASS, rangeReachesChunk, sessionRowPoint } =
+    await importOriginal<typeof TimescaleModule>();
+  return {
+    MAX_POINT_UPDATES_PER_PASS,
+    rangeReachesChunk,
+    sessionRowPoint,
+    uncapDecompressionForTx: vi.fn(),
+    getCompressedSessionChunkRanges: vi.fn(),
+    getSessionChunkRanges: vi.fn(),
+    getTimescaleStatus: vi.fn(),
+  };
+});
 
 vi.mock('../sessionWalk.js', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../sessionWalk.js')>()),
@@ -59,7 +66,7 @@ vi.mock('../../services/import/trackingCutoff.js', () => ({
 }));
 
 import { db } from '../../db/client.js';
-import { getCompressedSessionChunkRanges } from '../../db/timescale.js';
+import { getCompressedSessionChunkRanges, MAX_POINT_UPDATES_PER_PASS } from '../../db/timescale.js';
 import { getRedis } from '../../lib/redisShared.js';
 import {
   getImportedHistoryLinkState,
@@ -74,9 +81,9 @@ import {
 } from '../importedHistoryLinking.js';
 import { hasPendingLibrarySync } from '../librarySyncQueue.js';
 import { batchResolveMediaByPlexGuid } from '../poller/database.js';
-import { MAX_POINT_UPDATES_PER_PASS } from '../sessionIdentityBackfill.js';
 import { sessionWalkWindows } from '../sessionWalk.js';
 import type { SQL } from 'drizzle-orm';
+import type * as TimescaleModule from '../../db/timescale.js';
 
 const SERVER_A = '00000000-0000-4000-8000-00000000000a';
 const SERVER_B = '00000000-0000-4000-8000-00000000000b';
@@ -705,6 +712,8 @@ describe('runImportedHistoryLinkingWalk writes over a compressed chunk', () => {
   const episodeRow = (id: string) => ({
     id,
     started_at: '2026-02-10 12:00:00+00',
+    server_user_id: 'user-1',
+    server_id: SERVER_A,
     rating_key: '10',
     external_session_id: 'ref-10',
     media_type: 'episode',
@@ -759,12 +768,13 @@ describe('runImportedHistoryLinkingWalk writes over a compressed chunk', () => {
     expect(update?.sql).toContain(
       'SET media_id = $1::uuid, show_media_id = $2::uuid, imdb_id = COALESCE($3::text, s.imdb_id), ' +
         'tmdb_id = COALESCE($4::int, s.tmdb_id), tvdb_id = COALESCE($5::int, s.tvdb_id) ' +
-        'WHERE s.id = $6::uuid AND s.started_at = $7::timestamptz AND s.rating_key = $8::text ' +
-        'AND s.external_session_id = $9::text AND s.server_id = $10::uuid ' +
-        'AND s.started_at >= $11::timestamptz AND s.started_at < $12::timestamptz ' +
-        'AND s.started_at < $13::timestamptz AND s.media_type = $14::text ' +
+        'WHERE s.id = $6::uuid AND s.started_at = $7::timestamptz ' +
+        'AND s.server_user_id = $8::uuid AND s.server_id = $9::uuid AND s.rating_key = $10::text ' +
+        'AND s.external_session_id = $11::text AND s.server_id = $12::uuid ' +
+        'AND s.started_at >= $13::timestamptz AND s.started_at < $14::timestamptz ' +
+        'AND s.started_at < $15::timestamptz AND s.media_type = $16::text ' +
         "AND s.media_type IN ('movie', 'episode') " +
-        'AND (s.rating_key, s.external_session_id) IN (SELECT * FROM unnest($15::text[], $16::text[])) ' +
+        'AND (s.rating_key, s.external_session_id) IN (SELECT * FROM unnest($17::text[], $18::text[])) ' +
         'AND s.media_id IS NULL AND s.rating_key IS NOT NULL AND s.external_session_id IS NOT NULL ' +
         'RETURNING s.started_at'
     );
@@ -776,6 +786,8 @@ describe('runImportedHistoryLinkingWalk writes over a compressed chunk', () => {
       81189,
       'session-1',
       '2026-02-10 12:00:00+00',
+      'user-1',
+      SERVER_A,
       '10',
       'ref-10',
       SERVER_A,

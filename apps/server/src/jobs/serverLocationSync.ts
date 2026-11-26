@@ -4,8 +4,12 @@ import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
 import {
   getCompressedSessionChunkRanges,
+  MAX_POINT_UPDATES_PER_PASS,
+  rangeReachesChunk,
+  sessionRowPoint,
   uncapDecompressionForTx,
   type ChunkTimeRange,
+  type SessionRowPoint,
 } from '../db/timescale.js';
 import { geoipService } from '../services/geoip.js';
 import { locationRanges, type LocationRange } from '../services/serverLocationRanges.js';
@@ -18,7 +22,6 @@ import {
   ts,
   type BackfillWindow,
 } from './sessionWalk.js';
-import { MAX_POINT_UPDATES_PER_PASS } from './sessionIdentityBackfill.js';
 
 export const LOCATION_SYNC_BATCH_SIZE = 1000;
 
@@ -26,10 +29,7 @@ export const LOCATION_SYNC_BATCH_SIZE = 1000;
 const TAIL_RECHECK_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-interface CandidateRow {
-  id: string;
-  /** Postgres text, microseconds intact */
-  started_at: string;
+interface CandidateRow extends SessionRowPoint {
   ip_address: string;
   is_local: boolean | null;
 }
@@ -51,7 +51,7 @@ function earlierOf(a: Date | null, b: Date | null): Date | null {
  * nothing to change opens no transaction. The rows are written by two statements bounded by the
  * batch's span, which decompress every compressed batch of the server that span reaches; up to
  * MAX_POINT_UPDATES_PER_PASS rows over a compressed chunk instead each take a point update on
- * constant (id, started_at), which decompresses only the batch holding the row.
+ * the row's constant key and segment, which decompresses only the batch holding the row.
  */
 export async function syncLocationBatch(
   serverId: string,
@@ -84,7 +84,7 @@ export async function syncLocationBatch(
   );
 
   const selected = await db.execute(sql`
-    SELECT s.id, s.started_at, s.ip_address, s.is_local
+    SELECT s.id, s.started_at, s.server_user_id, s.server_id, s.ip_address, s.is_local
     FROM sessions s
     WHERE ${bounds}
       AND ${localSessionSql('s')}
@@ -127,19 +127,19 @@ export async function syncLocationBatch(
   const publicSet = sql`is_local = false`;
   const pointUpdates =
     rows.length <= MAX_POINT_UPDATES_PER_PASS &&
-    compressed.some(
-      (chunk) =>
-        chunk.end > new Date(oldest.started_at) && chunk.start <= new Date(newest.started_at)
-    );
+    rangeReachesChunk(compressed, {
+      start: new Date(oldest.started_at),
+      end: new Date(newest.started_at),
+      endInclusive: true,
+    });
 
   await db.transaction(async (tx) => {
     await uncapDecompressionForTx(tx);
     if (pointUpdates) {
       const point = (set: SQL, row: CandidateRow) =>
         tx.execute(sql`
-          UPDATE sessions SET ${set}
-          WHERE id = ${row.id}::uuid AND started_at = ${row.started_at}::timestamptz
-            AND server_id = ${serverId}::uuid
+          UPDATE sessions s SET ${set}
+          WHERE ${sessionRowPoint('s', row)}
         `);
       for (const row of placeRows) await point(placeSet, row);
       for (const row of publicRows) await point(publicSet, row);

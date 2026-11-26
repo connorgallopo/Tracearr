@@ -3,7 +3,11 @@ import { assertNever, type ServerType } from '@tracearr/shared';
 import { countedSessionSql } from '../db/sessions/rules.js';
 import { db } from '../db/client.js';
 import { servers } from '../db/schema.js';
-import { getSessionChunkRanges, uncapDecompressionForTx } from '../db/timescale.js';
+import {
+  getSessionChunkRanges,
+  sessionRowPoint,
+  uncapDecompressionForTx,
+} from '../db/timescale.js';
 import { getServerTrackingStart } from '../services/import/trackingCutoff.js';
 import {
   byInstant,
@@ -279,8 +283,8 @@ async function importsSharingChain(
  * guard on which rows may go. A root_id must never be a doomed row's own id.
  * Runs inside the caller's transaction, after uncapDecompressionForTx. One
  * DELETE decompresses every compressed batch its bounds reach; with
- * `pointDeletes` each row takes its own DELETE on constant (id, started_at),
- * which decompresses only the batch holding the row.
+ * `pointDeletes` each row takes its own DELETE on its constant key and
+ * segment, which decompresses only the batch holding the row.
  */
 export async function deleteSessionsRepointingChildren(
   tx: { execute: (query: SQL) => Promise<{ rows: unknown[] }> },
@@ -312,7 +316,7 @@ export async function deleteSessionsRepointingChildren(
     for (const p of doomed) {
       const removed = await tx.execute(sql`
         DELETE FROM sessions s
-        WHERE s.id = ${p.id}::uuid AND s.started_at = ${p.started_at}::timestamptz
+        WHERE ${sessionRowPoint('s', { ...p, server_id: serverId })}
           AND ${bounds}
         RETURNING s.started_at
       `);

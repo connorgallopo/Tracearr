@@ -14,7 +14,7 @@ import {
   createTestUser,
 } from '@tracearr/test-utils/factories';
 import { db, recreatePool } from '../../src/db/client.js';
-import { MAX_POINT_UPDATES_PER_PASS } from '../../src/jobs/sessionIdentityBackfill.js';
+import { MAX_POINT_UPDATES_PER_PASS } from '../../src/db/timescale.js';
 import { TautulliService } from '../../src/services/tautulli.js';
 import { compressSessionChunks } from '../../src/test/compressChunks.js';
 

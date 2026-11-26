@@ -1177,33 +1177,39 @@ describe('session identity backfill', () => {
     expect(await mediaRowsTitled('Harbor Gone')).toBe(0);
   });
 
-  it('the title pass does not relink a play the repair could not place', async () => {
-    const server = await createTestServer({ type: 'plex' });
-    const user = await createTestUser();
-    const su = await createTestServerUser({ userId: user.id, serverId: server.id });
-    const imported = (ratingKey: string) =>
-      createTestSession({
-        serverId: server.id,
-        serverUserId: su.id,
-        externalSessionId: `import-${ratingKey}`,
-        ratingKey,
-        mediaType: 'movie',
-        mediaTitle: 'Harbor Gone',
-        year: 2001,
-        tmdbId: 61_501,
-        startedAt: daysAgo(2),
-      });
-    const unplaced = await imported('unplaced-key');
-    await imported('placed-key');
-    await db.execute(sql`
+  it.each([
+    ['this', IMPORTED_LINK_REPAIR_VERSION],
+    ['an older', IMPORTED_LINK_REPAIR_VERSION - 1],
+  ])(
+    'the title pass does not relink a play %s repair version could not place',
+    async (_, version) => {
+      const server = await createTestServer({ type: 'plex' });
+      const user = await createTestUser();
+      const su = await createTestServerUser({ userId: user.id, serverId: server.id });
+      const imported = (ratingKey: string) =>
+        createTestSession({
+          serverId: server.id,
+          serverUserId: su.id,
+          externalSessionId: `import-${ratingKey}`,
+          ratingKey,
+          mediaType: 'movie',
+          mediaTitle: 'Harbor Gone',
+          year: 2001,
+          tmdbId: 61_501,
+          startedAt: daysAgo(2),
+        });
+      const unplaced = await imported('unplaced-key');
+      await imported('placed-key');
+      await db.execute(sql`
       INSERT INTO session_link_repairs (session_id, started_at, repair_version, server_id, clause)
-      SELECT id, started_at, ${IMPORTED_LINK_REPAIR_VERSION}, server_id, 'numbers'
+      SELECT id, started_at, ${version}, server_id, 'numbers'
       FROM sessions WHERE id = ${unplaced.id}::uuid
     `);
 
-    await backfillSessionIdentityBatch(1000);
+      await backfillSessionIdentityBatch(1000);
 
-    expect((await linkOf('unplaced-key')).media_id).toBeNull();
-    expect((await linkOf('placed-key')).media_id).not.toBeNull();
-  });
+      expect((await linkOf('unplaced-key')).media_id).toBeNull();
+      expect((await linkOf('placed-key')).media_id).not.toBeNull();
+    }
+  );
 });

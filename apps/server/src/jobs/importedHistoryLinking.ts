@@ -5,7 +5,11 @@ import { servers } from '../db/schema.js';
 import {
   type ChunkTimeRange,
   getCompressedSessionChunkRanges,
+  MAX_POINT_UPDATES_PER_PASS,
+  rangeReachesChunk,
+  sessionRowPoint,
   uncapDecompressionForTx,
+  type SessionRowPoint,
 } from '../db/timescale.js';
 import { getRedis } from '../lib/redisShared.js';
 import { getServerTrackingStart } from '../services/import/trackingCutoff.js';
@@ -18,7 +22,6 @@ import {
 import { TautulliService } from '../services/tautulli.js';
 import { normalizePlexGuid } from '../utils/plexGuid.js';
 import { batchResolveMediaByPlexGuid, CONTAINER_MEDIA_TYPES_SQL } from './poller/database.js';
-import { MAX_POINT_UPDATES_PER_PASS } from './sessionIdentityBackfill.js';
 import {
   byInstant,
   drainWindowsWithBisection,
@@ -112,9 +115,7 @@ function orphan(alias: string): SQL {
   );
 }
 
-interface PickedLink {
-  id: string;
-  started_at: string;
+interface PickedLink extends SessionRowPoint {
   rating_key: string;
   external_session_id: string;
   media_type: 'movie' | 'episode';
@@ -133,7 +134,7 @@ interface PickedLink {
  * or more than MAX_POINT_UPDATES_PER_PASS rows, takes one statement over the
  * picked rows, which decompresses every compressed batch the window bounds
  * reach. Fewer rows over a compressed chunk each take a point update on
- * constant (id, started_at), which decompresses only the batch holding the row.
+ * the row's constant key and segment, which decompresses only the batch holding the row.
  */
 async function linkPicked(
   serverId: string,
@@ -149,7 +150,7 @@ async function linkPicked(
   if (picked.length === 0) return { count: 0, oldest: null };
   const pointUpdates =
     picked.length <= MAX_POINT_UPDATES_PER_PASS &&
-    compressed.some((chunk) => !window || (chunk.end > window.start && chunk.start < window.end));
+    rangeReachesChunk(compressed, { start: window?.start, end: window?.end });
   const bounds = sessionBounds('s', serverId, cutoff, window, before);
   const starts = await db.transaction(async (tx) => {
     await uncapDecompressionForTx(tx);
@@ -191,7 +192,7 @@ async function linkPicked(
           imdb_id = COALESCE(${p.imdb_id}::text, s.imdb_id),
           tmdb_id = COALESCE(${p.tmdb_id}::int, s.tmdb_id),
           tvdb_id = COALESCE(${p.tvdb_id}::int, s.tvdb_id)
-        WHERE s.id = ${p.id}::uuid AND s.started_at = ${p.started_at}::timestamptz
+        WHERE ${sessionRowPoint('s', p)}
           AND s.rating_key = ${p.rating_key}::text
           AND s.external_session_id = ${p.external_session_id}::text
           AND ${bounds}
@@ -243,7 +244,8 @@ async function linkOrphanSessionsBatch(
     compressed,
     before,
     sql`
-      SELECT o.id, o.started_at, o.rating_key, o.external_session_id, l.media_type, l.media_id,
+      SELECT o.id, o.started_at, o.server_user_id, o.server_id, o.rating_key, o.external_session_id,
+        l.media_type, l.media_id,
         CASE WHEN l.media_type = 'episode' THEN l.show_media_id END AS show_media_id,
         l.imdb_id, l.tmdb_id, l.tvdb_id
       FROM sessions o
@@ -303,8 +305,8 @@ async function linkOrphanMoviesByProviderIdBatch(
     before,
     sql`
       WITH orphan AS (
-        SELECT o.id, o.started_at, o.rating_key, o.external_session_id,
-          o.imdb_id, o.tmdb_id, o.tvdb_id
+        SELECT o.id, o.started_at, o.server_user_id, o.server_id, o.rating_key,
+          o.external_session_id, o.imdb_id, o.tmdb_id, o.tvdb_id
         FROM sessions o
         WHERE ${sessionBounds('o', serverId, cutoff, window, before)}
           AND o.media_type = 'movie'
@@ -329,7 +331,7 @@ async function linkOrphanMoviesByProviderIdBatch(
         SELECT tmdb_id, min(id::text)::uuid AS media_id, count(*) AS matches
         FROM canonical WHERE tmdb_id IS NOT NULL GROUP BY tmdb_id
       )
-      SELECT o.id, o.started_at, o.rating_key, o.external_session_id,
+      SELECT o.id, o.started_at, o.server_user_id, o.server_id, o.rating_key, o.external_session_id,
         'movie' AS media_type, c.id AS media_id,
         NULL::uuid AS show_media_id, c.imdb_id, c.tmdb_id, c.tvdb_id
       FROM orphan o
