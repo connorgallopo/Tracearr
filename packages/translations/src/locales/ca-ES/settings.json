@@ -425,7 +425,7 @@
     "deletesDataDesc": "Les files eliminades no es poden restaurar. Feu abans una còpia de seguretat si no n'esteu segur.",
     "automatic": "Automàtica",
     "startJob": "Inicia la tasca",
-    "repairHeld": ""
+    "repairHeld": "Reparació retinguda a {{server}}: {{count}} reproduccions importades (el {{percent}}% de les seves reproduccions importades) semblen enllaçades amb la sèrie o la pel·lícula equivocada, més de les que Tracearr repara sense preguntar. Executeu la tasca per reparar-les."
   },
   "memberLogin": {
     "serverActivity": "Mostra als membres l'activitat anònima del servidor",
