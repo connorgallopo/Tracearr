@@ -1,8 +1,13 @@
 name: Renovate
 
 on:
+  # GitHub drops most top-of-hour scheduled runs. Renovate merges only when it runs,
+  # so a green Renovate PR also triggers a run instead of waiting for the next cron.
   schedule:
-    - cron: '0 * * * *'
+    - cron: '17 * * * *'
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
   workflow_dispatch:
     inputs:
       logLevel:
@@ -29,6 +34,11 @@ permissions:
 jobs:
   renovate:
     name: Renovate
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_repository.full_name == github.repository &&
+      startsWith(github.event.workflow_run.head_branch, 'renovate/'))
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
