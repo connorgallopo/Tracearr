@@ -1,7 +1,29 @@
 {
   "version": "3.3.0",
-  "date": "2026-11-25",
+  "date": "2026-11-27",
+  "headline": "Profiles, a repair for imported Plex history, and fewer disk writes",
   "upgradeWarning": "Back up before upgrading. tofa requests are stored differently from this release on, so going back to 3.2 needs that backup",
+  "highlights": [
+    {
+      "title": "Profiles",
+      "body": "tofa and Silo accounts can have several profiles. Tracearr now records which profile played each stream and download, shows it as a small badge on the account avatar wherever plays appear, splits plays and watch time by profile on the user page, and lets History filter by profile. The main profile stays unlabeled. tofa plays from before updating pick up their profile after the first user sync.",
+      "docs": "https://docs.tracearr.com/faq#what-are-profiles"
+    },
+    {
+      "title": "Imported Plex history",
+      "body": "After a Plex rebuild reused item keys, imported plays could show under another show or movie. Imports now take a library item by key only when the play and the item agree, and a repair runs once after updating to put existing plays back. Where many of a server's imported plays look mislinked, it holds back and asks: run Repair Imported Plex Links in Settings → Data → Jobs.",
+      "docs": "https://github.com/connorgallopo/Tracearr/issues/1486"
+    },
+    {
+      "title": "Silo",
+      "body": "Tracearr monitors Silo servers: live sessions, library, history import, downloads, CPU and memory, and Silo's own requests. Add one with a code approved in Silo or an API key; members sign in with their Silo account. Silo is pre-release with no tagged releases and its API still changes, so a Silo update can break support until Tracearr catches up.",
+      "docs": "https://docs.tracearr.com/getting-started/first-server#silo"
+    },
+    {
+      "title": "Fewer disk writes",
+      "body": "Background jobs that walk history, such as identity matching, imported history linking, location sync and import cleanup, no longer decompress and rewrite old history they don't change. On a large history that means far less writing to disk."
+    }
+  ],
   "changes": [
     {
       "type": "new",
@@ -13,7 +35,15 @@
     },
     {
       "type": "new",
+      "text": "the user page splits plays and watch time by profile when the account has played on more than one"
+    },
+    {
+      "type": "new",
       "text": "stream notifications, the public API, Downloads and media History also show a profile that isn't the account's main one"
+    },
+    {
+      "type": "new",
+      "text": "plays on tofa from before updating pick up their profile from tofa's watch history after the first user sync"
     },
     {
       "type": "new",
@@ -40,6 +70,10 @@
       "type": "fix",
       "text": "after a Plex rebuild, imported plays no longer show under another show, and updating repairs the ones that did",
       "refs": ["#1486"]
+    },
+    {
+      "type": "note",
+      "text": "the Plex link repair holds back where many imported plays look mislinked; run it in Settings → Data → Jobs"
     },
     {
       "type": "note",
