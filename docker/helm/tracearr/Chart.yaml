@@ -2,8 +2,8 @@ apiVersion: v2
 name: tracearr
 description: Media server monitoring for Plex, Jellyfin, Emby, tofa, and Silo
 type: application
-version: 3.2.1
-appVersion: "3.2.1"
+version: 3.3.0
+appVersion: "3.3.0"
 home: https://github.com/connorgallopo/Tracearr
 sources:
   - https://github.com/connorgallopo/Tracearr
