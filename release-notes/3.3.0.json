@@ -1,6 +1,6 @@
 {
   "version": "3.3.0",
-  "date": "2026-11-27",
+  "date": "2026-11-28",
   "headline": "Profiles, a repair for imported Plex history, and fewer disk writes",
   "upgradeWarning": "Back up before upgrading. tofa requests are stored differently from this release on, so going back to 3.2 needs that backup",
   "highlights": [
